@@ -45,7 +45,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     // The Scenarios are defined https://tools.hmcts.net/confluence/display/SSCS/ESA+DN+template+content+-+judges+input
     @Test
     public void scenario1_shouldGeneratePdfWithExpectedText() throws IOException {
-        String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList("same", "standardRate", "preparingFood1e", "takingNutrition2d", "same", "standardRate", "movingAround", "movingAround12a"));
+        String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList("same", "standardRate", "preparingFood1e", "takingNutrition2d", "same", "standardRate", "movingAround", "movingAround12a"));
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
@@ -215,9 +215,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void notConsideredNoAward_shouldGeneratePdfWithExpectedText(String comparedToDwpMobility, boolean allowed, boolean setAside, boolean indefinite) throws IOException {
         String json;
         if (indefinite) {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a", ""));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a", ""));
         } else {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a"));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a"));
         }
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -249,9 +249,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void notConsideredStandardRate_shouldGeneratePdfWithExpectedText(String comparedToDwpMobility, boolean allowed, boolean setAside, boolean indefinite) throws IOException {
         String json;
         if (indefinite) {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12c", ""));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12c", ""));
         } else {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12c"));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12c"));
         }
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -284,9 +284,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void notConsideredEnhancedRate_shouldGeneratePdfWithExpectedText(String comparedToDwpMobility, boolean allowed, boolean setAside, boolean indefinite) throws IOException {
         String json;
         if (indefinite) {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "enhancedRate", "movingAround", "movingAround12e", ""));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "enhancedRate", "movingAround", "movingAround12e", ""));
         } else {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "enhancedRate", "movingAround", "movingAround12e"));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "enhancedRate", "movingAround", "movingAround12e"));
         }
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -303,7 +303,11 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                 assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
             }
             assertThat(pdfTextWithoutNewLines, containsString("3. Only the mobility component was in issue on this appeal and the daily living component was not considered. "));
-            assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs is entitled to the mobility component at the enhanced rate from 17/12/2020 for an indefinite period."));
+            if (indefinite) {
+                assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs is entitled to the mobility component at the enhanced rate from 17/12/2020 for an indefinite period."));
+            } else {
+                assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs is entitled to the mobility component at the enhanced rate from 17/12/2020 to 17/12/2021."));
+            }
             assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is severely limited in their ability to mobilise. They score 12 points.They satisfy the following descriptors:"));
             assertThat(pdfTextWithoutNewLines, containsString("12. Moving around e."));
             assertThat(pdfTextWithoutNewLines, containsString("12 points"));
@@ -320,9 +324,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void noAwardNotConsidered_shouldGeneratePdfWithExpectedText(String comparedToDwpDailyLiving, boolean allowed, boolean setAside, boolean indefinite) throws IOException {
         String json;
         if (indefinite) {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "\"pipWriteFinalDecisionComparedToDWPMobilityQuestion\": \"COMPARED_TO_DWP_MOBILITY\",", "MOBILITY_RATE", "\"pipWriteFinalDecisionMobilityActivitiesQuestion\" : [\"MOBILITY_ACTIVITIES_ANSWER\"],", "\"pipWriteFinalDecisionMovingAroundQuestion\" : \"MOVING_AROUND_ANSWER\",", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "noAward", "preparingFood1d", "takingNutrition2d", "", "notConsidered", "", "", ""));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "\"pipWriteFinalDecisionComparedToDWPMobilityQuestion\": \"COMPARED_TO_DWP_MOBILITY\",", "MOBILITY_RATE", "\"pipWriteFinalDecisionMobilityActivitiesQuestion\" : [\"MOBILITY_ACTIVITIES_ANSWER\"],", "\"pipWriteFinalDecisionMovingAroundQuestion\" : \"MOVING_AROUND_ANSWER\",", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "noAward", "preparingFood1d", "takingNutrition2d", "", "notConsidered", "", "", ""));
         } else {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "\"pipWriteFinalDecisionComparedToDWPMobilityQuestion\": \"COMPARED_TO_DWP_MOBILITY\",", "MOBILITY_RATE", "\"pipWriteFinalDecisionMobilityActivitiesQuestion\" : [\"MOBILITY_ACTIVITIES_ANSWER\"],", "\"pipWriteFinalDecisionMovingAroundQuestion\" : \"MOVING_AROUND_ANSWER\","), Arrays.asList(comparedToDwpDailyLiving, "noAward", "preparingFood1d", "takingNutrition2d", "", "notConsidered", "", ""));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "\"pipWriteFinalDecisionComparedToDWPMobilityQuestion\": \"COMPARED_TO_DWP_MOBILITY\",", "MOBILITY_RATE", "\"pipWriteFinalDecisionMobilityActivitiesQuestion\" : [\"MOBILITY_ACTIVITIES_ANSWER\"],", "\"pipWriteFinalDecisionMovingAroundQuestion\" : \"MOVING_AROUND_ANSWER\","), Arrays.asList(comparedToDwpDailyLiving, "noAward", "preparingFood1d", "takingNutrition2d", "", "notConsidered", "", ""));
         }
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -356,9 +360,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void noAwardNoAward_shouldGeneratePdfWithExpectedText(String comparedToDwpDailyLiving, String comparedToDwpMobility, boolean allowed, boolean setAside, boolean indefinite) throws IOException {
         String json;
         if (indefinite) {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "noAward", "preparingFood1d", "takingNutrition2d", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a", ""));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "noAward", "preparingFood1d", "takingNutrition2d", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a", ""));
         } else {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList(comparedToDwpDailyLiving, "noAward", "preparingFood1d", "takingNutrition2d", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a"));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList(comparedToDwpDailyLiving, "noAward", "preparingFood1d", "takingNutrition2d", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a"));
         }
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -394,9 +398,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void noAwardStandardRate_shouldGeneratePdfWithExpectedText(String comparedToDwpDailyLiving, String comparedToDwpMobility, boolean allowed, boolean setAside, boolean indefinite) throws IOException {
         String json;
         if (indefinite) {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "noAward", "preparingFood1d", "takingNutrition2d", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12c", ""));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "noAward", "preparingFood1d", "takingNutrition2d", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12c", ""));
         } else {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList(comparedToDwpDailyLiving, "noAward", "preparingFood1d", "takingNutrition2d", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12c"));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList(comparedToDwpDailyLiving, "noAward", "preparingFood1d", "takingNutrition2d", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12c"));
         }
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -416,7 +420,11 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("1. Preparing food d. Needs prompting to be able to either prepare or cook a simple meal. 2 points"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Taking nutrition d. Needs prompting to be able to take nutrition. 4 points"));
             assertThat(pdfTextWithoutNewLines, containsString("6 points"));
-            assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs is entitled to the mobility component at the standard rate from 17/12/2020 for an indefinite period."));
+            if (indefinite) {
+                assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs is entitled to the mobility component at the standard rate from 17/12/2020 for an indefinite period."));
+            } else {
+                assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs is entitled to the mobility component at the standard rate from 17/12/2020 to 17/12/2021."));
+            }
             assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is limited in their ability to mobilise. They score 8 points.They satisfy the following descriptors:"));
             assertThat(pdfTextWithoutNewLines, containsString("12. Moving around c."));
             assertThat(pdfTextWithoutNewLines, containsString("8 points"));
@@ -433,9 +441,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void noAwardEnhancedRate_shouldGeneratePdfWithExpectedText(String comparedToDwpDailyLiving, String comparedToDwpMobility, boolean allowed, boolean setAside, boolean indefinite) throws IOException {
         String json;
         if (indefinite) {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "noAward", "preparingFood1d", "takingNutrition2d", comparedToDwpMobility, "enhancedRate", "movingAround", "movingAround12e", ""));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "noAward", "preparingFood1d", "takingNutrition2d", comparedToDwpMobility, "enhancedRate", "movingAround", "movingAround12e", ""));
         } else {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList(comparedToDwpDailyLiving, "noAward", "preparingFood1d", "takingNutrition2d", comparedToDwpMobility, "enhancedRate", "movingAround", "movingAround12e"));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList(comparedToDwpDailyLiving, "noAward", "preparingFood1d", "takingNutrition2d", comparedToDwpMobility, "enhancedRate", "movingAround", "movingAround12e"));
         }
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -455,7 +463,11 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("1. Preparing food d. Needs prompting to be able to either prepare or cook a simple meal. 2 points"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Taking nutrition d. Needs prompting to be able to take nutrition. 4 points"));
             assertThat(pdfTextWithoutNewLines, containsString("6 points"));
-            assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs is entitled to the mobility component at the enhanced rate from 17/12/2020 for an indefinite period."));
+            if (indefinite) {
+                assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs is entitled to the mobility component at the enhanced rate from 17/12/2020 for an indefinite period."));
+            } else {
+                assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs is entitled to the mobility component at the enhanced rate from 17/12/2020 to 17/12/2021."));
+            }
             assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is severely limited in their ability to mobilise. They score 12 points.They satisfy the following descriptors:"));
             assertThat(pdfTextWithoutNewLines, containsString("12. Moving around e."));
             assertThat(pdfTextWithoutNewLines, containsString("12 points"));
@@ -473,9 +485,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void standardRateNotConsidered_shouldGeneratePdfWithExpectedText(String comparedToDwpDailyLiving, boolean allowed, boolean setAside, boolean indefinite) throws IOException {
         String json;
         if (indefinite) {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "\"pipWriteFinalDecisionComparedToDWPMobilityQuestion\": \"COMPARED_TO_DWP_MOBILITY\",", "MOBILITY_RATE", "\"pipWriteFinalDecisionMobilityActivitiesQuestion\" : [\"MOBILITY_ACTIVITIES_ANSWER\"],", "\"pipWriteFinalDecisionMovingAroundQuestion\" : \"MOVING_AROUND_ANSWER\",", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "standardRate", "preparingFood1e", "takingNutrition2d", "", "notConsidered", "", "", ""));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "\"pipWriteFinalDecisionComparedToDWPMobilityQuestion\": \"COMPARED_TO_DWP_MOBILITY\",", "MOBILITY_RATE", "\"pipWriteFinalDecisionMobilityActivitiesQuestion\" : [\"MOBILITY_ACTIVITIES_ANSWER\"],", "\"pipWriteFinalDecisionMovingAroundQuestion\" : \"MOVING_AROUND_ANSWER\",", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "standardRate", "preparingFood1e", "takingNutrition2d", "", "notConsidered", "", "", ""));
         } else {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "\"pipWriteFinalDecisionComparedToDWPMobilityQuestion\": \"COMPARED_TO_DWP_MOBILITY\",", "MOBILITY_RATE", "\"pipWriteFinalDecisionMobilityActivitiesQuestion\" : [\"MOBILITY_ACTIVITIES_ANSWER\"],", "\"pipWriteFinalDecisionMovingAroundQuestion\" : \"MOVING_AROUND_ANSWER\","), Arrays.asList(comparedToDwpDailyLiving, "standardRate", "preparingFood1e", "takingNutrition2d", "", "notConsidered", "", ""));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "\"pipWriteFinalDecisionComparedToDWPMobilityQuestion\": \"COMPARED_TO_DWP_MOBILITY\",", "MOBILITY_RATE", "\"pipWriteFinalDecisionMobilityActivitiesQuestion\" : [\"MOBILITY_ACTIVITIES_ANSWER\"],", "\"pipWriteFinalDecisionMovingAroundQuestion\" : \"MOVING_AROUND_ANSWER\","), Arrays.asList(comparedToDwpDailyLiving, "standardRate", "preparingFood1e", "takingNutrition2d", "", "notConsidered", "", ""));
         }
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -491,7 +503,11 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             } else {
                 assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
             }
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 for an indefinite period."));
+            if (indefinite) {
+                assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 for an indefinite period."));
+            } else {
+                assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 to 17/12/2021."));
+            }
             assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs has limited ability to carry out the activities of daily living set out below. They score 8 points. They satisfy the following descriptors:"));
             assertThat(pdfTextWithoutNewLines, containsString("1. Preparing food e. Needs supervision or assistance to either prepare or cook a simple meal. 4 points"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Taking nutrition d. Needs prompting to be able to take nutrition. 4 points"));
@@ -510,9 +526,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void standardRateNoAward_shouldGeneratePdfWithExpectedText(String comparedToDwpMobility, String comparedToDwpDailyLiving, boolean allowed, boolean setAside, boolean indefinite) throws IOException {
         String json;
         if (indefinite) {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "standardRate", "preparingFood1e", "takingNutrition2d", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a", ""));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "standardRate", "preparingFood1e", "takingNutrition2d", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a", ""));
         } else {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList(comparedToDwpDailyLiving, "standardRate", "preparingFood1e", "takingNutrition2d", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a"));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList(comparedToDwpDailyLiving, "standardRate", "preparingFood1e", "takingNutrition2d", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a"));
         }
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -528,7 +544,11 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             } else {
                 assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
             }
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 for an indefinite period."));
+            if (indefinite) {
+                assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 for an indefinite period."));
+            } else {
+                assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 to 17/12/2021."));
+            }
             assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs has limited ability to carry out the activities of daily living set out below. They score 8 points. They satisfy the following descriptors:"));
             assertThat(pdfTextWithoutNewLines, containsString("1. Preparing food e. Needs supervision or assistance to either prepare or cook a simple meal. 4 points"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Taking nutrition d. Needs prompting to be able to take nutrition. 4 points"));
@@ -549,9 +569,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void standardRateStandardRate_shouldGeneratePdfWithExpectedText(String comparedToDwpDailyLiving, String comparedToDwpMobility, boolean allowed, boolean setAside, boolean indefinite) throws IOException {
         String json;
         if (indefinite) {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "standardRate", "preparingFood1e", "takingNutrition2d", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12c", ""));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "standardRate", "preparingFood1e", "takingNutrition2d", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12c", ""));
         } else {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList(comparedToDwpDailyLiving, "standardRate", "preparingFood1e", "takingNutrition2d", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12c"));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList(comparedToDwpDailyLiving, "standardRate", "preparingFood1e", "takingNutrition2d", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12c"));
         }
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -567,12 +587,20 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             } else {
                 assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
             }
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 for an indefinite period."));
+            if (indefinite) {
+                assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 for an indefinite period."));
+            } else {
+                assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 to 17/12/2021."));
+            }
             assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs has limited ability to carry out the activities of daily living set out below. They score 8 points. They satisfy the following descriptors:"));
             assertThat(pdfTextWithoutNewLines, containsString("1. Preparing food e. Needs supervision or assistance to either prepare or cook a simple meal. 4 points"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Taking nutrition d. Needs prompting to be able to take nutrition. 4 points"));
             assertThat(pdfTextWithoutNewLines, containsString("8 points"));
-            assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is entitled to the mobility component at the standard rate from 17/12/2020 for an indefinite period."));
+            if (indefinite) {
+                assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is entitled to the mobility component at the standard rate from 17/12/2020 for an indefinite period."));
+            } else {
+                assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is entitled to the mobility component at the standard rate from 17/12/2020 to 17/12/2021."));
+            }
             assertThat(pdfTextWithoutNewLines, containsString("6. Joe Bloggs is limited in their ability to mobilise. They score 8 points.They satisfy the following descriptors:"));
             assertThat(pdfTextWithoutNewLines, containsString("12. Moving around c."));
             assertThat(pdfTextWithoutNewLines, containsString("8 points"));
@@ -589,9 +617,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void standardRateEnhancedRate_shouldGeneratePdfWithExpectedText(String comparedToDwpDailyLiving, String comparedToDwpMobility, boolean allowed, boolean setAside, boolean indefinite) throws IOException {
         String json;
         if (indefinite) {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "standardRate", "preparingFood1e", "takingNutrition2d", comparedToDwpMobility, "enhancedRate", "movingAround", "movingAround12e", ""));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "standardRate", "preparingFood1e", "takingNutrition2d", comparedToDwpMobility, "enhancedRate", "movingAround", "movingAround12e", ""));
         } else {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList(comparedToDwpDailyLiving, "standardRate", "preparingFood1e", "takingNutrition2d", comparedToDwpMobility, "enhancedRate", "movingAround", "movingAround12e"));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList(comparedToDwpDailyLiving, "standardRate", "preparingFood1e", "takingNutrition2d", comparedToDwpMobility, "enhancedRate", "movingAround", "movingAround12e"));
         }
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -607,7 +635,11 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             } else {
                 assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
             }
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 for an indefinite period."));
+            if (indefinite) {
+                assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 for an indefinite period."));
+            } else {
+                assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 to 17/12/2021."));
+            }
             assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs has limited ability to carry out the activities of daily living set out below. They score 8 points. They satisfy the following descriptors:"));
             assertThat(pdfTextWithoutNewLines, containsString("1. Preparing food e. Needs supervision or assistance to either prepare or cook a simple meal. 4 points"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Taking nutrition d. Needs prompting to be able to take nutrition. 4 points"));
@@ -629,9 +661,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void enhancedRateNotConsidered_shouldGeneratePdfWithExpectedText(String comparedToDwpDailyLiving, boolean allowed, boolean setAside, boolean indefinite) throws IOException {
         String json;
         if (indefinite) {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "\"pipWriteFinalDecisionComparedToDWPMobilityQuestion\": \"COMPARED_TO_DWP_MOBILITY\",", "MOBILITY_RATE", "\"pipWriteFinalDecisionMobilityActivitiesQuestion\" : [\"MOBILITY_ACTIVITIES_ANSWER\"],", "\"pipWriteFinalDecisionMovingAroundQuestion\" : \"MOVING_AROUND_ANSWER\",", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "enhancedRate", "preparingFood1f", "takingNutrition2d", "", "notConsidered", "", "", ""));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "\"pipWriteFinalDecisionComparedToDWPMobilityQuestion\": \"COMPARED_TO_DWP_MOBILITY\",", "MOBILITY_RATE", "\"pipWriteFinalDecisionMobilityActivitiesQuestion\" : [\"MOBILITY_ACTIVITIES_ANSWER\"],", "\"pipWriteFinalDecisionMovingAroundQuestion\" : \"MOVING_AROUND_ANSWER\",", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "enhancedRate", "preparingFood1f", "takingNutrition2d", "", "notConsidered", "", "", ""));
         } else {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "\"pipWriteFinalDecisionComparedToDWPMobilityQuestion\": \"COMPARED_TO_DWP_MOBILITY\",", "MOBILITY_RATE", "\"pipWriteFinalDecisionMobilityActivitiesQuestion\" : [\"MOBILITY_ACTIVITIES_ANSWER\"],", "\"pipWriteFinalDecisionMovingAroundQuestion\" : \"MOVING_AROUND_ANSWER\","), Arrays.asList(comparedToDwpDailyLiving, "enhancedRate", "preparingFood1f", "takingNutrition2d", "", "notConsidered", "", ""));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "\"pipWriteFinalDecisionComparedToDWPMobilityQuestion\": \"COMPARED_TO_DWP_MOBILITY\",", "MOBILITY_RATE", "\"pipWriteFinalDecisionMobilityActivitiesQuestion\" : [\"MOBILITY_ACTIVITIES_ANSWER\"],", "\"pipWriteFinalDecisionMovingAroundQuestion\" : \"MOVING_AROUND_ANSWER\","), Arrays.asList(comparedToDwpDailyLiving, "enhancedRate", "preparingFood1f", "takingNutrition2d", "", "notConsidered", "", ""));
         }
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -647,7 +679,11 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             } else {
                 assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
             }
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the enhanced rate from 17/12/2020 for an indefinite period."));
+            if (indefinite) {
+                assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the enhanced rate from 17/12/2020 for an indefinite period."));
+            } else {
+                assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the enhanced rate from 17/12/2020 to 17/12/2021."));
+            }
             assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs has severely limited ability to carry out the activities of daily living set out below. They score 12 points. They satisfy the following descriptors:"));
             assertThat(pdfTextWithoutNewLines, containsString("1. Preparing food f. Cannot prepare and cook food. 8 points"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Taking nutrition d. Needs prompting to be able to take nutrition. 4 points"));
@@ -666,9 +702,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void enhancedRateNoAward_shouldGeneratePdfWithExpectedText(String comparedToDwpMobility, String comparedToDwpDailyLiving, boolean allowed, boolean setAside, boolean indefinite) throws IOException {
         String json;
         if (indefinite) {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "enhancedRate", "preparingFood1f", "takingNutrition2d", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a", ""));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "enhancedRate", "preparingFood1f", "takingNutrition2d", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a", ""));
         } else {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList(comparedToDwpDailyLiving, "enhancedRate", "preparingFood1f", "takingNutrition2d", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a"));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList(comparedToDwpDailyLiving, "enhancedRate", "preparingFood1f", "takingNutrition2d", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a"));
         }
         System.out.println(json);
         byte[] bytes = callPreviewFinalDecision(json);
@@ -685,7 +721,11 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             } else {
                 assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
             }
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the enhanced rate from 17/12/2020 for an indefinite period."));
+            if (indefinite) {
+                assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the enhanced rate from 17/12/2020 for an indefinite period."));
+            } else {
+                assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the enhanced rate from 17/12/2020 to 17/12/2021."));
+            }
             assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs has severely limited ability to carry out the activities of daily living set out below. They score 12 points. They satisfy the following descriptors:"));
             assertThat(pdfTextWithoutNewLines, containsString("1. Preparing food f. Cannot prepare and cook food. 8 points"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Taking nutrition d. Needs prompting to be able to take nutrition. 4 points"));
@@ -706,9 +746,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void enhancedRateStandardRate_shouldGeneratePdfWithExpectedText(String comparedToDwpMobility, String comparedToDwpDailyLiving, boolean allowed, boolean setAside, boolean indefinite) throws IOException {
         String json;
         if (indefinite) {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "enhancedRate", "preparingFood1f", "takingNutrition2d", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12c", ""));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "enhancedRate", "preparingFood1f", "takingNutrition2d", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12c", ""));
         } else {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList(comparedToDwpDailyLiving, "enhancedRate", "preparingFood1f", "takingNutrition2d", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12c"));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList(comparedToDwpDailyLiving, "enhancedRate", "preparingFood1f", "takingNutrition2d", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12c"));
         }
         System.out.println(json);
         byte[] bytes = callPreviewFinalDecision(json);
@@ -725,12 +765,20 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             } else {
                 assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
             }
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the enhanced rate from 17/12/2020 for an indefinite period."));
+            if (indefinite) {
+                assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the enhanced rate from 17/12/2020 for an indefinite period."));
+            } else {
+                assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the enhanced rate from 17/12/2020 to 17/12/2021."));
+            }
             assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs has severely limited ability to carry out the activities of daily living set out below. They score 12 points. They satisfy the following descriptors:"));
             assertThat(pdfTextWithoutNewLines, containsString("1. Preparing food f. Cannot prepare and cook food. 8 points"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Taking nutrition d. Needs prompting to be able to take nutrition. 4 points"));
             assertThat(pdfTextWithoutNewLines, containsString("8 points"));
-            assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is entitled to the mobility component at the standard rate from 17/12/2020 for an indefinite period."));
+            if (indefinite) {
+                assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is entitled to the mobility component at the standard rate from 17/12/2020 for an indefinite period."));
+            } else {
+                assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is entitled to the mobility component at the standard rate from 17/12/2020 to 17/12/2021."));
+            }
             assertThat(pdfTextWithoutNewLines, containsString("6. Joe Bloggs is limited in their ability to mobilise. They score 8 points.They satisfy the following descriptors:"));
             assertThat(pdfTextWithoutNewLines, containsString("12. Moving around c."));
             assertThat(pdfTextWithoutNewLines, containsString("8 points"));
@@ -747,9 +795,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void enhancedRateEnhancedRate_shouldGeneratePdfWithExpectedText(String comparedToDwpDailyLiving, String comparedToDwpMobility, boolean allowed, boolean setAside, boolean indefinite) throws IOException {
         String json;
         if (indefinite) {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "enhancedRate", "preparingFood1f", "takingNutrition2d", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12e", ""));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "enhancedRate", "preparingFood1f", "takingNutrition2d", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12e", ""));
         } else {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList(comparedToDwpDailyLiving, "enhancedRate", "preparingFood1f", "takingNutrition2d", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12e"));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList(comparedToDwpDailyLiving, "enhancedRate", "preparingFood1f", "takingNutrition2d", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12e"));
         }
         System.out.println(json);
         byte[] bytes = callPreviewFinalDecision(json);
@@ -766,12 +814,20 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             } else {
                 assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
             }
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the enhanced rate from 17/12/2020 for an indefinite period."));
+            if (indefinite) {
+                assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the enhanced rate from 17/12/2020 for an indefinite period."));
+            } else {
+                assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the enhanced rate from 17/12/2020 to 17/12/2021."));
+            }
             assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs has severely limited ability to carry out the activities of daily living set out below. They score 12 points. They satisfy the following descriptors:"));
             assertThat(pdfTextWithoutNewLines, containsString("1. Preparing food f. Cannot prepare and cook food. 8 points"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Taking nutrition d. Needs prompting to be able to take nutrition. 4 points"));
             assertThat(pdfTextWithoutNewLines, containsString("12 points"));
-            assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is entitled to the mobility component at the enhanced rate from 17/12/2020 for an indefinite period."));
+            if (indefinite) {
+                assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is entitled to the mobility component at the enhanced rate from 17/12/2020 for an indefinite period."));
+            } else {
+                assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is entitled to the mobility component at the enhanced rate from 17/12/2020 to 17/12/2021."));
+            }
             assertThat(pdfTextWithoutNewLines, containsString("6. Joe Bloggs is severely limited in their ability to mobilise. They score 8 points.They satisfy the following descriptors:"));
             assertThat(pdfTextWithoutNewLines, containsString("12. Moving around e."));
             assertThat(pdfTextWithoutNewLines, containsString("12 points"));
