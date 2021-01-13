@@ -644,7 +644,11 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("1. Preparing food e. Needs supervision or assistance to either prepare or cook a simple meal. 4 points"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Taking nutrition d. Needs prompting to be able to take nutrition. 4 points"));
             assertThat(pdfTextWithoutNewLines, containsString("8 points"));
-            assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is entitled to the mobility component at the enhanced rate from 17/12/2020 for an indefinite period."));
+            if (indefinite) {
+                assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is entitled to the mobility component at the enhanced rate from 17/12/2020 for an indefinite period."));
+            } else {
+                assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is entitled to the mobility component at the enhanced rate from 17/12/2020 to 17/12/2021."));
+            }
             assertThat(pdfTextWithoutNewLines, containsString("6. Joe Bloggs is severely limited in their ability to mobilise. They score 12 points.They satisfy the following descriptors:"));
             assertThat(pdfTextWithoutNewLines, containsString("12. Moving around e."));
             assertThat(pdfTextWithoutNewLines, containsString("12 points"));
@@ -795,9 +799,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void enhancedRateEnhancedRate_shouldGeneratePdfWithExpectedText(String comparedToDwpDailyLiving, String comparedToDwpMobility, boolean allowed, boolean setAside, boolean indefinite) throws IOException {
         String json;
         if (indefinite) {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "enhancedRate", "preparingFood1f", "takingNutrition2d", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12e", ""));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","), Arrays.asList(comparedToDwpDailyLiving, "enhancedRate", "preparingFood1f", "takingNutrition2d", comparedToDwpMobility, "enhancedRate", "movingAround", "movingAround12e", ""));
         } else {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList(comparedToDwpDailyLiving, "enhancedRate", "preparingFood1f", "takingNutrition2d", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12e"));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList(comparedToDwpDailyLiving, "enhancedRate", "preparingFood1f", "takingNutrition2d", comparedToDwpMobility, "enhancedRate", "movingAround", "movingAround12e"));
         }
         System.out.println(json);
         byte[] bytes = callPreviewFinalDecision(json);
