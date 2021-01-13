@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import junitparams.JUnitParamsRunner;
 import junitparams.NamedParameters;
-import junitparams.Parameters;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
@@ -671,7 +670,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
         }
     }
 
-    
+
      */
 
     private String replaceNewLines(String pdfText) {
