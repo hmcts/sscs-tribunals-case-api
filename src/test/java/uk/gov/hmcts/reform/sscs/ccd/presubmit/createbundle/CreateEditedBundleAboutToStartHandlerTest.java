@@ -52,6 +52,9 @@ public class CreateEditedBundleAboutToStartHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(serviceRequestExecutor.post(any(), any())).thenReturn(new PreSubmitCallbackResponse<>(sscsCaseData));
+
+        callback.getCaseDetails().getCaseData().setPhmeGranted(YesNo.YES);
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
     }
 
     @Test
@@ -154,4 +157,38 @@ public class CreateEditedBundleAboutToStartHandlerTest {
             .orElse("");
         assertEquals("The edited bundle cannot be created as mandatory edited DWP documents are missing", error);
     }
+
+    @Test
+    public void givenPhmeNoReviewDwpEditedResponseDocumentLink_thenReturnError() {
+
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+        callback.getCaseDetails().getCaseData().setDwpPhme("Yes");
+        callback.getCaseDetails().getCaseData().setPhmeGranted(YesNo.NO);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream()
+                .findFirst()
+                .orElse("");
+        assertEquals("The edited bundle cannot be created as PHME status has not been granted", error);
+    }
+
+    @Test
+    public void givenPhmeNullReviewDwpEditedResponseDocumentLink_thenReturnError() {
+
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+        callback.getCaseDetails().getCaseData().setDwpPhme("Yes");
+        callback.getCaseDetails().getCaseData().setPhmeGranted(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream()
+                .findFirst()
+                .orElse("");
+        assertEquals("The edited bundle cannot be created as PHME status has not been granted", error);
+    }
+
+
 }

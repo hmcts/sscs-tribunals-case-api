@@ -10,10 +10,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
@@ -59,11 +56,25 @@ public class CreateEditedBundleAboutToStartHandler implements PreSubmitCallbackH
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        if (checkMandatoryFilesMissing(sscsCaseData)) {
-            PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(
+        PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(
                 callback.getCaseDetails().getCaseData());
-            response.addError("The edited bundle cannot be created as mandatory edited DWP documents are missing");
-            return response;
+
+        boolean mandatoryFilesMissing = false;
+        boolean phmeStatusIsNotGranted = false;
+
+        if (checkMandatoryFilesMissing(sscsCaseData)) {
+            mandatoryFilesMissing = true;
+            errorResponse.addError("The edited bundle cannot be created as mandatory edited DWP documents are missing");
+        } else if (checkPhmeStatusIsNotGranted(sscsCaseData)) {
+            phmeStatusIsNotGranted = true;
+            errorResponse.addError("The edited bundle cannot be created as PHME status has not been granted");
+        }
+
+        log.info("mandatoryFilesMissing" + mandatoryFilesMissing);
+        log.info("phmeStatusIsNotGranted" + phmeStatusIsNotGranted);
+
+        if (mandatoryFilesMissing || phmeStatusIsNotGranted) {
+            return errorResponse;
         } else {
             if (sscsCaseData.getDwpEditedResponseDocument() != null && sscsCaseData.getDwpEditedResponseDocument().getDocumentFileName() == null) {
                 sscsCaseData.getDwpEditedResponseDocument().setDocumentFileName(DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX);
@@ -91,6 +102,18 @@ public class CreateEditedBundleAboutToStartHandler implements PreSubmitCallbackH
 
             return serviceRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
         }
+    }
+
+    protected boolean checkPhmeStatusIsNotGranted(SscsCaseData sscsCaseData) {
+        log.info("sscsCaseData.getPhmeGranted()" + sscsCaseData.getPhmeGranted());
+        if (sscsCaseData.getDwpEditedEvidenceReason() != null) {
+            log.info("sscsCaseData.getPhmeGranted().getValue()" + sscsCaseData.getDwpEditedEvidenceReason());
+        } else {
+            log.info("null");
+        }
+
+        return sscsCaseData.getDwpEditedEvidenceReason() == null || !sscsCaseData.getDwpEditedEvidenceReason().equals("phme")
+                || sscsCaseData.getPhmeGranted() == null || sscsCaseData.getPhmeGranted().getValue().equals("No");
     }
 
     private boolean checkMandatoryFilesMissing(SscsCaseData sscsCaseData) {
