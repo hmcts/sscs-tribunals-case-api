@@ -22,12 +22,12 @@ public abstract class PipTemplateContent extends WriteFinalDecisionTemplateConte
         return "PIP";
     }
 
-    protected String getIsEntitledDailyLiving(String appellantName) {
-        return appellantName + " is entitled to the daily living component at the standard rate from 10/10/2020 for an indefinite period.";
+    protected String getIsEntitledDailyLiving(String appellantName, String dailyLivingRate, String startDate) {
+        return appellantName + " is entitled to the daily living component at the " + dailyLivingRate.replace("Rate", "") + " rate from " + DATEFORMATTER.format(LocalDate.parse(startDate))  + " for an indefinite period.";
     }
 
-    protected String getIsEntitledMobility(String appellantName) {
-        return appellantName + " is entitled to the mobility component at the standard rate from 10/10/2020 for an indefinite period.";
+    protected String getIsEntitledMobility(String appellantName, String mobilityRate, String startDate) {
+        return appellantName + " is entitled to the mobility component at the " + mobilityRate.replace("Rate", "") + " rate from " + DATEFORMATTER.format(LocalDate.parse(startDate))  + " for an indefinite period.";
     }
 
     public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate) {
@@ -35,18 +35,34 @@ public abstract class PipTemplateContent extends WriteFinalDecisionTemplateConte
                 + (!setAside ? "confirmed." : "set aside.");
     }
 
-    protected String getLimitedAbilityDailyLiving(String appellantName, Integer points, List<Descriptor> descriptors) {
-        if (points == null) {
-            points = 0;
-        }
-        return appellantName + " has limited ability to carry out the activities of daily living set out below. They score " + points + " point" + (points == 1 ? "." : "s.") + (descriptors != null && descriptors.size() > 0 ? " They satisfy the following descriptors:" : "");
+    public String getDailyLivingNotConsidered() {
+        return "Only the mobility component was in issue on this appeal and the daily living component was not considered.";
     }
 
-    protected String getLimitedAbilityMobility(String appellantName, Integer points, List<Descriptor> descriptors) {
+    public String getMobilityNotConsidered() {
+        return "Only the daily living component was in issue on this appeal and the mobility component was not considered. ";
+    }
+    
+    public String getMobilityNoAward(String appellantName, String startDate, int points) {
+        return appellantName + " does not qualify for an award of the mobility component from " + DATEFORMATTER.format(LocalDate.parse(startDate)) + ". They score " + points + " point" + (points == 1 ? "" : "s") + ". This is insufficient to meet the threshold for the test.";
+    }
+
+    public String getDailyLivingNoAward(String appellantName, String startDate, int points) {
+        return appellantName + " is not entitled to the daily living component from " + DATEFORMATTER.format(LocalDate.parse(startDate)) + ". They score " + points + " point" + (points == 1 ? "" : "s") + ". This is insufficient to meet the threshold for the test.";
+    }
+    
+    protected String getLimitedAbilityDailyLiving(String appellantName, Integer points, List<Descriptor> descriptors, boolean dailyLivingIsSeverelyLimited) {
         if (points == null) {
             points = 0;
         }
-        return appellantName + " is limited in their ability to mobilise. They score " + points + " point" + (points == 1 ? "." : "s.") + (descriptors != null && descriptors.size() > 0 ? " They satisfy the following descriptors:" : "");
+        return appellantName + " has " + (dailyLivingIsSeverelyLimited ? "severely " : "") +  "limited ability to carry out the activities of daily living set out below. They score " + points + " point" + (points == 1 ? "." : "s.") + (descriptors != null && descriptors.size() > 0 ? " They satisfy the following descriptors:" : "");
+    }
+
+    protected String getLimitedAbilityMobility(String appellantName, Integer points, List<Descriptor> descriptors, boolean mobililtyIsSeverelyLimited) {
+        if (points == null) {
+            points = 0;
+        }
+        return appellantName + " is " + (mobililtyIsSeverelyLimited ? "severely " : "") + "limited in their ability to mobilise. They score " + points + " point" + (points == 1 ? "." : "s.") + (descriptors != null && descriptors.size() > 0 ? "They satisfy the following descriptors:" : "");
     }
 
     public abstract PipScenario getScenario();
