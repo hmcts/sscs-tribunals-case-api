@@ -52,7 +52,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 for an indefinite period."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 to 17/12/2021."));
             assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs has limited ability to carry out the activities of daily living set out below. They score 8 points. They satisfy the following descriptors:"));
             assertThat(pdfTextWithoutNewLines, containsString("1. Preparing food e. Needs supervision or assistance to either prepare or cook a simple meal. 4 points"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Taking nutrition d. Needs prompting to be able to take nutrition. 4 points"));
@@ -208,6 +208,74 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             new Object[]{"same", false, false, true},
             new Object[]{"higher", true, true, true}
         };
+    }
+
+    @NamedParameters("hearingTypeCombinations")
+    @SuppressWarnings("unused")
+    private Object[] hearingTypeCombinations() {
+        return new Object[]{
+                new Object[]{"video", false, false},
+                new Object[]{"video", false, true},
+                new Object[]{"video", true, false},
+                new Object[]{"video", true, true},
+                new Object[]{"paper", false, false},
+                new Object[]{"paper", false, true},
+                new Object[]{"paper", true, false},
+                new Object[]{"paper", true, true},
+                new Object[]{"telephone", false, false},
+                new Object[]{"telephone", false, true},
+                new Object[]{"telephone", true, false},
+                new Object[]{"telephone", true, true},
+                new Object[]{"triage", false, false},
+                new Object[]{"triage", false, true},
+                new Object[]{"triage", true, false},
+                new Object[]{"triage", true, true},
+                new Object[]{"faceToFace", false, false},
+                new Object[]{"faceToFace", false, true},
+                new Object[]{"faceToFace", true, false},
+                new Object[]{"faceToFace", true, true},
+        };
+    }
+
+    @Test
+    @Parameters(named = "hearingTypeCombinations")
+    public void notConsideredNoAward_shouldGeneratePdfWithExpectedText(String hearingType, boolean appellantAttended, boolean presentingOfficerAttended) throws IOException {
+
+        String comparedToDwpMobility = "lower";
+        boolean allowed = false;
+        boolean setAside = false;
+        boolean indefinite = false;
+
+        String json;
+        if (indefinite) {
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\",", "TYPE_OF_HEARING", "APPELLANT_ATTENDED", "PRESENTING_OFFICE_ATTENDED"), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a", "", hearingType, appellantAttended ? "Yes" : "No", presentingOfficerAttended ? "Yes" : "No"));
+        } else {
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "TYPE_OF_HEARING", "APPELLANT_ATTENDED", "PRESENTING_OFFICE_ATTENDED"), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a", hearingType, appellantAttended ? "Yes" : "No", presentingOfficerAttended ? "Yes" : "No"));
+        }
+        byte[] bytes = callPreviewFinalDecision(json);
+        try (PDDocument document = PDDocument.load(bytes)) {
+            String pdfText = new PDFTextStripper().getText(document);
+            String pdfTextWithoutNewLines = replaceNewLines(pdfText);
+            if (allowed) {
+                assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
+            } else {
+                assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
+            }
+            if (setAside) {
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is set aside."));
+            } else {
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
+            }
+            assertThat(pdfTextWithoutNewLines, containsString("3. Only the mobility component was in issue on this appeal and the daily living component was not considered. "));
+            assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs does not qualify for an award of the mobility component from 17/12/2020. They score 0 points. This is insufficient to meet the threshold for the test."));
+            assertThat(pdfTextWithoutNewLines, containsString("12. Moving around a."));
+            assertThat(pdfTextWithoutNewLines, containsString("0 points"));
+            assertThat(pdfTextWithoutNewLines, containsString("5. Reasons for decision 1"));
+            assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 2"));
+            assertThat(pdfTextWithoutNewLines, containsString("7. Anything else."));
+            assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, not(containsString("9.")));
+        }
     }
 
     @Test
@@ -832,7 +900,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             } else {
                 assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is entitled to the mobility component at the enhanced rate from 17/12/2020 to 17/12/2021."));
             }
-            assertThat(pdfTextWithoutNewLines, containsString("6. Joe Bloggs is severely limited in their ability to mobilise. They score 8 points.They satisfy the following descriptors:"));
+            assertThat(pdfTextWithoutNewLines, containsString("6. Joe Bloggs is severely limited in their ability to mobilise. They score 12 points.They satisfy the following descriptors:"));
             assertThat(pdfTextWithoutNewLines, containsString("12. Moving around e."));
             assertThat(pdfTextWithoutNewLines, containsString("12 points"));
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 1"));
