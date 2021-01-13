@@ -42,7 +42,7 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
         log.info("before looping callback handlers");
         int iterationCount = 0;
         for (PreSubmitCallbackHandler<T> callbackHandler : callbackHandlers) {
-                iterationCount ++;
+            iterationCount++;
             if (callbackHandler.canHandle(callbackType, callback)) {
                 log.info("callback successfully found, number of iterations: {}", iterationCount);
                 PreSubmitCallbackResponse<T> callbackResponseFromHandler = callbackHandler.handle(callbackType, callback, userAuthorisation);
