@@ -51,7 +51,7 @@
       "pipWriteFinalDecisionDailyLivingQuestion" : "DAILY_LIVING_RATE",
       "pipWriteFinalDecisionMobilityQuestion" : "MOBILITY_RATE",
       "pipWriteFinalDecisionDailyLivingActivitiesQuestion" : ["preparingFood", "takingNutrition"],
-      "pipWriteFinalDecisionMobilityActivitiesQuestion" : ["movingAround"],
+      "pipWriteFinalDecisionMobilityActivitiesQuestion" : ["MOBILITY_ACTIVITIES_ANSWER"],
       "pipWriteFinalDecisionPreparingFoodQuestion" : "PREPARING_FOOD_ANSWER",
       "pipWriteFinalDecisionTakingNutritionQuestion" : "TAKING_NUTRITION_ANSWER",
       "pipWriteFinalDecisionMovingAroundQuestion" : "MOVING_AROUND_ANSWER",
