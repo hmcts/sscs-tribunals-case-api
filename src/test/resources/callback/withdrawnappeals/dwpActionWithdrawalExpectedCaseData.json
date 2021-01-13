@@ -46,13 +46,9 @@
         "identity": {
           "dob": null,
           "nino": null
-        },
-        "wantsReasonableAdjustment": null,
-        "reasonableAdjustmentRequirements": null
+        }
       },
-      "isAddressSameAsAppointee": null,
-      "wantsReasonableAdjustment": null,
-      "reasonableAdjustmentRequirements": null
+      "isAddressSameAsAppointee": null
     },
     "benefitType": {
       "code": "PIP",
@@ -82,9 +78,7 @@
         "email": "harry.potter@wizards.com",
         "phone": null,
         "mobile": "07411999999"
-      },
-      "wantsReasonableAdjustment": null,
-      "reasonableAdjustmentRequirements": null
+      }
     },
     "signer": null,
     "hearingSubtype":null,
