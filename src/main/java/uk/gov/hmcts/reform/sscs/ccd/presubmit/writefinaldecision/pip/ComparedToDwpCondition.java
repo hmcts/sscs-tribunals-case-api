@@ -10,7 +10,7 @@ public class ComparedToDwpCondition extends FieldConditionBase<String> {
     private PipActivityType activityType;
 
     public ComparedToDwpCondition(ComparedToDwpPredicate predicate, Function<SscsCaseData, String> fieldExtractor, PipActivityType activityType) {
-        super("Compared to DWP", predicate, fieldExtractor);
+        super("compared to DWP", predicate, fieldExtractor);
         this.activityType = activityType;
     }
 
@@ -19,9 +19,9 @@ public class ComparedToDwpCondition extends FieldConditionBase<String> {
         String value = fieldExtractor.apply(caseData);
         if (!predicate.test(value)) {
             if (value == null) {
-                return Optional.of("a missing answer for the " + activityType + " " + fieldName + " question");
+                return Optional.of("a missing answer for the '" + activityType.getName().toLowerCase() + " " + fieldName + "' question");
             } else {
-                return Optional.of(value + " for the " + activityType + " " + fieldName + " question");
+                return Optional.of(value + " for the '" + activityType.getName().toLowerCase() + " " + fieldName + "' question");
             }
         }
         return Optional.empty();
@@ -30,11 +30,11 @@ public class ComparedToDwpCondition extends FieldConditionBase<String> {
     @Override
     public Optional<String> getOptionalIsSatisfiedMessage(SscsCaseData sscsCaseData) {
         if (ComparedToDwpPredicate.SAME.equals(predicate)) {
-            return Optional.of("specified that the award for " + activityType + " is the same as that awarded by DWP");
+            return Optional.of("specified that the award for " + activityType.getName().toLowerCase() + " is the same as that awarded by DWP");
         } else if (ComparedToDwpPredicate.LOWER.equals(predicate)) {
-            return Optional.of("specified that the award for " + activityType + " is the lower than that awarded by DWP");
+            return Optional.of("specified that the award for " + activityType.getName().toLowerCase() + " is lower than that awarded by DWP");
         } else if (ComparedToDwpPredicate.HIGHER.equals(predicate)) {
-            return Optional.of("specified that the award for " + activityType + " is the higher than that awarded by DWP");
+            return Optional.of("specified that the award for " + activityType.getName().toLowerCase() + " is higher than that awarded by DWP");
         } else {
             return Optional.empty();
         }
