@@ -239,7 +239,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
     @Test
     @Parameters(named = "hearingTypeCombinations")
-    public void notConsideredNoAward_shouldGeneratePdfWithExpectedText(String hearingType, boolean appellantAttended, boolean presentingOfficerAttended) throws IOException {
+    public void notConsideredNoAward_shouldGeneratePdfWithExpectedTextForHearingType(String hearingType, boolean appellantAttended, boolean presentingOfficerAttended) throws IOException {
 
         String comparedToDwpMobility = "lower";
         boolean allowed = false;
@@ -248,9 +248,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
         String json;
         if (indefinite) {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\",", "TYPE_OF_HEARING", "APPELLANT_ATTENDED", "PRESENTING_OFFICE_ATTENDED"), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a", "", hearingType, appellantAttended ? "Yes" : "No", presentingOfficerAttended ? "Yes" : "No"));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallbackHearingType.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\",", "TYPE_OF_HEARING", "APPELLANT_ATTENDED", "PRESENTING_OFFICE_ATTENDED"), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a", "", hearingType, appellantAttended ? "Yes" : "No", presentingOfficerAttended ? "Yes" : "No"));
         } else {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "TYPE_OF_HEARING", "APPELLANT_ATTENDED", "PRESENTING_OFFICE_ATTENDED"), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a", hearingType, appellantAttended ? "Yes" : "No", presentingOfficerAttended ? "Yes" : "No"));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallbackHearingType.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "TYPE_OF_HEARING", "APPELLANT_ATTENDED", "PRESENTING_OFFICE_ATTENDED"), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a", hearingType, appellantAttended ? "Yes" : "No", presentingOfficerAttended ? "Yes" : "No"));
         }
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -273,8 +273,35 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("5. Reasons for decision 1"));
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("7. Anything else."));
-            assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
-            assertThat(pdfTextWithoutNewLines, not(containsString("9.")));
+            boolean additionalParagraph = false;
+            if ("video".equals(hearingType)) {
+                if (appellantAttended && presentingOfficerAttended) {
+                    assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                } else if (appellantAttended && !presentingOfficerAttended) {
+                    assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent."));
+                } else if (!appellantAttended && presentingOfficerAttended) {
+                    assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Felix Sydney did not attend the hearing today. A Presenting Officer attended on behalf of the Respondent.\n"));
+                } else if (!appellantAttended && !presentingOfficerAttended) {
+                    assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Felix Sydney did not attend the hearing today. No Presenting Officer attended on behalf of the Respondent.\n"));
+                }
+                assertThat(pdfTextWithoutNewLines, containsString("Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today.\n"));
+            } else {
+                if (appellantAttended && presentingOfficerAttended) {
+                    assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                } else if (appellantAttended && !presentingOfficerAttended) {
+                    assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent."));
+                } else if (!appellantAttended && presentingOfficerAttended) {
+                    assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Felix Sydney did not attend the hearing today. A Presenting Officer attended on behalf of the Respondent.\n"));
+                } else if (!appellantAttended && !presentingOfficerAttended) {
+                    assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Felix Sydney did not attend the hearing today. No Presenting Officer attended on behalf of the Respondent.\n"));
+                }
+                assertThat(pdfTextWithoutNewLines, containsString("Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today.\n"));
+            }
+            if (additionalParagraph) {
+                assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
+            } else {
+                assertThat(pdfTextWithoutNewLines, not(containsString("9.")));
+            }
         }
     }
 
