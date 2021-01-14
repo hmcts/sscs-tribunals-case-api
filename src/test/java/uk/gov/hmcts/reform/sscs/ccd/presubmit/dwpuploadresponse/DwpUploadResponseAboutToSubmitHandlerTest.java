@@ -351,6 +351,22 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenUcCaseWithAppendix12Document_thenMoveDocumentToDwpDocumentsCollection() {
+        callback.getCaseDetails().getCaseData().setAppendix12Doc(DwpResponseDocument.builder().documentFileName("testA").build());
+        List<DwpDocument> dwpResponseDocuments = new ArrayList<>();
+        dwpResponseDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentFileName("existingDoc").build()).build());
+
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpResponseDocuments);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(2, response.getData().getDwpDocuments().size());
+
+        assertEquals("existingDoc", response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
+        assertEquals("Appendix 12 document", response.getData().getDwpDocuments().get(1).getValue().getDocumentFileName());
+    }
+
+    @Test
     public void givenUcbSelectedAndNoUcbDocument_displayAnError() {
         sscsCaseData.setDwpUcb(YES.getValue());
         sscsCaseData.setDwpUcbEvidenceDocument(null);
