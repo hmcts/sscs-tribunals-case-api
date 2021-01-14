@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -71,6 +71,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 preSubmitCallbackResponse.addError("If edited evidence is added a reason must be selected");
                 return preSubmitCallbackResponse;
             }
+            sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
             sscsCaseData.setDwpEditedResponseDocument(buildDwpResponseDocumentWithDate(
                     AppConstants.DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX,
                     todayDate,
