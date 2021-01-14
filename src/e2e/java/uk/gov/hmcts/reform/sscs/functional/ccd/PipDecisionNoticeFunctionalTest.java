@@ -145,8 +145,8 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     @SuppressWarnings("unused")
     private Object[] allowed() {
         return new Object[]{
-                new Object[]{ false},
-                new Object[]{ true }
+            new Object[]{ false},
+            new Object[]{ true }
         };
     }
 
@@ -361,8 +361,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                     assertThat(pdfTextWithoutNewLines, containsString("8. This has been an oral (face to face) hearing. Joe Bloggs requested an oral hearing but did not attend today. No Presenting Officer attended on behalf of the Respondent."));
                     assertThat(pdfTextWithoutNewLines, containsString("Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today."));
                 }
-            }
-            else {
+            } else {
                 if (appellantAttended && presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
                 } else if (appellantAttended && !presentingOfficerAttended) {
