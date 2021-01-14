@@ -31,9 +31,10 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandler implements PreSubmit
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        if (isYes(sscsCaseData.getAppeal().getAppellant().getIsAppointee()) || nonNull(sscsCaseData.getReasonableAdjustments().getAppellant()) && isNoOrNull(sscsCaseData.getReasonableAdjustments().getAppellant().getWantsReasonableAdjustment())) {
+        final ReasonableAdjustments reasonableAdjustments = sscsCaseData.getReasonableAdjustments();
+        if (isYes(sscsCaseData.getAppeal().getAppellant().getIsAppointee()) || nonNull(reasonableAdjustments.getAppellant()) && isNoOrNull(sscsCaseData.getReasonableAdjustments().getAppellant().getWantsReasonableAdjustment())) {
             sscsCaseData.getReasonableAdjustments().setAppellant(null);
         }
 
@@ -45,11 +46,17 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandler implements PreSubmit
             sscsCaseData.getReasonableAdjustments().setJointParty(null);
         }
 
-        Representative representative = sscsCaseData.getAppeal().getRep();
+        final Representative representative = sscsCaseData.getAppeal().getRep();
         if (isNull(representative) || isNoOrNull(representative.getHasRepresentative()) || nonNull(sscsCaseData.getReasonableAdjustments().getRepresentative()) && isNoOrNull(sscsCaseData.getReasonableAdjustments().getRepresentative().getWantsReasonableAdjustment())) {
             sscsCaseData.getReasonableAdjustments().setRepresentative(null);
         }
+
+        if (nonNull(sscsCaseData.getReasonableAdjustments()) && isNull(reasonableAdjustments.getAppellant()) && isNull(reasonableAdjustments.getAppointee()) && isNull(reasonableAdjustments.getRepresentative()) && isNull(reasonableAdjustments.getJointParty())) {
+            sscsCaseData.setReasonableAdjustments(null);
+        }
+
         sscsCaseData.setUpdateReasonableAdjustment(null);
+
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }

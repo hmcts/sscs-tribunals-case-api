@@ -68,6 +68,15 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenNoUpdateReasonableAdjustment_thenClearReasonableAdjustmentField() {
+        sscsCaseData.getReasonableAdjustments().getAppellant().setWantsReasonableAdjustment(NO);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getUpdateReasonableAdjustment());
+        assertNull(response.getData().getReasonableAdjustments());
+    }
+
+    @Test
     public void givenAppellantUpdateReasonableAdjustment_thenClearAlternativeLetterFieldsSetToNo() {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
