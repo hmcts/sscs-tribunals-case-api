@@ -243,7 +243,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
         String comparedToDwpMobility = "lower";
         boolean allowed = false;
-        boolean setAside = false;
+        boolean setAside = true;
         boolean indefinite = false;
 
         String json;
