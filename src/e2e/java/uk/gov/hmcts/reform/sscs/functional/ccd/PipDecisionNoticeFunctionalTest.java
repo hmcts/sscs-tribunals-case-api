@@ -280,9 +280,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                 } else if (appellantAttended && !presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent."));
                 } else if (!appellantAttended && presentingOfficerAttended) {
-                    assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Felix Sydney did not attend the hearing today. A Presenting Officer attended on behalf of the Respondent.\n"));
+                    assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Joe Bloggs did not attend the hearing today. A Presenting Officer attended on behalf of the Respondent.\n"));
                 } else if (!appellantAttended && !presentingOfficerAttended) {
-                    assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Felix Sydney did not attend the hearing today. No Presenting Officer attended on behalf of the Respondent.\n"));
+                    assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Joe Bloggs did not attend the hearing today. No Presenting Officer attended on behalf of the Respondent.\n"));
                 }
                 assertThat(pdfTextWithoutNewLines, containsString("Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today.\n"));
             } else {
@@ -291,9 +291,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                 } else if (appellantAttended && !presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent."));
                 } else if (!appellantAttended && presentingOfficerAttended) {
-                    assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Felix Sydney did not attend the hearing today. A Presenting Officer attended on behalf of the Respondent.\n"));
+                    assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Joe Bloggs did not attend the hearing today. A Presenting Officer attended on behalf of the Respondent.\n"));
                 } else if (!appellantAttended && !presentingOfficerAttended) {
-                    assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Felix Sydney did not attend the hearing today. No Presenting Officer attended on behalf of the Respondent.\n"));
+                    assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Joe Bloggs did not attend the hearing today. No Presenting Officer attended on behalf of the Respondent.\n"));
                 }
                 assertThat(pdfTextWithoutNewLines, containsString("Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today.\n"));
             }
