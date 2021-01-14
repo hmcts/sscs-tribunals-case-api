@@ -41,33 +41,6 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     @Autowired
     protected ObjectMapper objectMapper;
 
-
-    // The Scenarios are defined https://tools.hmcts.net/confluence/display/SSCS/ESA+DN+template+content+-+judges+input
-    @Test
-    public void scenario1_shouldGeneratePdfWithExpectedText() throws IOException {
-        String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList("same", "standardRate", "preparingFood1e", "takingNutrition2d", "same", "standardRate", "movingAround", "movingAround12a"));
-        byte[] bytes = callPreviewFinalDecision(json);
-        try (PDDocument document = PDDocument.load(bytes)) {
-            String pdfText = new PDFTextStripper().getText(document);
-            String pdfTextWithoutNewLines = replaceNewLines(pdfText);
-            assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
-            assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 to 17/12/2021."));
-            assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs has limited ability to carry out the activities of daily living set out below. They score 8 points. They satisfy the following descriptors:"));
-            assertThat(pdfTextWithoutNewLines, containsString("1. Preparing food e. Needs supervision or assistance to either prepare or cook a simple meal. 4 points"));
-            assertThat(pdfTextWithoutNewLines, containsString("2. Taking nutrition d. Needs prompting to be able to take nutrition. 4 points"));
-            assertThat(pdfTextWithoutNewLines, containsString("8 points"));
-            assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is entitled to the mobility component at the standard rate from 17/12/2020 to 17/12/2021."));
-            assertThat(pdfTextWithoutNewLines, containsString("6. Joe Bloggs is limited in their ability to mobilise. They score 0 points."));
-            assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 1"));
-            assertThat(pdfTextWithoutNewLines, containsString("8. Reasons for decision 2"));
-            assertThat(pdfTextWithoutNewLines, containsString("9. Anything else."));
-            assertThat(pdfTextWithoutNewLines, containsString("10. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
-            assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
-        }
-    }
-
-
     @NamedParameters("noAwardComparisons")
     @SuppressWarnings("unused")
     private Object[] noAwardComparisons() {
@@ -284,9 +257,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
         String json;
         if (indefinite) {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallbackHearingType.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\",", "TYPE_OF_HEARING", "APPELLANT_ATTENDED", "PRESENTING_OFFICE_ATTENDED"), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a", "", hearingType, appellantAttended ? "Yes" : "No", presentingOfficerAttended ? "Yes" : "No"));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallbackHearingType.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\",", "TYPE_OF_HEARING", "APPELLANT_ATTENDED", "PRESENTING_OFFICER_ATTENDED"), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a", "", hearingType, appellantAttended ? "Yes" : "No", presentingOfficerAttended ? "Yes" : "No"));
         } else {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallbackHearingType.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "TYPE_OF_HEARING", "APPELLANT_ATTENDED", "PRESENTING_OFFICE_ATTENDED"), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a", hearingType, appellantAttended ? "Yes" : "No", presentingOfficerAttended ? "Yes" : "No"));
+            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallbackHearingType.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER", "TYPE_OF_HEARING", "APPELLANT_ATTENDED", "PRESENTING_OFFICER_ATTENDED"), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a", hearingType, appellantAttended ? "Yes" : "No", presentingOfficerAttended ? "Yes" : "No"));
         }
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -343,16 +316,16 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             }  else if ("paper".equals(hearingType)) {
                 if (appellantAttended && presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString("8. No party has objected to the matter being decided without a hearing."));
-                    assertThat(pdfTextWithoutNewLines, containsString("Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is in the interests of justice to proceed today."));
+                    assertThat(pdfTextWithoutNewLines, containsString("Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way."));
                 } else if (appellantAttended && !presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString("8. No party has objected to the matter being decided without a hearing."));
-                    assertThat(pdfTextWithoutNewLines, containsString("Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is in the interests of justice to proceed today."));
+                    assertThat(pdfTextWithoutNewLines, containsString("Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way."));
                 } else if (!appellantAttended && presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString("8. No party has objected to the matter being decided without a hearing."));
-                    assertThat(pdfTextWithoutNewLines, containsString("Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is in the interests of justice to proceed today."));
+                    assertThat(pdfTextWithoutNewLines, containsString("Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way."));
                 } else if (!appellantAttended && !presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString("8. No party has objected to the matter being decided without a hearing."));
-                    assertThat(pdfTextWithoutNewLines, containsString("Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is in the interests of justice to proceed today."));
+                    assertThat(pdfTextWithoutNewLines, containsString("Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way."));
                 }
             } else if ("faceToFace".equals(hearingType)) {
                 if (appellantAttended && presentingOfficerAttended) {
