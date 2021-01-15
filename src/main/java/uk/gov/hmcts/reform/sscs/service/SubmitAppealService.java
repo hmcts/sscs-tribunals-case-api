@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -181,26 +182,16 @@ public class SubmitAppealService {
 
     private SscsCaseDetails createCaseInCcd(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
         SscsCaseDetails caseDetails = null;
+
         try {
-            caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(
-                    caseData.getAppeal().getAppellant().getIdentity().getNino(),
-                    caseData.getAppeal().getBenefitType().getCode(),
-                    caseData.getAppeal().getMrnDetails().getMrnDate(),
-                    idamTokens);
+            List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(caseData.getAppeal().getAppellant().getIdentity().getNino(), idamTokens);
+            caseDetails = matchedByNinoCases.stream().filter(createNinoAndBenefitTypeAndMrnDatePredicate(caseData)).findFirst().orElse(null);
 
             if (caseDetails == null) {
-
-                if (caseData.getAppeal().getAppellant().getIdentity() != null
-                    && !StringUtils.isEmpty(caseData.getAppeal().getAppellant().getIdentity().getNino())) {
-
-                    String nino = caseData.getAppeal().getAppellant().getIdentity().getNino();
-                    List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(nino, idamTokens);
-
-                    if (!matchedByNinoCases.isEmpty()) {
-                        log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + nino);
-
-                        caseData = addAssociatedCases(caseData, matchedByNinoCases);
-                    }
+                if (!matchedByNinoCases.isEmpty()) {
+                    log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino "
+                            + caseData.getAppeal().getAppellant().getIdentity().getNino());
+                    caseData = addAssociatedCases(caseData, matchedByNinoCases);
                 }
 
                 log.info("About to attempt creating case in CCD for benefit type {} and event {} and isScottish {} and languagePreference {}",
@@ -210,14 +201,14 @@ public class SubmitAppealService {
                         caseData.getLanguagePreference().getCode());
 
                 caseDetails = ccdService.createCase(caseData,
-                    eventType.getCcdType(),
-                    "SSCS - new case created",
-                    "Created SSCS case from Submit Your Appeal online with event " + eventType.getCcdType(),
-                    idamTokens);
+                        eventType.getCcdType(),
+                        "SSCS - new case created",
+                        "Created SSCS case from Submit Your Appeal online with event " + eventType.getCcdType(),
+                        idamTokens);
                 log.info("Case {} successfully created in CCD for benefit type {} with event {}",
-                    caseDetails.getId(),
-                    caseData.getAppeal().getBenefitType().getCode(),
-                    eventType);
+                        caseDetails.getId(),
+                        caseData.getAppeal().getBenefitType().getCode(),
+                        eventType);
                 return caseDetails;
             }
         } catch (Exception e) {
@@ -238,6 +229,7 @@ public class SubmitAppealService {
     }
 
     protected List<SscsCaseDetails> getMatchedCases(String nino, IdamTokens idamTokens) {
+        log.info("Find matching cases for Nino " + nino);
         return ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens);
     }
 
@@ -257,6 +249,12 @@ public class SubmitAppealService {
         } else {
             return caseData.toBuilder().linkedCasesBoolean("No").build();
         }
+    }
+
+    private Predicate<SscsCaseDetails> createNinoAndBenefitTypeAndMrnDatePredicate(SscsCaseData caseData) {
+        return c -> c.getData().getAppeal().getAppellant().getIdentity().getNino().equalsIgnoreCase(caseData.getAppeal().getAppellant().getIdentity().getNino())
+                && c.getData().getAppeal().getBenefitType().getCode().equals(caseData.getAppeal().getBenefitType().getCode())
+                && c.getData().getAppeal().getMrnDetails().getMrnDate().equalsIgnoreCase(caseData.getAppeal().getMrnDetails().getMrnDate());
     }
 
     private SaveCaseResult saveDraftCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
