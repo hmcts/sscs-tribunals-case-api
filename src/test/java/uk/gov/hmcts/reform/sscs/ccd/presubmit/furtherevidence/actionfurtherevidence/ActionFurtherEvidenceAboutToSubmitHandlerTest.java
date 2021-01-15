@@ -172,6 +172,35 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenAConfidentialCaseWithScannedDocumentsAndEditedDocument_shouldMoveToSscsDocumentsWithEditedDocument() {
+        sscsCaseData.setIsConfidentialCase(YesNo.YES);
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder()
+                        .fileName("bla3.pdf")
+                        .subtype("sscs1")
+                        .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                        .editedUrl(DocumentLink.builder().documentUrl("www.edited.com").build())
+                        .scannedDate("2020-06-13T00:00:00.000")
+                        .controlNumber("123")
+                        .build()).build();
+
+        scannedDocumentList.add(scannedDocument);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(0).getValue();
+        assertEquals("Other document received on 13-06-2020", sscsDocumentDetail.getDocumentFileName());
+        assertEquals("Other document", sscsDocumentDetail.getDocumentType());
+        assertEquals("www.test.com", sscsDocumentDetail.getDocumentLink().getDocumentUrl());
+        assertEquals("www.edited.com", sscsDocumentDetail.getEditedDocumentLink().getDocumentUrl());
+        assertEquals("2020-06-13", sscsDocumentDetail.getDocumentDateAdded());
+        assertEquals("123", sscsDocumentDetail.getControlNumber());
+        assertEquals(NO, response.getData().getSscsDocument().get(1).getValue().getEvidenceIssued());
+        assertNull(response.getData().getScannedDocuments());
+        assertEquals(YES, response.getData().getEvidenceHandled());
+    }
+
+    @Test
     @Parameters({"true", "false"})
     public void givenACaseWithScannedDocumentOfTypeCoversheet_shouldNotMoveToSscsDocumentsAndWarningShouldBeReturned(boolean ignoreWarnings) {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
@@ -512,6 +541,47 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         for (String error : response.getErrors()) {
             assertEquals("No document URL so could not process", error);
         }
+    }
+
+    @Test
+    public void givenANonConfidentialCaseAndEditedDocumentPopulated_thenAddAnErrorToResponse() {
+        List<ScannedDocument> docs = new ArrayList<>();
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder().fileName("Testing.jpg").url(DocumentLink.builder().documentUrl("test.com").build())
+                        .editedUrl(DocumentLink.builder().documentUrl("test").build()).build()).build();
+
+        docs.add(scannedDocument);
+
+        sscsCaseData.setScannedDocuments(docs);
+        sscsCaseData.setIsConfidentialCase(YesNo.NO);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+
+        for (String error : response.getErrors()) {
+            assertEquals("Case is not marked as confidential so cannot upload an edited document", error);
+        }
+    }
+
+    @Test
+    public void givenAConfidentialCaseAndEditedDocumentPopulated_thenDoNotAddAnErrorToResponse() {
+        List<ScannedDocument> docs = new ArrayList<>();
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder().fileName("Testing.jpg").url(DocumentLink.builder().documentUrl("test.com").build())
+                        .editedUrl(DocumentLink.builder().documentUrl("test").build()).build()).build();
+
+        docs.add(scannedDocument);
+
+        sscsCaseData.setScannedDocuments(docs);
+        sscsCaseData.setIsConfidentialCase(YesNo.YES);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+
     }
 
     @Test

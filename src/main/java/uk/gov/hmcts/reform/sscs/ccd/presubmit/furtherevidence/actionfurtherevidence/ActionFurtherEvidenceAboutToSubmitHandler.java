@@ -30,20 +30,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.ScannedDocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
@@ -250,6 +237,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             preSubmitCallbackResponse.addError("No document URL so could not process");
         }
 
+        if (!YES.equals(preSubmitCallbackResponse.getData().getIsConfidentialCase()) && scannedDocument.getValue().getEditedUrl() != null) {
+            preSubmitCallbackResponse.addError("Case is not marked as confidential so cannot upload an edited document");
+        }
+
         if (isBlank(scannedDocument.getValue().getFileName())) {
             preSubmitCallbackResponse.addError("No document file name so could not process");
         }
@@ -327,6 +318,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             .documentFileName(fileName)
             .bundleAddition(bundleAddition)
             .documentLink(url)
+            .editedDocumentLink(scannedDocument.getValue().getEditedUrl())
             .documentDateAdded(scannedDate)
             .controlNumber(scannedDocument.getValue().getControlNumber())
             .evidenceIssued("No")
