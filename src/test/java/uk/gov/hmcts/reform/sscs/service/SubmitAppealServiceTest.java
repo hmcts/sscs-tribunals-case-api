@@ -145,19 +145,12 @@ public class SubmitAppealServiceTest {
         + "    \"email\" : \"Sutton_SYA_Respons@justice.gov.uk\"\n"
         + "  }";
 
-    private List<String> offices;
-
     @Before
     public void setUp() {
-        offices = new ArrayList<>();
-        offices.add("DWP PIP (1)");
-        offices.add("Balham DRT");
-        offices.add("Watford DRT");
-        offices.add("Sheffield DRT");
 
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, regionalProcessingCenterService,
-            idamService, convertAIntoBService, airLookupService, offices);
+            idamService, convertAIntoBService, airLookupService);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
@@ -173,7 +166,7 @@ public class SubmitAppealServiceTest {
     public void givenCaseDoesNotExistInCcd_shouldCreateCaseWithAppealDetailsWithValidAppealCreatedEvent() {
         submitAppealService = new SubmitAppealService(
                 ccdService, citizenCcdService, regionalProcessingCenterService,
-                idamService, convertAIntoBService, airLookupService, offices);
+                idamService, convertAIntoBService, airLookupService);
 
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
@@ -340,21 +333,7 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void givenAPipCaseWithReadyToListOffice_thenSetCreatedInGapsFromFieldToReadyToList() {
-        SyaCaseWrapper appealData = getSyaCaseWrapper();
-        SyaBenefitType syaBenefitType = new SyaBenefitType("PIP", "PIP");
-        appealData.setBenefitType(syaBenefitType);
-
-        SyaMrn mrn = new SyaMrn();
-        mrn.setDwpIssuingOffice("1");
-        appealData.setMrn(mrn);
-
-        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
-        assertEquals(READY_TO_LIST.getId(), caseData.getCreatedInGapsFrom());
-    }
-
-    @Test
-    public void givenAPipCaseWithValidAppealOffice_thenSetCreatedInGapsFromFieldToValidAppeal() {
+    public void givenAPipCase_thenSetCreatedInGapsFromFieldToReadyToList() {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
         SyaBenefitType syaBenefitType = new SyaBenefitType("PIP", "PIP");
         appealData.setBenefitType(syaBenefitType);
@@ -364,25 +343,11 @@ public class SubmitAppealServiceTest {
         appealData.setMrn(mrn);
 
         SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
-        assertEquals(State.VALID_APPEAL.getId(), caseData.getCreatedInGapsFrom());
-    }
-
-    @Test
-    public void givenAEsaCaseWithReadyToListOffice_thenSetCreatedInGapsFromToReadyToList() {
-        SyaCaseWrapper appealData = getSyaCaseWrapper();
-        SyaBenefitType syaBenefitType = new SyaBenefitType("ESA", "ESA");
-        appealData.setBenefitType(syaBenefitType);
-
-        SyaMrn mrn = new SyaMrn();
-        mrn.setDwpIssuingOffice("Watford DRT");
-        appealData.setMrn(mrn);
-
-        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
         assertEquals(READY_TO_LIST.getId(), caseData.getCreatedInGapsFrom());
     }
 
     @Test
-    public void givenAEsaCaseWithValidAppealOffice_thenSetCreatedInGapsFromFieldToValidAppeal() {
+    public void givenAEsaCase_thenSetCreatedInGapsFromToReadyToList() {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
         SyaBenefitType syaBenefitType = new SyaBenefitType("ESA", "ESA");
         appealData.setBenefitType(syaBenefitType);
@@ -392,7 +357,7 @@ public class SubmitAppealServiceTest {
         appealData.setMrn(mrn);
 
         SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
-        assertEquals(State.VALID_APPEAL.getId(), caseData.getCreatedInGapsFrom());
+        assertEquals(READY_TO_LIST.getId(), caseData.getCreatedInGapsFrom());
     }
 
     @Test(expected = CcdException.class)
