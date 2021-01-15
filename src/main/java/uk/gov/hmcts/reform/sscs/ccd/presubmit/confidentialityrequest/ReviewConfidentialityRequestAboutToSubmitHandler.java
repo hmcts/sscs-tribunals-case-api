@@ -60,7 +60,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubm
                         sscsCaseData.setDwpState(null);
                         sscsCaseData.setInterlocReviewState(null);
                     }
-                    sscsCaseData.setIsProgressingViaGaps("Yes");
+                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
+                    sscsCaseData.setIsProgressingViaGaps(YesNo.YES.getValue());
                     log.info("'Confidentiality - Action Required' set on case id " + sscsCaseData.getCcdCaseId());
                 } else {
                     sscsCaseData.setInterlocReviewState(InterlocReviewState.NONE.getId());
