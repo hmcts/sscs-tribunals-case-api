@@ -315,19 +315,8 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                 }
             }  else if ("paper".equals(hearingType)) {
                 // Lower case "the Tribunal"
-                if (appellantAttended && presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString("8. No party has objected to the matter being decided without a hearing."));
                     assertThat(pdfTextWithoutNewLines, containsString("Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way."));
-                } else if (appellantAttended && !presentingOfficerAttended) {
-                    assertThat(pdfTextWithoutNewLines, containsString("8. No party has objected to the matter being decided without a hearing."));
-                    assertThat(pdfTextWithoutNewLines, containsString("Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way."));
-                } else if (!appellantAttended && presentingOfficerAttended) {
-                    assertThat(pdfTextWithoutNewLines, containsString("8. No party has objected to the matter being decided without a hearing."));
-                    assertThat(pdfTextWithoutNewLines, containsString("Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way."));
-                } else if (!appellantAttended && !presentingOfficerAttended) {
-                    assertThat(pdfTextWithoutNewLines, containsString("8. No party has objected to the matter being decided without a hearing."));
-                    assertThat(pdfTextWithoutNewLines, containsString("Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way."));
-                }
             } else if ("faceToFace".equals(hearingType)) {
                 if (appellantAttended && presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString("8. This has been an oral (face to face) hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
