@@ -23,11 +23,11 @@ public abstract class PipTemplateContent extends WriteFinalDecisionTemplateConte
     }
 
     protected String getIsEntitledDailyLiving(String appellantName, String dailyLivingRate, String startDate) {
-        return appellantName + " is entitled to the daily living component at the " + dailyLivingRate.replace("Rate", "") + " rate from " + DATEFORMATTER.format(LocalDate.parse(startDate))  + " for an indefinite period.";
+        return appellantName + " is entitled to the daily living component at the " + dailyLivingRate + " from " + DATEFORMATTER.format(LocalDate.parse(startDate))  + " for an indefinite period.";
     }
 
     protected String getIsEntitledMobility(String appellantName, String mobilityRate, String startDate) {
-        return appellantName + " is entitled to the mobility component at the " + mobilityRate.replace("Rate", "") + " rate from " + DATEFORMATTER.format(LocalDate.parse(startDate))  + " for an indefinite period.";
+        return appellantName + " is entitled to the mobility component at the " + mobilityRate + " from " + DATEFORMATTER.format(LocalDate.parse(startDate))  + " for an indefinite period.";
     }
 
     public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate) {

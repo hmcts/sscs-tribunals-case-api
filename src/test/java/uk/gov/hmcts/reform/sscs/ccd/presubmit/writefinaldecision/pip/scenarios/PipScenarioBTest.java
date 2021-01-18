@@ -30,7 +30,7 @@ public class PipScenarioBTest {
                         .mobilityIsEntited(true)
                         .mobilityNumberOfPoints(8)
                         .dailyLivingAwardRate("notConsidered")
-                        .mobilityAwardRate("standardRate")
+                        .mobilityAwardRate("standard rate")
                     .pageNumber("A1")
                         .appellantName("Felix Sydney")
                         .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))

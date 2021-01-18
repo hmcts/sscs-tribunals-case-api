@@ -31,7 +31,7 @@ public class PipScenarioCTest {
                         .mobilityIsSeverelyLimited(true)
                         .mobilityNumberOfPoints(12)
                         .dailyLivingAwardRate("notConsidered")
-                        .mobilityAwardRate("enhancedRate")
+                        .mobilityAwardRate("enhanced rate")
                     .pageNumber("A1")
                         .appellantName("Felix Sydney")
                         .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
