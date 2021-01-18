@@ -200,7 +200,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -238,7 +238,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
             esaDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration);
 
         when(generateFile.assemble(any())).thenReturn(URL);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(NO);
+        sscsCaseData.setWcaAppeal(NO);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -306,7 +306,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
         assertEquals(allowed, body.isAllowed());
         assertEquals(isSetAside, body.isSetAside());
         assertNull(body.getDetailsOfDecision());
-        assertEquals(isDescriptorFlow, body.isLcwaAppeal());
+        assertEquals(isDescriptorFlow, body.isWcaAppeal());
 
         return payload;
     }

@@ -253,8 +253,8 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
-    public void scenario10_refused_nonLcwa() throws IOException {
-        String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNonLcwaCallback.json");
+    public void scenario10_refused_nonWca() throws IOException {
+        String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNonWcaCallback.json");
         json = json.replaceFirst("allowed", "refused");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -272,8 +272,8 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
-    public void scenario11_allowed_nonLcwaAppeal() throws IOException {
-        String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNonLcwaCallback.json");
+    public void scenario11_allowed_nonWcaAppeal() throws IOException {
+        String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNonWcaCallback.json");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
