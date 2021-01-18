@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 
-import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-
 import java.time.LocalDate;
 import java.util.List;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.scenarios.PipScenario;
@@ -30,13 +28,8 @@ public abstract class PipTemplateContent extends WriteFinalDecisionTemplateConte
 
     @Override
     protected String getAppellantAttended(String hearingType, String appellantName, boolean presentingOfifficerAttened, String bundlePage) {
-        if (true || equalsIgnoreCase("faceToFace", hearingType)) {
-            return appellantName + " attended the hearing today and the Tribunal considered the appeal bundle to page " + bundlePage + ". "
+        return appellantName + " attended the hearing today and the Tribunal considered the appeal bundle to page " + bundlePage + ". "
                 + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.";
-        } else {
-            return appellantName + " attended and the Tribunal considered the appeal bundle to page " + bundlePage + ". "
-                + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.";
-        }
     }
 
     protected String getIsEntitledMobility(String appellantName, String mobilityRate, String startDate, String endDate) {
