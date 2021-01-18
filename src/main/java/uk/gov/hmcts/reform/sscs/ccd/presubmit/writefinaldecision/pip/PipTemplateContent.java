@@ -28,7 +28,7 @@ public abstract class PipTemplateContent extends WriteFinalDecisionTemplateConte
 
     @Override
     protected String getAppellantAttended(String hearingType, String appellantName, boolean presentingOfifficerAttened, String bundlePage) {
-        return appellantName + " attended the hearing today and the Tribunal considered the appeal bundle to page " + bundlePage + ". "
+        return appellantName + " attended the hearing today and the tribunal considered the appeal bundle to page " + bundlePage + ". "
                 + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.";
     }
 
