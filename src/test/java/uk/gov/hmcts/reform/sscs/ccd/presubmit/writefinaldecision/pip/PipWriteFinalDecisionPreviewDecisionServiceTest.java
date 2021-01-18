@@ -496,7 +496,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     @Test
     public void willSetPreviewFileWithNullReasons_WhenReasonsListIsEmpty() {
 
-        final String endDate = "10-10-2020";
+        final String endDate = "2020-10-10";
         final String rate = "standardRate";
 
         setCommonPreviewParams(sscsCaseData, endDate);

@@ -26,7 +26,7 @@ public abstract class PipTemplateContent extends WriteFinalDecisionTemplateConte
     }
 
     protected String getIsEntitledDailyLiving(String appellantName, String dailyLivingRate, String startDate, String endDate) {
-        return appellantName + " is entitled to the daily living component at the " + dailyLivingRate + " from " + DATEFORMATTER.format(LocalDate.parse(startDate))  + endDate == null ? " for an indefinite period." : " to " + DATEFORMATTER.format(LocalDate.parse(endDate)) + ".";
+        return appellantName + " is entitled to the daily living component at the " + dailyLivingRate + " from " + DATEFORMATTER.format(LocalDate.parse(startDate))  + (endDate == null ? " for an indefinite period." : (" to " + DATEFORMATTER.format(LocalDate.parse(endDate)) + "."));
     }
 
     @Override
@@ -41,7 +41,7 @@ public abstract class PipTemplateContent extends WriteFinalDecisionTemplateConte
     }
 
     protected String getIsEntitledMobility(String appellantName, String mobilityRate, String startDate, String endDate) {
-        return appellantName + " is entitled to the mobility component at the " + mobilityRate + " from " + DATEFORMATTER.format(LocalDate.parse(startDate))  + endDate == null ? " for an indefinite period." : " to " + DATEFORMATTER.format(LocalDate.parse(endDate)) + ".";
+        return appellantName + " is entitled to the mobility component at the " + mobilityRate + " from " + DATEFORMATTER.format(LocalDate.parse(startDate))  + (endDate == null ? " for an indefinite period." : (" to " + DATEFORMATTER.format(LocalDate.parse(endDate)) + "."));
     }
 
     public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate) {
