@@ -1,11 +1,10 @@
 package uk.gov.hmcts.reform.sscs.pdf;
 
+import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.*;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.util.Matrix;
@@ -20,7 +19,7 @@ import uk.gov.hmcts.reform.sscs.model.InputStreamWrapper;
 public class PdfWatermarker {
 
     private static final float SCALE_PERCENTAGE = .88f;
-    private static final int margin = 45;
+    private static final float margin = 45f;
 
     public byte[] shrinkAndWatermarkPdf(byte[] input, String leftText, String rightText) throws Exception {
         try (PDDocument document = PDDocument.load(input)) {
@@ -68,19 +67,20 @@ public class PdfWatermarker {
 
         }
 
-        int fontSize = 12;
+        float fontSize = 12f;
 
         float rightTextWidth = (font.getStringWidth(rightText) / 1000.0f) * fontSize;
 
-        float xoffset = page.getMediaBox().getWidth() - margin - rightTextWidth;
+        float pageWidthDifference = (page.getMediaBox().getWidth() - page.getBBox().getWidth()) / 2;
+        float xoffset = page.getMediaBox().getWidth() - pageWidthDifference - margin - rightTextWidth;
 
         try (PDPageContentStream contentStream =
                      new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true)) {
 
             contentStream.setFont(font, fontSize);
-            contentStream.setNonStrokingColor(0);
+            contentStream.setNonStrokingColor(Color.BLACK);
             contentStream.beginText();
-            contentStream.newLineAtOffset((float) margin, margin);
+            contentStream.newLineAtOffset(pageWidthDifference + margin, margin);
             contentStream.showText(leftText);
             contentStream.endText();
             contentStream.beginText();
