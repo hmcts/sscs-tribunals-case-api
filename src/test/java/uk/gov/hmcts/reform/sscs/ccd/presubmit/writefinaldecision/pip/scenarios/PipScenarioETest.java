@@ -15,18 +15,21 @@ public class PipScenarioETest {
 
         List<Descriptor> dailyLivingDescriptors =
             Arrays.asList(Descriptor.builder()
-                    .activityQuestionValue("1. Preparing Food")
-                    .activityAnswerValue("1")
+                    .activityQuestionNumber("1")
+                    .activityQuestionValue("Preparing Food")
+                    .activityAnswerValue("Needs prompting to be able to either prepare or cook a simple meal.")
                     .activityAnswerLetter("d").activityAnswerPoints(2).build(),
                 Descriptor.builder()
-                    .activityQuestionValue("2. Taking Nutrition")
-                    .activityAnswerValue("2")
+                    .activityQuestionNumber("2")
+                    .activityQuestionValue("Taking Nutrition")
+                    .activityAnswerValue("Needs prompting to be able to take nutrition.")
                     .activityAnswerLetter("d").activityAnswerPoints(4).build());
 
         List<Descriptor> mobilityDescriptors =
             Arrays.asList(Descriptor.builder()
-                .activityQuestionValue("12. Moving Around")
-                .activityAnswerValue("12")
+                .activityQuestionNumber("12")
+                .activityQuestionValue("Moving Around")
+                .activityAnswerValue("Can stand and then move more than 200 metres, either aided or unaided.")
                 .activityAnswerLetter("a").activityAnswerPoints(0).build());
 
         WriteFinalDecisionTemplateBody body =
@@ -57,14 +60,15 @@ public class PipScenarioETest {
             + "\n"
             + "Felix Sydney is not entitled to the daily living component from 17/12/2020. They score 6 points. This is insufficient to meet the threshold for the test.\n"
             + "\n"
-            + "1. Preparing Food\td.1\t2\n"
-            + "2. Taking Nutrition\td.2\t4"
+            + "1.Preparing Food\td.Needs prompting to be able to either prepare or cook a simple meal.\t2\n"
+            + "2.Taking Nutrition\td.Needs prompting to be able to take nutrition.\t4\n"
             + "\n"
-            + "\n\n"
+            + "\n"
             + "Felix Sydney does not qualify for an award of the mobility component from 17/12/2020. They score 0 points. This is insufficient to meet the threshold for the test.\n"
             + "\n"
-            + "12. Moving Around\ta.12\t0\n"
-            + "\n\n"
+            + "12.Moving Around\ta.Can stand and then move more than 200 metres, either aided or unaided.\t0\n"
+            + "\n"
+            + "\n"
             + "My first reasons\n"
             + "\n"
             + "My second reasons\n"

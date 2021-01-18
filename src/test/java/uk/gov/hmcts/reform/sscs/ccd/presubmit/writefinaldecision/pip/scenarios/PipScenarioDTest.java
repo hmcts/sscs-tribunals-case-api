@@ -15,12 +15,14 @@ public class PipScenarioDTest {
 
         List<Descriptor> dailyLivingDescriptors =
                 Arrays.asList(Descriptor.builder()
-                                .activityQuestionValue("1. Preparing Food")
-                                .activityAnswerValue("1")
+                                .activityQuestionNumber("1")
+                                .activityQuestionValue("Preparing Food")
+                                .activityAnswerValue("Needs prompting to be able to either prepare or cook a simple meal.")
                                 .activityAnswerLetter("d").activityAnswerPoints(2).build(),
                     Descriptor.builder()
-                        .activityQuestionValue("2. Taking Nutrition")
-                        .activityAnswerValue("2")
+                        .activityQuestionNumber("2")
+                        .activityQuestionValue("Taking Nutrition")
+                        .activityAnswerValue("Needs prompting to be able to take nutrition.")
                         .activityAnswerLetter("d").activityAnswerPoints(4).build());
 
         WriteFinalDecisionTemplateBody body =
@@ -45,25 +47,25 @@ public class PipScenarioDTest {
 
 
         String expectedContent = "The appeal is refused.\n"
-                + "\n"
-                + "The decision made by the Secretary of State on 20/09/2020 in respect of Personal Independence Payment is confirmed.\n"
-                + "\n"
-                + "Felix Sydney is not entitled to the daily living component from 17/12/2020. They score 6 points. This is insufficient to meet the threshold for the test.\n"
-                + "\n"
-                + "1. Preparing Food\td.1\t2\n"
-                + "2. Taking Nutrition\td.2\t4"
-                + "\n"
-                + "\n\n"
-                + "Only the daily living component was in issue on this appeal and the mobility component was not considered. \n"
-                + "\n"
-                + "My first reasons\n"
-                + "\n"
-                + "My second reasons\n"
-                + "\n"
-                + "Something else\n"
-                + "\n"
-                + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. No Presenting Officer attended on behalf of the Respondent.\n"
-                + "\n";
+            + "\n"
+            + "The decision made by the Secretary of State on 20/09/2020 in respect of Personal Independence Payment is confirmed.\n"
+            + "\n"
+            + "Felix Sydney is not entitled to the daily living component from 17/12/2020. They score 6 points. This is insufficient to meet the threshold for the test.\n"
+            + "\n"
+            + "1.Preparing Food\td.Needs prompting to be able to either prepare or cook a simple meal.\t2\n"
+            + "2.Taking Nutrition\td.Needs prompting to be able to take nutrition.\t4\n"
+            + "\n"
+            + "\n"
+            + "Only the daily living component was in issue on this appeal and the mobility component was not considered. \n"
+            + "\n"
+            + "My first reasons\n"
+            + "\n"
+            + "My second reasons\n"
+            + "\n"
+            + "Something else\n"
+            + "\n"
+            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. No Presenting Officer attended on behalf of the Respondent.\n"
+            + "\n";
 
         Assert.assertEquals(9, content.getComponents().size());
 

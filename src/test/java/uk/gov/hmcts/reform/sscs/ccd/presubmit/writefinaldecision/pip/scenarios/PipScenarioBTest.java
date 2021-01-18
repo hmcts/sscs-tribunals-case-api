@@ -15,8 +15,9 @@ public class PipScenarioBTest {
 
         List<Descriptor> mobilityDescriptors =
                 Arrays.asList(Descriptor.builder()
-                                .activityQuestionValue("12. Moving Around")
-                                .activityAnswerValue("12")
+                                .activityQuestionNumber("12")
+                                .activityQuestionValue("Moving Around")
+                                .activityAnswerValue("Can stand and then move unaided more than 20 metres but no more than 50 metres.")
                                 .activityAnswerLetter("c").activityAnswerPoints(8).build());
 
         WriteFinalDecisionTemplateBody body =
@@ -41,26 +42,26 @@ public class PipScenarioBTest {
 
 
         String expectedContent = "The appeal is refused.\n"
-                + "\n"
-                + "The decision made by the Secretary of State on 20/09/2020 in respect of Personal Independence Payment is confirmed.\n"
-                + "\n"
-                + "Only the mobility component was in issue on this appeal and the daily living component was not considered.\n"
-                + "\n"
-                + "Felix Sydney is entitled to the mobility component at the standard rate from 17/12/2020 for an indefinite period.\n"
-                + "\n"
-                + "Felix Sydney is limited in their ability to mobilise. They score 8 points.They satisfy the following descriptors:\n"
-                + "\n"
-                + "12. Moving Around\tc.12\t8"
-                + "\n"
-                + "\n\n"
-                + "My first reasons\n"
-                + "\n"
-                + "My second reasons\n"
-                + "\n"
-                + "Something else\n"
-                + "\n"
-                + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. No Presenting Officer attended on behalf of the Respondent.\n"
-                + "\n";
+            + "\n"
+            + "The decision made by the Secretary of State on 20/09/2020 in respect of Personal Independence Payment is confirmed.\n"
+            + "\n"
+            + "Only the mobility component was in issue on this appeal and the daily living component was not considered.\n"
+            + "\n"
+            + "Felix Sydney is entitled to the mobility component at the standard rate from 17/12/2020 for an indefinite period.\n"
+            + "\n"
+            + "Felix Sydney is limited in their ability to mobilise. They score 8 points.They satisfy the following descriptors:\n"
+            + "\n"
+            + "12.Moving Around\tc.Can stand and then move unaided more than 20 metres but no more than 50 metres.\t8\n"
+            + "\n"
+            + "\n"
+            + "My first reasons\n"
+            + "\n"
+            + "My second reasons\n"
+            + "\n"
+            + "Something else\n"
+            + "\n"
+            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. No Presenting Officer attended on behalf of the Respondent.\n"
+            + "\n";
 
         Assert.assertEquals(10, content.getComponents().size());
 

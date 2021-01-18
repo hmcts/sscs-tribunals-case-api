@@ -15,12 +15,14 @@ public class PipScenario1Test {
 
         List<Descriptor> dailyLivingDescriptors =
                 Arrays.asList(Descriptor.builder()
-                                .activityQuestionValue("1. Preparing food")
-                                .activityAnswerValue("1")
+                                .activityQuestionNumber("1")
+                                .activityQuestionValue("Preparing food")
+                                .activityAnswerValue("Needs supervision or assistance to either prepare or cook a simple meal.")
                                 .activityAnswerLetter("e").activityAnswerPoints(4).build(),
                         Descriptor.builder()
-                                .activityQuestionValue("2. Taking nutrition")
-                                .activityAnswerValue("2")
+                                .activityQuestionNumber("2")
+                                .activityQuestionValue("Taking nutrition")
+                                .activityAnswerValue("Needs prompting to be able to take nutrition.")
                                 .activityAnswerLetter("d").activityAnswerPoints(4).build());
 
 
@@ -54,8 +56,8 @@ public class PipScenario1Test {
                 + "\n"
                 + "Felix Sydney has limited ability to carry out the activities of daily living set out below. They score 8 points. They satisfy the following descriptors:\n"
                 + "\n"
-                + "1. Preparing food\te.1\t4\n"
-                + "2. Taking nutrition\td.2\t4\n"
+                + "1.Preparing food\te.Needs supervision or assistance to either prepare or cook a simple meal.\t4\n"
+                + "2.Taking nutrition\td.Needs prompting to be able to take nutrition.\t4\n"
                 + "\n"
                 + "\n" + "Felix Sydney is entitled to the mobility component at the standard rate from 10/10/2020 for an indefinite period.\n"
                 + "\n"
