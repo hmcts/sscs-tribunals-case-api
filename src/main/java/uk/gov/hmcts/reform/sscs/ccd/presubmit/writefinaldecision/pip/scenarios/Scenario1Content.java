@@ -11,7 +11,7 @@ public class Scenario1Content extends PipTemplateContent {
     public Scenario1Content(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
         addComponent(new Paragraph(PipTemplateComponentId.ALLOWED_OR_REFUSED_PARAGRAPH.name(), getAllowedOrRefusedSentence(writeFinalDecisionTemplateBody.isAllowed())));
         addComponent(new Paragraph(PipTemplateComponentId.CONFIRMED_OR_SET_ASIDE_PARAGRAPH.name(), getConfirmedOrSetAsideSentence(writeFinalDecisionTemplateBody.isSetAside(), writeFinalDecisionTemplateBody.getDateOfDecision())));
-        if ("notConsidered".equals(writeFinalDecisionTemplateBody.getDailyLivingAwardRate())) {
+        if ("not considered".equals(writeFinalDecisionTemplateBody.getDailyLivingAwardRate())) {
             addComponent(new Paragraph(PipTemplateComponentId.CONFIRMED_OR_SET_ASIDE_PARAGRAPH.name(), getDailyLivingNotConsidered()));
         } else {
             if (writeFinalDecisionTemplateBody.isDailyLivingIsEntited()) {
@@ -30,10 +30,10 @@ public class Scenario1Content extends PipTemplateContent {
             }
         }
 
-        if (!"notConsidered".equals(writeFinalDecisionTemplateBody.getDailyLivingAwardRate())) {
+        if (!"not considered".equals(writeFinalDecisionTemplateBody.getDailyLivingAwardRate())) {
             addDescriptorTableIfPopulated(new DescriptorTable(PipTemplateComponentId.DAILY_LIVING_DESCRIPTORS.name(), writeFinalDecisionTemplateBody.getDailyLivingDescriptors(), false));
         }
-        if ("notConsidered".equals(writeFinalDecisionTemplateBody.getMobilityAwardRate())) {
+        if ("not considered".equals(writeFinalDecisionTemplateBody.getMobilityAwardRate())) {
             addComponent(new Paragraph(PipTemplateComponentId.CONFIRMED_OR_SET_ASIDE_PARAGRAPH.name(), getMobilityNotConsidered()));
         } else {
             if (writeFinalDecisionTemplateBody.isMobilityIsEntited()) {

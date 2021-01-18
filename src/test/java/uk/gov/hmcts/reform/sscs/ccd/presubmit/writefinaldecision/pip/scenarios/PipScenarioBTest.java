@@ -29,7 +29,7 @@ public class PipScenarioBTest {
                         .dailyLivingIsEntited(false)
                         .mobilityIsEntited(true)
                         .mobilityNumberOfPoints(8)
-                        .dailyLivingAwardRate("notConsidered")
+                        .dailyLivingAwardRate("not considered")
                         .mobilityAwardRate("standard rate")
                     .pageNumber("A1")
                         .appellantName("Felix Sydney")
