@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
-
 import java.time.LocalDate;
 import java.util.List;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.scenarios.PipScenario;
