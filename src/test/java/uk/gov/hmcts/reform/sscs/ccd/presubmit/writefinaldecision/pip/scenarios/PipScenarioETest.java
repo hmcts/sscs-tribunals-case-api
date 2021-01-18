@@ -16,19 +16,19 @@ public class PipScenarioETest {
         List<Descriptor> dailyLivingDescriptors =
             Arrays.asList(Descriptor.builder()
                     .activityQuestionNumber("1")
-                    .activityQuestionValue("Preparing Food")
+                    .activityQuestionValue("1.Preparing Food")
                     .activityAnswerValue("Needs prompting to be able to either prepare or cook a simple meal.")
                     .activityAnswerLetter("d").activityAnswerPoints(2).build(),
                 Descriptor.builder()
                     .activityQuestionNumber("2")
-                    .activityQuestionValue("Taking Nutrition")
+                    .activityQuestionValue("2.Taking Nutrition")
                     .activityAnswerValue("Needs prompting to be able to take nutrition.")
                     .activityAnswerLetter("d").activityAnswerPoints(4).build());
 
         List<Descriptor> mobilityDescriptors =
             Arrays.asList(Descriptor.builder()
                 .activityQuestionNumber("12")
-                .activityQuestionValue("Moving Around")
+                .activityQuestionValue("12.Moving Around")
                 .activityAnswerValue("Can stand and then move more than 200 metres, either aided or unaided.")
                 .activityAnswerLetter("a").activityAnswerPoints(0).build());
 

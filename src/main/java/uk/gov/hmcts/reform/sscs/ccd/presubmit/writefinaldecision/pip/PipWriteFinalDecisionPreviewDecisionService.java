@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityAnswer;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestion;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.scenarios.PipScenario;
@@ -38,6 +40,16 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
     @Override
     public String getBenefitType() {
         return "PIP";
+    }
+
+    @Override
+    protected Descriptor buildDescriptorFromActivityAnswer(ActivityQuestion activityQuestion, ActivityAnswer answer) {
+        return Descriptor.builder().activityAnswerPoints(answer.getActivityAnswerPoints())
+            .activityQuestionNumber(answer.getActivityAnswerNumber())
+            .activityAnswerLetter(answer.getActivityAnswerLetter())
+            .activityAnswerValue(answer.getActivityAnswerValue())
+            .activityQuestionValue(answer.getActivityAnswerNumber() + ". " + activityQuestion.getValue())
+            .build();
     }
 
     @Override

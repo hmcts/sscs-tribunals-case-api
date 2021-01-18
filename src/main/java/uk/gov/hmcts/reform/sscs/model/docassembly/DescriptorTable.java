@@ -6,21 +6,19 @@ import java.util.List;
 public class DescriptorTable extends TemplateComponent<List<Descriptor>> {
 
     private boolean hideAnswerColumns;
-    private boolean prefixWithQuestionNumber;
 
-    public DescriptorTable(String id, List<Descriptor> content, boolean hideAnswerColumns, boolean prefixWithQuestionNumber) {
+    public DescriptorTable(String id, List<Descriptor> content, boolean hideAnswerColumns) {
         super(id, content);
         this.hideAnswerColumns = hideAnswerColumns;
-        this.prefixWithQuestionNumber = prefixWithQuestionNumber;
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (Descriptor descriptor : content) {
             if (hideAnswerColumns) {
-                sb.append((prefixWithQuestionNumber ? (descriptor.getActivityQuestionNumber() + ".") : "") + descriptor.getActivityQuestionValue());
+                sb.append(descriptor.getActivityQuestionValue());
             } else {
-                sb.append((prefixWithQuestionNumber ? (descriptor.getActivityQuestionNumber() + ".") : "") + descriptor.getActivityQuestionValue());
+                sb.append(descriptor.getActivityQuestionValue());
                 sb.append("\t");
                 sb.append(descriptor.getActivityAnswerLetter());
                 sb.append(".");

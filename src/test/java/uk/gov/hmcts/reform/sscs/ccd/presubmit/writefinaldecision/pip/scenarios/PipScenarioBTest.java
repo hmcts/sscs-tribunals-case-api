@@ -16,7 +16,7 @@ public class PipScenarioBTest {
         List<Descriptor> mobilityDescriptors =
                 Arrays.asList(Descriptor.builder()
                                 .activityQuestionNumber("12")
-                                .activityQuestionValue("Moving Around")
+                                .activityQuestionValue("12.Moving Around")
                                 .activityAnswerValue("Can stand and then move unaided more than 20 metres but no more than 50 metres.")
                                 .activityAnswerLetter("c").activityAnswerPoints(8).build());
 

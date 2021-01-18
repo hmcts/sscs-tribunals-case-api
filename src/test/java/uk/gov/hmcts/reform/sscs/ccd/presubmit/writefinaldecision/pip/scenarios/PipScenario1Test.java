@@ -16,12 +16,12 @@ public class PipScenario1Test {
         List<Descriptor> dailyLivingDescriptors =
                 Arrays.asList(Descriptor.builder()
                                 .activityQuestionNumber("1")
-                                .activityQuestionValue("Preparing food")
+                                .activityQuestionValue("1.Preparing food")
                                 .activityAnswerValue("Needs supervision or assistance to either prepare or cook a simple meal.")
                                 .activityAnswerLetter("e").activityAnswerPoints(4).build(),
                         Descriptor.builder()
                                 .activityQuestionNumber("2")
-                                .activityQuestionValue("Taking nutrition")
+                                .activityQuestionValue("2.Taking nutrition")
                                 .activityAnswerValue("Needs prompting to be able to take nutrition.")
                                 .activityAnswerLetter("d").activityAnswerPoints(4).build());
 
