@@ -302,7 +302,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
             assertEquals(10, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
             assertEquals("d", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
             assertEquals("Can stand and then move using an aid or appliance more than 20 metres but no more than 50 metres.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
-            assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
+            assertEquals("12. Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
             assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
             assertNotNull(body.getMobilityNumberOfPoints());
             assertEquals(10, body.getMobilityNumberOfPoints().intValue());
@@ -389,7 +389,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
             assertEquals(8, body.getDailyLivingDescriptors().get(0).getActivityAnswerPoints());
             assertEquals("f", body.getDailyLivingDescriptors().get(0).getActivityAnswerLetter());
             assertEquals("Cannot prepare and cook food.", body.getDailyLivingDescriptors().get(0).getActivityAnswerValue());
-            assertEquals("Preparing food", body.getDailyLivingDescriptors().get(0).getActivityQuestionValue());
+            assertEquals("1. Preparing food", body.getDailyLivingDescriptors().get(0).getActivityQuestionValue());
             assertEquals("1", body.getDailyLivingDescriptors().get(0).getActivityQuestionNumber());
             assertNotNull(body.getDailyLivingNumberOfPoints());
             assertEquals(8, body.getDailyLivingNumberOfPoints().intValue());
@@ -478,7 +478,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
             assertEquals(10, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
             assertEquals("d", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
             assertEquals("Can stand and then move using an aid or appliance more than 20 metres but no more than 50 metres.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
-            assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
+            assertEquals("12. Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
             assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
             assertNotNull(body.getMobilityNumberOfPoints());
             assertEquals(10, body.getMobilityNumberOfPoints().intValue());
@@ -548,7 +548,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertEquals(10, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
         assertEquals("d", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
         assertEquals("Can stand and then move using an aid or appliance more than 20 metres but no more than 50 metres.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
-        assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
+        assertEquals("12. Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
         assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
         assertNotNull(body.getMobilityNumberOfPoints());
         assertEquals(10, body.getMobilityNumberOfPoints().intValue());
