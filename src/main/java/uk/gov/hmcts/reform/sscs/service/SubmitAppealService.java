@@ -69,13 +69,24 @@ public class SubmitAppealService {
         SscsCaseData caseData = convertAppealToSscsCaseData(appeal);
         EventType event = findEventType(caseData);
         IdamTokens idamTokens = idamService.getIdamTokens();
+
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, event, idamTokens);
-        postCreateCaseInCcdProcess(caseData, idamTokens, caseDetails, userToken);
+
+        postCreateCaseInCcdProcess(caseData, idamTokens, caseDetails, userToken, toLongO(appeal.getCcdCaseId()), appeal);
+
         if (appeal.getIsSaveAndReturn() != null && appeal.getIsSaveAndReturn().equals("No")) {
             log.info("Case {} created from cache, setting isSaveAndReturn to No", caseDetails.getData().getCcdCaseId());
         }
         // in case of duplicate case the caseDetails will be null
         return caseDetails.getId();
+    }
+
+    private Optional<Long> toLongO(String in) {
+        try {
+            return Optional.of(Long.valueOf(in));
+        } catch (NumberFormatException nfe) {
+            return Optional.empty();
+        }
     }
 
     public Optional<SaveCaseResult> submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal, Boolean forceCreate) {
@@ -216,15 +227,33 @@ public class SubmitAppealService {
     private void postCreateCaseInCcdProcess(SscsCaseData caseData,
                                             IdamTokens idamTokens,
                                             SscsCaseDetails caseDetails,
-                                            String userToken) {
+                                            String userToken,
+                                            Optional<Long> draftCaseId,
+                                            SyaCaseWrapper appeal) {
         if (null != caseDetails && StringUtils.isNotEmpty(userToken)) {
 
-            Optional<SscsCaseDetails> draftDetails = citizenCcdService.draftArchivedFirst(caseData, getUserTokens(userToken), idamTokens);
+            Optional<Long> deletedDraftId;
+
+            if (! draftCaseId.isPresent()) {
+                Optional<SscsCaseDetails> draftDetails =
+                        citizenCcdService.draftArchivedFirst(caseData, getUserTokens(userToken), idamTokens);
+                log.info("Archived First found draft for created case {}", caseDetails.getId());
+                deletedDraftId = draftDetails.map(caseDetail -> caseDetail.getId());
+
+            } else {
+                appeal.setCaseType("draft");
+                SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal);
+
+                citizenCcdService.archiveDraft(sscsCaseData, getUserTokens(userToken), draftCaseId.get());
+                log.info("Archived draft {} for created case {}", draftCaseId.get(), caseDetails.getId());
+                deletedDraftId = draftCaseId;
+            }
 
             citizenCcdService.associateCaseToCitizen(getUserTokens(userToken), caseDetails.getId(), idamTokens);
+
             if (caseDetails.getData() != null && caseDetails.getData().getIsSaveAndReturn() != null
-                    && caseDetails.getData().getIsSaveAndReturn().equals("Yes") && draftDetails.isPresent()) {
-                log.info("Case {} created from draft {}, setting isSaveAndReturn to Yes", caseDetails.getId(), draftDetails.get().getId());
+                    && caseDetails.getData().getIsSaveAndReturn().equals("Yes") && deletedDraftId.isPresent()) {
+                log.info("Case {} created from draft {}, setting isSaveAndReturn to Yes", caseDetails.getId(), deletedDraftId.get());
             }
         }
     }

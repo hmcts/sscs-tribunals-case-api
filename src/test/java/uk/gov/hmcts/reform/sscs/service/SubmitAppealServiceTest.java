@@ -577,13 +577,43 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void willArchiveADraftOnceAppealIsSubmitted() {
+    public void willArchiveFirstDraftOnceAppealIsSubmitted() {
         String userToken = "MyCitizenToken";
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
 
         submitAppealService.submitAppeal(appealData, userToken);
 
+
+        verify(ccdService).createCase(any(SscsCaseData.class), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(citizenCcdService).draftArchivedFirst(any(SscsCaseData.class), any(IdamTokens.class), any(IdamTokens.class));
+    }
+
+    @Test
+    public void willArchiveASpecifcDraftOnceAppealIsSubmittedWithValidCaseId() {
+
+        byte[] expected = {};
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
+        String userToken = "MyCitizenToken";
+        appealData.setCcdCaseId("576890");
+        submitAppealService.submitAppeal(appealData, userToken);
+
+        verify(ccdService).createCase(any(SscsCaseData.class), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(citizenCcdService).archiveDraft(any(SscsCaseData.class), any(IdamTokens.class), any());
+    }
+
+    @Test
+    public void willArchiveFirstcDraftOnceAppealIsSubmittedWithInvalidCaseId() {
+
+        byte[] expected = {};
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
+        String userToken = "MyCitizenToken";
+        appealData.setCcdCaseId("lkj3242&*^");
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService).createCase(any(SscsCaseData.class), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         verify(citizenCcdService).draftArchivedFirst(any(SscsCaseData.class), any(IdamTokens.class), any(IdamTokens.class));
