@@ -366,20 +366,16 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             } else if ("triage".equals(hearingType)) {
                 if (appellantAttended && presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "8. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                        "8. The tribunal considered the appeal bundle to page B7."));
                 } else if (appellantAttended && !presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "8. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent."));
+                        "8. The tribunal considered the appeal bundle to page B7."));
                 } else if (!appellantAttended && presentingOfficerAttended) {
-                    assertThat(pdfTextWithoutNewLines, containsString("8. Joe Bloggs did not attend today. A Presenting Officer attended on behalf of the Respondent."));
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
-                    additionalParagraph = true;
+                        "8. The tribunal considered the appeal bundle to page B7."));
                 } else if (!appellantAttended && !presentingOfficerAttended) {
-                    assertThat(pdfTextWithoutNewLines, containsString("8. Joe Bloggs did not attend today. No Presenting Officer attended on behalf of the Respondent."));
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
-                    additionalParagraph = true;
+                        "8. The tribunal considered the appeal bundle to page B7."));
                 }
             }
             if (additionalParagraph) {
