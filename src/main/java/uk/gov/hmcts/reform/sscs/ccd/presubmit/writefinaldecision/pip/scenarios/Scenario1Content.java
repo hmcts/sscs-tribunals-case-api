@@ -52,6 +52,9 @@ public class Scenario1Content extends PipTemplateContent {
         }
 
         addDescriptorTableIfPopulated(new DescriptorTable(PipTemplateComponentId.MOBILITY_DESCRIPTORS.name(), writeFinalDecisionTemplateBody.getMobilityDescriptors(), false));
+        if (writeFinalDecisionTemplateBody.getSummaryOfOutcomeDecision() != null) {
+            addComponent(new Paragraph(PipTemplateComponentId.SUMMARY_OF_OUTCOME_DECISION.name(), writeFinalDecisionTemplateBody.getSummaryOfOutcomeDecision()));
+        }
         addReasonsIfPresent(writeFinalDecisionTemplateBody);
         addAnythingElseIfPresent(writeFinalDecisionTemplateBody);
         addHearingType(writeFinalDecisionTemplateBody);

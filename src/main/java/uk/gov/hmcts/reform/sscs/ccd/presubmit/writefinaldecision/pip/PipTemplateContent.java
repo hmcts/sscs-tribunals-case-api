@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
+
 import java.time.LocalDate;
 import java.util.List;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.scenarios.PipScenario;
@@ -39,6 +43,39 @@ public abstract class PipTemplateContent extends WriteFinalDecisionTemplateConte
     public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate) {
         return "The decision made by the Secretary of State on " + DATEFORMATTER.format(LocalDate.parse(decisionDate)) + " in respect of Personal Independence Payment is "
                 + (!setAside ? "confirmed." : "set aside.");
+    }
+
+    @Override // Remove the hearing
+    public List<String> getFaceToFaceTelephoneVideoHearingTypeSentences(String hearingType, String appellantName, String bundlePage,
+        boolean appellantAttended, boolean presentingOfifficerAttened) {
+        if (appellantAttended) {
+            if (equalsIgnoreCase("faceToFace", hearingType)) {
+                // Removed "This has been"
+                return singletonList(
+                    getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
+            } else if (equalsIgnoreCase("triage", hearingType)) {
+                return singletonList(getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
+            }  else {
+                return singletonList("This has been a remote hearing in the form of a " + hearingType + " hearing. "
+                    + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
+            }
+        } else {
+            if (equalsIgnoreCase("faceToFace", hearingType)) {
+                return asList(appellantName + " requested an oral hearing but did not attend today. "
+                        + (presentingOfifficerAttened ? "A " : "No ") + "Presenting Officer attended on behalf of the Respondent.",
+                    getConsideredParagraph(bundlePage, appellantName));
+            } else if (equalsIgnoreCase("triage", hearingType)) {
+                // Removed "the hearing"
+                return asList(appellantName + " did not attend today. "
+                        + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.",
+                    getConsideredParagraph(bundlePage, appellantName));
+            } else {
+                // Removed "the hearing"
+                return asList("This has been a remote hearing in the form of a " + hearingType + " hearing. " + appellantName + " did not attend today. "
+                        + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.",
+                    getConsideredParagraph(bundlePage, appellantName));
+            }
+        }
     }
 
     public String getDailyLivingNotConsidered() {
