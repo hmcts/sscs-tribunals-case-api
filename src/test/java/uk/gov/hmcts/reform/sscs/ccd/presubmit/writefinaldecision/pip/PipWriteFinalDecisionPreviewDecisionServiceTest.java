@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceTestBase;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.scenarios.PipScenario;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
@@ -301,7 +302,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
             assertEquals(10, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
             assertEquals("d", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
             assertEquals("Can stand and then move using an aid or appliance more than 20 metres but no more than 50 metres.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
-            assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
+            assertEquals("12. Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
             assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
             assertNotNull(body.getMobilityNumberOfPoints());
             assertEquals(10, body.getMobilityNumberOfPoints().intValue());
@@ -388,18 +389,19 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
             assertEquals(8, body.getDailyLivingDescriptors().get(0).getActivityAnswerPoints());
             assertEquals("f", body.getDailyLivingDescriptors().get(0).getActivityAnswerLetter());
             assertEquals("Cannot prepare and cook food.", body.getDailyLivingDescriptors().get(0).getActivityAnswerValue());
-            assertEquals("Preparing food", body.getDailyLivingDescriptors().get(0).getActivityQuestionValue());
+            assertEquals("1. Preparing food", body.getDailyLivingDescriptors().get(0).getActivityQuestionValue());
             assertEquals("1", body.getDailyLivingDescriptors().get(0).getActivityQuestionNumber());
             assertNotNull(body.getDailyLivingNumberOfPoints());
             assertEquals(8, body.getDailyLivingNumberOfPoints().intValue());
 
         }
-
-
+        
         // Mobility specific assertions
         assertEquals(false, body.isMobilityIsEntited());
         assertEquals(false, body.isMobilityIsSeverelyLimited());
         assertNull(body.getMobilityDescriptors());
+        PipTemplateContent templateContent = (PipTemplateContent)payload.getWriteFinalDecisionTemplateContent();
+        assertEquals(PipScenario.SCENARIO_1, templateContent.getScenario());
     }
 
     @Test
@@ -476,7 +478,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
             assertEquals(10, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
             assertEquals("d", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
             assertEquals("Can stand and then move using an aid or appliance more than 20 metres but no more than 50 metres.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
-            assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
+            assertEquals("12. Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
             assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
             assertNotNull(body.getMobilityNumberOfPoints());
             assertEquals(10, body.getMobilityNumberOfPoints().intValue());
@@ -494,7 +496,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     @Test
     public void willSetPreviewFileWithNullReasons_WhenReasonsListIsEmpty() {
 
-        final String endDate = "10-10-2020";
+        final String endDate = "2020-10-10";
         final String rate = "standardRate";
 
         setCommonPreviewParams(sscsCaseData, endDate);
@@ -546,7 +548,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertEquals(10, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
         assertEquals("d", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
         assertEquals("Can stand and then move using an aid or appliance more than 20 metres but no more than 50 metres.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
-        assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
+        assertEquals("12. Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
         assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
         assertNotNull(body.getMobilityNumberOfPoints());
         assertEquals(10, body.getMobilityNumberOfPoints().intValue());

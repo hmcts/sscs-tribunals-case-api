@@ -1,15 +1,18 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
@@ -62,6 +65,11 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                     todayDate,
                     sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink()));
         }
+
+        if (sscsCaseData.getAppendix12Doc() != null) {
+            addToDwpDocuments(sscsCaseData, sscsCaseData.getAppendix12Doc(), DwpDocumentType.APPENDIX_12);
+        }
+
         if (sscsCaseData.getDwpEditedEvidenceBundleDocument() != null || sscsCaseData.getDwpEditedResponseDocument() != null) {
             if (sscsCaseData.getDwpEditedEvidenceBundleDocument() == null || sscsCaseData.getDwpEditedResponseDocument() == null) {
                 preSubmitCallbackResponse.addError("You must submit both an edited response document and an edited evidence bundle");
@@ -71,6 +79,11 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 preSubmitCallbackResponse.addError("If edited evidence is added a reason must be selected");
                 return preSubmitCallbackResponse;
             }
+
+            sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
+
+            //FIXME: These should be moved to the DWP document collection at some point, ideally before we switch this feature on
+
             sscsCaseData.setDwpEditedResponseDocument(buildDwpResponseDocumentWithDate(
                     AppConstants.DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX,
                     todayDate,
@@ -80,7 +93,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                     AppConstants.DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX,
                     todayDate,
                     sscsCaseData.getDwpEditedEvidenceBundleDocument().getDocumentLink()));
-
 
             if (!StringUtils.equalsIgnoreCase(sscsCaseData.getDwpFurtherInfo(), "Yes")) {
                 DynamicListItem reviewByJudgeItem = new DynamicListItem("reviewByJudge", null);
@@ -123,5 +135,17 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                                 .documentFilename(documentType + " on " + dateForFile + fileExtension)
                                 .build()
                 ).build());
+    }
+
+    private void addToDwpDocuments(SscsCaseData sscsCaseData, DwpResponseDocument dwpDocument, DwpDocumentType docType) {
+        DwpDocumentDetails dwpDocumentDetails = new DwpDocumentDetails(docType.getValue(),
+                docType.getLabel(),
+                LocalDate.now().toString(),
+                dwpDocument.getDocumentLink(), null, null, null);
+        DwpDocument doc = new DwpDocument(dwpDocumentDetails);
+        if (isNull(sscsCaseData.getDwpDocuments())) {
+            sscsCaseData.setDwpDocuments(new ArrayList<>());
+        }
+        sscsCaseData.getDwpDocuments().add(doc);
     }
 }
