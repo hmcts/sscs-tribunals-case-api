@@ -96,10 +96,8 @@ public abstract class PipTemplateContent extends WriteFinalDecisionTemplateConte
                         + (presentingOfifficerAttened ? "A " : "No ") + "Presenting Officer attended on behalf of the Respondent.",
                     getConsideredParagraph(bundlePage, appellantName));
             } else if (equalsIgnoreCase("triage", hearingType)) {
-                // Removed "the hearing"
-                return asList(appellantName + " did not attend today. "
-                        + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.",
-                    getConsideredParagraph(bundlePage, appellantName));
+                // Replaced with triage considered paragraph
+                return singletonList(getTriageConsideredParagraph(bundlePage));
             } else if (equalsIgnoreCase("paper", hearingType)) {
                 // Removed "the hearing"
                 return asList("This has been a remote hearing in the form of a " + hearingType + " hearing. " + appellantName + " did not attend today. "
