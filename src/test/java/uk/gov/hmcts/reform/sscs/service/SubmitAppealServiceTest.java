@@ -15,6 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -182,9 +183,17 @@ public class SubmitAppealServiceTest {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
 
-        given(ccdService.findCaseBy(any(), any(), any())).willReturn(Collections.singletonList(
-                SscsCaseDetails.builder().id(12345678L).build()
-        ));
+        given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq(appealData.getAppellant().getNino()), any()))
+                .willReturn(Collections.singletonList(
+                        SscsCaseDetails.builder()
+                                .id(12345678L)
+                                .data(SscsCaseData.builder()
+                                        .appeal(Appeal.builder()
+                                                .appellant(Appellant.builder().identity(Identity.builder().nino(appealData.getAppellant().getNino()).build()).build())
+                                                .benefitType(BenefitType.builder().code(appealData.getBenefitType().getCode()).build())
+                                                .mrnDetails(MrnDetails.builder().mrnDate(appealData.getMrn().getDate().plusDays(5).format(DateTimeFormatter.ISO_LOCAL_DATE))
+                                                        .build()).build()).build()).build()
+                ));
 
         submitAppealService.submitAppeal(appealData, userToken);
 
@@ -353,7 +362,7 @@ public class SubmitAppealServiceTest {
 
     @Test(expected = CcdException.class)
     public void givenExceptionWhenSearchingForCaseInCcd_shouldThrowException() {
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any(IdamTokens.class)))
+        given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq(appealData.getAppellant().getNino()), any(IdamTokens.class)))
             .willThrow(RuntimeException.class);
 
         submitAppealService.submitAppeal(appealData, userToken);
@@ -372,9 +381,17 @@ public class SubmitAppealServiceTest {
 
     @Test(expected = DuplicateCaseException.class)
     public void givenCaseIsADuplicate_shouldNotResendEmails() {
-        SscsCaseDetails duplicateCase = SscsCaseDetails.builder().build();
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any(IdamTokens.class)))
-            .willReturn(duplicateCase);
+        given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq(appealData.getAppellant().getNino()), any()))
+            .willReturn(Collections.singletonList(
+                    SscsCaseDetails.builder()
+                            .id(12345678L)
+                            .data(SscsCaseData.builder()
+                                    .appeal(Appeal.builder()
+                                            .appellant(Appellant.builder().identity(Identity.builder().nino(appealData.getAppellant().getNino()).build()).build())
+                                            .benefitType(BenefitType.builder().code(appealData.getBenefitType().getCode()).build())
+                                            .mrnDetails(MrnDetails.builder().mrnDate(appealData.getMrn().getDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
+                                                    .build()).build()).build()).build()
+            ));
 
         submitAppealService.submitAppeal(appealData, userToken);
 
@@ -383,8 +400,30 @@ public class SubmitAppealServiceTest {
 
     @Test(expected = DuplicateCaseException.class)
     public void givenCaseAlreadyExistsInCcd_shouldNotCreateCaseWithAppealDetails() {
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any()))
-            .willReturn(SscsCaseDetails.builder().build());
+        given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq(appealData.getAppellant().getNino()), any()))
+                .willReturn(Arrays.asList(
+                        SscsCaseDetails.builder()
+                                .data(SscsCaseData.builder()
+                                        .appeal(Appeal.builder()
+                                                .appellant(Appellant.builder().identity(Identity.builder().nino(appealData.getAppellant().getNino()).build()).build())
+                                                .benefitType(BenefitType.builder().code(appealData.getBenefitType().getCode()).build())
+                                                .mrnDetails(MrnDetails.builder().mrnDate(appealData.getMrn().getDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
+                                                        .build()).build()).build()).build(),
+                        SscsCaseDetails.builder()
+                                .data(SscsCaseData.builder()
+                                        .appeal(Appeal.builder()
+                                                .appellant(Appellant.builder().identity(Identity.builder().nino(appealData.getAppellant().getNino()).build()).build())
+                                                .benefitType(BenefitType.builder().code("ESA").build())
+                                                .mrnDetails(MrnDetails.builder().mrnDate(appealData.getMrn().getDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
+                                                        .build()).build()).build()).build(),
+                        SscsCaseDetails.builder()
+                                .data(SscsCaseData.builder()
+                                        .appeal(Appeal.builder()
+                                                .appellant(Appellant.builder().identity(Identity.builder().nino(appealData.getAppellant().getNino()).build()).build())
+                                                .benefitType(BenefitType.builder().code(appealData.getBenefitType().getCode()).build())
+                                                .mrnDetails(MrnDetails.builder().mrnDate(LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE))
+                                                        .build()).build()).build()).build()
+                ));
 
         submitAppealService.submitAppeal(appealData, userToken);
 
@@ -396,8 +435,6 @@ public class SubmitAppealServiceTest {
         String userToken = "MyCitizenToken";
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
-
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
 
         submitAppealService.submitAppeal(appealData, userToken);
 
