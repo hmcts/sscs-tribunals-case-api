@@ -41,14 +41,28 @@ public abstract class PipTemplateContent extends WriteFinalDecisionTemplateConte
         return "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify " + appellantName + " of the hearing and that it is in the interests of justice to proceed today. ";
     }
 
+    /*
+
+     protected String getConsideredParagraph(String bundlePage, String appellantName) {
+        return "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify " + appellantName + " of the hearing and that it is in the interests of justice to proceed today. ";
+    }
+     */
+
     protected String getIsEntitledMobility(String appellantName, String mobilityRate, String startDate, String endDate) {
         return appellantName + " is entitled to the mobility component at the " + mobilityRate + " from " + DATEFORMATTER.format(LocalDate.parse(startDate))  + (endDate == null ? " for an indefinite period." : (" to " + DATEFORMATTER.format(LocalDate.parse(endDate)) + "."));
     }
 
+    @Override
     public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate) {
         return "The decision made by the Secretary of State on " + DATEFORMATTER.format(LocalDate.parse(decisionDate)) + " in respect of Personal Independence Payment is "
                 + (!setAside ? "confirmed." : "set aside.");
     }
+
+    /*
+    public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate) {
+        return "The decision made by the Secretary of State on " + DATEFORMATTER.format(LocalDate.parse(decisionDate)) + " is "
+            + (!setAside ? "confirmed." : "set aside.");
+     */
 
     @Override
     public List<String> getHearingTypeSentences(String appellantName, String bundlePage, String hearingType, boolean appellantAttended, boolean presentingOfficerAttened) {
@@ -68,7 +82,7 @@ public abstract class PipTemplateContent extends WriteFinalDecisionTemplateConte
                 return singletonList("This has been an oral (face to face) hearing. "
                     + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
             } else if (equalsIgnoreCase("triage", hearingType)) {
-                return singletonList(getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
+                return singletonList(getTriageConsideredParagraph(bundlePage));
             } else if (equalsIgnoreCase("paper", hearingType)) {
                 return singletonList("This has been a remote hearing in the form of a " + hearingType + " hearing. " + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
             } else {

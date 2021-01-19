@@ -68,6 +68,10 @@ public abstract class WriteFinalDecisionTemplateContent {
         return value;
     }
 
+    protected String getTriageConsideredParagraph(String bundlePage) {
+        return "The tribunal considered the appeal bundle to page " + bundlePage + ".";
+    }
+
     public WriteFinalDecisionTemplateContent() {
         this.components = new ArrayList<>();
     }
