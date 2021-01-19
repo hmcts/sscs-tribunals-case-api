@@ -36,6 +36,11 @@ public abstract class PipTemplateContent extends WriteFinalDecisionTemplateConte
                 + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.";
     }
 
+    @Override
+    protected String getConsideredParagraph(String bundlePage, String appellantName) {
+        return "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify " + appellantName + " of the hearing and that it is in the interests of justice to proceed today. ";
+    }
+
     protected String getIsEntitledMobility(String appellantName, String mobilityRate, String startDate, String endDate) {
         return appellantName + " is entitled to the mobility component at the " + mobilityRate + " from " + DATEFORMATTER.format(LocalDate.parse(startDate))  + (endDate == null ? " for an indefinite period." : (" to " + DATEFORMATTER.format(LocalDate.parse(endDate)) + "."));
     }
@@ -50,18 +55,20 @@ public abstract class PipTemplateContent extends WriteFinalDecisionTemplateConte
         boolean appellantAttended, boolean presentingOfifficerAttened) {
         if (appellantAttended) {
             if (equalsIgnoreCase("faceToFace", hearingType)) {
-                // Removed "This has been"
-                return singletonList(
+                return singletonList("This has been an oral (face to face) hearing. " +
                     getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
             } else if (equalsIgnoreCase("triage", hearingType)) {
                 return singletonList(getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
-            }  else {
+            } else if (equalsIgnoreCase("paper", hearingType)) {
+                return singletonList("This has been a remote hearing in the form of a " + hearingType + " hearing. " + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
+            } else {
                 return singletonList("This has been a remote hearing in the form of a " + hearingType + " hearing. "
                     + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
             }
         } else {
             if (equalsIgnoreCase("faceToFace", hearingType)) {
-                return asList(appellantName + " requested an oral hearing but did not attend today. "
+                // Adding in // This has been
+                return asList("This has been an oral (face to face) hearing. " + appellantName + " requested an oral hearing but did not attend today. "
                         + (presentingOfifficerAttened ? "A " : "No ") + "Presenting Officer attended on behalf of the Respondent.",
                     getConsideredParagraph(bundlePage, appellantName));
             } else if (equalsIgnoreCase("triage", hearingType)) {
@@ -69,6 +76,10 @@ public abstract class PipTemplateContent extends WriteFinalDecisionTemplateConte
                 return asList(appellantName + " did not attend today. "
                         + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.",
                     getConsideredParagraph(bundlePage, appellantName));
+            } else if (equalsIgnoreCase("paper", hearingType)) {
+                // Removed "the hearing"
+                return asList("This has been a remote hearing in the form of a " + hearingType + " hearing. " + appellantName + " did not attend today. "
+                        + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent. " + getConsideredParagraph(bundlePage, appellantName));
             } else {
                 // Removed "the hearing"
                 return asList("This has been a remote hearing in the form of a " + hearingType + " hearing. " + appellantName + " did not attend today. "
