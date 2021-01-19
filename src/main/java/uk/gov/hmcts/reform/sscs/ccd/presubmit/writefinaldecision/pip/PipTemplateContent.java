@@ -55,8 +55,8 @@ public abstract class PipTemplateContent extends WriteFinalDecisionTemplateConte
         boolean appellantAttended, boolean presentingOfifficerAttened) {
         if (appellantAttended) {
             if (equalsIgnoreCase("faceToFace", hearingType)) {
-                return singletonList("This has been an oral (face to face) hearing. " +
-                    getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
+                return singletonList("This has been an oral (face to face) hearing. "
+                    + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
             } else if (equalsIgnoreCase("triage", hearingType)) {
                 return singletonList(getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
             } else if (equalsIgnoreCase("paper", hearingType)) {
