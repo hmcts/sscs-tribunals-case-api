@@ -55,8 +55,7 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandler implements PreSubmit
             sscsCaseData.setReasonableAdjustments(null);
         }
 
-        sscsCaseData.setUpdateReasonableAdjustment(null);
-
+        sscsCaseData.setReasonableAdjustmentChoice(null);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
