@@ -41,7 +41,7 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private static final String FURTHER_EVIDENCE_RECEIVED = "furtherEvidenceReceived";
     private static final String COVERSHEET = "coversheet";
-    public static final String YES = "Yes";
+    public static final String YES = YesNo.YES.getValue();
 
     private final FooterService footerService;
     private final BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder;
@@ -237,7 +237,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             preSubmitCallbackResponse.addError("No document URL so could not process");
         }
 
-        if (!YES.equals(preSubmitCallbackResponse.getData().getIsConfidentialCase()) && scannedDocument.getValue().getEditedUrl() != null) {
+        if (!YesNo.YES.equals(preSubmitCallbackResponse.getData().getIsConfidentialCase()) && scannedDocument.getValue().getEditedUrl() != null) {
             preSubmitCallbackResponse.addError("Case is not marked as confidential so cannot upload an edited document");
         }
 
