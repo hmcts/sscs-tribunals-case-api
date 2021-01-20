@@ -310,7 +310,6 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.1.35.RC-SSCS-8495-5'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.20-RC-SSCS-8495-2'
 
-
     testCompile group: 'io.rest-assured', name: 'rest-assured'
     compile 'org.projectlombok:lombok:1.18.16'
     annotationProcessor 'org.projectlombok:lombok:1.18.14'
