@@ -75,6 +75,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     protected void setHigherRateScenarioFields(SscsCaseData caseData) {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionStartDate("2018-10-11");
     }
 
     @Override

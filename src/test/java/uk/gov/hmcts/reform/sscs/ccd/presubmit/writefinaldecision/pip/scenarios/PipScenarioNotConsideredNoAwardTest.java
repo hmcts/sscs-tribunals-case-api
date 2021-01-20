@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipTemplate
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class PipScenarioATest {
+public class PipScenarioNotConsideredNoAwardTest {
 
     @Test
     public void testScenario1() {
@@ -31,6 +31,9 @@ public class PipScenarioATest {
                         .dailyLivingAwardRate("not considered")
                         .dailyLivingIsEntited(false)
                         .mobilityIsEntited(false)
+                        .isDescriptorFlow(true)
+                        .isAllowed(false)
+                        .isSetAside(false)
                         .mobilityAwardRate("no award")
                     .pageNumber("A1")
                         .appellantName("Felix Sydney")
@@ -38,7 +41,7 @@ public class PipScenarioATest {
                         .anythingElse("Something else")
                         .mobilityDescriptors(mobilityDescriptors).build();
 
-        PipTemplateContent content = PipScenario.SCENARIO_1.getContent(body);
+        PipTemplateContent content = PipScenario.SCENARIO_NOT_CONSIDERED_NO_AWARD.getContent(body);
 
 
         String expectedContent = "The appeal is refused.\n"

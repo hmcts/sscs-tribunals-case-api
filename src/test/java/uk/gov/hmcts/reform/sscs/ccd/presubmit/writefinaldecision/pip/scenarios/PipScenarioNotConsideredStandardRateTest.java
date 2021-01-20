@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipTemplate
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class PipScenarioCTest {
+public class PipScenarioNotConsideredStandardRateTest {
 
     @Test
     public void testScenario1() {
@@ -17,8 +17,8 @@ public class PipScenarioCTest {
                 Arrays.asList(Descriptor.builder()
                                 .activityQuestionNumber("12")
                                 .activityQuestionValue("12.Moving Around")
-                                .activityAnswerValue("Can stand and then move more than 1 metre but no more than 20 metres, either aided or unaided.")
-                                .activityAnswerLetter("e").activityAnswerPoints(12).build());
+                                .activityAnswerValue("Can stand and then move unaided more than 20 metres but no more than 50 metres.")
+                                .activityAnswerLetter("c").activityAnswerPoints(8).build());
 
         WriteFinalDecisionTemplateBody body =
                 WriteFinalDecisionTemplateBody.builder()
@@ -29,17 +29,19 @@ public class PipScenarioCTest {
                         .startDate("2020-12-17")
                         .dailyLivingIsEntited(false)
                         .mobilityIsEntited(true)
-                        .mobilityIsSeverelyLimited(true)
-                        .mobilityNumberOfPoints(12)
+                        .mobilityNumberOfPoints(8)
+                        .isDescriptorFlow(true)
+                        .isAllowed(false)
+                        .isSetAside(false)
                         .dailyLivingAwardRate("not considered")
-                        .mobilityAwardRate("enhanced rate")
+                        .mobilityAwardRate("standard rate")
                     .pageNumber("A1")
                         .appellantName("Felix Sydney")
                         .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
                         .anythingElse("Something else")
                         .mobilityDescriptors(mobilityDescriptors).build();
 
-        PipTemplateContent content = PipScenario.SCENARIO_1.getContent(body);
+        PipTemplateContent content = PipScenario.SCENARIO_NOT_CONSIDERED_AWARD.getContent(body);
 
 
         String expectedContent = "The appeal is refused.\n"
@@ -48,11 +50,11 @@ public class PipScenarioCTest {
             + "\n"
             + "Only the mobility component was in issue on this appeal and the daily living component was not considered.\n"
             + "\n"
-            + "Felix Sydney is entitled to the mobility component at the enhanced rate from 17/12/2020 for an indefinite period.\n"
+            + "Felix Sydney is entitled to the mobility component at the standard rate from 17/12/2020 for an indefinite period.\n"
             + "\n"
-            + "Felix Sydney is severely limited in their ability to mobilise. They score 12 points.They satisfy the following descriptors:\n"
+            + "Felix Sydney is limited in their ability to mobilise. They score 8 points.They satisfy the following descriptors:\n"
             + "\n"
-            + "12.Moving Around\te.Can stand and then move more than 1 metre but no more than 20 metres, either aided or unaided.\t12\n"
+            + "12.Moving Around\tc.Can stand and then move unaided more than 20 metres but no more than 50 metres.\t8\n"
             + "\n"
             + "\n"
             + "My first reasons\n"

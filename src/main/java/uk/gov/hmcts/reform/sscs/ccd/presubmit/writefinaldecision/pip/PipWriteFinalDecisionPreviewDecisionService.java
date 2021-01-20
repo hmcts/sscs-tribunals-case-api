@@ -68,7 +68,28 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
             // Optional<EsaAllowedOrRefusedCondition> condition = EsaPointsRegulationsAndSchedule3ActivitiesCondition
             //   .getPassingAllowedOrRefusedCondition(decisionNoticeQuestionService, caseData);
             //if (condition.isPresent()) {
+
             PipScenario scenario = PipScenario.SCENARIO_1;
+
+            if (!payload.isDescriptorFlow()) {
+                scenario = PipScenario.SCENARIO_NON_DESCRIPTOR;
+            } else {
+                if ("no award".equals(payload.getDailyLivingAwardRate()) && "no award".equals(payload.getMobilityAwardRate())) {
+                    scenario = PipScenario.SCENARIO_NO_AWARD_NO_AWARD;
+                } else if ("not considered".equals(payload.getDailyLivingAwardRate()) && "no award".equals(payload.getMobilityAwardRate())) {
+                    scenario = PipScenario.SCENARIO_NOT_CONSIDERED_NO_AWARD;
+                } else if ("not considered".equals(payload.getDailyLivingAwardRate()) && !"no award".equals(payload.getMobilityAwardRate())) {
+                    scenario = PipScenario.SCENARIO_NOT_CONSIDERED_AWARD;
+                } else if ("no award".equals(payload.getDailyLivingAwardRate()) && !"not considered".equals(payload.getMobilityAwardRate())) {
+                    scenario = PipScenario.SCENARIO_NO_AWARD_AWARD;
+                } else if ("no award".equals(payload.getDailyLivingAwardRate()) && "not considered".equals(payload.getMobilityAwardRate())) {
+                    scenario = PipScenario.SCENARIO_NO_AWARD_NOT_CONSIDERED;
+                } else if (!"no award".equals(payload.getDailyLivingAwardRate()) && "no award".equals(payload.getMobilityAwardRate())) {
+                    scenario = PipScenario.SCENARIO_AWARD_NO_AWARD;
+                } else if (!"no award".equals(payload.getDailyLivingAwardRate()) && !"no award".equals(payload.getMobilityAwardRate())) {
+                    scenario = PipScenario.SCENARIO_AWARD_AWARD;
+                }
+            }
             PipTemplateContent templateContent = scenario.getContent(payload);
             builder.writeFinalDecisionTemplateContent(templateContent);
             // } else {
