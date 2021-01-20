@@ -328,6 +328,11 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(descriptorsComparedToDwp);
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(nonDescriptorsComparedWithDwp);
+        if ("higher".equals(descriptorsComparedToDwp)) {
+            sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        } else {
+            sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
+        }
 
         setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");

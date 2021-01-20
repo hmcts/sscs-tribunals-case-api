@@ -6,7 +6,8 @@ public enum ComparedToDwpPredicate implements Predicate<String> {
 
     SAME("same"::equals),
     LOWER("lower"::equals),
-    HIGHER("higher"::equals);
+    HIGHER("higher"::equals),
+    NOT_CONSIDERED(s -> s == null);
 
     Predicate<String> predicate;
 

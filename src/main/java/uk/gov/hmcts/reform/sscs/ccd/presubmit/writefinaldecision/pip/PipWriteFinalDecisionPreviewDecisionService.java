@@ -5,6 +5,7 @@ import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -69,6 +70,12 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
             //   .getPassingAllowedOrRefusedCondition(decisionNoticeQuestionService, caseData);
             //if (condition.isPresent()) {
 
+
+            Optional<PipAllowedOrRefusedCondition> condition = PipAllowedOrRefusedCondition.getPassingAllowedOrRefusedCondition(decisionNoticeQuestionService, caseData);
+            if (!condition.isPresent()) {
+                throw new UnsupportedOperationException();
+            }
+            
             PipScenario scenario = null;
 
             if (!payload.isDescriptorFlow()) {

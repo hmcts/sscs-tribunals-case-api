@@ -187,6 +187,7 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.setWriteFinalDecisionStartDate("2018-11-10");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         when(pipDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
 
@@ -223,6 +224,7 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("no");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         when(pipDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
 
