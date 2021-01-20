@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceTestBase;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.scenarios.PipScenario;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
@@ -381,7 +382,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(descriptorsComparedToDwp);
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(nonDescriptorsComparedWithDwp);
-        if ("higher".equals(descriptorsComparedToDwp) || "higher".equals(nonDescriptorsComparedWithDwp)) {
+        if ("higher".equals(descriptorsComparedToDwp)) {
             sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         } else {
             sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
@@ -453,6 +454,18 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
             assertEquals("1", body.getDailyLivingDescriptors().get(0).getActivityQuestionNumber());
             assertNotNull(body.getDailyLivingNumberOfPoints());
             assertEquals(8, body.getDailyLivingNumberOfPoints().intValue());
+            PipTemplateContent templateContent = (PipTemplateContent)payload.getWriteFinalDecisionTemplateContent();
+            if ("notConsidered".equals(rate)) {
+                assertNull(templateContent);
+            }
+            if ("noAward".equals(rate)) {
+                assertEquals(PipScenario.SCENARIO_NO_AWARD_NOT_CONSIDERED, templateContent.getScenario());
+            } else if ("notConsidered".equals(rate)) {
+                assertNull(templateContent);
+            } else {
+                System.out.println(rate);
+                assertEquals(PipScenario.SCENARIO_AWARD_NOT_CONSIDERED, templateContent.getScenario());
+            }
 
         }
         

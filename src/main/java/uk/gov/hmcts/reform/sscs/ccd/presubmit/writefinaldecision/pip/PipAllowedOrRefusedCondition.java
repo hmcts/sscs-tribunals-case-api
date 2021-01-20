@@ -145,6 +145,26 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
         if (REFUSED_NOT_CONSIDERED_NOT_CONSIDERED == this || ALLOWED_NOT_CONSIDERED_NOT_CONSIDERED == this) {
             return PipScenario.SCENARIO_NON_DESCRIPTOR;
         } else if (isDailyLivingConsidered && isMobilityConsidered) {
+            if ("no award".equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion()) && "noAward".equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+                return PipScenario.SCENARIO_NO_AWARD_NO_AWARD;
+            } else if ("notConsidered".equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion()) && "noAward".equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+                return PipScenario.SCENARIO_NOT_CONSIDERED_NO_AWARD;
+            } else if ("notConsidered".equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion()) && (!"noAward".equals(caseData.getPipWriteFinalDecisionMobilityQuestion()) && !"not considered".equals(caseData.getPipWriteFinalDecisionMobilityQuestion()))) {
+                return PipScenario.SCENARIO_NOT_CONSIDERED_AWARD;
+            } else if ("noAward".equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion()) && !"notConsidered".equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+                return PipScenario.SCENARIO_NO_AWARD_AWARD;
+            } else if ("noAward".equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion()) && "notConsidered".equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+                return PipScenario.SCENARIO_NO_AWARD_NOT_CONSIDERED;
+            } else if ((!"noAward".equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion()) && !"notConsidered".equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) && "notConsidered".equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+                return PipScenario.SCENARIO_AWARD_NOT_CONSIDERED;
+            } else if ((!"nnoAward".equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion()) && !"notConsidered".equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) && "noAward".equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+                return PipScenario.SCENARIO_AWARD_NO_AWARD;
+            } else if ((!"noAward".equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion()) && !"notConsidered".equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) && (!"noAward".equals(caseData.getPipWriteFinalDecisionMobilityQuestion()) && !"notConsidered".equals(caseData.getPipWriteFinalDecisionMobilityQuestion()))) {
+                return PipScenario.SCENARIO_AWARD_AWARD;
+            } else {
+                throw new IllegalStateException("should not happen");
+            }
+            /*
             if ("noAward".equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion()) && "noAward".equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
                 return PipScenario.SCENARIO_NO_AWARD_NO_AWARD;
             } else if ("noAward".equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
@@ -166,6 +186,7 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
             } else {
                 return PipScenario.SCENARIO_NOT_CONSIDERED_AWARD;
             }
+            */
         } else {
             throw new IllegalStateException("Should not happen");
         }
