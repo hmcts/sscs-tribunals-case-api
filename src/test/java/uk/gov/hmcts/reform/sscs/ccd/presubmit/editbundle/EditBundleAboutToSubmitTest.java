@@ -24,10 +24,10 @@ import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
 
 @RunWith(JUnitParamsRunner.class)
-public class EditBundleAboutToStartTest {
+public class EditBundleAboutToSubmitTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private EditBundleAboutToStartHandler handler;
+    private EditBundleAboutToSubmitHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -48,7 +48,7 @@ public class EditBundleAboutToStartTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new EditBundleAboutToStartHandler(serviceRequestExecutor, "bundleUrl.com", documentConfiguration);
+        handler = new EditBundleAboutToSubmitHandler(serviceRequestExecutor, "bundleUrl.com", documentConfiguration);
 
         when(callback.getEvent()).thenReturn(EventType.EDIT_BUNDLE);
 
