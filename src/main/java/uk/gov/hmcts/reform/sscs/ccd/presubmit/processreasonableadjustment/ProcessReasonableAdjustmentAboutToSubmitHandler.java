@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.processreasonableadjustment;
 
 import static java.util.Objects.requireNonNull;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
@@ -37,21 +40,9 @@ public class ProcessReasonableAdjustmentAboutToSubmitHandler implements PreSubmi
             callbackResponse.addError("No reasonable adjustment correspondence has been generated on this case");
         }
 
-        checkReasonableAdjustmentsOutstandingFlag(sscsCaseData);
+        sscsCaseData.updateReasonableAdjustmentsOutstanding();
 
         return callbackResponse;
-    }
-
-    private void checkReasonableAdjustmentsOutstandingFlag(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().size() > 0) {
-            sscsCaseData.setReasonableAdjustmentsOutstanding(YesNo.NO);
-
-            for (Correspondence correspondence : sscsCaseData.getReasonableAdjustmentsLetters()) {
-                if (!correspondence.getValue().getReasonableAdjustmentStatus().equals(ReasonableAdjustmentStatus.ACTIONED)) {
-                    sscsCaseData.setReasonableAdjustmentsOutstanding(YesNo.YES);
-                }
-            }
-        }
     }
 
 }
