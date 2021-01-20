@@ -188,6 +188,8 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.setWriteFinalDecisionStartDate("2018-11-10");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
 
         when(pipDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
 

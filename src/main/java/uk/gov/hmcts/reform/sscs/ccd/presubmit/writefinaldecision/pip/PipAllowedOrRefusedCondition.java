@@ -39,104 +39,136 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
             isAllowedOrRefused(REFUSED),
             isDescriptorFlow(FALSE, false),
             isDailyLivingComparedToDwp(NOT_CONSIDERED),
-            isMobilityComparedToDwp(NOT_CONSIDERED)),
+            isMobilityComparedToDwp(NOT_CONSIDERED), false, false),
     ALLOWED_NOT_CONSIDERED_NOT_CONSIDERED(
             isAllowedOrRefused(ALLOWED),
             isDescriptorFlow(FALSE, false),
             isDailyLivingComparedToDwp(NOT_CONSIDERED),
-            isMobilityComparedToDwp(NOT_CONSIDERED)),
+            isMobilityComparedToDwp(NOT_CONSIDERED), false, false),
     REFUSED_NOT_CONSIDERED_LOWER(
             isAllowedOrRefused(REFUSED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(NOT_CONSIDERED),
-            isMobilityComparedToDwp(LOWER)),
+            isMobilityComparedToDwp(LOWER), false, true),
     REFUSED_NOT_CONSIDERED_SAME(
             isAllowedOrRefused(REFUSED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(NOT_CONSIDERED),
-            isMobilityComparedToDwp(SAME)),
+            isMobilityComparedToDwp(SAME), false, true),
     ALLOWED_NOT_CONSIDERED_HIGHER(
             isAllowedOrRefused(ALLOWED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(NOT_CONSIDERED),
-            isMobilityComparedToDwp(HIGHER)),
+            isMobilityComparedToDwp(HIGHER), false, true),
     REFUSED_LOWER_NOT_CONSIDERED(
             isAllowedOrRefused(REFUSED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(LOWER),
-            isMobilityComparedToDwp(NOT_CONSIDERED)),
+            isMobilityComparedToDwp(NOT_CONSIDERED), true, false),
     REFUSED_LOWER_LOWER(
             isAllowedOrRefused(REFUSED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(LOWER),
-            isMobilityComparedToDwp(LOWER)),
+            isMobilityComparedToDwp(LOWER), true, true),
     REFUSED_LOWER_SAME(
             isAllowedOrRefused(REFUSED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(LOWER),
-            isMobilityComparedToDwp(SAME)),
+            isMobilityComparedToDwp(SAME), true, true),
     ALLOWED_LOWER_HIGHER(
             isAllowedOrRefused(ALLOWED),
             isDescriptorFlow(TRUE, false),
-            isDailyLivingComparedToDwp(NOT_CONSIDERED),
-            isMobilityComparedToDwp(HIGHER)),
+            isDailyLivingComparedToDwp(LOWER),
+            isMobilityComparedToDwp(HIGHER), true, true),
     REFUSED_SAME_NOT_CONSIDERED(
             isAllowedOrRefused(REFUSED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(SAME),
-            isMobilityComparedToDwp(NOT_CONSIDERED)),
+            isMobilityComparedToDwp(NOT_CONSIDERED), true, false),
     REFUSED_SAME_LOWER(
             isAllowedOrRefused(REFUSED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(SAME),
-            isMobilityComparedToDwp(LOWER)),
+            isMobilityComparedToDwp(LOWER), true, true),
     REFUSED_SAME_SAME(
             isAllowedOrRefused(REFUSED),
             isDescriptorFlow(TRUE, false),
-            isDailyLivingComparedToDwp(LOWER),
-            isMobilityComparedToDwp(SAME)),
+            isDailyLivingComparedToDwp(SAME),
+            isMobilityComparedToDwp(SAME), true, true),
     ALLOWED_SAME_HIGHER(
             isAllowedOrRefused(ALLOWED),
             isDescriptorFlow(TRUE, false),
-            isDailyLivingComparedToDwp(NOT_CONSIDERED),
-            isMobilityComparedToDwp(HIGHER)),
+            isDailyLivingComparedToDwp(SAME),
+            isMobilityComparedToDwp(HIGHER), true, true),
     ALLOWED_HIGHER_NOT_CONSIDERED(
             isAllowedOrRefused(ALLOWED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(HIGHER),
-            isMobilityComparedToDwp(NOT_CONSIDERED)),
+            isMobilityComparedToDwp(NOT_CONSIDERED), true, false),
     ALLOWED_HIGHER_LOWER(
             isAllowedOrRefused(ALLOWED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(HIGHER),
-            isMobilityComparedToDwp(LOWER)),
+            isMobilityComparedToDwp(LOWER), true, true),
     ALLOWED_HIGHER_SAME(
             isAllowedOrRefused(ALLOWED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(HIGHER),
-            isMobilityComparedToDwp(SAME)),
+            isMobilityComparedToDwp(SAME), true, true),
     ALLOWED_HIGHER_HIGHER(
             isAllowedOrRefused(ALLOWED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(HIGHER),
-            isMobilityComparedToDwp(HIGHER));
+            isMobilityComparedToDwp(HIGHER), true, true);
 
     List<FieldCondition> primaryConditions;
     List<FieldCondition> validationConditions;
+    boolean isDailyLivingConsidered;
+    boolean isMobilityConsidered;
 
     PipAllowedOrRefusedCondition(AllowedOrRefusedCondition allowedOrRefusedCondition, YesNoFieldCondition descriptorFlowCondition, DailyLivingComparedToDwpCondition dailyLivingComparedToDwpCondition,
-                                 MobilityComparedToDwpCondition mobilityLivingComparedToDwpCondition) {
+                                 MobilityComparedToDwpCondition mobilityLivingComparedToDwpCondition, boolean isDailyLivingConsidered, boolean isMobilityConsidered) {
         this.primaryConditions = new ArrayList<>();
         this.validationConditions = new ArrayList<>();
         this.primaryConditions.add(allowedOrRefusedCondition);
         this.primaryConditions.add(descriptorFlowCondition);
         this.primaryConditions.add(dailyLivingComparedToDwpCondition);
         this.primaryConditions.add(mobilityLivingComparedToDwpCondition);
+        this.isDailyLivingConsidered = isDailyLivingConsidered;
+        this.isMobilityConsidered = isMobilityConsidered;
+
     }
 
 
     public PipScenario getPipScenario(SscsCaseData caseData) {
-        return null;
+
+        if (REFUSED_NOT_CONSIDERED_NOT_CONSIDERED == this || ALLOWED_NOT_CONSIDERED_NOT_CONSIDERED == this) {
+            return PipScenario.SCENARIO_NON_DESCRIPTOR;
+        } else if (isDailyLivingConsidered && isMobilityConsidered) {
+            if ("noAward".equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion()) && "noAward".equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+                return PipScenario.SCENARIO_NO_AWARD_NO_AWARD;
+            } else if ("noAward".equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
+                return PipScenario.SCENARIO_NO_AWARD_AWARD;
+            } else if ("noAward".equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+                return PipScenario.SCENARIO_AWARD_NO_AWARD;
+            } else {
+                return PipScenario.SCENARIO_AWARD_AWARD;
+            }
+        } else if (isDailyLivingConsidered) {
+            if ("noAward".equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
+                return PipScenario.SCENARIO_NO_AWARD_NO_AWARD;
+            } else {
+                return PipScenario.SCENARIO_AWARD_NOT_CONSIDERED;
+            }
+        } else if (isMobilityConsidered) {
+            if ("noAward".equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+                return PipScenario.SCENARIO_NOT_CONSIDERED_NO_AWARD;
+            } else {
+                return PipScenario.SCENARIO_NOT_CONSIDERED_AWARD;
+            }
+        } else {
+            throw new IllegalStateException("Should not happen");
+        }
     }
 
     public static Optional<PipAllowedOrRefusedCondition> getPassingAllowedOrRefusedCondition(DecisionNoticeQuestionService questionService,
@@ -158,7 +190,7 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
 
     static YesNoFieldCondition isDescriptorFlow(Predicate<YesNo> predicate, boolean displayIsSatisfiedMessage) {
         return new YesNoFieldCondition("Descriptor Flow", predicate,
-                s -> "Yes".equals(s.getWriteFinalDecisionIsDescriptorFlow()) ? YesNo.YES : YesNo.NO, displayIsSatisfiedMessage);
+                s -> "Yes".equalsIgnoreCase(s.getWriteFinalDecisionIsDescriptorFlow()) ? YesNo.YES : YesNo.NO, displayIsSatisfiedMessage);
     }
 
     static AllowedOrRefusedCondition isAllowedOrRefused(AllowedOrRefusedPredicate predicate) {
@@ -192,27 +224,13 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
                 emptyIfNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionMentalAssessmentQuestion()));
     }
 
-    /*
-    public PipScenario getPipScenario(SscsCaseData caseData) {
-        if (REFUSED_SAME_SAME == this) {
-            return PipScenario.SCENARIO_1;
-        } else {
-            throw new IllegalStateException("No scenario applicable");
-        }
-    }
-    
-     */
-
     @Override
     public boolean isApplicable(DecisionNoticeQuestionService questionService, SscsCaseData caseData) {
-        /*
         if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
             return primaryConditions.stream().allMatch(c -> c.isSatisified(caseData));
         } else {
             return false;
         }
-         */
-        return true;
     }
 
     @Override

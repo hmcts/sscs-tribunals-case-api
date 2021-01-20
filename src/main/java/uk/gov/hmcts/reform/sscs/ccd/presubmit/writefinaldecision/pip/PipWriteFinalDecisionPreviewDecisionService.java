@@ -69,45 +69,19 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
             // Optional<EsaAllowedOrRefusedCondition> condition = EsaPointsRegulationsAndSchedule3ActivitiesCondition
             //   .getPassingAllowedOrRefusedCondition(decisionNoticeQuestionService, caseData);
             //if (condition.isPresent()) {
-
-
             Optional<PipAllowedOrRefusedCondition> condition = PipAllowedOrRefusedCondition.getPassingAllowedOrRefusedCondition(decisionNoticeQuestionService, caseData);
-            if (!condition.isPresent()) {
-                throw new UnsupportedOperationException();
-            }
-            
-            PipScenario scenario = null;
-
-            if (!payload.isDescriptorFlow()) {
-                scenario = PipScenario.SCENARIO_NON_DESCRIPTOR;
-            } else {
-                if ("no award".equals(payload.getDailyLivingAwardRate()) && "no award".equals(payload.getMobilityAwardRate())) {
-                    scenario = PipScenario.SCENARIO_NO_AWARD_NO_AWARD;
-                } else if ("not considered".equals(payload.getDailyLivingAwardRate()) && "no award".equals(payload.getMobilityAwardRate())) {
-                    scenario = PipScenario.SCENARIO_NOT_CONSIDERED_NO_AWARD;
-                } else if ("not considered".equals(payload.getDailyLivingAwardRate()) && (!"no award".equals(payload.getMobilityAwardRate()) && !"not considered".equals(payload.getMobilityAwardRate()))) {
-                    scenario = PipScenario.SCENARIO_NOT_CONSIDERED_AWARD;
-                } else if ("no award".equals(payload.getDailyLivingAwardRate()) && !"not considered".equals(payload.getMobilityAwardRate())) {
-                    scenario = PipScenario.SCENARIO_NO_AWARD_AWARD;
-                } else if ("no award".equals(payload.getDailyLivingAwardRate()) && "not considered".equals(payload.getMobilityAwardRate())) {
-                    scenario = PipScenario.SCENARIO_NO_AWARD_NOT_CONSIDERED;
-                } else if ((!"no award".equals(payload.getDailyLivingAwardRate()) && !"not considered".equals(payload.getDailyLivingAwardRate())) && "not considered".equals(payload.getMobilityAwardRate())) {
-                    scenario = PipScenario.SCENARIO_AWARD_NOT_CONSIDERED;
-                } else if ((!"no award".equals(payload.getDailyLivingAwardRate()) && !"not considered".equals(payload.getDailyLivingAwardRate())) && "no award".equals(payload.getMobilityAwardRate())) {
-                    scenario = PipScenario.SCENARIO_AWARD_NO_AWARD;
-                } else if ((!"no award".equals(payload.getDailyLivingAwardRate()) && !"not considered".equals(payload.getDailyLivingAwardRate())) && (!"no award".equals(payload.getMobilityAwardRate()) && !"not considered".equals(payload.getMobilityAwardRate()))) {
-                    scenario = PipScenario.SCENARIO_AWARD_AWARD;
+            if (condition.isPresent()) {
+                PipAllowedOrRefusedCondition allowedOrRefusedCondition = condition.get();
+                PipScenario scenario = allowedOrRefusedCondition.getPipScenario(caseData);
+                if (scenario != null) {
+                    PipTemplateContent templateContent = scenario.getContent(payload);
+                    builder.writeFinalDecisionTemplateContent(templateContent);
                 }
+            } else {
+                // Should never happen.
+                log.error("Unable to obtain a valid scenario before preview - Something has gone wrong for caseId: ", caseData.getCcdCaseId());
+                response.addError("Unable to obtain a valid scenario - something has gone wrong");
             }
-            if (scenario != null) {
-                PipTemplateContent templateContent = scenario.getContent(payload);
-                builder.writeFinalDecisionTemplateContent(templateContent);
-            }
-            // } else {
-            // Should never happen.
-            //  log.error("Unable to obtain a valid scenario before preview - Something has gone wrong for caseId: ", caseData.getCcdCaseId());
-            //  response.addError("Unable to obtain a valid scenario - something has gone wrong");
-            //}
         }
     }
 

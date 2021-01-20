@@ -26,6 +26,7 @@
     "case_data": {
       "writeFinalDecisionIsDescriptorFlow" : "Yes",
       "writeFinalDecisionGenerateNotice": "Yes",
+      "writeFinalDecisionAllowedOrRefused": "allowed",
       "writeFinalDecisionDisabilityQualifiedPanelMemberName": "Panel Member 1",
       "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Panel Member 2",
       "pipWriteFinalDecisionComparedToDWPDailyLivingQuestion": "higher",
