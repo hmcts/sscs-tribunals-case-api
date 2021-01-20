@@ -55,13 +55,15 @@ public class PipScenarioStandardRateNoAwardTest {
                 .dailyLivingDescriptors(dailyLivingDescriptors)
                 .mobilityDescriptors(mobilityDescriptors).build();
 
-        PipTemplateContent content = PipScenario.SCENARIO_NO_AWARD_NO_AWARD.getContent(body);
+        PipTemplateContent content = PipScenario.SCENARIO_AWARD_NO_AWARD.getContent(body);
 
         String expectedContent = "The appeal is refused.\n"
                 + "\n"
                 + "The decision made by the Secretary of State on 20/09/2020 in respect of Personal Independence Payment is confirmed.\n"
                 + "\n"
-                + "Felix Sydney is not entitled to the daily living component from 17/12/2020. They score 6 points. This is insufficient to meet the threshold for the test.\n"
+                + "Felix Sydney is entitled to the daily living component at the standardRate from 17/12/2020 for an indefinite period.\n"
+                + "\n"
+                + "Felix Sydney has limited ability to carry out the activities of daily living set out below. They score 6 points. They satisfy the following descriptors:\n"
                 + "\n"
                 + "1.Preparing Food\tf.Cannot prepare and cook food.\t8\n"
                 + "2.Taking Nutrition\ta.Can take nutrition unaided.\t0\n"
@@ -81,7 +83,7 @@ public class PipScenarioStandardRateNoAwardTest {
                 + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the tribunal considered the appeal bundle to page A1. No Presenting Officer attended on behalf of the Respondent.\n"
                 + "\n";
 
-        Assert.assertEquals(10, content.getComponents().size());
+        Assert.assertEquals(11, content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
 
