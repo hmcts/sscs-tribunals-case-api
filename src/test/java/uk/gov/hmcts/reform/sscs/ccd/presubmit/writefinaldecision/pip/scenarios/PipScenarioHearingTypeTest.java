@@ -87,7 +87,7 @@ public class PipScenarioHearingTypeTest {
                 .anythingElse("Something else")
                 .mobilityDescriptors(mobilityDescriptors).build();
 
-        PipTemplateContent content = PipScenario.SCENARIO_1.getContent(body);
+        PipTemplateContent content = PipScenario.SCENARIO_NOT_CONSIDERED_NO_AWARD.getContent(body);
 
         String expectedContent = "The appeal is refused.\n"
             + "\n"

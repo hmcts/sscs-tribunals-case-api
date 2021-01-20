@@ -18,6 +18,6 @@ public class ScenarioNonDescriptorContent extends PipTemplateContent {
 
     @Override
     public PipScenario getScenario() {
-        return PipScenario.SCENARIO_1;
+        return PipScenario.SCENARIO_NON_DESCRIPTOR;
     }
 }

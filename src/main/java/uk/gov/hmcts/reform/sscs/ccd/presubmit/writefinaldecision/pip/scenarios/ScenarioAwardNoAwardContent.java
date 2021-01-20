@@ -35,6 +35,6 @@ public class ScenarioAwardNoAwardContent extends PipTemplateContent {
 
     @Override
     public PipScenario getScenario() {
-        return PipScenario.SCENARIO_1;
+        return PipScenario.SCENARIO_AWARD_NO_AWARD;
     }
 }

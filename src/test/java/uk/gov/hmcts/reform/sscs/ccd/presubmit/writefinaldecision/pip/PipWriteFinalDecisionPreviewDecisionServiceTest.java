@@ -402,7 +402,14 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertEquals(false, body.isMobilityIsSeverelyLimited());
         assertNull(body.getMobilityDescriptors());
         PipTemplateContent templateContent = (PipTemplateContent)payload.getWriteFinalDecisionTemplateContent();
-        assertEquals(PipScenario.SCENARIO_1, templateContent.getScenario());
+
+        if ("noAward".equals(rate)) {
+            assertEquals(PipScenario.SCENARIO_NO_AWARD_NOT_CONSIDERED, templateContent.getScenario());
+        } else if ("notConsidered".equals(rate)) {
+            assertNull(templateContent);
+        } else {
+            assertEquals(PipScenario.SCENARIO_AWARD_NOT_CONSIDERED, templateContent.getScenario());
+        }
     }
 
     @Test

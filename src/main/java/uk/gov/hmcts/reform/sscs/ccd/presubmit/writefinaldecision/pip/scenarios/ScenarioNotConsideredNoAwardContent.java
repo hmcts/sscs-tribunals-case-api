@@ -22,6 +22,6 @@ public class ScenarioNotConsideredNoAwardContent extends PipTemplateContent {
 
     @Override
     public PipScenario getScenario() {
-        return PipScenario.SCENARIO_1;
+        return PipScenario.SCENARIO_NOT_CONSIDERED_NO_AWARD;
     }
 }
