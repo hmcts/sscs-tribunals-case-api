@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
 @Service
 @Slf4j
-public class EditBundleAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class EditBundleAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private ServiceRequestExecutor serviceRequestExecutor;
     private String bundleUrl;
@@ -29,9 +29,9 @@ public class EditBundleAboutToStartHandler implements PreSubmitCallbackHandler<S
     private static String EDIT_BUNDLE_ENDPOINT = "/api/stitch-ccd-bundles";
 
     @Autowired
-    public EditBundleAboutToStartHandler(ServiceRequestExecutor serviceRequestExecutor,
-                                         @Value("${bundle.url}") String bundleUrl,
-                                         DocumentConfiguration documentConfiguration) {
+    public EditBundleAboutToSubmitHandler(ServiceRequestExecutor serviceRequestExecutor,
+                                          @Value("${bundle.url}") String bundleUrl,
+                                          DocumentConfiguration documentConfiguration) {
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bundleUrl = bundleUrl;
         this.documentConfiguration = documentConfiguration;
