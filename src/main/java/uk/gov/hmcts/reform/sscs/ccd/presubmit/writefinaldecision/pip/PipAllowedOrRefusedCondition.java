@@ -16,7 +16,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -29,7 +28,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoFieldCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.scenarios.PipScenario;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
-import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 /**
  * Encapsulates the conditions satisfied by valid combinations of allowed/refused and other attributes of the Decision Notice journey - to be used on Outcome validation (eg. on submission), but not on
@@ -152,20 +150,20 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
         this.isDailyLivingConsidered = dailyLivingCondition.getAwardTypePredicate() == AwardTypePredicate.CONSIDERED;
         this.isMobilityConsidered =  mobilityCondition.getAwardTypePredicate() == AwardTypePredicate.CONSIDERED;;
         this.primaryConditions = new ArrayList<>();
+        this.primaryConditions.add(descriptorFlowCondition);
         if (allowedOrRefusedCondition.isPresent()) {
             this.primaryConditions.add(allowedOrRefusedCondition.get());
         }
-        this.primaryConditions.add(dailyLivingCondition);
-        this.primaryConditions.add(mobilityCondition);
-
-        this.primaryConditions.add(descriptorFlowCondition);
-        if (isDailyLivingConsidered) {
-            this.primaryConditions.add(dailyLivingComparedToDwpCondition);
+        if (isDailyLivingConsidered || isMobilityConsidered) {
+            this.primaryConditions.add(dailyLivingCondition);
+            this.primaryConditions.add(mobilityCondition);
+            if (isDailyLivingConsidered) {
+                this.primaryConditions.add(dailyLivingComparedToDwpCondition);
+            }
+            if (isMobilityConsidered) {
+                this.primaryConditions.add(mobilityLivingComparedToDwpCondition);
+            }
         }
-        if (isMobilityConsidered) {
-            this.primaryConditions.add(mobilityLivingComparedToDwpCondition);
-        }
-
     }
 
     PipAllowedOrRefusedCondition(YesNoFieldCondition descriptorFlowCondition, DailyLivingComparedToDwpCondition dailyLivingComparedToDwpCondition,
@@ -174,14 +172,16 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
         this.isMobilityConsidered =  mobilityCondition.getAwardTypePredicate() == AwardTypePredicate.CONSIDERED;;
         this.primaryConditions = new ArrayList<>();
         this.primaryConditions.add(descriptorFlowCondition);
-        if (isDailyLivingConsidered) {
-            this.primaryConditions.add(dailyLivingComparedToDwpCondition);
+        if (isDailyLivingConsidered || isMobilityConsidered) {
+            this.primaryConditions.add(dailyLivingCondition);
+            this.primaryConditions.add(mobilityCondition);
+            if (isDailyLivingConsidered) {
+                this.primaryConditions.add(dailyLivingComparedToDwpCondition);
+            }
+            if (isMobilityConsidered) {
+                this.primaryConditions.add(mobilityLivingComparedToDwpCondition);
+            }
         }
-        if (isMobilityConsidered) {
-            this.primaryConditions.add(mobilityLivingComparedToDwpCondition);
-        }
-        this.primaryConditions.add(dailyLivingCondition);
-        this.primaryConditions.add(mobilityCondition);
     }
 
     public static Optional<PipAllowedOrRefusedCondition> getPassingAllowedOrRefusedCondition(DecisionNoticeQuestionService questionService,
@@ -302,23 +302,6 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
 
     @Override
     public Optional<String> getOptionalErrorMessage(DecisionNoticeQuestionService questionService, SscsCaseData sscsCaseData) {
-
-        final List<String> primaryCriteriaSatisfiedMessages =
-            primaryConditions.stream()
-                .map(c -> c.getOptionalIsSatisfiedMessage(sscsCaseData))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-
-        List<String> criteriaSatisfiedMessages = new ArrayList<>();
-
-        criteriaSatisfiedMessages.addAll(primaryCriteriaSatisfiedMessages);
-
-        if (!criteriaSatisfiedMessages.isEmpty()) {
-            return Optional.of("You have " + StringUtils.getGramaticallyJoinedStrings(criteriaSatisfiedMessages)
-                + ". Please review your previous selection.");
-        }
-
         return Optional.empty();
     }
 }
