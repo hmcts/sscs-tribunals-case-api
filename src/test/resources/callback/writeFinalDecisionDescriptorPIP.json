@@ -26,7 +26,6 @@
     "case_data": {
       "writeFinalDecisionIsDescriptorFlow" : "Yes",
       "writeFinalDecisionGenerateNotice": "Yes",
-      "writeFinalDecisionAllowedOrRefused": "allowed",
       "writeFinalDecisionGeneratedDate" : "GENERATED_DATE",
       "writeFinalDecisionDisabilityQualifiedPanelMemberName": "Panel Member 1",
       "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Panel Member 2",
