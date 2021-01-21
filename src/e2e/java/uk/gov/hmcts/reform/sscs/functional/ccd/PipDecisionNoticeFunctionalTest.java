@@ -296,8 +296,6 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("7. Anything else."));
             boolean additionalParagraph = false;
-            // Remove "the hearing"
-            // Add space before (Social Entitite....)
             if ("video".equals(hearingType)) {
                 if (appellantAttended && presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString(
@@ -339,10 +337,10 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                     additionalParagraph = true;
                 }
             } else if ("paper".equals(hearingType)) {
-                // Lower case "the Tribunal"
                 assertThat(pdfTextWithoutNewLines, containsString("8. No party has objected to the matter being decided without a hearing."));
                 assertThat(pdfTextWithoutNewLines, containsString(
-                    "Having considered the appeal bundle to page B7 and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way."));
+                    "9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way."));
+                additionalParagraph = true;
             } else if ("faceToFace".equals(hearingType)) {
                 if (appellantAttended && presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString(
@@ -429,7 +427,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("7. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("9.")));
         }
     }
@@ -472,7 +470,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
     }
@@ -519,7 +517,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
     }
@@ -565,7 +563,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("7. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("9.")));
         }
     }
@@ -613,7 +611,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("7. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("9.")));
         }
     }
@@ -665,7 +663,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
     }
@@ -717,7 +715,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
     }
@@ -770,7 +768,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
     }
@@ -823,7 +821,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
     }
@@ -880,7 +878,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("8. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("9. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "10. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "10. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
     }
@@ -937,7 +935,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("8. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("9. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "10. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "10. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
     }
@@ -989,7 +987,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
     }
@@ -1043,7 +1041,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
     }
@@ -1101,7 +1099,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("8. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("9. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "10. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "10. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
     }
@@ -1159,7 +1157,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("8. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("9. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "10. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "10. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
     }
