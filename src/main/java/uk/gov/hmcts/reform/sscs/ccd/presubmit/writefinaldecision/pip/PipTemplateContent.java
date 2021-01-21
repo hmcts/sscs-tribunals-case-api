@@ -1,9 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-
 import java.time.LocalDate;
 import java.util.List;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.scenarios.PipScenario;
@@ -33,7 +29,7 @@ public abstract class PipTemplateContent extends WriteFinalDecisionTemplateConte
     protected String getIsEntitledMobility(String appellantName, String mobilityRate, String startDate, String endDate) {
         return appellantName + " is entitled to the mobility component at the " + mobilityRate + " from " + DATEFORMATTER.format(LocalDate.parse(startDate))  + (endDate == null ? " for an indefinite period." : (" to " + DATEFORMATTER.format(LocalDate.parse(endDate)) + "."));
     }
-    
+
     public String getDailyLivingNotConsidered() {
         return "Only the mobility component was in issue on this appeal and the daily living component was not considered.";
     }
