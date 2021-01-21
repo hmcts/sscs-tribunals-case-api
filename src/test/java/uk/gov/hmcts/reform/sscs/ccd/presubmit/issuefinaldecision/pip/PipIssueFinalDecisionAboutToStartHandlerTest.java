@@ -100,7 +100,6 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
 
         when(idamClient.getUserDetails("Bearer token")).thenReturn(userDetails);
 
-
         capture = ArgumentCaptor.forClass(GenerateFileParams.class);
 
         sscsCaseData = SscsCaseData.builder()
