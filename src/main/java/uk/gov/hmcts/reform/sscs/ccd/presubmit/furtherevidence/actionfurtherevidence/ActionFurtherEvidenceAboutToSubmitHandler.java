@@ -12,6 +12,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REINSTATEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome.GRANTED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
@@ -54,7 +56,6 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private static final String FURTHER_EVIDENCE_RECEIVED = "furtherEvidenceReceived";
     private static final String COVERSHEET = "coversheet";
-    public static final String YES = "Yes";
 
     private final FooterService footerService;
     private final BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder;
@@ -88,8 +89,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (!callback.isIgnoreWarnings() && YES.equalsIgnoreCase(sscsCaseData.getIsProgressingViaGaps())) {
-            preSubmitCallbackResponse.addWarning("This case is progressing via GAPS. Please ensure any documents are emailed to the Regional Processing Centre to be attached to the paper file.");
+        if (!callback.isIgnoreWarnings()) {
+            checkForWarnings(preSubmitCallbackResponse);
         }
 
         if (isIssueFurtherEvidenceToAllParties(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction())) {
@@ -106,6 +107,22 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         buildSscsDocumentFromScan(sscsCaseData, caseDetails.getState(), callback.isIgnoreWarnings(), preSubmitCallbackResponse);
 
         return preSubmitCallbackResponse;
+    }
+
+    private void checkForWarnings(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (YES.getValue().equalsIgnoreCase(preSubmitCallbackResponse.getData().getIsProgressingViaGaps())) {
+            preSubmitCallbackResponse.addWarning("This case is progressing via GAPS. Please ensure any documents are emailed to the Regional Processing Centre to be attached to the paper file.");
+        }
+
+        if ((null != preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeAppellant()
+                && GRANTED.equals(preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeAppellant().getRequestOutcome())
+                && OriginalSenderItemList.APPELLANT.getCode().equals(preSubmitCallbackResponse.getData().getOriginalSender().getValue().getCode()))
+                || (null != preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeJointParty()
+                && GRANTED.equals(preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeJointParty().getRequestOutcome())
+                && OriginalSenderItemList.JOINT_PARTY.getCode().equals(preSubmitCallbackResponse.getData().getOriginalSender().getValue().getCode()))) {
+            preSubmitCallbackResponse.addWarning("This case has a confidentiality flag, ensure any evidence from the "
+                    + preSubmitCallbackResponse.getData().getOriginalSender().getValue().getLabel().toLowerCase() + " has confidential information redacted");
+        }
     }
 
     private boolean isIssueFurtherEvidenceToAllParties(DynamicList furtherEvidenceActionList) {
@@ -135,7 +152,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private boolean isAppellantOrAppointeeAddressInvalid(SscsCaseData caseData) {
-        if (null != caseData.getAppeal().getAppellant() && YES.equalsIgnoreCase(caseData.getAppeal().getAppellant().getIsAppointee())) {
+        if (null != caseData.getAppeal().getAppellant() && YES.getValue().equalsIgnoreCase(caseData.getAppeal().getAppellant().getIsAppointee())) {
             return null == caseData.getAppeal().getAppellant().getAppointee()
                 || isAddressInvalid(caseData.getAppeal().getAppellant().getAppointee().getAddress());
         } else {
@@ -148,7 +165,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         Representative rep = caseData.getAppeal().getRep();
 
         return null != rep
-            && YES.equalsIgnoreCase(rep.getHasRepresentative())
+            && YES.getValue().equalsIgnoreCase(rep.getHasRepresentative())
             && isAddressInvalid(rep.getAddress());
     }
 
@@ -208,7 +225,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             documents.add(sscsDocument);
 
             if (sscsCaseData.isLanguagePreferenceWelsh()) {
-                sscsCaseData.setTranslationWorkOutstanding(YES);
+                sscsCaseData.setTranslationWorkOutstanding(YES.getValue());
                 log.info("Set the TranslationWorkOutstanding flag to YES,  for case id : {}", sscsCaseData.getCcdCaseId());
             }
         }
@@ -220,7 +237,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             sscsCaseData.setSscsDocument(documents);
         }
 
-        sscsCaseData.setEvidenceHandled(YES);
+        sscsCaseData.setEvidenceHandled(YES.getValue());
     }
 
     private void setConfidentialCaseFields(SscsCaseData sscsCaseData) {
@@ -271,7 +288,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         if (ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
 
-            if (!YES.equalsIgnoreCase(sscsCaseData.getJointParty())) {
+            if (!YES.getValue().equalsIgnoreCase(sscsCaseData.getJointParty())) {
                 preSubmitCallbackResponse.addError("Document type \"Confidentiality Request\" is invalid as there is no joint party on the case");
             }
 

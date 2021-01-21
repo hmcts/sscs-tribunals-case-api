@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -67,6 +68,14 @@ public class BaseHandler {
     public static String getJsonCallbackForTest(String path) throws IOException {
         String pathName = Objects.requireNonNull(BaseHandler.class.getClassLoader().getResource(path)).getFile();
         return FileUtils.readFileToString(new File(pathName), StandardCharsets.UTF_8.name());
+    }
+
+    public static String getJsonCallbackForTestAndReplace(String fileLocation, List<String> replaceKeys, List<String> replaceValues) throws IOException {
+        String result = getJsonCallbackForTest(fileLocation);
+        for (int i = 0; i < replaceKeys.size(); i++) {
+            result = result.replace(replaceKeys.get(i), replaceValues.get(i));
+        }
+        return result;
     }
 
     protected static SscsCaseData buildSscsCaseDataForTesting(final String surname, final String nino) {

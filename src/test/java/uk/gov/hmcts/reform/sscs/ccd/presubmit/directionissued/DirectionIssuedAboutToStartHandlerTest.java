@@ -38,7 +38,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new DirectionIssuedAboutToStartHandler(false, false);
+        handler = new DirectionIssuedAboutToStartHandler();
 
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
 
@@ -137,7 +137,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
     @Test
     public void givenAppealWithReinstatementRequest_populateDirectionTypeDropdown() {
 
-        handler = new DirectionIssuedAboutToStartHandler(true, false);
+        handler = new DirectionIssuedAboutToStartHandler();
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
@@ -159,7 +159,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
     @Test
     public void givenAppealWithUrgentHearingEnabledAndUrgentCaseYes_populateDirectionTypeDropdown() {
 
-        handler = new DirectionIssuedAboutToStartHandler(false, true);
+        handler = new DirectionIssuedAboutToStartHandler();
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
@@ -181,7 +181,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
     @Test
     public void givenAppealWithUrgentHearingEnabledAndUrgentCaseNo_populateDirectionTypeDropdown() {
 
-        handler = new DirectionIssuedAboutToStartHandler(false, true);
+        handler = new DirectionIssuedAboutToStartHandler();
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);

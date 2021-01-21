@@ -9,6 +9,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -200,8 +201,8 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             () -> assertEquals(AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentFilename()),
             () -> assertEquals("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw", response.getData().getDwpEditedResponseDocument().getDocumentLink().getDocumentUrl()),
             () -> assertEquals("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw/binary", response.getData().getDwpEditedResponseDocument().getDocumentLink().getDocumentBinaryUrl()),
+            () -> assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState()),
             () -> assertEquals(AppConstants.DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpEditedResponseDocument().getDocumentLink().getDocumentFilename()));
-
     }
 
     @Test
@@ -217,6 +218,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("001", response.getData().getBenefitCode());
         assertEquals("001US", response.getData().getCaseCode());
         assertEquals(DwpState.RESPONSE_SUBMITTED_DWP.getId(), response.getData().getDwpState());
+        assertNull(response.getData().getInterlocReviewState());
     }
 
     @Test
@@ -233,6 +235,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("001", response.getData().getBenefitCode());
         assertEquals("001UM", response.getData().getCaseCode());
         assertEquals(DwpState.RESPONSE_SUBMITTED_DWP.getId(), response.getData().getDwpState());
+        assertNull(response.getData().getInterlocReviewState());
     }
 
     @Test
@@ -260,6 +263,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         assertEquals("reviewByJudge", response.getData().getSelectWhoReviewsCase().getValue().getCode());
         assertEquals("phmeRequest", response.getData().getInterlocReferralReason());
+        assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
     }
 
     @Test
@@ -278,6 +282,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         assertNull(response.getData().getSelectWhoReviewsCase());
         assertNull(response.getData().getInterlocReferralReason());
+        assertNull(response.getData().getInterlocReviewState());
     }
 
     @Test
@@ -348,6 +353,22 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         for (String error : response.getErrors()) {
             assertEquals("You must submit both an edited response document and an edited evidence bundle", error);
         }
+    }
+
+    @Test
+    public void givenUcCaseWithAppendix12Document_thenMoveDocumentToDwpDocumentsCollection() {
+        callback.getCaseDetails().getCaseData().setAppendix12Doc(DwpResponseDocument.builder().documentFileName("testA").build());
+        List<DwpDocument> dwpResponseDocuments = new ArrayList<>();
+        dwpResponseDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentFileName("existingDoc").build()).build());
+
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpResponseDocuments);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(2, response.getData().getDwpDocuments().size());
+
+        assertEquals("existingDoc", response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
+        assertEquals("Appendix 12 document", response.getData().getDwpDocuments().get(1).getValue().getDocumentFileName());
     }
 
     @Test
