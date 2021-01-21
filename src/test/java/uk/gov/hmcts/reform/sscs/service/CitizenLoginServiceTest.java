@@ -307,6 +307,20 @@ public class CitizenLoginServiceTest {
     }
 
     @Test
+    public void cannotAssociateUserWithCaseAsCasePostcodeIsEmpty() {
+        SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppellantSubscription(tya);
+        expectedCase.getData().getAppeal().getAppellant().getAddress().setPostcode("");
+        when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens))
+                .thenReturn(expectedCase);
+        Optional<OnlineHearing> sscsCaseDetails = underTest.associateCaseToCitizen(
+                citizenIdamTokens, tya, SUBSCRIPTION_EMAIL_ADDRESS, "someOtherPostcode"
+        );
+
+        verify(citizenCcdService, never()).addUserToCase(any(IdamTokens.class), any(String.class), anyLong());
+        assertThat(sscsCaseDetails.isPresent(), is(false));
+    }
+
+    @Test
     public void cannotAssociatesUserWithCaseAsCaseNotFound() {
         String someOtherPostcode = "someOtherPostcode";
         when(postcodeUtil.hasAppellantPostcode(any(SscsCaseDetails.class), eq(someOtherPostcode))).thenReturn(false);
