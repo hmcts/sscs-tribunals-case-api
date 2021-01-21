@@ -256,7 +256,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
         setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
@@ -275,8 +275,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
         setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("someValue");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("someValue");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
 
@@ -296,8 +296,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
         setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("someValue");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("someValue");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()

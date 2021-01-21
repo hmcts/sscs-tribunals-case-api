@@ -210,11 +210,11 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
     }
 
     static AwardTypeCondition isDailyLivingAward(AwardTypePredicate awardTypePredicate) {
-        return new AwardTypeCondition(awardTypePredicate, c -> c.getPipWriteFinalDecisionDailyLivingQuestion(), PipActivityType.DAILY_LIVING);
+        return new AwardTypeCondition(awardTypePredicate, c -> c.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion(), PipActivityType.DAILY_LIVING);
     }
 
     static AwardTypeCondition isMobilityAward(AwardTypePredicate awardTypePredicate) {
-        return new AwardTypeCondition(awardTypePredicate, c -> c.getPipWriteFinalDecisionMobilityQuestion(), PipActivityType.MOBILITY);
+        return new AwardTypeCondition(awardTypePredicate, c -> c.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion(), PipActivityType.MOBILITY);
     }
 
     static DailyLivingComparedToDwpCondition isDailyLivingComparedToDwp(ComparedToDwpPredicate predicate) {
@@ -237,11 +237,11 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
         throw new IllegalStateException(
             "No allowed/refused condition found for " + caseData.getWriteFinalDecisionIsDescriptorFlow()
                 + ":" + caseData.getWriteFinalDecisionAllowedOrRefused()
-                + ":" + caseData.getPipWriteFinalDecisionDailyLivingQuestion() + ":"
-                + caseData.getPipWriteFinalDecisionMobilityQuestion() + ":"
-                + caseData
+                + ":" + caseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion() + ":"
+                + caseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion() + ":"
+                + caseData.getSscsPipCaseData()
                 .getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion() + ":"
-                + caseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+                + caseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
     }
 
     public static Function<SscsCaseData, List<String>> getAllAnswersExtractor() {
@@ -253,23 +253,23 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
         if (REFUSED_NOT_CONSIDERED_NOT_CONSIDERED == this || ALLOWED_NOT_CONSIDERED_NOT_CONSIDERED == this) {
             return PipScenario.SCENARIO_NON_DESCRIPTOR;
         } else if (isDailyLivingConsidered && isMobilityConsidered) {
-            if ("noAward".equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion()) && "noAward".equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+            if ("noAward".equals(caseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion()) && "noAward".equals(caseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion())) {
                 return PipScenario.SCENARIO_NO_AWARD_NO_AWARD;
-            } else if ("noAward".equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
+            } else if ("noAward".equals(caseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion())) {
                 return PipScenario.SCENARIO_NO_AWARD_AWARD;
-            } else if ("noAward".equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+            } else if ("noAward".equals(caseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion())) {
                 return PipScenario.SCENARIO_AWARD_NO_AWARD;
             } else {
                 return PipScenario.SCENARIO_AWARD_AWARD;
             }
         } else if (isDailyLivingConsidered) {
-            if ("noAward".equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
+            if ("noAward".equals(caseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion())) {
                 return PipScenario.SCENARIO_NO_AWARD_NOT_CONSIDERED;
             } else {
                 return PipScenario.SCENARIO_AWARD_NOT_CONSIDERED;
             }
         } else if (isMobilityConsidered) {
-            if ("noAward".equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+            if ("noAward".equals(caseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion())) {
                 return PipScenario.SCENARIO_NOT_CONSIDERED_NO_AWARD;
             } else {
                 return PipScenario.SCENARIO_NOT_CONSIDERED_AWARD;

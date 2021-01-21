@@ -56,21 +56,21 @@ public class PipDecisionNoticeOutcomeService extends DecisionNoticeOutcomeServic
 
         // Daily living and or/mobility
 
-        if ((!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion())
-            && sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion() == null)
-            || (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion())
-            && sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion() == null)) {
+        if ((!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion())
+            && sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion() == null)
+            || (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion())
+            && sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpMobilityQuestion() == null)) {
             return null;
         } else {
 
             try {
 
                 ComparedRate dailyLivingComparedRate = AwardType.NOT_CONSIDERED.getKey()
-                    .equalsIgnoreCase(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion()) ? null :
-                    ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
+                    .equalsIgnoreCase(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion()) ? null :
+                    ComparedRate.getByKey(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
 
                 ComparedRate mobilityComparedRate = AwardType.NOT_CONSIDERED.getKey()
-                    .equalsIgnoreCase(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()) ? null : ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+                    .equalsIgnoreCase(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion()) ? null : ComparedRate.getByKey(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
 
                 Set<ComparedRate> comparedRates = new HashSet<>();
                 if (dailyLivingComparedRate != null) {

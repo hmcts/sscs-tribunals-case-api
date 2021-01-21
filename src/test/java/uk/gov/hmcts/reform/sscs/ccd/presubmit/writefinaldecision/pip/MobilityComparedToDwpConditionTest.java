@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsPipCaseData;
 
 public class MobilityComparedToDwpConditionTest {
 
@@ -17,7 +18,7 @@ public class MobilityComparedToDwpConditionTest {
     @Test
     public void testIsHigherWhenSame() {
         MobilityComparedToDwpCondition condition = new MobilityComparedToDwpCondition(ComparedToDwpPredicate.HIGHER);
-        SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpMobilityQuestion("same").build();
+        SscsCaseData caseData = SscsCaseData.builder().pipSscsCaseData(SscsPipCaseData.builder().pipWriteFinalDecisionComparedToDwpMobilityQuestion("same").build()).build();
         Assert.assertFalse(condition.isSatisified(caseData));
         Assert.assertEquals("same for the 'mobility compared to DWP' question", condition.getOptionalErrorMessage(caseData).get());
         Assert.assertTrue(condition.getOptionalIsSatisfiedMessage(caseData).isPresent());
@@ -27,7 +28,7 @@ public class MobilityComparedToDwpConditionTest {
     @Test
     public void testIsHigherWhenLower() {
         MobilityComparedToDwpCondition condition = new MobilityComparedToDwpCondition(ComparedToDwpPredicate.HIGHER);
-        SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpMobilityQuestion("lower").build();
+        SscsCaseData caseData = SscsCaseData.builder().pipSscsCaseData(SscsPipCaseData.builder().pipWriteFinalDecisionComparedToDwpMobilityQuestion("lower").build()).build();
         Assert.assertFalse(condition.isSatisified(caseData));
         Assert.assertEquals("lower for the 'mobility compared to DWP' question", condition.getOptionalErrorMessage(caseData).get());
         Assert.assertTrue(condition.getOptionalIsSatisfiedMessage(caseData).isPresent());
@@ -37,7 +38,7 @@ public class MobilityComparedToDwpConditionTest {
     @Test
     public void testIsHigherWhenHigher() {
         MobilityComparedToDwpCondition condition = new MobilityComparedToDwpCondition(ComparedToDwpPredicate.HIGHER);
-        SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpMobilityQuestion("higher").build();
+        SscsCaseData caseData = SscsCaseData.builder().pipSscsCaseData(SscsPipCaseData.builder().pipWriteFinalDecisionComparedToDwpMobilityQuestion("higher").build()).build();
         Assert.assertTrue(condition.isSatisified(caseData));
         Assert.assertFalse(condition.getOptionalErrorMessage(caseData).isPresent());
         Assert.assertTrue(condition.getOptionalIsSatisfiedMessage(caseData).isPresent());
@@ -47,7 +48,7 @@ public class MobilityComparedToDwpConditionTest {
     @Test
     public void testIsLowerWhenSame() {
         MobilityComparedToDwpCondition condition = new MobilityComparedToDwpCondition(ComparedToDwpPredicate.LOWER);
-        SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpMobilityQuestion("same").build();
+        SscsCaseData caseData = SscsCaseData.builder().pipSscsCaseData(SscsPipCaseData.builder().pipWriteFinalDecisionComparedToDwpMobilityQuestion("same").build()).build();
         Assert.assertFalse(condition.isSatisified(caseData));
         Assert.assertEquals("same for the 'mobility compared to DWP' question", condition.getOptionalErrorMessage(caseData).get());
         Assert.assertTrue(condition.getOptionalIsSatisfiedMessage(caseData).isPresent());
@@ -57,7 +58,7 @@ public class MobilityComparedToDwpConditionTest {
     @Test
     public void testIsLowerWhenLower() {
         MobilityComparedToDwpCondition condition = new MobilityComparedToDwpCondition(ComparedToDwpPredicate.LOWER);
-        SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpMobilityQuestion("lower").build();
+        SscsCaseData caseData = SscsCaseData.builder().pipSscsCaseData(SscsPipCaseData.builder().pipWriteFinalDecisionComparedToDwpMobilityQuestion("lower").build()).build();
         Assert.assertTrue(condition.isSatisified(caseData));
         Assert.assertFalse(condition.getOptionalErrorMessage(caseData).isPresent());
         Assert.assertTrue(condition.getOptionalIsSatisfiedMessage(caseData).isPresent());
@@ -67,7 +68,7 @@ public class MobilityComparedToDwpConditionTest {
     @Test
     public void testIsLowerWhenHigher() {
         MobilityComparedToDwpCondition condition = new MobilityComparedToDwpCondition(ComparedToDwpPredicate.LOWER);
-        SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpMobilityQuestion("higher").build();
+        SscsCaseData caseData = SscsCaseData.builder().pipSscsCaseData(SscsPipCaseData.builder().pipWriteFinalDecisionComparedToDwpMobilityQuestion("higher").build()).build();
         Assert.assertFalse(condition.isSatisified(caseData));
         Assert.assertEquals("higher for the 'mobility compared to DWP' question", condition.getOptionalErrorMessage(caseData).get());
         Assert.assertTrue(condition.getOptionalIsSatisfiedMessage(caseData).isPresent());
@@ -77,7 +78,7 @@ public class MobilityComparedToDwpConditionTest {
     @Test
     public void testIsSameWhenSame() {
         MobilityComparedToDwpCondition condition = new MobilityComparedToDwpCondition(ComparedToDwpPredicate.SAME);
-        SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpMobilityQuestion("same").build();
+        SscsCaseData caseData = SscsCaseData.builder().pipSscsCaseData(SscsPipCaseData.builder().pipWriteFinalDecisionComparedToDwpMobilityQuestion("same").build()).build();
         Assert.assertTrue(condition.isSatisified(caseData));
         Assert.assertFalse(condition.getOptionalErrorMessage(caseData).isPresent());
         Assert.assertTrue(condition.getOptionalIsSatisfiedMessage(caseData).isPresent());
@@ -87,7 +88,7 @@ public class MobilityComparedToDwpConditionTest {
     @Test
     public void testIsSameWhenLower() {
         MobilityComparedToDwpCondition condition = new MobilityComparedToDwpCondition(ComparedToDwpPredicate.SAME);
-        SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpMobilityQuestion("lower").build();
+        SscsCaseData caseData = SscsCaseData.builder().pipSscsCaseData(SscsPipCaseData.builder().pipWriteFinalDecisionComparedToDwpMobilityQuestion("lower").build()).build();
         Assert.assertFalse(condition.isSatisified(caseData));
         Assert.assertTrue(condition.getOptionalErrorMessage(caseData).isPresent());
         Assert.assertEquals("lower for the 'mobility compared to DWP' question", condition.getOptionalErrorMessage(caseData).get());
@@ -98,7 +99,7 @@ public class MobilityComparedToDwpConditionTest {
     @Test
     public void testIsSameWhenHigher() {
         MobilityComparedToDwpCondition condition = new MobilityComparedToDwpCondition(ComparedToDwpPredicate.SAME);
-        SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpMobilityQuestion("higher").build();
+        SscsCaseData caseData = SscsCaseData.builder().pipSscsCaseData(SscsPipCaseData.builder().pipWriteFinalDecisionComparedToDwpMobilityQuestion("higher").build()).build();
         Assert.assertFalse(condition.isSatisified(caseData));
         Assert.assertTrue(condition.getOptionalErrorMessage(caseData).isPresent());
         Assert.assertEquals("higher for the 'mobility compared to DWP' question", condition.getOptionalErrorMessage(caseData).get());

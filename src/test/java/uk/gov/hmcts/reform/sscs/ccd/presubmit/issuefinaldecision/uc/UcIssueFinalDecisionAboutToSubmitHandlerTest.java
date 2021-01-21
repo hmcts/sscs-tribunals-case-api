@@ -363,8 +363,8 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
         sscsCaseData.setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionGenerateNotice("yes");
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 

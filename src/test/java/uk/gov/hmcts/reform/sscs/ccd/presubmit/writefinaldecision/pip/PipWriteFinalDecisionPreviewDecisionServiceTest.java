@@ -122,10 +122,10 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
     @Override
     protected void setHigherRateScenarioFields(SscsCaseData caseData) {
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("enhancedRate");
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("enhancedRate");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("enhancedRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("enhancedRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionStartDate("2018-10-11");
     }
 
@@ -288,18 +288,18 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(descriptorsComparedToDwp);
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(nonDescriptorsComparedWithDwp);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(descriptorsComparedToDwp);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(nonDescriptorsComparedWithDwp);
 
         if ("noAward".equals(rate) || "notConsidered".equals(rate)) {
             sscsCaseData.setWriteFinalDecisionEndDateType("na");
         }
 
         // Mobility specific parameters
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(rate);
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("notConsidered");
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround"));
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(rate);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("notConsidered");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround"));
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
@@ -377,18 +377,18 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(descriptorsComparedToDwp);
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(nonDescriptorsComparedWithDwp);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(descriptorsComparedToDwp);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(nonDescriptorsComparedWithDwp);
 
         setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
         // Daily living specific params
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(rate);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(rate);
 
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("notConsidered");
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(Arrays.asList("preparingFood"));
-        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("notConsidered");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(Arrays.asList("preparingFood"));
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
@@ -472,14 +472,14 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(descriptorsComparedToDwp);
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(nonDescriptorsComparedWithDwp);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(descriptorsComparedToDwp);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(nonDescriptorsComparedWithDwp);
 
         // Mobility specific parameters
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(rate);
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("notConsidered");
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround"));
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(rate);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("notConsidered");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround"));
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, false);
 
@@ -568,13 +568,13 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
         setHigherRateScenarioFields(sscsCaseData);
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(null);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(null);
 
         // Mobility specific parameters
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(rate);
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("same");
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround"));
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(rate);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("same");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround"));
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 

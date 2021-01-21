@@ -88,8 +88,8 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
     @Override
     protected void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
 
-        String dailyLivingAwardType = caseData.getPipWriteFinalDecisionDailyLivingQuestion();
-        String mobilityAwardType = caseData.getPipWriteFinalDecisionMobilityQuestion();
+        String dailyLivingAwardType = caseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion();
+        String mobilityAwardType = caseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion();
 
         if (dailyLivingAwardType != null) {
             builder.dailyLivingAwardRate(join(
@@ -133,7 +133,7 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         builder.isDescriptorFlow(caseData.isDailyLivingAndOrMobilityDecision());
 
         List<String> dailyLivingAnswers = PipActivityType.DAILY_LIVING.getAnswersExtractor().apply(caseData);
-        if (dailyLivingAnswers != null && !AwardType.NOT_CONSIDERED.getKey().equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
+        if (dailyLivingAnswers != null && !AwardType.NOT_CONSIDERED.getKey().equals(caseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion())) {
 
             List<Descriptor> dailyLivingDescriptors = getPipDescriptorsFromQuestionKeys(caseData, dailyLivingAnswers);
 
@@ -146,7 +146,7 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         }
 
         List<String> mobilityAnswers = PipActivityType.MOBILITY.getAnswersExtractor().apply(caseData);
-        if (mobilityAnswers != null && !AwardType.NOT_CONSIDERED.getKey().equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+        if (mobilityAnswers != null && !AwardType.NOT_CONSIDERED.getKey().equals(caseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion())) {
             List<Descriptor> mobilityDescriptors = getPipDescriptorsFromQuestionKeys(caseData, mobilityAnswers);
 
             builder.mobilityDescriptors(mobilityDescriptors);
@@ -174,11 +174,11 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
 
     private List<String> getConsideredComparisonsWithDwp(SscsCaseData caseData) {
         List<String> consideredComparissons = new ArrayList<>();
-        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
-            consideredComparissons.add(caseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
+        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion())) {
+            consideredComparissons.add(caseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
         }
-        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
-            consideredComparissons.add(caseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion())) {
+            consideredComparissons.add(caseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
         }
         return consideredComparissons;
     }
