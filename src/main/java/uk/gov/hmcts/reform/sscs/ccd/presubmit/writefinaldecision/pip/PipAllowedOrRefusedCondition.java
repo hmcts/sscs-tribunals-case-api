@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoFieldCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.scenarios.PipScenario;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 /**
  * Encapsulates the conditions satisfied by valid combinations of allowed/refused and other attributes of the Decision Notice journey - to be used on Outcome validation (eg. on submission), but not on
@@ -196,10 +197,6 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
         }
     }
 
-    static Optional<PipPointsCondition> isPoints(PipPointsCondition pointsCondition) {
-        return Optional.of(pointsCondition);
-    }
-
     static YesNoFieldCondition isDescriptorFlow(Predicate<YesNo> predicate, boolean displayIsSatisfiedMessage) {
         return new YesNoFieldCondition("Descriptor Flow", predicate,
             s -> "Yes".equalsIgnoreCase(s.getWriteFinalDecisionIsDescriptorFlow()) ? YesNo.YES : YesNo.NO, displayIsSatisfiedMessage);
@@ -316,6 +313,11 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
         List<String> criteriaSatisfiedMessages = new ArrayList<>();
 
         criteriaSatisfiedMessages.addAll(primaryCriteriaSatisfiedMessages);
+
+        if (!criteriaSatisfiedMessages.isEmpty()) {
+            return Optional.of("You have " + StringUtils.getGramaticallyJoinedStrings(criteriaSatisfiedMessages)
+                + ". Please review your previous selection.");
+        }
 
         return Optional.empty();
     }
