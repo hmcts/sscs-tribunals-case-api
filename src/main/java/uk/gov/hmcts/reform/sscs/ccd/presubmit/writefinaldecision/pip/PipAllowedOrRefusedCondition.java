@@ -186,15 +186,7 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
 
     public static Optional<PipAllowedOrRefusedCondition> getPassingAllowedOrRefusedCondition(DecisionNoticeQuestionService questionService,
         SscsCaseData caseData) {
-
-        PipAllowedOrRefusedCondition condition
-            = getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(questionService, caseData);
-
-        if (condition.getOptionalErrorMessage(questionService, caseData).isEmpty()) {
-            return Optional.of(PipAllowedOrRefusedCondition.getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(questionService, caseData));
-        } else {
-            return Optional.empty();
-        }
+        return Optional.of(PipAllowedOrRefusedCondition.getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(questionService, caseData));
     }
 
     static YesNoFieldCondition isDescriptorFlow(Predicate<YesNo> predicate, boolean displayIsSatisfiedMessage) {
