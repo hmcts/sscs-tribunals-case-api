@@ -22,12 +22,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardTypeCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardTypePredicate;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.FieldCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoFieldCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.scenarios.PipScenario;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
-import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 /**
  * Encapsulates the conditions satisfied by valid combinations of allowed/refused and other attributes of the Decision Notice journey - to be used on Outcome validation (eg. on submission), but not on
@@ -36,106 +37,217 @@ import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOrRefusedCondition> {
 
     REFUSED_NOT_CONSIDERED_NOT_CONSIDERED(
-            isAllowedOrRefused(REFUSED),
-            isDescriptorFlow(FALSE, false),
-            isDailyLivingComparedToDwp(NOT_CONSIDERED),
-            isMobilityComparedToDwp(NOT_CONSIDERED), false, false),
+        isAllowedOrRefused(REFUSED),
+        isDescriptorFlow(FALSE, false),
+        isDailyLivingComparedToDwp(NOT_CONSIDERED),
+        isMobilityComparedToDwp(NOT_CONSIDERED),
+        isDailyLivingAward(AwardTypePredicate.NOT_CONSIDERED),
+        isMobilityAward(AwardTypePredicate.NOT_CONSIDERED)),
     ALLOWED_NOT_CONSIDERED_NOT_CONSIDERED(
-            isAllowedOrRefused(ALLOWED),
-            isDescriptorFlow(FALSE, false),
-            isDailyLivingComparedToDwp(NOT_CONSIDERED),
-            isMobilityComparedToDwp(NOT_CONSIDERED), false, false),
+        isAllowedOrRefused(ALLOWED),
+        isDescriptorFlow(FALSE, false),
+        isDailyLivingComparedToDwp(NOT_CONSIDERED),
+        isMobilityComparedToDwp(NOT_CONSIDERED),
+        isDailyLivingAward(AwardTypePredicate.NOT_CONSIDERED),
+        isMobilityAward(AwardTypePredicate.NOT_CONSIDERED)),
     REFUSED_NOT_CONSIDERED_LOWER(
-            isDescriptorFlow(TRUE, false),
-            isDailyLivingComparedToDwp(NOT_CONSIDERED),
-            isMobilityComparedToDwp(LOWER), false, true),
+        isDescriptorFlow(TRUE, false),
+        isDailyLivingComparedToDwp(NOT_CONSIDERED),
+        isMobilityComparedToDwp(LOWER),
+        isDailyLivingAward(AwardTypePredicate.NOT_CONSIDERED),
+        isMobilityAward(AwardTypePredicate.CONSIDERED)),
     REFUSED_NOT_CONSIDERED_SAME(
-            isDescriptorFlow(TRUE, false),
-            isDailyLivingComparedToDwp(NOT_CONSIDERED),
-            isMobilityComparedToDwp(SAME), false, true),
+        isDescriptorFlow(TRUE, false),
+        isDailyLivingComparedToDwp(NOT_CONSIDERED),
+        isMobilityComparedToDwp(SAME),
+        isDailyLivingAward(AwardTypePredicate.NOT_CONSIDERED),
+        isMobilityAward(AwardTypePredicate.CONSIDERED)),
     ALLOWED_NOT_CONSIDERED_HIGHER(
-            isDescriptorFlow(TRUE, false),
-            isDailyLivingComparedToDwp(NOT_CONSIDERED),
-            isMobilityComparedToDwp(HIGHER), false, true),
+        isDescriptorFlow(TRUE, false),
+        isDailyLivingComparedToDwp(NOT_CONSIDERED),
+        isMobilityComparedToDwp(HIGHER),
+        isDailyLivingAward(AwardTypePredicate.NOT_CONSIDERED),
+        isMobilityAward(AwardTypePredicate.CONSIDERED)),
     REFUSED_LOWER_NOT_CONSIDERED(
-            isDescriptorFlow(TRUE, false),
-            isDailyLivingComparedToDwp(LOWER),
-            isMobilityComparedToDwp(NOT_CONSIDERED), true, false),
+        isDescriptorFlow(TRUE, false),
+        isDailyLivingComparedToDwp(LOWER),
+        isMobilityComparedToDwp(NOT_CONSIDERED),
+        isDailyLivingAward(AwardTypePredicate.CONSIDERED),
+        isMobilityAward(AwardTypePredicate.NOT_CONSIDERED)),
     REFUSED_LOWER_LOWER(
-            isDescriptorFlow(TRUE, false),
-            isDailyLivingComparedToDwp(LOWER),
-            isMobilityComparedToDwp(LOWER), true, true),
+        isDescriptorFlow(TRUE, false),
+        isDailyLivingComparedToDwp(LOWER),
+        isMobilityComparedToDwp(LOWER),
+        isDailyLivingAward(AwardTypePredicate.CONSIDERED),
+        isMobilityAward(AwardTypePredicate.CONSIDERED)),
     REFUSED_LOWER_SAME(
-            isDescriptorFlow(TRUE, false),
-            isDailyLivingComparedToDwp(LOWER),
-            isMobilityComparedToDwp(SAME), true, true),
+        isDescriptorFlow(TRUE, false),
+        isDailyLivingComparedToDwp(LOWER),
+        isMobilityComparedToDwp(SAME),
+        isDailyLivingAward(AwardTypePredicate.CONSIDERED),
+        isMobilityAward(AwardTypePredicate.CONSIDERED)),
     ALLOWED_LOWER_HIGHER(
-            isDescriptorFlow(TRUE, false),
-            isDailyLivingComparedToDwp(LOWER),
-            isMobilityComparedToDwp(HIGHER), true, true),
+        isDescriptorFlow(TRUE, false),
+        isDailyLivingComparedToDwp(LOWER),
+        isMobilityComparedToDwp(HIGHER),
+        isDailyLivingAward(AwardTypePredicate.CONSIDERED),
+        isMobilityAward(AwardTypePredicate.CONSIDERED)),
     REFUSED_SAME_NOT_CONSIDERED(
-            isDescriptorFlow(TRUE, false),
-            isDailyLivingComparedToDwp(SAME),
-            isMobilityComparedToDwp(NOT_CONSIDERED), true, false),
+        isDescriptorFlow(TRUE, false),
+        isDailyLivingComparedToDwp(SAME),
+        isMobilityComparedToDwp(NOT_CONSIDERED),
+        isDailyLivingAward(AwardTypePredicate.CONSIDERED),
+        isMobilityAward(AwardTypePredicate.NOT_CONSIDERED)),
     REFUSED_SAME_LOWER(
-            isDescriptorFlow(TRUE, false),
-            isDailyLivingComparedToDwp(SAME),
-            isMobilityComparedToDwp(LOWER), true, true),
+        isDescriptorFlow(TRUE, false),
+        isDailyLivingComparedToDwp(SAME),
+        isMobilityComparedToDwp(LOWER),
+        isDailyLivingAward(AwardTypePredicate.CONSIDERED),
+        isMobilityAward(AwardTypePredicate.CONSIDERED)),
     REFUSED_SAME_SAME(
-            isDescriptorFlow(TRUE, false),
-            isDailyLivingComparedToDwp(SAME),
-            isMobilityComparedToDwp(SAME), true, true),
+        isDescriptorFlow(TRUE, false),
+        isDailyLivingComparedToDwp(SAME),
+        isMobilityComparedToDwp(SAME),
+        isDailyLivingAward(AwardTypePredicate.CONSIDERED),
+        isMobilityAward(AwardTypePredicate.CONSIDERED)),
     ALLOWED_SAME_HIGHER(
-            isDescriptorFlow(TRUE, false),
-            isDailyLivingComparedToDwp(SAME),
-            isMobilityComparedToDwp(HIGHER), true, true),
+        isDescriptorFlow(TRUE, false),
+        isDailyLivingComparedToDwp(SAME),
+        isMobilityComparedToDwp(HIGHER),
+        isDailyLivingAward(AwardTypePredicate.CONSIDERED),
+        isMobilityAward(AwardTypePredicate.CONSIDERED)),
     ALLOWED_HIGHER_NOT_CONSIDERED(
-            isDescriptorFlow(TRUE, false),
-            isDailyLivingComparedToDwp(HIGHER),
-            isMobilityComparedToDwp(NOT_CONSIDERED), true, false),
+        isDescriptorFlow(TRUE, false),
+        isDailyLivingComparedToDwp(HIGHER),
+        isMobilityComparedToDwp(NOT_CONSIDERED),
+        isDailyLivingAward(AwardTypePredicate.CONSIDERED),
+        isMobilityAward(AwardTypePredicate.NOT_CONSIDERED)),
     ALLOWED_HIGHER_LOWER(
-            isDescriptorFlow(TRUE, false),
-            isDailyLivingComparedToDwp(HIGHER),
-            isMobilityComparedToDwp(LOWER), true, true),
+        isDescriptorFlow(TRUE, false),
+        isDailyLivingComparedToDwp(HIGHER),
+        isMobilityComparedToDwp(LOWER),
+        isDailyLivingAward(AwardTypePredicate.CONSIDERED),
+        isMobilityAward(AwardTypePredicate.CONSIDERED)),
     ALLOWED_HIGHER_SAME(
-            isDescriptorFlow(TRUE, false),
-            isDailyLivingComparedToDwp(HIGHER),
-            isMobilityComparedToDwp(SAME), true, true),
+        isDescriptorFlow(TRUE, false),
+        isDailyLivingComparedToDwp(HIGHER),
+        isMobilityComparedToDwp(SAME),
+        isDailyLivingAward(AwardTypePredicate.CONSIDERED),
+        isMobilityAward(AwardTypePredicate.CONSIDERED)),
     ALLOWED_HIGHER_HIGHER(
-            isDescriptorFlow(TRUE, false),
-            isDailyLivingComparedToDwp(HIGHER),
-            isMobilityComparedToDwp(HIGHER), true, true);
+        isDescriptorFlow(TRUE, false),
+        isDailyLivingComparedToDwp(HIGHER),
+        isMobilityComparedToDwp(HIGHER),
+        isDailyLivingAward(AwardTypePredicate.CONSIDERED),
+        isMobilityAward(AwardTypePredicate.CONSIDERED));
 
     List<FieldCondition> primaryConditions;
-    List<FieldCondition> validationConditions;
     boolean isDailyLivingConsidered;
     boolean isMobilityConsidered;
 
-    PipAllowedOrRefusedCondition(Optional<AllowedOrRefusedCondition> allowedOrRefusedCondition, YesNoFieldCondition descriptorFlowCondition, DailyLivingComparedToDwpCondition dailyLivingComparedToDwpCondition,
-                                 MobilityComparedToDwpCondition mobilityLivingComparedToDwpCondition, boolean isDailyLivingConsidered, boolean isMobilityConsidered) {
+    PipAllowedOrRefusedCondition(Optional<AllowedOrRefusedCondition> allowedOrRefusedCondition, YesNoFieldCondition descriptorFlowCondition,
+        DailyLivingComparedToDwpCondition dailyLivingComparedToDwpCondition,
+        MobilityComparedToDwpCondition mobilityLivingComparedToDwpCondition, AwardTypeCondition dailyLivingCondition, AwardTypeCondition mobilityCondition) {
+        this.isDailyLivingConsidered = dailyLivingCondition.getAwardTypePredicate() == AwardTypePredicate.CONSIDERED;
+        this.isMobilityConsidered =  mobilityCondition.getAwardTypePredicate() == AwardTypePredicate.CONSIDERED;;
         this.primaryConditions = new ArrayList<>();
-        this.validationConditions = new ArrayList<>();
         if (allowedOrRefusedCondition.isPresent()) {
             this.primaryConditions.add(allowedOrRefusedCondition.get());
         }
+        this.primaryConditions.add(dailyLivingCondition);
+        this.primaryConditions.add(mobilityCondition);
+
         this.primaryConditions.add(descriptorFlowCondition);
-        this.primaryConditions.add(dailyLivingComparedToDwpCondition);
-        this.primaryConditions.add(mobilityLivingComparedToDwpCondition);
-        this.isDailyLivingConsidered = isDailyLivingConsidered;
-        this.isMobilityConsidered = isMobilityConsidered;
+        if (isDailyLivingConsidered) {
+            this.primaryConditions.add(dailyLivingComparedToDwpCondition);
+        }
+        if (isMobilityConsidered) {
+            this.primaryConditions.add(mobilityLivingComparedToDwpCondition);
+        }
+
     }
 
     PipAllowedOrRefusedCondition(YesNoFieldCondition descriptorFlowCondition, DailyLivingComparedToDwpCondition dailyLivingComparedToDwpCondition,
-        MobilityComparedToDwpCondition mobilityLivingComparedToDwpCondition, boolean isDailyLivingConsidered, boolean isMobilityConsidered) {
+        MobilityComparedToDwpCondition mobilityLivingComparedToDwpCondition, AwardTypeCondition dailyLivingCondition, AwardTypeCondition mobilityCondition) {
+        this.isDailyLivingConsidered = dailyLivingCondition.getAwardTypePredicate() == AwardTypePredicate.CONSIDERED;
+        this.isMobilityConsidered =  mobilityCondition.getAwardTypePredicate() == AwardTypePredicate.CONSIDERED;;
         this.primaryConditions = new ArrayList<>();
-        this.validationConditions = new ArrayList<>();
         this.primaryConditions.add(descriptorFlowCondition);
-        this.primaryConditions.add(dailyLivingComparedToDwpCondition);
-        this.primaryConditions.add(mobilityLivingComparedToDwpCondition);
-        this.isDailyLivingConsidered = isDailyLivingConsidered;
-        this.isMobilityConsidered = isMobilityConsidered;
+        if (isDailyLivingConsidered) {
+            this.primaryConditions.add(dailyLivingComparedToDwpCondition);
+        }
+        if (isMobilityConsidered) {
+            this.primaryConditions.add(mobilityLivingComparedToDwpCondition);
+        }
+        this.primaryConditions.add(dailyLivingCondition);
+        this.primaryConditions.add(mobilityCondition);
     }
 
+    public static Optional<PipAllowedOrRefusedCondition> getPassingAllowedOrRefusedCondition(DecisionNoticeQuestionService questionService,
+        SscsCaseData caseData) {
+
+        PipAllowedOrRefusedCondition condition
+            = getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(questionService, caseData);
+
+        if (condition.getOptionalErrorMessage(questionService, caseData).isEmpty()) {
+            return Optional.of(PipAllowedOrRefusedCondition.getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(questionService, caseData));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    static Optional<PipPointsCondition> isPoints(PipPointsCondition pointsCondition) {
+        return Optional.of(pointsCondition);
+    }
+
+    static YesNoFieldCondition isDescriptorFlow(Predicate<YesNo> predicate, boolean displayIsSatisfiedMessage) {
+        return new YesNoFieldCondition("Descriptor Flow", predicate,
+            s -> "Yes".equalsIgnoreCase(s.getWriteFinalDecisionIsDescriptorFlow()) ? YesNo.YES : YesNo.NO, displayIsSatisfiedMessage);
+    }
+
+    static Optional<AllowedOrRefusedCondition> isAllowedOrRefused(AllowedOrRefusedPredicate predicate) {
+        return Optional.of(new AllowedOrRefusedCondition(predicate));
+    }
+
+    static AwardTypeCondition isDailyLivingAward(AwardTypePredicate awardTypePredicate) {
+        return new AwardTypeCondition(awardTypePredicate, c -> c.getPipWriteFinalDecisionDailyLivingQuestion(), PipActivityType.DAILY_LIVING);
+    }
+
+    static AwardTypeCondition isMobilityAward(AwardTypePredicate awardTypePredicate) {
+        return new AwardTypeCondition(awardTypePredicate, c -> c.getPipWriteFinalDecisionMobilityQuestion(), PipActivityType.MOBILITY);
+    }
+
+    static DailyLivingComparedToDwpCondition isDailyLivingComparedToDwp(ComparedToDwpPredicate predicate) {
+        return new DailyLivingComparedToDwpCondition(predicate);
+    }
+
+    static MobilityComparedToDwpCondition isMobilityComparedToDwp(ComparedToDwpPredicate predicate) {
+        return new MobilityComparedToDwpCondition(predicate);
+    }
+
+    protected static PipAllowedOrRefusedCondition getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(DecisionNoticeQuestionService questionService,
+        SscsCaseData caseData) {
+
+        for (PipAllowedOrRefusedCondition pipPointsAndActivitiesCondition : PipAllowedOrRefusedCondition.values()) {
+
+            if (pipPointsAndActivitiesCondition.isApplicable(questionService, caseData) && pipPointsAndActivitiesCondition.getOptionalErrorMessage(questionService, caseData).isEmpty()) {
+                return pipPointsAndActivitiesCondition;
+            }
+        }
+        throw new IllegalStateException(
+            "No allowed/refused condition found for " + caseData.getWriteFinalDecisionIsDescriptorFlow()
+                + ":" + caseData.getWriteFinalDecisionAllowedOrRefused()
+                + ":" + caseData.getPipWriteFinalDecisionDailyLivingQuestion() + ":"
+                + caseData.getPipWriteFinalDecisionMobilityQuestion() + ":"
+                + caseData
+                .getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion() + ":"
+                + caseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+    }
+
+    public static Function<SscsCaseData, List<String>> getAllAnswersExtractor() {
+        return sscsCaseData -> CollectionUtils.collate(emptyIfNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion()),
+            emptyIfNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionMentalAssessmentQuestion()));
+    }
 
     public PipScenario getPipScenario(SscsCaseData caseData) {
         if (REFUSED_NOT_CONSIDERED_NOT_CONSIDERED == this || ALLOWED_NOT_CONSIDERED_NOT_CONSIDERED == this) {
@@ -167,59 +279,6 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
         }
     }
 
-    public static Optional<PipAllowedOrRefusedCondition> getPassingAllowedOrRefusedCondition(DecisionNoticeQuestionService questionService,
-                                                                                             SscsCaseData caseData) {
-
-        PipAllowedOrRefusedCondition condition
-                = getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(questionService, caseData);
-
-        if (condition.getOptionalErrorMessage(questionService, caseData).isEmpty()) {
-            return Optional.of(PipAllowedOrRefusedCondition.getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(questionService, caseData));
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    static Optional<PipPointsCondition> isPoints(PipPointsCondition pointsCondition) {
-        return Optional.of(pointsCondition);
-    }
-
-    static YesNoFieldCondition isDescriptorFlow(Predicate<YesNo> predicate, boolean displayIsSatisfiedMessage) {
-        return new YesNoFieldCondition("Descriptor Flow", predicate,
-                s -> "Yes".equalsIgnoreCase(s.getWriteFinalDecisionIsDescriptorFlow()) ? YesNo.YES : YesNo.NO, displayIsSatisfiedMessage);
-    }
-
-    static Optional<AllowedOrRefusedCondition> isAllowedOrRefused(AllowedOrRefusedPredicate predicate) {
-        return Optional.of(new AllowedOrRefusedCondition(predicate));
-    }
-
-    static DailyLivingComparedToDwpCondition isDailyLivingComparedToDwp(ComparedToDwpPredicate predicate) {
-        return new DailyLivingComparedToDwpCondition(predicate);
-    }
-
-    static MobilityComparedToDwpCondition isMobilityComparedToDwp(ComparedToDwpPredicate predicate) {
-        return new MobilityComparedToDwpCondition(predicate);
-    }
-
-    protected static PipAllowedOrRefusedCondition getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(DecisionNoticeQuestionService questionService,
-                                                                                                                    SscsCaseData caseData) {
-
-        for (PipAllowedOrRefusedCondition pipPointsAndActivitiesCondition : PipAllowedOrRefusedCondition.values()) {
-
-            if (pipPointsAndActivitiesCondition.isApplicable(questionService, caseData) && pipPointsAndActivitiesCondition.getOptionalErrorMessage(questionService, caseData).isEmpty()) {
-                return pipPointsAndActivitiesCondition;
-            }
-        }
-        throw new IllegalStateException(
-                "No allowed/refused condition found for " + caseData.getWriteFinalDecisionIsDescriptorFlow() + ":" + caseData.getWriteFinalDecisionAllowedOrRefused() + ":" + caseData
-                        .getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion() + ":" + caseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
-    }
-
-    public static Function<SscsCaseData, List<String>> getAllAnswersExtractor() {
-        return sscsCaseData -> CollectionUtils.collate(emptyIfNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion()),
-                emptyIfNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionMentalAssessmentQuestion()));
-    }
-
     @Override
     public boolean isApplicable(DecisionNoticeQuestionService questionService, SscsCaseData caseData) {
         if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
@@ -248,43 +307,16 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
     public Optional<String> getOptionalErrorMessage(DecisionNoticeQuestionService questionService, SscsCaseData sscsCaseData) {
 
         final List<String> primaryCriteriaSatisfiedMessages =
-                primaryConditions.stream()
-                        .map(c -> c.getOptionalIsSatisfiedMessage(sscsCaseData))
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .collect(Collectors.toList());
-
-        final List<String> validationErrorMessages =
-                validationConditions.stream()
-                        .map(e -> e.getOptionalErrorMessage(sscsCaseData))
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .collect(Collectors.toList());
+            primaryConditions.stream()
+                .map(c -> c.getOptionalIsSatisfiedMessage(sscsCaseData))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
 
         List<String> criteriaSatisfiedMessages = new ArrayList<>();
-        /*
-        if (primaryPointsCondition.isPresent()) {
-            criteriaSatisfiedMessages.add(primaryPointsCondition.get().getIsSatisfiedMessage());
-        }
-         */
+
         criteriaSatisfiedMessages.addAll(primaryCriteriaSatisfiedMessages);
 
-        List<String> validationMessages = new ArrayList<>();
-        /*
-        if (validationPointsCondition.isPresent()) {
-            int points = questionService.getTotalPoints(sscsCaseData, getAnswersExtractor().apply(sscsCaseData));
-            if (!validationPointsCondition.get().getPointsRequirementCondition().test(points)) {
-                validationMessages.add(validationPointsCondition.get().getErrorMessage());
-            }
-        }
-         */
-        validationMessages.addAll(validationErrorMessages);
-
-        if (!validationMessages.isEmpty()) {
-            return Optional.of("You have " + StringUtils.getGramaticallyJoinedStrings(criteriaSatisfiedMessages)
-                    + (criteriaSatisfiedMessages.isEmpty() ? "" : ", but have ") + StringUtils.getGramaticallyJoinedStrings(validationMessages)
-                    + ". Please review your previous selection.");
-        }
         return Optional.empty();
     }
 }
