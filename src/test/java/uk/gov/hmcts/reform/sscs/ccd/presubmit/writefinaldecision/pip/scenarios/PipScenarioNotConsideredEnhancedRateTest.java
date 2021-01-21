@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody
 public class PipScenarioNotConsideredEnhancedRateTest {
 
     @Test
-    public void testScenario1() {
+    public void testScenario() {
 
         List<Descriptor> mobilityDescriptors =
                 Arrays.asList(Descriptor.builder()
