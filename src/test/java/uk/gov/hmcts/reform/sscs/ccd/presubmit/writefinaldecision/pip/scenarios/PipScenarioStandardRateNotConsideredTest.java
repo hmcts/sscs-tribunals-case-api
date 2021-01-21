@@ -50,7 +50,7 @@ public class PipScenarioStandardRateNotConsideredTest {
 
         String expectedContent = "The appeal is refused.\n"
             + "\n"
-            + "The decision made by the Secretary of State on 20/09/2020 in respect of Personal Independence Payment is confirmed.\n"
+            + "The decision made by the Secretary of State on 20/09/2020 is confirmed.\n"
             + "\n"
             + "Felix Sydney is entitled to the daily living component at the standard rate from 17/12/2020 for an indefinite period.\n"
             + "\n"
@@ -67,7 +67,7 @@ public class PipScenarioStandardRateNotConsideredTest {
             + "\n"
             + "Something else\n"
             + "\n"
-            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the tribunal considered the appeal bundle to page A1. No Presenting Officer attended on behalf of the Respondent.\n"
+            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. No Presenting Officer attended on behalf of the Respondent.\n"
             + "\n";
 
         Assert.assertEquals(10, content.getComponents().size());

@@ -30,75 +30,10 @@ public abstract class PipTemplateContent extends WriteFinalDecisionTemplateConte
         return appellantName + " is entitled to the daily living component at the " + dailyLivingRate + " from " + DATEFORMATTER.format(LocalDate.parse(startDate))  + (endDate == null ? " for an indefinite period." : (" to " + DATEFORMATTER.format(LocalDate.parse(endDate)) + "."));
     }
 
-    @Override
-    protected String getAppellantAttended(String hearingType, String appellantName, boolean presentingOfifficerAttened, String bundlePage) {
-        return appellantName + " attended the hearing today and the tribunal considered the appeal bundle to page " + bundlePage + ". "
-                + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.";
-    }
-
-    @Override
-    protected String getConsideredParagraph(String bundlePage, String appellantName) {
-        return "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify " + appellantName + " of the hearing and that it is in the interests of justice to proceed today. ";
-    }
-
     protected String getIsEntitledMobility(String appellantName, String mobilityRate, String startDate, String endDate) {
         return appellantName + " is entitled to the mobility component at the " + mobilityRate + " from " + DATEFORMATTER.format(LocalDate.parse(startDate))  + (endDate == null ? " for an indefinite period." : (" to " + DATEFORMATTER.format(LocalDate.parse(endDate)) + "."));
     }
-
-    public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate) {
-        return "The decision made by the Secretary of State on " + DATEFORMATTER.format(LocalDate.parse(decisionDate)) + " in respect of Personal Independence Payment is "
-                + (!setAside ? "confirmed." : "set aside.");
-    }
-
-    @Override
-    public List<String> getHearingTypeSentences(String appellantName, String bundlePage, String hearingType, boolean appellantAttended, boolean presentingOfficerAttened) {
-        if (equalsIgnoreCase("paper", hearingType)) {
-            // Single output.
-            return asList("No party has objected to the matter being decided without a hearing. Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.");
-        } else  {
-            return getFaceToFaceTelephoneVideoHearingTypeSentences(hearingType, appellantName, bundlePage, appellantAttended, presentingOfficerAttened);
-        }
-    }
-
-    @Override // Remove the hearing
-    public List<String> getFaceToFaceTelephoneVideoHearingTypeSentences(String hearingType, String appellantName, String bundlePage,
-        boolean appellantAttended, boolean presentingOfifficerAttened) {
-        if (appellantAttended) {
-            if (equalsIgnoreCase("faceToFace", hearingType)) {
-                return singletonList("This has been an oral (face to face) hearing. "
-                    + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
-            } else if (equalsIgnoreCase("triage", hearingType)) {
-                return singletonList(getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
-            } else if (equalsIgnoreCase("paper", hearingType)) {
-                return singletonList("This has been a remote hearing in the form of a " + hearingType + " hearing. " + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
-            } else {
-                return singletonList("This has been a remote hearing in the form of a " + hearingType + " hearing. "
-                    + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
-            }
-        } else {
-            if (equalsIgnoreCase("faceToFace", hearingType)) {
-                // Adding in // This has been
-                return asList("This has been an oral (face to face) hearing. " + appellantName + " requested an oral hearing but did not attend today. "
-                        + (presentingOfifficerAttened ? "A " : "No ") + "Presenting Officer attended on behalf of the Respondent.",
-                    getConsideredParagraph(bundlePage, appellantName));
-            } else if (equalsIgnoreCase("triage", hearingType)) {
-                // Removed "the hearing"
-                return asList(appellantName + " did not attend today. "
-                        + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.",
-                    getConsideredParagraph(bundlePage, appellantName));
-            } else if (equalsIgnoreCase("paper", hearingType)) {
-                // Removed "the hearing"
-                return asList("This has been a remote hearing in the form of a " + hearingType + " hearing. " + appellantName + " did not attend today. "
-                        + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent. " + getConsideredParagraph(bundlePage, appellantName));
-            } else {
-                // Removed "the hearing"
-                return asList("This has been a remote hearing in the form of a " + hearingType + " hearing. " + appellantName + " did not attend today. "
-                        + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.",
-                    getConsideredParagraph(bundlePage, appellantName));
-            }
-        }
-    }
-
+    
     public String getDailyLivingNotConsidered() {
         return "Only the mobility component was in issue on this appeal and the daily living component was not considered.";
     }
