@@ -124,7 +124,6 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionStartDate("2018-10-11");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
     }
 
     @Override
@@ -291,12 +290,6 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
             sscsCaseData.setWriteFinalDecisionEndDateType("na");
         }
 
-        if ("higher".equals(descriptorsComparedToDwp)) {
-            sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        } else {
-            sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
-        }
-
         // Mobility specific parameters
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(rate);
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("notConsidered");
@@ -382,11 +375,6 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(descriptorsComparedToDwp);
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(nonDescriptorsComparedWithDwp);
-        if ("higher".equals(descriptorsComparedToDwp)) {
-            sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        } else {
-            sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
-        }
 
         setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -497,12 +485,6 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-
-        if ("higher".equals(descriptorsComparedToDwp)) {
-            sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        } else {
-            sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
-        }
 
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(descriptorsComparedToDwp);
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(nonDescriptorsComparedWithDwp);

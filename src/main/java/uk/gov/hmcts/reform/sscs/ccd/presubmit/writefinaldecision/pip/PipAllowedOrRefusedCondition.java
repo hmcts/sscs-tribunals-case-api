@@ -46,77 +46,62 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
             isDailyLivingComparedToDwp(NOT_CONSIDERED),
             isMobilityComparedToDwp(NOT_CONSIDERED), false, false),
     REFUSED_NOT_CONSIDERED_LOWER(
-            isAllowedOrRefused(REFUSED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(NOT_CONSIDERED),
             isMobilityComparedToDwp(LOWER), false, true),
     REFUSED_NOT_CONSIDERED_SAME(
-            isAllowedOrRefused(REFUSED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(NOT_CONSIDERED),
             isMobilityComparedToDwp(SAME), false, true),
     ALLOWED_NOT_CONSIDERED_HIGHER(
-            isAllowedOrRefused(ALLOWED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(NOT_CONSIDERED),
             isMobilityComparedToDwp(HIGHER), false, true),
     REFUSED_LOWER_NOT_CONSIDERED(
-            isAllowedOrRefused(REFUSED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(LOWER),
             isMobilityComparedToDwp(NOT_CONSIDERED), true, false),
     REFUSED_LOWER_LOWER(
-            isAllowedOrRefused(REFUSED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(LOWER),
             isMobilityComparedToDwp(LOWER), true, true),
     REFUSED_LOWER_SAME(
-            isAllowedOrRefused(REFUSED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(LOWER),
             isMobilityComparedToDwp(SAME), true, true),
     ALLOWED_LOWER_HIGHER(
-            isAllowedOrRefused(ALLOWED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(LOWER),
             isMobilityComparedToDwp(HIGHER), true, true),
     REFUSED_SAME_NOT_CONSIDERED(
-            isAllowedOrRefused(REFUSED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(SAME),
             isMobilityComparedToDwp(NOT_CONSIDERED), true, false),
     REFUSED_SAME_LOWER(
-            isAllowedOrRefused(REFUSED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(SAME),
             isMobilityComparedToDwp(LOWER), true, true),
     REFUSED_SAME_SAME(
-            isAllowedOrRefused(REFUSED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(SAME),
             isMobilityComparedToDwp(SAME), true, true),
     ALLOWED_SAME_HIGHER(
-            isAllowedOrRefused(ALLOWED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(SAME),
             isMobilityComparedToDwp(HIGHER), true, true),
     ALLOWED_HIGHER_NOT_CONSIDERED(
-            isAllowedOrRefused(ALLOWED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(HIGHER),
             isMobilityComparedToDwp(NOT_CONSIDERED), true, false),
     ALLOWED_HIGHER_LOWER(
-            isAllowedOrRefused(ALLOWED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(HIGHER),
             isMobilityComparedToDwp(LOWER), true, true),
     ALLOWED_HIGHER_SAME(
-            isAllowedOrRefused(ALLOWED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(HIGHER),
             isMobilityComparedToDwp(SAME), true, true),
     ALLOWED_HIGHER_HIGHER(
-            isAllowedOrRefused(ALLOWED),
             isDescriptorFlow(TRUE, false),
             isDailyLivingComparedToDwp(HIGHER),
             isMobilityComparedToDwp(HIGHER), true, true);
@@ -126,17 +111,29 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
     boolean isDailyLivingConsidered;
     boolean isMobilityConsidered;
 
-    PipAllowedOrRefusedCondition(AllowedOrRefusedCondition allowedOrRefusedCondition, YesNoFieldCondition descriptorFlowCondition, DailyLivingComparedToDwpCondition dailyLivingComparedToDwpCondition,
+    PipAllowedOrRefusedCondition(Optional<AllowedOrRefusedCondition> allowedOrRefusedCondition, YesNoFieldCondition descriptorFlowCondition, DailyLivingComparedToDwpCondition dailyLivingComparedToDwpCondition,
                                  MobilityComparedToDwpCondition mobilityLivingComparedToDwpCondition, boolean isDailyLivingConsidered, boolean isMobilityConsidered) {
         this.primaryConditions = new ArrayList<>();
         this.validationConditions = new ArrayList<>();
-        this.primaryConditions.add(allowedOrRefusedCondition);
+        if (allowedOrRefusedCondition.isPresent()) {
+            this.primaryConditions.add(allowedOrRefusedCondition.get());
+        }
         this.primaryConditions.add(descriptorFlowCondition);
         this.primaryConditions.add(dailyLivingComparedToDwpCondition);
         this.primaryConditions.add(mobilityLivingComparedToDwpCondition);
         this.isDailyLivingConsidered = isDailyLivingConsidered;
         this.isMobilityConsidered = isMobilityConsidered;
+    }
 
+    PipAllowedOrRefusedCondition(YesNoFieldCondition descriptorFlowCondition, DailyLivingComparedToDwpCondition dailyLivingComparedToDwpCondition,
+        MobilityComparedToDwpCondition mobilityLivingComparedToDwpCondition, boolean isDailyLivingConsidered, boolean isMobilityConsidered) {
+        this.primaryConditions = new ArrayList<>();
+        this.validationConditions = new ArrayList<>();
+        this.primaryConditions.add(descriptorFlowCondition);
+        this.primaryConditions.add(dailyLivingComparedToDwpCondition);
+        this.primaryConditions.add(mobilityLivingComparedToDwpCondition);
+        this.isDailyLivingConsidered = isDailyLivingConsidered;
+        this.isMobilityConsidered = isMobilityConsidered;
     }
 
 
@@ -212,8 +209,8 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
                 s -> "Yes".equalsIgnoreCase(s.getWriteFinalDecisionIsDescriptorFlow()) ? YesNo.YES : YesNo.NO, displayIsSatisfiedMessage);
     }
 
-    static AllowedOrRefusedCondition isAllowedOrRefused(AllowedOrRefusedPredicate predicate) {
-        return new AllowedOrRefusedCondition(predicate);
+    static Optional<AllowedOrRefusedCondition> isAllowedOrRefused(AllowedOrRefusedPredicate predicate) {
+        return Optional.of(new AllowedOrRefusedCondition(predicate));
     }
 
     static DailyLivingComparedToDwpCondition isDailyLivingComparedToDwp(ComparedToDwpPredicate predicate) {
