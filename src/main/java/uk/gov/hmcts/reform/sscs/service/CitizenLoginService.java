@@ -86,7 +86,7 @@ public class CitizenLoginService {
         if (caseByAppealNumber != null) {
             log.info(format("Associate case: Found case to assign id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
             String appealPostcode = caseByAppealNumber.getData().getAppeal().getAppellant().getAddress().getPostcode();
-            if (!appealPostcode.isEmpty()) {
+            if (appealPostcode != null && !appealPostcode.isEmpty()) {
                 if (postcodeUtil.hasAppellantPostcode(caseByAppealNumber, postcode)) {
                     log.info(format("Associate case: Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] matches postcode", caseByAppealNumber.getId(), tya, email, postcode));
                     if (caseHasSubscriptionWithTyaAndEmail(caseByAppealNumber, tya, email)) {

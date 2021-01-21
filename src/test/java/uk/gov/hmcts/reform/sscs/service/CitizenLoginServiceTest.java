@@ -296,20 +296,24 @@ public class CitizenLoginServiceTest {
     @Test
     public void cannotAssociatesUserWithCaseAsPostcodeIncorrect() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppellantSubscription(tya);
-        when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens))
-                .thenReturn(expectedCase);
-        Optional<OnlineHearing> sscsCaseDetails = underTest.associateCaseToCitizen(
-                citizenIdamTokens, tya, SUBSCRIPTION_EMAIL_ADDRESS, "someOtherPostcode"
-        );
-
-        verify(citizenCcdService, never()).addUserToCase(any(IdamTokens.class), any(String.class), anyLong());
-        assertThat(sscsCaseDetails.isPresent(), is(false));
+        assertThatUserIsNotAddedToCase(expectedCase);
     }
 
     @Test
     public void cannotAssociateUserWithCaseAsCasePostcodeIsEmpty() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppellantSubscription(tya);
         expectedCase.getData().getAppeal().getAppellant().getAddress().setPostcode("");
+        assertThatUserIsNotAddedToCase(expectedCase);
+    }
+
+    @Test
+    public void cannotAssociateUserWithCaseAsCasePostcodeIsNull() {
+        SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppellantSubscription(tya);
+        expectedCase.getData().getAppeal().getAppellant().getAddress().setPostcode(null);
+        assertThatUserIsNotAddedToCase(expectedCase);
+    }
+
+    private void assertThatUserIsNotAddedToCase(SscsCaseDetails expectedCase) {
         when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens))
                 .thenReturn(expectedCase);
         Optional<OnlineHearing> sscsCaseDetails = underTest.associateCaseToCitizen(
