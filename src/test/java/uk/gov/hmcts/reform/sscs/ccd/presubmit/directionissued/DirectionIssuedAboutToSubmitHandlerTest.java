@@ -82,7 +82,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", false, dwpAddressLookupService);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService);
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
@@ -345,7 +345,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     public void givenDirectionTypeOfGrantReinstatementAndNotInterlocReview_setState() {
 
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", true, dwpAddressLookupService);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService);
 
         callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
         callback.getCaseDetails().getCaseData().setPreviousState(State.APPEAL_CREATED);
@@ -366,7 +366,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     public void givenDirectionTypeOfGrantReinstatementAndInterlocReview_setState() {
 
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", true, dwpAddressLookupService);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService);
 
         callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
         callback.getCaseDetails().getCaseData().setPreviousState(State.INTERLOCUTORY_REVIEW_STATE);
@@ -386,7 +386,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     public void givenDirectionTypeOfRefuseReinstatementkeepState() {
 
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", true, dwpAddressLookupService);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService);
 
         callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
         callback.getCaseDetails().getCaseData().setPreviousState(State.APPEAL_CREATED);
@@ -406,7 +406,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     public void givenDirectionTypeOfGrantUrgentHearingAndInterlocReview_setState() {
 
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", false, dwpAddressLookupService);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService);
 
         callback.getCaseDetails().getCaseData().setState(State.INTERLOCUTORY_REVIEW_STATE);
         callback.getCaseDetails().getCaseData().setPreviousState(State.DORMANT_APPEAL_STATE);
@@ -426,7 +426,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     public void givenDirectionTypeOfRefuseUrgentHearingkeepState() {
 
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", false, dwpAddressLookupService);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService);
 
         callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
         callback.getCaseDetails().getCaseData().setPreviousState(State.APPEAL_CREATED);

@@ -39,19 +39,16 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private final FooterService footerService;
     private final ServiceRequestExecutor serviceRequestExecutor;
     private final String bulkScanEndpoint;
-    private final boolean reinstatementFeatureFlag;
     private final DwpAddressLookupService dwpAddressLookupService;
 
     @Autowired
     public DirectionIssuedAboutToSubmitHandler(FooterService footerService, ServiceRequestExecutor serviceRequestExecutor,
                                                @Value("${bulk_scan.url}") String bulkScanUrl,
                                                @Value("${bulk_scan.validateEndpoint}") String validateEndpoint,
-                                               @Value("#{new Boolean('${reinstatement_requests_feature_flag}')}") boolean reinstatement,
                                                DwpAddressLookupService dwpAddressLookupService) {
         this.footerService = footerService;
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bulkScanEndpoint = String.format("%s%s", trimToEmpty(bulkScanUrl), trimToEmpty(validateEndpoint));
-        this.reinstatementFeatureFlag = reinstatement;
         this.dwpAddressLookupService = dwpAddressLookupService;
     }
 
@@ -151,12 +148,10 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 && ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
             caseData = updateCaseAfterExtensionRefused(caseData, null, State.WITH_DWP);
 
-        } else if (DirectionTypeItemList.GRANT_REINSTATEMENT.getCode().equals(caseData.getDirectionTypeDl().getValue().getCode())
-                && reinstatementFeatureFlag) {
+        } else if (DirectionTypeItemList.GRANT_REINSTATEMENT.getCode().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData = updateCaseAfterReinstatementGranted(caseData);
 
-        } else if (DirectionTypeItemList.REFUSE_REINSTATEMENT.getCode().equals(caseData.getDirectionTypeDl().getValue().getCode())
-                && reinstatementFeatureFlag) {
+        } else if (DirectionTypeItemList.REFUSE_REINSTATEMENT.getCode().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData = updateCaseAfterReinstatementRefused(caseData);
 
         } else if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)
@@ -321,8 +316,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     }
 
     private boolean shouldSetDwpState(SscsCaseData caseData) {
-        return ! reinstatementFeatureFlag
-                || isNull(caseData.getReinstatementOutcome())
+        return isNull(caseData.getReinstatementOutcome())
                 || (!caseData.getReinstatementOutcome().equals(RequestOutcome.GRANTED)
                 && !caseData.getReinstatementOutcome().equals(RequestOutcome.REFUSED));
     }
