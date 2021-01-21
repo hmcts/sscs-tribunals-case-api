@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody
 public class PipScenarioNonDescriptorAllowedTest {
 
     @Test
-    public void testScenario1() {
+    public void testScenario() {
 
         WriteFinalDecisionTemplateBody body =
             WriteFinalDecisionTemplateBody.builder()

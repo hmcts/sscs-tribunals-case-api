@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipTemplate
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class PipScenarioStandardRateNoAwardTest {
+public class PipScenarioEnhancedRateEnhancedRateTest {
 
     @Test
     public void testScenario() {
@@ -22,15 +22,15 @@ public class PipScenarioStandardRateNoAwardTest {
                 Descriptor.builder()
                     .activityQuestionNumber("2")
                     .activityQuestionValue("2.Taking Nutrition")
-                    .activityAnswerValue("Can take nutrition unaided.")
-                    .activityAnswerLetter("a").activityAnswerPoints(0).build());
+                    .activityAnswerValue("Needs prompting to be able to take nutrition.")
+                    .activityAnswerLetter("d").activityAnswerPoints(4).build());
 
         List<Descriptor> mobilityDescriptors =
             Arrays.asList(Descriptor.builder()
                 .activityQuestionNumber("12")
                 .activityQuestionValue("12.Moving Around")
-                .activityAnswerValue("Can stand and then move more than 200 metres, either aided or unaided.")
-                .activityAnswerLetter("a").activityAnswerPoints(0).build());
+                .activityAnswerValue("Can stand and then move more than 1 metre but no more than 20 metres, either aided or unaided.")
+                .activityAnswerLetter("e").activityAnswerPoints(8).build());
 
         WriteFinalDecisionTemplateBody body =
             WriteFinalDecisionTemplateBody.builder()
@@ -40,14 +40,16 @@ public class PipScenarioStandardRateNoAwardTest {
                 .dateOfDecision("2020-09-20")
                 .startDate("2020-12-17")
                 .dailyLivingIsEntited(true)
-                .mobilityIsEntited(false)
+                .mobilityIsEntited(true)
+                .dailyLivingIsSeverelyLimited(true)
+                .mobilityIsSeverelyLimited(true)
                 .isDescriptorFlow(true)
                 .isAllowed(false)
                 .isSetAside(false)
                 .dailyLivingNumberOfPoints(8)
-                .mobilityNumberOfPoints(0)
-                .dailyLivingAwardRate("standard rate")
-                .mobilityAwardRate("no award")
+                .mobilityNumberOfPoints(12)
+                .dailyLivingAwardRate("enhanced rate")
+                .mobilityAwardRate("enhanced rate")
                 .pageNumber("A1")
                 .appellantName("Felix Sydney")
                 .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
@@ -55,25 +57,25 @@ public class PipScenarioStandardRateNoAwardTest {
                 .dailyLivingDescriptors(dailyLivingDescriptors)
                 .mobilityDescriptors(mobilityDescriptors).build();
 
-        PipTemplateContent content = PipScenario.SCENARIO_AWARD_NO_AWARD.getContent(body);
+        PipTemplateContent content = PipScenario.SCENARIO_AWARD_AWARD.getContent(body);
 
         String expectedContent = "The appeal is refused.\n"
                 + "\n"
                 + "The decision made by the Secretary of State on 20/09/2020 in respect of Personal Independence Payment is confirmed.\n"
                 + "\n"
-                + "Felix Sydney is entitled to the daily living component at the standard rate from 17/12/2020 for an indefinite period.\n"
+                + "Felix Sydney is entitled to the daily living component at the enhanced rate from 17/12/2020 for an indefinite period.\n"
                 + "\n"
-                + "Felix Sydney has limited ability to carry out the activities of daily living set out below. They score 8 points. They satisfy the following descriptors:\n"
+                + "Felix Sydney has severely limited ability to carry out the activities of daily living set out below. They score 8 points. They satisfy the following descriptors:\n"
                 + "\n"
                 + "1.Preparing Food\tf.Cannot prepare and cook food.\t8\n"
-                + "2.Taking Nutrition\ta.Can take nutrition unaided.\t0\n"
+                + "2.Taking Nutrition\td.Needs prompting to be able to take nutrition.\t4\n"
+                + "\n\n"
+                + "Felix Sydney is entitled to the mobility component at the enhanced rate from 17/12/2020 for an indefinite period.\n"
                 + "\n"
+                + "Felix Sydney is severely limited in their ability to mobilise. They score 12 points.They satisfy the following descriptors:\n"
                 + "\n"
-                + "Felix Sydney does not qualify for an award of the mobility component from 17/12/2020. They score 0 points. This is insufficient to meet the threshold for the test.\n"
-                + "\n"
-                + "12.Moving Around\ta.Can stand and then move more than 200 metres, either aided or unaided.\t0\n"
-                + "\n"
-                + "\n"
+                + "12.Moving Around\te.Can stand and then move more than 1 metre but no more than 20 metres, either aided or unaided.\t8\n"
+                + "\n\n"
                 + "My first reasons\n"
                 + "\n"
                 + "My second reasons\n"
@@ -83,7 +85,7 @@ public class PipScenarioStandardRateNoAwardTest {
                 + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the tribunal considered the appeal bundle to page A1. No Presenting Officer attended on behalf of the Respondent.\n"
                 + "\n";
 
-        Assert.assertEquals(11, content.getComponents().size());
+        Assert.assertEquals(12, content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
 
