@@ -140,7 +140,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private boolean isAppellantOrAppointeeAddressInvalid(SscsCaseData caseData) {
-        if (null != caseData.getAppeal().getAppellant() && YES.getValue().equalsIgnoreCase(caseData.getAppeal().getAppellant().getIsAppointee())) {
+        if (null != caseData.getAppeal().getAppellant() && YES.equalsIgnoreCase(caseData.getAppeal().getAppellant().getIsAppointee())) {
             return null == caseData.getAppeal().getAppellant().getAppointee()
                 || isAddressInvalid(caseData.getAppeal().getAppellant().getAppointee().getAddress());
         } else {
@@ -213,7 +213,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             documents.add(sscsDocument);
 
             if (sscsCaseData.isLanguagePreferenceWelsh()) {
-                sscsCaseData.setTranslationWorkOutstanding(YES.getValue());
+                sscsCaseData.setTranslationWorkOutstanding(YES);
                 log.info("Set the TranslationWorkOutstanding flag to YES,  for case id : {}", sscsCaseData.getCcdCaseId());
             }
         }
@@ -280,7 +280,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         if (ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
 
-            if (!YES.getValue().equalsIgnoreCase(sscsCaseData.getJointParty())) {
+            if (!YES.equalsIgnoreCase(sscsCaseData.getJointParty())) {
                 preSubmitCallbackResponse.addError("Document type \"Confidentiality Request\" is invalid as there is no joint party on the case");
             }
 
