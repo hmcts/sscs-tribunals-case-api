@@ -43,7 +43,7 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.UPDATE_REASONABLE_ADJUSTMENT);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
-                .updateReasonableAdjustment("alternativeLetterFormat")
+                .reasonableAdjustmentChoice("alternativeLetterFormat")
                 .reasonableAdjustments(ReasonableAdjustments.builder()
                         .appellant(ReasonableAdjustmentDetails.builder().reasonableAdjustmentRequirements(RED_FONT).wantsReasonableAdjustment(YES).build())
                         .appointee(ReasonableAdjustmentDetails.builder().reasonableAdjustmentRequirements(RED_FONT).wantsReasonableAdjustment(NO).build())
@@ -72,7 +72,7 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandlerTest {
         sscsCaseData.getReasonableAdjustments().getAppellant().setWantsReasonableAdjustment(NO);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getUpdateReasonableAdjustment());
+        assertNull(response.getData().getReasonableAdjustmentChoice());
         assertNull(response.getData().getReasonableAdjustments());
     }
 
@@ -80,7 +80,7 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandlerTest {
     public void givenAppellantUpdateReasonableAdjustment_thenClearAlternativeLetterFieldsSetToNo() {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getUpdateReasonableAdjustment());
+        assertNull(response.getData().getReasonableAdjustmentChoice());
         assertNull(response.getData().getReasonableAdjustments().getRepresentative());
         assertNull(response.getData().getReasonableAdjustments().getJointParty());
         assertNull(response.getData().getReasonableAdjustments().getAppointee());
@@ -96,7 +96,7 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandlerTest {
         sscsCaseData.getReasonableAdjustments().setAppointee(ReasonableAdjustmentDetails.builder().wantsReasonableAdjustment(YES).reasonableAdjustmentRequirements(RED_FONT).build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getUpdateReasonableAdjustment());
+        assertNull(response.getData().getReasonableAdjustmentChoice());
         assertNull(response.getData().getReasonableAdjustments().getRepresentative());
         assertNull(response.getData().getReasonableAdjustments().getJointParty());
         assertNull(response.getData().getReasonableAdjustments().getAppellant());
@@ -113,7 +113,7 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getUpdateReasonableAdjustment());
+        assertNull(response.getData().getReasonableAdjustmentChoice());
         assertNull(response.getData().getReasonableAdjustments().getJointParty());
         assertNull(response.getData().getReasonableAdjustments().getAppellant());
         assertNull(response.getData().getReasonableAdjustments().getAppointee());
@@ -131,7 +131,7 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getUpdateReasonableAdjustment());
+        assertNull(response.getData().getReasonableAdjustmentChoice());
         assertNull(response.getData().getReasonableAdjustments().getRepresentative());
         assertNull(response.getData().getReasonableAdjustments().getAppellant());
         assertNull(response.getData().getReasonableAdjustments().getAppointee());
