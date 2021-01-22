@@ -3,4 +3,3 @@ java:
   ingressHost: ${SERVICE_FQDN}
   environment:
     CREATE_CCD_ENDPOINT: true
-    URGENT_HEARING_ENABLED: true

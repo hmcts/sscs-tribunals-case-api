@@ -65,6 +65,5 @@ public class DwpRaiseExceptionAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("Yes", response.getData().getIsProgressingViaGaps());
-        assertEquals(State.NOT_LISTABLE, response.getData().getState());
     }
 }
