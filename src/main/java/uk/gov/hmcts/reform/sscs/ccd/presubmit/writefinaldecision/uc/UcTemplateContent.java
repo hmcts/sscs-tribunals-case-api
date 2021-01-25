@@ -75,13 +75,14 @@ public abstract class UcTemplateContent extends WriteFinalDecisionTemplateConten
     }
 
     public String getSchedule8Paragraph4AndSchedule9Paragraph4DiseaseOrDisablementSentence(boolean isSchedule8Paragraph4Applied, boolean isSchedule9Paragraph4Applied) {
-        return "The tribunal applied "
-            + (isSchedule8Paragraph4Applied ? "Schedule 8, paragraph 4 " : "")
-            + (isSchedule8Paragraph4Applied && isSchedule9Paragraph4Applied ? "and " : "")
-            + (isSchedule9Paragraph4Applied ? "Schedule 9, paragraph 4 " : "")
-            + "because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited "
-            + "capability for work"
-            + (isSchedule9Paragraph4Applied ? " and for work-related activity." : ".");
+        return "The tribunal applied"
+            + (isSchedule8Paragraph4Applied ? " Schedule 8, paragraph 4" : "")
+            + (isSchedule8Paragraph4Applied && isSchedule9Paragraph4Applied ? " and" : "")
+            + (isSchedule9Paragraph4Applied ? " Schedule 9, paragraph 4" : "")
+            + " because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability"
+            + (isSchedule8Paragraph4Applied ? " for work" : "")
+            + (isSchedule8Paragraph4Applied && isSchedule9Paragraph4Applied ? " and" : "")
+            + (isSchedule9Paragraph4Applied ? " for work-related activity." : ".");
     }
 
     public String getNoSchedule7SentenceSchedule9Paragraph4Applies() {
