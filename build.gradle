@@ -307,7 +307,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.0.6'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.1.35-RC-SSCS-8520'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.1.41-RC-SSCS-8520'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.18'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
@@ -316,7 +316,7 @@ dependencies {
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.5.RELEASE'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.6.28'
-    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.21.0'
+    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.22.1'
     testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.6.28'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.21.0'
