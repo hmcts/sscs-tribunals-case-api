@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.functional.mya;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import io.github.artsok.RepeatedIfExceptionsTest;
 import java.io.IOException;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -23,6 +24,7 @@ public class CitizenLoginTest extends BaseFunctionTest {
     }
 
     @Test
+    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
     public void checkUserDoesNotHaveCaseAssignCaseAndCheckUserHasCase() throws IOException, InterruptedException {
         String appellantTya = ccdCase.getAppellantTya();
 
@@ -45,6 +47,7 @@ public class CitizenLoginTest extends BaseFunctionTest {
     }
 
     @Test
+    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
     public void checkJointDoesNotHaveCaseAssignCaseAndCheckUserHasCase() throws IOException, InterruptedException {
 
         String jointPartyTya = ccdCase.getJointPartyTya();
@@ -69,6 +72,7 @@ public class CitizenLoginTest extends BaseFunctionTest {
     }
 
     @Test
+    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
     public void logUserWithCase_returnsNoContent() throws IOException, InterruptedException {
 
         // Give ES time to index

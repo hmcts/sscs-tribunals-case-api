@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToC
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_DWP_REGIONAL_CENTRE;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
+import io.github.artsok.RepeatedIfExceptionsTest;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -134,6 +135,7 @@ public class SubmitAppealTest {
 
     @Test
     @Parameters({"ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS, validAppeal"})
+    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
     public void appealShouldCreateDuplicateAndLinked(SyaJsonMessageSerializer syaJsonMessageSerializer, String expectedState) throws InterruptedException {
         String body = syaJsonMessageSerializer.getSerializedMessage();
         String nino = submitHelper.getRandomNino();
