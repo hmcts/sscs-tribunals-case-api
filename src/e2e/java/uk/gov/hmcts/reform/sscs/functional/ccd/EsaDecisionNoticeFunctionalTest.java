@@ -91,7 +91,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is to be treated as having limited capability for work-related activity."));
             assertThat(pdfTextWithoutNewLines, containsString("4. The Secretary of State has accepted that Joe Bloggs has limited capability for work. This was not in issue."));
             assertThat(pdfTextWithoutNewLines, containsString("5. No activity or descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 was satisfied but regulation 35 of the ESA Regulations applied."));
-            assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied regulation 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
+            assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied regulation 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work-related activity."));
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
             assertThat(pdfTextWithoutNewLines, containsString("9. This has been an oral (face to face) hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent."));
@@ -351,7 +351,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work and is to be treated as having limited capability for work-related activity."));
             assertThat(pdfTextWithoutNewLines, containsString("4. In applying the Work Capability Assessment 30 points were scored from the activities and descriptors in Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008 made up as follows:"));
             assertThat(pdfTextWithoutNewLines, containsString("5. No activity or descriptor from Schedule 3 of the ESA Regulations was satisfied but regulation 35 of the ESA Regulations applied."));
-            assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied regulation 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
+            assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied regulation 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work-related activity."));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Standing and sitting."));
             assertThat(pdfTextWithoutNewLines, containsString("15 points"));

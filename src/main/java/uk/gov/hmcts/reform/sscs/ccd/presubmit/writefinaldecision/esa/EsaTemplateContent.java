@@ -82,12 +82,14 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
 
     public String getRegulation29And35DiseaseOrDisablementSentence(boolean isRegulation29Applied, boolean isRegulation35Applied) {
         return "The tribunal applied regulation" + (isRegulation29Applied && isRegulation35Applied ? "s" : "")
-                + (isRegulation29Applied ? " 29 " : "")
-                + (isRegulation29Applied && isRegulation35Applied ? "and" : "")
-                + (isRegulation35Applied ? " 35 " : "")
-            + "because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited "
-            + "capability for work"
-            + (isRegulation35Applied ? " and for work-related activity." : ".");
+                + (isRegulation29Applied ? " 29" : "")
+                + (isRegulation29Applied && isRegulation35Applied ? " and" : "")
+                + (isRegulation35Applied ? " 35" : "")
+                + " because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited"
+                + " capability"
+                + (isRegulation29Applied ? " for work" : "")
+                + (isRegulation29Applied && isRegulation35Applied ? " and" : "")
+                + (isRegulation35Applied ? " for work-related activity." : ".");
     }
 
     public String getSchedule3AppliesParagraph(List<Descriptor> descriptors) {
