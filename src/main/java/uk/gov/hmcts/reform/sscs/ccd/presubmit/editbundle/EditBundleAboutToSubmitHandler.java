@@ -64,7 +64,8 @@ public class EditBundleAboutToSubmitHandler implements PreSubmitCallbackHandler<
             for (Bundle bundle : sscsCaseData.getCaseBundles()) {
                 if ("Yes".equals(bundle.getValue().getEligibleForStitching())) {
 
-                    final String bundleName = sscsCaseData.getCcdCaseId() + "-SscsBundle";
+                    final String bundleName = null != bundle.getValue().getStitchedDocument()
+                            ? bundle.getValue().getStitchedDocument().getDocumentFilename() : sscsCaseData.getCcdCaseId() + "-SscsBundle";
 
                     log.info("EditBundleAboutToStartHandler Bundle File Name {}",bundleName);
 

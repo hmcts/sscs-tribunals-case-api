@@ -81,14 +81,14 @@ public class EditBundleAboutToSubmitTest {
 
     @Test
     public void givenABundleSelectedToBeStitched_thenSetDefaultConfigDetails() {
-        Bundle bundle = Bundle.builder().value(BundleDetails.builder().eligibleForStitching("Yes").build()).build();
+        Bundle bundle = Bundle.builder().value(BundleDetails.builder().eligibleForStitching("Yes").stitchedDocument(DocumentLink.builder().documentFilename("9876-myBundle.pdf").build()).build()).build();
         List<Bundle> bundles = new ArrayList<>();
         bundles.add(bundle);
 
         callback.getCaseDetails().getCaseData().setCaseBundles(bundles);
         BundleDetails bundleResult = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION).getData().getCaseBundles().get(0).getValue();
 
-        assertEquals("54321-SscsBundle", bundleResult.getFileName());
+        assertEquals("9876-myBundle.pdf", bundleResult.getFileName());
         assertEquals("SSCS-cover-page.docx", bundleResult.getCoverpageTemplate());
         assertEquals("Yes", bundleResult.getHasTableOfContents());
         assertEquals("Yes", bundleResult.getHasCoversheets());
@@ -99,7 +99,7 @@ public class EditBundleAboutToSubmitTest {
 
     @Test
     public void givenWelsh_ABundleSelectedToBeStitched_thenSetDefaultConfigDetails() {
-        Bundle bundle = Bundle.builder().value(BundleDetails.builder().eligibleForStitching("Yes").build()).build();
+        Bundle bundle = Bundle.builder().value(BundleDetails.builder().eligibleForStitching("Yes").stitchedDocument(DocumentLink.builder().documentFilename("9876-myBundle.pdf").build()).build()).build();
         List<Bundle> bundles = new ArrayList<>();
         bundles.add(bundle);
 
@@ -108,7 +108,7 @@ public class EditBundleAboutToSubmitTest {
         caseData.setLanguagePreferenceWelsh("Yes");
         BundleDetails bundleResult = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION).getData().getCaseBundles().get(0).getValue();
 
-        assertEquals("54321-SscsBundle", bundleResult.getFileName());
+        assertEquals("9876-myBundle.pdf", bundleResult.getFileName());
         assertEquals(coverPage.get(LanguagePreference.WELSH), bundleResult.getCoverpageTemplate());
         assertEquals("Yes", bundleResult.getHasTableOfContents());
         assertEquals("Yes", bundleResult.getHasCoversheets());
