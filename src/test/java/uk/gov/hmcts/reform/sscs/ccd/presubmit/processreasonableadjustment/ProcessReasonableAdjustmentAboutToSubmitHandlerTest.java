@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -65,7 +66,9 @@ public class ProcessReasonableAdjustmentAboutToSubmitHandlerTest {
         List<Correspondence> correspondenceList = new ArrayList<>();
 
         sscsCaseData.setReasonableAdjustmentsOutstanding(YesNo.YES);
-        sscsCaseData.setReasonableAdjustmentsLetters(correspondenceList);
+        ReasonableAdjustmentsLetters reasonableAdjustmentsLetters =
+                new ReasonableAdjustmentsLetters(correspondenceList, correspondenceList, correspondenceList, correspondenceList);
+        sscsCaseData.setReasonableAdjustmentsLetters(reasonableAdjustmentsLetters);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("No reasonable adjustment correspondence has been generated on this case", response.getErrors().toArray()[0]);
@@ -77,7 +80,9 @@ public class ProcessReasonableAdjustmentAboutToSubmitHandlerTest {
         correspondenceList.add(Correspondence.builder().value(CorrespondenceDetails.builder().reasonableAdjustmentStatus(ReasonableAdjustmentStatus.ACTIONED).build()).build());
 
         sscsCaseData.setReasonableAdjustmentsOutstanding(YesNo.YES);
-        sscsCaseData.setReasonableAdjustmentsLetters(correspondenceList);
+        ReasonableAdjustmentsLetters reasonableAdjustmentsLetters =
+                new ReasonableAdjustmentsLetters(correspondenceList, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+        sscsCaseData.setReasonableAdjustmentsLetters(reasonableAdjustmentsLetters);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(YesNo.NO, response.getData().getReasonableAdjustmentsOutstanding());
@@ -91,7 +96,9 @@ public class ProcessReasonableAdjustmentAboutToSubmitHandlerTest {
         correspondenceList.add(Correspondence.builder().value(CorrespondenceDetails.builder().reasonableAdjustmentStatus(ReasonableAdjustmentStatus.REQUIRED).build()).build());
 
         sscsCaseData.setReasonableAdjustmentsOutstanding(YesNo.YES);
-        sscsCaseData.setReasonableAdjustmentsLetters(correspondenceList);
+        ReasonableAdjustmentsLetters reasonableAdjustmentsLetters =
+                new ReasonableAdjustmentsLetters(correspondenceList, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+        sscsCaseData.setReasonableAdjustmentsLetters(reasonableAdjustmentsLetters);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(YesNo.YES, response.getData().getReasonableAdjustmentsOutstanding());
@@ -104,7 +111,9 @@ public class ProcessReasonableAdjustmentAboutToSubmitHandlerTest {
         correspondenceList.add(Correspondence.builder().value(CorrespondenceDetails.builder().reasonableAdjustmentStatus(null).build()).build());
 
         sscsCaseData.setReasonableAdjustmentsOutstanding(YesNo.YES);
-        sscsCaseData.setReasonableAdjustmentsLetters(correspondenceList);
+        ReasonableAdjustmentsLetters reasonableAdjustmentsLetters =
+                new ReasonableAdjustmentsLetters(correspondenceList, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+        sscsCaseData.setReasonableAdjustmentsLetters(reasonableAdjustmentsLetters);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(YesNo.YES, response.getData().getReasonableAdjustmentsOutstanding());
