@@ -31,14 +31,11 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     private static String CREATE_BUNDLE_ENDPOINT = "/api/new-bundle";
 
     @Autowired
-    public CreateBundleAboutToStartHandler(ServiceRequestExecutor serviceRequestExecutor,
+    public CreateBundleAboutToSubmitHandler(ServiceRequestExecutor serviceRequestExecutor,
                                            @Value("${bundle.url}") String bundleUrl,
                                            @Value("${bundle.welsh.config}") String bundleWelshConfig,
                                            @Value("${bundle.unedited.config}") String bundleUnEditedConfig,
                                            @Value("${bundle.welsh.unedited.config}") String bundleWelshUnEditedConfig) {
-    public CreateBundleAboutToSubmitHandler(ServiceRequestExecutor serviceRequestExecutor,
-                                            @Value("${bundle.url}") String bundleUrl,
-                                            @Value("${bundle.welsh.config}") String bundleWelshConfig) {
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bundleUrl = bundleUrl;
         this.bundleWelshConfig = bundleWelshConfig;
