@@ -88,6 +88,48 @@ public class ProcessReasonableAdjustmentAboutToSubmitHandlerTest {
         assertEquals(YesNo.NO, response.getData().getReasonableAdjustmentsOutstanding());
     }
 
+    @Test
+    public void givenARepProcessReasonableAdjustmentEventWithAllDocsActioned_thenClearReasonableAdjustmentsOutstandingFlag() {
+        List<Correspondence> correspondenceList = new ArrayList<>();
+        correspondenceList.add(Correspondence.builder().value(CorrespondenceDetails.builder().reasonableAdjustmentStatus(ReasonableAdjustmentStatus.ACTIONED).build()).build());
+
+        sscsCaseData.setReasonableAdjustmentsOutstanding(YesNo.YES);
+        ReasonableAdjustmentsLetters reasonableAdjustmentsLetters =
+                new ReasonableAdjustmentsLetters(Collections.emptyList(), correspondenceList, Collections.emptyList(), Collections.emptyList());
+        sscsCaseData.setReasonableAdjustmentsLetters(reasonableAdjustmentsLetters);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(YesNo.NO, response.getData().getReasonableAdjustmentsOutstanding());
+    }
+
+    @Test
+    public void givenAnAppointeeProcessReasonableAdjustmentEventWithAllDocsActioned_thenClearReasonableAdjustmentsOutstandingFlag() {
+        List<Correspondence> correspondenceList = new ArrayList<>();
+        correspondenceList.add(Correspondence.builder().value(CorrespondenceDetails.builder().reasonableAdjustmentStatus(ReasonableAdjustmentStatus.ACTIONED).build()).build());
+
+        sscsCaseData.setReasonableAdjustmentsOutstanding(YesNo.YES);
+        ReasonableAdjustmentsLetters reasonableAdjustmentsLetters =
+                new ReasonableAdjustmentsLetters(Collections.emptyList(), Collections.emptyList(), correspondenceList, Collections.emptyList());
+        sscsCaseData.setReasonableAdjustmentsLetters(reasonableAdjustmentsLetters);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(YesNo.NO, response.getData().getReasonableAdjustmentsOutstanding());
+    }
+
+    @Test
+    public void givenAJointPartyProcessReasonableAdjustmentEventWithAllDocsActioned_thenClearReasonableAdjustmentsOutstandingFlag() {
+        List<Correspondence> correspondenceList = new ArrayList<>();
+        correspondenceList.add(Correspondence.builder().value(CorrespondenceDetails.builder().reasonableAdjustmentStatus(ReasonableAdjustmentStatus.ACTIONED).build()).build());
+
+        sscsCaseData.setReasonableAdjustmentsOutstanding(YesNo.YES);
+        ReasonableAdjustmentsLetters reasonableAdjustmentsLetters =
+                new ReasonableAdjustmentsLetters(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), correspondenceList);
+        sscsCaseData.setReasonableAdjustmentsLetters(reasonableAdjustmentsLetters);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(YesNo.NO, response.getData().getReasonableAdjustmentsOutstanding());
+    }
+
 
     @Test
     public void givenAProcessReasonableAdjustmentEventWithSomeDocsStillRequired_thenDoNotClearReasonableAdjustmentsOutstandingFlag() {
