@@ -37,10 +37,10 @@ public class ProcessReasonableAdjustmentAboutToSubmitHandler implements PreSubmi
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if ((sscsCaseData.getReasonableAdjustmentsLetters() == null)
-                || ((sscsCaseData.getReasonableAdjustmentsLetters().getAppellant() == null || sscsCaseData.getReasonableAdjustmentsLetters().getAppellant().size() == 0)
-                && (sscsCaseData.getReasonableAdjustmentsLetters().getRepresentative() == null || sscsCaseData.getReasonableAdjustmentsLetters().getRepresentative().size() == 0)
-                && (sscsCaseData.getReasonableAdjustmentsLetters().getAppointee() == null || sscsCaseData.getReasonableAdjustmentsLetters().getAppointee().size() == 0)
-                && (sscsCaseData.getReasonableAdjustmentsLetters().getJointParty() == null || sscsCaseData.getReasonableAdjustmentsLetters().getJointParty().size() == 0))) {
+                || (sscsCaseData.getReasonableAdjustmentsLetters().getAppellant().isEmpty()
+                && sscsCaseData.getReasonableAdjustmentsLetters().getRepresentative().isEmpty()
+                && sscsCaseData.getReasonableAdjustmentsLetters().getAppointee().isEmpty()
+                && sscsCaseData.getReasonableAdjustmentsLetters().getJointParty().isEmpty())) {
             callbackResponse.addError("No reasonable adjustment correspondence has been generated on this case");
         }
 
