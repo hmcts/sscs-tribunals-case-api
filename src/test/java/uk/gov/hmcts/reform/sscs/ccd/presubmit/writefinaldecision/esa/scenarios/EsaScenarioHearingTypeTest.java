@@ -18,6 +18,7 @@ public class EsaScenarioHearingTypeTest {
     @SuppressWarnings("unused")
     private Object[] allNextHearingTypeParameters() {
         return new Object[] {
+            new Object[] {"triage", false, false, "The tribunal considered the appeal bundle to page A1.\n"},
             new Object[] {"faceToFace", true, true, "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"},
             new Object[] {"faceToFace", true, false, "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. No Presenting Officer attended on behalf of the Respondent.\n"},
             new Object[] {"faceToFace", false, true, "Felix Sydney requested an oral hearing but did not attend today. A Presenting Officer attended on behalf of the Respondent."
@@ -87,7 +88,7 @@ public class EsaScenarioHearingTypeTest {
                 + expectedHearingType
                 + "\n";
 
-        Assert.assertEquals(appellantAttended ? 10 : 11, content.getComponents().size());
+        Assert.assertEquals(appellantAttended || "triage".equals(hearingType) ? 10 : 11, content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
     }
