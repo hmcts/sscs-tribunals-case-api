@@ -32,7 +32,7 @@ public class UcDecisionNoticeOutcomeService extends DecisionNoticeOutcomeService
 
             SscsUcCaseData ucCaseData = sscsCaseData.getSscsUcCaseData();
 
-            if (sscsCaseData.getSscsUcCaseData().isLcwaAppeal()) {
+            if (sscsCaseData.isWcaAppeal()) {
 
                 if (sscsCaseData.isSupportGroupOnlyAppeal()) {
                     ucCaseData.setDoesSchedule8Paragraph4Apply(null);

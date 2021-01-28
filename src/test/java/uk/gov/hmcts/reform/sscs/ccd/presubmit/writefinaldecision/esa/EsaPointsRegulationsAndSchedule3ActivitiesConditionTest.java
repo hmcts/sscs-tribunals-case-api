@@ -244,20 +244,20 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                             .supportGroupOnlyAppeal(supportGroupOnly == null ? null : supportGroupOnly ? "Yes" : "No")
                             .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
                             .dwpReassessTheAward(null)
+                            .wcaAppeal(YES)
                             .sscsEsaCaseData(
                                 SscsEsaCaseData.builder().esaWriteFinalDecisionSchedule3ActivitiesApply(schedule3ActivitesApply)
                                     .esaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities)
                                     .doesRegulation29Apply(getYesNoFieldValue(doesRegulation29Apply))
-                                    .wcaAppeal(YES)
                                     .doesRegulation35Apply(getYesNoFieldValue(doesRegulation35Apply)).build()).build();
                     } else {
                         caseData = SscsCaseData.builder()
                             .writeFinalDecisionGenerateNotice("Yes")
                             .supportGroupOnlyAppeal(supportGroupOnly == null ? null : supportGroupOnly ? "Yes" : "No")
                             .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
+                            .wcaAppeal(NO)
                             .sscsEsaCaseData(
                                 SscsEsaCaseData.builder().esaWriteFinalDecisionSchedule3ActivitiesApply(schedule3ActivitesApply)
-                                    .wcaAppeal(NO)
                                     .esaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities).build()).build();
                     }
 
