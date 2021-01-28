@@ -82,6 +82,10 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
             sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
 
+            if (StringUtils.equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "phme")) {
+                sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHME_REQUEST.getId());
+            }
+
             //FIXME: These should be moved to the DWP document collection at some point, ideally before we switch this feature on
 
             sscsCaseData.setDwpEditedResponseDocument(buildDwpResponseDocumentWithDate(
@@ -101,9 +105,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                     sscsCaseData.setSelectWhoReviewsCase(new DynamicList(reviewByJudgeItem, null));
                 } else {
                     sscsCaseData.getSelectWhoReviewsCase().getListItems().add(reviewByJudgeItem);
-                }
-                if (StringUtils.equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "phme")) {
-                    sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHME_REQUEST.getId());
                 }
             }
         }
