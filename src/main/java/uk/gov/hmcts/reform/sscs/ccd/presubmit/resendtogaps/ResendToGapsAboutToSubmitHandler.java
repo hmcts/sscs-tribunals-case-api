@@ -63,6 +63,8 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
             Set<String> errorSet = isValid(sscsCaseData, caseDetails.getId(), caseDetails.getState());
             if (!CollectionUtils.isEmpty(errorSet)) {
                 preSubmitCallbackResponse.addErrors(errorSet);
+            } else {
+                sscsCaseData.setHmctsDwpState("sentToRobotics");
             }
         } catch (RoboticsValidationException roboticsValidationException) {
             preSubmitCallbackResponse.addError(roboticsValidationException.getMessage());
