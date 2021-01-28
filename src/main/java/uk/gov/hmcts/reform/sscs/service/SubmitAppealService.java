@@ -190,14 +190,14 @@ public class SubmitAppealService {
                         caseData.getLanguagePreference().getCode());
 
                 caseDetails = ccdService.createCase(caseData,
-                        eventType.getCcdType(),
-                        "SSCS - new case created",
-                        "Created SSCS case from Submit Your Appeal online with event " + eventType.getCcdType(),
-                        idamTokens);
+                    eventType.getCcdType(),
+                    "SSCS - new case created",
+                    "Created SSCS case from Submit Your Appeal online with event " + eventType.getCcdType(),
+                    idamTokens);
                 log.info("Case {} successfully created in CCD for benefit type {} with event {}",
-                        caseDetails.getId(),
-                        caseData.getAppeal().getBenefitType().getCode(),
-                        eventType);
+                    caseDetails.getId(),
+                    caseData.getAppeal().getBenefitType().getCode(),
+                    eventType);
                 return caseDetails;
             }
         } catch (Exception e) {
@@ -243,6 +243,7 @@ public class SubmitAppealService {
     private Predicate<SscsCaseDetails> createNinoAndBenefitTypeAndMrnDatePredicate(SscsCaseData caseData) {
         return c -> c.getData().getAppeal().getAppellant().getIdentity().getNino().equalsIgnoreCase(caseData.getAppeal().getAppellant().getIdentity().getNino())
                 && c.getData().getAppeal().getBenefitType().getCode().equals(caseData.getAppeal().getBenefitType().getCode())
+                && c.getData().getAppeal().getMrnDetails().getMrnDate() != null
                 && c.getData().getAppeal().getMrnDetails().getMrnDate().equalsIgnoreCase(caseData.getAppeal().getMrnDetails().getMrnDate());
     }
 

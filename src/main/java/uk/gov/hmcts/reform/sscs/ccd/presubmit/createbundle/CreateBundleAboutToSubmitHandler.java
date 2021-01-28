@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
 @Service
 @Slf4j
-public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private ServiceRequestExecutor serviceRequestExecutor;
 
@@ -30,9 +30,9 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
     private static String CREATE_BUNDLE_ENDPOINT = "/api/new-bundle";
 
     @Autowired
-    public CreateBundleAboutToStartHandler(ServiceRequestExecutor serviceRequestExecutor,
-                                           @Value("${bundle.url}") String bundleUrl,
-                                           @Value("${bundle.welsh.config}") String bundleWelshConfig) {
+    public CreateBundleAboutToSubmitHandler(ServiceRequestExecutor serviceRequestExecutor,
+                                            @Value("${bundle.url}") String bundleUrl,
+                                            @Value("${bundle.welsh.config}") String bundleWelshConfig) {
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bundleUrl = bundleUrl;
         this.bundleWelshConfig = bundleWelshConfig;

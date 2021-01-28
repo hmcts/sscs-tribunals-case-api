@@ -130,7 +130,7 @@ public abstract class WriteFinalDecisionTemplateContent {
 
     public List<String> getHearingTypeSentences(String appellantName, String bundlePage, String hearingType, boolean appellantAttended, boolean presentingOfficerAttened) {
         if (equalsIgnoreCase("paper", hearingType)) {
-            return asList("No party has objected to the matter being decided without a hearing.", "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.");
+            return asList("No party has objected to the matter being decided without a hearing.", "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.");
         } else  {
             return getFaceToFaceTelephoneVideoHearingTypeSentences(hearingType, appellantName, bundlePage, appellantAttended, presentingOfficerAttened);
         }
@@ -170,12 +170,15 @@ public abstract class WriteFinalDecisionTemplateContent {
     }
 
 
+
     public List<String> getFaceToFaceTelephoneVideoHearingTypeSentences(String hearingType, String appellantName, String bundlePage,
         boolean appellantAttended, boolean presentingOfifficerAttened) {
         if (appellantAttended) {
             if (equalsIgnoreCase("faceToFace", hearingType)) {
                 return singletonList("This has been an oral (face to face) hearing. "
                     + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
+            } else if (equalsIgnoreCase("triage", hearingType)) {
+                return singletonList(getTriageConsideredParagraph(bundlePage));
             } else {
                 return singletonList("This has been a remote hearing in the form of a " + hearingType + " hearing. "
                     + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
@@ -185,6 +188,8 @@ public abstract class WriteFinalDecisionTemplateContent {
                 return asList(appellantName + " requested an oral hearing but did not attend today. "
                         + (presentingOfifficerAttened ? "A " : "No ") + "Presenting Officer attended on behalf of the Respondent.",
                     getConsideredParagraph(bundlePage, appellantName));
+            } else if (equalsIgnoreCase("triage", hearingType)) {
+                return singletonList(getTriageConsideredParagraph(bundlePage));
             } else {
                 return asList("This has been a remote hearing in the form of a " + hearingType + " hearing. " + appellantName + " did not attend the hearing today. "
                         + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.",

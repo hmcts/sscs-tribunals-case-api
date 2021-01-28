@@ -193,6 +193,30 @@ public class SubmitAppealServiceTest {
                                                 .benefitType(BenefitType.builder().code(appealData.getBenefitType().getCode()).build())
                                                 .mrnDetails(MrnDetails.builder().mrnDate(appealData.getMrn().getDate().plusDays(5).format(DateTimeFormatter.ISO_LOCAL_DATE))
                                                         .build()).build()).build()).build()
+        ));
+
+        submitAppealService.submitAppeal(appealData, userToken);
+
+        verify(ccdService).createCase(capture.capture(), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals(1, capture.getValue().getAssociatedCase().size());
+        assertEquals("12345678", capture.getValue().getAssociatedCase().get(0).getValue().getCaseReference());
+    }
+
+    @Test
+    public void givenAssociatedCaseAlreadyExistsInCcd_shouldCreateCaseWithAppealDetailsAndAssociatedCaseWithoutMrn() {
+        byte[] expected = {};
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+
+        given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq(appealData.getAppellant().getNino()), any()))
+                .willReturn(Collections.singletonList(
+                        SscsCaseDetails.builder()
+                                .id(12345678L)
+                                .data(SscsCaseData.builder()
+                                        .appeal(Appeal.builder()
+                                                .appellant(Appellant.builder().identity(Identity.builder().nino(appealData.getAppellant().getNino()).build()).build())
+                                                .benefitType(BenefitType.builder().code(appealData.getBenefitType().getCode()).build())
+                                                .mrnDetails(MrnDetails.builder().build())
+                                                .build()).build()).build()
                 ));
 
         submitAppealService.submitAppeal(appealData, userToken);
@@ -382,16 +406,16 @@ public class SubmitAppealServiceTest {
     @Test(expected = DuplicateCaseException.class)
     public void givenCaseIsADuplicate_shouldNotResendEmails() {
         given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq(appealData.getAppellant().getNino()), any()))
-            .willReturn(Collections.singletonList(
-                    SscsCaseDetails.builder()
-                            .id(12345678L)
-                            .data(SscsCaseData.builder()
-                                    .appeal(Appeal.builder()
-                                            .appellant(Appellant.builder().identity(Identity.builder().nino(appealData.getAppellant().getNino()).build()).build())
-                                            .benefitType(BenefitType.builder().code(appealData.getBenefitType().getCode()).build())
-                                            .mrnDetails(MrnDetails.builder().mrnDate(appealData.getMrn().getDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
-                                                    .build()).build()).build()).build()
-            ));
+                .willReturn(Collections.singletonList(
+                        SscsCaseDetails.builder()
+                                .id(12345678L)
+                                .data(SscsCaseData.builder()
+                                        .appeal(Appeal.builder()
+                                                .appellant(Appellant.builder().identity(Identity.builder().nino(appealData.getAppellant().getNino()).build()).build())
+                                                .benefitType(BenefitType.builder().code(appealData.getBenefitType().getCode()).build())
+                                                .mrnDetails(MrnDetails.builder().mrnDate(appealData.getMrn().getDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
+                                                        .build()).build()).build()).build()
+                ));
 
         submitAppealService.submitAppeal(appealData, userToken);
 
