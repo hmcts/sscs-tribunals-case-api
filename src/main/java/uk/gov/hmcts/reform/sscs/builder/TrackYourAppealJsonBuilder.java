@@ -123,7 +123,9 @@ public class TrackYourAppealJsonBuilder {
                 caseNode.put("status", "CLOSED");
             }
 
-            caseNode.put("hideHearing", hearingAdjourned || NOT_LISTABLE.equalsIgnoreCase(state));
+            caseNode.put("hideHearing", hearingAdjourned
+                    || NOT_LISTABLE.equalsIgnoreCase(state)
+                    || HearingType.PAPER.getValue().equalsIgnoreCase(caseData.getAppeal().getHearingType()));
 
             ArrayNode outcomeNode = getHearingOutcome(caseData.getSscsDocument());
             if (!outcomeNode.isEmpty()) {
