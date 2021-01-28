@@ -53,14 +53,14 @@ public class CitizenLoginTest extends BaseFunctionTest {
         assertThat(onlineHearingForTya.length(), is(0));
 
         // Give ES time to index
-        Thread.sleep(10000L);
+        Thread.sleep(3000L);
 
         JSONObject jsonObject = sscsMyaBackendRequests.assignCaseToUser(jointPartyTya, userEmail, "TN32 6PL");
         Long expectedCaseId = Long.valueOf(ccdCase.getCaseId());
         assertThat(jsonObject.getLong("case_id"), is(expectedCaseId));
 
         // Wait for above request to finish
-        Thread.sleep(10000L);
+        Thread.sleep(3000L);
 
 
         onlineHearingForTya = sscsMyaBackendRequests.getOnlineHearingForCitizen("", userEmail);
