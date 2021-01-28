@@ -339,7 +339,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             } else if ("paper".equals(hearingType)) {
                 assertThat(pdfTextWithoutNewLines, containsString("8. No party has objected to the matter being decided without a hearing."));
                 assertThat(pdfTextWithoutNewLines, containsString(
-                    "9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way."));
+                    "9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way."));
                 additionalParagraph = true;
             } else if ("faceToFace".equals(hearingType)) {
                 if (appellantAttended && presentingOfficerAttended) {
@@ -362,19 +362,8 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                     additionalParagraph = true;
                 }
             } else if ("triage".equals(hearingType)) {
-                if (appellantAttended && presentingOfficerAttended) {
-                    assertThat(pdfTextWithoutNewLines, containsString(
-                        "8. The tribunal considered the appeal bundle to page B7."));
-                } else if (appellantAttended && !presentingOfficerAttended) {
-                    assertThat(pdfTextWithoutNewLines, containsString(
-                        "8. The tribunal considered the appeal bundle to page B7."));
-                } else if (!appellantAttended && presentingOfficerAttended) {
-                    assertThat(pdfTextWithoutNewLines, containsString(
-                        "8. The tribunal considered the appeal bundle to page B7."));
-                } else if (!appellantAttended && !presentingOfficerAttended) {
-                    assertThat(pdfTextWithoutNewLines, containsString(
-                        "8. The tribunal considered the appeal bundle to page B7."));
-                }
+                assertThat(pdfTextWithoutNewLines, containsString(
+                    "8. The tribunal considered the appeal bundle to page B7."));
             }
             if (additionalParagraph) {
                 assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
