@@ -24,7 +24,7 @@ import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
 
 @RunWith(JUnitParamsRunner.class)
-public class EditBundleAboutToSubmitTest {
+public class EditBundleAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private EditBundleAboutToSubmitHandler handler;
