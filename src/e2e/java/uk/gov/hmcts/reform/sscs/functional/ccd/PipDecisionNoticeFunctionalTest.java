@@ -342,7 +342,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                 // Lower case "the Tribunal"
                 assertThat(pdfTextWithoutNewLines, containsString("8. No party has objected to the matter being decided without a hearing."));
                 assertThat(pdfTextWithoutNewLines, containsString(
-                    "Having considered the appeal bundle to page B7 and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way."));
+                    "Having considered the appeal bundle to page B7 and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way."));
             } else if ("faceToFace".equals(hearingType)) {
                 if (appellantAttended && presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString(
