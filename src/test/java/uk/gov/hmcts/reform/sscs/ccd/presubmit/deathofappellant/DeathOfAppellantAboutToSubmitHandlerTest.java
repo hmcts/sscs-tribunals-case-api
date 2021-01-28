@@ -218,6 +218,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getIsConfidentialCase());
+        assertEquals(YesNo.YES, response.getData().getIsAppellantDeceased());
         assertNull(response.getData().getConfidentialityRequestOutcomeAppellant());
     }
 
@@ -232,6 +233,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getIsConfidentialCase());
+        assertEquals(YesNo.YES, response.getData().getIsAppellantDeceased());
         assertNull(response.getData().getConfidentialityRequestOutcomeAppellant());
         assertEquals(RequestOutcome.IN_PROGRESS, response.getData().getConfidentialityRequestOutcomeJointParty().getRequestOutcome());
     }
@@ -247,6 +249,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(YesNo.YES, response.getData().getIsConfidentialCase());
+        assertEquals(YesNo.YES, response.getData().getIsAppellantDeceased());
         assertNull(response.getData().getConfidentialityRequestOutcomeAppellant());
         assertEquals(RequestOutcome.GRANTED, response.getData().getConfidentialityRequestOutcomeJointParty().getRequestOutcome());
     }

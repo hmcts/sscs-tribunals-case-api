@@ -18,6 +18,7 @@ public class UcScenarioHearingTypeTest {
     @SuppressWarnings("unused")
     private Object[] allNextHearingTypeParameters() {
         return new Object[] {
+            new Object[] {"triage", false, false, "The tribunal considered the appeal bundle to page A1.\n"},
             new Object[] {"faceToFace", true, true, "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"},
             new Object[] {"faceToFace", true, false, "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. No Presenting Officer attended on behalf of the Respondent.\n"},
             new Object[] {"faceToFace", false, true, "Felix Sydney requested an oral hearing but did not attend today. A Presenting Officer attended on behalf of the Respondent.\n"
@@ -80,7 +81,7 @@ public class UcScenarioHearingTypeTest {
                 + "\n"
                 + "No activity or descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations applied.\n"
                 + "\n"
-                + "The tribunal applied Schedule 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity.\n"
+                + "The tribunal applied Schedule 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work-related activity.\n"
                 + "\n"
                 + "My first reasons\n"
                 + "\n"
@@ -91,7 +92,7 @@ public class UcScenarioHearingTypeTest {
                 + expectedHearingType
                 + "\n";
 
-        if (appellantAttended) {
+        if (appellantAttended || "triage".equals(hearingType)) {
             Assert.assertEquals(10, content.getComponents().size());
         } else {
             Assert.assertEquals(11, content.getComponents().size());

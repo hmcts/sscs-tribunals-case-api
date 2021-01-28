@@ -18,6 +18,7 @@ public class EsaScenarioHearingTypeTest {
     @SuppressWarnings("unused")
     private Object[] allNextHearingTypeParameters() {
         return new Object[] {
+            new Object[] {"triage", false, false, "The tribunal considered the appeal bundle to page A1.\n"},
             new Object[] {"faceToFace", true, true, "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"},
             new Object[] {"faceToFace", true, false, "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. No Presenting Officer attended on behalf of the Respondent.\n"},
             new Object[] {"faceToFace", false, true, "Felix Sydney requested an oral hearing but did not attend today. A Presenting Officer attended on behalf of the Respondent."
@@ -76,7 +77,7 @@ public class EsaScenarioHearingTypeTest {
                 + "\n"
                 + "No activity or descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 was satisfied but regulation 35 of the ESA Regulations applied.\n"
                 + "\n"
-                + "The tribunal applied regulation 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity.\n"
+                + "The tribunal applied regulation 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work-related activity.\n"
                 + "\n"
                 + "My first reasons\n"
                 + "\n"
@@ -87,7 +88,7 @@ public class EsaScenarioHearingTypeTest {
                 + expectedHearingType
                 + "\n";
 
-        Assert.assertEquals(appellantAttended ? 10 : 11, content.getComponents().size());
+        Assert.assertEquals(appellantAttended || "triage".equals(hearingType) ? 10 : 11, content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
     }
