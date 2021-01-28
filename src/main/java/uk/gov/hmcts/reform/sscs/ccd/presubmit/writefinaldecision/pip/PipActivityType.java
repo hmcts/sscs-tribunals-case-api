@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 import java.util.List;
 import java.util.function.Function;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsPipCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityType;
 
 /**
@@ -11,19 +12,19 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityType;
  */
 public enum PipActivityType implements ActivityType {
 
-    DAILY_LIVING("Daily Living", SscsCaseData::getPipWriteFinalDecisionDailyLivingQuestion,
-        SscsCaseData::getPipWriteFinalDecisionDailyLivingActivitiesQuestion),
-    MOBILITY("Mobility", SscsCaseData::getPipWriteFinalDecisionMobilityQuestion,
-        SscsCaseData::getPipWriteFinalDecisionMobilityActivitiesQuestion);
+    DAILY_LIVING("Daily Living", SscsPipCaseData::getPipWriteFinalDecisionDailyLivingQuestion,
+        SscsPipCaseData::getPipWriteFinalDecisionDailyLivingActivitiesQuestion),
+    MOBILITY("Mobility", SscsPipCaseData::getPipWriteFinalDecisionMobilityQuestion,
+        SscsPipCaseData::getPipWriteFinalDecisionMobilityActivitiesQuestion);
 
     final String name;
     final Function<SscsCaseData, String> awardTypeExtractor;
     final Function<SscsCaseData, List<String>> answersExtractor;
 
-    PipActivityType(String name, Function<SscsCaseData, String> awardTypeExtractor, Function<SscsCaseData, List<String>> answersExtractor) {
+    PipActivityType(String name, Function<SscsPipCaseData, String> awardTypeExtractor, Function<SscsPipCaseData, List<String>> answersExtractor) {
         this.name = name;
-        this.awardTypeExtractor = awardTypeExtractor;
-        this.answersExtractor = answersExtractor;
+        this.awardTypeExtractor = c -> awardTypeExtractor.apply(c.getSscsPipCaseData());
+        this.answersExtractor = c -> answersExtractor.apply(c.getSscsPipCaseData());
     }
 
     public Function<SscsCaseData, String> getAwardTypeExtractor() {

@@ -3,14 +3,15 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 import java.util.Optional;
 import java.util.function.Function;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsPipCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.FieldConditionBase;
 
 public class ComparedToDwpCondition extends FieldConditionBase<String> {
 
     private PipActivityType activityType;
 
-    public ComparedToDwpCondition(ComparedToDwpPredicate predicate, Function<SscsCaseData, String> fieldExtractor, PipActivityType activityType) {
-        super("compared to DWP", predicate, fieldExtractor);
+    public ComparedToDwpCondition(ComparedToDwpPredicate predicate, Function<SscsPipCaseData, String> fieldExtractor, PipActivityType activityType) {
+        super("compared to DWP", predicate, c -> fieldExtractor.apply(c.getSscsPipCaseData()));
         this.activityType = activityType;
     }
 

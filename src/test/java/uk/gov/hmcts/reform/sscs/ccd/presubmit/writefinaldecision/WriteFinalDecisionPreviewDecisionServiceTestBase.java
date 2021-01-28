@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
-import junitparams.NamedParameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -147,54 +146,6 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         when(generateFile.assemble(any())).thenReturn(URL);
     }
 
-
-    @NamedParameters("previewEndDateAndRateCombinations")
-    @SuppressWarnings("unused")
-    private Object[] previewEndDateAndRateCombinations() {
-        return new Object[]{
-            new String[]{"2018-11-10", "standardRate", "lower", "lower"},
-            new String[]{"2018-11-10", "standardRate", "same", "lower"},
-            new String[]{"2018-11-10", "standardRate", "higher", "lower"},
-            new String[]{"2018-11-10", "standardRate", "lower", "same"},
-            new String[]{"2018-11-10", "standardRate", "same", "same"},
-            new String[]{"2018-11-10", "standardRate", "higher", "same"},
-            new String[]{"2018-11-10", "enhancedRate", "same", "lower"},
-            new String[]{"2018-11-10", "enhancedRate", "higher", "lower"},
-            new String[]{"2018-11-10", "enhancedRate", "same", "same"},
-            new String[]{"2018-11-10", "enhancedRate", "higher", "same"},
-            new String[]{"2018-11-10", "noAward", "lower", "lower"},
-            new String[]{"2018-11-10", "noAward", "same", "lower"},
-            new String[]{"2018-11-10", "noAward", "lower", "same"},
-            new String[]{"2018-11-10", "noAward", "same", "same"},
-            new String[]{"2018-11-10", "notConsidered", "lower", "lower"},
-            new String[]{"2018-11-10", "notConsidered", "same", "lower"},
-            new String[]{"2018-11-10", "notConsidered", "higher", "lower"},
-            new String[]{"2018-11-10", "notConsidered", "lower", "same"},
-            new String[]{"2018-11-10", "notConsidered", "same", "same"},
-            new String[]{"2018-11-10", "notConsidered", "higher", "same"},
-            new String[]{null, "standardRate", "lower", "lower"},
-            new String[]{null, "standardRate", "same", "lower"},
-            new String[]{null, "standardRate", "higher", "lower"},
-            new String[]{null, "standardRate", "lower", "same"},
-            new String[]{null, "standardRate", "same", "same"},
-            new String[]{null, "standardRate", "higher", "same"},
-            new String[]{null, "enhancedRate", "same", "lower"},
-            new String[]{null, "enhancedRate", "higher", "lower"},
-            new String[]{null, "enhancedRate", "same", "same"},
-            new String[]{null, "enhancedRate", "higher", "same"},
-            new String[]{null, "noAward", "lower", "lower"},
-            new String[]{null, "noAward", "same", "lower"},
-            new String[]{null, "noAward", "lower", "same"},
-            new String[]{null, "noAward", "same", "same"},
-            new String[]{null, "notConsidered", "lower", "lower"},
-            new String[]{null, "notConsidered", "same", "lower"},
-            new String[]{null, "notConsidered", "higher", "lower"},
-            new String[]{null, "notConsidered", "lower", "same"},
-            new String[]{null, "notConsidered", "same", "same"},
-            new String[]{null, "notConsidered", "higher", "same"},
-        };
-    }
-
     protected void setCommonPreviewParams(SscsCaseData sscsCaseData, String endDate) {
         sscsCaseData.setWriteFinalDecisionStartDate("2018-10-11");
         sscsCaseData.setWriteFinalDecisionEndDate(endDate);
@@ -305,7 +256,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
         setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
@@ -324,8 +275,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
         setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("someValue");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("someValue");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
 
@@ -345,8 +296,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
         setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("someValue");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("someValue");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
@@ -801,7 +752,6 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
-
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
         sscsCaseData.getAppeal().getAppellant().setAppointee(Appointee.builder()
@@ -813,7 +763,6 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 

@@ -8,10 +8,10 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipTemplate
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class PipScenarioDTest {
+public class PipScenarioNoAwardNotConsideredTest {
 
     @Test
-    public void testScenario1() {
+    public void testScenario() {
 
         List<Descriptor> dailyLivingDescriptors =
                 Arrays.asList(Descriptor.builder()
@@ -34,6 +34,9 @@ public class PipScenarioDTest {
                         .startDate("2020-12-17")
                         .dailyLivingIsEntited(false)
                         .mobilityIsEntited(false)
+                        .isDescriptorFlow(true)
+                        .isAllowed(false)
+                        .isSetAside(false)
                         .dailyLivingNumberOfPoints(6)
                         .dailyLivingAwardRate("no award")
                         .mobilityAwardRate("not considered")
@@ -43,12 +46,12 @@ public class PipScenarioDTest {
                         .anythingElse("Something else")
                         .dailyLivingDescriptors(dailyLivingDescriptors).build();
 
-        PipTemplateContent content = PipScenario.SCENARIO_1.getContent(body);
+        PipTemplateContent content = PipScenario.SCENARIO_NO_AWARD_NOT_CONSIDERED.getContent(body);
 
 
         String expectedContent = "The appeal is refused.\n"
             + "\n"
-            + "The decision made by the Secretary of State on 20/09/2020 in respect of Personal Independence Payment is confirmed.\n"
+            + "The decision made by the Secretary of State on 20/09/2020 is confirmed.\n"
             + "\n"
             + "Felix Sydney is not entitled to the daily living component from 17/12/2020. They score 6 points. This is insufficient to meet the threshold for the test.\n"
             + "\n"
@@ -64,7 +67,7 @@ public class PipScenarioDTest {
             + "\n"
             + "Something else\n"
             + "\n"
-            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the tribunal considered the appeal bundle to page A1. No Presenting Officer attended on behalf of the Respondent.\n"
+            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. No Presenting Officer attended on behalf of the Respondent.\n"
             + "\n";
 
         Assert.assertEquals(9, content.getComponents().size());

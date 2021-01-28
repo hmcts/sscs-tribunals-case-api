@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody
 
 public enum PipScenario {
 
-    SCENARIO_1(Scenario1Content::new);
+    SCENARIO_NON_DESCRIPTOR(ScenarioNonDescriptorContent::new), SCENARIO_NOT_CONSIDERED_NO_AWARD(ScenarioNotConsideredNoAwardContent::new), SCENARIO_AWARD_NOT_CONSIDERED(ScenarioAwardNotConsideredContent::new), SCENARIO_NOT_CONSIDERED_AWARD(ScenarioNotConsideredAwardContent::new), SCENARIO_NO_AWARD_AWARD(ScenarioNoAwardAwardContent::new), SCENARIO_AWARD_AWARD(ScenarioAwardAwardContent::new), SCENARIO_AWARD_NO_AWARD(ScenarioAwardNoAwardContent::new),  SCENARIO_NO_AWARD_NOT_CONSIDERED(ScenarioNoAwardNotConsideredContent::new), SCENARIO_NO_AWARD_NO_AWARD(ScenarioNoAwardNoAwardContent::new);
 
     Function<WriteFinalDecisionTemplateBody, PipTemplateContent> contentSupplier;
 

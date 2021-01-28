@@ -68,10 +68,6 @@ public abstract class WriteFinalDecisionTemplateContent {
         return value;
     }
 
-    protected String getTriageConsideredParagraph(String bundlePage) {
-        return "The tribunal considered the appeal bundle to page " + bundlePage + ".";
-    }
-
     public WriteFinalDecisionTemplateContent() {
         this.components = new ArrayList<>();
     }
@@ -169,7 +165,9 @@ public abstract class WriteFinalDecisionTemplateContent {
         return "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify " + appellantName + " of the hearing and that it is in the interests of justice to proceed today. ";
     }
 
-
+    protected String getTriageConsideredParagraph(String bundlePage) {
+        return "The tribunal considered the appeal bundle to page " + bundlePage + ".";
+    }
 
     public List<String> getFaceToFaceTelephoneVideoHearingTypeSentences(String hearingType, String appellantName, String bundlePage,
         boolean appellantAttended, boolean presentingOfifficerAttened) {
