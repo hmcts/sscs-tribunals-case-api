@@ -100,7 +100,6 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
 
         when(idamClient.getUserDetails("Bearer token")).thenReturn(userDetails);
 
-
         capture = ArgumentCaptor.forClass(GenerateFileParams.class);
 
         sscsCaseData = SscsCaseData.builder()
@@ -179,10 +178,17 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
             pipDecisionNoticeQuestionService, pipDecisionNoticeOutcomeService, documentConfiguration);
 
         when(generateFile.assemble(any())).thenReturn(URL);
-
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("preparingFood1a");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(Arrays.asList("preparingFood"));
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("movingAround1a");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround"));
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionStartDate("2018-11-10");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
 
         when(pipDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
 
@@ -219,6 +225,7 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("no");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         when(pipDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
 

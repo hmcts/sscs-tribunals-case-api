@@ -13,10 +13,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -44,7 +41,11 @@ public class CitizenCcdService {
     public List<SscsCaseData> findCase(IdamTokens idamTokens) {
         return searchForCitizen(idamTokens)
             .stream()
-            .map(f -> sscsCcdConvertService.getCaseData(f.getData()))
+            .map(f -> {
+                SscsCaseData caseData = sscsCcdConvertService.getCaseData(f.getData());
+                caseData.setCcdCaseId(f.getId().toString());
+                return caseData;
+            })
             .collect(Collectors.toList());
     }
 
@@ -57,29 +58,41 @@ public class CitizenCcdService {
     }
 
     public SaveCaseResult saveCase(SscsCaseData caseData, IdamTokens idamTokens) {
+
         List<CaseDetails> caseDetailsList = citizenCcdClient.searchForCitizen(idamTokens);
 
         CaseDetails caseDetails;
+
         if (CollectionUtils.isNotEmpty(caseDetailsList)) {
+
             String caseId = caseDetailsList.get(0).getId().toString();
             caseDetails = updateCase(caseData, EventType.UPDATE_DRAFT.getCcdType(), "Update draft",
                 "Update draft in CCD", idamTokens, caseId);
+
             return SaveCaseResult.builder()
                 .caseDetailsId(caseDetails.getId())
                 .saveCaseOperation(SaveCaseOperation.UPDATE)
                 .build();
         } else {
-            caseDetails = newCase(caseData, EventType.CREATE_DRAFT.getCcdType(), "Create draft",
-                "Create draft in CCD", idamTokens);
-            return SaveCaseResult.builder()
-                .caseDetailsId(caseDetails.getId())
-                .saveCaseOperation(SaveCaseOperation.CREATE)
-                .build();
+            return createDraft(caseData, idamTokens);
         }
     }
 
-    public Optional<SscsCaseDetails> draftArchived(SscsCaseData caseData, IdamTokens citizenIdamTokens,
-                                                   IdamTokens userIdamTokens) {
+    public SaveCaseResult createDraft(SscsCaseData caseData, IdamTokens idamTokens) {
+
+        CaseDetails caseDetails;
+        caseDetails = newCase(caseData, EventType.CREATE_DRAFT.getCcdType(), "Create draft",
+                "Create draft in CCD", idamTokens);
+
+        return SaveCaseResult.builder()
+                .caseDetailsId(caseDetails.getId())
+                .saveCaseOperation(SaveCaseOperation.CREATE)
+                .build();
+    }
+
+    public Optional<SscsCaseDetails> draftArchivedFirst(SscsCaseData caseData,
+                                                        IdamTokens citizenIdamTokens,
+                                                        IdamTokens userIdamTokens) {
         List<CaseDetails> caseDetailsList = citizenCcdClient.searchForCitizen(citizenIdamTokens);
 
         if (!caseDetailsList.isEmpty()) {
@@ -91,6 +104,13 @@ public class CitizenCcdService {
             return Optional.of(sscsCaseDetails);
         }
         return Optional.empty();
+    }
+
+    public CaseDetails archiveDraft(SscsCaseData caseData, IdamTokens userIdamTokens, Long caseId) {
+        log.info("Archiving Draft for caseId {} with user roles {}", caseId, userIdamTokens.getRoles().toString());
+        CaseDetails caseDetails = updateCase(caseData, DRAFT_ARCHIVED.getCcdType(), "SSCS Archive Draft", "SSCS Archive Draft", userIdamTokens, caseId.toString());
+
+        return caseDetails;
     }
 
     private CaseDetails newCase(SscsCaseData caseData, String eventType, String summary, String description, IdamTokens idamTokens) {

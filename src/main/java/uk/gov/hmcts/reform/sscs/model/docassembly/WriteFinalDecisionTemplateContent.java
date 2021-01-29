@@ -126,7 +126,7 @@ public abstract class WriteFinalDecisionTemplateContent {
 
     public List<String> getHearingTypeSentences(String appellantName, String bundlePage, String hearingType, boolean appellantAttended, boolean presentingOfficerAttened) {
         if (equalsIgnoreCase("paper", hearingType)) {
-            return asList("No party has objected to the matter being decided without a hearing.", "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.");
+            return asList("No party has objected to the matter being decided without a hearing.", "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.");
         } else  {
             return getFaceToFaceTelephoneVideoHearingTypeSentences(hearingType, appellantName, bundlePage, appellantAttended, presentingOfficerAttened);
         }
