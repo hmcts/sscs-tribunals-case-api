@@ -278,11 +278,22 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                                 .build()
                 ).build());
 
+        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(DwpResponseDocument.builder()
+                .documentLink(
+                        DocumentLink.builder()
+                                .documentBinaryUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary")
+                                .documentUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop")
+                                .documentFilename("testEditedResponseDocument.pdf")
+                                .build()
+                ).build());
+
+        callback.getCaseDetails().getCaseData().setDwpFurtherInfo("Yes");
+
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getSelectWhoReviewsCase());
-        assertNull(response.getData().getInterlocReferralReason());
-        assertNull(response.getData().getInterlocReviewState());
+        assertEquals("phmeRequest", response.getData().getInterlocReferralReason());
+        assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
     }
 
     @Test

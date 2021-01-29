@@ -24,7 +24,7 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
-      "lcwaAppeal" : "Yes",
+      "wcaAppeal" : "Yes",
       "writeFinalDecisionGenerateNotice": "Yes",
       "supportGroupOnlyAppeal" : "SUPPORT_GROUP_ONLY",
       "writeFinalDecisionAllowedOrRefused" : "ALLOWED_OR_REFUSED",
@@ -762,7 +762,7 @@
     "security_classification": "PUBLIC",
     "case_data": {
       "writeFinalDecisionGenerateNotice": "Yes",
-      "lcwaAppeal" : "Yes",
+      "wcaAppeal" : "Yes",
       "supportGroupOnlyAppeal" : "SUPPORT_GROUP_ONLY",
       "writeFinalDecisionAllowedOrRefused" : "ALLOWED_OR_REFUSED",
       "writeFinalDecisionDisabilityQualifiedPanelMemberName": "Panel Member 1",
