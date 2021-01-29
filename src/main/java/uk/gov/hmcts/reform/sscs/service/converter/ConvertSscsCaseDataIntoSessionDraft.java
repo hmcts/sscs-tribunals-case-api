@@ -120,6 +120,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
             .datesCantAttend(buildDatesCantAttend(appeal))
             .pcqId(new SessionPcqId(caseData.getPcqId()))
             .languagePreferenceWelsh(buildLanuagePreferenceWelsh(caseData))
+            .ccdCaseId(caseData.getCcdCaseId())
             .build();
     }
 
