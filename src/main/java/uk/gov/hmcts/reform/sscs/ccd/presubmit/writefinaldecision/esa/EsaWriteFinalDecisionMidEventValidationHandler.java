@@ -49,7 +49,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     }
 
     private boolean isWcaNotSupportGroupOnly(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getSscsEsaCaseData().isWcaAppeal() && !sscsCaseData.isSupportGroupOnlyAppeal();
+        return sscsCaseData.isWcaAppeal() && !sscsCaseData.isSupportGroupOnlyAppeal();
     }
 
     @Override
@@ -64,7 +64,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getSscsEsaCaseData().getWcaAppeal() != null && NO.equals(sscsCaseData.getSscsEsaCaseData().getWcaAppeal())) {
+        if (sscsCaseData.getWcaAppeal() != null && NO.equals(sscsCaseData.getWcaAppeal())) {
             sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YES);
             return;
         }
@@ -75,7 +75,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData) {
 
         if (YesNo.YES.getValue().equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionGenerateNotice())
-                && sscsCaseData.getSscsEsaCaseData().isWcaAppeal()
+                && sscsCaseData.isWcaAppeal()
                 && "allowed".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionAllowedOrRefused())) {
             sscsCaseData.setShowDwpReassessAwardPage(YesNo.YES);
             return;

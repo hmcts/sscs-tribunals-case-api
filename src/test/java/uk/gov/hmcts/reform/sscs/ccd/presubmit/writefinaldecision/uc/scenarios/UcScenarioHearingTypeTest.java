@@ -18,6 +18,7 @@ public class UcScenarioHearingTypeTest {
     @SuppressWarnings("unused")
     private Object[] allNextHearingTypeParameters() {
         return new Object[] {
+            new Object[] {"triage", false, false, "The tribunal considered the appeal bundle to page A1.\n"},
             new Object[] {"faceToFace", true, true, "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"},
             new Object[] {"faceToFace", true, false, "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. No Presenting Officer attended on behalf of the Respondent.\n"},
             new Object[] {"faceToFace", false, true, "Felix Sydney requested an oral hearing but did not attend today. A Presenting Officer attended on behalf of the Respondent.\n"
@@ -91,7 +92,7 @@ public class UcScenarioHearingTypeTest {
                 + expectedHearingType
                 + "\n";
 
-        if (appellantAttended) {
+        if (appellantAttended || "triage".equals(hearingType)) {
             Assert.assertEquals(10, content.getComponents().size());
         } else {
             Assert.assertEquals(11, content.getComponents().size());

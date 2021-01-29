@@ -239,7 +239,7 @@ dependencyManagement {
 	    }
 
         // CVE-2020-13954
-        dependencySet(group: 'org.apache.cxf', version: '3.4.1') {
+        dependencySet(group: 'org.apache.cxf', version: '3.4.2') {
             entry 'cxf-core'
             entry 'cxf-rt-frontend-jaxrs'
             entry 'cxf-rt-rs-client'
@@ -307,8 +307,9 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.0.6'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.1.38'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.18'
+
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.1.45'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.21'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
     compile 'org.projectlombok:lombok:1.18.16'
