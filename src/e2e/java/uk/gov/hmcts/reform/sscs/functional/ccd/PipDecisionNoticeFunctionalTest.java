@@ -233,17 +233,17 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             if (allowed) {
                 assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is set aside."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             } else {
                 assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is confirmed."));
             }
             assertThat(pdfTextWithoutNewLines, containsString("3. My summary."));
             assertThat(pdfTextWithoutNewLines, containsString("4. Reasons for decision 1"));
             assertThat(pdfTextWithoutNewLines, containsString("5. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("6. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "7. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "7. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("8.")));
         }
     }
@@ -283,9 +283,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                 assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             }
             if (setAside) {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is set aside."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             } else {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is confirmed."));
             }
             assertThat(pdfTextWithoutNewLines, containsString("3. Only the mobility component was in issue on this appeal and the daily living component was not considered. "));
             assertThat(pdfTextWithoutNewLines,
@@ -296,91 +296,74 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("7. Anything else."));
             boolean additionalParagraph = false;
-            // Remove "the hearing"
-            // Add space before (Social Entitite....)
             if ("video".equals(hearingType)) {
                 if (appellantAttended && presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                        "8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
                 } else if (appellantAttended && !presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent."));
+                        "8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent."));
                 } else if (!appellantAttended && presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "8. This has been a remote hearing in the form of a video hearing. Joe Bloggs did not attend today. A Presenting Officer attended on behalf of the Respondent."));
+                        "8. This has been a remote hearing in the form of a video hearing. Joe Bloggs did not attend the hearing today. A Presenting Officer attended on behalf of the Respondent."));
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
+                        "9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
                     additionalParagraph = true;
                 } else if (!appellantAttended && !presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "8. This has been a remote hearing in the form of a video hearing. Joe Bloggs did not attend today. No Presenting Officer attended on behalf of the Respondent."));
+                        "8. This has been a remote hearing in the form of a video hearing. Joe Bloggs did not attend the hearing today. No Presenting Officer attended on behalf of the Respondent."));
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
+                        "9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
                     additionalParagraph = true;
                 }
             } else if ("telephone".equals(hearingType)) {
                 if (appellantAttended && presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "8. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                        "8. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
                 } else if (appellantAttended && !presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "8. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent."));
+                        "8. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent."));
                 } else if (!appellantAttended && presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "8. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs did not attend today. A Presenting Officer attended on behalf of the Respondent."));
+                        "8. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs did not attend the hearing today. A Presenting Officer attended on behalf of the Respondent."));
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
+                        "9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
                     additionalParagraph = true;
                 } else if (!appellantAttended && !presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "8. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs did not attend today. No Presenting Officer attended on behalf of the Respondent."));
+                        "8. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs did not attend the hearing today. No Presenting Officer attended on behalf of the Respondent."));
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
+                        "9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
                     additionalParagraph = true;
                 }
             } else if ("paper".equals(hearingType)) {
-                // Lower case "the Tribunal"
                 assertThat(pdfTextWithoutNewLines, containsString("8. No party has objected to the matter being decided without a hearing."));
                 assertThat(pdfTextWithoutNewLines, containsString(
-                    "Having considered the appeal bundle to page B7 and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way."));
+                    "9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way."));
+                additionalParagraph = true;
             } else if ("faceToFace".equals(hearingType)) {
                 if (appellantAttended && presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "8. This has been an oral (face to face) hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                        "8. This has been an oral (face to face) hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
                 } else if (appellantAttended && !presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "8. This has been an oral (face to face) hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent."));
+                        "8. This has been an oral (face to face) hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent."));
                 } else if (!appellantAttended && presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "8. This has been an oral (face to face) hearing. Joe Bloggs requested an oral hearing but did not attend today. A Presenting Officer attended on behalf of the Respondent."));
+                        "8. Joe Bloggs requested an oral hearing but did not attend today. A Presenting Officer attended on behalf of the Respondent."));
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
+                        "9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
                     additionalParagraph = true;
                 } else if (!appellantAttended && !presentingOfficerAttended) {
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "8. This has been an oral (face to face) hearing. Joe Bloggs requested an oral hearing but did not attend today. No Presenting Officer attended on behalf of the Respondent."));
+                        "8. Joe Bloggs requested an oral hearing but did not attend today. No Presenting Officer attended on behalf of the Respondent."));
                     assertThat(pdfTextWithoutNewLines, containsString(
-                        "9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
+                        "9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
                     additionalParagraph = true;
                 }
             } else if ("triage".equals(hearingType)) {
-                if (appellantAttended && presentingOfficerAttended) {
-                    assertThat(pdfTextWithoutNewLines, containsString(
-                        "8. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
-                } else if (appellantAttended && !presentingOfficerAttended) {
-                    assertThat(pdfTextWithoutNewLines, containsString(
-                        "8. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent."));
-                } else if (!appellantAttended && presentingOfficerAttended) {
-                    assertThat(pdfTextWithoutNewLines, containsString("8. Joe Bloggs did not attend today. A Presenting Officer attended on behalf of the Respondent."));
-                    assertThat(pdfTextWithoutNewLines, containsString(
-                        "9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
-                    additionalParagraph = true;
-                } else if (!appellantAttended && !presentingOfficerAttended) {
-                    assertThat(pdfTextWithoutNewLines, containsString("8. Joe Bloggs did not attend today. No Presenting Officer attended on behalf of the Respondent."));
-                    assertThat(pdfTextWithoutNewLines, containsString(
-                        "9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
-                    additionalParagraph = true;
-                }
+                assertThat(pdfTextWithoutNewLines, containsString(
+                    "8. The tribunal considered the appeal bundle to page B7."));
             }
             if (additionalParagraph) {
                 assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
@@ -416,9 +399,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                 assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             }
             if (setAside) {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is set aside."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             } else {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is confirmed."));
             }
             assertThat(pdfTextWithoutNewLines, containsString("3. Only the mobility component was in issue on this appeal and the daily living component was not considered. "));
             assertThat(pdfTextWithoutNewLines,
@@ -429,7 +412,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("7. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("9.")));
         }
     }
@@ -459,9 +442,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                 assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             }
             if (setAside) {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is set aside."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             } else {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is confirmed."));
             }
             assertThat(pdfTextWithoutNewLines, containsString("3. Only the mobility component was in issue on this appeal and the daily living component was not considered. "));
             assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs is entitled to the mobility component at the standard rate from 17/12/2020 for an indefinite period."));
@@ -472,7 +455,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
     }
@@ -502,9 +485,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                 assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             }
             if (setAside) {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is set aside."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             } else {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is confirmed."));
             }
             assertThat(pdfTextWithoutNewLines, containsString("3. Only the mobility component was in issue on this appeal and the daily living component was not considered. "));
             if (indefinite) {
@@ -519,7 +502,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
     }
@@ -551,9 +534,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                 assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             }
             if (setAside) {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is set aside."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             } else {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is confirmed."));
             }
             assertThat(pdfTextWithoutNewLines,
                 containsString("3. Joe Bloggs is not entitled to the daily living component from 17/12/2020. They score 6 points. This is insufficient to meet the threshold for the test."));
@@ -565,7 +548,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("7. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("9.")));
         }
     }
@@ -596,9 +579,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                 assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             }
             if (setAside) {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is set aside."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             } else {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is confirmed."));
             }
             assertThat(pdfTextWithoutNewLines,
                 containsString("3. Joe Bloggs is not entitled to the daily living component from 17/12/2020. They score 6 points. This is insufficient to meet the threshold for the test."));
@@ -613,7 +596,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("7. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("9.")));
         }
     }
@@ -644,9 +627,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                 assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             }
             if (setAside) {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is set aside."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             } else {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is confirmed."));
             }
             assertThat(pdfTextWithoutNewLines,
                 containsString("3. Joe Bloggs is not entitled to the daily living component from 17/12/2020. They score 6 points. This is insufficient to meet the threshold for the test."));
@@ -665,7 +648,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
     }
@@ -696,9 +679,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                 assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             }
             if (setAside) {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is set aside."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             } else {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is confirmed."));
             }
             assertThat(pdfTextWithoutNewLines,
                 containsString("3. Joe Bloggs is not entitled to the daily living component from 17/12/2020. They score 6 points. This is insufficient to meet the threshold for the test."));
@@ -717,7 +700,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
     }
@@ -751,9 +734,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                 assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             }
             if (setAside) {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is set aside."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             } else {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is confirmed."));
             }
             if (indefinite) {
                 assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 for an indefinite period."));
@@ -770,7 +753,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
     }
@@ -801,9 +784,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                 assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             }
             if (setAside) {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is set aside."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             } else {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is confirmed."));
             }
             if (indefinite) {
                 assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 for an indefinite period."));
@@ -823,7 +806,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
     }
@@ -854,9 +837,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                 assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             }
             if (setAside) {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is set aside."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             } else {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is confirmed."));
             }
             if (indefinite) {
                 assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 for an indefinite period."));
@@ -880,7 +863,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("8. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("9. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "10. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "10. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
     }
@@ -911,9 +894,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                 assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             }
             if (setAside) {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is set aside."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             } else {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is confirmed."));
             }
             if (indefinite) {
                 assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 for an indefinite period."));
@@ -937,7 +920,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("8. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("9. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "10. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "10. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
     }
@@ -970,9 +953,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                 assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             }
             if (setAside) {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is set aside."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             } else {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is confirmed."));
             }
             if (indefinite) {
                 assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the enhanced rate from 17/12/2020 for an indefinite period."));
@@ -989,7 +972,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
     }
@@ -1021,9 +1004,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                 assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             }
             if (setAside) {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is set aside."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             } else {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is confirmed."));
             }
             if (indefinite) {
                 assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the enhanced rate from 17/12/2020 for an indefinite period."));
@@ -1043,7 +1026,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
     }
@@ -1075,9 +1058,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                 assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             }
             if (setAside) {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is set aside."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             } else {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is confirmed."));
             }
             if (indefinite) {
                 assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the enhanced rate from 17/12/2020 for an indefinite period."));
@@ -1101,7 +1084,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("8. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("9. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "10. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "10. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
     }
@@ -1133,9 +1116,9 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
                 assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             }
             if (setAside) {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is set aside."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             } else {
-                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
+                assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is confirmed."));
             }
             if (indefinite) {
                 assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the enhanced rate from 17/12/2020 for an indefinite period."));
@@ -1159,7 +1142,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("8. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("9. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString(
-                "10. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+                "10. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
     }
