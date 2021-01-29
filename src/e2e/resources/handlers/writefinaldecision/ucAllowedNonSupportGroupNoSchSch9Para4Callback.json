@@ -279,7 +279,7 @@
           }
         }
       ],
-      "lcwaAppeal":"Yes",
+      "wcaAppeal":"Yes",
       "writeFinalDecisionMedicallyQualifiedPanelMemberName":"Dr Doolittle",
       "writeFinalDecisionAllowedOrRefused":"allowed",
       "ucWriteFinalDecisionMentalAssessmentQuestion":[],
