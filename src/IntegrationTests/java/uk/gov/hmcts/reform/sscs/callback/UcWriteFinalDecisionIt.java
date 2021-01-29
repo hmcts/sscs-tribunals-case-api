@@ -120,9 +120,9 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForUc_WhenNonLcwa_WhenQuestionsPreviouslyAnsweredAndOver15Points() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForUc_WhenNonWca_WhenQuestionsPreviouslyAnsweredAndOver15Points() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorUCNonLcwa.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED"), Arrays.asList("2018-10-10", "allowed"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorUCNonWca.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED"), Arrays.asList("2018-10-10", "allowed"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
@@ -1481,9 +1481,9 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForUcLcwaScenario10Refused() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForUcWcaScenario10Refused() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorUCNonLcwa.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "ANSWERED_QUESTIONS"), Arrays.asList("2018-10-10", "refused", ""));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorUCNonWca.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "ANSWERED_QUESTIONS"), Arrays.asList("2018-10-10", "refused", ""));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
@@ -1547,9 +1547,9 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForUcNonLcwaScenario10Allowed() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForUcNonWcaScenario10Allowed() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorUCNonLcwa.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "ANSWERED_QUESTIONS"), Arrays.asList("2018-10-10", "allowed", ""));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorUCNonWca.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "ANSWERED_QUESTIONS"), Arrays.asList("2018-10-10", "allowed", ""));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
@@ -1614,9 +1614,9 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForUcNonLcwa_WhenPreviousQuestionsAnsweredAndOver15Points() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForUcNonWca_WhenPreviousQuestionsAnsweredAndOver15Points() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorUCNonLcwa.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "ANSWERED_QUESTIONS"), Arrays.asList("2018-10-10", "allowed", "mobilisingUnaided\", \"standingAndSitting"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorUCNonWca.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "ANSWERED_QUESTIONS"), Arrays.asList("2018-10-10", "allowed", "mobilisingUnaided\", \"standingAndSitting"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
