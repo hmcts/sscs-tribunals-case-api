@@ -11,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsPipCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestion;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityQuestion;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityType;
@@ -19,7 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivity
 public class PipActivityQuestionTest {
 
     @Mock
-    private SscsCaseData sscsCaseData;
+    private SscsPipCaseData sscsPipCaseData;
 
     @Before
     public void setUp() {
@@ -28,7 +29,7 @@ public class PipActivityQuestionTest {
 
     @Test
     public void testGetPreparingFoodQuestion() {
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionPreparingFoodQuestion()).thenReturn("testAnswer");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionPreparingFoodQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = PipActivityQuestion.getByKey("preparingFood");
         Assert.assertNotNull(activityQuestion);
         Assert.assertNotNull(activityQuestion.getActivityType());
@@ -38,12 +39,13 @@ public class PipActivityQuestionTest {
         Assert.assertEquals("Preparing food", activityQuestion.getValue());
         Assert.assertEquals(PipActivityType.DAILY_LIVING, activityQuestion.getActivityType());
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
+        SscsCaseData sscsCaseData = SscsCaseData.builder().pipSscsCaseData(sscsPipCaseData).build();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
 
     @Test
     public void testGetTakingNutritionQuestion() {
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionTakingNutritionQuestion()).thenReturn("testAnswer");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionTakingNutritionQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = PipActivityQuestion.getByKey("takingNutrition");
         Assert.assertNotNull(activityQuestion);
         Assert.assertNotNull(activityQuestion.getActivityType());
@@ -53,12 +55,13 @@ public class PipActivityQuestionTest {
         Assert.assertEquals("Taking nutrition", activityQuestion.getValue());
         Assert.assertEquals(PipActivityType.DAILY_LIVING, activityQuestion.getActivityType());
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
+        SscsCaseData sscsCaseData = SscsCaseData.builder().pipSscsCaseData(sscsPipCaseData).build();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
 
     @Test
     public void testGetManagingTherapyQuestion() {
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionManagingTherapyQuestion()).thenReturn("testAnswer");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionManagingTherapyQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = PipActivityQuestion.getByKey("managingTherapy");
         Assert.assertNotNull(activityQuestion);
         Assert.assertNotNull(activityQuestion.getActivityType());
@@ -68,12 +71,13 @@ public class PipActivityQuestionTest {
         Assert.assertEquals("Managing therapy or monitoring a health condition", activityQuestion.getValue());
         Assert.assertEquals(PipActivityType.DAILY_LIVING, activityQuestion.getActivityType());
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
+        SscsCaseData sscsCaseData = SscsCaseData.builder().pipSscsCaseData(sscsPipCaseData).build();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
 
     @Test
     public void testGetWashingAndBathingQuestion() {
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionWashAndBatheQuestion()).thenReturn("testAnswer");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionWashAndBatheQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = PipActivityQuestion.getByKey("washingAndBathing");
         Assert.assertNotNull(activityQuestion);
         Assert.assertNotNull(activityQuestion.getActivityType());
@@ -83,12 +87,13 @@ public class PipActivityQuestionTest {
         Assert.assertEquals("Washing and bathing", activityQuestion.getValue());
         Assert.assertEquals(PipActivityType.DAILY_LIVING, activityQuestion.getActivityType());
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
+        SscsCaseData sscsCaseData = SscsCaseData.builder().pipSscsCaseData(sscsPipCaseData).build();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
 
     @Test
     public void testGetManagingToiletNeedsQuestion() {
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionManagingToiletNeedsQuestion()).thenReturn("testAnswer");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionManagingToiletNeedsQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = PipActivityQuestion.getByKey("managingToiletNeeds");
         Assert.assertNotNull(activityQuestion);
         Assert.assertNotNull(activityQuestion.getActivityType());
@@ -98,12 +103,13 @@ public class PipActivityQuestionTest {
         Assert.assertEquals("Managing toilet needs or incontinence", activityQuestion.getValue());
         Assert.assertEquals(PipActivityType.DAILY_LIVING, activityQuestion.getActivityType());
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
+        SscsCaseData sscsCaseData = SscsCaseData.builder().pipSscsCaseData(sscsPipCaseData).build();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
 
     @Test
     public void testGetDressingAndUndressingQuestion() {
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionDressingAndUndressingQuestion()).thenReturn("testAnswer");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionDressingAndUndressingQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = PipActivityQuestion.getByKey("dressingAndUndressing");
         Assert.assertNotNull(activityQuestion);
         Assert.assertNotNull(activityQuestion.getActivityType());
@@ -113,12 +119,13 @@ public class PipActivityQuestionTest {
         Assert.assertEquals("Dressing and undressing", activityQuestion.getValue());
         Assert.assertEquals(PipActivityType.DAILY_LIVING, activityQuestion.getActivityType());
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
+        SscsCaseData sscsCaseData = SscsCaseData.builder().pipSscsCaseData(sscsPipCaseData).build();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
 
     @Test
     public void testGetCommunicatingQuestion() {
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionCommunicatingQuestion()).thenReturn("testAnswer");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionCommunicatingQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = PipActivityQuestion.getByKey("communicating");
         Assert.assertNotNull(activityQuestion);
         Assert.assertNotNull(activityQuestion.getActivityType());
@@ -128,12 +135,13 @@ public class PipActivityQuestionTest {
         Assert.assertEquals("Communicating", activityQuestion.getValue());
         Assert.assertEquals(PipActivityType.DAILY_LIVING, activityQuestion.getActivityType());
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
+        SscsCaseData sscsCaseData = SscsCaseData.builder().pipSscsCaseData(sscsPipCaseData).build();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
 
     @Test
     public void testGetReadingAndUnderstandingQuestion() {
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionReadingUnderstandingQuestion()).thenReturn("testAnswer");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionReadingUnderstandingQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = PipActivityQuestion.getByKey("readingUnderstanding");
         Assert.assertNotNull(activityQuestion);
         Assert.assertNotNull(activityQuestion.getActivityType());
@@ -143,12 +151,13 @@ public class PipActivityQuestionTest {
         Assert.assertEquals("Reading and understanding signs, symbols and words", activityQuestion.getValue());
         Assert.assertEquals(PipActivityType.DAILY_LIVING, activityQuestion.getActivityType());
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
+        SscsCaseData sscsCaseData = SscsCaseData.builder().pipSscsCaseData(sscsPipCaseData).build();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
 
     @Test
     public void testGetEngagingWithOthersQuestion() {
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionEngagingWithOthersQuestion()).thenReturn("testAnswer");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionEngagingWithOthersQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = PipActivityQuestion.getByKey("engagingWithOthers");
         Assert.assertNotNull(activityQuestion);
         Assert.assertNotNull(activityQuestion.getActivityType());
@@ -158,12 +167,13 @@ public class PipActivityQuestionTest {
         Assert.assertEquals("Engaging with other people face to face", activityQuestion.getValue());
         Assert.assertEquals(PipActivityType.DAILY_LIVING, activityQuestion.getActivityType());
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
+        SscsCaseData sscsCaseData = SscsCaseData.builder().pipSscsCaseData(sscsPipCaseData).build();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
 
     @Test
     public void testGetMakingBudgetingDecisionsQuestion() {
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionBudgetingDecisionsQuestion()).thenReturn("testAnswer");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionBudgetingDecisionsQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = PipActivityQuestion.getByKey("budgetingDecisions");
         Assert.assertNotNull(activityQuestion);
         Assert.assertNotNull(activityQuestion.getActivityType());
@@ -173,12 +183,13 @@ public class PipActivityQuestionTest {
         Assert.assertEquals("Making budgeting decisions", activityQuestion.getValue());
         Assert.assertEquals(PipActivityType.DAILY_LIVING, activityQuestion.getActivityType());
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
+        SscsCaseData sscsCaseData = SscsCaseData.builder().pipSscsCaseData(sscsPipCaseData).build();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
 
     @Test
     public void testGetPlanningAndFollowingJourneysQuestion() {
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionPlanningAndFollowingQuestion()).thenReturn("testAnswer");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionPlanningAndFollowingQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = PipActivityQuestion.getByKey("planningAndFollowing");
         Assert.assertNotNull(activityQuestion);
         Assert.assertNotNull(activityQuestion.getActivityType());
@@ -188,12 +199,13 @@ public class PipActivityQuestionTest {
         Assert.assertEquals("Planning and following journeys", activityQuestion.getValue());
         Assert.assertEquals(PipActivityType.MOBILITY, activityQuestion.getActivityType());
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
+        SscsCaseData sscsCaseData = SscsCaseData.builder().pipSscsCaseData(sscsPipCaseData).build();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
 
     @Test
     public void testGetMovingAroundQuestion() {
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionMovingAroundQuestion()).thenReturn("testAnswer");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionMovingAroundQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = PipActivityQuestion.getByKey("movingAround");
         Assert.assertNotNull(activityQuestion);
         Assert.assertNotNull(activityQuestion.getActivityType());
@@ -203,6 +215,7 @@ public class PipActivityQuestionTest {
         Assert.assertEquals("Moving around", activityQuestion.getValue());
         Assert.assertEquals(PipActivityType.MOBILITY, activityQuestion.getActivityType());
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
+        SscsCaseData sscsCaseData = SscsCaseData.builder().pipSscsCaseData(sscsPipCaseData).build();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
 
