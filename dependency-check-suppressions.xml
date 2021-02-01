@@ -40,19 +40,4 @@
         <cve>CVE-2020-11022</cve>
         <cve>CVE-2020-11023</cve>
     </suppress>
-    <suppress until="2021-03-01">
-        <notes><![CDATA[
-         file name: tomcat-embed-core-9.0.39.jar/tomcat-embed-websocket-9.0.39.jar
-         Awaiting patch for Tomcat
-        ]]></notes>
-        <cve>CVE-2020-13943</cve>
-        <cve>CVE-2020-17527</cve>
-    </suppress>
-    <suppress until="2021-03-01">
-        <notes><![CDATA[
-         file name: groovy-2.5.13.jar
-         Awaiting patch from Groovy
-        ]]></notes>
-        <cve>CVE-2020-17521</cve>
-    </suppress>
 </suppressions>
