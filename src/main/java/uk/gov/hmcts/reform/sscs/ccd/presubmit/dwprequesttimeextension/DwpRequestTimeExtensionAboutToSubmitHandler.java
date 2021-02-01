@@ -3,10 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwprequesttimeextension;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
@@ -14,9 +12,17 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 
-@Service
+@Component
 public class DwpRequestTimeExtensionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private DwpDocumentService dwpDocumentService;
+
+    @Autowired
+    public DwpRequestTimeExtensionAboutToSubmitHandler(DwpDocumentService dwpDocumentService) {
+        this.dwpDocumentService = dwpDocumentService;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -47,35 +53,10 @@ public class DwpRequestTimeExtensionAboutToSubmitHandler implements PreSubmitCal
         caseData.setTimeExtensionRequested("Yes");
 
         DwpResponseDocument tl1Form = caseData.getTl1Form();
-        List<DwpDocument> updatedDocuments = addDocument(caseData.getDwpDocuments(), tl1Form);
+        dwpDocumentService.addToDwpDocuments(caseData, tl1Form, DwpDocumentType.TL1_FORM);
 
         caseData.setTl1Form(null);
-        caseData.setDwpDocuments(updatedDocuments);
-
 
         return caseData;
-    }
-
-    public List<DwpDocument> addDocument(List<DwpDocument> existingDwpDocuments, DwpResponseDocument tl1Form) {
-
-        DwpDocumentDetails docDetails = new DwpDocumentDetails(
-                DwpDocumentType.TL1_FORM.getValue(),
-                "TL1-Form",
-                LocalDate.now().toString(),
-                tl1Form.getDocumentLink(),
-                null,
-                null,
-                null
-        );
-
-        DwpDocument newDoc = new DwpDocument(docDetails);
-
-        if (isNull(existingDwpDocuments)) {
-            existingDwpDocuments = new ArrayList<>();
-        }
-
-        existingDwpDocuments.add(newDoc);
-
-        return existingDwpDocuments;
     }
 }

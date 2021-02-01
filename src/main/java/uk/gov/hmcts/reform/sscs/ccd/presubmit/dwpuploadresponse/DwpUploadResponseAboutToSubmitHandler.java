@@ -1,14 +1,13 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -19,10 +18,18 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
+import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 
 @Component
 @Slf4j
 public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private DwpDocumentService dwpDocumentService;
+
+    @Autowired
+    public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService) {
+        this.dwpDocumentService = dwpDocumentService;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -67,7 +74,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         }
 
         if (sscsCaseData.getAppendix12Doc() != null) {
-            addToDwpDocuments(sscsCaseData, sscsCaseData.getAppendix12Doc(), DwpDocumentType.APPENDIX_12);
+            dwpDocumentService.addToDwpDocuments(sscsCaseData, sscsCaseData.getAppendix12Doc(), DwpDocumentType.APPENDIX_12);
         }
 
         if (sscsCaseData.getDwpEditedEvidenceBundleDocument() != null || sscsCaseData.getDwpEditedResponseDocument() != null) {
@@ -138,15 +145,4 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 ).build());
     }
 
-    private void addToDwpDocuments(SscsCaseData sscsCaseData, DwpResponseDocument dwpDocument, DwpDocumentType docType) {
-        DwpDocumentDetails dwpDocumentDetails = new DwpDocumentDetails(docType.getValue(),
-                docType.getLabel(),
-                LocalDate.now().toString(),
-                dwpDocument.getDocumentLink(), null, null, null);
-        DwpDocument doc = new DwpDocument(dwpDocumentDetails);
-        if (isNull(sscsCaseData.getDwpDocuments())) {
-            sscsCaseData.setDwpDocuments(new ArrayList<>());
-        }
-        sscsCaseData.getDwpDocuments().add(doc);
-    }
 }
