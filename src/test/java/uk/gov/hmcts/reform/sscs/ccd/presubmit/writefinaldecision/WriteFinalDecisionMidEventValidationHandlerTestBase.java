@@ -262,6 +262,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     @Parameters({"typeOfAppeal", "previewDecisionNotice"})
     public void givenDeathOfAppellant_thenDisplayWarning(String pageId) {
         sscsCaseData.setIsAppellantDeceased(YesNo.YES);
+        when(callback.isIgnoreWarnings()).thenReturn(false);
         when(callback.getPageId()).thenReturn(pageId);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -274,6 +275,19 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     @Test
     public void givenDeathOfAppellantButNotOnTheCorrectPage_thenDoNotDisplayWarning() {
         when(callback.getPageId()).thenReturn("incorrectPage");
+        when(callback.isIgnoreWarnings()).thenReturn(false);
+        sscsCaseData.setIsAppellantDeceased(YesNo.YES);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getWarnings().size(), is(0));
+    }
+
+    @Test
+    public void givenDeathOfAppellantWithIgnoreWarnings_thenDoNotDisplayWarning() {
+        when(callback.isIgnoreWarnings()).thenReturn(true);
+        when(callback.getPageId()).thenReturn("typeOfAppeal");
         sscsCaseData.setIsAppellantDeceased(YesNo.YES);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 

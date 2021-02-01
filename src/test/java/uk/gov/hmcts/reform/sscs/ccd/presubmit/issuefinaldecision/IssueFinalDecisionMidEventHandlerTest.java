@@ -73,6 +73,7 @@ public class IssueFinalDecisionMidEventHandlerTest {
     @Test
     public void givenIssueFinalDecisionEventWithDeathOfAppellant_thenDisplayWarning() {
         sscsCaseData.setIsAppellantDeceased(YesNo.YES);
+        when(callback.isIgnoreWarnings()).thenReturn(false);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -82,8 +83,20 @@ public class IssueFinalDecisionMidEventHandlerTest {
     }
 
     @Test
+    public void givenIssueFinalDecisionEventWithDeathOfAppellantWithIgnoreWarnings_thenDoNotDisplayWarning() {
+        when(callback.isIgnoreWarnings()).thenReturn(true);
+        sscsCaseData.setIsAppellantDeceased(YesNo.YES);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getWarnings().size(), is(0));
+    }
+
+    @Test
     public void givenIssueFinalDecisionEventWithDeathOfAppellantButNotOnTheCorrectPage_thenDoNotDisplayWarning() {
         when(callback.getPageId()).thenReturn("incorrectPage");
+        when(callback.isIgnoreWarnings()).thenReturn(false);
         sscsCaseData.setIsAppellantDeceased(YesNo.YES);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
