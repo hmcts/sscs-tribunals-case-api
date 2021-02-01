@@ -32,6 +32,7 @@ public enum SerializeJsonMessageManager {
     DORMANT_CCD("tya/dormantCcd.json"),
     HEARING("tya/hearing.json"),
     HEARING_MYA("tya/hearingMya.json"),
+    HEARING_PAPER_MYA("tya/hearingPaperMya.json"),
     HEARING_CCD("tya/hearingCcd.json"),
     NOT_LISTABLE_MYA("tya/notListableMya.json"),
     NOT_LISTABLE_CCD("tya/notListableCcd.json"),
