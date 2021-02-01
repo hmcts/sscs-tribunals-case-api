@@ -21,9 +21,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
+import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 
 @RunWith(JUnitParamsRunner.class)
 public class DwpUploadResponseAboutToSubmitHandlerTest {
@@ -38,10 +40,13 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    private DwpDocumentService dwpDocumentService;
+
     @Before
     public void setUp() {
         openMocks(this);
-        dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler();
+        dwpDocumentService = new DwpDocumentService();
+        dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService);
 
         when(callback.getEvent()).thenReturn(EventType.DWP_UPLOAD_RESPONSE);
 
@@ -370,7 +375,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     public void givenUcCaseWithAppendix12Document_thenMoveDocumentToDwpDocumentsCollection() {
         callback.getCaseDetails().getCaseData().setAppendix12Doc(DwpResponseDocument.builder().documentFileName("testA").build());
         List<DwpDocument> dwpResponseDocuments = new ArrayList<>();
-        dwpResponseDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentFileName("existingDoc").build()).build());
+        dwpResponseDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentFileName("existingDoc").documentDateAdded(LocalDate.now().minusDays(1).toString()).build()).build());
 
         callback.getCaseDetails().getCaseData().setDwpDocuments(dwpResponseDocuments);
 
@@ -378,8 +383,9 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         assertEquals(2, response.getData().getDwpDocuments().size());
 
-        assertEquals("existingDoc", response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
-        assertEquals("Appendix 12 document", response.getData().getDwpDocuments().get(1).getValue().getDocumentFileName());
+        assertEquals("Appendix 12 document", response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
+        assertEquals(DwpDocumentType.APPENDIX_12.getValue(), response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
+        assertEquals("existingDoc", response.getData().getDwpDocuments().get(1).getValue().getDocumentFileName());
     }
 
     @Test
