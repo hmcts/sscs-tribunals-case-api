@@ -43,11 +43,8 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
     @NamedParameters("allowed")
     @SuppressWarnings("unused")
-    private Object[] allowed() {
-        return new Object[] {
-            new Object[] {false},
-            new Object[] {true}
-        };
+    private Boolean[] allowed() {
+        return new Boolean[] { false, true};
     }
 
     @Test
