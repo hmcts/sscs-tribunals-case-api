@@ -75,7 +75,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
             preSubmitCallbackResponse.addError("Decision notice end date must be after decision notice start date");
         }
 
-        if (isYes(sscsCaseData.getIsAppellantDeceased()) && DEATH_OF_APPELLANT_WARNING_PAGES.contains(callback.getPageId())) {
+        if (isYes(sscsCaseData.getIsAppellantDeceased()) && DEATH_OF_APPELLANT_WARNING_PAGES.contains(callback.getPageId()) && !callback.isIgnoreWarnings()) {
             preSubmitCallbackResponse.addWarning("Appellant is deceased. Copy the draft decision and amend offline, then upload the offline version.");
         }
 

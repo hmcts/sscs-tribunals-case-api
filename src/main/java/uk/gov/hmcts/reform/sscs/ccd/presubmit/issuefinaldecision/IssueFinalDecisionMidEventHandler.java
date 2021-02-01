@@ -36,7 +36,7 @@ public class IssueFinalDecisionMidEventHandler implements PreSubmitCallbackHandl
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (isYes(sscsCaseData.getIsAppellantDeceased()) && DEATH_OF_APPELLANT_WARNING_PAGES.contains(callback.getPageId())) {
+        if (isYes(sscsCaseData.getIsAppellantDeceased()) && DEATH_OF_APPELLANT_WARNING_PAGES.contains(callback.getPageId()) && !callback.isIgnoreWarnings()) {
             response.addWarning("Appellant is deceased. Copy the draft decision and amend offline, then upload the offline version.");
         }
 
