@@ -265,7 +265,7 @@ public class SubmitDraftTest {
     }
 
     private void archiveDraft(SscsCaseData draftAppeal) {
-        citizenCcdService.draftArchived(draftAppeal, citizenIdamTokens, userIdamTokens);
+        citizenCcdService.draftArchivedFirst(draftAppeal, citizenIdamTokens, userIdamTokens);
     }
 
     public String getIdamOauth2Token(String username, String password) {
