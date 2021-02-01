@@ -42,7 +42,8 @@ public class CreateBundleAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new CreateBundleAboutToSubmitHandler(serviceRequestExecutor, "bundleUrl.com", "bundleWelshConfig");
+        handler = new CreateBundleAboutToSubmitHandler(serviceRequestExecutor, "bundleUrl.com", "bundleWelshConfig",
+                "bundleUnEditedConfig", "bundleWelshUnEditedConfig");
 
         when(callback.getEvent()).thenReturn(EventType.CREATE_BUNDLE);
 
