@@ -10,7 +10,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -480,8 +479,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     public void notConsideredNoAward_shouldGeneratePdfWithExpectedTextForHearingType(String hearingType, boolean appellantAttended, boolean presentingOfficerAttended) throws Exception {
         setup();
         String comparedToDwpMobility = "lower";
-        boolean allowed = false;
-        boolean setAside = true;
+
         boolean indefinite = false;
 
         String json;
@@ -500,6 +498,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
                 .asList("", "notConsidered", "", comparedToDwpMobility, "noAward", "movingAround", "movingAround12a", hearingType, appellantAttended ? "Yes" : "No",
                     presentingOfficerAttended ? "Yes" : "No"));
         }
+
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
@@ -522,16 +521,8 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final WriteFinalDecisionTemplateContent content = parentPayload.getWriteFinalDecisionTemplateContent();
         List<TemplateComponent<?>> components = content.getComponents();
 
-        if (allowed) {
-            assertIsParagraphWithText(components, 1, "The appeal is allowed.");
-        } else {
-            assertIsParagraphWithText(components, 1, "The appeal is refused.");
-        }
-        if (setAside) {
-            assertIsParagraphWithText(components, 2, "The decision made by the Secretary of State on 17/11/2020 is set aside.");
-        } else {
-            assertIsParagraphWithText(components, 2, "The decision made by the Secretary of State on 17/11/2020 is set confirmed.");
-        }
+        assertIsParagraphWithText(components, 1, "The appeal is refused.");
+        assertIsParagraphWithText(components, 2, "The decision made by the Secretary of State on 17/11/2020 is set aside.");
 
         assertIsParagraphWithText(components, 3, "Only the mobility component was in issue on this appeal and the daily living component was not considered.");
         assertIsParagraphWithText(components, 4,
