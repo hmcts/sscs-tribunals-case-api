@@ -269,7 +269,7 @@ public class EvidenceUploadServiceTest {
         draftDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("audio2.mp3").build()).build());
         draftDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("word1.docx").build()).build());
 
-        assertEquals(2, evidenceUploadService.removeAudioVideoFilesFromDraft(draftDocuments).size());
+        assertEquals(2, evidenceUploadService.pullAudioVideoFilesFromDraft(draftDocuments).size());
         assertEquals(1, draftDocuments.size());
     }
 
@@ -282,7 +282,7 @@ public class EvidenceUploadServiceTest {
         draftDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("word2.docx").build()).build());
         draftDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("video1.mp4").build()).build());
 
-        assertEquals(3, evidenceUploadService.removeAudioVideoFilesFromDraft(draftDocuments).size());
+        assertEquals(3, evidenceUploadService.pullAudioVideoFilesFromDraft(draftDocuments).size());
         assertEquals(2, draftDocuments.size());
     }
 
@@ -293,7 +293,7 @@ public class EvidenceUploadServiceTest {
         draftDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build());
         draftDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("word1.docx").build()).build());
 
-        assertEquals(1, evidenceUploadService.removeAudioVideoFilesFromDraft(draftDocuments).size());
+        assertEquals(1, evidenceUploadService.pullAudioVideoFilesFromDraft(draftDocuments).size());
         assertEquals(2, draftDocuments.size());
     }
 
@@ -303,12 +303,23 @@ public class EvidenceUploadServiceTest {
         draftDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("text.txt").build()).build());
         draftDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("word1.docx").build()).build());
 
-        assertEquals(2, evidenceUploadService.removeAudioVideoFilesFromDraft(draftDocuments).size());
-        assertEquals(0, draftDocuments.size());
+        assertEquals(0, evidenceUploadService.pullAudioVideoFilesFromDraft(draftDocuments).size());
+        assertEquals(2, draftDocuments.size());
     }
 
     @Test
     public void testBuildScannedDocumentByGivenSscsDoc() {
+        List<SscsDocument> audioVideoDocuments = new ArrayList<>();
+
+        SscsDocument draftSscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentDateAdded("2021-01-30")
+                .documentLink(DocumentLink.builder().documentBinaryUrl("url/binary").documentFilename("coversheet").documentUrl("url").build()).build()).build();
+
+        List<ScannedDocument> scannedDocuments = evidenceUploadService.buildScannedDocumentByGivenSscsDoc(draftSscsDocument, audioVideoDocuments);
+        assertEquals(1, scannedDocuments.size());
+    }
+
+    @Test
+    public void testBuildScannedDocumentByGivenSscsDocAndAudio() {
         List<SscsDocument> audioVideoDocuments = new ArrayList<>();
         audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("word1.docx").build()).build());
         audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("audio2.mp3").build()).build());

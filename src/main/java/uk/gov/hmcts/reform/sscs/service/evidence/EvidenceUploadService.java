@@ -201,7 +201,7 @@ public class EvidenceUploadService {
                                                                        MyaEventActionContext storePdfContext,
                                                                        String filename) {
         removeStatementDocFromDocumentTab(sscsCaseData, storePdfContext.getDocument().getData().getSscsDocument());
-        List<SscsDocument> audioVideoMedia = removeAudioVideoFilesFromDraft(storePdfContext.getDocument().getData().getDraftSscsDocument());
+        List<SscsDocument> audioVideoMedia = pullAudioVideoFilesFromDraft(storePdfContext.getDocument().getData().getDraftSscsDocument());
 
         List<byte[]> contentUploads = getContentListFromTheEvidenceUploads(storePdfContext);
         ByteArrayResource statementContent = getContentFromTheStatement(storePdfContext);
@@ -299,7 +299,7 @@ public class EvidenceUploadService {
         sscsCaseData.setSscsDocument(sscsDocument);
     }
 
-    protected List<SscsDocument> removeAudioVideoFilesFromDraft(List<SscsDocument> sscsDocuments) {
+    protected List<SscsDocument> pullAudioVideoFilesFromDraft(List<SscsDocument> sscsDocuments) {
         List<SscsDocument> audioVideoFiles = new ArrayList<>();
 
         Iterator<SscsDocument> iterator = sscsDocuments.iterator();
