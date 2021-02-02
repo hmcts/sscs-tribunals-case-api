@@ -56,6 +56,8 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             .benefitCode("002")
             .issueCode("CC")
             .dwpFurtherInfo("Yes")
+            .dwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().build()).build())
+            .dwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().build()).build())
             .appeal(Appeal.builder().build())
             .build();
 
@@ -116,6 +118,26 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(1, response.getErrors().size());
 
         assertEquals("Further information to assist the tribunal cannot be empty.", response.getErrors().iterator().next());
+    }
+
+    @Test
+    public void givenADwpUploadResponseEventWithEmptyDwpResponseDoc_displayAnError() {
+        callback.getCaseDetails().getCaseData().setDwpResponseDocument(null);
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+
+        assertEquals("DWP response document cannot be empty.", response.getErrors().iterator().next());
+    }
+
+    @Test
+    public void givenADwpUploadResponseEventWithEmptyDwpEvidenceBundle_displayAnError() {
+        callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(null);
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+
+        assertEquals("DWP evidence bundle cannot be empty.", response.getErrors().iterator().next());
     }
 
     @Test
@@ -272,21 +294,24 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                 () -> assertNull(response.getData().getDwpEditedEvidenceBundleDocument()),
                 () -> assertNull(response.getData().getDwpResponseDocument()),
                 () -> assertNull(response.getData().getDwpEditedResponseDocument()),
-                () -> assertEquals("http://dm-store:5005/documents/defg-6545-xyzabcmnop", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl()),
-                () -> assertEquals("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentBinaryUrl()),
-                () -> assertEquals(AppConstants.DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentFilename()),
-                () -> assertEquals("http://dm-store:5005/documents/defg-5678-xyzabcmnop", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl()),
-                () -> assertEquals("http://dm-store:5005/documents/defg-5678-xyzabcmnop/binary", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentBinaryUrl()),
-                () -> assertEquals(AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentFilename()),
-                () -> assertEquals("http://dm-store:5005/documents/abcd-0123-xyzabcdefgh", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentUrl()),
-                () -> assertEquals("http://dm-store:5005/documents/abcd-0123-xyzabcdefgh/binary", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentBinaryUrl()),
-                () -> assertEquals(AppConstants.DWP_DOCUMENT_AT38_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentFilename()),
-                () -> assertEquals("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw", response.getData().getDwpDocuments().get(3).getValue().getDocumentLink().getDocumentUrl()),
-                () -> assertEquals("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw/binary", response.getData().getDwpDocuments().get(3).getValue().getDocumentLink().getDocumentBinaryUrl()),
-                () -> assertEquals(AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(3).getValue().getDocumentLink().getDocumentFilename()),
-                () -> assertEquals("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw", response.getData().getDwpDocuments().get(4).getValue().getDocumentLink().getDocumentUrl()),
-                () -> assertEquals("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw/binary", response.getData().getDwpDocuments().get(4).getValue().getDocumentLink().getDocumentBinaryUrl()),
-                () -> assertEquals(AppConstants.DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(4).getValue().getDocumentLink().getDocumentFilename()),
+                () -> assertEquals(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue(), response.getData().getDwpDocuments().get(0).getValue().getDocumentType()),
+                () -> assertEquals("http://dm-store:5005/documents/defg-5678-xyzabcmnop", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl()),
+                () -> assertEquals("http://dm-store:5005/documents/defg-5678-xyzabcmnop/binary", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentBinaryUrl()),
+                () -> assertEquals("http://dm-store:5005/documents/defg-6545-xyzabcmnop", response.getData().getDwpDocuments().get(0).getValue().getEditedDocumentLink().getDocumentUrl()),
+                () -> assertEquals("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary", response.getData().getDwpDocuments().get(0).getValue().getEditedDocumentLink().getDocumentBinaryUrl()),
+                () -> assertEquals(AppConstants.DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(0).getValue().getEditedDocumentLink().getDocumentFilename()),
+                () -> assertEquals(AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentFilename()),
+                () -> assertEquals(DwpDocumentType.AT_38.getValue(), response.getData().getDwpDocuments().get(1).getValue().getDocumentType()),
+                () -> assertEquals("http://dm-store:5005/documents/abcd-0123-xyzabcdefgh", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl()),
+                () -> assertEquals("http://dm-store:5005/documents/abcd-0123-xyzabcdefgh/binary", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentBinaryUrl()),
+                () -> assertEquals(AppConstants.DWP_DOCUMENT_AT38_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentFilename()),
+                () -> assertEquals(DwpDocumentType.DWP_RESPONSE.getValue(), response.getData().getDwpDocuments().get(2).getValue().getDocumentType()),
+                () -> assertEquals("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentUrl()),
+                () -> assertEquals("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw/binary", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentBinaryUrl()),
+                () -> assertEquals("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw", response.getData().getDwpDocuments().get(2).getValue().getEditedDocumentLink().getDocumentUrl()),
+                () -> assertEquals("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw/binary", response.getData().getDwpDocuments().get(2).getValue().getEditedDocumentLink().getDocumentBinaryUrl()),
+                () -> assertEquals(AppConstants.DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(2).getValue().getEditedDocumentLink().getDocumentFilename()),
+                () -> assertEquals(AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentFilename()),
                 () -> assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState()));
     }
 
