@@ -286,6 +286,17 @@ public class EvidenceUploadServiceTest {
         assertEquals(2, draftDocuments.size());
     }
 
+    @Test
+    public void testDontRemoveNullFromList() {
+        List<SscsDocument> draftDocuments = new ArrayList<>();
+        draftDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("audio1.mp3").build()).build());
+        draftDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build());
+        draftDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("word1.docx").build()).build());
+
+        assertEquals(1, evidenceUploadService.removeAudioVideoFilesFromDraft(draftDocuments).size());
+        assertEquals(2, draftDocuments.size());
+    }
+
     private SscsDocument getCombinedEvidenceDoc(String combinedEvidenceFilename, String otherEvidenceDocType) {
         DocumentLink documentLink = DocumentLink.builder().documentUrl("http://dm-store/112").build();
         SscsDocumentDetails sscsDocumentDetails = SscsDocumentDetails.builder()

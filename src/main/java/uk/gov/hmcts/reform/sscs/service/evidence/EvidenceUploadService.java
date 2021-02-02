@@ -305,8 +305,8 @@ public class EvidenceUploadService {
         Iterator<SscsDocument> iterator = sscsDocuments.iterator();
         while (iterator.hasNext()) {
             SscsDocument document = iterator.next();
-            String filename = document.getValue().getDocumentFileName().toLowerCase();
-            if (filename != null && (filename.endsWith("mp3") || filename.endsWith("mp4"))) {
+            String filename = document.getValue().getDocumentFileName();
+            if (filename != null && (filename.toLowerCase().endsWith("mp3") || filename.toLowerCase().endsWith("mp4"))) {
                 audioVideoFiles.add(document);
                 iterator.remove();
             }
