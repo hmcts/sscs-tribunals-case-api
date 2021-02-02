@@ -339,7 +339,7 @@ public class EvidenceUploadService {
         return fileName.startsWith("Appellant upload") || fileName.startsWith("Representative upload");
     }
 
-    private List<ScannedDocument> buildScannedDocumentByGivenSscsDoc(SscsDocument draftSscsDocument,
+    protected List<ScannedDocument> buildScannedDocumentByGivenSscsDoc(SscsDocument draftSscsDocument,
                                                                List<SscsDocument> audioVideoMedia) {
         LocalDate ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(),
             DateTimeFormatter.ofPattern("yyyy-MM-dd"));

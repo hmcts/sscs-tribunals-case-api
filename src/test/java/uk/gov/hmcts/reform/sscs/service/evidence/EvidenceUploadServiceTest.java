@@ -307,6 +307,20 @@ public class EvidenceUploadServiceTest {
         assertEquals(0, draftDocuments.size());
     }
 
+    @Test
+    public void testBuildScannedDocumentByGivenSscsDoc() {
+        List<SscsDocument> audioVideoDocuments = new ArrayList<>();
+        audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("word1.docx").build()).build());
+        audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("audio2.mp3").build()).build());
+        audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("word2.docx").build()).build());
+
+        SscsDocument draftSscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentDateAdded("2021-01-30")
+                .documentLink(DocumentLink.builder().documentBinaryUrl("url/binary").documentFilename("coversheet").documentUrl("url").build()).build()).build();
+
+        List<ScannedDocument> scannedDocuments = evidenceUploadService.buildScannedDocumentByGivenSscsDoc(draftSscsDocument, audioVideoDocuments);
+        assertEquals(4, scannedDocuments.size());
+    }
+
     private SscsDocument getCombinedEvidenceDoc(String combinedEvidenceFilename, String otherEvidenceDocType) {
         DocumentLink documentLink = DocumentLink.builder().documentUrl("http://dm-store/112").build();
         SscsDocumentDetails sscsDocumentDetails = SscsDocumentDetails.builder()
