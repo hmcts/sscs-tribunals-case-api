@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadfurtherevidence;
 
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -90,12 +91,19 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({
-            "fileName,Please add a file name",
-            "documentType,Please select a document type",
-            "documentLink,Please upload a file"}
+            "fileName, Please add a file name",
+            "documentType, Please select a document type",
+            "documentLink, Please upload a file",
+            "documentUrl, Please upload a file",
+            "invalidFileType;docx, You need to upload PDF\\, MP3 or MP4 documents only",
+            "invalidFileType;xlsx, You need to upload PDF\\, MP3 or MP4 documents only",
+            "invalidFileType;txt, You need to upload PDF\\, MP3 or MP4 documents only",
+            "invalidFileType;doc, You need to upload PDF\\, MP3 or MP4 documents only",
+            "invalidFileType;mov, You need to upload PDF\\, MP3 or MP4 documents only"}
             )
     public void shouldCatchErrorInDraftFurtherEvidenceDocument(String nullField, String expectedErrorMessage) {
-        final List<DraftSscsDocument> draftDocs = getDraftSscsDocuments(nullField);
+        final List<DraftSscsDocument> draftDocs = getDraftSscsDocuments(
+                nullField, nullField.startsWith("invalidFileType") ? format("doc.%s", nullField.split(";")[1]) : "document.pdf");
         sscsCaseData.setDraftFurtherEvidenceDocuments(draftDocs);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -107,11 +115,12 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @NotNull
-    private List<DraftSscsDocument> getDraftSscsDocuments(String nullField) {
+    private List<DraftSscsDocument> getDraftSscsDocuments(String nullField, String fileName) {
         final DraftSscsDocument doc = DraftSscsDocument.builder().value(DraftSscsDocumentDetails.builder()
                 .documentFileName(nullField.contains("fileName") ? null : "File1.pdf")
                 .documentType(nullField.contains("documentType") ? null : "documentType")
-                .documentLink(nullField.contains("documentLink") ? null : DocumentLink.builder().documentUrl("documentUrl").build())
+                .documentLink(nullField.contains("documentLink") ? null : DocumentLink.builder().documentUrl(
+                        nullField.equals("documentUrl") ? null : "documentUrl").documentFilename(fileName).build())
                 .build()).build();
         return unmodifiableList(singletonList(doc));
     }
@@ -126,10 +135,13 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void shouldMoveOneDraftUploadsToSscsDocuments() {
-        sscsCaseData.setDraftFurtherEvidenceDocuments(getDraftSscsDocuments(""));
+    @Parameters({"pdf", "PDF", "mp3", "MP3", "mp4", "MP4"})
+    public void shouldMoveOneDraftUploadsToSscsDocuments(String fileType) {
+        sscsCaseData.setDraftFurtherEvidenceDocuments(getDraftSscsDocuments("", format("document.%s", fileType)));
         sscsCaseData.setSscsDocument(null);
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getData().getDraftFurtherEvidenceDocuments(), is(nullValue()));
         assertThat(response.getData().getSscsDocument().size(), is(1));
@@ -138,8 +150,8 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
     @Test
     public void shouldMoveTwoDraftUploadsToSscsDocumentsWhenOneSscsDocumentExists() {
         ArrayList<DraftSscsDocument> draftSscsDocuments = new ArrayList<>();
-        draftSscsDocuments.addAll(getDraftSscsDocuments(""));
-        draftSscsDocuments.addAll(getDraftSscsDocuments(""));
+        draftSscsDocuments.addAll(getDraftSscsDocuments("", "doc1.pdf"));
+        draftSscsDocuments.addAll(getDraftSscsDocuments("", "doc2.pdf"));
         sscsCaseData.setSscsDocument(unmodifiableList(singletonList(SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build())));
         sscsCaseData.setDraftFurtherEvidenceDocuments(unmodifiableList(draftSscsDocuments));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
