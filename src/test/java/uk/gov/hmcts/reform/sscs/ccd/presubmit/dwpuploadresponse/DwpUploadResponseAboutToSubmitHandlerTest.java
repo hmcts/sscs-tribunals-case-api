@@ -238,6 +238,12 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         ReflectionTestUtils.setField(dwpUploadResponseAboutToSubmitHandler, "dwpDocumentsBundleFeature", true);
 
+        List<DwpDocument> existingDwpDocuments = new ArrayList();
+
+        existingDwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DwpDocumentType.DWP_RESPONSE.getValue()).documentDateAdded(LocalDate.now().minusDays(1).toString()).documentLink(DocumentLink.builder().documentUrl("existing.com").build()).build()).build());
+        existingDwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue()).documentDateAdded(LocalDate.now().minusDays(1).toString()).documentLink(DocumentLink.builder().documentUrl("existing2.com").build()).build()).build());
+        callback.getCaseDetails().getCaseData().setDwpDocuments(existingDwpDocuments);
+
         callback.getCaseDetails().getCaseData().setDwpAT38Document(DwpResponseDocument.builder()
                 .documentLink(
                         DocumentLink.builder()
@@ -294,6 +300,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                 () -> assertNull(response.getData().getDwpEditedEvidenceBundleDocument()),
                 () -> assertNull(response.getData().getDwpResponseDocument()),
                 () -> assertNull(response.getData().getDwpEditedResponseDocument()),
+                () -> assertEquals(3, response.getData().getDwpDocuments().size()),
                 () -> assertEquals(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue(), response.getData().getDwpDocuments().get(0).getValue().getDocumentType()),
                 () -> assertEquals("http://dm-store:5005/documents/defg-5678-xyzabcmnop", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl()),
                 () -> assertEquals("http://dm-store:5005/documents/defg-5678-xyzabcmnop/binary", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentBinaryUrl()),

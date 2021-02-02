@@ -33,4 +33,10 @@ public class DwpDocumentService {
             sscsCaseData.sortCollections();
         }
     }
+
+    public void removeDwpDocumentTypeFromCollection(SscsCaseData sscsCaseData, DwpDocumentType docType) {
+        if (null != sscsCaseData.getDwpDocuments()) {
+            sscsCaseData.getDwpDocuments().removeIf(e -> docType.getValue().equals(e.getValue().getDocumentType()));
+        }
+    }
 }
