@@ -22,14 +22,14 @@
         <cve>CVE-2016-5394</cve>
         <cve>CVE-2016-6798</cve>
     </suppress>
-    <suppress until="2021-01-31">
+    <suppress until="2021-03-01">
         <notes><![CDATA[
          file name: kotlin-stdlib-common-1.4.0.jar
         ]]></notes>
         <gav regex="true">^org\.jetbrains\.kotlin:*:.*$</gav>
         <cve>CVE-2020-15824</cve>
     </suppress>
-    <suppress until="2021-02-01">
+    <suppress until="2021-03-01">
         <notes><![CDATA[
          file name: sscs-pdf-email-common-1.4.14.jar
          Jquery included from SpringCloud. We are on latest release awaiting patch (Hoxton SR8)
@@ -39,20 +39,5 @@
         <cve>CVE-2019-11358</cve>
         <cve>CVE-2020-11022</cve>
         <cve>CVE-2020-11023</cve>
-    </suppress>
-    <suppress until="2021-01-31">
-        <notes><![CDATA[
-         file name: tomcat-embed-core-9.0.39.jar/tomcat-embed-websocket-9.0.39.jar
-         Awaiting patch for Tomcat
-        ]]></notes>
-        <cve>CVE-2020-13943</cve>
-        <cve>CVE-2020-17527</cve>
-    </suppress>
-    <suppress until="2021-01-31">
-        <notes><![CDATA[
-         file name: groovy-2.5.13.jar
-         Awaiting patch from Groovy
-        ]]></notes>
-        <cve>CVE-2020-17521</cve>
     </suppress>
 </suppressions>

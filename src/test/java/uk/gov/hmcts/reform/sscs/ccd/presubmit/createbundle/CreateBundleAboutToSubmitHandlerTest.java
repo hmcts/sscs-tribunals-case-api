@@ -23,10 +23,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
 @RunWith(JUnitParamsRunner.class)
-public class CreateBundleAboutToStartHandlerTest {
+public class CreateBundleAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private CreateBundleAboutToStartHandler handler;
+    private CreateBundleAboutToSubmitHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -42,7 +42,8 @@ public class CreateBundleAboutToStartHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new CreateBundleAboutToStartHandler(serviceRequestExecutor, "bundleUrl.com", "bundleWelshConfig");
+        handler = new CreateBundleAboutToSubmitHandler(serviceRequestExecutor, "bundleUrl.com", "bundleWelshConfig",
+                "bundleUnEditedConfig", "bundleWelshUnEditedConfig");
 
         when(callback.getEvent()).thenReturn(EventType.CREATE_BUNDLE);
 

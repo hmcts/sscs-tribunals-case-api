@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
 @Service
 @Slf4j
-public class EditBundleAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class EditBundleAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private ServiceRequestExecutor serviceRequestExecutor;
     private String bundleUrl;
@@ -29,9 +29,9 @@ public class EditBundleAboutToStartHandler implements PreSubmitCallbackHandler<S
     private static String EDIT_BUNDLE_ENDPOINT = "/api/stitch-ccd-bundles";
 
     @Autowired
-    public EditBundleAboutToStartHandler(ServiceRequestExecutor serviceRequestExecutor,
-                                         @Value("${bundle.url}") String bundleUrl,
-                                         DocumentConfiguration documentConfiguration) {
+    public EditBundleAboutToSubmitHandler(ServiceRequestExecutor serviceRequestExecutor,
+                                          @Value("${bundle.url}") String bundleUrl,
+                                          DocumentConfiguration documentConfiguration) {
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bundleUrl = bundleUrl;
         this.documentConfiguration = documentConfiguration;
@@ -56,17 +56,18 @@ public class EditBundleAboutToStartHandler implements PreSubmitCallbackHandler<S
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         final String template = documentConfiguration.getCover().get(sscsCaseData.getLanguagePreference());
 
-        log.info("EditBundleAboutToStartHandler getLanguagePreference  {}",sscsCaseData.getLanguagePreference());
-        log.info("EditBundleAboutToStartHandler Coversheet Template {}",template);
+        log.info("EditBundleAboutToStartHandler getLanguagePreference  {}", sscsCaseData.getLanguagePreference());
+        log.info("EditBundleAboutToStartHandler Coversheet Template {}", template);
 
         if (sscsCaseData.getCaseBundles() != null) {
             boolean eligibleForStitching = false;
             for (Bundle bundle : sscsCaseData.getCaseBundles()) {
                 if ("Yes".equals(bundle.getValue().getEligibleForStitching())) {
 
-                    final String bundleName = sscsCaseData.getCcdCaseId() + "-SscsBundle";
+                    final String bundleName = null != bundle.getValue().getStitchedDocument()
+                            ? bundle.getValue().getStitchedDocument().getDocumentFilename() : sscsCaseData.getCcdCaseId() + "-SscsBundle";
 
-                    log.info("EditBundleAboutToStartHandler Bundle File Name {}",bundleName);
+                    log.info("EditBundleAboutToStartHandler Bundle File Name {}", bundleName);
 
                     eligibleForStitching = true;
                     bundle.getValue().setFileName(bundleName);
@@ -78,19 +79,23 @@ public class EditBundleAboutToStartHandler implements PreSubmitCallbackHandler<S
                 }
             }
 
-            if (!eligibleForStitching && !callback.isIgnoreWarnings()) {
+            return processRequest(eligibleForStitching, callback, sscsCaseData);
 
-                PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-                preSubmitCallbackResponse.addWarning("No bundle selected to be amended. The stitched PDF will not be updated. Are you sure you want to continue?");
-
-                return preSubmitCallbackResponse;
-            } else {
-                return serviceRequestExecutor.post(callback, bundleUrl + EDIT_BUNDLE_ENDPOINT);
-            }
         } else {
             return null;
-        }
 
+        }
     }
 
+    public PreSubmitCallbackResponse<SscsCaseData> processRequest(boolean eligibleForStitching, Callback<SscsCaseData> callback, SscsCaseData sscsCaseData) {
+        if (!eligibleForStitching && !callback.isIgnoreWarnings()) {
+
+            PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+            preSubmitCallbackResponse.addWarning("No bundle selected to be amended. The stitched PDF will not be updated. Are you sure you want to continue?");
+
+            return preSubmitCallbackResponse;
+        } else {
+            return serviceRequestExecutor.post(callback, bundleUrl + EDIT_BUNDLE_ENDPOINT);
+        }
+    }
 }

@@ -19,6 +19,7 @@ public enum SerializeJsonMessageManager {
     APPEAL_CREATED_WITH_CREATEDINGAPSFROM_FIELD_CCD_RESPONSE("tya/appealCreatedWithCreatedInGapsFromFieldCcdResponse.json"),
     DWP_RESPOND("tya/dwpRespond.json"),
     DWP_RESPOND_MYA("tya/dwpRespondMya.json"),
+    DWP_RESPOND_MYA_FOR_PAPER_HEARING_TYPE("tya/dwpRespondMyaForPaperHearingType.json"),
     DWP_RESPOND_CCD("tya/dwpRespondCcd.json"),
     DWP_RESPOND_PAPER_CASE_OLDER_THAN_8_WEEKS("tya/dwpRespondPaperCaseOlderThan8Weeks.json"),
     DWP_RESPOND_PAPER_CASE_OLDER_THAN_8_WEEKS_CCD("tya/dwpRespondPaperCaseOlderThan8WeeksCcd.json"),

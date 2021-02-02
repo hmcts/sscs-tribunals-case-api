@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.*;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,22 +19,28 @@ import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
 @Service
 @Slf4j
-public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private ServiceRequestExecutor serviceRequestExecutor;
 
     private String bundleUrl;
     private String bundleWelshConfig;
+    private String bundleUnEditedConfig;
+    private String bundleWelshUnEditedConfig;
 
     private static String CREATE_BUNDLE_ENDPOINT = "/api/new-bundle";
 
     @Autowired
-    public CreateBundleAboutToStartHandler(ServiceRequestExecutor serviceRequestExecutor,
+    public CreateBundleAboutToSubmitHandler(ServiceRequestExecutor serviceRequestExecutor,
                                            @Value("${bundle.url}") String bundleUrl,
-                                           @Value("${bundle.welsh.config}") String bundleWelshConfig) {
+                                           @Value("${bundle.welsh.config}") String bundleWelshConfig,
+                                           @Value("${bundle.unedited.config}") String bundleUnEditedConfig,
+                                           @Value("${bundle.welsh.unedited.config}") String bundleWelshUnEditedConfig) {
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bundleUrl = bundleUrl;
         this.bundleWelshConfig = bundleWelshConfig;
+        this.bundleUnEditedConfig = bundleUnEditedConfig;
+        this.bundleWelshUnEditedConfig = bundleWelshUnEditedConfig;
     }
 
     @Override
@@ -57,8 +62,8 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         if (checkMandatoryFilesMissing(sscsCaseData)) {
-            PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(
-                callback.getCaseDetails().getCaseData());
+            PreSubmitCallbackResponse<SscsCaseData> response;
+            response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
             response.addError("The bundle cannot be created as mandatory DWP documents are missing");
             return response;
         } else {
@@ -70,6 +75,7 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
             if (sscsCaseData.getDwpEvidenceBundleDocument() != null && sscsCaseData.getDwpEvidenceBundleDocument().getDocumentFileName() == null) {
                 sscsCaseData.getDwpEvidenceBundleDocument().setDocumentFileName(DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX);
             }
+
             if (sscsCaseData.getSscsDocument() != null) {
                 for (SscsDocument sscsDocument : sscsCaseData.getSscsDocument()) {
                     if (sscsDocument.getValue() != null && sscsDocument.getValue().getDocumentFileName() == null) {
@@ -77,10 +83,20 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
                     }
                 }
             }
+
             if (sscsCaseData.isLanguagePreferenceWelsh()) {
-                sscsCaseData.setBundleConfiguration(bundleWelshConfig);
+                if (sscsCaseData.getDwpEditedResponseDocument() != null && sscsCaseData.getDwpEditedEvidenceBundleDocument() != null) {
+                    sscsCaseData.setBundleConfiguration(bundleWelshUnEditedConfig);
+                } else {
+                    sscsCaseData.setBundleConfiguration(bundleWelshConfig);
+                }
                 log.info("Setting the bundleConfiguration on the case: " + bundleWelshConfig);
             }
+
+            if (sscsCaseData.getDwpEditedResponseDocument() != null && sscsCaseData.getDwpEditedEvidenceBundleDocument() != null) {
+                sscsCaseData.setBundleConfiguration(bundleUnEditedConfig);
+            }
+
             return serviceRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
         }
     }

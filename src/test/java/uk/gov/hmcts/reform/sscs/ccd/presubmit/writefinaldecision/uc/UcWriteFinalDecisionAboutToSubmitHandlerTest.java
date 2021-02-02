@@ -66,7 +66,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
     public void givenSchedule8Paragraph4FieldIsPopulatedWithYesAndPointsAreTooHigh_thenOnlyDisplayAnErrorIfSchedule7ActivitiesNotPopulated(Boolean schedule7Activities, Boolean schedule9Paragraph4) {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -138,7 +138,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
     public void givenSchedule8Paragraph4FieldIsPopulatedWithNoAndPointsAreTooHigh_thenOnlyDisplayAnErrorIfSchedule7ActivitiesNotPopulated(Boolean schedule7Activities, Boolean schedule9Paragraph4) {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
 
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -214,7 +214,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
@@ -246,7 +246,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         if (schedule7Activities != null) {
             sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(schedule7Activities.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>());
@@ -272,7 +272,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         if (schedule7Activities != null) {
             sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(schedule7Activities.booleanValue() ? "Yes" : "No");
@@ -316,7 +316,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -340,7 +340,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
     public void givenSchedule8Paragraph4FieldIsPopulatedWithYesAndPointsAreCorrectForSchedule8Paragraph4AndActivitiesSelectedAndSchedule9Paragraph4SetToNo_thenDoNotDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
@@ -368,7 +368,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
     public void givenSchedule8Paragraph4FieldIsPopulatedWithYesAndPointsAreCorrectForSchedule8Paragraph4AndActivitiesSelectedAndSchedule9Paragraph4SetToYes_thenDoDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
@@ -396,7 +396,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -422,7 +422,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -448,7 +448,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(new ArrayList<>());
@@ -473,7 +473,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
@@ -495,7 +495,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
     public void givenSchedule8Paragraph4FieldIsNotPopulatedAndPointsAreCorrectForSchedule8Paragraph4AndActivitiesSelectedAndSchedule9Paragraph4SetToNo_thenDoNotDisplayAnErrorButResetSchedule9Paragraph4OnSubmit() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
@@ -521,7 +521,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
     public void givenSchedule8Paragraph4FieldIsNotPopulatedAndPointsAreCorrectForSchedule8Paragraph4AndActivitiesSelectedAndSchedule9Paragraph4SetToYes_thenDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
@@ -548,7 +548,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -576,7 +576,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -601,7 +601,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(new ArrayList<>());
@@ -631,7 +631,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(
             Arrays.asList("mobilisingUnaided"));
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("no".equalsIgnoreCase(descriptorFlowValue) ? NO : YES);
+        sscsCaseData.setWcaAppeal("no".equalsIgnoreCase(descriptorFlowValue) ? NO : YES);
         if ("Yes".equalsIgnoreCase(descriptorFlowValue)) {
             sscsCaseData.setSupportGroupOnlyAppeal("No");
         }
@@ -646,7 +646,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         List<SscsDocument> docs = new ArrayList<>();
         docs.add(doc);
         callback.getCaseDetails().getCaseData().setSscsDocument(docs);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
         // Why do we not need to set valid scenario ?
@@ -666,7 +666,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -689,7 +689,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -717,7 +717,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -743,7 +743,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -770,7 +770,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -802,7 +802,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -835,7 +835,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -861,7 +861,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -892,7 +892,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -926,7 +926,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
 
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -953,7 +953,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -982,7 +982,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -1011,7 +1011,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided"));
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1037,7 +1037,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided"));
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -1067,7 +1067,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList(""));
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");

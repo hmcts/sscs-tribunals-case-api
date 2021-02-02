@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.deathofappellant;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.APPOINTEE_DETAILS_NEEDED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome.GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 
 import java.util.Optional;
@@ -61,29 +62,37 @@ public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHa
             preSubmitCallbackResponse.getData().getSubscriptions().getAppellantSubscription().setWantSmsNotifications("No");
         }
 
-        CaseDetails<SscsCaseData> caseDetailsBefore = null;
 
         Optional<CaseDetails<SscsCaseData>> beforeOptional = callback.getCaseDetailsBefore();
+        CaseDetails<SscsCaseData> caseDataAfter = callback.getCaseDetails();
+        CaseDetails<SscsCaseData> caseDataBefore = null;
 
         if (beforeOptional.isPresent()) {
-            caseDetailsBefore = beforeOptional.get();
+            caseDataBefore = beforeOptional.get();
         }
 
         Appointee appointeeBefore = null;
 
-        if (caseDetailsBefore != null && caseDetailsBefore.getCaseData().getAppeal().getAppellant().getAppointee() != null) {
-            appointeeBefore = caseDetailsBefore.getCaseData().getAppeal().getAppellant().getAppointee();
+        if (caseDataBefore != null && caseDataBefore.getCaseData().getAppeal().getAppellant().getAppointee() != null) {
+            appointeeBefore = caseDataBefore.getCaseData().getAppeal().getAppellant().getAppointee();
         }
 
-        Appointee appointeeAfter = callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAppointee();
+        Appointee appointeeAfter = caseDataAfter.getCaseData().getAppeal().getAppellant().getAppointee();
 
         if (shouldSetInterlocReviewState(appointeeBefore, appointeeAfter)) {
             preSubmitCallbackResponse.getData().setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
         }
 
-        if ((appointeeBefore == null || "no".equalsIgnoreCase(caseDetailsBefore.getCaseData().getAppeal().getAppellant().getIsAppointee()) || null == caseDetailsBefore.getCaseData().getAppeal().getAppellant().getIsAppointee())
-                && appointeeAfter == null || "no".equalsIgnoreCase(callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getIsAppointee()) || null == callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getIsAppointee()) {
+        if ((appointeeBefore == null || "no".equalsIgnoreCase(caseDataBefore.getCaseData().getAppeal().getAppellant().getIsAppointee()) || null == caseDataBefore.getCaseData().getAppeal().getAppellant().getIsAppointee())
+                && appointeeAfter == null || "no".equalsIgnoreCase(caseDataAfter.getCaseData().getAppeal().getAppellant().getIsAppointee()) || null == caseDataAfter.getCaseData().getAppeal().getAppellant().getIsAppointee()) {
             preSubmitCallbackResponse.getData().setDwpState(APPOINTEE_DETAILS_NEEDED.getId());
+        }
+
+        preSubmitCallbackResponse.getData().setConfidentialityRequestOutcomeAppellant(null);
+        preSubmitCallbackResponse.getData().setIsAppellantDeceased(YesNo.YES);
+
+        if (!shouldKeepConfidentialCaseFlag(caseDataAfter)) {
+            preSubmitCallbackResponse.getData().setIsConfidentialCase(null);
         }
 
         return preSubmitCallbackResponse;
@@ -92,6 +101,13 @@ public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHa
     private boolean shouldSetInterlocReviewState(Appointee appointeeBefore, Appointee appointeeAfter) {
 
         return !(null != appointeeBefore && null != appointeeAfter && appointeeBefore.equals(appointeeAfter));
+    }
+
+    private boolean shouldKeepConfidentialCaseFlag(CaseDetails<SscsCaseData> caseData) {
+
+        return null != caseData.getCaseData().getConfidentialityRequestOutcomeJointParty()
+            && null != caseData.getCaseData().getConfidentialityRequestOutcomeJointParty().getRequestOutcome()
+            && GRANTED.equals(caseData.getCaseData().getConfidentialityRequestOutcomeJointParty().getRequestOutcome());
     }
 
 }

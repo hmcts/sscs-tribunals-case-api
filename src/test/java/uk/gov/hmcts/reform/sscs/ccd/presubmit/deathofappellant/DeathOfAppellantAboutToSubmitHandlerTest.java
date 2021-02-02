@@ -209,6 +209,51 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
         assertTrue(response.getErrors().isEmpty());
     }
 
+    @Test
+    public void givenADeathOfAppellantWithNoJointPartyOnCase_thenClearConfidentialFlags() {
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YesNo.YES);
+        callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeAppellant(
+                DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(RequestOutcome.GRANTED).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getIsConfidentialCase());
+        assertEquals(YesNo.YES, response.getData().getIsAppellantDeceased());
+        assertNull(response.getData().getConfidentialityRequestOutcomeAppellant());
+    }
+
+    @Test
+    public void givenADeathOfAppellantWithJointPartyConfidentialRequestNotGranted_thenClearConfidentialFlagsForAppellant() {
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YesNo.YES);
+        callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeAppellant(
+                DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(RequestOutcome.GRANTED).build());
+        callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeJointParty(
+                DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(RequestOutcome.IN_PROGRESS).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getIsConfidentialCase());
+        assertEquals(YesNo.YES, response.getData().getIsAppellantDeceased());
+        assertNull(response.getData().getConfidentialityRequestOutcomeAppellant());
+        assertEquals(RequestOutcome.IN_PROGRESS, response.getData().getConfidentialityRequestOutcomeJointParty().getRequestOutcome());
+    }
+
+    @Test
+    public void givenADeathOfAppellantWithJointPartyOnCaseAndConfidentialRequestGranted_thenClearConfidentialFlagForAppellantAndDoNotClearConfidentialFlagOnCase() {
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YesNo.YES);
+        callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeAppellant(
+                DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(RequestOutcome.GRANTED).build());
+        callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeJointParty(
+                DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(RequestOutcome.GRANTED).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(YesNo.YES, response.getData().getIsConfidentialCase());
+        assertEquals(YesNo.YES, response.getData().getIsAppellantDeceased());
+        assertNull(response.getData().getConfidentialityRequestOutcomeAppellant());
+        assertEquals(RequestOutcome.GRANTED, response.getData().getConfidentialityRequestOutcomeJointParty().getRequestOutcome());
+    }
+
     @Test(expected = IllegalStateException.class)
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
