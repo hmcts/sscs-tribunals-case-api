@@ -299,14 +299,16 @@ public class EvidenceUploadService {
         sscsCaseData.setSscsDocument(sscsDocument);
     }
 
-    private List<SscsDocument> removeAudioVideoFilesFromDraft(List<SscsDocument> sscsDocuments) {
+    protected List<SscsDocument> removeAudioVideoFilesFromDraft(List<SscsDocument> sscsDocuments) {
         List<SscsDocument> audioVideoFiles = new ArrayList<>();
-        for (SscsDocument document: sscsDocuments) {
+
+        Iterator<SscsDocument> iterator = sscsDocuments.iterator();
+        while (iterator.hasNext()) {
+            SscsDocument document = iterator.next();
             String filename = document.getValue().getDocumentFileName().toLowerCase();
             if (filename != null && (filename.endsWith("mp3") || filename.endsWith("mp4"))) {
-                //need to test this works and doesn't skip over documents
                 audioVideoFiles.add(document);
-                sscsDocuments.remove(document);
+                iterator.remove();
             }
         }
         return audioVideoFiles;

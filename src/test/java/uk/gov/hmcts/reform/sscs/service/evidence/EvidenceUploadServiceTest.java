@@ -4,8 +4,7 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.AdditionalMatchers.and;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -261,6 +260,30 @@ public class EvidenceUploadServiceTest {
         });
         assertTrue(exception.getMessage().contains("Error when getting PDDocument " + docType
                 + " for caseId " + caseId + " with bytes length " + badBytes.length));
+    }
+
+    @Test
+    public void testRemoveAudioFromList() {
+        List<SscsDocument> draftDocuments = new ArrayList<>();
+        draftDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("audio1.mp3").build()).build());
+        draftDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("audio2.mp3").build()).build());
+        draftDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("word1.docx").build()).build());
+
+        assertEquals(2, evidenceUploadService.removeAudioVideoFilesFromDraft(draftDocuments).size());
+        assertEquals(1, draftDocuments.size());
+    }
+
+    @Test
+    public void testRemoveAudioVideoFromList() {
+        List<SscsDocument> draftDocuments = new ArrayList<>();
+        draftDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("word1.docx").build()).build());
+        draftDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("audio1.mp3").build()).build());
+        draftDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("audio2.mp3").build()).build());
+        draftDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("word2.docx").build()).build());
+        draftDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("video1.mp4").build()).build());
+
+        assertEquals(3, evidenceUploadService.removeAudioVideoFilesFromDraft(draftDocuments).size());
+        assertEquals(2, draftDocuments.size());
     }
 
     private SscsDocument getCombinedEvidenceDoc(String combinedEvidenceFilename, String otherEvidenceDocType) {
