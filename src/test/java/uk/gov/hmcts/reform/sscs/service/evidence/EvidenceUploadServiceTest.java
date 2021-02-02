@@ -297,6 +297,16 @@ public class EvidenceUploadServiceTest {
         assertEquals(2, draftDocuments.size());
     }
 
+    @Test
+    public void testNoAudioInList() {
+        List<SscsDocument> draftDocuments = new ArrayList<>();
+        draftDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("text.txt").build()).build());
+        draftDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("word1.docx").build()).build());
+
+        assertEquals(2, evidenceUploadService.removeAudioVideoFilesFromDraft(draftDocuments).size());
+        assertEquals(0, draftDocuments.size());
+    }
+
     private SscsDocument getCombinedEvidenceDoc(String combinedEvidenceFilename, String otherEvidenceDocType) {
         DocumentLink documentLink = DocumentLink.builder().documentUrl("http://dm-store/112").build();
         SscsDocumentDetails sscsDocumentDetails = SscsDocumentDetails.builder()
