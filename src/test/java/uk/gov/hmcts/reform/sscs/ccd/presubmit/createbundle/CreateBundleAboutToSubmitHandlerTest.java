@@ -20,6 +20,7 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
 @RunWith(JUnitParamsRunner.class)
@@ -39,11 +40,15 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
+    private DwpDocumentService dwpDocumentService;
+
+
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new CreateBundleAboutToSubmitHandler(serviceRequestExecutor, "bundleUrl.com", "bundleWelshConfig",
-                "bundleUnEditedConfig", "bundleWelshUnEditedConfig");
+        dwpDocumentService = new DwpDocumentService();
+        handler = new CreateBundleAboutToSubmitHandler(serviceRequestExecutor, dwpDocumentService,"bundleUrl.com", "bundleEnglishConfig", "bundleWelshConfig",
+                "bundleUnEditedConfig", "bundleWelshUnEditedConfig", false);
 
         when(callback.getEvent()).thenReturn(EventType.CREATE_BUNDLE);
 
