@@ -28,22 +28,18 @@ public class CreateEditedBundleAboutToSubmitHandler implements PreSubmitCallback
     private String bundleEditedConfig;
     private String bundleWelshEditedConfig;
 
-    private boolean dwpDocumentsBundleFeature;
-
     private static String CREATE_BUNDLE_ENDPOINT = "/api/new-bundle";
 
     @Autowired
     public CreateEditedBundleAboutToSubmitHandler(ServiceRequestExecutor serviceRequestExecutor,
                                                   @Value("${bundle.url}") String bundleUrl,
                                                   @Value("${bundle.edited.config}") String bundleEditedConfig,
-                                                  @Value("${bundle.welsh.edited.config}") String bundleWelshEditedConfig,
-                                                  @Value("${feature.dwp-documents-bundle.enabled}") boolean dwpDocumentsBundleFeature) {
+                                                  @Value("${bundle.welsh.edited.config}") String bundleWelshEditedConfig) {
 
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bundleUrl = bundleUrl;
         this.bundleEditedConfig = bundleEditedConfig;
         this.bundleWelshEditedConfig = bundleWelshEditedConfig;
-        this.dwpDocumentsBundleFeature = dwpDocumentsBundleFeature;
     }
 
     @Override
@@ -67,8 +63,7 @@ public class CreateEditedBundleAboutToSubmitHandler implements PreSubmitCallback
         PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(
                 callback.getCaseDetails().getCaseData());
 
-        if ((!dwpDocumentsBundleFeature && checkMandatoryFilesMissingOld(sscsCaseData))
-                || (dwpDocumentsBundleFeature && checkMandatoryFilesMissing(sscsCaseData))) {
+        if ((checkMandatoryFilesMissing(sscsCaseData))) {
             errorResponse.addError("The edited bundle cannot be created as mandatory edited DWP documents are missing");
         }
         if (checkPhmeStatusIsNotGranted(sscsCaseData)) {
@@ -105,14 +100,6 @@ public class CreateEditedBundleAboutToSubmitHandler implements PreSubmitCallback
                 || sscsCaseData.getPhmeGranted() == null || sscsCaseData.getPhmeGranted().getValue().equals("No");
     }
 
-    //FIXME: Remove after dwpDocumentsBundleFeature switched on
-    private boolean checkMandatoryFilesMissingOld(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getDwpEditedResponseDocument() == null
-            || sscsCaseData.getDwpEditedResponseDocument().getDocumentLink() == null
-            || sscsCaseData.getDwpEditedEvidenceBundleDocument() == null
-            || sscsCaseData.getDwpEditedEvidenceBundleDocument().getDocumentLink() == null;
-    }
-
     private boolean checkMandatoryFilesMissing(SscsCaseData sscsCaseData) {
         if (null != sscsCaseData.getDwpDocuments()) {
 
@@ -126,6 +113,7 @@ public class CreateEditedBundleAboutToSubmitHandler implements PreSubmitCallback
             if (dwpEditedEvidenceBundleDocs.size() == 0 || dwpEditedEvidenceBundleDocs.stream().filter(e -> null == e.getValue().getDocumentLink()).count() > 0) {
                 return true;
             }
+            return false;
         }
         return true;
     }
