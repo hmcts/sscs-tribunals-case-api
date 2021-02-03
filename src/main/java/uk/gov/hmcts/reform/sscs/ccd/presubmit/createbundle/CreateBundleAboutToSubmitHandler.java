@@ -91,9 +91,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
                     sscsCaseData.setBundleConfiguration(bundleWelshConfig);
                 }
                 log.info("Setting the bundleConfiguration on the case: " + bundleWelshConfig);
-            }
-
-            if (sscsCaseData.getDwpEditedResponseDocument() != null && sscsCaseData.getDwpEditedEvidenceBundleDocument() != null) {
+            } else if (sscsCaseData.getDwpEditedResponseDocument() != null && sscsCaseData.getDwpEditedEvidenceBundleDocument() != null) {
                 sscsCaseData.setBundleConfiguration(bundleUnEditedConfig);
             }
 
