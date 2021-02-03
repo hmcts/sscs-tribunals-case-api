@@ -34,7 +34,23 @@ public class DwpDocumentService {
         }
     }
 
-    public void removeDwpDocumentTypeFromCollection(SscsCaseData sscsCaseData, DwpDocumentType docType) {
+    public void moveDwpResponseDocumentToDwpDocumentCollection(SscsCaseData sscsCaseData) {
+        removeDwpDocumentTypeFromCollection(sscsCaseData, DwpDocumentType.DWP_RESPONSE);
+        DocumentLink editedResponseDocumentLink = sscsCaseData.getDwpEditedResponseDocument() != null ? sscsCaseData.getDwpEditedResponseDocument().getDocumentLink() : null;
+        addToDwpDocumentsWithEditedDoc(sscsCaseData, sscsCaseData.getDwpResponseDocument(), DwpDocumentType.DWP_RESPONSE, editedResponseDocumentLink);
+        sscsCaseData.setDwpResponseDocument(null);
+        sscsCaseData.setDwpEditedResponseDocument(null);
+    }
+
+    public void moveDwpEvidenceBundleToDwpDocumentCollection(SscsCaseData sscsCaseData) {
+        removeDwpDocumentTypeFromCollection(sscsCaseData, DwpDocumentType.DWP_EVIDENCE_BUNDLE);
+        DocumentLink editedEvidenceBundleDocumentLink = sscsCaseData.getDwpEditedEvidenceBundleDocument() != null ? sscsCaseData.getDwpEditedEvidenceBundleDocument().getDocumentLink() : null;
+        addToDwpDocumentsWithEditedDoc(sscsCaseData, sscsCaseData.getDwpEvidenceBundleDocument(), DwpDocumentType.DWP_EVIDENCE_BUNDLE, editedEvidenceBundleDocumentLink);
+        sscsCaseData.setDwpEvidenceBundleDocument(null);
+        sscsCaseData.setDwpEditedEvidenceBundleDocument(null);
+    }
+
+    protected void removeDwpDocumentTypeFromCollection(SscsCaseData sscsCaseData, DwpDocumentType docType) {
         if (null != sscsCaseData.getDwpDocuments()) {
             sscsCaseData.getDwpDocuments().removeIf(e -> docType.getValue().equals(e.getValue().getDocumentType()));
         }

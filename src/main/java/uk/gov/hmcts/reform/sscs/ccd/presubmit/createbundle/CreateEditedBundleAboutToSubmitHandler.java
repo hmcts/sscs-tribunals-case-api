@@ -1,14 +1,17 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.*;
 
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -17,7 +20,7 @@ import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
 @Service
 @Slf4j
-public class CreateEditedBundleAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class CreateEditedBundleAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private ServiceRequestExecutor serviceRequestExecutor;
 
@@ -25,17 +28,22 @@ public class CreateEditedBundleAboutToStartHandler implements PreSubmitCallbackH
     private String bundleEditedConfig;
     private String bundleWelshEditedConfig;
 
+    private boolean dwpDocumentsBundleFeature;
+
     private static String CREATE_BUNDLE_ENDPOINT = "/api/new-bundle";
 
     @Autowired
-    public CreateEditedBundleAboutToStartHandler(ServiceRequestExecutor serviceRequestExecutor,
-                                                 @Value("${bundle.url}") String bundleUrl,
-                                                 @Value("${bundle.edited.config}") String bundleEditedConfig,
-                                                 @Value("${bundle.welsh.edited.config}") String bundleWelshEditedConfig) {
+    public CreateEditedBundleAboutToSubmitHandler(ServiceRequestExecutor serviceRequestExecutor,
+                                                  @Value("${bundle.url}") String bundleUrl,
+                                                  @Value("${bundle.edited.config}") String bundleEditedConfig,
+                                                  @Value("${bundle.welsh.edited.config}") String bundleWelshEditedConfig,
+                                                  @Value("${feature.dwp-documents-bundle.enabled}") boolean dwpDocumentsBundleFeature) {
+
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bundleUrl = bundleUrl;
         this.bundleEditedConfig = bundleEditedConfig;
         this.bundleWelshEditedConfig = bundleWelshEditedConfig;
+        this.dwpDocumentsBundleFeature = dwpDocumentsBundleFeature;
     }
 
     @Override
@@ -59,30 +67,17 @@ public class CreateEditedBundleAboutToStartHandler implements PreSubmitCallbackH
         PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(
                 callback.getCaseDetails().getCaseData());
 
-        boolean mandatoryFilesMissing = false;
-        boolean phmeStatusIsNotGranted = false;
-
-        if (checkMandatoryFilesMissing(sscsCaseData)) {
-            mandatoryFilesMissing = true;
+        if ((!dwpDocumentsBundleFeature && checkMandatoryFilesMissingOld(sscsCaseData))
+                || (dwpDocumentsBundleFeature && checkMandatoryFilesMissing(sscsCaseData))) {
             errorResponse.addError("The edited bundle cannot be created as mandatory edited DWP documents are missing");
-        } else if (checkPhmeStatusIsNotGranted(sscsCaseData)) {
-            phmeStatusIsNotGranted = true;
+        }
+        if (checkPhmeStatusIsNotGranted(sscsCaseData)) {
             errorResponse.addError("The edited bundle cannot be created as PHME status has not been granted");
         }
 
-        log.info("mandatoryFilesMissing" + mandatoryFilesMissing);
-        log.info("phmeStatusIsNotGranted" + phmeStatusIsNotGranted);
-
-        if (mandatoryFilesMissing || phmeStatusIsNotGranted) {
+        if (errorResponse.getErrors() != null && errorResponse.getErrors().size() > 0) {
             return errorResponse;
         } else {
-            if (sscsCaseData.getDwpEditedResponseDocument() != null && sscsCaseData.getDwpEditedResponseDocument().getDocumentFileName() == null) {
-                sscsCaseData.getDwpEditedResponseDocument().setDocumentFileName(DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX);
-            }
-
-            if (sscsCaseData.getDwpEditedEvidenceBundleDocument() != null && sscsCaseData.getDwpEditedEvidenceBundleDocument().getDocumentFileName() == null) {
-                sscsCaseData.getDwpEditedEvidenceBundleDocument().setDocumentFileName(DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX);
-            }
 
             if (sscsCaseData.getSscsDocument() != null) {
                 for (SscsDocument sscsDocument : sscsCaseData.getSscsDocument()) {
@@ -94,32 +89,44 @@ public class CreateEditedBundleAboutToStartHandler implements PreSubmitCallbackH
 
             if (sscsCaseData.isLanguagePreferenceWelsh()) {
                 sscsCaseData.setBundleConfiguration(bundleWelshEditedConfig);
-                log.info("Setting the editedBundleConfiguration {} on the case: {}",
-                        bundleWelshEditedConfig, sscsCaseData.getCcdCaseId());
             } else {
                 sscsCaseData.setBundleConfiguration(bundleEditedConfig);
             }
+
+            log.info("Setting the edited bundleConfiguration on the case {} for case id {}", sscsCaseData.getBundleConfiguration(), callback.getCaseDetails().getId());
 
             return serviceRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
         }
     }
 
     protected boolean checkPhmeStatusIsNotGranted(SscsCaseData sscsCaseData) {
-        log.info("sscsCaseData.getPhmeGranted()" + sscsCaseData.getPhmeGranted());
-        if (sscsCaseData.getDwpEditedEvidenceReason() != null) {
-            log.info("sscsCaseData.getPhmeGranted().getValue()" + sscsCaseData.getDwpEditedEvidenceReason());
-        } else {
-            log.info("null");
-        }
 
         return sscsCaseData.getDwpEditedEvidenceReason() == null || !sscsCaseData.getDwpEditedEvidenceReason().equals("phme")
                 || sscsCaseData.getPhmeGranted() == null || sscsCaseData.getPhmeGranted().getValue().equals("No");
     }
 
-    private boolean checkMandatoryFilesMissing(SscsCaseData sscsCaseData) {
+    //FIXME: Remove after dwpDocumentsBundleFeature switched on
+    private boolean checkMandatoryFilesMissingOld(SscsCaseData sscsCaseData) {
         return sscsCaseData.getDwpEditedResponseDocument() == null
             || sscsCaseData.getDwpEditedResponseDocument().getDocumentLink() == null
             || sscsCaseData.getDwpEditedEvidenceBundleDocument() == null
             || sscsCaseData.getDwpEditedEvidenceBundleDocument().getDocumentLink() == null;
+    }
+
+    private boolean checkMandatoryFilesMissing(SscsCaseData sscsCaseData) {
+        if (null != sscsCaseData.getDwpDocuments()) {
+
+            List<DwpDocument> dwpEditedResponseDocs = sscsCaseData.getDwpDocuments().stream().filter(e -> DwpDocumentType.DWP_RESPONSE.getValue().equals(e.getValue().getDocumentType()) && null != e.getValue().getEditedDocumentLink()).collect(toList());
+            List<DwpDocument> dwpEditedEvidenceBundleDocs = sscsCaseData.getDwpDocuments().stream().filter(e -> DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue().equals(e.getValue().getDocumentType()) && null != e.getValue().getEditedDocumentLink()).collect(toList());
+
+            if (dwpEditedResponseDocs.size() == 0 || dwpEditedResponseDocs.stream().filter(e -> null == e.getValue().getDocumentLink()).count() > 0) {
+                return true;
+            }
+
+            if (dwpEditedEvidenceBundleDocs.size() == 0 || dwpEditedEvidenceBundleDocs.stream().filter(e -> null == e.getValue().getDocumentLink()).count() > 0) {
+                return true;
+            }
+        }
+        return true;
     }
 }
