@@ -6,6 +6,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_EVIDENCE_BUNDLE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_RESPONSE;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.*;
 
 import java.util.ArrayList;
@@ -43,7 +45,7 @@ public class CreateEditedBundleAboutToSubmitHandlerTest {
     public void setUp() {
         openMocks(this);
         handler = new CreateEditedBundleAboutToSubmitHandler(serviceRequestExecutor, "bundleUrl.com",
-                "bundleEditedConfig", "bundleWelshEditedConfig", false);
+                "bundleEditedConfig", "bundleWelshEditedConfig");
 
         when(callback.getEvent()).thenReturn(EventType.CREATE_EDITED_BUNDLE);
 
@@ -70,29 +72,15 @@ public class CreateEditedBundleAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenDwpEditedResponseDocumentHasEmptyFileName_thenPopulateFileName() {
-        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument((DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()));
-        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().build()).build());
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX, response.getData().getDwpEditedResponseDocument().getDocumentFileName());
-    }
-
-    @Test
-    public void givenDwpEditedEvidenceDocumentHasEmptyFileName_thenPopulateFileName() {
-        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().build()).build());
-        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX, response.getData().getDwpEditedEvidenceBundleDocument().getDocumentFileName());
-    }
-
-    @Test
     @Parameters({"Yes, bundleWelshEditedConfig", " No, bundleEditedConfig"})
     public void givenWelsh_thenPopulateWelshConfigFileName(String languagePreference, String configFile) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        caseData.setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().build()).build());
-        caseData.setDwpEditedResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
+        caseData.setDwpDocuments(dwpDocuments);
+
         caseData.setLanguagePreferenceWelsh(languagePreference);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -112,8 +100,11 @@ public class CreateEditedBundleAboutToSubmitHandlerTest {
         docs.add(sscsDocument);
 
         callback.getCaseDetails().getCaseData().setSscsDocument(docs);
-        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
-        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -122,8 +113,10 @@ public class CreateEditedBundleAboutToSubmitHandlerTest {
 
     @Test
     public void givenCreateBundleEvent_thenTriggerTheExternalCreateBundleEvent() {
-        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
-        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -133,8 +126,10 @@ public class CreateEditedBundleAboutToSubmitHandlerTest {
     @Test
     public void givenEmptyDwpEditedEvidenceBundleDocumentLink_thenReturnError() {
 
-        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder().build());
-        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).build()).build());
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -147,8 +142,10 @@ public class CreateEditedBundleAboutToSubmitHandlerTest {
     @Test
     public void givenEmptyDwpEditedResponseDocumentLink_thenReturnError() {
 
-        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
-        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(DwpResponseDocument.builder().build());
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).build()).build());
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -161,8 +158,11 @@ public class CreateEditedBundleAboutToSubmitHandlerTest {
     @Test
     public void givenPhmeNoReviewDwpEditedResponseDocumentLink_thenReturnError() {
 
-        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
-        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
+
         callback.getCaseDetails().getCaseData().setDwpPhme("Yes");
         callback.getCaseDetails().getCaseData().setPhmeGranted(YesNo.NO);
 
@@ -177,8 +177,11 @@ public class CreateEditedBundleAboutToSubmitHandlerTest {
     @Test
     public void givenPhmeNullReviewDwpEditedResponseDocumentLink_thenReturnError() {
 
-        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
-        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
+
         callback.getCaseDetails().getCaseData().setDwpPhme("Yes");
         callback.getCaseDetails().getCaseData().setPhmeGranted(null);
 

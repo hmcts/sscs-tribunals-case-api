@@ -176,13 +176,13 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
             if (dwpEvidenceBundleDocs.size() == 0 || dwpEvidenceBundleDocs.stream().filter(e -> null == e.getValue().getDocumentLink()).count() > 0) {
                 return true;
             }
+            return false;
         }
-        return false;
+        return true;
     }
 
 
     private void moveDocsToDwpCollectionIfOldPattern(SscsCaseData sscsCaseData) {
-        //TODO: Move docs over if follow old pattern
         if (dwpDocumentsBundleFeature) {
             //Before we moved to the new DWP document collection, we stored DWP documents within their own fields. This would break bundling with the new config that
             //looks at the new DWP document collection. Therefore, if the DWP fields are populated, then assume old pattern and move to the DWP document collection.
