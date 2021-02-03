@@ -48,6 +48,7 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         String nextEvent = callback.getCaseDetails().getCaseData().getSscsWelshPreviewNextEvent();
+        log.info("Next event to submit {}", nextEvent);
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
@@ -59,7 +60,7 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
         } else if (isReinstatementRequest(sscsCaseData)) {
             sscsCaseData = setReinstatementRequest(sscsCaseData, callback.getCaseDetails().getId(), nextEvent);
         } else {
-            log.info("Next event to submit  {}", nextEvent);
+            log.info("Submitting Next Event {}", nextEvent);
             ccdService.updateCase(sscsCaseData, callback.getCaseDetails().getId(),
                     nextEvent, "Upload welsh document",
                     "Upload welsh document", idamService.getIdamTokens());
@@ -78,8 +79,11 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
 
         Boolean isTranslationsOutstanding = (StringUtils.isEmpty(caseData.getTranslationWorkOutstanding()) || "No".equalsIgnoreCase(caseData.getTranslationWorkOutstanding()));
         Boolean isDocReinstatement = !CollectionUtils.isEmpty(caseData.getSscsDocument()) && caseData.getSscsDocument().stream().anyMatch(d -> REINSTATEMENT_REQUEST.getValue().equals(d.getValue().getDocumentType()));
-        Boolean isWleshReinstatement = (!CollectionUtils.isEmpty(caseData.getSscsWelshDocuments()) && caseData.getSscsWelshDocuments().stream().anyMatch(d -> REINSTATEMENT_REQUEST.getValue().equals(d.getValue().getDocumentType())));
-        return (isTranslationsOutstanding && (isDocReinstatement && isWleshReinstatement));
+        Boolean isWelshReinstatement = (!CollectionUtils.isEmpty(caseData.getSscsWelshDocuments()) && caseData.getSscsWelshDocuments().stream().anyMatch(d -> REINSTATEMENT_REQUEST.getValue().equals(d.getValue().getDocumentType())));
+
+        log.info("Is Reinstatement Request: translationOutstanding = {}. isCorReintstatement = {}. isWelshDocReinstatement = {}", isTranslationsOutstanding, isDocReinstatement, isWelshReinstatement);
+
+        return (isTranslationsOutstanding && isDocReinstatement && isWelshReinstatement);
     }
 
     private SscsCaseDetails setMakeCaseUrgentTriggerEvent(
