@@ -154,4 +154,23 @@ public class CreateBundleAboutToSubmitHandlerTest {
             .orElse("");
         assertEquals("The bundle cannot be created as mandatory DWP documents are missing", error);
     }
+
+    @Test
+    @Parameters({"Yes, bundleWelshUnEditedConfig", " No, bundleUnEditedConfig"})
+    public void givenWelshWithEdited_thenPopulateUneditedWelshConfigFileName(String languagePreference, String configFile) {
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setDwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().build()).build());
+        caseData.setDwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+
+        caseData.setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().build()).build());
+        caseData.setDwpEditedResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+        caseData.setLanguagePreferenceWelsh(languagePreference);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        if (caseData.isLanguagePreferenceWelsh()) {
+            assertEquals(configFile, response.getData().getBundleConfiguration());
+        } else {
+            assertEquals(configFile, response.getData().getBundleConfiguration());
+        }
+    }
 }
