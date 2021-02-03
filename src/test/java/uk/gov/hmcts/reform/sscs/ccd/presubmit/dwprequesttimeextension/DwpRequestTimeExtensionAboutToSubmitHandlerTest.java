@@ -20,6 +20,7 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
@@ -97,6 +98,8 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
         assertEquals(1, dwpDocs.size());
 
         DwpDocumentDetails dwpDoc = dwpDocs.get(0).getValue();
+        assertNull(actualCallback.getData().getTl1Form());
+        assertEquals(DwpDocumentType.TL1_FORM.getValue(), dwpDoc.getDocumentType());
         assertEquals(expectedDocumentLink, dwpDoc.getDocumentLink());
         assertEquals(expectedDocumentLink.getDocumentFilename(), dwpDoc.getDocumentLink().getDocumentFilename());
 

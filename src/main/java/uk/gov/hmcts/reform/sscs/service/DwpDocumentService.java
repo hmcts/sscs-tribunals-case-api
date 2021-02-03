@@ -16,17 +16,19 @@ public class DwpDocumentService {
 
     public void addToDwpDocuments(SscsCaseData sscsCaseData, DwpResponseDocument dwpDocument, DwpDocumentType docType) {
 
-        DwpDocumentDetails dwpDocumentDetails = new DwpDocumentDetails(docType.getValue(),
-                docType.getLabel(),
-                LocalDate.now().toString(),
-                dwpDocument.getDocumentLink(), null, null, null);
+        if (dwpDocument != null) {
+            DwpDocumentDetails dwpDocumentDetails = new DwpDocumentDetails(docType.getValue(),
+                    docType.getLabel(),
+                    LocalDate.now().toString(),
+                    dwpDocument.getDocumentLink(), null, null, null);
 
-        DwpDocument doc = new DwpDocument(dwpDocumentDetails);
+            DwpDocument doc = new DwpDocument(dwpDocumentDetails);
 
-        if (isNull(sscsCaseData.getDwpDocuments())) {
-            sscsCaseData.setDwpDocuments(new ArrayList<>());
+            if (isNull(sscsCaseData.getDwpDocuments())) {
+                sscsCaseData.setDwpDocuments(new ArrayList<>());
+            }
+            sscsCaseData.getDwpDocuments().add(doc);
+            sscsCaseData.sortCollections();
         }
-        sscsCaseData.getDwpDocuments().add(doc);
-        sscsCaseData.sortCollections();
     }
 }
