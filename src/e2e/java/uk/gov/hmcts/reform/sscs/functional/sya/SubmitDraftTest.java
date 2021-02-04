@@ -103,7 +103,7 @@ public class SubmitDraftTest {
 
     @After
     public void tearDown() {
-        List<SscsCaseData> savedDrafts = citizenCcdService.findCase(citizenIdamTokens);
+        List<SscsCaseData> savedDrafts = findCase(citizenIdamTokens);
 
         if (savedDrafts.size() > 0) {
             savedDrafts.stream().forEach(d -> archiveDraft(d));
@@ -132,7 +132,7 @@ public class SubmitDraftTest {
             .body(getAllDetailsDwpRegionalCentre("PIP", "DWP PIP (1)"))
             .put("/drafts");
 
-        SscsCaseData draft = citizenCcdService.findCase(citizenIdamTokens).get(0);
+        SscsCaseData draft = findCase(citizenIdamTokens).get(0);
         assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
     }
 
@@ -147,7 +147,7 @@ public class SubmitDraftTest {
                 .body(getAllDetailsDwpRegionalCentre("PIP", "DWP PIP (2)"))
                 .put("/drafts");
 
-        SscsCaseData draft = citizenCcdService.findCase(citizenIdamTokens).get(0);
+        SscsCaseData draft = findCase(citizenIdamTokens).get(0);
         assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
     }
 
@@ -162,7 +162,7 @@ public class SubmitDraftTest {
                 .body(getAllDetailsDwpRegionalCentre("ESA", expectedDwpRegionalCentre))
                 .put("/drafts");
 
-        SscsCaseData draft = citizenCcdService.findCase(citizenIdamTokens).get(0);
+        SscsCaseData draft = findCase(citizenIdamTokens).get(0);
         assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
     }
 
@@ -177,7 +177,7 @@ public class SubmitDraftTest {
                 .body(getAllDetailsDwpRegionalCentre("ESA", expectedDwpRegionalCentre))
                 .put("/drafts");
 
-        SscsCaseData draft = citizenCcdService.findCase(citizenIdamTokens).get(0);
+        SscsCaseData draft = findCase(citizenIdamTokens).get(0);
         assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
     }
 
@@ -191,7 +191,7 @@ public class SubmitDraftTest {
                 .body(getAllDetailsDwpRegionalCentre("UC", ""))
                 .put("/drafts");
 
-        SscsCaseData draft = citizenCcdService.findCase(citizenIdamTokens).get(0);
+        SscsCaseData draft = findCase(citizenIdamTokens).get(0);
         assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
     }
 
@@ -236,13 +236,25 @@ public class SubmitDraftTest {
     public void onceADraftIsArchived_itCannotBeRetrievedByTheCitizenUser() {
         saveDraft(draftAppeal);
 
-        List<SscsCaseData> savedDrafts = citizenCcdService.findCase(citizenIdamTokens);
+        List<SscsCaseData> savedDrafts = findCase(citizenIdamTokens);
         assertTrue(CollectionUtils.isNotEmpty(savedDrafts));
         SscsCaseData caseData = savedDrafts.get(0);
 
         archiveDraft(caseData);
 
         assertEquals(0, citizenCcdService.findCase(citizenIdamTokens).size());
+    }
+
+    private List<SscsCaseData> findCase(IdamTokens idamTokens) {
+        List<SscsCaseData> savedDrafts = citizenCcdService.findCase(citizenIdamTokens);
+        if (CollectionUtils.isEmpty(savedDrafts)) {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException ignored) {
+            }
+            savedDrafts = citizenCcdService.findCase(citizenIdamTokens);
+        }
+        return savedDrafts;
     }
 
     private String getAllDetailsDwpRegionalCentre(String benefitCode, String dwpIssuingOffice) {

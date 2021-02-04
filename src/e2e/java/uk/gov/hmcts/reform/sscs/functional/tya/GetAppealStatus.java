@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.functional.tya;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
+import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,42 +33,27 @@ public class GetAppealStatus extends BaseHandler {
     @Test
     public void testDwpRespond() throws Exception {
 
-        SscsCaseDetails sscsCaseDetails = createCaseInWithDwpState();
+        SscsCaseDetails sscsCaseDetails = createCaseInWithDwpState(2);
 
         RestAssured.baseURI = testUrl;
         RestAssured.useRelaxedHTTPSValidation();
 
         log.info("Get appeals for case {}", sscsCaseDetails.getId());
 
-        String response = RestAssured
-                .given()
-                .when()
-                .get("appeals?mya=true&caseId=" + sscsCaseDetails.getId())
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .and()
-                .extract().body().asString();
+        String response = getMyaResponse(2, sscsCaseDetails.getId());
         assertThat(response).contains("status\":\"WITH_DWP");
     }
 
     @Test
     public void testResponseReceived() throws Exception {
-        SscsCaseDetails sscsCaseDetails = createCaseInResponseReceivedState();
+        SscsCaseDetails sscsCaseDetails = createCaseInResponseReceivedState(2);
 
         RestAssured.baseURI = testUrl;
         RestAssured.useRelaxedHTTPSValidation();
 
         log.info("Get appeals for case {}", sscsCaseDetails.getId());
 
-        String response = RestAssured
-                .given()
-                .when()
-                .get("appeals?mya=true&caseId=" + sscsCaseDetails.getId())
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .and()
-                .extract().body().asString();
+        String response = getMyaResponse(2, sscsCaseDetails.getId());
         assertThat(response).contains("status\":\"DWP_RESPOND");
-
     }
 }
