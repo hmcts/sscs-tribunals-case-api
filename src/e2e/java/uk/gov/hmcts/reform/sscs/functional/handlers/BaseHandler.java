@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -14,9 +16,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
-import io.restassured.RestAssured;
-import io.restassured.response.Response;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +68,7 @@ public class BaseHandler {
 
     protected String getMyaResponse(int retry, Long caseId) {
         Response response = null;
-        while (retry >= 0 && ( response == null || response.statusCode() != HttpStatus.OK.value())) {
+        while (retry >= 0 && (response == null || response.statusCode() != HttpStatus.OK.value())) {
             response = RestAssured
                     .given()
                     .when()
