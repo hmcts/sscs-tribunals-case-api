@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -26,9 +27,13 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     private DwpDocumentService dwpDocumentService;
 
+    private boolean dwpDocumentsBundleFeature;
+
     @Autowired
-    public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService) {
+    public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService,
+             @Value("${feature.dwp-documents-bundle.enabled}") boolean dwpDocumentsBundleFeature) {
         this.dwpDocumentService = dwpDocumentService;
+        this.dwpDocumentsBundleFeature = dwpDocumentsBundleFeature;
     }
 
     @Override
@@ -51,8 +56,8 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (sscsCaseData.getDwpFurtherInfo() == null) {
-            preSubmitCallbackResponse.addError("Further information to assist the tribunal cannot be empty.");
+        if (checkErrors(sscsCaseData, preSubmitCallbackResponse)) {
+            return preSubmitCallbackResponse;
         }
 
         setCaseCode(sscsCaseData, callback.getEvent());
@@ -60,32 +65,91 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
 
         String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+
+        handleEditedDocuments(sscsCaseData, todayDate, preSubmitCallbackResponse);
+
+        moveDocsToCorrectCollection(sscsCaseData, todayDate);
+
+        checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
+
+        return preSubmitCallbackResponse;
+    }
+
+    private boolean checkErrors(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        boolean isErrors = false;
+        if (sscsCaseData.getDwpFurtherInfo() == null) {
+            preSubmitCallbackResponse.addError("Further information to assist the tribunal cannot be empty.");
+            isErrors = true;
+        }
+
+        if (sscsCaseData.getDwpResponseDocument() == null) {
+            preSubmitCallbackResponse.addError("DWP response document cannot be empty.");
+            isErrors = true;
+        }
+
+        if (sscsCaseData.getDwpEvidenceBundleDocument() == null) {
+            preSubmitCallbackResponse.addError("DWP evidence bundle cannot be empty.");
+            isErrors = true;
+        }
+
+        if (sscsCaseData.getDwpEditedEvidenceBundleDocument() != null || sscsCaseData.getDwpEditedResponseDocument() != null) {
+            if (sscsCaseData.getDwpEditedEvidenceBundleDocument() == null || sscsCaseData.getDwpEditedResponseDocument() == null) {
+                preSubmitCallbackResponse.addError("You must submit both an edited response document and an edited evidence bundle");
+                isErrors = true;
+            }
+            if (sscsCaseData.getDwpEditedEvidenceReason() == null) {
+                preSubmitCallbackResponse.addError("If edited evidence is added a reason must be selected");
+                isErrors = true;
+            }
+        }
+        return isErrors;
+    }
+
+    private void moveDocsToCorrectCollection(SscsCaseData sscsCaseData, String todayDate) {
+        //FIXME: Clear this up after dwpDocumentsBundleFeature switched on
         if (sscsCaseData.getDwpAT38Document() != null) {
             sscsCaseData.setDwpAT38Document(buildDwpResponseDocumentWithDate(
                     AppConstants.DWP_DOCUMENT_AT38_FILENAME_PREFIX,
                     todayDate,
                     sscsCaseData.getDwpAT38Document().getDocumentLink()));
         }
-        if (sscsCaseData.getDwpEvidenceBundleDocument() != null) {
-            sscsCaseData.setDwpEvidenceBundleDocument(buildDwpResponseDocumentWithDate(
-                    AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX,
-                    todayDate,
-                    sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink()));
+
+        sscsCaseData.setDwpResponseDocument(buildDwpResponseDocumentWithDate(
+                AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX,
+                todayDate,
+                sscsCaseData.getDwpResponseDocument().getDocumentLink()));
+
+
+        sscsCaseData.setDwpEvidenceBundleDocument(buildDwpResponseDocumentWithDate(
+                AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX,
+                todayDate,
+                sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink()));
+
+
+        if (dwpDocumentsBundleFeature) {
+            dwpDocumentService.addToDwpDocuments(sscsCaseData, sscsCaseData.getDwpAT38Document(), DwpDocumentType.AT_38);
+            sscsCaseData.setDwpAT38Document(null);
+
+            dwpDocumentService.removeDwpDocumentTypeFromCollection(sscsCaseData, DwpDocumentType.DWP_RESPONSE);
+            DocumentLink editedResponseDocumentLink = sscsCaseData.getDwpEditedResponseDocument() != null ? sscsCaseData.getDwpEditedResponseDocument().getDocumentLink() : null;
+            dwpDocumentService.addToDwpDocumentsWithEditedDoc(sscsCaseData, sscsCaseData.getDwpResponseDocument(), DwpDocumentType.DWP_RESPONSE, editedResponseDocumentLink);
+            sscsCaseData.setDwpResponseDocument(null);
+            sscsCaseData.setDwpEditedResponseDocument(null);
+
+            dwpDocumentService.removeDwpDocumentTypeFromCollection(sscsCaseData, DwpDocumentType.DWP_EVIDENCE_BUNDLE);
+            DocumentLink editedEvidenceBundleDocumentLink = sscsCaseData.getDwpEditedEvidenceBundleDocument() != null ? sscsCaseData.getDwpEditedEvidenceBundleDocument().getDocumentLink() : null;
+            dwpDocumentService.addToDwpDocumentsWithEditedDoc(sscsCaseData, sscsCaseData.getDwpEvidenceBundleDocument(), DwpDocumentType.DWP_EVIDENCE_BUNDLE, editedEvidenceBundleDocumentLink);
+            sscsCaseData.setDwpEvidenceBundleDocument(null);
+            sscsCaseData.setDwpEditedEvidenceBundleDocument(null);
         }
 
         if (sscsCaseData.getAppendix12Doc() != null) {
             dwpDocumentService.addToDwpDocuments(sscsCaseData, sscsCaseData.getAppendix12Doc(), DwpDocumentType.APPENDIX_12);
         }
+    }
 
-        if (sscsCaseData.getDwpEditedEvidenceBundleDocument() != null || sscsCaseData.getDwpEditedResponseDocument() != null) {
-            if (sscsCaseData.getDwpEditedEvidenceBundleDocument() == null || sscsCaseData.getDwpEditedResponseDocument() == null) {
-                preSubmitCallbackResponse.addError("You must submit both an edited response document and an edited evidence bundle");
-                return preSubmitCallbackResponse;
-            }
-            if (sscsCaseData.getDwpEditedEvidenceReason() == null) {
-                preSubmitCallbackResponse.addError("If edited evidence is added a reason must be selected");
-                return preSubmitCallbackResponse;
-            }
+    private PreSubmitCallbackResponse<SscsCaseData> handleEditedDocuments(SscsCaseData sscsCaseData, String todayDate, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (sscsCaseData.getDwpEditedEvidenceBundleDocument() != null && sscsCaseData.getDwpEditedResponseDocument() != null) {
 
             sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
 
@@ -93,8 +157,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHME_REQUEST.getId());
             }
 
-            //FIXME: These should be moved to the DWP document collection at some point, ideally before we switch this feature on
-
+            //FIXME: Clear up after dwpDocumentsBundleFeature switched on
             sscsCaseData.setDwpEditedResponseDocument(buildDwpResponseDocumentWithDate(
                     AppConstants.DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX,
                     todayDate,
@@ -115,15 +178,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 }
             }
         }
-        if (sscsCaseData.getDwpResponseDocument() != null) {
-            sscsCaseData.setDwpResponseDocument(buildDwpResponseDocumentWithDate(
-                    AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX,
-                    todayDate,
-                    sscsCaseData.getDwpResponseDocument().getDocumentLink()));
-        }
-
-        checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
-
         return preSubmitCallbackResponse;
     }
 

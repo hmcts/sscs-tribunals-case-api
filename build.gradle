@@ -14,7 +14,7 @@ plugins {
     id 'jacoco'
     id 'org.springframework.boot' version '2.3.5.RELEASE'
     id 'uk.gov.hmcts.java' version '0.12.2'
-    id 'com.gorylenko.gradle-git-properties' version '1.4.21'
+    id 'com.gorylenko.gradle-git-properties' version '2.2.4'
     id 'com.github.ben-manes.versions' version '0.36.0'
     id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.5.2'
@@ -307,8 +307,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.0.6'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
-
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.2.3'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.2.5'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.21'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
