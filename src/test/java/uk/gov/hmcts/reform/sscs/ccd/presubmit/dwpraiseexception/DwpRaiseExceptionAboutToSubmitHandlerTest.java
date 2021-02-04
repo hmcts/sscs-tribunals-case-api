@@ -60,17 +60,17 @@ public class DwpRaiseExceptionAboutToSubmitHandlerTest {
     @Test
     public void setMoveToGapsFields() {
         sscsCaseData = sscsCaseData.toBuilder().state(State.WITH_DWP).build();
-        AssertIsProgressingToGaps();
+        assertIsProgressingToGaps();
     }
 
     @Test
     public void setMoveToGapsFieldsIfInterlocReviewStateIsEmptyString() {
         sscsCaseData = sscsCaseData.toBuilder().state(State.WITH_DWP).build();
         sscsCaseData.setInterlocReviewState("");
-        AssertIsProgressingToGaps();
+        assertIsProgressingToGaps();
     }
 
-    private void AssertIsProgressingToGaps() {
+    private void assertIsProgressingToGaps() {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
