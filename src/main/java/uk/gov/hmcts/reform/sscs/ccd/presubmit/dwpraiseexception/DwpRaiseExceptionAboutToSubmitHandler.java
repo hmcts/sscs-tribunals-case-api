@@ -30,6 +30,10 @@ public class DwpRaiseExceptionAboutToSubmitHandler implements PreSubmitCallbackH
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
+        if (sscsCaseData.getInterlocReviewState() != null && !sscsCaseData.getInterlocReviewState().isEmpty()) {
+            sscsCaseData.setInterlocReviewState("none");
+        }
+
         sscsCaseData.setIsProgressingViaGaps("Yes");
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
