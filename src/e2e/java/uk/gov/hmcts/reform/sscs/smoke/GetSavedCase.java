@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -26,16 +25,9 @@ public class GetSavedCase  extends BaseHandler {
         RestAssured.baseURI = tcaInstance;
         RestAssured.useRelaxedHTTPSValidation();
 
-        SscsCaseDetails sscsCaseDetails = createCaseInWithDwpState();
-        
-        String response = RestAssured
-                .given()
-                .when()
-                .get("appeals?mya=true&caseId=" + sscsCaseDetails.getId())
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .and()
-                .extract().body().asString();
+        SscsCaseDetails sscsCaseDetails = createCaseInWithDwpState(2);
+
+        String response = getMyaResponse(2, sscsCaseDetails.getId());
         assertThat(response).contains("status\":\"WITH_DWP");
     }
 }
