@@ -52,7 +52,9 @@ public class CreateBundleAboutToSubmitHandlerTest {
         openMocks(this);
         dwpDocumentService = new DwpDocumentService();
         handler = new CreateBundleAboutToSubmitHandler(serviceRequestExecutor, dwpDocumentService,"bundleUrl.com", "bundleEnglishConfig", "bundleWelshConfig",
-                "bundleUnEditedConfig", "bundleWelshUnEditedConfig", true);
+                "bundleUnEditedConfig", "bundleWelshUnEditedConfig",
+                "bundleNewEnglishConfig", "bundleNewWelshConfig",
+                "bundleNewUnEditedConfig", "bundleNewWelshUnEditedConfig", true);
 
         when(callback.getEvent()).thenReturn(EventType.CREATE_BUNDLE);
 
@@ -116,7 +118,7 @@ public class CreateBundleAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"Yes, bundleWelshConfig", " No, bundleEnglishConfig"})
+    @Parameters({"Yes, bundleNewWelshConfig", " No, bundleNewEnglishConfig"})
     public void givenWelshCase_thenPopulateWelshConfigFileName(String languagePreference, String configFile) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         List<DwpDocument> dwpDocuments = new ArrayList<>();
@@ -277,7 +279,7 @@ public class CreateBundleAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"Yes, bundleWelshUnEditedConfig", " No, bundleUnEditedConfig"})
+    @Parameters({"Yes, bundleNewWelshUnEditedConfig", " No, bundleNewUnEditedConfig"})
     public void givenWelshWithEdited_thenPopulateUneditedWelshConfigFileName(String languagePreference, String configFile) {
 
         List<DwpDocument> dwpDocuments = new ArrayList<>();

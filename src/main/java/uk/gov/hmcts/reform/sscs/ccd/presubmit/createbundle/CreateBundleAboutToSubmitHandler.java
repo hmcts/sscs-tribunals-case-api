@@ -25,12 +25,19 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     private ServiceRequestExecutor serviceRequestExecutor;
 
     private String bundleUrl;
+
     private String bundleEnglishConfig;
     private String bundleWelshConfig;
     private String bundleUnEditedConfig;
     private String bundleWelshUnEditedConfig;
 
-    private boolean dwpDocumentsBundleFeature;
+    //FIXME to be remove after dwpDocumentsBundleFeature turned on
+    private String bundleNewEnglishConfig;
+    private String bundleNewWelshConfig;
+    private String bundleNewUnEditedConfig;
+    private String bundleNewWelshUnEditedConfig;
+
+    protected boolean dwpDocumentsBundleFeature;
 
     private static String CREATE_BUNDLE_ENDPOINT = "/api/new-bundle";
 
@@ -44,6 +51,10 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
                                             @Value("${bundle.welsh.config}") String bundleWelshConfig,
                                             @Value("${bundle.unedited.config}") String bundleUnEditedConfig,
                                             @Value("${bundle.welsh.unedited.config}") String bundleWelshUnEditedConfig,
+                                            @Value("${bundle.new.english.config}") String bundleNewEnglishConfig,
+                                            @Value("${bundle.new.welsh.config}") String bundleNewWelshConfig,
+                                            @Value("${bundle.new.unedited.config}") String bundleNewUnEditedConfig,
+                                            @Value("${bundle.new.welsh.unedited.config}") String bundleNewWelshUnEditedConfig,
                                             @Value("${feature.dwp-documents-bundle.enabled}") boolean dwpDocumentsBundleFeature) {
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.dwpDocumentService = dwpDocumentService;
@@ -52,6 +63,10 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         this.bundleWelshConfig = bundleWelshConfig;
         this.bundleUnEditedConfig = bundleUnEditedConfig;
         this.bundleWelshUnEditedConfig = bundleWelshUnEditedConfig;
+        this.bundleNewEnglishConfig = bundleNewEnglishConfig;
+        this.bundleNewWelshConfig = bundleNewWelshConfig;
+        this.bundleNewUnEditedConfig = bundleNewUnEditedConfig;
+        this.bundleNewWelshUnEditedConfig = bundleNewWelshUnEditedConfig;
         this.dwpDocumentsBundleFeature = dwpDocumentsBundleFeature;
     }
 
@@ -142,15 +157,15 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
                 || f.getValue().getDocumentType().equals(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue())
                 && f.getValue().getEditedDocumentLink() != null).count() > 0) {
             if (sscsCaseData.isLanguagePreferenceWelsh()) {
-                sscsCaseData.setBundleConfiguration(bundleWelshUnEditedConfig);
+                sscsCaseData.setBundleConfiguration(bundleNewWelshUnEditedConfig);
             } else {
-                sscsCaseData.setBundleConfiguration(bundleUnEditedConfig);
+                sscsCaseData.setBundleConfiguration(bundleNewUnEditedConfig);
             }
         } else {
             if (sscsCaseData.isLanguagePreferenceWelsh()) {
-                sscsCaseData.setBundleConfiguration(bundleWelshConfig);
+                sscsCaseData.setBundleConfiguration(bundleNewWelshConfig);
             } else {
-                sscsCaseData.setBundleConfiguration(bundleEnglishConfig);
+                sscsCaseData.setBundleConfiguration(bundleNewEnglishConfig);
             }
         }
     }
