@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 
+import feign.FeignException;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import java.io.File;
@@ -16,6 +17,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
+@Slf4j
 public class BaseHandler {
 
     protected static final String CREATED_BY_FUNCTIONAL_TEST = "created by functional test";
@@ -68,25 +71,32 @@ public class BaseHandler {
 
     protected String getMyaResponse(int retry, Long caseId) {
         Response response = null;
-        while (retry >= 0 && (response == null || response.statusCode() != HttpStatus.OK.value())) {
+        while (retry > 0 && (response == null || response.statusCode() != HttpStatus.OK.value())) {
             response = RestAssured
                     .given()
                     .when()
                     .get("appeals?mya=true&caseId=" + caseId);
+            retry--;
         }
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         return response.then().extract().body().asString();
     }
 
-    private SscsCaseDetails updateCase(int retry, SscsCaseData caseData, Long caseId, String eventType, String summary, String description, IdamTokens idamTokens) throws InterruptedException {
-        SscsCaseDetails caseDetails = null;
-        while (retry >= 0 && caseDetails == null) {
-            Thread.sleep(5000);
-            caseDetails = ccdService.updateCase(caseData, caseId, eventType, summary, description, idamTokens);
+    private SscsCaseDetails updateCase(int retry, SscsCaseData caseData, Long caseId, String eventType, String summary, String description, IdamTokens idamTokens) throws Exception {
+        while (retry > 0) {
             retry--;
+            Thread.sleep(5000);
+            try {
+                log.info("UpdateCase failed for caseId {} retry count {}", caseId, retry);
+                return ccdService.updateCase(caseData, caseId, eventType, summary, description, idamTokens);
+            } catch (FeignException feignException) {
+                if (feignException.status() < HttpStatus.INTERNAL_SERVER_ERROR.value() || retry <= 0) {
+                    throw feignException;
+                }
+            }
         }
-        return caseDetails;
+        throw new Exception("UpdateCase failed for caseId:" + caseId);
     }
 
 
