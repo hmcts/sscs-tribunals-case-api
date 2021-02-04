@@ -88,9 +88,10 @@ public class BaseHandler {
             retry--;
             Thread.sleep(5000);
             try {
-                log.info("UpdateCase failed for caseId {} retry count {}", caseId, retry);
+                log.info("UpdateCase for caseId {} retry count {}", caseId, retry);
                 return ccdService.updateCase(caseData, caseId, eventType, summary, description, idamTokens);
             } catch (FeignException feignException) {
+                log.info("UpdateCase failed for caseId {} with error {}", caseId, feignException.getMessage());
                 if (feignException.status() < HttpStatus.INTERNAL_SERVER_ERROR.value() || retry <= 0) {
                     throw feignException;
                 }
