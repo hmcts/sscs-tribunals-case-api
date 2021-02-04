@@ -32,6 +32,7 @@ public class AppConstants {
     public static final String DWP_DOCUMENT_AT38_FILENAME_PREFIX = "AT38 received ";
     public static final String DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX = "DWP response received";
     public static final String DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX = "DWP evidence received";
+    //FIXME: Can remove these edited variables after dwpDocumentsBundleFeature switched on
     public static final String DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX = "DWP edited response received";
     public static final String DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX = "DWP edited evidence received";
 
