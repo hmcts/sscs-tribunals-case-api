@@ -31,6 +31,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     private String bundleUnEditedConfig;
     private String bundleWelshUnEditedConfig;
 
+    
     //FIXME to be remove after dwpDocumentsBundleFeature turned on
     private String bundleNewEnglishConfig;
     private String bundleNewWelshConfig;
