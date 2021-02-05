@@ -102,8 +102,8 @@ public class SubmitDraftTest {
     }
 
     @After
-    public void tearDown() {
-        List<SscsCaseData> savedDrafts = citizenCcdService.findCase(citizenIdamTokens);
+    public void tearDown() throws InterruptedException {
+        List<SscsCaseData> savedDrafts = findCase(citizenIdamTokens);
 
         if (savedDrafts.size() > 0) {
             savedDrafts.stream().forEach(d -> archiveDraft(d));
@@ -122,7 +122,7 @@ public class SubmitDraftTest {
     }
 
     @Test
-    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToNewcastle() {
+    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToNewcastle() throws InterruptedException {
         String expectedDwpRegionalCentre = "Newcastle";
 
         RestAssured.given()
@@ -132,12 +132,12 @@ public class SubmitDraftTest {
             .body(getAllDetailsDwpRegionalCentre("PIP", "DWP PIP (1)"))
             .put("/drafts");
 
-        SscsCaseData draft = citizenCcdService.findCase(citizenIdamTokens).get(0);
+        SscsCaseData draft = findCase(citizenIdamTokens).get(0);
         assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
     }
 
     @Test
-    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToGlasgow() {
+    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToGlasgow() throws InterruptedException {
         String expectedDwpRegionalCentre = "Glasgow";
 
         RestAssured.given()
@@ -147,12 +147,12 @@ public class SubmitDraftTest {
                 .body(getAllDetailsDwpRegionalCentre("PIP", "DWP PIP (2)"))
                 .put("/drafts");
 
-        SscsCaseData draft = citizenCcdService.findCase(citizenIdamTokens).get(0);
+        SscsCaseData draft = findCase(citizenIdamTokens).get(0);
         assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
     }
 
     @Test
-    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToInvernessDrt() {
+    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToInvernessDrt() throws InterruptedException {
         String expectedDwpRegionalCentre = "Inverness DRT";
 
         RestAssured.given()
@@ -162,12 +162,12 @@ public class SubmitDraftTest {
                 .body(getAllDetailsDwpRegionalCentre("ESA", expectedDwpRegionalCentre))
                 .put("/drafts");
 
-        SscsCaseData draft = citizenCcdService.findCase(citizenIdamTokens).get(0);
+        SscsCaseData draft = findCase(citizenIdamTokens).get(0);
         assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
     }
 
     @Test
-    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToCoatbridgeBenefitCentre() {
+    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToCoatbridgeBenefitCentre() throws InterruptedException {
         String expectedDwpRegionalCentre = "Coatbridge Benefit Centre";
 
         RestAssured.given()
@@ -177,12 +177,12 @@ public class SubmitDraftTest {
                 .body(getAllDetailsDwpRegionalCentre("ESA", expectedDwpRegionalCentre))
                 .put("/drafts");
 
-        SscsCaseData draft = citizenCcdService.findCase(citizenIdamTokens).get(0);
+        SscsCaseData draft = findCase(citizenIdamTokens).get(0);
         assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
     }
 
     @Test
-    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToUniversalCredit() {
+    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToUniversalCredit() throws InterruptedException {
         String expectedDwpRegionalCentre = "Universal Credit";
         RestAssured.given()
                 .log().method().log().headers().log().uri().log().body(true)
@@ -191,7 +191,7 @@ public class SubmitDraftTest {
                 .body(getAllDetailsDwpRegionalCentre("UC", ""))
                 .put("/drafts");
 
-        SscsCaseData draft = citizenCcdService.findCase(citizenIdamTokens).get(0);
+        SscsCaseData draft = findCase(citizenIdamTokens).get(0);
         assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
     }
 
@@ -233,16 +233,25 @@ public class SubmitDraftTest {
     }
 
     @Test
-    public void onceADraftIsArchived_itCannotBeRetrievedByTheCitizenUser() {
+    public void onceADraftIsArchived_itCannotBeRetrievedByTheCitizenUser() throws InterruptedException {
         saveDraft(draftAppeal);
 
-        List<SscsCaseData> savedDrafts = citizenCcdService.findCase(citizenIdamTokens);
+        List<SscsCaseData> savedDrafts = findCase(citizenIdamTokens);
         assertTrue(CollectionUtils.isNotEmpty(savedDrafts));
         SscsCaseData caseData = savedDrafts.get(0);
 
         archiveDraft(caseData);
 
         assertEquals(0, citizenCcdService.findCase(citizenIdamTokens).size());
+    }
+
+    private List<SscsCaseData> findCase(IdamTokens idamTokens) throws InterruptedException {
+        List<SscsCaseData> savedDrafts = citizenCcdService.findCase(idamTokens);
+        if (CollectionUtils.isEmpty(savedDrafts)) {
+            Thread.sleep(5000);
+            savedDrafts = citizenCcdService.findCase(citizenIdamTokens);
+        }
+        return savedDrafts;
     }
 
     private String getAllDetailsDwpRegionalCentre(String benefitCode, String dwpIssuingOffice) {

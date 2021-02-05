@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
@@ -254,6 +256,55 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("You need to upload PDF documents only", error);
+    }
+
+    @Test
+    @Parameters({"typeOfAppeal", "previewDecisionNotice"})
+    public void givenDeathOfAppellant_thenDisplayWarning(String pageId) {
+        sscsCaseData.setIsAppellantDeceased(YesNo.YES);
+        when(callback.isIgnoreWarnings()).thenReturn(false);
+        when(callback.getPageId()).thenReturn(pageId);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String warning = response.getWarnings().stream().findFirst().orElse("");
+        assertThat(warning, is("Appellant is deceased. Copy the draft decision and amend offline, then upload the offline version."));
+    }
+
+    @Test
+    public void givenDeathOfAppellantButNotOnTheCorrectPage_thenDoNotDisplayWarning() {
+        when(callback.getPageId()).thenReturn("incorrectPage");
+        when(callback.isIgnoreWarnings()).thenReturn(false);
+        sscsCaseData.setIsAppellantDeceased(YesNo.YES);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getWarnings().size(), is(0));
+    }
+
+    @Test
+    public void givenDeathOfAppellantWithIgnoreWarnings_thenDoNotDisplayWarning() {
+        when(callback.isIgnoreWarnings()).thenReturn(true);
+        when(callback.getPageId()).thenReturn("typeOfAppeal");
+        sscsCaseData.setIsAppellantDeceased(YesNo.YES);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getWarnings().size(), is(0));
+    }
+
+    @Test
+    public void givenNoDeathOfAppellant_thenDoNotDisplayWarning() {
+        when(callback.getPageId()).thenReturn("typeOfAppeal");
+        sscsCaseData.setIsAppellantDeceased(YesNo.NO);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getWarnings().size(), is(0));
     }
 
     protected abstract void shouldExhibitBenefitSpecificBehaviourWhenAnAnAwardIsGivenAndNoActivitiesSelected(AwardType dailyLiving, AwardType mobility);
