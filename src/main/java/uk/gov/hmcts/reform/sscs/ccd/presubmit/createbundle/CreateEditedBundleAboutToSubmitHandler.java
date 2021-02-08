@@ -99,24 +99,18 @@ public class CreateEditedBundleAboutToSubmitHandler implements PreSubmitCallback
                 }
             }
 
-            log.info("dwpDocumentsBundleFeature" + dwpDocumentsBundleFeature);
-
             if (dwpDocumentsBundleFeature) {
                 //FIXME to be removed after dwpDocumentsBundleFeature turned on
                 if (sscsCaseData.isLanguagePreferenceWelsh()) {
                     sscsCaseData.setBundleConfiguration(bundleNewWelshEditedConfig);
-                    log.info("bundleNewWelshEditedConfig" + bundleNewWelshEditedConfig);
                 } else {
                     sscsCaseData.setBundleConfiguration(bundleNewEditedConfig);
-                    log.info("bundleNewEditedConfig" + bundleNewEditedConfig);
                 }
             } else {
                 if (sscsCaseData.isLanguagePreferenceWelsh()) {
                     sscsCaseData.setBundleConfiguration(bundleWelshEditedConfig);
-                    log.info("bundleWelshEditedConfig" + bundleWelshEditedConfig);
                 } else {
                     sscsCaseData.setBundleConfiguration(bundleEditedConfig);
-                    log.info("bundleEditedConfig" + bundleEditedConfig);
                 }
             }
 
@@ -128,8 +122,7 @@ public class CreateEditedBundleAboutToSubmitHandler implements PreSubmitCallback
 
     protected boolean checkPhmeStatusIsNotGranted(SscsCaseData sscsCaseData) {
 
-        return sscsCaseData.getDwpEditedEvidenceReason() == null || !sscsCaseData.getDwpEditedEvidenceReason().equals("phme")
-                || sscsCaseData.getPhmeGranted() == null || sscsCaseData.getPhmeGranted().getValue().equals("No");
+        return sscsCaseData.getPhmeGranted() == null || sscsCaseData.getPhmeGranted().getValue().equals("No");
     }
 
     private boolean checkMandatoryFilesMissingOld(SscsCaseData sscsCaseData) {
