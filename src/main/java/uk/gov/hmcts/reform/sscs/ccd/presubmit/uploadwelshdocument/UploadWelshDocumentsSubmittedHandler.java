@@ -82,7 +82,7 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
         Boolean isWelshReinstatement = (!CollectionUtils.isEmpty(caseData.getSscsWelshDocuments()) && caseData.getSscsWelshDocuments().stream().anyMatch(d -> REINSTATEMENT_REQUEST.getValue().equals(d.getValue().getDocumentType())));
 
         log.info("Is Reinstatement Request: translationOutstanding = {}. isCorReintstatement = {}. isWelshDocReinstatement = {}",isTranslationsOutstanding, isDocReinstatement, isWelshReinstatement);
-        return (isTranslationsOutstanding && isDocReinstatement && isWelshReinstatement);
+        return (isTranslationsOutstanding && (isDocReinstatement || isWelshReinstatement));
     }
 
     private SscsCaseDetails setMakeCaseUrgentTriggerEvent(

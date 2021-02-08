@@ -188,7 +188,7 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
             "DORMANT_APPEAL_STATE",
             "VOID_STATE",
     })
-    public void shouldSetReinstatementRequestWithWelshAndNonWelshReinstatementDocumentsWhenNonVoidOrDormant(State state) {
+    public void shouldSetReinstatementRequestWithWelshAndNonWelshReinstatementDocumentsWhenVoidOrDormant(State state) {
 
         SscsWelshDocument sscsWelshDocument = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder().documentType(DocumentType.REINSTATEMENT_REQUEST.getValue()).build()).build();
 
@@ -213,7 +213,7 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
     }
 
     @Test
-    public void shouldNotSetReinstatementRequestWithWelshButNoNonWelshReinstatementDocuments() {
+    public void shouldSetReinstatementRequestWithWelshButNoNonWelshReinstatementDocuments() {
 
         SscsWelshDocument sscsWelshDocument = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder().documentType(DocumentType.REINSTATEMENT_REQUEST.getValue()).build()).build();
 
@@ -233,14 +233,13 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertNull(caseData.getSscsWelshPreviewNextEvent());
-        assertNull(caseData.getReinstatementOutcome());
+        assertEquals(RequestOutcome.IN_PROGRESS, caseData.getReinstatementOutcome());
         assertNull(caseData.getInterlocReviewState());
         assertEquals(State.APPEAL_CREATED, caseData.getPreviousState());
-        assertEquals(State.INTERLOCUTORY_REVIEW_STATE, caseData.getState());
     }
 
     @Test
-    public void shouldNotSetReinstatementRequestWithNoWelshButNonWelshReinstatementDocuments() {
+    public void shouldSetReinstatementRequestWithNoWelshButNonWelshReinstatementDocuments() {
 
         SscsWelshDocument sscsWelshDocument = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder().documentType(DocumentType.OTHER_DOCUMENT.getValue()).build()).build();
 
@@ -248,6 +247,32 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         sscsWelshDocuments.add(sscsWelshDocument);
 
         SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(DocumentType.REINSTATEMENT_REQUEST.getValue()).build()).build();
+        List<SscsDocument> sscsDocuments = new ArrayList<>();
+        sscsDocuments.add(sscsDocument);
+
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setSscsWelshDocuments(sscsWelshDocuments);
+        caseData.setSscsDocument(sscsDocuments);
+        caseData.setPreviousState(State.APPEAL_CREATED);
+        caseData.setState(State.INTERLOCUTORY_REVIEW_STATE);
+
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertNull(caseData.getSscsWelshPreviewNextEvent());
+        assertEquals(RequestOutcome.IN_PROGRESS, caseData.getReinstatementOutcome());
+        assertNull(caseData.getInterlocReviewState());
+        assertEquals(State.APPEAL_CREATED, caseData.getPreviousState());
+    }
+
+    @Test
+    public void shouldNotSetReinstatementRequestWithNoWelshAndNoNonWelshReinstatementDocuments() {
+
+        SscsWelshDocument sscsWelshDocument = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder().documentType(DocumentType.OTHER_DOCUMENT.getValue()).build()).build();
+
+        List<SscsWelshDocument> sscsWelshDocuments = new ArrayList<>();
+        sscsWelshDocuments.add(sscsWelshDocument);
+
+        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(DocumentType.OTHER_DOCUMENT.getValue()).build()).build();
         List<SscsDocument> sscsDocuments = new ArrayList<>();
         sscsDocuments.add(sscsDocument);
 
