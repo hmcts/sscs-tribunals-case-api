@@ -31,6 +31,14 @@
     </suppress>
     <suppress until="2021-03-01">
         <notes><![CDATA[
+         file name: kotlin-stdlib-*
+         Kotlin claim to have fixed in 1.4.21 but CVE not updated yet
+        ]]></notes>
+        <gav regex="true">^org\.jetbrains\.kotlin:*:.*$</gav>
+        <cve>CVE-2020-29582</cve>
+    </suppress>
+    <suppress until="2021-03-01">
+        <notes><![CDATA[
          file name: sscs-pdf-email-common-1.4.14.jar
          Jquery included from SpringCloud. We are on latest release awaiting patch (Hoxton SR8)
         ]]></notes>
