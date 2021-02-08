@@ -133,7 +133,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             dwpDocumentService.moveDwpResponseDocumentToDwpDocumentCollection(sscsCaseData);
             dwpDocumentService.moveDwpEvidenceBundleToDwpDocumentCollection(sscsCaseData);
 
-
+            sscsCaseData.setDwpEditedEvidenceReason(null);
         }
 
         if (sscsCaseData.getAppendix12Doc() != null) {

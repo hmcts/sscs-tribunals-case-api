@@ -46,7 +46,6 @@ public class DwpDocumentServiceTest {
 
         assertEquals("test.url", sscsCaseData.getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
         assertEquals("existing.com", sscsCaseData.getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
-
     }
 
     @Test
@@ -56,11 +55,52 @@ public class DwpDocumentServiceTest {
 
         sscsCaseData = sscsCaseData.toBuilder().dwpDocuments(dwpDocuments).build();
 
-        dwpDocumentService.addToDwpDocumentsWithEditedDoc(sscsCaseData, DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("test.url").build()).build(), DwpDocumentType.UCB, DocumentLink.builder().documentUrl("edited.url").build());
+        dwpDocumentService.addToDwpDocumentsWithEditedDoc(sscsCaseData, DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("test.url").build()).build(), DwpDocumentType.UCB, DocumentLink.builder().documentUrl("edited.url").build(), "Edited reason");
 
         assertEquals("test.url", sscsCaseData.getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
         assertEquals("edited.url", sscsCaseData.getDwpDocuments().get(0).getValue().getEditedDocumentLink().getDocumentUrl());
+        assertEquals("Edited reason", sscsCaseData.getDwpDocuments().get(0).getValue().getDwpEditedEvidenceReason());
         assertEquals("existing.com", sscsCaseData.getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
+    }
+
+    @Test
+    public void givenDwpResponseDoc_thenMoveToDwpDocuments() {
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DwpDocumentType.DWP_RESPONSE.getValue()).documentDateAdded(LocalDate.now().minusDays(1).toString()).documentLink(DocumentLink.builder().documentUrl("existing.com").build()).build()).build());
+
+        sscsCaseData = sscsCaseData.toBuilder()
+                .dwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("test.url").build()).build())
+                .dwpEditedResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("edited.url").build()).build())
+                .dwpEditedEvidenceReason("Edited reason")
+                .dwpDocuments(dwpDocuments).build();
+
+        dwpDocumentService.moveDwpResponseDocumentToDwpDocumentCollection(sscsCaseData);
+
+        assertEquals(1, sscsCaseData.getDwpDocuments().size());
+        assertEquals("test.url", sscsCaseData.getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("edited.url", sscsCaseData.getDwpDocuments().get(0).getValue().getEditedDocumentLink().getDocumentUrl());
+        assertEquals("Edited reason", sscsCaseData.getDwpDocuments().get(0).getValue().getDwpEditedEvidenceReason());
+        assertEquals(DwpDocumentType.DWP_RESPONSE.getValue(), sscsCaseData.getDwpDocuments().get(0).getValue().getDocumentType());
+    }
+
+    @Test
+    public void givenDwpEvidenceBundle_thenMoveToDwpDocuments() {
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue()).documentDateAdded(LocalDate.now().minusDays(1).toString()).documentLink(DocumentLink.builder().documentUrl("existing.com").build()).build()).build());
+
+        sscsCaseData = sscsCaseData.toBuilder()
+                .dwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("test.url").build()).build())
+                .dwpEditedEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("edited.url").build()).build())
+                .dwpEditedEvidenceReason("Edited reason")
+                .dwpDocuments(dwpDocuments).build();
+
+        dwpDocumentService.moveDwpEvidenceBundleToDwpDocumentCollection(sscsCaseData);
+
+        assertEquals(1, sscsCaseData.getDwpDocuments().size());
+        assertEquals("test.url", sscsCaseData.getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("edited.url", sscsCaseData.getDwpDocuments().get(0).getValue().getEditedDocumentLink().getDocumentUrl());
+        assertEquals("Edited reason", sscsCaseData.getDwpDocuments().get(0).getValue().getDwpEditedEvidenceReason());
+        assertEquals(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue(), sscsCaseData.getDwpDocuments().get(0).getValue().getDocumentType());
     }
 
     @Test
