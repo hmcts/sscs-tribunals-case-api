@@ -26,6 +26,12 @@ public class DocumentUtil {
                 && equalsAnyIgnoreCase("pdf", getExtension(docLink.getDocumentFilename()));
     }
 
+    public static boolean isFileAMedia(DocumentLink docLink) {
+        return docLink != null
+                && isNotBlank(docLink.getDocumentUrl())
+                && equalsAnyIgnoreCase(getExtension(docLink.getDocumentFilename()), "mp3", "mp4");
+    }
+
     public static String userFriendlyName(String documentType) {
         return StringUtils.capitalize(StringUtils.join(Arrays.stream(StringUtils.splitByCharacterTypeCamelCase(documentType)).map(StringUtils::uncapitalize).toArray(String[]::new), " "));
     }

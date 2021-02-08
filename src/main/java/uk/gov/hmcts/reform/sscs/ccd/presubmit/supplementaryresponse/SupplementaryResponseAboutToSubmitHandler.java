@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.collections4.ListUtils.union;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,10 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
 
 @Service
 @Slf4j
@@ -50,8 +54,15 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
         }
 
         if (sscsCaseData.getDwpOtherDoc() != null && sscsCaseData.getDwpOtherDoc().getDocumentLink() != null) {
-            responseDocuments.add(sscsCaseData.getDwpOtherDoc());
+            if (DocumentUtil.isFileAMedia(sscsCaseData.getDwpOtherDoc().getDocumentLink())) {
+                addAudioVideoEvidence(sscsCaseData);
+                sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId());
+            } else {
+                responseDocuments.add(sscsCaseData.getDwpOtherDoc());
+            }
             sscsCaseData.setDwpOtherDoc(null);
+            sscsCaseData.setRip1Doc(null);
+            sscsCaseData.setIsRip1Doc(null);
         }
 
         if (responseDocuments.size() > 0) {
@@ -61,6 +72,23 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
         }
 
         return callbackResponse;
+    }
+
+    private void addAudioVideoEvidence(SscsCaseData sscsCaseData) {
+        AudioVideoEvidence audioVideoEvidence = AudioVideoEvidence.builder()
+                .value(AudioVideoEvidenceDetails.builder()
+                        .documentType(DocumentType.OTHER_DOCUMENT.getValue())
+                        .documentLink(sscsCaseData.getDwpOtherDoc().getDocumentLink())
+                        .fileName(sscsCaseData.getDwpOtherDoc().getDocumentLink().getDocumentFilename())
+                        .rip1Document(sscsCaseData.getRip1Doc())
+                        .dateAdded(LocalDate.now())
+                        .build())
+                .build();
+
+        if (sscsCaseData.getAudioVideoEvidence() == null ) {
+            sscsCaseData.setAudioVideoEvidence(new ArrayList<>());
+        }
+        sscsCaseData.getAudioVideoEvidence().add(audioVideoEvidence);
     }
 
     private List<ScannedDocument> buildScannedDocsList(SscsCaseData sscsCaseData, List<DwpResponseDocument> responseDocuments) {
