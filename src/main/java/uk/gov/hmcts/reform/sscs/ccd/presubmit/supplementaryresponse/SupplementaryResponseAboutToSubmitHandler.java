@@ -13,11 +13,11 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentSubtype;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
 
 @Service
@@ -85,7 +85,7 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
                         .build())
                 .build();
 
-        if (sscsCaseData.getAudioVideoEvidence() == null ) {
+        if (sscsCaseData.getAudioVideoEvidence() == null) {
             sscsCaseData.setAudioVideoEvidence(new ArrayList<>());
         }
         sscsCaseData.getAudioVideoEvidence().add(audioVideoEvidence);

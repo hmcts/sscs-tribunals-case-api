@@ -177,7 +177,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenASupplementaryResponseWithDwpSupplementaryResponseDocAndAudioVideoDwpOtherDocAndRIP1Doc_thenMoveOtherDocToAudioVideoEvidenceListAndLinkRIP1Doc() {
+    public void givenASupplementaryResponseWithDwpSupplementaryResponseDocAndAudioVideoDwpOtherDocAndRip1Doc_thenMoveOtherDocToAudioVideoEvidenceListAndLinkRip1Doc() {
         sscsCaseData.setDwpSupplementaryResponseDoc(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("test1.doc").documentUrl("myurl1").build()).build());
         sscsCaseData.setDwpOtherDoc(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("test2.mp3").documentUrl("myurl2").build()).build());
         sscsCaseData.setRip1Doc(DocumentLink.builder().documentFilename("test3.pdf").documentUrl("myurl3").build());
