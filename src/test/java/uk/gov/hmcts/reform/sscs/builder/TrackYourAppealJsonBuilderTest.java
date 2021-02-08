@@ -92,6 +92,15 @@ public class TrackYourAppealJsonBuilderTest {
         assertJsonEquals(FINAL_DECISION_NOTICE_MYA.getSerializedMessage(), objectNode);
     }
 
+    @Test
+    public void shouldReturnDwpRespondStatesForPaperTypeInHearingStatusCaseInTheMyaResponse() {
+        SscsCaseData caseData = HEARING_CCD.getDeserializeMessage();
+        caseData.getAppeal().setHearingType(HearingType.PAPER.getValue());
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter(), 1L, true, "hearing");
+        assertJsonEquals(HEARING_PAPER_MYA.getSerializedMessage(), objectNode);
+    }
+
     private RegionalProcessingCenter populateRegionalProcessingCenter() {
         return RegionalProcessingCenter.builder()
             .name("LIVERPOOL")
