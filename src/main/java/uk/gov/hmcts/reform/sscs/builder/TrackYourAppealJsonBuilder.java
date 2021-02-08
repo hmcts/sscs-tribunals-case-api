@@ -102,7 +102,10 @@ public class TrackYourAppealJsonBuilder {
 
             List<String> withDwpStates = Arrays.asList("appealCreated", "validAppeal", "withDwp");
 
-            List<String> dwpRespondStates = Arrays.asList("readyToList", "responseReceived", NOT_LISTABLE);
+            List<String> dwpRespondStates = new ArrayList<>(List.of("readyToList", "responseReceived", NOT_LISTABLE));
+            if (getHearingType(caseData).equals(PAPER)) {
+                dwpRespondStates.addAll(List.of("hearing", "outcome"));
+            }
 
             List<String> hearingStates = Arrays.asList("hearing", "outcome");
 

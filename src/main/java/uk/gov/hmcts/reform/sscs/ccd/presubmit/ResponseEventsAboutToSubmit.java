@@ -37,7 +37,7 @@ public class ResponseEventsAboutToSubmit {
         DwpDocumentDetails dwpDocumentDetails = new DwpDocumentDetails(DwpDocumentType.UCB.getValue(),
                 "UCB document",
                 LocalDate.now().toString(),
-                dwpUcbEvidenceDocument, null, null, null);
+                dwpUcbEvidenceDocument, null, null, null, null);
         DwpDocument dwpDocument = new DwpDocument(dwpDocumentDetails);
         if (isNull(sscsCaseData.getDwpDocuments())) {
             sscsCaseData.setDwpDocuments(new ArrayList<>());

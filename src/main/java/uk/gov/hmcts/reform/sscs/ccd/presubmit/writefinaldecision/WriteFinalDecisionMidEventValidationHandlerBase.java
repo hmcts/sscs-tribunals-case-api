@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
@@ -21,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 @Slf4j
 public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    private static final List<String> DEATH_OF_APPELLANT_WARNING_PAGES = Arrays.asList("typeOfAppeal", "previewDecisionNotice");
     private final Validator validator;
 
     protected final DecisionNoticeService decisionNoticeService;
@@ -69,6 +73,10 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
 
         if (isDecisionNoticeDatesInvalid(sscsCaseData)) {
             preSubmitCallbackResponse.addError("Decision notice end date must be after decision notice start date");
+        }
+
+        if (isYes(sscsCaseData.getIsAppellantDeceased()) && DEATH_OF_APPELLANT_WARNING_PAGES.contains(callback.getPageId()) && !callback.isIgnoreWarnings()) {
+            preSubmitCallbackResponse.addWarning("Appellant is deceased. Copy the draft decision and amend offline, then upload the offline version.");
         }
 
         setShowSummaryOfOutcomePage(sscsCaseData);
