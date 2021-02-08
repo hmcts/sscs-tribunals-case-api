@@ -1,12 +1,218 @@
+tags:
+  sscs-ccd-idam-pr: true
+
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
   readinessDelay: 45
   environment:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
-    CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+    CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-data-store-api"
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
+    CCD_UI_BASE_URL: https://case-management-web-${SERVICE_FQDN}
     IDAM_S2S_AUTH: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
     IDAM_API_JWK_URL: https://idam-api.aat.platform.hmcts.net/jwks
     CREATE_CCD_ENDPOINT: true
+
+ccd:
+  ccd:
+    adminWeb:
+      enabled: false
+      apiGatewayWeb:
+        enabled: true
+      definitionImporter:
+        enabled: false
+      managementWeb:
+        enabled: false
+      s2s:
+        enabled: false
+      elastic:
+        enabled: true
+  global:
+    ccdApiGatewayIngress: gateway-${SERVICE_FQDN}
+    ccdCaseManagementWebIngress: case-management-web-${SERVICE_FQDN}
+    ccdDataStoreUrl: http://${SERVICE_NAME}-ccd-data-store-api
+    ccdDefinitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
+    ccdUserProfileUrl: http://${SERVICE_NAME}-ccd-user-profile-api
+    dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
+    idamApiUrl: https://idam-api.aat.platform.hmcts.net
+    idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
+    s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+
+  ccd-api-gateway-web:
+    nodejs:
+      imagePullPolicy: Always
+      environment:
+        ADDRESS_LOOKUP_TOKEN: ${ADDRESS_LOOKUP_TOKEN}
+        IDAM_SERVICE_KEY: ${API_GATEWAY_S2S_KEY}
+        IDAM_OAUTH2_CLIENT_SECRET: ${API_GATEWAY_IDAM_SECRET}
+        PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
+      ingressHost: gateway-${SERVICE_FQDN}
+      ingressIP: ${INGRESS_IP}
+      keyVaults: [ ]
+
+  ccd-data-store-api:
+    java:
+      imagePullPolicy: Always
+      memoryRequests: '1524Mi'
+      cpuRequests: '900m'
+      environment:
+        DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
+        DATA_STORE_IDAM_KEY: ${DATA_STORE_S2S_KEY}
+        IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
+        CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES: sscs,ccd_gw
+        ELASTIC_SEARCH_ENABLED: true
+        ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
+        ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
+        HTTP_CLIENT_READ_TIMEOUT: '120000'
+        HTTP_CLIENT_MAX_TOTAL: '300'
+        HTTP_CLIENT_MAX_CLIENT_PER_ROUTE: '30'
+        DATA_STORE_DB_MAX_POOL_SIZE: 80
+        DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
+      keyVaults: [ ]
+      ingressHost: ccd-data-store-api-${SERVICE_FQDN}
+      autoscaling:
+        enabled: false
+    ccd-definition-store-api:
+      java:
+        autoscaling:
+          enabled: false
+        imagePullPolicy: Always
+        environment:
+          DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
+          DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
+          IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
+          ELASTIC_SEARCH_ENABLED: true
+          ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
+        keyVaults: [ ]
+        ingressHost: ccd-definition-store-${SERVICE_FQDN}
+    ccd-user-profile-api:
+      java:
+        imagePullPolicy: Always
+        enviroment:
+          USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
+        keyVaults: [ ]
+        ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
+
+    postgresql:
+      persistence:
+        enabled: false
+      postgresConfig:
+        maxConnections: "300"
+
+elastic:
+  enabled: true
+
+elasticsearch:
+  clusterName: "es"
+  imageTag: "6.4.2"
+  replicas: 1
+  minimumMasterNodes: 1
+  antiAffinity: "soft"
+  esJavaOpts: "-Xmx512m -Xms512m"
+  persistence:
+    enabled: false
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: traefik
+    path: /
+    hosts:
+      - es-${SERVICE_FQDN}
+logstash:
+  image:
+    repository: hmctspublic.azurecr.io/ccd/logstash:ccd-sscs-logstash-latest
+    tag: latest
+    pullPolicy: Always
+  logstashJavaOpts: -Xmx1g -Xms512M
+  persistence:
+    enabled: false
+  volumeMounts:
+    - name: pipeline
+      mountPath: /usr/share/logstash/files
+  elasticsearch:
+    host: ${SERVICE_NAME}-es-master
+    port: 9200
+  configTpl:
+    xpack.monitoring.enabled: "false"
+    db.url: jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?ssl=disable&stringtype=unspecified
+    db.user: hmcts
+    db.pwd: hmcts
+    es.data.nodes.url: http://${SERVICE_NAME}-es-master:9200
+  livenessProbe:
+    initialDelaySeconds: 90
+#  postgresql:
+#    nameOverride: postgres
+#
+#  idam-pr:
+#    releaseNameOverride: ${SERVICE_NAME}-ccd-idam-pr
+#    redirect_uris:
+#      CCD:
+#        - https://case-management-web-${SERVICE_FQDN}/oauth2redirect
+#      CCD Admin:
+#        - https://admin-web-${SERVICE_FQDN}/oauth2redirect
+#
+#  apiGateway:
+#    s2sKey: ${API_GATEWAY_S2S_KEY}
+#    idamClientSecret:
+#      value: ${API_GATEWAY_IDAM_SECRET}
+#
+#  userProfileApi:
+#    authorisedServices: ccd_admin,ccd_data,ccd_definition,sscs
+#
+#  dataStoreApi:
+#    s2sKey: ${DATA_STORE_S2S_KEY}
+#    s2sAuthorisedServices: sscs,ccd_gw
+#
+#  definitionStoreApi:
+#    s2sKey: ${DEFINITION_STORE_S2S_KEY}
+#    s2sAuthorisedServices: ccd_admin,ccd_data,sscs,ccd_gw
+#
+#  caseManagementWeb:
+#    enabled: true # if you need access to the web ui then enable this, otherwise it won't be deployed
+#    environment:
+#      NODE_TLS_REJECT_UNAUTHORIZED: 0
+#
+#  adminWeb:
+#    enabled: false # if you need access to the admin web ui then enable this, otherwise it won't be deployed
+#    s2sKey: ${ADMIN_S2S_KEY}
+#    idamClientSecret:
+#      value: ${ADMIN_WEB_IDAM_SECRET}
+#    environment:
+#      NODE_TLS_REJECT_UNAUTHORIZED: 0
+#
+  importer:
+    userprofile:
+      enabled: true
+      jurisdictions:
+        - SSCS
+      users:
+        - system.update@hmcts.net|SSCS|Benefit|appealCreated
+      userProfileDatabaseHost: ${SERVICE_NAME}-ccd-postgres
+      userProfileDatabasePort: 5432
+      userProfileDatabaseUser: hmcts
+      userProfileDatabasePassword: hmcts
+      userProfileDatabaseName: user-profile
+    definition:
+      enabled: true
+      image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.7.44
+      kvSecretRef: kvcreds
+      gitSecretRef: kvcreds
+      redirectUri: https://case-management-web-${SERVICE_FQDN}/oauth2redirect
+      definitionFilename: sscs-ccd.xlsx
+      userRoles:
+        - citizen
+        - caseworker
+        - caseworker-sscs
+        - caseworker-sscs-systemupdate
+        - caseworker-sscs-anonymouscitizen
+        - caseworker-sscs-callagent
+        - caseworker-sscs-judge
+        - caseworker-sscs-clerk
+        - caseworker-sscs-dwpresponsewriter
+        - caseworker-sscs-registrar
+        - caseworker-sscs-superuser
+        - caseworker-sscs-teamleader
+        - caseworker-sscs-panelmember
+        - caseworker-sscs-bulkscan
