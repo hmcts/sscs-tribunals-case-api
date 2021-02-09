@@ -58,13 +58,13 @@ ccd:
       memoryRequests: '1524Mi'
       cpuRequests: '900m'
       environment:
-        DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
+        DATA_STORE_DB_HOST: ${SERVICE_NAME}-shared-database
         DATA_STORE_IDAM_KEY: ${DATA_STORE_S2S_KEY}
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
         CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES: sscs,ccd_gw
         ELASTIC_SEARCH_ENABLED: true
-        ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
-        ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
+        ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-elasticsearch:9200
+        ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-elasticsearch:9200
         HTTP_CLIENT_READ_TIMEOUT: '120000'
         HTTP_CLIENT_MAX_TOTAL: '300'
         HTTP_CLIENT_MAX_CLIENT_PER_ROUTE: '30'
@@ -80,7 +80,7 @@ ccd:
           enabled: false
         imagePullPolicy: Always
         environment:
-          DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
+          DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-shared-database
           DEFINITION_STORE_IDAM_KEY: ${DEFINITION_STORE_S2S_KEY}
           IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
           ELASTIC_SEARCH_ENABLED: true
@@ -91,7 +91,7 @@ ccd:
       java:
         imagePullPolicy: Always
         enviroment:
-          USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
+          USER_PROFILE_DB_HOST: ${SERVICE_NAME}-shared-database
         keyVaults: [ ]
         ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
 
