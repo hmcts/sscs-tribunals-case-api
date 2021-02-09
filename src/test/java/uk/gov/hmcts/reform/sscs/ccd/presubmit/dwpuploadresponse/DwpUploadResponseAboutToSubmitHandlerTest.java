@@ -418,8 +418,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("reviewByJudge", response.getData().getSelectWhoReviewsCase().getValue().getCode());
         assertEquals("phmeRequest", response.getData().getInterlocReferralReason());
         assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
-
-        dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 
     @Test
