@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFurtherEvidenceDoc;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
 
 @Service
 public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -50,12 +51,6 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
             response.addError("You need to provide a file and a document type");
             return response;
         }
-        if (!isFileUploadedAPdf(caseData.getDraftSscsFurtherEvidenceDocument())) {
-            initDraftSscsFurtherEvidenceDocument(caseData);
-            PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
-            response.addError("You need to upload PDF documents only");
-            return response;
-        }
 
         moveDraftsToSscsDocs(caseData);
         initDraftSscsFurtherEvidenceDocument(caseData);
@@ -77,16 +72,6 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
                 });
         }
         return false;
-    }
-
-    private boolean isFileUploadedAPdf(List<SscsFurtherEvidenceDoc> draftSscsFurtherEvidenceDocuments) {
-        return draftSscsFurtherEvidenceDocuments.stream().allMatch(this::isFileAPdf);
-    }
-
-    private boolean isFileAPdf(SscsFurtherEvidenceDoc doc) {
-        return doc.getValue().getDocumentLink() != null
-                && isNotBlank(doc.getValue().getDocumentLink().getDocumentUrl())
-                && equalsAnyIgnoreCase("pdf", getExtension(doc.getValue().getDocumentLink().getDocumentFilename()));
     }
 
     private boolean isFileUploaded(SscsFurtherEvidenceDoc doc) {
