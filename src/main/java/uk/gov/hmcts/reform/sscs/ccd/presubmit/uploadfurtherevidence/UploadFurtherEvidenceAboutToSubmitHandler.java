@@ -8,17 +8,13 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.lowerCase;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +25,12 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
 
 @Service
 @Slf4j
 public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private static final List<String> ALLOWED_FILE_TYPES = Arrays.asList("pdf", "mp3", "mp4");
-    private static final List<String> MEDIA_FILE_TYPES = Arrays.asList("mp3", "mp4");
-    private static final String PDF_FILE_TYPE = "pdf";
     private final boolean uploadAudioVideoEvidenceEnabled;
 
     @Autowired
@@ -94,7 +88,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private void addToSscsDocuments(SscsCaseData sscsCaseData) {
         List<SscsDocument> newSscsDocuments = sscsCaseData.getDraftFurtherEvidenceDocuments().stream()
-                .filter(doc -> PDF_FILE_TYPE.equalsIgnoreCase(getExtension(doc.getValue().getDocumentLink().getDocumentFilename())))
+                .filter(this::isFileAPdf)
                 .map(doc ->
                         SscsDocument.builder().value(SscsDocumentDetails.builder()
                                 .documentLink(doc.getValue().getDocumentLink())
@@ -112,7 +106,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private void addToAudioVideoEvidence(SscsCaseData sscsCaseData) {
         List<AudioVideoEvidence> newAudioVideoEvidence = sscsCaseData.getDraftFurtherEvidenceDocuments().stream()
-                .filter(doc -> MEDIA_FILE_TYPES.contains(lowerCase(getExtension(doc.getValue().getDocumentLink().getDocumentFilename()))))
+                .filter(doc -> DocumentUtil.isFileAMedia(doc.getValue().getDocumentLink()))
                 .map(doc ->
                         AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
                                 .documentLink(doc.getValue().getDocumentLink())
@@ -129,19 +123,16 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private boolean isFileAPdf(DraftSscsDocument doc) {
-        return doc.getValue().getDocumentLink() != null
-                && isNotBlank(doc.getValue().getDocumentLink().getDocumentUrl())
-                && PDF_FILE_TYPE.equalsIgnoreCase(getExtension(doc.getValue().getDocumentLink().getDocumentFilename()));
+        return doc.getValue().getDocumentLink() != null && DocumentUtil.isFileAPdf(doc.getValue().getDocumentLink());
     }
 
     private boolean hasMp3OrMp4(List<DraftSscsDocument> draftSscsFurtherEvidenceDocument) {
-        return ofNullable(draftSscsFurtherEvidenceDocument).orElse(emptyList()).stream().anyMatch(doc -> MEDIA_FILE_TYPES.contains(lowerCase(getExtension(doc.getValue().getDocumentLink().getDocumentFilename()))));
+        return ofNullable(draftSscsFurtherEvidenceDocument).orElse(emptyList()).stream().anyMatch(doc -> DocumentUtil.isFileAMedia(doc.getValue().getDocumentLink()));
     }
 
     private boolean isFileAPdfOrMedia(DraftSscsDocument doc) {
         return doc.getValue().getDocumentLink() != null
-                && isNotBlank(doc.getValue().getDocumentLink().getDocumentUrl())
-                && ALLOWED_FILE_TYPES.contains(lowerCase(getExtension(doc.getValue().getDocumentLink().getDocumentFilename())));
+                && (DocumentUtil.isFileAPdf(doc.getValue().getDocumentLink()) || DocumentUtil.isFileAMedia(doc.getValue().getDocumentLink()));
     }
 
 }
