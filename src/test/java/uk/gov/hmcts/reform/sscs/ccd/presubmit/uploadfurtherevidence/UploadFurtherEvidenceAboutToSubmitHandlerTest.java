@@ -59,7 +59,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        handler = new UploadFurtherEvidenceAboutToSubmitHandler();
+        handler = new UploadFurtherEvidenceAboutToSubmitHandler(true);
         when(callback.getEvent()).thenReturn(EventType.UPLOAD_FURTHER_EVIDENCE);
         sscsCaseData = SscsCaseData.builder().state(State.VALID_APPEAL).appeal(Appeal.builder().build()).build();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -158,6 +158,21 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getData().getDraftFurtherEvidenceDocuments(), is(nullValue()));
         assertThat(response.getData().getSscsDocument().size(), is(3));
+    }
+
+    @Test
+    @Parameters({"doc.mp4", "doc.mp3"})
+    public void shouldOnlyUploadPdfFilesWhenFeatureFlagIsFalse(String fileName) {
+        handler = new UploadFurtherEvidenceAboutToSubmitHandler(false);
+        final List<DraftSscsDocument> draftDocs = getDraftSscsDocuments("", fileName);
+        sscsCaseData.setDraftFurtherEvidenceDocuments(draftDocs);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getErrors().iterator().next(), is("You need to upload PDF documents only"));
+        assertThat(response.getData().getDraftFurtherEvidenceDocuments(), is(draftDocs));
+        assertThat(response.getData().getSscsDocument(), is(nullValue()));
     }
 
 }

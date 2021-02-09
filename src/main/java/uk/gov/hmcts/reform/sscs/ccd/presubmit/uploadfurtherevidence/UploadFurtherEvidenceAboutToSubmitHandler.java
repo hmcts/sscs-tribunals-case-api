@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -28,7 +30,14 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Slf4j
 public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private static final List<String> ALLOWED_FILE_TYPES = Arrays.asList("pdf", "PDF", "mp3", "MP3", "mp4", "MP4");
+    private static final List<String> ALLOWED_FILE_TYPES = Arrays.asList("pdf", "mp3", "mp4");
+    private static final String PDF_FILE_TYPE = "pdf";
+    private final boolean uploadAudioVideoEvidenceEnabled;
+
+    @Autowired
+    public UploadFurtherEvidenceAboutToSubmitHandler(@Value("${feature.upload-audio-video-evidence.enabled}") boolean uploadAudioVideoEvidenceEnabled) {
+        this.uploadAudioVideoEvidenceEnabled = uploadAudioVideoEvidenceEnabled;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -58,22 +67,14 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 }
                 if (isNull(doc.getValue().getDocumentLink()) || isBlank(doc.getValue().getDocumentLink().getDocumentUrl())) {
                     preSubmitCallbackResponse.addError("Please upload a file");
-                } else if (!isFileAPdfOrMedia(doc)) {
+                } else if (!uploadAudioVideoEvidenceEnabled && !isFileAPdf(doc)) {
+                    preSubmitCallbackResponse.addError("You need to upload PDF documents only");
+                } else if (uploadAudioVideoEvidenceEnabled && !isFileAPdfOrMedia(doc)) {
                     preSubmitCallbackResponse.addError("You need to upload PDF, MP3 or MP4 documents only");
                 }
             });
             if (isEmpty(preSubmitCallbackResponse.getErrors())) {
-                List<SscsDocument> newDocuments = sscsCaseData.getDraftFurtherEvidenceDocuments().stream().map(doc ->
-                        SscsDocument.builder().value(SscsDocumentDetails.builder()
-                        .documentLink(doc.getValue().getDocumentLink())
-                        .documentFileName(doc.getValue().getDocumentFileName())
-                        .documentType(doc.getValue().getDocumentType())
-                        .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
-                        .build()).build()).collect(toList());
-                List<SscsDocument> allDocuments = new ArrayList<>(ofNullable(sscsCaseData.getSscsDocument()).orElse(emptyList()));
-                allDocuments.addAll(newDocuments);
-                sort(newDocuments);
-                sscsCaseData.setSscsDocument(allDocuments);
+                addToSscsDocuments(sscsCaseData);
             }
         }
         if (isEmpty(preSubmitCallbackResponse.getErrors())) {
@@ -82,10 +83,30 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         return preSubmitCallbackResponse;
     }
 
+    private void addToSscsDocuments(SscsCaseData sscsCaseData) {
+        List<SscsDocument> newSscsDocuments = sscsCaseData.getDraftFurtherEvidenceDocuments().stream().map(doc ->
+                SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentLink(doc.getValue().getDocumentLink())
+                .documentFileName(doc.getValue().getDocumentFileName())
+                .documentType(doc.getValue().getDocumentType())
+                .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
+                .build()).build()).collect(toList());
+        List<SscsDocument> allDocuments = new ArrayList<>(ofNullable(sscsCaseData.getSscsDocument()).orElse(emptyList()));
+        allDocuments.addAll(newSscsDocuments);
+        sort(newSscsDocuments);
+        sscsCaseData.setSscsDocument(allDocuments);
+    }
+
+    private boolean isFileAPdf(DraftSscsDocument doc) {
+        return doc.getValue().getDocumentLink() != null
+                && isNotBlank(doc.getValue().getDocumentLink().getDocumentUrl())
+                && PDF_FILE_TYPE.equalsIgnoreCase(getExtension(doc.getValue().getDocumentLink().getDocumentFilename()));
+    }
+
     private boolean isFileAPdfOrMedia(DraftSscsDocument doc) {
         return doc.getValue().getDocumentLink() != null
                 && isNotBlank(doc.getValue().getDocumentLink().getDocumentUrl())
-                && ALLOWED_FILE_TYPES.contains(getExtension(doc.getValue().getDocumentLink().getDocumentFilename()));
+                && ALLOWED_FILE_TYPES.contains(lowerCase(getExtension(doc.getValue().getDocumentLink().getDocumentFilename())));
     }
 
 }
