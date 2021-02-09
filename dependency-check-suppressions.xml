@@ -28,6 +28,7 @@
         ]]></notes>
         <gav regex="true">^org\.jetbrains\.kotlin:*:.*$</gav>
         <cve>CVE-2020-15824</cve>
+        <cve>CVE-2020-29582</cve>
     </suppress>
     <suppress until="2021-03-01">
         <notes><![CDATA[
