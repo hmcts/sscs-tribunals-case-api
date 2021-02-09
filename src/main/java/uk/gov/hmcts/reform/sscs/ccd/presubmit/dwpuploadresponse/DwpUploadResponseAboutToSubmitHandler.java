@@ -78,13 +78,13 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     protected void handleAudioVideoDocuments(SscsCaseData sscsCaseData) {
         //do nothing if there is nothing
-        if (sscsCaseData.getDwpUploadAudioVideoEvidence() == null || sscsCaseData.getDwpUploadAudioVideoEvidence().size() == 0) {
+        if (sscsCaseData.getDwpUploadAudioVideoEvidence() == null || sscsCaseData.getDwpUploadAudioVideoEvidence().isEmpty()) {
             return;
         }
 
         List<AudioVideoEvidence> audioVideoEvidence = sscsCaseData.getAudioVideoEvidence();
         if (audioVideoEvidence == null) {
-            audioVideoEvidence = new ArrayList<AudioVideoEvidence>();
+            audioVideoEvidence = new ArrayList<>();
             sscsCaseData.setAudioVideoEvidence(audioVideoEvidence);
         }
         //fill in fields, type, name and date
