@@ -77,7 +77,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     }
 
     protected void handleAudioVideoDocuments(SscsCaseData sscsCaseData) {
-        //do nothing if there is nothing
         if (sscsCaseData.getDwpUploadAudioVideoEvidence() == null || sscsCaseData.getDwpUploadAudioVideoEvidence().isEmpty()) {
             return;
         }
@@ -87,7 +86,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             audioVideoEvidence = new ArrayList<>();
             sscsCaseData.setAudioVideoEvidence(audioVideoEvidence);
         }
-        //fill in fields, type, name and date
+
         List<AudioVideoEvidence> dwpAudioVideoEvidence = sscsCaseData.getDwpUploadAudioVideoEvidence();
         for (AudioVideoEvidence audioVideo: dwpAudioVideoEvidence) {
             audioVideo.getValue().setDateAdded(LocalDate.now());
@@ -96,7 +95,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             sscsCaseData.getAudioVideoEvidence().add(audioVideo);
         }
         log.info("DWP audio video documents moved into case audio video {}", sscsCaseData.getCcdCaseId());
-        //then empty it
+        
         sscsCaseData.setDwpUploadAudioVideoEvidence(null);
     }
 
