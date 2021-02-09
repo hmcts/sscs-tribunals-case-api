@@ -40,4 +40,11 @@
         <cve>CVE-2020-11022</cve>
         <cve>CVE-2020-11023</cve>
     </suppress>
+    <suppress until="2021-03-01">
+        <notes><![CDATA[
+         file name: kotlin-stdlib-1.4.30.jar
+        ]]></notes>
+        <gav regex="true">^org\.jetbrains\.kotlin:*:.*$</gav>
+        <cve>CVE-2020-29582</cve>
+    </suppress>
 </suppressions>
