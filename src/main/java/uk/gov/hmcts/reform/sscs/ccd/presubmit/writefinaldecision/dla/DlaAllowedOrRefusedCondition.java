@@ -1,0 +1,120 @@
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.dla;
+
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate.ALLOWED;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate.REFUSED;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.FALSE;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.IntPredicate;
+import java.util.function.Predicate;
+import org.apache.commons.collections4.CollectionUtils;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.FieldCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoFieldCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.dla.scenarios.DlaScenario;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
+
+/**
+ * Encapsulates the conditions satisfied by valid combinations of allowed/refused and other attributes of the Decision Notice journey - to be used on Outcome validation (eg. on submission), but not on
+ * preview.
+ */
+public enum DlaAllowedOrRefusedCondition implements PointsCondition<DlaAllowedOrRefusedCondition> {
+
+    REFUSED_NOT_CONSIDERED_NOT_CONSIDERED(
+        isAllowedOrRefused(REFUSED),
+        isDescriptorFlow(FALSE, false)),
+    ALLOWED_NOT_CONSIDERED_NOT_CONSIDERED(
+        isAllowedOrRefused(ALLOWED),
+        isDescriptorFlow(FALSE, false));
+
+
+    List<FieldCondition> primaryConditions;
+
+    DlaAllowedOrRefusedCondition(Optional<AllowedOrRefusedCondition> allowedOrRefusedCondition, YesNoFieldCondition descriptorFlowCondition) {
+        this.primaryConditions = new ArrayList<>();
+        this.primaryConditions.add(descriptorFlowCondition);
+        if (allowedOrRefusedCondition.isPresent()) {
+            this.primaryConditions.add(allowedOrRefusedCondition.get());
+        }
+    }
+
+    public static Optional<DlaAllowedOrRefusedCondition> getPassingAllowedOrRefusedCondition(DecisionNoticeQuestionService questionService,
+        SscsCaseData caseData) {
+        return Optional.of(DlaAllowedOrRefusedCondition.getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(questionService, caseData));
+    }
+
+    static YesNoFieldCondition isDescriptorFlow(Predicate<YesNo> predicate, boolean displayIsSatisfiedMessage) {
+        return new YesNoFieldCondition("Descriptor Flow", predicate,
+            s -> "Yes".equalsIgnoreCase(s.getWriteFinalDecisionIsDescriptorFlow()) ? YesNo.YES : YesNo.NO, displayIsSatisfiedMessage);
+    }
+
+    static Optional<AllowedOrRefusedCondition> isAllowedOrRefused(AllowedOrRefusedPredicate predicate) {
+        return Optional.of(new AllowedOrRefusedCondition(predicate));
+    }
+
+    protected static DlaAllowedOrRefusedCondition getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(DecisionNoticeQuestionService questionService,
+        SscsCaseData caseData) {
+
+        for (DlaAllowedOrRefusedCondition dlaPointsAndActivitiesCondition : DlaAllowedOrRefusedCondition.values()) {
+
+            if (dlaPointsAndActivitiesCondition.isApplicable(questionService, caseData) && dlaPointsAndActivitiesCondition.getOptionalErrorMessage(questionService, caseData).isEmpty()) {
+                return dlaPointsAndActivitiesCondition;
+            }
+        }
+        throw new IllegalStateException(
+            "No allowed/refused condition found for " + caseData.getWriteFinalDecisionIsDescriptorFlow()
+                + ":" + caseData.getWriteFinalDecisionAllowedOrRefused()
+                + ":" + caseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion() + ":"
+                + caseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion() + ":"
+                + caseData.getSscsPipCaseData()
+                .getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion() + ":"
+                + caseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+    }
+
+    public static Function<SscsCaseData, List<String>> getAllAnswersExtractor() {
+        return sscsCaseData -> CollectionUtils.collate(emptyIfNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion()),
+            emptyIfNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionMentalAssessmentQuestion()));
+    }
+
+    public DlaScenario getPipScenario(SscsCaseData caseData) {
+        return DlaScenario.SCENARIO_NON_DESCRIPTOR;
+    }
+
+    @Override
+    public boolean isApplicable(DecisionNoticeQuestionService questionService, SscsCaseData caseData) {
+        if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+            return primaryConditions.stream().allMatch(c -> c.isSatisified(caseData));
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public IntPredicate getPointsRequirementCondition() {
+        return p -> true;
+    }
+
+    @Override
+    public Class<DlaAllowedOrRefusedCondition> getEnumClass() {
+        return DlaAllowedOrRefusedCondition.class;
+    }
+
+    @Override
+    public Function<SscsCaseData, List<String>> getAnswersExtractor() {
+        return getAllAnswersExtractor();
+    }
+
+    @Override
+    public Optional<String> getOptionalErrorMessage(DecisionNoticeQuestionService questionService, SscsCaseData sscsCaseData) {
+        return Optional.empty();
+    }
+}
+
