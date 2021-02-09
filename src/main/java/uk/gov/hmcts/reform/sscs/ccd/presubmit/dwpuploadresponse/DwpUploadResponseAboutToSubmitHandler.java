@@ -130,17 +130,10 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             dwpDocumentService.addToDwpDocuments(sscsCaseData, sscsCaseData.getDwpAT38Document(), DwpDocumentType.AT_38);
             sscsCaseData.setDwpAT38Document(null);
 
-            dwpDocumentService.removeDwpDocumentTypeFromCollection(sscsCaseData, DwpDocumentType.DWP_RESPONSE);
-            DocumentLink editedResponseDocumentLink = sscsCaseData.getDwpEditedResponseDocument() != null ? sscsCaseData.getDwpEditedResponseDocument().getDocumentLink() : null;
-            dwpDocumentService.addToDwpDocumentsWithEditedDoc(sscsCaseData, sscsCaseData.getDwpResponseDocument(), DwpDocumentType.DWP_RESPONSE, editedResponseDocumentLink);
-            sscsCaseData.setDwpResponseDocument(null);
-            sscsCaseData.setDwpEditedResponseDocument(null);
+            dwpDocumentService.moveDwpResponseDocumentToDwpDocumentCollection(sscsCaseData);
+            dwpDocumentService.moveDwpEvidenceBundleToDwpDocumentCollection(sscsCaseData);
 
-            dwpDocumentService.removeDwpDocumentTypeFromCollection(sscsCaseData, DwpDocumentType.DWP_EVIDENCE_BUNDLE);
-            DocumentLink editedEvidenceBundleDocumentLink = sscsCaseData.getDwpEditedEvidenceBundleDocument() != null ? sscsCaseData.getDwpEditedEvidenceBundleDocument().getDocumentLink() : null;
-            dwpDocumentService.addToDwpDocumentsWithEditedDoc(sscsCaseData, sscsCaseData.getDwpEvidenceBundleDocument(), DwpDocumentType.DWP_EVIDENCE_BUNDLE, editedEvidenceBundleDocumentLink);
-            sscsCaseData.setDwpEvidenceBundleDocument(null);
-            sscsCaseData.setDwpEditedEvidenceBundleDocument(null);
+            sscsCaseData.setDwpEditedEvidenceReason(null);
         }
 
         if (sscsCaseData.getAppendix12Doc() != null) {
