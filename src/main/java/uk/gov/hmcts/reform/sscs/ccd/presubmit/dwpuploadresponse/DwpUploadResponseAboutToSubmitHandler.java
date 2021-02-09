@@ -5,15 +5,14 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.callback.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -68,11 +67,37 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         handleEditedDocuments(sscsCaseData, todayDate, preSubmitCallbackResponse);
 
+        handleAudioVideoDocuments(sscsCaseData);
+
         moveDocsToCorrectCollection(sscsCaseData, todayDate);
 
         checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
 
         return preSubmitCallbackResponse;
+    }
+
+    protected void handleAudioVideoDocuments(SscsCaseData sscsCaseData) {
+        //do nothing if there is nothing
+        if (sscsCaseData.getDwpUploadAudioVideoEvidence() == null || sscsCaseData.getDwpUploadAudioVideoEvidence().size() == 0) {
+            return;
+        }
+
+        List<AudioVideoEvidence> audioVideoEvidence = sscsCaseData.getAudioVideoEvidence();
+        if (audioVideoEvidence == null) {
+            audioVideoEvidence = new ArrayList<AudioVideoEvidence>();
+            sscsCaseData.setAudioVideoEvidence(audioVideoEvidence);
+        }
+        //fill in fields, type, name and date
+        List<AudioVideoEvidence> dwpAudioVideoEvidence = sscsCaseData.getDwpUploadAudioVideoEvidence();
+        for (AudioVideoEvidence audioVideo: dwpAudioVideoEvidence) {
+            audioVideo.getValue().setDateAdded(LocalDate.now());
+            audioVideo.getValue().setFileName(audioVideo.getValue().getDocumentLink().getDocumentFilename());
+            audioVideo.getValue().setDocumentType(DocumentType.DWP_EVIDENCE.getValue());
+            sscsCaseData.getAudioVideoEvidence().add(audioVideo);
+        }
+        log.info("DWP audio video documents moved into case audio video ", sscsCaseData.getCcdCaseId());
+        //then empty it
+        sscsCaseData.setDwpUploadAudioVideoEvidence(null);
     }
 
     private boolean checkErrors(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {

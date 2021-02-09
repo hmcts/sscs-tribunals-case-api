@@ -14,6 +14,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
@@ -22,6 +24,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -532,6 +535,57 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(sscsCaseData.getDwpUcb(), is(YES.getValue()));
         assertThat(sscsCaseData.getDwpUcbEvidenceDocument(), is(nullValue()));
         assertThat(sscsCaseData.getDwpDocuments().size(), is(1));
+    }
+
+    @Test
+    public void givenHandleAudioVideoDocuments_thenItMovesToAudioVideoListAndFillsInFields() {
+        AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
+                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
+                .surveillanceDocument(DocumentLink.builder()
+                        .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("surveillance").build()).build();
+
+        sscsCaseData.setDwpUploadAudioVideoEvidence(Collections
+                .singletonList(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build()));
+
+        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
+
+        assertNull(callback.getCaseDetails().getCaseData().getDwpUploadAudioVideoEvidence());
+        assertEquals(1, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
+        assertEquals("filename", callback.getCaseDetails().getCaseData().getAudioVideoEvidence().get(0).getValue().getFileName());
+        assertNotNull(callback.getCaseDetails().getCaseData().getAudioVideoEvidence().get(0).getValue().getDateAdded());
+        assertEquals(DocumentType.DWP_EVIDENCE.getValue(), callback.getCaseDetails().getCaseData().getAudioVideoEvidence().get(0).getValue().getDocumentType());
+    }
+
+    @Test
+    public void givenHandleNullAudioVideoDocuments_thenNoAudioVideoList() {
+        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
+        assertNull(sscsCaseData.getAudioVideoEvidence());
+    }
+
+    @Test
+    public void givenHandleEmptyAudioVideoDocuments_thenNoAudioVideoList() {
+        sscsCaseData.setDwpUploadAudioVideoEvidence(Collections.emptyList());
+        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
+        assertNull(sscsCaseData.getAudioVideoEvidence());
+    }
+
+    @Test
+    public void givenExistingAudioVideo_thenItGetsAddedToList() {
+        AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
+                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
+                .surveillanceDocument(DocumentLink.builder()
+                        .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("surveillance").build()).build();
+
+        List audioVideoList = new ArrayList<>();
+        audioVideoList.add(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build());
+
+        sscsCaseData.setDwpUploadAudioVideoEvidence(Collections
+                .singletonList(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build()));
+
+        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
+
+        assertNull(callback.getCaseDetails().getCaseData().getDwpUploadAudioVideoEvidence());
+        assertEquals(1, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
     }
 
 }
