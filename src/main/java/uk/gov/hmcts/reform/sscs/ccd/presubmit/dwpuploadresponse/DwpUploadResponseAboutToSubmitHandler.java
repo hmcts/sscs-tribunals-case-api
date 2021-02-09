@@ -95,7 +95,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             audioVideo.getValue().setDocumentType(DocumentType.DWP_EVIDENCE.getValue());
             sscsCaseData.getAudioVideoEvidence().add(audioVideo);
         }
-        log.info("DWP audio video documents moved into case audio video ", sscsCaseData.getCcdCaseId());
+        log.info("DWP audio video documents moved into case audio video {}", sscsCaseData.getCcdCaseId());
         //then empty it
         sscsCaseData.setDwpUploadAudioVideoEvidence(null);
     }
