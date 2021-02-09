@@ -136,7 +136,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             sscsCaseData.setDwpEditedEvidenceReason(null);
         }
 
-        if (sscsCaseData.getAppendix12Doc() != null) {
+        if (sscsCaseData.getAppendix12Doc() != null && sscsCaseData.getAppendix12Doc().getDocumentLink() != null) {
             dwpDocumentService.addToDwpDocuments(sscsCaseData, sscsCaseData.getAppendix12Doc(), DwpDocumentType.APPENDIX_12);
         }
     }
