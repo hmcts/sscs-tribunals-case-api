@@ -1,20 +1,16 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.supplementaryresponse;
 
+import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
+
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
-
-import java.util.List;
-
-import static java.util.Collections.singletonList;
-import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 @Service
 public class SupplementaryResponseMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
