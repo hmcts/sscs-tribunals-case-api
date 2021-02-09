@@ -390,7 +390,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenUcCaseWithPhmeNoFurtherInfo2ndCall_thenSetReviewByJudge() {
+    public void givenUcCaseWithPhmeNoFurtherInfo2ndCall_thenNoError() {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder()
                 .documentLink(
