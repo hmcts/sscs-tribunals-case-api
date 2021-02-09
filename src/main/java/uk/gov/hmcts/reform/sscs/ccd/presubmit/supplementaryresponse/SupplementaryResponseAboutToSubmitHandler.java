@@ -62,8 +62,9 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
             }
             sscsCaseData.setDwpOtherDoc(null);
             sscsCaseData.setRip1Doc(null);
-            sscsCaseData.setIsRip1Doc(null);
         }
+
+        sscsCaseData.setShowRip1DocPage(null);
 
         if (responseDocuments.size() > 0) {
             sscsCaseData.setScannedDocuments(buildScannedDocsList(sscsCaseData, responseDocuments));

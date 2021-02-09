@@ -174,6 +174,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), response.getData().getInterlocReviewState());
         assertEquals("No", response.getData().getEvidenceHandled());
         assertNull(response.getData().getDwpOtherDoc());
+        assertNull(response.getData().getShowRip1DocPage());
     }
 
     @Test
@@ -199,5 +200,6 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         assertEquals("No", response.getData().getEvidenceHandled());
         assertNull(response.getData().getDwpOtherDoc());
         assertNull(response.getData().getRip1Doc());
+        assertNull(response.getData().getShowRip1DocPage());
     }
 }
