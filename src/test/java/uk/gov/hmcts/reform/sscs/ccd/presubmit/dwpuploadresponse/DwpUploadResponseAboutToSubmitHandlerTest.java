@@ -14,7 +14,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
@@ -545,7 +544,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     public void givenHandleAudioVideoDocuments_thenItMovesToAudioVideoListAndFillsInFields() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
                 .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
-                .surveillanceDocument(DocumentLink.builder()
+                .rip1Document(DocumentLink.builder()
                         .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("surveillance").build()).build();
 
         sscsCaseData.setDwpUploadAudioVideoEvidence(Collections
@@ -577,7 +576,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     public void givenExistingAudioVideo_thenItGetsAddedToList() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
                 .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
-                .surveillanceDocument(DocumentLink.builder()
+                .rip1Document(DocumentLink.builder()
                         .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("surveillance").build()).build();
 
         List audioVideoList = new ArrayList<>();
