@@ -1,10 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.dla;
 
-import static org.apache.commons.lang3.StringUtils.join;
-import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +9,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityAnswer;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestion;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.dla.scenarios.DlaScenario;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
@@ -60,14 +54,6 @@ public class DlaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
 
         if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
 
-            // Validate here for PIP instead of only validating on submit.
-            // This ensures that we know we can obtain a valid allowed or refused condition below
-            //outcomeService.validate(response, caseData)
-            // If validation has produced no errors, we know that we can get an allowed/refused condition.
-
-            // Optional<EsaAllowedOrRefusedCondition> condition = EsaPointsRegulationsAndSchedule3ActivitiesCondition
-            //   .getPassingAllowedOrRefusedCondition(decisionNoticeQuestionService, caseData);
-            //if (condition.isPresent()) {
             Optional<DlaAllowedOrRefusedCondition> condition = DlaAllowedOrRefusedCondition.getPassingAllowedOrRefusedCondition(decisionNoticeQuestionService, caseData);
             if (condition.isPresent()) {
                 DlaAllowedOrRefusedCondition allowedOrRefusedCondition = condition.get();
@@ -86,60 +72,11 @@ public class DlaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
 
     @Override
     protected void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
-
-        String dailyLivingAwardType = caseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion();
-        String mobilityAwardType = caseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion();
-
-        if (dailyLivingAwardType != null) {
-            builder.dailyLivingAwardRate(join(
-                splitByCharacterTypeCamelCase(dailyLivingAwardType), ' ').toLowerCase());
-        } else {
-            builder.dailyLivingAwardRate(null);
-        }
-
-        if (AwardType.ENHANCED_RATE.getKey().equals(dailyLivingAwardType)) {
-            builder.dailyLivingIsEntited(true);
-            builder.dailyLivingIsSeverelyLimited(true);
-        } else if (AwardType.STANDARD_RATE.getKey().equals(dailyLivingAwardType)) {
-            builder.dailyLivingIsEntited(true);
-            builder.dailyLivingIsSeverelyLimited(false);
-        } else {
-            builder.dailyLivingIsEntited(false);
-            builder.dailyLivingIsSeverelyLimited(false);
-        }
-
-        if (mobilityAwardType != null) {
-            builder.mobilityAwardRate(join(
-                splitByCharacterTypeCamelCase(mobilityAwardType), ' ').toLowerCase());
-        } else {
-            builder.mobilityAwardRate(null);
-        }
-
-        if (AwardType.ENHANCED_RATE.getKey().equals(mobilityAwardType)) {
-            builder.mobilityIsEntited(true);
-            builder.mobilityIsSeverelyLimited(true);
-        } else if (AwardType.STANDARD_RATE.getKey().equals(mobilityAwardType)) {
-            builder.mobilityIsEntited(true);
-            builder.mobilityIsSeverelyLimited(false);
-        } else {
-            builder.mobilityIsEntited(false);
-            builder.mobilityIsSeverelyLimited(false);
-        }
+        // No-op for DLA
     }
 
     @Override
     protected void setDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
         builder.isDescriptorFlow(false);
-    }
-
-    private List<String> getConsideredComparisonsWithDwp(SscsCaseData caseData) {
-        List<String> consideredComparissons = new ArrayList<>();
-        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion())) {
-            consideredComparissons.add(caseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
-        }
-        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion())) {
-            consideredComparissons.add(caseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
-        }
-        return consideredComparissons;
     }
 }
