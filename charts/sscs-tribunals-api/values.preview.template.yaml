@@ -141,7 +141,7 @@ ccd:
         keyVaults: [ ]
         ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
 
-    postgresql:
+    shared-database:
       persistence:
         enabled: false
       postgresConfig:
@@ -168,7 +168,7 @@ elasticsearch:
       - es-${SERVICE_FQDN}
 logstash:
   image:
-    repository: hmctspublic.azurecr.io/ccd/logstash:ccd-sscs-logstash-latest
+    repository: hmctspublic.azurecr.io/ccd/logstash
     tag: latest
     pullPolicy: Always
   logstashJavaOpts: -Xmx1g -Xms512M
@@ -178,7 +178,7 @@ logstash:
     - name: pipeline
       mountPath: /usr/share/logstash/files
   elasticsearch:
-    host: ${SERVICE_NAME}-es-master
+    host: ${SERVICE_NAME}-elasticsearch
     port: 9200
   configTpl:
     xpack.monitoring.enabled: "false"
