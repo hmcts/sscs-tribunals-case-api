@@ -45,6 +45,12 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
             response.addError("You need to provide a file and a document type");
             return response;
         }
+        if (!isFileUploadedAValid(caseData.getDraftSscsFurtherEvidenceDocument())) {
+            initDraftSscsFurtherEvidenceDocument(caseData);
+            PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+            response.addError("You need to upload PDF,MP3 or MP4 file only");
+            return response;
+        }
 
         moveDraftsToSscsDocs(caseData);
         moveDraftsToAudioVideoEvidence(caseData);
@@ -67,6 +73,12 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
                 });
         }
         return false;
+    }
+
+    private boolean isFileUploadedAValid(List<SscsFurtherEvidenceDoc> draftSscsFurtherEvidenceDocuments) {
+        return draftSscsFurtherEvidenceDocuments.stream().allMatch(doc ->
+                DocumentUtil.isFileAPdf(doc.getValue().getDocumentLink())
+                        || DocumentUtil.isFileAMedia(doc.getValue().getDocumentLink()));
     }
 
     private boolean isFileUploaded(SscsFurtherEvidenceDoc doc) {
