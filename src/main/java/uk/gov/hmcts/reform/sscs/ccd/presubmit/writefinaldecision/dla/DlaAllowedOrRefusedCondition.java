@@ -29,18 +29,14 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 public enum DlaAllowedOrRefusedCondition implements PointsCondition<DlaAllowedOrRefusedCondition> {
 
     REFUSED_NOT_CONSIDERED_NOT_CONSIDERED(
-        isAllowedOrRefused(REFUSED),
-        isDescriptorFlow(FALSE, false)),
+        isAllowedOrRefused(REFUSED)),
     ALLOWED_NOT_CONSIDERED_NOT_CONSIDERED(
-        isAllowedOrRefused(ALLOWED),
-        isDescriptorFlow(FALSE, false));
-
+        isAllowedOrRefused(ALLOWED));
 
     List<FieldCondition> primaryConditions;
 
-    DlaAllowedOrRefusedCondition(Optional<AllowedOrRefusedCondition> allowedOrRefusedCondition, YesNoFieldCondition descriptorFlowCondition) {
+    DlaAllowedOrRefusedCondition(Optional<AllowedOrRefusedCondition> allowedOrRefusedCondition) {
         this.primaryConditions = new ArrayList<>();
-        this.primaryConditions.add(descriptorFlowCondition);
         if (allowedOrRefusedCondition.isPresent()) {
             this.primaryConditions.add(allowedOrRefusedCondition.get());
         }
@@ -49,11 +45,6 @@ public enum DlaAllowedOrRefusedCondition implements PointsCondition<DlaAllowedOr
     public static Optional<DlaAllowedOrRefusedCondition> getPassingAllowedOrRefusedCondition(DecisionNoticeQuestionService questionService,
         SscsCaseData caseData) {
         return Optional.of(DlaAllowedOrRefusedCondition.getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(questionService, caseData));
-    }
-
-    static YesNoFieldCondition isDescriptorFlow(Predicate<YesNo> predicate, boolean displayIsSatisfiedMessage) {
-        return new YesNoFieldCondition("Descriptor Flow", predicate,
-            s -> "Yes".equalsIgnoreCase(s.getWriteFinalDecisionIsDescriptorFlow()) ? YesNo.YES : YesNo.NO, displayIsSatisfiedMessage);
     }
 
     static Optional<AllowedOrRefusedCondition> isAllowedOrRefused(AllowedOrRefusedPredicate predicate) {
@@ -65,7 +56,7 @@ public enum DlaAllowedOrRefusedCondition implements PointsCondition<DlaAllowedOr
 
         for (DlaAllowedOrRefusedCondition dlaPointsAndActivitiesCondition : DlaAllowedOrRefusedCondition.values()) {
 
-            if (dlaPointsAndActivitiesCondition.isApplicable(questionService, caseData) && dlaPointsAndActivitiesCondition.getOptionalErrorMessage(questionService, caseData).isEmpty()) {
+            if (dlaPointsAndActivitiesCondition.isApplicable(questionService, caseData)) {
                 return dlaPointsAndActivitiesCondition;
             }
         }
