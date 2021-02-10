@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
@@ -545,7 +546,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
                 .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
                 .rip1Document(DocumentLink.builder()
-                        .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("surveillance").build()).build();
+                        .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("rip1").build()).build();
 
         sscsCaseData.setDwpUploadAudioVideoEvidence(Collections
                 .singletonList(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build()));
@@ -554,9 +555,32 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         assertNull(callback.getCaseDetails().getCaseData().getDwpUploadAudioVideoEvidence());
         assertEquals(1, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
-        assertEquals("filename", callback.getCaseDetails().getCaseData().getAudioVideoEvidence().get(0).getValue().getFileName());
-        assertNotNull(callback.getCaseDetails().getCaseData().getAudioVideoEvidence().get(0).getValue().getDateAdded());
-        assertEquals(DocumentType.DWP_EVIDENCE.getValue(), callback.getCaseDetails().getCaseData().getAudioVideoEvidence().get(0).getValue().getDocumentType());
+        AudioVideoEvidence audioVideoEvidence = callback.getCaseDetails().getCaseData().getAudioVideoEvidence().get(0);
+        assertEquals("/url", audioVideoEvidence.getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("rip1", audioVideoEvidence.getValue().getRip1Document().getDocumentFilename());
+        assertEquals("filename", audioVideoEvidence.getValue().getFileName());
+        assertNotNull(audioVideoEvidence.getValue().getDateAdded());
+        assertEquals(DocumentType.DWP_EVIDENCE.getValue(), audioVideoEvidence.getValue().getDocumentType());
+    }
+
+    @Test
+    public void givenHandleAudioVideoDocumentsNoRip1_thenItMovesToAudioVideoListAndFillsInFields() {
+        AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
+                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build()).build();
+
+        sscsCaseData.setDwpUploadAudioVideoEvidence(Collections
+                .singletonList(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build()));
+
+        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
+
+        assertNull(callback.getCaseDetails().getCaseData().getDwpUploadAudioVideoEvidence());
+        assertEquals(1, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
+        AudioVideoEvidence audioVideoEvidence = callback.getCaseDetails().getCaseData().getAudioVideoEvidence().get(0);
+        assertEquals("/url", audioVideoEvidence.getValue().getDocumentLink().getDocumentUrl());
+        assertNull("rip1", audioVideoEvidence.getValue().getRip1Document());
+        assertEquals("filename", audioVideoEvidence.getValue().getFileName());
+        assertNotNull(audioVideoEvidence.getValue().getDateAdded());
+        assertEquals(DocumentType.DWP_EVIDENCE.getValue(), audioVideoEvidence.getValue().getDocumentType());
     }
 
     @Test
@@ -582,13 +606,16 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         List audioVideoList = new ArrayList<>();
         audioVideoList.add(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build());
 
-        sscsCaseData.setDwpUploadAudioVideoEvidence(Collections
-                .singletonList(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build()));
+        sscsCaseData.setAudioVideoEvidence(new ArrayList<>(
+                Arrays.asList(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build())));
+
+        sscsCaseData.setDwpUploadAudioVideoEvidence(new ArrayList<>(
+                Arrays.asList(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build())));
 
         dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
 
         assertNull(callback.getCaseDetails().getCaseData().getDwpUploadAudioVideoEvidence());
-        assertEquals(1, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
+        assertEquals(2, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
     }
 
 }

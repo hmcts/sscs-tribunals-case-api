@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
+import static java.util.Collections.*;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 
@@ -88,6 +89,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         }
 
         List<AudioVideoEvidence> dwpAudioVideoEvidence = sscsCaseData.getDwpUploadAudioVideoEvidence();
+
         for (AudioVideoEvidence audioVideo: dwpAudioVideoEvidence) {
             audioVideo.getValue().setDateAdded(LocalDate.now());
             audioVideo.getValue().setFileName(audioVideo.getValue().getDocumentLink().getDocumentFilename());
@@ -95,6 +97,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             sscsCaseData.getAudioVideoEvidence().add(audioVideo);
         }
         log.info("DWP audio video documents moved into case audio video {}", sscsCaseData.getCcdCaseId());
+        sort(sscsCaseData.getAudioVideoEvidence());
         
         sscsCaseData.setDwpUploadAudioVideoEvidence(null);
     }
