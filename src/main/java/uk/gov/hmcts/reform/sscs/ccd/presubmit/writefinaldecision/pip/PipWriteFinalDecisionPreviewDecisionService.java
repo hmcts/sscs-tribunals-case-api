@@ -58,17 +58,7 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData,
         WriteFinalDecisionTemplateBody payload) {
 
-
         if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
-
-            // Validate here for PIP instead of only validating on submit.
-            // This ensures that we know we can obtain a valid allowed or refused condition below
-            //outcomeService.validate(response, caseData)
-            // If validation has produced no errors, we know that we can get an allowed/refused condition.
-
-            // Optional<EsaAllowedOrRefusedCondition> condition = EsaPointsRegulationsAndSchedule3ActivitiesCondition
-            //   .getPassingAllowedOrRefusedCondition(decisionNoticeQuestionService, caseData);
-            //if (condition.isPresent()) {
             Optional<PipAllowedOrRefusedCondition> condition = PipAllowedOrRefusedCondition.getPassingAllowedOrRefusedCondition(decisionNoticeQuestionService, caseData);
             if (condition.isPresent()) {
                 PipAllowedOrRefusedCondition allowedOrRefusedCondition = condition.get();

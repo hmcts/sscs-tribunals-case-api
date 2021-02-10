@@ -38,12 +38,7 @@ public class DlaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
 
     @Override
     protected Descriptor buildDescriptorFromActivityAnswer(ActivityQuestion activityQuestion, ActivityAnswer answer) {
-        return Descriptor.builder().activityAnswerPoints(answer.getActivityAnswerPoints())
-            .activityQuestionNumber(answer.getActivityAnswerNumber())
-            .activityAnswerLetter(answer.getActivityAnswerLetter())
-            .activityAnswerValue(answer.getActivityAnswerValue())
-            .activityQuestionValue(answer.getActivityAnswerNumber() + ". " + activityQuestion.getValue())
-            .build();
+        return Descriptor.builder().build();
     }
 
     @Override
@@ -51,13 +46,12 @@ public class DlaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData,
         WriteFinalDecisionTemplateBody payload) {
 
-
         if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
 
             Optional<DlaAllowedOrRefusedCondition> condition = DlaAllowedOrRefusedCondition.getPassingAllowedOrRefusedCondition(decisionNoticeQuestionService, caseData);
             if (condition.isPresent()) {
                 DlaAllowedOrRefusedCondition allowedOrRefusedCondition = condition.get();
-                DlaScenario scenario = allowedOrRefusedCondition.getPipScenario(caseData);
+                DlaScenario scenario = allowedOrRefusedCondition.getPipScenario();
                 if (scenario != null) {
                     DlaTemplateContent templateContent = scenario.getContent(payload);
                     builder.writeFinalDecisionTemplateContent(templateContent);

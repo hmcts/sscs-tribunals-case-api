@@ -65,7 +65,7 @@ public enum DlaAllowedOrRefusedCondition implements PointsCondition<DlaAllowedOr
             emptyIfNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionMentalAssessmentQuestion()));
     }
 
-    public DlaScenario getPipScenario(SscsCaseData caseData) {
+    public DlaScenario getPipScenario() {
         return DlaScenario.SCENARIO_NON_DESCRIPTOR;
     }
 
