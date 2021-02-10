@@ -16,6 +16,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -419,7 +421,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     public void givenUcCaseWithAppendix12Document_thenMoveDocumentToDwpDocumentsCollection() {
-        callback.getCaseDetails().getCaseData().setAppendix12Doc(DwpResponseDocument.builder().documentFileName("testA").build());
+        callback.getCaseDetails().getCaseData().setAppendix12Doc(DwpResponseDocument.builder().documentFileName("testA").documentLink(DocumentLink.builder().build()).build());
         List<DwpDocument> dwpResponseDocuments = new ArrayList<>();
         dwpResponseDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentFileName("existingDoc").documentDateAdded(LocalDate.now().minusDays(1).toString()).build()).build());
 
@@ -432,6 +434,23 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("Appendix 12 document", response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
         assertEquals(DwpDocumentType.APPENDIX_12.getValue(), response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
         assertEquals("existingDoc", response.getData().getDwpDocuments().get(1).getValue().getDocumentFileName());
+    }
+
+    @Test
+    @Parameters(method = "emptyAppendix12Documents")
+    public void givenEmptyAppendix12Document_thenDoNotMoveDocumentToDwpDocumentsCollection(@Nullable DwpResponseDocument dwpResponseDocument) {
+        callback.getCaseDetails().getCaseData().setAppendix12Doc(dwpResponseDocument);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getDwpDocuments());
+    }
+
+    public static Object[][] emptyAppendix12Documents() {
+        return new Object[][] {
+                {DwpResponseDocument.builder().build()},
+                {null}
+        };
     }
 
     @Test
