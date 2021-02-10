@@ -57,13 +57,7 @@ public enum DlaAllowedOrRefusedCondition implements PointsCondition<DlaAllowedOr
             }
         }
         throw new IllegalStateException(
-            "No allowed/refused condition found for " + caseData.getWriteFinalDecisionIsDescriptorFlow()
-                + ":" + caseData.getWriteFinalDecisionAllowedOrRefused()
-                + ":" + caseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion() + ":"
-                + caseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion() + ":"
-                + caseData.getSscsPipCaseData()
-                .getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion() + ":"
-                + caseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+            "No allowed/refused condition found for " + caseData.getWriteFinalDecisionAllowedOrRefused());
     }
 
     public static Function<SscsCaseData, List<String>> getAllAnswersExtractor() {
