@@ -117,28 +117,26 @@ ccd:
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
       autoscaling:
         enabled: false
-
-    ccd-definition-store-api:
-      java:
-        autoscaling:
-          enabled: false
-        imagePullPolicy: Always
-        environment:
-          DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
-          DEFINITION_STORE_IDAM_KEY: ${DEFINITION_STORE_S2S_KEY}
-          IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
-          ELASTIC_SEARCH_ENABLED: true
-          ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
-        keyVaults: [ ]
-        ingressHost: ccd-definition-store-${SERVICE_FQDN}
-
-    ccd-user-profile-api:
-      java:
-        imagePullPolicy: Always
-        enviroment:
-          USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
-        keyVaults: [ ]
-        ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
+  ccd-definition-store-api:
+    java:
+      autoscaling:
+        enabled: false
+      imagePullPolicy: Always
+      environment:
+        DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
+        DEFINITION_STORE_IDAM_KEY: ${DEFINITION_STORE_S2S_KEY}
+        IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
+        ELASTIC_SEARCH_ENABLED: true
+        ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
+      keyVaults: [ ]
+      ingressHost: ccd-definition-store-${SERVICE_FQDN}
+  ccd-user-profile-api:
+    java:
+      imagePullPolicy: Always
+      enviroment:
+        USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
+      keyVaults: [ ]
+      ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
 
     postgresql:
       persistence:
