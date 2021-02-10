@@ -31,14 +31,6 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     private String bundleUnEditedConfig;
     private String bundleWelshUnEditedConfig;
 
-    //FIXME to be remove after dwpDocumentsBundleFeature turned on
-    private String bundleNewEnglishConfig;
-    private String bundleNewWelshConfig;
-    private String bundleNewUnEditedConfig;
-    private String bundleNewWelshUnEditedConfig;
-
-    protected boolean dwpDocumentsBundleFeature;
-
     private static String CREATE_BUNDLE_ENDPOINT = "/api/new-bundle";
 
     private DwpDocumentService dwpDocumentService;
@@ -50,12 +42,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
                                             @Value("${bundle.english.config}") String bundleEnglishConfig,
                                             @Value("${bundle.welsh.config}") String bundleWelshConfig,
                                             @Value("${bundle.unedited.config}") String bundleUnEditedConfig,
-                                            @Value("${bundle.welsh.unedited.config}") String bundleWelshUnEditedConfig,
-                                            @Value("${bundle.new.english.config}") String bundleNewEnglishConfig,
-                                            @Value("${bundle.new.welsh.config}") String bundleNewWelshConfig,
-                                            @Value("${bundle.new.unedited.config}") String bundleNewUnEditedConfig,
-                                            @Value("${bundle.new.welsh.unedited.config}") String bundleNewWelshUnEditedConfig,
-                                            @Value("${feature.dwp-documents-bundle.enabled}") boolean dwpDocumentsBundleFeature) {
+                                            @Value("${bundle.welsh.unedited.config}") String bundleWelshUnEditedConfig) {
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.dwpDocumentService = dwpDocumentService;
         this.bundleUrl = bundleUrl;
@@ -63,11 +50,6 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         this.bundleWelshConfig = bundleWelshConfig;
         this.bundleUnEditedConfig = bundleUnEditedConfig;
         this.bundleWelshUnEditedConfig = bundleWelshUnEditedConfig;
-        this.bundleNewEnglishConfig = bundleNewEnglishConfig;
-        this.bundleNewWelshConfig = bundleNewWelshConfig;
-        this.bundleNewUnEditedConfig = bundleNewUnEditedConfig;
-        this.bundleNewWelshUnEditedConfig = bundleNewWelshUnEditedConfig;
-        this.dwpDocumentsBundleFeature = dwpDocumentsBundleFeature;
     }
 
     @Override
@@ -90,35 +72,24 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
         moveDocsToDwpCollectionIfOldPattern(sscsCaseData);
 
-        if ((!dwpDocumentsBundleFeature && checkMandatoryFilesMissingOld(sscsCaseData))
-                || (dwpDocumentsBundleFeature && checkMandatoryFilesMissing(sscsCaseData))) {
+        if (checkMandatoryFilesMissing(sscsCaseData)) {
             PreSubmitCallbackResponse<SscsCaseData> response;
             response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
             response.addError("The bundle cannot be created as mandatory DWP documents are missing");
             return response;
         } else {
 
-            if (!dwpDocumentsBundleFeature) {
-                //FIXME: Remove this after dwpDocumentsBundleFeature switched on
-                if (sscsCaseData.getDwpResponseDocument() != null && sscsCaseData.getDwpResponseDocument().getDocumentFileName() == null) {
-                    sscsCaseData.getDwpResponseDocument().setDocumentFileName(DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX);
+            sscsCaseData.getDwpDocuments().forEach(f -> {
+                if (DwpDocumentType.DWP_RESPONSE.getValue().equals(f.getValue().getDocumentType()) && null == f.getValue().getDocumentFileName()) {
+                    f.getValue().setDocumentFileName(DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX);
                 }
-                if (sscsCaseData.getDwpEvidenceBundleDocument() != null && sscsCaseData.getDwpEvidenceBundleDocument().getDocumentFileName() == null) {
-                    sscsCaseData.getDwpEvidenceBundleDocument().setDocumentFileName(DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX);
-                }
-            } else {
-                sscsCaseData.getDwpDocuments().forEach(f -> {
-                    if (DwpDocumentType.DWP_RESPONSE.getValue().equals(f.getValue().getDocumentType()) && null == f.getValue().getDocumentFileName()) {
-                        f.getValue().setDocumentFileName(DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX);
-                    }
-                });
+            });
 
-                sscsCaseData.getDwpDocuments().forEach(f -> {
-                    if (DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue().equals(f.getValue().getDocumentType()) && null == f.getValue().getDocumentFileName()) {
-                        f.getValue().setDocumentFileName(DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX);
-                    }
-                });
-            }
+            sscsCaseData.getDwpDocuments().forEach(f -> {
+                if (DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue().equals(f.getValue().getDocumentType()) && null == f.getValue().getDocumentFileName()) {
+                    f.getValue().setDocumentFileName(DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX);
+                }
+            });
 
             if (sscsCaseData.getSscsDocument() != null) {
                 for (SscsDocument sscsDocument : sscsCaseData.getSscsDocument()) {
@@ -128,22 +99,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
                 }
             }
 
-            if (!dwpDocumentsBundleFeature) {
-                //FIXME: Remove this after dwpDocumentsBundleFeature switched on
-                if (sscsCaseData.isLanguagePreferenceWelsh()) {
-                    if (sscsCaseData.getDwpEditedResponseDocument() != null && sscsCaseData.getDwpEditedEvidenceBundleDocument() != null) {
-                        sscsCaseData.setBundleConfiguration(bundleWelshUnEditedConfig);
-                    } else {
-                        sscsCaseData.setBundleConfiguration(bundleWelshConfig);
-                    }
-                } else if (sscsCaseData.getDwpEditedResponseDocument() != null && sscsCaseData.getDwpEditedEvidenceBundleDocument() != null) {
-                    sscsCaseData.setBundleConfiguration(bundleUnEditedConfig);
-                } else {
-                    sscsCaseData.setBundleConfiguration(bundleEnglishConfig);
-                }
-            } else {
-                setBundleConfig(sscsCaseData);
-            }
+            setBundleConfig(sscsCaseData);
 
             log.info("Setting the bundleConfiguration on the case {} for case id {}", sscsCaseData.getBundleConfiguration(), callback.getCaseDetails().getId());
 
@@ -157,26 +113,19 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
                 || f.getValue().getDocumentType().equals(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue())
                 && f.getValue().getEditedDocumentLink() != null).count() > 0) {
             if (sscsCaseData.isLanguagePreferenceWelsh()) {
-                sscsCaseData.setBundleConfiguration(bundleNewWelshUnEditedConfig);
+                sscsCaseData.setBundleConfiguration(bundleWelshUnEditedConfig);
             } else {
-                sscsCaseData.setBundleConfiguration(bundleNewUnEditedConfig);
+                sscsCaseData.setBundleConfiguration(bundleUnEditedConfig);
             }
         } else {
             if (sscsCaseData.isLanguagePreferenceWelsh()) {
-                sscsCaseData.setBundleConfiguration(bundleNewWelshConfig);
+                sscsCaseData.setBundleConfiguration(bundleWelshConfig);
             } else {
-                sscsCaseData.setBundleConfiguration(bundleNewEnglishConfig);
+                sscsCaseData.setBundleConfiguration(bundleEnglishConfig);
             }
         }
     }
 
-    //FIXME: Remove after dwpDocumentsBundleFeature switched on
-    private boolean checkMandatoryFilesMissingOld(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getDwpResponseDocument() == null
-                || sscsCaseData.getDwpResponseDocument().getDocumentLink() == null
-                || sscsCaseData.getDwpEvidenceBundleDocument() == null
-                || sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink() == null;
-    }
 
     private boolean checkMandatoryFilesMissing(SscsCaseData sscsCaseData) {
         if (null != sscsCaseData.getDwpDocuments()) {
@@ -198,15 +147,13 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
 
     private void moveDocsToDwpCollectionIfOldPattern(SscsCaseData sscsCaseData) {
-        if (dwpDocumentsBundleFeature) {
-            //Before we moved to the new DWP document collection, we stored DWP documents within their own fields. This would break bundling with the new config that
-            //looks at the new DWP document collection. Therefore, if the DWP fields are populated, then assume old pattern and move to the DWP document collection.
-            if (sscsCaseData.getDwpResponseDocument() != null) {
-                dwpDocumentService.moveDwpResponseDocumentToDwpDocumentCollection(sscsCaseData);
-            }
-            if (sscsCaseData.getDwpEvidenceBundleDocument() != null) {
-                dwpDocumentService.moveDwpEvidenceBundleToDwpDocumentCollection(sscsCaseData);
-            }
+        //Before we moved to the new DWP document collection, we stored DWP documents within their own fields. This would break bundling with the new config that
+        //looks at the new DWP document collection. Therefore, if the DWP fields are populated, then assume old pattern and move to the DWP document collection.
+        if (sscsCaseData.getDwpResponseDocument() != null) {
+            dwpDocumentService.moveDwpResponseDocumentToDwpDocumentCollection(sscsCaseData);
+        }
+        if (sscsCaseData.getDwpEvidenceBundleDocument() != null) {
+            dwpDocumentService.moveDwpEvidenceBundleToDwpDocumentCollection(sscsCaseData);
         }
     }
 }
