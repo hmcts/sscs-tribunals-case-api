@@ -56,7 +56,9 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (checkErrors(sscsCaseData, preSubmitCallbackResponse)) {
+        preSubmitCallbackResponse = checkErrors(sscsCaseData, preSubmitCallbackResponse);
+
+        if (preSubmitCallbackResponse.getErrors() != null && preSubmitCallbackResponse.getErrors().size() > 0) {
             return preSubmitCallbackResponse;
         }
 
@@ -75,34 +77,29 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         return preSubmitCallbackResponse;
     }
 
-    private boolean checkErrors(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        boolean isErrors = false;
+    private PreSubmitCallbackResponse<SscsCaseData> checkErrors(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (sscsCaseData.getDwpFurtherInfo() == null) {
             preSubmitCallbackResponse.addError("Further information to assist the tribunal cannot be empty.");
-            isErrors = true;
         }
 
         if (sscsCaseData.getDwpResponseDocument() == null) {
             preSubmitCallbackResponse.addError("DWP response document cannot be empty.");
-            isErrors = true;
         }
 
         if (sscsCaseData.getDwpEvidenceBundleDocument() == null) {
             preSubmitCallbackResponse.addError("DWP evidence bundle cannot be empty.");
-            isErrors = true;
         }
 
-        if (sscsCaseData.getDwpEditedEvidenceBundleDocument() != null || sscsCaseData.getDwpEditedResponseDocument() != null) {
-            if (sscsCaseData.getDwpEditedEvidenceBundleDocument() == null || sscsCaseData.getDwpEditedResponseDocument() == null) {
-                preSubmitCallbackResponse.addError("You must submit both an edited response document and an edited evidence bundle");
-                isErrors = true;
+        if (sscsCaseData.getDwpEditedEvidenceReason() != null) {
+            if (sscsCaseData.getDwpEditedResponseDocument() == null || sscsCaseData.getDwpEditedResponseDocument().getDocumentLink() == null) {
+                preSubmitCallbackResponse.addError("You must upload an edited DWP response document");
             }
-            if (sscsCaseData.getDwpEditedEvidenceReason() == null) {
-                preSubmitCallbackResponse.addError("If edited evidence is added a reason must be selected");
-                isErrors = true;
+
+            if (sscsCaseData.getDwpEditedEvidenceBundleDocument() == null || sscsCaseData.getDwpEditedEvidenceBundleDocument().getDocumentLink() == null) {
+                preSubmitCallbackResponse.addError("You must upload an edited DWP evidence bundle");
             }
         }
-        return isErrors;
+        return preSubmitCallbackResponse;
     }
 
     private void moveDocsToCorrectCollection(SscsCaseData sscsCaseData, String todayDate) {
@@ -166,8 +163,9 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
                 if (sscsCaseData.getSelectWhoReviewsCase() == null) {
                     sscsCaseData.setSelectWhoReviewsCase(new DynamicList(reviewByJudgeItem, null));
+
                 } else {
-                    sscsCaseData.getSelectWhoReviewsCase().getListItems().add(reviewByJudgeItem);
+                    sscsCaseData.getSelectWhoReviewsCase().setValue(reviewByJudgeItem);
                 }
             }
         }
