@@ -129,10 +129,9 @@ ccd:
           IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
           ELASTIC_SEARCH_ENABLED: true
           ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
-          s2sKey: ${DEFINITION_STORE_S2S_KEY}
-          s2sAuthorisedServices: ccd_admin,ccd_data,sscs,ccd_gw
         keyVaults: [ ]
         ingressHost: ccd-definition-store-${SERVICE_FQDN}
+
     ccd-user-profile-api:
       java:
         imagePullPolicy: Always
@@ -196,7 +195,7 @@ logstash:
         - SSCS
       users:
         - system.update@hmcts.net|SSCS|Benefit|appealCreated
-      userProfileDatabaseHost: ${SERVICE_NAME}-ccd-postgres
+      userProfileDatabaseHost: ${SERVICE_NAME}-postgresql
       userProfileDatabasePort: 5432
       userProfileDatabaseUser: hmcts
       userProfileDatabasePassword: hmcts
