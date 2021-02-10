@@ -17,16 +17,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 
 @RunWith(JUnitParamsRunner.class)
 public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String UPLOAD_DOCUMENT_FE_CALLBACK_JSON = "uploaddocument/uploadDocumentFECallback.json";
-    private static final String UPLOAD_DOCUMENT_FE_EXPECTED_JSON = "uploaddocument/expectedUploadDocumentFECallbackResponse.json";
     private static final String UPLOAD_AUDIO_VIDEO_DOCUMENT_FE_CALLBACK_JSON = "uploaddocument/uploadAudioVideoDocumentFECallback.json";
-    private static final String UPLOAD_AUDIO_VIDEO_DOCUMENT_FE_EXPECTED_JSON = "uploaddocument/expectedUploadAudioVideoDocumentFECallbackResponse.json";
     private UploadDocumentFurtherEvidenceHandler handler = new UploadDocumentFurtherEvidenceHandler();
 
     @Test
@@ -76,7 +76,7 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(ABOUT_TO_SUBMIT, callback,
             USER_AUTHORISATION);
 
-        assertThatJson(actualCaseData).isEqualTo(getExpectedResponse(UPLOAD_DOCUMENT_FE_EXPECTED_JSON));
+        assertThatJson(actualCaseData).isEqualTo(getExpectedResponse());
         assertEquals("feReceived", actualCaseData.getData().getDwpState());
         assertNull(actualCaseData.getData().getDraftSscsFurtherEvidenceDocument());
     }
@@ -84,12 +84,18 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
     @Test
     public void handleHappyPathWhenAudioVideoFileUploaded() throws IOException {
         Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,"appealCreated",
-                "Other evidence", "appellantEvidence", UPLOAD_AUDIO_VIDEO_DOCUMENT_FE_CALLBACK_JSON);
+                DocumentType.OTHER_EVIDENCE.getId(), DocumentType.APPELLANT_EVIDENCE.getId(), UPLOAD_AUDIO_VIDEO_DOCUMENT_FE_CALLBACK_JSON);
 
         PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(ABOUT_TO_SUBMIT, callback,
                 USER_AUTHORISATION);
 
-        assertThatJson(actualCaseData).isEqualTo(getExpectedResponse(UPLOAD_AUDIO_VIDEO_DOCUMENT_FE_EXPECTED_JSON));
+        assertEquals(1, actualCaseData.getData().getScannedDocuments().size());
+        assertEquals("reps-some-name.pdf", actualCaseData.getData().getScannedDocuments().get(0).getValue().getFileName());
+        assertEquals("other", actualCaseData.getData().getScannedDocuments().get(0).getValue().getType());
+        assertEquals(1, actualCaseData.getData().getAudioVideoEvidence().size());
+        assertEquals("appellant-some-name.mp3", actualCaseData.getData().getAudioVideoEvidence().get(0).getValue().getFileName());
+        assertEquals(DocumentType.APPELLANT_EVIDENCE.getId(), actualCaseData.getData().getAudioVideoEvidence().get(0).getValue().getDocumentType());
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), actualCaseData.getData().getInterlocReviewState());
         assertEquals("feReceived", actualCaseData.getData().getDwpState());
         assertNull(actualCaseData.getData().getDraftSscsFurtherEvidenceDocument());
     }
@@ -142,10 +148,9 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
         assertEquals(1, numberOfExpectedError);
     }
 
-    private String getExpectedResponse(String expectedFile) throws IOException {
-        String expectedResponse = fetchData(expectedFile);
-        return expectedResponse.replace("DOCUMENT_DATE_ADDED_PLACEHOLDER", LocalDate.now().atStartOfDay()
-            .toString()).replace("AUDIO_VIDEO_DATE_ADDED_PLACEHOLDER", LocalDate.now().toString());
+    private String getExpectedResponse() throws IOException {
+        String expectedResponse = fetchData("uploaddocument/" + "expectedUploadDocumentFECallbackResponse.json");
+        return expectedResponse.replace("DOCUMENT_DATE_ADDED_PLACEHOLDER", LocalDate.now().atStartOfDay().toString());
     }
 
     @Test(expected = IllegalStateException.class)
