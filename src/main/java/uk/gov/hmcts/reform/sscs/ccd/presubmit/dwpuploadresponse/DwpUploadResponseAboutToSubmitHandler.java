@@ -163,8 +163,9 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
                 if (sscsCaseData.getSelectWhoReviewsCase() == null) {
                     sscsCaseData.setSelectWhoReviewsCase(new DynamicList(reviewByJudgeItem, null));
+
                 } else {
-                    sscsCaseData.getSelectWhoReviewsCase().getListItems().add(reviewByJudgeItem);
+                    sscsCaseData.getSelectWhoReviewsCase().setValue(reviewByJudgeItem);
                 }
             }
         }
