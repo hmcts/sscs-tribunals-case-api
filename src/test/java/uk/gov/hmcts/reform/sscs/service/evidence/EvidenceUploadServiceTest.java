@@ -115,10 +115,13 @@ public class EvidenceUploadServiceTest {
     }
 
     @Test
-    public void uploadsEvidenceAndAddsItToDraftSscsDocumentsInCcd() {
+    public void uploadsEvidenceAndAddsItToDraftSscsDocumentsInCcd() throws IOException {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
         final int originalNumberOfSscsDocuments = sscsCaseDetails.getData().getDraftSscsDocument().size();
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+
+        when(file.getOriginalFilename()).thenReturn(fileName);
+        when(file.getBytes()).thenReturn(fileName.getBytes());
 
         Optional<Evidence> evidenceOptional = evidenceUploadService.uploadDraftHearingEvidence(someOnlineHearingId, file);
 
@@ -137,10 +140,12 @@ public class EvidenceUploadServiceTest {
     }
 
     @Test
-    public void uploadsEvidenceWhenThereAreNotAlreadySscsDocumentsInCcd() {
+    public void uploadsEvidenceWhenThereAreNotAlreadySscsDocumentsInCcd() throws IOException {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
+        when(file.getOriginalFilename()).thenReturn(fileName);
+        when(file.getBytes()).thenReturn(fileName.getBytes());
         Optional<Evidence> evidenceOptional = evidenceUploadService.uploadDraftHearingEvidence(someOnlineHearingId, file);
 
         assertThat(evidenceOptional.isPresent(), is(true));
