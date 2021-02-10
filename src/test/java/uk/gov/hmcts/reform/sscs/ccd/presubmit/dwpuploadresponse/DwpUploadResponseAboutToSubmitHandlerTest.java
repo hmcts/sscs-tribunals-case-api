@@ -496,7 +496,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     public void givenUcCaseWithAppendix12Document_thenMoveDocumentToDwpDocumentsCollection() {
-        callback.getCaseDetails().getCaseData().setAppendix12Doc(DwpResponseDocument.builder().documentFileName("testA").build());
+        callback.getCaseDetails().getCaseData().setAppendix12Doc(DwpResponseDocument.builder().documentFileName("testA").documentLink(DocumentLink.builder().build()).build());
         List<DwpDocument> dwpResponseDocuments = new ArrayList<>();
         dwpResponseDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentFileName("existingDoc").documentDateAdded(LocalDate.now().minusDays(1).toString()).build()).build());
 
