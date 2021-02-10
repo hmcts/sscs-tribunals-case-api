@@ -24,9 +24,9 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
  */
 public enum DlaAllowedOrRefusedCondition implements PointsCondition<DlaAllowedOrRefusedCondition> {
 
-    REFUSED_NOT_CONSIDERED_NOT_CONSIDERED(
+    REFUSED_CONDITION(
         isAllowedOrRefused(REFUSED)),
-    ALLOWED_NOT_CONSIDERED_NOT_CONSIDERED(
+    ALLOWED_CONDITION(
         isAllowedOrRefused(ALLOWED));
 
     List<FieldCondition> primaryConditions;

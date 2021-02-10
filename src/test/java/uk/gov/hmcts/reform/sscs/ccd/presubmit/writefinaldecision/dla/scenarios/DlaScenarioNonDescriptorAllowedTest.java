@@ -27,7 +27,7 @@ public class DlaScenarioNonDescriptorAllowedTest {
                 .anythingElse("Something else").build();
 
         DlaTemplateContent content = DlaScenario.SCENARIO_NON_DESCRIPTOR.getContent(body);
-
+        
         String expectedContent = "The appeal is allowed.\n"
                 + "\n"
                 + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"
