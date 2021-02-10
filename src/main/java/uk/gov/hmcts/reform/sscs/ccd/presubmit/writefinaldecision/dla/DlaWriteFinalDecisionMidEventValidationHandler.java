@@ -39,8 +39,7 @@ public class DlaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getWriteFinalDecisionIsDescriptorFlow() != null && sscsCaseData.getWriteFinalDecisionIsDescriptorFlow().equalsIgnoreCase(YesNo.NO.getValue())
-            && sscsCaseData.getWriteFinalDecisionGenerateNotice() != null && sscsCaseData.getWriteFinalDecisionGenerateNotice().equalsIgnoreCase(YesNo.YES.getValue())) {
+        if (sscsCaseData.getWriteFinalDecisionGenerateNotice() != null && sscsCaseData.getWriteFinalDecisionGenerateNotice().equalsIgnoreCase(YesNo.YES.getValue())) {
             sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES);
             return;
         }
