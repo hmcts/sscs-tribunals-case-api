@@ -101,13 +101,13 @@ ccd:
       memoryRequests: '1524Mi'
       cpuRequests: '900m'
       environment:
-        DATA_STORE_DB_HOST: ${SERVICE_NAME}-shared-database
+        DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
         DATA_STORE_IDAM_KEY: ${DATA_STORE_S2S_KEY}
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
         CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,sscs,sscs_bulkscan,em_ccd_orchestrator
         ELASTIC_SEARCH_ENABLED: true
-        ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-elasticsearch:9200
-        ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-elasticsearch:9200
+        ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
+        ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
         HTTP_CLIENT_READ_TIMEOUT: '120000'
         HTTP_CLIENT_MAX_TOTAL: '300'
         HTTP_CLIENT_MAX_CLIENT_PER_ROUTE: '30'
@@ -124,11 +124,11 @@ ccd:
           enabled: false
         imagePullPolicy: Always
         environment:
-          DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-shared-database
+          DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
           DEFINITION_STORE_IDAM_KEY: ${DEFINITION_STORE_S2S_KEY}
           IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
           ELASTIC_SEARCH_ENABLED: true
-          ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-elasticsearch
+          ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
           s2sKey: ${DEFINITION_STORE_S2S_KEY}
           s2sAuthorisedServices: ccd_admin,ccd_data,sscs,ccd_gw
         keyVaults: [ ]
@@ -137,11 +137,11 @@ ccd:
       java:
         imagePullPolicy: Always
         enviroment:
-          USER_PROFILE_DB_HOST: ${SERVICE_NAME}-shared-database
+          USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
         keyVaults: [ ]
         ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
 
-    shared-database:
+    postgresql:
       persistence:
         enabled: false
       postgresConfig:
@@ -178,14 +178,14 @@ logstash:
     - name: pipeline
       mountPath: /usr/share/logstash/files
   elasticsearch:
-    host: ${SERVICE_NAME}-elasticsearch
+    host: ${SERVICE_NAME}-es-master
     port: 9200
   configTpl:
     xpack.monitoring.enabled: "false"
-    db.url: jdbc:postgresql://${SERVICE_NAME}-shared-database:5432/ccd_data?stringtype=unspecified&ssl=false
+    db.url: jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/ccd_data?stringtype=unspecified&ssl=false
     db.user: ccd
     db.pwd: ccd
-    es.data.nodes.url: http://${SERVICE_NAME}-elasticsearch:9200
+    es.data.nodes.url: http://${SERVICE_NAME}-es-master:9200
   livenessProbe:
     initialDelaySeconds: 90
 
