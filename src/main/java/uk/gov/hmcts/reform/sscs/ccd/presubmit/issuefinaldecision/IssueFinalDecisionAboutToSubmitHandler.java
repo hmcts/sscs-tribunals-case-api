@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionBenefitTypeHelper;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -87,7 +88,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
     private void calculateOutcomeCode(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
 
-        String benefitType = sscsCaseData.getAppeal().getBenefitType() == null ? null : sscsCaseData.getAppeal().getBenefitType().getCode();
+        String benefitType = WriteFinalDecisionBenefitTypeHelper.getBenefitType(sscsCaseData);
 
         if (benefitType == null) {
             throw new IllegalStateException("Unable to determine benefit type");

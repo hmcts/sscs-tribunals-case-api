@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionBenefitTypeHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 
@@ -47,7 +48,7 @@ public class IssueFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
 
         if (sscsCaseData.getWriteFinalDecisionPreviewDocument() != null) {
 
-            String benefitType = sscsCaseData.getAppeal().getBenefitType() == null ? null : sscsCaseData.getAppeal().getBenefitType().getCode();
+            String benefitType = WriteFinalDecisionBenefitTypeHelper.getBenefitType(sscsCaseData);
 
             if (benefitType == null) {
                 response.addError("Unexpected error - benefit type is null");
