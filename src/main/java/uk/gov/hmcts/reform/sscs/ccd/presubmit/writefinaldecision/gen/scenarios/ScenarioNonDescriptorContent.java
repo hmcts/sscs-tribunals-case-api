@@ -1,11 +1,11 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.dla.scenarios;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen.scenarios;
 
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionComponentId;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.dla.DlaTemplateContent;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen.GenTemplateContent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Paragraph;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class ScenarioNonDescriptorContent extends DlaTemplateContent {
+public class ScenarioNonDescriptorContent extends GenTemplateContent {
 
     public ScenarioNonDescriptorContent(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
         addComponent(new Paragraph(WriteFinalDecisionComponentId.ALLOWED_OR_REFUSED_PARAGRAPH.name(), getAllowedOrRefusedSentence(writeFinalDecisionTemplateBody.isAllowed())));
@@ -18,7 +18,7 @@ public class ScenarioNonDescriptorContent extends DlaTemplateContent {
     }
 
     @Override
-    public DlaScenario getScenario() {
-        return DlaScenario.SCENARIO_NON_DESCRIPTOR;
+    public GenScenario getScenario() {
+        return GenScenario.SCENARIO_NON_DESCRIPTOR;
     }
 }

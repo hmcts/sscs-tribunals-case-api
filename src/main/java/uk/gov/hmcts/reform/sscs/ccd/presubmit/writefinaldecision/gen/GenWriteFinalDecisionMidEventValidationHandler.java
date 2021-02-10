@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.dla;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen;
 
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
@@ -11,30 +11,30 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 
 @Slf4j
 @Component
-public class DlaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDecisionMidEventValidationHandlerBase {
+public class GenWriteFinalDecisionMidEventValidationHandler extends WriteFinalDecisionMidEventValidationHandlerBase {
 
-    public DlaWriteFinalDecisionMidEventValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService) {
+    public GenWriteFinalDecisionMidEventValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService) {
         super(validator, decisionNoticeService);
     }
 
     @Override
     protected String getBenefitType() {
-        return "DLA";
+        return "GEN";
     }
 
     @Override
     protected void setDefaultFields(SscsCaseData sscsCaseData) {
-        // N/A for DLA
+        // N/A for GEN
     }
 
     @Override
     protected void setShowPageFlags(SscsCaseData sscsCaseData) {
-        // N/A for DLA
+        // N/A for GEN
     }
 
     @Override
     protected void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        // N/A for DLA
+        // N/A for GEN
     }
 
     @Override

@@ -8,11 +8,11 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestio
 
 @Slf4j
 @Service
-public class DlaDecisionNoticeQuestionService extends DecisionNoticeQuestionService {
+public class GenDecisionNoticeQuestionService extends DecisionNoticeQuestionService {
 
     @Autowired
-    public DlaDecisionNoticeQuestionService() throws IOException {
-        super("DLA");
+    public GenDecisionNoticeQuestionService() throws IOException {
+        super("GEN");
     }
 
     @Override

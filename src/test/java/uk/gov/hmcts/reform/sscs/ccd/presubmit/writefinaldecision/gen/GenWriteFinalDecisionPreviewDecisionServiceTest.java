@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.dla;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -25,25 +25,25 @@ import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
-import uk.gov.hmcts.reform.sscs.service.DlaDecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.DlaDecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.GenDecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.GenDecisionNoticeQuestionService;
 
-public class DlaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDecisionPreviewDecisionServiceTestBase {
+public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDecisionPreviewDecisionServiceTestBase {
 
-    protected DlaDecisionNoticeOutcomeService dlaDecisionNoticeOutcomeService;
-    protected DlaDecisionNoticeQuestionService dlaDecisionNoticeQuestionService;
+    protected GenDecisionNoticeOutcomeService genDecisionNoticeOutcomeService;
+    protected GenDecisionNoticeQuestionService genDecisionNoticeQuestionService;
 
-    public DlaWriteFinalDecisionPreviewDecisionServiceTest() throws IOException {
-        super("DLA");
-        this.dlaDecisionNoticeQuestionService = new DlaDecisionNoticeQuestionService();
-        this.dlaDecisionNoticeOutcomeService = new DlaDecisionNoticeOutcomeService(dlaDecisionNoticeQuestionService);
+    public GenWriteFinalDecisionPreviewDecisionServiceTest() throws IOException {
+        super("GEN");
+        this.genDecisionNoticeQuestionService = new GenDecisionNoticeQuestionService();
+        this.genDecisionNoticeOutcomeService = new GenDecisionNoticeOutcomeService(genDecisionNoticeQuestionService);
     }
 
     @Override
     protected WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient,
         DocumentConfiguration documentConfiguration) {
-        return new DlaWriteFinalDecisionPreviewDecisionService(generateFile, idamClient, dlaDecisionNoticeQuestionService,
-            dlaDecisionNoticeOutcomeService, documentConfiguration);
+        return new GenWriteFinalDecisionPreviewDecisionService(generateFile, idamClient, genDecisionNoticeQuestionService,
+            genDecisionNoticeOutcomeService, documentConfiguration);
     }
 
     @NamedParameters("previewEndDateAndRateCombinations")
@@ -117,7 +117,7 @@ public class DlaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
     @Override
     protected void setHigherRateScenarioFields(SscsCaseData caseData) {
-        // Note for DLA, we don't have the concept of "higher rate" so we just
+        // Note for GEN, we don't have the concept of "higher rate" so we just
         // set the common parameters instead
         setCommonNonDescriptorRoutePreviewParams(caseData);
         caseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -142,7 +142,7 @@ public class DlaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
     @Override
     public void givenGeneratedDateIsAlreadySetNonGeneratedDescriptorFlow_thenDoSetNewGeneratedDate() {
-        // N/A for DLA
+        // N/A for GEN
     }
 
     @Override

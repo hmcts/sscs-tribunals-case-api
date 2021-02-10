@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.dla;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen;
 
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityAnswer;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestion;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.dla.scenarios.DlaScenario;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen.scenarios.GenScenario;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
@@ -18,22 +18,22 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.Notic
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody.WriteFinalDecisionTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.DlaDecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.DlaDecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.GenDecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.GenDecisionNoticeQuestionService;
 
 @Slf4j
 @Component
-public class DlaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisionPreviewDecisionServiceBase {
+public class GenWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisionPreviewDecisionServiceBase {
 
     @Autowired
-    public DlaWriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient,
-        DlaDecisionNoticeQuestionService decisionNoticeQuestionService, DlaDecisionNoticeOutcomeService decisionNoticeOutcomeService, DocumentConfiguration documentConfiguration) {
+    public GenWriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient,
+        GenDecisionNoticeQuestionService decisionNoticeQuestionService, GenDecisionNoticeOutcomeService decisionNoticeOutcomeService, DocumentConfiguration documentConfiguration) {
         super(generateFile, idamClient, decisionNoticeQuestionService, decisionNoticeOutcomeService, documentConfiguration);
     }
 
     @Override
     public String getBenefitType() {
-        return "DLA";
+        return "GEN";
     }
 
     @Override
@@ -48,12 +48,12 @@ public class DlaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
 
         if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
 
-            Optional<DlaAllowedOrRefusedCondition> condition = DlaAllowedOrRefusedCondition.getPassingAllowedOrRefusedCondition(decisionNoticeQuestionService, caseData);
+            Optional<GenAllowedOrRefusedCondition> condition = GenAllowedOrRefusedCondition.getPassingAllowedOrRefusedCondition(decisionNoticeQuestionService, caseData);
             if (condition.isPresent()) {
-                DlaAllowedOrRefusedCondition allowedOrRefusedCondition = condition.get();
-                DlaScenario scenario = allowedOrRefusedCondition.getPipScenario();
+                GenAllowedOrRefusedCondition allowedOrRefusedCondition = condition.get();
+                GenScenario scenario = allowedOrRefusedCondition.getPipScenario();
                 if (scenario != null) {
-                    DlaTemplateContent templateContent = scenario.getContent(payload);
+                    GenTemplateContent templateContent = scenario.getContent(payload);
                     builder.writeFinalDecisionTemplateContent(templateContent);
                 }
             } else {
@@ -66,7 +66,7 @@ public class DlaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
 
     @Override
     protected void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
-        // No-op for DLA
+        // No-op for GEN
     }
 
     @Override

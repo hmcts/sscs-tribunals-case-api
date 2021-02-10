@@ -1,6 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.dla;
-
-import static java.util.Collections.emptyList;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen;
 
 import javax.validation.Validator;
 import junitparams.JUnitParamsRunner;
@@ -12,16 +10,16 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecis
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 
 @RunWith(JUnitParamsRunner.class)
-public class DlaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFinalDecisionMidEventValidationHandlerTestBase {
+public class GenWriteFinalDecisionMidEventValidationHandlerTest extends WriteFinalDecisionMidEventValidationHandlerTestBase {
 
     @Override
     protected WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService) {
-        return new DlaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService);
+        return new GenWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService);
     }
 
     @Override
     protected String getBenefitType() {
-        return "DLA";
+        return "GEN";
     }
 
     @Override
@@ -31,43 +29,39 @@ public class DlaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Override
     protected void setNoAwardsScenario(SscsCaseData sscsCaseData) {
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(AwardType.NO_AWARD.getKey());
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(AwardType.NO_AWARD.getKey());
+        // N/A for GEN
     }
 
     @Override
     protected void setEmptyActivitiesListScenario(SscsCaseData caseData) {
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(emptyList());
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(emptyList());
+        // N/A for GEN
     }
 
     @Override
     protected void setNullActivitiesListScenario(SscsCaseData caseData) {
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(null);
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(null);
+        // N/A for GEN
     }
 
     @Override
     protected void shouldExhibitBenefitSpecificBehaviourWhenNoAwardsAreGivenAndNoActivitiesAreSelected() {
-        // N/A for DLA
+        // N/A for GEN
     }
 
     @Override
     protected void shouldExhibitBenefitSpecificBehaviourWhenNoAwardsAreGivenAndNoActivitiesAreSelectedAndEndDateTypeIsSetEndDate() {
-        // N/A for DLA
+        // N/A for GEN
     }
 
     @Override
     protected void shouldExhibitBenefitSpecificBehaviourWhenNoAwardsAreGivenAndNoActivitiesAreSelectedAndEndDateTypeIsIndefinite() {
-        // N/A for DLA
+        // N/A for GEN
     }
 
 
     @Override
     protected void shouldExhibitBenefitSpecificBehaviourWhenAnAnAwardIsGivenAndNoActivitiesSelected(AwardType dailyLiving, AwardType mobility) {
-        // N/A for DLA
+        // N/A for GEN
     }
-
 
 }
 

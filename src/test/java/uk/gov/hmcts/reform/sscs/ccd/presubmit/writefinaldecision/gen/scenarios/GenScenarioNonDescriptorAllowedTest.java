@@ -1,12 +1,12 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.dla.scenarios;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen.scenarios;
 
 import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.dla.DlaTemplateContent;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen.GenTemplateContent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class DlaScenarioNonDescriptorAllowedTest {
+public class GenScenarioNonDescriptorAllowedTest {
 
     @Test
     public void testScenario() {
@@ -26,8 +26,8 @@ public class DlaScenarioNonDescriptorAllowedTest {
                 .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
                 .anythingElse("Something else").build();
 
-        DlaTemplateContent content = DlaScenario.SCENARIO_NON_DESCRIPTOR.getContent(body);
-        
+        GenTemplateContent content = GenScenario.SCENARIO_NON_DESCRIPTOR.getContent(body);
+
         String expectedContent = "The appeal is allowed.\n"
                 + "\n"
                 + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"

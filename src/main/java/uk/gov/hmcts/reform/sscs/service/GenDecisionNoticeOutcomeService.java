@@ -7,10 +7,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @Slf4j
 @Service
-public class DlaDecisionNoticeOutcomeService extends DecisionNoticeOutcomeService {
+public class GenDecisionNoticeOutcomeService extends DecisionNoticeOutcomeService {
 
-    public DlaDecisionNoticeOutcomeService(DlaDecisionNoticeQuestionService questionService) {
-        super("DLA", questionService);
+    public GenDecisionNoticeOutcomeService(GenDecisionNoticeQuestionService questionService) {
+        super("GEN", questionService);
     }
 
     public Outcome determineOutcome(SscsCaseData sscsCaseData) {
@@ -19,7 +19,7 @@ public class DlaDecisionNoticeOutcomeService extends DecisionNoticeOutcomeServic
 
     @Override
     public void performPreOutcomeIntegrityAdjustments(SscsCaseData sscsCaseData) {
-        // N/A for DLA
+        // N/A for GEN
     }
 
     @Override

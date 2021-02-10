@@ -40,7 +40,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.TemplateComponent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateContent;
 
 @RunWith(JUnitParamsRunner.class)
-public class DlaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
+public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
     @Test
     public void callToMidEventCallback_willValidateTheDate() throws Exception {
@@ -57,7 +57,7 @@ public class DlaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForDescriptorRoute() throws Exception {
-        // N/A for DLA
+        // N/A for GEN
     }
     
     @Test

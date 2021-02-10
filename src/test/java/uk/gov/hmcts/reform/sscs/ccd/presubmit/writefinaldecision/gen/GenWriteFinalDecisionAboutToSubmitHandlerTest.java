@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.dla;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen;
 
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -17,19 +17,19 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionAboutToSubmitHandlerTestBase;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.DlaDecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.DlaDecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.GenDecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.GenDecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
-public class DlaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDecisionAboutToSubmitHandlerTestBase<DlaDecisionNoticeQuestionService> {
+public class GenWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDecisionAboutToSubmitHandlerTestBase<GenDecisionNoticeQuestionService> {
 
-    public DlaWriteFinalDecisionAboutToSubmitHandlerTest() throws IOException {
-        super(new DlaDecisionNoticeQuestionService());
+    public GenWriteFinalDecisionAboutToSubmitHandlerTest() throws IOException {
+        super(new GenDecisionNoticeQuestionService());
     }
 
     @Override
-    protected DecisionNoticeOutcomeService createOutcomeService(DlaDecisionNoticeQuestionService decisionNoticeQuestionService) {
-        return new DlaDecisionNoticeOutcomeService(decisionNoticeQuestionService);
+    protected DecisionNoticeOutcomeService createOutcomeService(GenDecisionNoticeQuestionService decisionNoticeQuestionService) {
+        return new GenDecisionNoticeOutcomeService(decisionNoticeQuestionService);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.dla;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate.ALLOWED;
@@ -15,14 +15,14 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefuse
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.FieldCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.dla.scenarios.DlaScenario;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen.scenarios.GenScenario;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
 /**
  * Encapsulates the conditions satisfied by valid combinations of allowed/refused and other attributes of the Decision Notice journey - to be used on Outcome validation (eg. on submission), but not on
  * preview.
  */
-public enum DlaAllowedOrRefusedCondition implements PointsCondition<DlaAllowedOrRefusedCondition> {
+public enum GenAllowedOrRefusedCondition implements PointsCondition<GenAllowedOrRefusedCondition> {
 
     REFUSED_CONDITION(
         isAllowedOrRefused(REFUSED)),
@@ -31,29 +31,29 @@ public enum DlaAllowedOrRefusedCondition implements PointsCondition<DlaAllowedOr
 
     List<FieldCondition> primaryConditions;
 
-    DlaAllowedOrRefusedCondition(Optional<AllowedOrRefusedCondition> allowedOrRefusedCondition) {
+    GenAllowedOrRefusedCondition(Optional<AllowedOrRefusedCondition> allowedOrRefusedCondition) {
         this.primaryConditions = new ArrayList<>();
         if (allowedOrRefusedCondition.isPresent()) {
             this.primaryConditions.add(allowedOrRefusedCondition.get());
         }
     }
 
-    public static Optional<DlaAllowedOrRefusedCondition> getPassingAllowedOrRefusedCondition(DecisionNoticeQuestionService questionService,
+    public static Optional<GenAllowedOrRefusedCondition> getPassingAllowedOrRefusedCondition(DecisionNoticeQuestionService questionService,
         SscsCaseData caseData) {
-        return Optional.of(DlaAllowedOrRefusedCondition.getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(questionService, caseData));
+        return Optional.of(GenAllowedOrRefusedCondition.getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(questionService, caseData));
     }
 
     static Optional<AllowedOrRefusedCondition> isAllowedOrRefused(AllowedOrRefusedPredicate predicate) {
         return Optional.of(new AllowedOrRefusedCondition(predicate));
     }
 
-    protected static DlaAllowedOrRefusedCondition getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(DecisionNoticeQuestionService questionService,
+    protected static GenAllowedOrRefusedCondition getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(DecisionNoticeQuestionService questionService,
         SscsCaseData caseData) {
 
-        for (DlaAllowedOrRefusedCondition dlaPointsAndActivitiesCondition : DlaAllowedOrRefusedCondition.values()) {
+        for (GenAllowedOrRefusedCondition genPointsAndActivitiesCondition : GenAllowedOrRefusedCondition.values()) {
 
-            if (dlaPointsAndActivitiesCondition.isApplicable(questionService, caseData)) {
-                return dlaPointsAndActivitiesCondition;
+            if (genPointsAndActivitiesCondition.isApplicable(questionService, caseData)) {
+                return genPointsAndActivitiesCondition;
             }
         }
         throw new IllegalStateException(
@@ -65,8 +65,8 @@ public enum DlaAllowedOrRefusedCondition implements PointsCondition<DlaAllowedOr
             emptyIfNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionMentalAssessmentQuestion()));
     }
 
-    public DlaScenario getPipScenario() {
-        return DlaScenario.SCENARIO_NON_DESCRIPTOR;
+    public GenScenario getPipScenario() {
+        return GenScenario.SCENARIO_NON_DESCRIPTOR;
     }
 
     @Override
@@ -84,8 +84,8 @@ public enum DlaAllowedOrRefusedCondition implements PointsCondition<DlaAllowedOr
     }
 
     @Override
-    public Class<DlaAllowedOrRefusedCondition> getEnumClass() {
-        return DlaAllowedOrRefusedCondition.class;
+    public Class<GenAllowedOrRefusedCondition> getEnumClass() {
+        return GenAllowedOrRefusedCondition.class;
     }
 
     @Override

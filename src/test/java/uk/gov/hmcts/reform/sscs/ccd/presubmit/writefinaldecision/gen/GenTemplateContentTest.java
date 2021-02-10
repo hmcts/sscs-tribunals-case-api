@@ -1,12 +1,12 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.dla;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen;
 
 import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.dla.scenarios.DlaScenario;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen.scenarios.GenScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class DlaTemplateContentTest {
+public class GenTemplateContentTest {
 
     @Test
     public void testConstructor() {
@@ -25,9 +25,9 @@ public class DlaTemplateContentTest {
                 .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
                 .anythingElse("Something else").build();
 
-        DlaTemplateContent content = DlaScenario.SCENARIO_NON_DESCRIPTOR.getContent(body);
-        Assert.assertEquals("DLA", content.getBenefitTypeInitials());
-        Assert.assertEquals("Disability Living Allowance", content.getBenefitTypeNameWithoutInitials());
+        GenTemplateContent content = GenScenario.SCENARIO_NON_DESCRIPTOR.getContent(body);
+        Assert.assertEquals("GEN", content.getBenefitTypeInitials());
+        Assert.assertEquals("Generic Benefit Type", content.getBenefitTypeNameWithoutInitials());
         Assert.assertNull(content.getRegulationsYear());
     }
 

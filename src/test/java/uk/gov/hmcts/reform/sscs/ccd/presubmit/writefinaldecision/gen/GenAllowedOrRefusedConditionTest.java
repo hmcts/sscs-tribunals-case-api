@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.dla;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen;
 
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
-public class DlaAllowedOrRefusedConditionTest {
+public class GenAllowedOrRefusedConditionTest {
 
     @Mock
     private DecisionNoticeQuestionService questionService;
@@ -54,13 +54,13 @@ public class DlaAllowedOrRefusedConditionTest {
             .writeFinalDecisionAllowedOrRefused(allowedOrRefused)
             .dwpReassessTheAward(null).build();
 
-        DlaAllowedOrRefusedCondition matchingCondition = null;
+        GenAllowedOrRefusedCondition matchingCondition = null;
 
-        for (DlaAllowedOrRefusedCondition dlaAllowedOrRefusedCondition : DlaAllowedOrRefusedCondition.values()) {
+        for (GenAllowedOrRefusedCondition genAllowedOrRefusedCondition : GenAllowedOrRefusedCondition.values()) {
 
-            if (dlaAllowedOrRefusedCondition.isApplicable(questionService, caseData)) {
+            if (genAllowedOrRefusedCondition.isApplicable(questionService, caseData)) {
                 conditionApplicableCount++;
-                matchingCondition = dlaAllowedOrRefusedCondition;
+                matchingCondition = genAllowedOrRefusedCondition;
             }
         }
 
@@ -79,19 +79,19 @@ public class DlaAllowedOrRefusedConditionTest {
         }
 
         if ("allowed".equals(allowedOrRefused)) {
-            Assert.assertEquals(DlaAllowedOrRefusedCondition.ALLOWED_CONDITION, matchingCondition);
+            Assert.assertEquals(GenAllowedOrRefusedCondition.ALLOWED_CONDITION, matchingCondition);
         } else if ("refused".equals(allowedOrRefused)) {
-            Assert.assertEquals(DlaAllowedOrRefusedCondition.REFUSED_CONDITION, matchingCondition);
+            Assert.assertEquals(GenAllowedOrRefusedCondition.REFUSED_CONDITION, matchingCondition);
         }
     }
 
     @Test
     public void testAllPointsConditionAttributesAreNotNull() {
-        for (DlaAllowedOrRefusedCondition condition : DlaAllowedOrRefusedCondition.values()) {
+        for (GenAllowedOrRefusedCondition condition : GenAllowedOrRefusedCondition.values()) {
             Assert.assertNotNull(condition.getAnswersExtractor());
-            Assert.assertSame(condition.getAnswersExtractor(), DlaAllowedOrRefusedCondition.getAllAnswersExtractor());
+            Assert.assertSame(condition.getAnswersExtractor(), GenAllowedOrRefusedCondition.getAllAnswersExtractor());
             Assert.assertNotNull(condition.getEnumClass());
-            Assert.assertEquals(DlaAllowedOrRefusedCondition.class, condition.getEnumClass());
+            Assert.assertEquals(GenAllowedOrRefusedCondition.class, condition.getEnumClass());
             Assert.assertNotNull(condition.getPointsRequirementCondition());
         }
     }
