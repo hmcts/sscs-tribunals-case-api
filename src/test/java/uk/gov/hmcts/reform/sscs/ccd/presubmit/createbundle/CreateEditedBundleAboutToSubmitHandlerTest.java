@@ -17,7 +17,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -45,8 +44,7 @@ public class CreateEditedBundleAboutToSubmitHandlerTest {
     public void setUp() {
         openMocks(this);
         handler = new CreateEditedBundleAboutToSubmitHandler(serviceRequestExecutor, "bundleUrl.com",
-                "bundleEditedConfig", "bundleWelshEditedConfig",
-                "bundleNewEditedConfig", "bundleNewWelshEditedConfig", true);
+                "bundleEditedConfig", "bundleWelshEditedConfig");
 
         when(callback.getEvent()).thenReturn(EventType.CREATE_EDITED_BUNDLE);
 
@@ -74,25 +72,6 @@ public class CreateEditedBundleAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"Yes, bundleWelshEditedConfig", " No, bundleEditedConfig"})
-    public void givenWelsh_thenPopulateOldWelshConfigFileName(String languagePreference, String configFile) {
-        ReflectionTestUtils.setField(handler, "dwpDocumentsBundleFeature", false);
-
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        caseData.setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().build()).build());
-        caseData.setDwpEditedResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
-
-        caseData.setLanguagePreferenceWelsh(languagePreference);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        if (caseData.isLanguagePreferenceWelsh()) {
-            assertEquals(configFile, response.getData().getBundleConfiguration());
-        } else {
-            assertEquals(configFile, response.getData().getBundleConfiguration());
-        }
-    }
-
-    @Test
-    @Parameters({"Yes, bundleNewWelshEditedConfig", " No, bundleNewEditedConfig"})
     public void givenWelsh_thenPopulateWelshConfigFileName(String languagePreference, String configFile) {
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
