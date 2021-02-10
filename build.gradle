@@ -315,7 +315,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.14'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.5.RELEASE'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.6.28'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.7.7'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.24.0'
     testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.6.28'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
