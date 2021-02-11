@@ -179,6 +179,11 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
     }
 
+    @Override
+    protected boolean isDescriptorFlowSupported() {
+        return true;
+    }
+
     @Test
     public void willSetPreviewFileForDailyLivingMobility_whenNotGeneratingNotice() {
 
