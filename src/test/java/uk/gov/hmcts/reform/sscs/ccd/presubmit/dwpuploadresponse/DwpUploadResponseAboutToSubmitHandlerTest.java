@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 
@@ -542,7 +543,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenHandleAudioVideoDocuments_thenItMovesToAudioVideoListAndFillsInFields() {
+    public void givenHandleAudioVideoDocuments_thenItMovesToAudioVideoListAndFillsInFieldsSendToTcw() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
                 .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
                 .rip1Document(DocumentLink.builder()
@@ -561,10 +562,11 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("filename", audioVideoEvidence.getValue().getFileName());
         assertNotNull(audioVideoEvidence.getValue().getDateAdded());
         assertEquals(DocumentType.DWP_EVIDENCE.getValue(), audioVideoEvidence.getValue().getDocumentType());
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
     }
 
     @Test
-    public void givenHandleAudioVideoDocumentsNoRip1_thenItMovesToAudioVideoListAndFillsInFields() {
+    public void givenHandleAudioVideoDocumentsNoRip1_thenItMovesToAudioVideoListAndFillsInFieldsSendToTcw() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
                 .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build()).build();
 
@@ -581,6 +583,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("filename", audioVideoEvidence.getValue().getFileName());
         assertNotNull(audioVideoEvidence.getValue().getDateAdded());
         assertEquals(DocumentType.DWP_EVIDENCE.getValue(), audioVideoEvidence.getValue().getDocumentType());
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
     }
 
     @Test
@@ -597,7 +600,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenExistingAudioVideo_thenItGetsAddedToList() {
+    public void givenExistingAudioVideo_thenItGetsAddedToListSendToTcw() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
                 .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
                 .rip1Document(DocumentLink.builder()
@@ -616,6 +619,32 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         assertNull(callback.getCaseDetails().getCaseData().getDwpUploadAudioVideoEvidence());
         assertEquals(2, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
+    }
+
+    @Test
+    public void givenHandleAudioVideoDocumentsAndPhme_thenItMovesToAudioVideoListAndFillsInFieldsSendToJudge() {
+        AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
+                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
+                .rip1Document(DocumentLink.builder()
+                        .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("rip1").build()).build();
+
+        sscsCaseData.setDwpUploadAudioVideoEvidence(Collections
+                .singletonList(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build()));
+
+        sscsCaseData.setDwpEditedEvidenceReason("phme");
+
+        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
+
+        assertNull(callback.getCaseDetails().getCaseData().getDwpUploadAudioVideoEvidence());
+        assertEquals(1, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
+        AudioVideoEvidence audioVideoEvidence = callback.getCaseDetails().getCaseData().getAudioVideoEvidence().get(0);
+        assertEquals("/url", audioVideoEvidence.getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("rip1", audioVideoEvidence.getValue().getRip1Document().getDocumentFilename());
+        assertEquals("filename", audioVideoEvidence.getValue().getFileName());
+        assertNotNull(audioVideoEvidence.getValue().getDateAdded());
+        assertEquals(DocumentType.DWP_EVIDENCE.getValue(), audioVideoEvidence.getValue().getDocumentType());
+        assertEquals(REVIEW_BY_JUDGE.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
     }
 
 }
