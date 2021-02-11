@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -18,6 +20,13 @@ import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
 
 @Service
 public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private final boolean uploadAudioVideoEvidenceEnabled;
+
+    @Autowired
+    public UploadDocumentFurtherEvidenceHandler(@Value("${feature.upload-audio-video-evidence.enabled}") boolean uploadAudioVideoEvidenceEnabled) {
+        this.uploadAudioVideoEvidenceEnabled = uploadAudioVideoEvidenceEnabled;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -38,30 +47,26 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
         }
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
         if (!validDraftFurtherEvidenceDocument(caseData.getDraftSscsFurtherEvidenceDocument())) {
-            initDraftSscsFurtherEvidenceDocument(caseData);
-            PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
             response.addError("You need to provide a file and a document type");
-            return response;
-        }
-        if (!isFileUploadedAValid(caseData.getDraftSscsFurtherEvidenceDocument())) {
-            initDraftSscsFurtherEvidenceDocument(caseData);
-            PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+        } else if (!uploadAudioVideoEvidenceEnabled && !isFileUploadedAPdf(caseData.getDraftSscsFurtherEvidenceDocument())) {
+            response.addError("You need to upload PDF documents only");
+        } else if (uploadAudioVideoEvidenceEnabled && !isFileUploadedAValid(caseData.getDraftSscsFurtherEvidenceDocument())) {
             response.addError("You need to upload PDF,MP3 or MP4 file only");
-            return response;
+        } else {
+            moveDraftsToSscsDocs(caseData);
+            moveDraftsToAudioVideoEvidence(caseData);
+            caseData.setEvidenceHandled("No");
+
+            if (!State.WITH_DWP.equals(callback.getCaseDetails().getState())) {
+                caseData.setDwpState(DwpState.FE_RECEIVED.getId());
+            }
         }
 
-        moveDraftsToSscsDocs(caseData);
-        moveDraftsToAudioVideoEvidence(caseData);
         initDraftSscsFurtherEvidenceDocument(caseData);
-        caseData.setEvidenceHandled("No");
-
-        if (!State.WITH_DWP.equals(callback.getCaseDetails().getState())) {
-            caseData.setDwpState(DwpState.FE_RECEIVED.getId());
-        }
-
-        return new PreSubmitCallbackResponse<>(caseData);
+        return response;
     }
 
     private boolean validDraftFurtherEvidenceDocument(List<SscsFurtherEvidenceDoc> draftSscsFurtherEvidenceDocuments) {
@@ -73,6 +78,11 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
                 });
         }
         return false;
+    }
+
+    private boolean isFileUploadedAPdf(List<SscsFurtherEvidenceDoc> draftSscsFurtherEvidenceDocuments) {
+        return draftSscsFurtherEvidenceDocuments.stream().allMatch(doc ->
+                DocumentUtil.isFileAPdf(doc.getValue().getDocumentLink()));
     }
 
     private boolean isFileUploadedAValid(List<SscsFurtherEvidenceDoc> draftSscsFurtherEvidenceDocuments) {

@@ -27,7 +27,7 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String UPLOAD_DOCUMENT_FE_CALLBACK_JSON = "uploaddocument/uploadDocumentFECallback.json";
     private static final String UPLOAD_AUDIO_VIDEO_DOCUMENT_FE_CALLBACK_JSON = "uploaddocument/uploadAudioVideoDocumentFECallback.json";
-    private UploadDocumentFurtherEvidenceHandler handler = new UploadDocumentFurtherEvidenceHandler();
+    private UploadDocumentFurtherEvidenceHandler handler = new UploadDocumentFurtherEvidenceHandler(true);
 
     @Test
     @Parameters({
@@ -150,6 +150,33 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
 
     @Test
     public void handleDocumentUploadWhereUploadedFileIsNotAPdf() throws IOException {
+        UploadDocumentFurtherEvidenceHandler handler = new UploadDocumentFurtherEvidenceHandler(false);
+        Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,
+                "withDwp",
+                "representativeEvidence", "appellantEvidence",
+                UPLOAD_DOCUMENT_FE_CALLBACK_JSON);
+        List<SscsFurtherEvidenceDoc> draftDocuments = Collections.singletonList(SscsFurtherEvidenceDoc.builder()
+                .value(SscsFurtherEvidenceDocDetails.builder()
+                        .documentFileName("word.docx")
+                        .documentType("representativeEvidence")
+                        .documentLink(DocumentLink.builder()
+                                .documentUrl("http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655")
+                                .documentFilename("word.docx").build())
+                        .build())
+                .build());
+        callback.getCaseDetails().getCaseData().setDraftSscsFurtherEvidenceDocument(draftDocuments);
+        PreSubmitCallbackResponse<SscsCaseData> actualResponse = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThatJson(actualResponse.getData()).isEqualTo(callback.getCaseDetails().getCaseData());
+        assertNull(actualResponse.getData().getDwpState());
+        assertNull(actualResponse.getData().getDraftSscsFurtherEvidenceDocument());
+        long numberOfExpectedError = actualResponse.getErrors().stream()
+                .filter(error -> error.equalsIgnoreCase("You need to upload PDF documents only"))
+                .count();
+        assertEquals(1, numberOfExpectedError);
+    }
+
+    @Test
+    public void handleDocumentUploadWhereUploadedFileIsNotAValid() throws IOException {
         Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,
                 "withDwp",
                 "representativeEvidence", "appellantEvidence",
