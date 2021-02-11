@@ -5,9 +5,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 public abstract class WriteFinalDecisionBenefitTypeHelper {
 
     public static String getBenefitType(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getAppeal() == null ? null :
+        String benefitType = sscsCaseData.getAppeal() == null ? null :
             sscsCaseData.getAppeal().getBenefitType() == null ? null :
                 sscsCaseData.getAppeal().getBenefitType().getCode();
 
+        if (benefitType != null && !benefitType.equals("PIP") && !benefitType.equals("ESA") && !benefitType.equals("UC")) {
+            return "GEN";
+        }
+
+        return benefitType;
     }
 }

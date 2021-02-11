@@ -1,0 +1,1411 @@
+{
+  "case_details": {
+    "after_submit_callback_response": null,
+    "callback_response_status": null,
+    "callback_response_status_code": null,
+    "case_data": {
+      "appeal": {
+        "appealReasons": {},
+        "appellant": {
+          "address": {},
+          "appointee": {
+            "address": {},
+            "contact": {
+              "email": null,
+              "mobile": null,
+              "phone": null
+            },
+            "identity": {
+              "dob": null,
+              "nino": null
+            },
+            "name": {
+              "firstName": null,
+              "lastName": null,
+              "title": null
+            }
+          },
+          "contact": {
+            "email": "mail@example.com",
+            "mobile": "01234567890",
+            "phone": "01234567890"
+          },
+          "identity": {
+            "dob": "1904-03-10",
+            "nino": "AB 22 55 66 B"
+          },
+          "isAddressSameAsAppointee": null,
+          "isAppointee": null,
+          "name": {
+            "firstName": "User",
+            "lastName": "Test",
+            "title": "Mr"
+          }
+        },
+        "benefitType": {
+          "code": "DLA",
+          "description": null
+        },
+        "hearingOptions": {
+          "arrangements": [
+            "disabledAccess",
+            "hearingLoop"
+          ],
+          "excludeDates": [
+            {
+              "id": "068f9688-4977-493e-bfba-3a63fca98d13",
+              "value": {
+                "end": "2018-06-30",
+                "start": "2018-06-30"
+              }
+            }
+          ],
+          "other": "No",
+          "wantsToAttend": "Yes"
+        },
+        "hearingType": null,
+        "mrnDetails": {
+          "dwpIssuingOffice": "1",
+          "mrnDate": "2018-06-30",
+          "mrnLateReason": null,
+          "mrnMissingReason": null
+        },
+        "receivedVia": "Online",
+        "rep": {
+          "address": {},
+          "contact": {
+            "email": null,
+            "mobile": null,
+            "phone": null
+          },
+          "hasRepresentative": "Yes",
+          "name": {
+            "firstName": null,
+            "lastName": null,
+            "title": null
+          },
+          "organisation": null
+        },
+        "signer": "Signer"
+      },
+      "dwpState": "finalDecisionIssued",
+      "events": [
+        {
+          "id": "2280d1a8-353b-4420-8256-0071dcd2d782",
+          "value": {
+            "date": "2001-12-14T21:59:43.10",
+            "description": "Appeal Created",
+            "type": "appealCreated"
+          }
+        }
+      ],
+      "generatedDOB": "1904-03-10",
+      "generatedEmail": "mail@example.com",
+      "generatedMobile": "01234567890",
+      "generatedNino": "AB 22 55 66 B",
+      "generatedSurname": "Test",
+      "sscsDocument": [
+        {
+          "id": "b59c9cce-d62b-458a-b92d-f05a358b3dba",
+          "value": {
+            "bundleAddition": "A",
+            "documentDateAdded": "2019-10-10",
+            "documentFileName": "Addition A - Decision Notice issued on 23-06-2020.pdf",
+            "documentLink": {
+              "document_binary_url": "http://dm-store:5005/documents/c300ce7d-f064-480f-910f-bbb2023934d0/binary",
+              "document_filename": "result 54.pdf",
+              "document_url": "http://dm-store:5005/documents/c300ce7d-f064-480f-910f-bbb2023934d0"
+            },
+            "documentType": "Decision Notice"
+          }
+        }
+      ],
+      "subscriptions": {
+        "appellantSubscription": {
+          "email": null,
+          "lastLoggedIntoMya": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "tya": null,
+          "wantSmsNotifications": null
+        },
+        "appointeeSubscription": {
+          "email": null,
+          "lastLoggedIntoMya": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "tya": null,
+          "wantSmsNotifications": null
+        },
+        "representativeSubscription": {
+          "email": null,
+          "lastLoggedIntoMya": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "tya": null,
+          "wantSmsNotifications": null
+        },
+        "supporterSubscription": {
+          "email": null,
+          "lastLoggedIntoMya": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "tya": null,
+          "wantSmsNotifications": null
+        }
+      },
+      "writeFinalDecisionAllowedOrRefused": "allowed",
+      "writeFinalDecisionGenerateNotice": "No",
+      "writeFinalDecisionIsDescriptorFlow": "Yes",
+      "writeFinalDecisionPreviewDocument": {
+        "document_binary_url": "http://dm-store:5005/documents/b5af2b80-a14b-4219-8c14-7a680bf7e4a7/binary",
+        "document_filename": "result 54.pdf",
+        "document_url": "http://dm-store:5005/documents/b5af2b80-a14b-4219-8c14-7a680bf7e4a7"
+      }
+    },
+    "case_type_id": "Benefit",
+    "created_date": [
+      2020,
+      4,
+      27,
+      11,
+      26,
+      11,
+      394000000
+    ],
+    "data_classification": {
+      "appeal": {
+        "classification": "PUBLIC",
+        "value": {
+          "appealReasons": {
+            "classification": "PUBLIC",
+            "value": {}
+          },
+          "appellant": {
+            "classification": "PUBLIC",
+            "value": {
+              "address": {
+                "classification": "PUBLIC",
+                "value": {}
+              },
+              "appointee": {
+                "classification": "PUBLIC",
+                "value": {
+                  "address": {
+                    "classification": "PUBLIC",
+                    "value": {}
+                  },
+                  "contact": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "email": "PUBLIC",
+                      "mobile": "PUBLIC",
+                      "phone": "PUBLIC"
+                    }
+                  },
+                  "identity": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "dob": "PUBLIC",
+                      "nino": "PUBLIC"
+                    }
+                  },
+                  "name": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "firstName": "PUBLIC",
+                      "lastName": "PUBLIC",
+                      "title": "PUBLIC"
+                    }
+                  }
+                }
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "phone": "PUBLIC"
+                }
+              },
+              "identity": {
+                "classification": "PUBLIC",
+                "value": {
+                  "dob": "PUBLIC",
+                  "nino": "PUBLIC"
+                }
+              },
+              "isAddressSameAsAppointee": "PUBLIC",
+              "isAppointee": "PUBLIC",
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "title": "PUBLIC"
+                }
+              }
+            }
+          },
+          "benefitType": {
+            "classification": "PUBLIC",
+            "value": {
+              "code": "PUBLIC",
+              "description": "PUBLIC"
+            }
+          },
+          "hearingOptions": {
+            "classification": "PUBLIC",
+            "value": {
+              "arrangements": "PUBLIC",
+              "excludeDates": {
+                "classification": "PUBLIC",
+                "value": [
+                  {
+                    "id": "068f9688-4977-493e-bfba-3a63fca98d13",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  }
+                ]
+              },
+              "other": "PUBLIC",
+              "wantsToAttend": "PUBLIC"
+            }
+          },
+          "hearingType": "PUBLIC",
+          "mrnDetails": {
+            "classification": "PUBLIC",
+            "value": {
+              "dwpIssuingOffice": "PUBLIC",
+              "mrnDate": "PUBLIC",
+              "mrnLateReason": "PUBLIC",
+              "mrnMissingReason": "PUBLIC"
+            }
+          },
+          "receivedVia": "PUBLIC",
+          "rep": {
+            "classification": "PUBLIC",
+            "value": {
+              "address": {
+                "classification": "PUBLIC",
+                "value": {}
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "phone": "PUBLIC"
+                }
+              },
+              "hasRepresentative": "PUBLIC",
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "title": "PUBLIC"
+                }
+              },
+              "organisation": "PUBLIC"
+            }
+          },
+          "signer": "PUBLIC"
+        }
+      },
+      "dwpState": "PUBLIC",
+      "events": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "id": "2280d1a8-353b-4420-8256-0071dcd2d782",
+            "value": {
+              "date": "PUBLIC",
+              "description": "PUBLIC",
+              "type": "PUBLIC"
+            }
+          }
+        ]
+      },
+      "generatedDOB": "PUBLIC",
+      "generatedEmail": "PUBLIC",
+      "generatedMobile": "PUBLIC",
+      "generatedNino": "PUBLIC",
+      "generatedSurname": "PUBLIC",
+      "outcome": "PUBLIC",
+      "sscsDocument": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "id": "6d626711-2f20-48dd-bbf9-a6a8b75938c2",
+            "value": {
+              "bundleAddition": "PUBLIC",
+              "documentDateAdded": "PUBLIC",
+              "documentFileName": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "documentType": "PUBLIC"
+            }
+          },
+          {
+            "id": "b59c9cce-d62b-458a-b92d-f05a358b3dba",
+            "value": {
+              "bundleAddition": "PUBLIC",
+              "documentDateAdded": "PUBLIC",
+              "documentFileName": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "documentType": "PUBLIC"
+            }
+          }
+        ]
+      },
+      "subscriptions": {
+        "classification": "PUBLIC",
+        "value": {
+          "appellantSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "appointeeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "representativeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "supporterSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          }
+        }
+      },
+      "writeFinalDecisionAllowedOrRefused": "PUBLIC",
+      "writeFinalDecisionDocumentDateAdded": "PUBLIC",
+      "writeFinalDecisionDocumentFileName": "PUBLIC",
+      "writeFinalDecisionGenerateNotice": "PUBLIC",
+      "writeFinalDecisionIsDescriptorFlow": "PUBLIC",
+      "writeFinalDecisionPreviewDocument": "PUBLIC"
+    },
+    "delete_draft_response_status": null,
+    "delete_draft_response_status_code": null,
+    "id": 1587986771359568,
+    "jurisdiction": "SSCS",
+    "last_modified": [
+      2020,
+      6,
+      23,
+      10,
+      3,
+      46,
+      953000000
+    ],
+    "last_state_modified_date": [
+      2020,
+      6,
+      23,
+      9,
+      1,
+      40,
+      856000000
+    ],
+    "security_classification": "PUBLIC",
+    "security_classifications": {
+      "appeal": {
+        "classification": "PUBLIC",
+        "value": {
+          "appealReasons": {
+            "classification": "PUBLIC",
+            "value": {}
+          },
+          "appellant": {
+            "classification": "PUBLIC",
+            "value": {
+              "address": {
+                "classification": "PUBLIC",
+                "value": {}
+              },
+              "appointee": {
+                "classification": "PUBLIC",
+                "value": {
+                  "address": {
+                    "classification": "PUBLIC",
+                    "value": {}
+                  },
+                  "contact": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "email": "PUBLIC",
+                      "mobile": "PUBLIC",
+                      "phone": "PUBLIC"
+                    }
+                  },
+                  "identity": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "dob": "PUBLIC",
+                      "nino": "PUBLIC"
+                    }
+                  },
+                  "name": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "firstName": "PUBLIC",
+                      "lastName": "PUBLIC",
+                      "title": "PUBLIC"
+                    }
+                  }
+                }
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "phone": "PUBLIC"
+                }
+              },
+              "identity": {
+                "classification": "PUBLIC",
+                "value": {
+                  "dob": "PUBLIC",
+                  "nino": "PUBLIC"
+                }
+              },
+              "isAddressSameAsAppointee": "PUBLIC",
+              "isAppointee": "PUBLIC",
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "title": "PUBLIC"
+                }
+              }
+            }
+          },
+          "benefitType": {
+            "classification": "PUBLIC",
+            "value": {
+              "code": "PUBLIC",
+              "description": "PUBLIC"
+            }
+          },
+          "hearingOptions": {
+            "classification": "PUBLIC",
+            "value": {
+              "arrangements": "PUBLIC",
+              "excludeDates": {
+                "classification": "PUBLIC",
+                "value": [
+                  {
+                    "id": "068f9688-4977-493e-bfba-3a63fca98d13",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  }
+                ]
+              },
+              "other": "PUBLIC",
+              "wantsToAttend": "PUBLIC"
+            }
+          },
+          "hearingType": "PUBLIC",
+          "mrnDetails": {
+            "classification": "PUBLIC",
+            "value": {
+              "dwpIssuingOffice": "PUBLIC",
+              "mrnDate": "PUBLIC",
+              "mrnLateReason": "PUBLIC",
+              "mrnMissingReason": "PUBLIC"
+            }
+          },
+          "receivedVia": "PUBLIC",
+          "rep": {
+            "classification": "PUBLIC",
+            "value": {
+              "address": {
+                "classification": "PUBLIC",
+                "value": {}
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "phone": "PUBLIC"
+                }
+              },
+              "hasRepresentative": "PUBLIC",
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "title": "PUBLIC"
+                }
+              },
+              "organisation": "PUBLIC"
+            }
+          },
+          "signer": "PUBLIC"
+        }
+      },
+      "dwpState": "PUBLIC",
+      "events": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "id": "2280d1a8-353b-4420-8256-0071dcd2d782",
+            "value": {
+              "date": "PUBLIC",
+              "description": "PUBLIC",
+              "type": "PUBLIC"
+            }
+          }
+        ]
+      },
+      "generatedDOB": "PUBLIC",
+      "generatedEmail": "PUBLIC",
+      "generatedMobile": "PUBLIC",
+      "generatedNino": "PUBLIC",
+      "generatedSurname": "PUBLIC",
+      "outcome": "PUBLIC",
+      "pipWriteFinalDecisionComparedToDWPDailyLivingQuestion": "PUBLIC",
+      "pipWriteFinalDecisionComparedToDWPMobilityQuestion": "PUBLIC",
+      "pipWriteFinalDecisionDailyLivingQuestion": "PUBLIC",
+      "pipWriteFinalDecisionMobilityQuestion": "PUBLIC",
+      "sscsDocument": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "id": "6d626711-2f20-48dd-bbf9-a6a8b75938c2",
+            "value": {
+              "bundleAddition": "PUBLIC",
+              "documentDateAdded": "PUBLIC",
+              "documentFileName": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "documentType": "PUBLIC"
+            }
+          },
+          {
+            "id": "b59c9cce-d62b-458a-b92d-f05a358b3dba",
+            "value": {
+              "bundleAddition": "PUBLIC",
+              "documentDateAdded": "PUBLIC",
+              "documentFileName": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "documentType": "PUBLIC"
+            }
+          }
+        ]
+      },
+      "subscriptions": {
+        "classification": "PUBLIC",
+        "value": {
+          "appellantSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "appointeeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "representativeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "supporterSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          }
+        }
+      },
+      "writeFinalDecisionAllowedOrRefused": "PUBLIC",
+      "writeFinalDecisionDocumentDateAdded": "PUBLIC",
+      "writeFinalDecisionDocumentFileName": "PUBLIC",
+      "writeFinalDecisionGenerateNotice": "PUBLIC",
+      "writeFinalDecisionIsDescriptorFlow": "PUBLIC",
+      "writeFinalDecisionPreviewDocument": "PUBLIC"
+    },
+    "state": "dormantAppealState",
+    "version": 4
+  },
+  "case_details_before": {
+    "after_submit_callback_response": null,
+    "callback_response_status": null,
+    "callback_response_status_code": null,
+    "case_data": {
+      "appeal": {
+        "appealReasons": {},
+        "appellant": {
+          "address": {},
+          "appointee": {
+            "address": {},
+            "contact": {
+              "email": null,
+              "mobile": null,
+              "phone": null
+            },
+            "identity": {
+              "dob": null,
+              "nino": null
+            },
+            "name": {
+              "firstName": null,
+              "lastName": null,
+              "title": null
+            }
+          },
+          "contact": {
+            "email": "mail@example.com",
+            "mobile": "01234567890",
+            "phone": "01234567890"
+          },
+          "identity": {
+            "dob": "1904-03-10",
+            "nino": "AB 22 55 66 B"
+          },
+          "isAddressSameAsAppointee": null,
+          "isAppointee": null,
+          "name": {
+            "firstName": "User",
+            "lastName": "Test",
+            "title": "Mr"
+          }
+        },
+        "benefitType": {
+          "code": "DLA",
+          "description": null
+        },
+        "hearingOptions": {
+          "arrangements": [
+            "disabledAccess",
+            "hearingLoop"
+          ],
+          "excludeDates": [
+            {
+              "id": "068f9688-4977-493e-bfba-3a63fca98d13",
+              "value": {
+                "end": "2018-06-30",
+                "start": "2018-06-30"
+              }
+            }
+          ],
+          "other": "No",
+          "wantsToAttend": "Yes"
+        },
+        "hearingType": null,
+        "mrnDetails": {
+          "dwpIssuingOffice": "1",
+          "mrnDate": "2018-06-30",
+          "mrnLateReason": null,
+          "mrnMissingReason": null
+        },
+        "receivedVia": "Online",
+        "rep": {
+          "address": {},
+          "contact": {
+            "email": null,
+            "mobile": null,
+            "phone": null
+          },
+          "hasRepresentative": "Yes",
+          "name": {
+            "firstName": null,
+            "lastName": null,
+            "title": null
+          },
+          "organisation": null
+        },
+        "signer": "Signer"
+      },
+      "dwpState": "finalDecisionIssued",
+      "events": [
+        {
+          "id": "2280d1a8-353b-4420-8256-0071dcd2d782",
+          "value": {
+            "date": "2001-12-14T21:59:43.10",
+            "description": "Appeal Created",
+            "type": "appealCreated"
+          }
+        }
+      ],
+      "generatedDOB": "1904-03-10",
+      "generatedEmail": "mail@example.com",
+      "generatedMobile": "01234567890",
+      "generatedNino": "AB 22 55 66 B",
+      "generatedSurname": "Test",
+      "sscsDocument": [
+        {
+          "id": "b59c9cce-d62b-458a-b92d-f05a358b3dba",
+          "value": {
+            "bundleAddition": "A",
+            "documentDateAdded": "2019-10-10",
+            "documentFileName": "Addition A - Decision Notice issued on 23-06-2020.pdf",
+            "documentLink": {
+              "document_binary_url": "http://dm-store:5005/documents/c300ce7d-f064-480f-910f-bbb2023934d0/binary",
+              "document_filename": "result 54.pdf",
+              "document_url": "http://dm-store:5005/documents/c300ce7d-f064-480f-910f-bbb2023934d0"
+            },
+            "documentType": "Decision Notice"
+          }
+        }
+      ],
+      "subscriptions": {
+        "appellantSubscription": {
+          "email": null,
+          "lastLoggedIntoMya": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "tya": null,
+          "wantSmsNotifications": null
+        },
+        "appointeeSubscription": {
+          "email": null,
+          "lastLoggedIntoMya": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "tya": null,
+          "wantSmsNotifications": null
+        },
+        "representativeSubscription": {
+          "email": null,
+          "lastLoggedIntoMya": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "tya": null,
+          "wantSmsNotifications": null
+        },
+        "supporterSubscription": {
+          "email": null,
+          "lastLoggedIntoMya": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "tya": null,
+          "wantSmsNotifications": null
+        }
+      },
+      "writeFinalDecisionAllowedOrRefused": "allowed"
+    },
+    "case_type_id": "Benefit",
+    "created_date": [
+      2020,
+      4,
+      27,
+      11,
+      26,
+      11,
+      394000000
+    ],
+    "data_classification": {
+      "appeal": {
+        "classification": "PUBLIC",
+        "value": {
+          "appealReasons": {
+            "classification": "PUBLIC",
+            "value": {}
+          },
+          "appellant": {
+            "classification": "PUBLIC",
+            "value": {
+              "address": {
+                "classification": "PUBLIC",
+                "value": {}
+              },
+              "appointee": {
+                "classification": "PUBLIC",
+                "value": {
+                  "address": {
+                    "classification": "PUBLIC",
+                    "value": {}
+                  },
+                  "contact": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "email": "PUBLIC",
+                      "mobile": "PUBLIC",
+                      "phone": "PUBLIC"
+                    }
+                  },
+                  "identity": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "dob": "PUBLIC",
+                      "nino": "PUBLIC"
+                    }
+                  },
+                  "name": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "firstName": "PUBLIC",
+                      "lastName": "PUBLIC",
+                      "title": "PUBLIC"
+                    }
+                  }
+                }
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "phone": "PUBLIC"
+                }
+              },
+              "identity": {
+                "classification": "PUBLIC",
+                "value": {
+                  "dob": "PUBLIC",
+                  "nino": "PUBLIC"
+                }
+              },
+              "isAddressSameAsAppointee": "PUBLIC",
+              "isAppointee": "PUBLIC",
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "title": "PUBLIC"
+                }
+              }
+            }
+          },
+          "benefitType": {
+            "classification": "PUBLIC",
+            "value": {
+              "code": "PUBLIC",
+              "description": "PUBLIC"
+            }
+          },
+          "hearingOptions": {
+            "classification": "PUBLIC",
+            "value": {
+              "arrangements": "PUBLIC",
+              "excludeDates": {
+                "classification": "PUBLIC",
+                "value": [
+                  {
+                    "id": "068f9688-4977-493e-bfba-3a63fca98d13",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  }
+                ]
+              },
+              "other": "PUBLIC",
+              "wantsToAttend": "PUBLIC"
+            }
+          },
+          "hearingType": "PUBLIC",
+          "mrnDetails": {
+            "classification": "PUBLIC",
+            "value": {
+              "dwpIssuingOffice": "PUBLIC",
+              "mrnDate": "PUBLIC",
+              "mrnLateReason": "PUBLIC",
+              "mrnMissingReason": "PUBLIC"
+            }
+          },
+          "receivedVia": "PUBLIC",
+          "rep": {
+            "classification": "PUBLIC",
+            "value": {
+              "address": {
+                "classification": "PUBLIC",
+                "value": {}
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "phone": "PUBLIC"
+                }
+              },
+              "hasRepresentative": "PUBLIC",
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "title": "PUBLIC"
+                }
+              },
+              "organisation": "PUBLIC"
+            }
+          },
+          "signer": "PUBLIC"
+        }
+      },
+      "dwpState": "PUBLIC",
+      "events": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "id": "2280d1a8-353b-4420-8256-0071dcd2d782",
+            "value": {
+              "date": "PUBLIC",
+              "description": "PUBLIC",
+              "type": "PUBLIC"
+            }
+          }
+        ]
+      },
+      "generatedDOB": "PUBLIC",
+      "generatedEmail": "PUBLIC",
+      "generatedMobile": "PUBLIC",
+      "generatedNino": "PUBLIC",
+      "generatedSurname": "PUBLIC",
+      "outcome": "PUBLIC",
+      "sscsDocument": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "id": "6d626711-2f20-48dd-bbf9-a6a8b75938c2",
+            "value": {
+              "bundleAddition": "PUBLIC",
+              "documentDateAdded": "PUBLIC",
+              "documentFileName": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "documentType": "PUBLIC"
+            }
+          },
+          {
+            "id": "b59c9cce-d62b-458a-b92d-f05a358b3dba",
+            "value": {
+              "bundleAddition": "PUBLIC",
+              "documentDateAdded": "PUBLIC",
+              "documentFileName": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "documentType": "PUBLIC"
+            }
+          }
+        ]
+      },
+      "subscriptions": {
+        "classification": "PUBLIC",
+        "value": {
+          "appellantSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "appointeeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "representativeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "supporterSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          }
+        }
+      },
+      "writeFinalDecisionAllowedOrRefused": "PUBLIC"
+    },
+    "delete_draft_response_status": null,
+    "delete_draft_response_status_code": null,
+    "id": 1587986771359568,
+    "jurisdiction": "SSCS",
+    "last_modified": [
+      2020,
+      6,
+      23,
+      9,
+      14,
+      38,
+      383000000
+    ],
+    "last_state_modified_date": [
+      2020,
+      6,
+      23,
+      9,
+      1,
+      40,
+      856000000
+    ],
+    "security_classification": "PUBLIC",
+    "security_classifications": {
+      "appeal": {
+        "classification": "PUBLIC",
+        "value": {
+          "appealReasons": {
+            "classification": "PUBLIC",
+            "value": {}
+          },
+          "appellant": {
+            "classification": "PUBLIC",
+            "value": {
+              "address": {
+                "classification": "PUBLIC",
+                "value": {}
+              },
+              "appointee": {
+                "classification": "PUBLIC",
+                "value": {
+                  "address": {
+                    "classification": "PUBLIC",
+                    "value": {}
+                  },
+                  "contact": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "email": "PUBLIC",
+                      "mobile": "PUBLIC",
+                      "phone": "PUBLIC"
+                    }
+                  },
+                  "identity": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "dob": "PUBLIC",
+                      "nino": "PUBLIC"
+                    }
+                  },
+                  "name": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "firstName": "PUBLIC",
+                      "lastName": "PUBLIC",
+                      "title": "PUBLIC"
+                    }
+                  }
+                }
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "phone": "PUBLIC"
+                }
+              },
+              "identity": {
+                "classification": "PUBLIC",
+                "value": {
+                  "dob": "PUBLIC",
+                  "nino": "PUBLIC"
+                }
+              },
+              "isAddressSameAsAppointee": "PUBLIC",
+              "isAppointee": "PUBLIC",
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "title": "PUBLIC"
+                }
+              }
+            }
+          },
+          "benefitType": {
+            "classification": "PUBLIC",
+            "value": {
+              "code": "PUBLIC",
+              "description": "PUBLIC"
+            }
+          },
+          "hearingOptions": {
+            "classification": "PUBLIC",
+            "value": {
+              "arrangements": "PUBLIC",
+              "excludeDates": {
+                "classification": "PUBLIC",
+                "value": [
+                  {
+                    "id": "068f9688-4977-493e-bfba-3a63fca98d13",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  }
+                ]
+              },
+              "other": "PUBLIC",
+              "wantsToAttend": "PUBLIC"
+            }
+          },
+          "hearingType": "PUBLIC",
+          "mrnDetails": {
+            "classification": "PUBLIC",
+            "value": {
+              "dwpIssuingOffice": "PUBLIC",
+              "mrnDate": "PUBLIC",
+              "mrnLateReason": "PUBLIC",
+              "mrnMissingReason": "PUBLIC"
+            }
+          },
+          "receivedVia": "PUBLIC",
+          "rep": {
+            "classification": "PUBLIC",
+            "value": {
+              "address": {
+                "classification": "PUBLIC",
+                "value": {}
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "phone": "PUBLIC"
+                }
+              },
+              "hasRepresentative": "PUBLIC",
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "title": "PUBLIC"
+                }
+              },
+              "organisation": "PUBLIC"
+            }
+          },
+          "signer": "PUBLIC"
+        }
+      },
+      "dwpState": "PUBLIC",
+      "events": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "id": "2280d1a8-353b-4420-8256-0071dcd2d782",
+            "value": {
+              "date": "PUBLIC",
+              "description": "PUBLIC",
+              "type": "PUBLIC"
+            }
+          }
+        ]
+      },
+      "generatedDOB": "PUBLIC",
+      "generatedEmail": "PUBLIC",
+      "generatedMobile": "PUBLIC",
+      "generatedNino": "PUBLIC",
+      "generatedSurname": "PUBLIC",
+      "outcome": "PUBLIC",
+      "sscsDocument": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "id": "6d626711-2f20-48dd-bbf9-a6a8b75938c2",
+            "value": {
+              "bundleAddition": "PUBLIC",
+              "documentDateAdded": "PUBLIC",
+              "documentFileName": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "documentType": "PUBLIC"
+            }
+          },
+          {
+            "id": "b59c9cce-d62b-458a-b92d-f05a358b3dba",
+            "value": {
+              "bundleAddition": "PUBLIC",
+              "documentDateAdded": "PUBLIC",
+              "documentFileName": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "documentType": "PUBLIC"
+            }
+          }
+        ]
+      },
+      "subscriptions": {
+        "classification": "PUBLIC",
+        "value": {
+          "appellantSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "appointeeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "representativeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "supporterSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          }
+        }
+      },
+      "writeFinalDecisionAllowedOrRefused": "PUBLIC"
+    },
+    "state": "dormantAppealState",
+    "version": 4
+  },
+  "event_id": "writeFinalDecision",
+  "ignore_warning": false
+}
