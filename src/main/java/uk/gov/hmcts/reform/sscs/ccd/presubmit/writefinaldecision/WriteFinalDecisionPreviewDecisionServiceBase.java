@@ -52,7 +52,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         }
         String templateId = eventTypeStringMap.get(EventType.ISSUE_FINAL_DECISION);
         if (templateId == null) {
-            throw new IllegalStateException("Unable to obtain template id for language:" + languagePreference);
+            throw new IllegalStateException("Unable to obtain template id for ISSUE_FINAL_DECISION and language:" + languagePreference);
         }
         return templateId;
     }

@@ -722,6 +722,51 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     }
 
     @Test
+    public void givenValidCase_WhenNoTemplatesForEnglishLanguageRegisteredThenDisplayError() {
+
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        setHigherRateScenarioFields(sscsCaseData);
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+
+        documentConfiguration.getDocuments().clear();
+
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
+        assertEquals(1, response.getErrors().size());
+
+        assertEquals("Unable to obtain benefit specific documents for language:ENGLISH", response.getErrors().iterator().next());
+    }
+
+    @Test
+    public void givenValidCase_WhenNoTemplatesForEventRegisteredThenDisplayError() {
+
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        setHigherRateScenarioFields(sscsCaseData);
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+
+        documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).clear();
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
+        assertEquals(1, response.getErrors().size());
+
+        assertEquals("Unable to obtain template id for ISSUE_FINAL_DECISION and language:ENGLISH", response.getErrors().iterator().next());
+    }
+
+    @Test
     public void givenCaseWithNoPanelMembersWithEmptyValues_thenCorrectlySetTheHeldBefore() {
 
         setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
