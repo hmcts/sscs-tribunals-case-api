@@ -93,8 +93,7 @@ ccd:
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
       ingressHost: gateway-${SERVICE_FQDN}
       ingressIP: ${INGRESS_IP}
-      keyVaults: [ ]
-
+      keyVaults: []
   ccd-data-store-api:
     java:
       imagePullPolicy: Always
@@ -113,7 +112,7 @@ ccd:
         HTTP_CLIENT_MAX_CLIENT_PER_ROUTE: '30'
         DATA_STORE_DB_MAX_POOL_SIZE: 80
         DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
-      keyVaults: [ ]
+      keyVaults: []
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
       autoscaling:
         enabled: false
@@ -128,14 +127,14 @@ ccd:
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
-      keyVaults: [ ]
+      keyVaults: []
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
   ccd-user-profile-api:
     java:
       imagePullPolicy: Always
       enviroment:
         USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
-      keyVaults: [ ]
+      keyVaults: []
       ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
 
     postgresql:
@@ -186,37 +185,37 @@ logstash:
   livenessProbe:
     initialDelaySeconds: 90
 
-  importer:
-    userprofile:
-      enabled: true
-      jurisdictions:
-        - SSCS
-      users:
-        - system.update@hmcts.net|SSCS|Benefit|appealCreated
-      userProfileDatabaseHost: ${SERVICE_NAME}-postgresql
-      userProfileDatabasePort: 5432
-      userProfileDatabaseUser: hmcts
-      userProfileDatabasePassword: hmcts
-      userProfileDatabaseName: user-profile
-    definition:
-      enabled: true
-      image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.7.44
-      kvSecretRef: kvcreds
-      gitSecretRef: kvcreds
-      redirectUri: https://case-management-web-${SERVICE_FQDN}/oauth2redirect
-      definitionFilename: sscs-ccd.xlsx
-      userRoles:
-        - citizen
-        - caseworker
-        - caseworker-sscs
-        - caseworker-sscs-systemupdate
-        - caseworker-sscs-anonymouscitizen
-        - caseworker-sscs-callagent
-        - caseworker-sscs-judge
-        - caseworker-sscs-clerk
-        - caseworker-sscs-dwpresponsewriter
-        - caseworker-sscs-registrar
-        - caseworker-sscs-superuser
-        - caseworker-sscs-teamleader
-        - caseworker-sscs-panelmember
-        - caseworker-sscs-bulkscan
+importer:
+  userprofile:
+    enabled: true
+    jurisdictions:
+      - SSCS
+    users:
+      - system.update@hmcts.net|SSCS|Benefit|appealCreated
+    userProfileDatabaseHost: ${SERVICE_NAME}-postgresql
+    userProfileDatabasePort: 5432
+    userProfileDatabaseUser: hmcts
+    userProfileDatabasePassword: hmcts
+    userProfileDatabaseName: user-profile
+  definition:
+    enabled: true
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.7.44
+    kvSecretRef: kvcreds
+    gitSecretRef: kvcreds
+    redirectUri: https://case-management-web-${SERVICE_FQDN}/oauth2redirect
+    definitionFilename: sscs-ccd.xlsx
+    userRoles:
+      - citizen
+      - caseworker
+      - caseworker-sscs
+      - caseworker-sscs-systemupdate
+      - caseworker-sscs-anonymouscitizen
+      - caseworker-sscs-callagent
+      - caseworker-sscs-judge
+      - caseworker-sscs-clerk
+      - caseworker-sscs-dwpresponsewriter
+      - caseworker-sscs-registrar
+      - caseworker-sscs-superuser
+      - caseworker-sscs-teamleader
+      - caseworker-sscs-panelmember
+      - caseworker-sscs-bulkscan
