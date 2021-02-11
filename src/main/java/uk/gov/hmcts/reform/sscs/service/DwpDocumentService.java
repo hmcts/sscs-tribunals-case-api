@@ -18,9 +18,12 @@ public class DwpDocumentService {
 
     public void addToDwpDocumentsWithEditedDoc(SscsCaseData sscsCaseData, DwpResponseDocument dwpDocument, DwpDocumentType docType, DocumentLink editedDocumentLink, String editedReason) {
 
+
         if (dwpDocument != null) {
+            String documentFileName = dwpDocument.getDocumentFileName() != null ? dwpDocument.getDocumentFileName() : docType.getLabel();
+
             DwpDocumentDetails dwpDocumentDetails = new DwpDocumentDetails(docType.getValue(),
-                    docType.getLabel(),
+                    documentFileName,
                     LocalDate.now().toString(),
                     dwpDocument.getDocumentLink(), editedDocumentLink, editedReason, null, null, null);
 

@@ -123,6 +123,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         dwpDocumentService.moveDwpEvidenceBundleToDwpDocumentCollection(sscsCaseData);
 
         if (sscsCaseData.getAppendix12Doc() != null && sscsCaseData.getAppendix12Doc().getDocumentLink() != null) {
+            sscsCaseData.getAppendix12Doc().setDocumentFileName(DwpDocumentType.APPENDIX_12.getLabel());
             dwpDocumentService.addToDwpDocuments(sscsCaseData, sscsCaseData.getAppendix12Doc(), DwpDocumentType.APPENDIX_12);
         }
     }
