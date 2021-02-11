@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionBenefitTypeHelper;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -87,7 +88,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
     private void calculateOutcomeCode(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
 
-        String benefitType = sscsCaseData.getAppeal().getBenefitType() == null ? null : sscsCaseData.getAppeal().getBenefitType().getCode();
+        String benefitType = WriteFinalDecisionBenefitTypeHelper.getBenefitType(sscsCaseData);
 
         if (benefitType == null) {
             throw new IllegalStateException("Unable to determine benefit type");
@@ -138,26 +139,27 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.setWriteFinalDecisionEndDateType(null);
         sscsCaseData.setWriteFinalDecisionEndDate(null);
         sscsCaseData.setWriteFinalDecisionDateOfDecision(null);
+        sscsCaseData.setWcaAppeal(null);
 
         //PIP
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(null);
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(null);
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(null);
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(null);
-        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion(null);
-        sscsCaseData.setPipWriteFinalDecisionTakingNutritionQuestion(null);
-        sscsCaseData.setPipWriteFinalDecisionManagingTherapyQuestion(null);
-        sscsCaseData.setPipWriteFinalDecisionWashAndBatheQuestion(null);
-        sscsCaseData.setPipWriteFinalDecisionManagingToiletNeedsQuestion(null);
-        sscsCaseData.setPipWriteFinalDecisionDressingAndUndressingQuestion(null);
-        sscsCaseData.setPipWriteFinalDecisionCommunicatingQuestion(null);
-        sscsCaseData.setPipWriteFinalDecisionReadingUnderstandingQuestion(null);
-        sscsCaseData.setPipWriteFinalDecisionEngagingWithOthersQuestion(null);
-        sscsCaseData.setPipWriteFinalDecisionBudgetingDecisionsQuestion(null);
-        sscsCaseData.setPipWriteFinalDecisionPlanningAndFollowingQuestion(null);
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion(null);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(null);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(null);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(null);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(null);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionPreparingFoodQuestion(null);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionTakingNutritionQuestion(null);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionManagingTherapyQuestion(null);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionWashAndBatheQuestion(null);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionManagingToiletNeedsQuestion(null);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDressingAndUndressingQuestion(null);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionCommunicatingQuestion(null);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionReadingUnderstandingQuestion(null);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionEngagingWithOthersQuestion(null);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionBudgetingDecisionsQuestion(null);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionPlanningAndFollowingQuestion(null);
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMovingAroundQuestion(null);
         sscsCaseData.setWriteFinalDecisionReasons(null);
         sscsCaseData.setWriteFinalDecisionPageSectionReference(null);
         sscsCaseData.setWriteFinalDecisionPreviewDocument(null);
@@ -193,7 +195,6 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.getSscsEsaCaseData().setShowSchedule3ActivitiesPage(null);
         sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(null);
         sscsCaseData.setWriteFinalDecisionDetailsOfDecision(null);
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(null);
         sscsCaseData.setSupportGroupOnlyAppeal(null);
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(null);
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(null);
@@ -225,7 +226,6 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.getSscsUcCaseData().setShowSchedule7ActivitiesPage(null);
         sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(null);
         sscsCaseData.setWriteFinalDecisionDetailsOfDecision(null);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(null);
         sscsCaseData.setSupportGroupOnlyAppeal(null);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(null);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(null);

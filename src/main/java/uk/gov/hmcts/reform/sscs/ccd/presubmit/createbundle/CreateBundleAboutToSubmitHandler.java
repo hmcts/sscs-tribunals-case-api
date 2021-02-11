@@ -1,21 +1,21 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX;
+import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.*;
 
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
 @Service
@@ -25,17 +25,31 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     private ServiceRequestExecutor serviceRequestExecutor;
 
     private String bundleUrl;
+
+    private String bundleEnglishConfig;
     private String bundleWelshConfig;
+    private String bundleUnEditedConfig;
+    private String bundleWelshUnEditedConfig;
 
     private static String CREATE_BUNDLE_ENDPOINT = "/api/new-bundle";
 
+    private DwpDocumentService dwpDocumentService;
+
     @Autowired
     public CreateBundleAboutToSubmitHandler(ServiceRequestExecutor serviceRequestExecutor,
+                                            DwpDocumentService dwpDocumentService,
                                             @Value("${bundle.url}") String bundleUrl,
-                                            @Value("${bundle.welsh.config}") String bundleWelshConfig) {
+                                            @Value("${bundle.english.config}") String bundleEnglishConfig,
+                                            @Value("${bundle.welsh.config}") String bundleWelshConfig,
+                                            @Value("${bundle.unedited.config}") String bundleUnEditedConfig,
+                                            @Value("${bundle.welsh.unedited.config}") String bundleWelshUnEditedConfig) {
         this.serviceRequestExecutor = serviceRequestExecutor;
+        this.dwpDocumentService = dwpDocumentService;
         this.bundleUrl = bundleUrl;
+        this.bundleEnglishConfig = bundleEnglishConfig;
         this.bundleWelshConfig = bundleWelshConfig;
+        this.bundleUnEditedConfig = bundleUnEditedConfig;
+        this.bundleWelshUnEditedConfig = bundleWelshUnEditedConfig;
     }
 
     @Override
@@ -44,7 +58,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() == EventType.CREATE_BUNDLE;
+                && callback.getEvent() == EventType.CREATE_BUNDLE;
     }
 
     @Override
@@ -56,20 +70,27 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
+        moveDocsToDwpCollectionIfOldPattern(sscsCaseData);
+
         if (checkMandatoryFilesMissing(sscsCaseData)) {
-            PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(
-                callback.getCaseDetails().getCaseData());
+            PreSubmitCallbackResponse<SscsCaseData> response;
+            response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
             response.addError("The bundle cannot be created as mandatory DWP documents are missing");
             return response;
         } else {
 
-            if (sscsCaseData.getDwpResponseDocument() != null && sscsCaseData.getDwpResponseDocument().getDocumentFileName() == null) {
-                sscsCaseData.getDwpResponseDocument().setDocumentFileName(DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX);
-            }
+            sscsCaseData.getDwpDocuments().forEach(f -> {
+                if (DwpDocumentType.DWP_RESPONSE.getValue().equals(f.getValue().getDocumentType()) && null == f.getValue().getDocumentFileName()) {
+                    f.getValue().setDocumentFileName(DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX);
+                }
+            });
 
-            if (sscsCaseData.getDwpEvidenceBundleDocument() != null && sscsCaseData.getDwpEvidenceBundleDocument().getDocumentFileName() == null) {
-                sscsCaseData.getDwpEvidenceBundleDocument().setDocumentFileName(DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX);
-            }
+            sscsCaseData.getDwpDocuments().forEach(f -> {
+                if (DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue().equals(f.getValue().getDocumentType()) && null == f.getValue().getDocumentFileName()) {
+                    f.getValue().setDocumentFileName(DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX);
+                }
+            });
+
             if (sscsCaseData.getSscsDocument() != null) {
                 for (SscsDocument sscsDocument : sscsCaseData.getSscsDocument()) {
                     if (sscsDocument.getValue() != null && sscsDocument.getValue().getDocumentFileName() == null) {
@@ -77,18 +98,62 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
                     }
                 }
             }
-            if (sscsCaseData.isLanguagePreferenceWelsh()) {
-                sscsCaseData.setBundleConfiguration(bundleWelshConfig);
-                log.info("Setting the bundleConfiguration on the case: " + bundleWelshConfig);
-            }
+
+            setBundleConfig(sscsCaseData);
+
+            log.info("Setting the bundleConfiguration on the case {} for case id {}", sscsCaseData.getBundleConfiguration(), callback.getCaseDetails().getId());
+
             return serviceRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
         }
     }
 
+    private void setBundleConfig(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getDwpDocuments().stream().filter(f -> (f.getValue().getDocumentType().equals(DwpDocumentType.DWP_RESPONSE.getValue())
+                && f.getValue().getEditedDocumentLink() != null)
+                || f.getValue().getDocumentType().equals(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue())
+                && f.getValue().getEditedDocumentLink() != null).count() > 0) {
+            if (sscsCaseData.isLanguagePreferenceWelsh()) {
+                sscsCaseData.setBundleConfiguration(bundleWelshUnEditedConfig);
+            } else {
+                sscsCaseData.setBundleConfiguration(bundleUnEditedConfig);
+            }
+        } else {
+            if (sscsCaseData.isLanguagePreferenceWelsh()) {
+                sscsCaseData.setBundleConfiguration(bundleWelshConfig);
+            } else {
+                sscsCaseData.setBundleConfiguration(bundleEnglishConfig);
+            }
+        }
+    }
+
+
     private boolean checkMandatoryFilesMissing(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getDwpResponseDocument() == null
-            || sscsCaseData.getDwpResponseDocument().getDocumentLink() == null
-            || sscsCaseData.getDwpEvidenceBundleDocument() == null
-            || sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink() == null;
+        if (null != sscsCaseData.getDwpDocuments()) {
+
+            List<DwpDocument> dwpResponseDocs = sscsCaseData.getDwpDocuments().stream().filter(e -> DwpDocumentType.DWP_RESPONSE.getValue().equals(e.getValue().getDocumentType())).collect(toList());
+            List<DwpDocument> dwpEvidenceBundleDocs = sscsCaseData.getDwpDocuments().stream().filter(e -> DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue().equals(e.getValue().getDocumentType())).collect(toList());
+
+            if (dwpResponseDocs.size() == 0 || dwpResponseDocs.stream().filter(e -> null == e.getValue().getDocumentLink()).count() > 0) {
+                return true;
+            }
+
+            if (dwpEvidenceBundleDocs.size() == 0 || dwpEvidenceBundleDocs.stream().filter(e -> null == e.getValue().getDocumentLink()).count() > 0) {
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
+
+
+    private void moveDocsToDwpCollectionIfOldPattern(SscsCaseData sscsCaseData) {
+        //Before we moved to the new DWP document collection, we stored DWP documents within their own fields. This would break bundling with the new config that
+        //looks at the new DWP document collection. Therefore, if the DWP fields are populated, then assume old pattern and move to the DWP document collection.
+        if (sscsCaseData.getDwpResponseDocument() != null) {
+            dwpDocumentService.moveDwpResponseDocumentToDwpDocumentCollection(sscsCaseData);
+        }
+        if (sscsCaseData.getDwpEvidenceBundleDocument() != null) {
+            dwpDocumentService.moveDwpEvidenceBundleToDwpDocumentCollection(sscsCaseData);
+        }
     }
 }

@@ -46,7 +46,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     // Scenario 1
     REFUSED_NON_SUPPORT_GROUP_ONLY(
         isAllowedOrRefused(REFUSED),
-        isLcwaAppeal(TRUE, false),
+        isWcaAppeal(TRUE, false),
         isSupportGroupOnly(YesNoPredicate.NOT_TRUE, true),
         isAnyPoints(),
         isAnySchedule7(),
@@ -58,7 +58,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     // Scenario 2
     REFUSED_SUPPORT_GROUP_ONLY_LOW_POINTS(
         isAllowedOrRefused(REFUSED),
-        isLcwaAppeal(TRUE, false),
+        isWcaAppeal(TRUE, false),
         isSupportGroupOnly(YesNoPredicate.TRUE, true),
         isPoints(POINTS_LESS_THAN_FIFTEEN),
         isAnySchedule7(),
@@ -68,7 +68,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     // Scenario 2
     REFUSED_SUPPORT_GROUP_ONLY_HIGH_POINTS(
         isAllowedOrRefused(REFUSED),
-        isLcwaAppeal(TRUE, false),
+        isWcaAppeal(TRUE, false),
         isSupportGroupOnly(YesNoPredicate.TRUE, true),
         isPoints(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN),
         isAnySchedule7(),
@@ -78,7 +78,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     // Scenario 5 and Scenario 6
     ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS(
         isAllowedOrRefused(ALLOWED),
-        isLcwaAppeal(TRUE, false),
+        isWcaAppeal(TRUE, false),
         isSupportGroupOnly(YesNoPredicate.NOT_TRUE, true),
         isPoints(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN),
         isAnySchedule7(),
@@ -86,7 +86,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     // Scenario 7 and Scenario 8
     ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS(
         isAllowedOrRefused(ALLOWED),
-        isLcwaAppeal(TRUE, false),
+        isWcaAppeal(TRUE, false),
         isSupportGroupOnly(NOT_TRUE, true),
         isPoints(POINTS_LESS_THAN_FIFTEEN),
         isAnySchedule7(),
@@ -96,7 +96,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     // Scenario 4
     ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_SELECTED(
         isAllowedOrRefused(ALLOWED),
-        isLcwaAppeal(TRUE, false),
+        isWcaAppeal(TRUE, false),
         isSupportGroupOnly(TRUE, true),
         isAnyPoints(),
         isSchedule7(NOT_EMPTY),
@@ -104,7 +104,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     // SCENARIO_3
     ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED(
         isAllowedOrRefused(ALLOWED),
-        isLcwaAppeal(TRUE, false),
+        isWcaAppeal(TRUE, false),
         isSupportGroupOnly(TRUE, true),
         isAnyPoints(),
         isSchedule7(EMPTY),
@@ -112,7 +112,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
         isSchedule9Paragraph4(YesNoPredicate.TRUE)),
     ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_UNSPECIFIED(
         isAllowedOrRefused(ALLOWED),
-        isLcwaAppeal(TRUE,true),
+        isWcaAppeal(TRUE,true),
         isSupportGroupOnly(TRUE, true),
         isAnyPoints(),
         isSchedule7(StringListPredicate.UNSPECIFIED),
@@ -121,7 +121,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     // Scenario 10
     NON_WCA_APPEAL_ALLOWED(
             isAllowedOrRefused(ALLOWED),
-            isLcwaAppeal(FALSE, true),
+            isWcaAppeal(FALSE, true),
             isAnySupportGroupOnly(),
             isAnyPoints(),
             isAnySchedule7(),
@@ -129,7 +129,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     // Scenario 10
     NON_WCA_APPEAL_REFUSED(
             isAllowedOrRefused(REFUSED),
-            isLcwaAppeal(FALSE, true),
+            isWcaAppeal(FALSE, true),
             isAnySupportGroupOnly(),
             isAnyPoints(),
             isAnySchedule7(),
@@ -214,9 +214,9 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
         return Optional.empty();
     }
 
-    static YesNoFieldCondition isLcwaAppeal(Predicate<YesNo> predicate, boolean displayIsSatisfiedMessage) {
-        return new YesNoFieldCondition("Lcwa Appeal", predicate,
-            s -> s.getSscsUcCaseData().isLcwaAppeal() ? YesNo.YES : YesNo.NO, displayIsSatisfiedMessage);
+    static YesNoFieldCondition isWcaAppeal(Predicate<YesNo> predicate, boolean displayIsSatisfiedMessage) {
+        return new YesNoFieldCondition("WCA Appeal", predicate,
+            s -> s.isWcaAppeal() ? YesNo.YES : YesNo.NO, displayIsSatisfiedMessage);
     }
 
     static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {

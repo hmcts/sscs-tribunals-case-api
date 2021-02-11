@@ -84,35 +84,37 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
             .writeFinalDecisionAppellantAttendedQuestion("")
             .writeFinalDecisionDisabilityQualifiedPanelMemberName("")
             .writeFinalDecisionMedicallyQualifiedPanelMemberName("")
-            .pipWriteFinalDecisionDailyLivingQuestion("")
-            .pipWriteFinalDecisionComparedToDwpDailyLivingQuestion("")
-            .pipWriteFinalDecisionMobilityQuestion("")
-            .pipWriteFinalDecisionComparedToDwpMobilityQuestion("")
             .writeFinalDecisionStartDate("")
             .writeFinalDecisionEndDateType("")
             .writeFinalDecisionEndDate("")
             .writeFinalDecisionDateOfDecision("")
-            .pipWriteFinalDecisionDailyLivingActivitiesQuestion(new ArrayList<>())
-            .pipWriteFinalDecisionMobilityActivitiesQuestion(new ArrayList<>())
-            .pipWriteFinalDecisionPreparingFoodQuestion("")
-            .pipWriteFinalDecisionTakingNutritionQuestion("")
-            .pipWriteFinalDecisionManagingTherapyQuestion("")
-            .pipWriteFinalDecisionWashAndBatheQuestion("")
-            .pipWriteFinalDecisionManagingToiletNeedsQuestion("")
-            .pipWriteFinalDecisionDressingAndUndressingQuestion("")
-            .pipWriteFinalDecisionCommunicatingQuestion("")
-            .pipWriteFinalDecisionReadingUnderstandingQuestion("")
-            .pipWriteFinalDecisionEngagingWithOthersQuestion("")
-            .pipWriteFinalDecisionBudgetingDecisionsQuestion("")
-            .pipWriteFinalDecisionPlanningAndFollowingQuestion("")
-            .pipWriteFinalDecisionMovingAroundQuestion("")
+            .pipSscsCaseData(SscsPipCaseData.builder()
+                    .pipWriteFinalDecisionDailyLivingQuestion("")
+                    .pipWriteFinalDecisionComparedToDwpDailyLivingQuestion("")
+                    .pipWriteFinalDecisionMobilityQuestion("")
+                    .pipWriteFinalDecisionComparedToDwpMobilityQuestion("")
+                    .pipWriteFinalDecisionDailyLivingActivitiesQuestion(new ArrayList<>())
+                    .pipWriteFinalDecisionMobilityActivitiesQuestion(new ArrayList<>())
+                    .pipWriteFinalDecisionPreparingFoodQuestion("")
+                    .pipWriteFinalDecisionTakingNutritionQuestion("")
+                    .pipWriteFinalDecisionManagingTherapyQuestion("")
+                    .pipWriteFinalDecisionWashAndBatheQuestion("")
+                    .pipWriteFinalDecisionManagingToiletNeedsQuestion("")
+                    .pipWriteFinalDecisionDressingAndUndressingQuestion("")
+                    .pipWriteFinalDecisionCommunicatingQuestion("")
+                    .pipWriteFinalDecisionReadingUnderstandingQuestion("")
+                    .pipWriteFinalDecisionEngagingWithOthersQuestion("")
+                    .pipWriteFinalDecisionBudgetingDecisionsQuestion("")
+                    .pipWriteFinalDecisionPlanningAndFollowingQuestion("")
+                    .pipWriteFinalDecisionMovingAroundQuestion("")
+                    .build())
             .writeFinalDecisionReasons(Arrays.asList(new CollectionItem(null, "")))
             .writeFinalDecisionPageSectionReference("")
             .writeFinalDecisionAnythingElse("something else")
             .writeFinalDecisionPreviewDocument(DocumentLink.builder().build())
+            .wcaAppeal(null)
             .sscsEsaCaseData(SscsEsaCaseData.builder().showRegulation29Page(YesNo.YES)
                 .showSchedule3ActivitiesPage(YesNo.YES).doesRegulation29Apply(YesNo.YES)
-                .wcaAppeal(null)
                 .doesRegulation35Apply(YesNo.YES).build())
             .dwpReassessTheAward("")
             .showFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES)
@@ -139,8 +141,8 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionAllowedOrRefused(null);
 
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionGenerateNotice("yes");
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -156,28 +158,28 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         assertNotNull(sscsCaseData.getWriteFinalDecisionAppellantAttendedQuestion());
         assertNotNull(sscsCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
         assertNotNull(sscsCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
         assertNotNull(sscsCaseData.getWriteFinalDecisionStartDate());
         assertNotNull(sscsCaseData.getWriteFinalDecisionEndDateType());
         assertNotNull(sscsCaseData.getWriteFinalDecisionEndDate());
         assertNotNull(sscsCaseData.getWriteFinalDecisionDateOfDecision());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionDailyLivingActivitiesQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionMobilityActivitiesQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionPreparingFoodQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionTakingNutritionQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionManagingTherapyQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionWashAndBatheQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionManagingToiletNeedsQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionDressingAndUndressingQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionCommunicatingQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionReadingUnderstandingQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionEngagingWithOthersQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionBudgetingDecisionsQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionPlanningAndFollowingQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionMovingAroundQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingActivitiesQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityActivitiesQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionPreparingFoodQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionTakingNutritionQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionManagingTherapyQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionWashAndBatheQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionManagingToiletNeedsQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDressingAndUndressingQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionCommunicatingQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionReadingUnderstandingQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionEngagingWithOthersQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionBudgetingDecisionsQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionPlanningAndFollowingQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMovingAroundQuestion());
         assertNotNull(sscsCaseData.getWriteFinalDecisionReasons());
         assertNotNull(sscsCaseData.getWriteFinalDecisionPageSectionReference());
         assertNotNull(sscsCaseData.getWriteFinalDecisionPreviewDocument());
@@ -198,8 +200,8 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionAllowedOrRefused(null);
 
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionGenerateNotice("yes");
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -215,28 +217,28 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         assertNotNull(sscsCaseData.getWriteFinalDecisionAppellantAttendedQuestion());
         assertNotNull(sscsCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
         assertNotNull(sscsCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
         assertNotNull(sscsCaseData.getWriteFinalDecisionStartDate());
         assertNotNull(sscsCaseData.getWriteFinalDecisionEndDateType());
         assertNotNull(sscsCaseData.getWriteFinalDecisionEndDate());
         assertNotNull(sscsCaseData.getWriteFinalDecisionDateOfDecision());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionDailyLivingActivitiesQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionMobilityActivitiesQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionPreparingFoodQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionTakingNutritionQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionManagingTherapyQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionWashAndBatheQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionManagingToiletNeedsQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionDressingAndUndressingQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionCommunicatingQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionReadingUnderstandingQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionEngagingWithOthersQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionBudgetingDecisionsQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionPlanningAndFollowingQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionMovingAroundQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingActivitiesQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityActivitiesQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionPreparingFoodQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionTakingNutritionQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionManagingTherapyQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionWashAndBatheQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionManagingToiletNeedsQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDressingAndUndressingQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionCommunicatingQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionReadingUnderstandingQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionEngagingWithOthersQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionBudgetingDecisionsQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionPlanningAndFollowingQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMovingAroundQuestion());
         assertNotNull(sscsCaseData.getWriteFinalDecisionReasons());
         assertNotNull(sscsCaseData.getWriteFinalDecisionPageSectionReference());
         assertNotNull(sscsCaseData.getWriteFinalDecisionPreviewDocument());
@@ -252,8 +254,8 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionIsDescriptorFlow("no");
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionGenerateNotice("yes");
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -269,28 +271,28 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getWriteFinalDecisionAppellantAttendedQuestion());
         assertNull(sscsCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
         assertNull(sscsCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
         assertNull(sscsCaseData.getWriteFinalDecisionStartDate());
         assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
         assertNull(sscsCaseData.getWriteFinalDecisionEndDate());
         assertNull(sscsCaseData.getWriteFinalDecisionDateOfDecision());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionDailyLivingActivitiesQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionMobilityActivitiesQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionPreparingFoodQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionTakingNutritionQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionManagingTherapyQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionWashAndBatheQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionManagingToiletNeedsQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionDressingAndUndressingQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionCommunicatingQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionReadingUnderstandingQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionEngagingWithOthersQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionBudgetingDecisionsQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionPlanningAndFollowingQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionMovingAroundQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingActivitiesQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityActivitiesQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionPreparingFoodQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionTakingNutritionQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionManagingTherapyQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionWashAndBatheQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionManagingToiletNeedsQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDressingAndUndressingQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionCommunicatingQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionReadingUnderstandingQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionEngagingWithOthersQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionBudgetingDecisionsQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionPlanningAndFollowingQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMovingAroundQuestion());
         assertNull(sscsCaseData.getWriteFinalDecisionReasons());
         assertNull(sscsCaseData.getWriteFinalDecisionPageSectionReference());
         assertNull(sscsCaseData.getWriteFinalDecisionPreviewDocument());
@@ -308,8 +310,8 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionAllowedOrRefused(null);
 
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionGenerateNotice("no");
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -325,28 +327,28 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         assertNotNull(sscsCaseData.getWriteFinalDecisionAppellantAttendedQuestion());
         assertNotNull(sscsCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
         assertNotNull(sscsCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
         assertNotNull(sscsCaseData.getWriteFinalDecisionStartDate());
         assertNotNull(sscsCaseData.getWriteFinalDecisionEndDateType());
         assertNotNull(sscsCaseData.getWriteFinalDecisionEndDate());
         assertNotNull(sscsCaseData.getWriteFinalDecisionDateOfDecision());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionDailyLivingActivitiesQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionMobilityActivitiesQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionPreparingFoodQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionTakingNutritionQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionManagingTherapyQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionWashAndBatheQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionManagingToiletNeedsQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionDressingAndUndressingQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionCommunicatingQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionReadingUnderstandingQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionEngagingWithOthersQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionBudgetingDecisionsQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionPlanningAndFollowingQuestion());
-        assertNotNull(sscsCaseData.getPipWriteFinalDecisionMovingAroundQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingActivitiesQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityActivitiesQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionPreparingFoodQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionTakingNutritionQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionManagingTherapyQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionWashAndBatheQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionManagingToiletNeedsQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDressingAndUndressingQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionCommunicatingQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionReadingUnderstandingQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionEngagingWithOthersQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionBudgetingDecisionsQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionPlanningAndFollowingQuestion());
+        assertNotNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMovingAroundQuestion());
         assertNotNull(sscsCaseData.getWriteFinalDecisionReasons());
         assertNotNull(sscsCaseData.getWriteFinalDecisionPageSectionReference());
         assertNotNull(sscsCaseData.getWriteFinalDecisionPreviewDocument());
@@ -362,8 +364,8 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionGenerateNotice("no");
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -379,28 +381,28 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getWriteFinalDecisionAppellantAttendedQuestion());
         assertNull(sscsCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
         assertNull(sscsCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
         assertNull(sscsCaseData.getWriteFinalDecisionStartDate());
         assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
         assertNull(sscsCaseData.getWriteFinalDecisionEndDate());
         assertNull(sscsCaseData.getWriteFinalDecisionDateOfDecision());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionDailyLivingActivitiesQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionMobilityActivitiesQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionPreparingFoodQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionTakingNutritionQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionManagingTherapyQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionWashAndBatheQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionManagingToiletNeedsQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionDressingAndUndressingQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionCommunicatingQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionReadingUnderstandingQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionEngagingWithOthersQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionBudgetingDecisionsQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionPlanningAndFollowingQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionMovingAroundQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingActivitiesQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityActivitiesQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionPreparingFoodQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionTakingNutritionQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionManagingTherapyQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionWashAndBatheQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionManagingToiletNeedsQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDressingAndUndressingQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionCommunicatingQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionReadingUnderstandingQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionEngagingWithOthersQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionBudgetingDecisionsQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionPlanningAndFollowingQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMovingAroundQuestion());
         assertNull(sscsCaseData.getWriteFinalDecisionReasons());
         assertNull(sscsCaseData.getWriteFinalDecisionPageSectionReference());
         assertNull(sscsCaseData.getWriteFinalDecisionPreviewDocument());
@@ -426,8 +428,8 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionGenerateNotice("yes");
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparedRateDailyLiving);
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility);
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparedRateDailyLiving);
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -443,28 +445,28 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getWriteFinalDecisionAppellantAttendedQuestion());
         assertNull(sscsCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
         assertNull(sscsCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
         assertNull(sscsCaseData.getWriteFinalDecisionStartDate());
         assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
         assertNull(sscsCaseData.getWriteFinalDecisionEndDate());
         assertNull(sscsCaseData.getWriteFinalDecisionDateOfDecision());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionDailyLivingActivitiesQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionMobilityActivitiesQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionPreparingFoodQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionTakingNutritionQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionManagingTherapyQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionWashAndBatheQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionManagingToiletNeedsQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionDressingAndUndressingQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionCommunicatingQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionReadingUnderstandingQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionEngagingWithOthersQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionBudgetingDecisionsQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionPlanningAndFollowingQuestion());
-        assertNull(sscsCaseData.getPipWriteFinalDecisionMovingAroundQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingActivitiesQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityActivitiesQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionPreparingFoodQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionTakingNutritionQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionManagingTherapyQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionWashAndBatheQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionManagingToiletNeedsQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDressingAndUndressingQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionCommunicatingQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionReadingUnderstandingQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionEngagingWithOthersQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionBudgetingDecisionsQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionPlanningAndFollowingQuestion());
+        assertNull(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMovingAroundQuestion());
         assertNull(sscsCaseData.getWriteFinalDecisionReasons());
         assertNull(sscsCaseData.getWriteFinalDecisionPageSectionReference());
         assertNull(sscsCaseData.getWriteFinalDecisionPreviewDocument());
@@ -480,8 +482,8 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionPreviewDocument(null);
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionGenerateNotice("yes");
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -495,8 +497,8 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         sscsCaseData.setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionGenerateNotice("yes");
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 

@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
-import junitparams.NamedParameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -147,57 +146,22 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         when(generateFile.assemble(any())).thenReturn(URL);
     }
 
-
-    @NamedParameters("previewEndDateAndRateCombinations")
-    @SuppressWarnings("unused")
-    private Object[] previewEndDateAndRateCombinations() {
-        return new Object[]{
-            new String[]{"2018-11-10", "standardRate", "lower", "lower"},
-            new String[]{"2018-11-10", "standardRate", "same", "lower"},
-            new String[]{"2018-11-10", "standardRate", "higher", "lower"},
-            new String[]{"2018-11-10", "standardRate", "lower", "same"},
-            new String[]{"2018-11-10", "standardRate", "same", "same"},
-            new String[]{"2018-11-10", "standardRate", "higher", "same"},
-            new String[]{"2018-11-10", "enhancedRate", "same", "lower"},
-            new String[]{"2018-11-10", "enhancedRate", "higher", "lower"},
-            new String[]{"2018-11-10", "enhancedRate", "same", "same"},
-            new String[]{"2018-11-10", "enhancedRate", "higher", "same"},
-            new String[]{"2018-11-10", "noAward", "lower", "lower"},
-            new String[]{"2018-11-10", "noAward", "same", "lower"},
-            new String[]{"2018-11-10", "noAward", "lower", "same"},
-            new String[]{"2018-11-10", "noAward", "same", "same"},
-            new String[]{"2018-11-10", "notConsidered", "lower", "lower"},
-            new String[]{"2018-11-10", "notConsidered", "same", "lower"},
-            new String[]{"2018-11-10", "notConsidered", "higher", "lower"},
-            new String[]{"2018-11-10", "notConsidered", "lower", "same"},
-            new String[]{"2018-11-10", "notConsidered", "same", "same"},
-            new String[]{"2018-11-10", "notConsidered", "higher", "same"},
-            new String[]{null, "standardRate", "lower", "lower"},
-            new String[]{null, "standardRate", "same", "lower"},
-            new String[]{null, "standardRate", "higher", "lower"},
-            new String[]{null, "standardRate", "lower", "same"},
-            new String[]{null, "standardRate", "same", "same"},
-            new String[]{null, "standardRate", "higher", "same"},
-            new String[]{null, "enhancedRate", "same", "lower"},
-            new String[]{null, "enhancedRate", "higher", "lower"},
-            new String[]{null, "enhancedRate", "same", "same"},
-            new String[]{null, "enhancedRate", "higher", "same"},
-            new String[]{null, "noAward", "lower", "lower"},
-            new String[]{null, "noAward", "same", "lower"},
-            new String[]{null, "noAward", "lower", "same"},
-            new String[]{null, "noAward", "same", "same"},
-            new String[]{null, "notConsidered", "lower", "lower"},
-            new String[]{null, "notConsidered", "same", "lower"},
-            new String[]{null, "notConsidered", "higher", "lower"},
-            new String[]{null, "notConsidered", "lower", "same"},
-            new String[]{null, "notConsidered", "same", "same"},
-            new String[]{null, "notConsidered", "higher", "same"},
-        };
-    }
-
     protected void setCommonPreviewParams(SscsCaseData sscsCaseData, String endDate) {
         sscsCaseData.setWriteFinalDecisionStartDate("2018-10-11");
         sscsCaseData.setWriteFinalDecisionEndDate(endDate);
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionReasons(Arrays.asList(new CollectionItem<>(null, "My reasons for decision")));
+        sscsCaseData.setWriteFinalDecisionAnythingElse("Something else.");
+        sscsCaseData.setWriteFinalDecisionTypeOfHearing("telephone");
+        sscsCaseData.setWriteFinalDecisionPageSectionReference("A1");
+        sscsCaseData.setWriteFinalDecisionAppellantAttendedQuestion("Yes");
+        sscsCaseData.setWriteFinalDecisionPresentingOfficerAttendedQuestion("No");
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+    }
+
+    protected void setCommonNonDescriptorRoutePreviewParams(SscsCaseData sscsCaseData) {
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.setWriteFinalDecisionReasons(Arrays.asList(new CollectionItem<>(null, "My reasons for decision")));
         sscsCaseData.setWriteFinalDecisionAnythingElse("Something else.");
@@ -229,6 +193,25 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         assertFalse(body.isPresentingOfficerAttended());
     }
 
+    protected void assertCommonNonDescriptorFlowPreviewParams(WriteFinalDecisionTemplateBody body, boolean nullReasonsExpected) {
+        assertNull(body.getStartDate());
+        assertNull(body.getEndDate());
+        assertEquals("2018-10-10", body.getDateOfDecision());
+        assertTrue(body.isIndefinite());
+        if (nullReasonsExpected) {
+            assertNull(body.getReasonsForDecision());
+        } else {
+            assertNotNull(body.getReasonsForDecision());
+            assertFalse(body.getReasonsForDecision().isEmpty());
+            assertEquals("My reasons for decision", body.getReasonsForDecision().get(0));
+        }
+        assertEquals("Something else.", body.getAnythingElse());
+        assertEquals("telephone", body.getHearingType());
+        assertEquals("A1", body.getPageNumber());
+        assertTrue(body.isAttendedHearing());
+        assertFalse(body.isPresentingOfficerAttended());
+    }
+
     protected List<String> getConsideredComparissons(String rate, String nonDescriptorsRate, String descriptorsComparedToDwp,
         String nonDescriptorsComparedWithDwp) {
         List<String> consideredComparissions = new ArrayList<>();
@@ -244,9 +227,10 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenDateOfDecisionNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
+        sscsCaseData.setWriteFinalDecisionDateOfDecision(null);
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -263,7 +247,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenSignedInJudgeNameNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -283,7 +267,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenSignedInJudgeUserDetailsNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -303,9 +287,9 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenComparedToDwpMobilityQuestionNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
@@ -322,10 +306,10 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenComparedToDwpDailyLivingSetIncorrectly_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("someValue");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("someValue");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
 
@@ -343,10 +327,10 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenComparedToDwpMobilityQuestionSetIncorrectly_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("someValue");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("someValue");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
@@ -371,7 +355,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithMultipleHearingsWithVenues_thenCorrectlySetHeldAtUsingTheFirstHearingInList() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -395,7 +379,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, isDescriptorFlowSupported(), true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -407,7 +391,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoVenueName_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator("Yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "Yes" : "No", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -432,7 +416,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoVenue_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes"  : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -457,7 +441,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayAnErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -480,7 +464,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDetails_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -504,7 +488,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithEmptyHearingsList_thenDefaultHearingData() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -516,7 +500,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
         assertTrue(response.getErrors().isEmpty());
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            true, true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, true, isDescriptorFlowSupported(), true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -530,9 +514,10 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithNullHearingsList_thenDefaultHearingData() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
+        sscsCaseData.setHearings(null);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
@@ -540,7 +525,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
         assertTrue(response.getErrors().isEmpty());
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true,  true, true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true,  true, isDescriptorFlowSupported(), true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -554,7 +539,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithMultipleHearingsWithHearingDates_thenCorrectlySetTheHeldOnUsingTheFirstHearingInList() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -578,7 +563,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null,
-            "2018-10-10", true, true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            "2018-10-10", true, true, true, isDescriptorFlowSupported(), true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -590,7 +575,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDate_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -615,7 +600,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayTwoErrorsAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -643,7 +628,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithMultiplePanelMembers_thenCorrectlySetTheHeldBefore() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -666,7 +651,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true,
-            true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            isDescriptorFlowSupported(), true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -677,7 +662,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithOnePanelMember_thenCorrectlySetTheHeldBefore() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -697,7 +682,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, isDescriptorFlowSupported(), true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -710,7 +695,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithNoPanelMembersWithNullValues_thenCorrectlySetTheHeldBefore() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -729,7 +714,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null,
-            "2018-10-10", true,true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            "2018-10-10", true,true, true, isDescriptorFlowSupported(), true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -741,7 +726,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithNoPanelMembersWithEmptyValues_thenCorrectlySetTheHeldBefore() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -762,7 +747,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            true,true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true,true, true, isDescriptorFlowSupported(), true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
 
@@ -773,7 +758,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void scottishRpcWillShowAScottishImage() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -786,7 +771,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         verifyTemplateBody(NoticeIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname", null,
-            "2018-10-10", true, true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            "2018-10-10", true, true, true, isDescriptorFlowSupported(), true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
     }
 
     protected abstract void setDescriptorFlowIndicator(String value, SscsCaseData sscsCaseData);
@@ -798,10 +783,9 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithAppointee_thenCorrectlySetTheNoticeNameWithAppellantAndAppointeeAppendedAndAppointeeFullNameSet() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
-
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
         sscsCaseData.getAppeal().getAppellant().setAppointee(Appointee.builder()
@@ -814,16 +798,15 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname", "Appointee Surname", "2018-10-10", true,
-            true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, isDescriptorFlowSupported(), true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
     }
 
     @Test
     public void givenDateIssuedParameterIsTrue_thenShowIssuedDateOnDocument() {
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -831,14 +814,14 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, isDescriptorFlowSupported(), true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now(), payload.getDateIssued());
     }
 
     @Test
     public void givenGeneratedDateIsAlreadySetGeneratedDescriptorFlow_thenSetNewGeneratedDate() {
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -847,7 +830,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true,
-            true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            isDescriptorFlowSupported(), true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
     }
@@ -877,6 +860,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
     }
+
+    protected abstract boolean isDescriptorFlowSupported();
 
     protected NoticeIssuedTemplateBody verifyTemplateBody(String image, String expectedName, String expectedAppointeeName, String dateOfDecision, boolean allowed, boolean isSetAside, boolean isDraft,
         boolean isDescriptorFlow, boolean isGenerateFile, String templateId) {

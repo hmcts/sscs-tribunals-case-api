@@ -57,6 +57,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
         sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("1234")
                 .createdInGapsFrom(State.READY_TO_LIST.getId())
+                .hmctsDwpState("failedRobotics")
                 .appeal(Appeal.builder().build())
                 .build();
 
@@ -92,6 +93,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = resendHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
+        assertEquals("sentToRobotics", response.getData().getHmctsDwpState());
         verify(jsonValidator, atLeastOnce()).validate(any(), any());
     }
 
@@ -122,6 +124,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
         String firstError = response.getErrors().iterator().next();
 
         assertTrue(firstError.contains(expectedError));
+        assertEquals("failedRobotics", response.getData().getHmctsDwpState());
         verify(jsonValidator, atLeastOnce()).validate(any(), any());
     }
 
@@ -135,6 +138,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = resendHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
+        assertEquals("failedRobotics", response.getData().getHmctsDwpState());
         assertTrue(response.getErrors().iterator().next().contains("Json Mapper Unable to build robotics json due to missing fields"));
         verify(jsonMapper, atLeastOnce()).map(any());
     }

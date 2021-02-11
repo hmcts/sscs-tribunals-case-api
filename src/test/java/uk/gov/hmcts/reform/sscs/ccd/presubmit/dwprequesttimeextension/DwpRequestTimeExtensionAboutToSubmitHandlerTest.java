@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwprequesttimeextension;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,8 +20,10 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 
 @RunWith(JUnitParamsRunner.class)
 public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
@@ -29,12 +33,21 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
-    private final DwpRequestTimeExtensionAboutToSubmitHandler handler = new DwpRequestTimeExtensionAboutToSubmitHandler();
+    private DwpRequestTimeExtensionAboutToSubmitHandler handler;
     private final DocumentLink expectedDocumentLink = DocumentLink.builder()
         .documentBinaryUrl("/BinaryUrl")
         .documentUrl("/url")
         .documentFilename("Tl1Form.pdf")
         .build();
+
+    private DwpDocumentService dwpDocumentService;
+
+    @Before
+    public void setUp() {
+        dwpDocumentService = new DwpDocumentService();
+        handler = new DwpRequestTimeExtensionAboutToSubmitHandler(dwpDocumentService);
+    }
+
 
     @Test
     @Parameters({
@@ -85,10 +98,12 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
         assertEquals(1, dwpDocs.size());
 
         DwpDocumentDetails dwpDoc = dwpDocs.get(0).getValue();
+        assertNull(actualCallback.getData().getTl1Form());
+        assertEquals(DwpDocumentType.TL1_FORM.getValue(), dwpDoc.getDocumentType());
         assertEquals(expectedDocumentLink, dwpDoc.getDocumentLink());
         assertEquals(expectedDocumentLink.getDocumentFilename(), dwpDoc.getDocumentLink().getDocumentFilename());
 
-        assertEquals(null, actualCallback.getData().getTl1Form());
+        assertNull(actualCallback.getData().getTl1Form());
 
         assertEquals("extensionRequested", actualCallback.getData().getDwpState());
         assertEquals("timeExtension", actualCallback.getData().getInterlocReferralReason());

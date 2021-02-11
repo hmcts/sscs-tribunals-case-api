@@ -141,7 +141,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     public void givenEsaCaseWithWcaAppealFlow_thenSetShowSummaryOfOutcomePage(
             @Nullable YesNo wcaFlow, YesNo expectedShowResult) {
 
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(wcaFlow);
+        sscsCaseData.setWcaAppeal(wcaFlow);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -164,7 +164,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
             @Nullable YesNo wcaFlow, @Nullable String allowedFlow, YesNo expectedShowResult) {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(wcaFlow);
+        sscsCaseData.setWcaAppeal(wcaFlow);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused(allowedFlow);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -189,6 +189,19 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Test
     public void shouldExhibitBenefitSpecificBehaviourWhenNoAwardsAreGivenAndNoActivitiesAreSelected() {
+
+        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        setNoAwardsScenario(sscsCaseData);
+        setEmptyActivitiesListScenario(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void shouldNotDisplayErrorWhenNoAwardIsGivenAndEitherDailyLivingOrMobilityIsNotConsideredAndNoActivitiesAreSelected() {
 
         setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
         setNoAwardsScenario(sscsCaseData);

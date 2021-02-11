@@ -5,6 +5,7 @@ import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,8 +13,11 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityAnswer;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestion;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.scenarios.PipScenario;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
@@ -40,17 +44,52 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
     }
 
     @Override
+    protected Descriptor buildDescriptorFromActivityAnswer(ActivityQuestion activityQuestion, ActivityAnswer answer) {
+        return Descriptor.builder().activityAnswerPoints(answer.getActivityAnswerPoints())
+            .activityQuestionNumber(answer.getActivityAnswerNumber())
+            .activityAnswerLetter(answer.getActivityAnswerLetter())
+            .activityAnswerValue(answer.getActivityAnswerValue())
+            .activityQuestionValue(answer.getActivityAnswerNumber() + ". " + activityQuestion.getValue())
+            .build();
+    }
+
+    @Override
     protected void setTemplateContent(DecisionNoticeOutcomeService outcomeService, PreSubmitCallbackResponse<SscsCaseData> response,
         NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData,
         WriteFinalDecisionTemplateBody payload) {
-        // No-op for PIP
+
+
+        if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+
+            // Validate here for PIP instead of only validating on submit.
+            // This ensures that we know we can obtain a valid allowed or refused condition below
+            //outcomeService.validate(response, caseData)
+            // If validation has produced no errors, we know that we can get an allowed/refused condition.
+
+            // Optional<EsaAllowedOrRefusedCondition> condition = EsaPointsRegulationsAndSchedule3ActivitiesCondition
+            //   .getPassingAllowedOrRefusedCondition(decisionNoticeQuestionService, caseData);
+            //if (condition.isPresent()) {
+            Optional<PipAllowedOrRefusedCondition> condition = PipAllowedOrRefusedCondition.getPassingAllowedOrRefusedCondition(decisionNoticeQuestionService, caseData);
+            if (condition.isPresent()) {
+                PipAllowedOrRefusedCondition allowedOrRefusedCondition = condition.get();
+                PipScenario scenario = allowedOrRefusedCondition.getPipScenario(caseData);
+                if (scenario != null) {
+                    PipTemplateContent templateContent = scenario.getContent(payload);
+                    builder.writeFinalDecisionTemplateContent(templateContent);
+                }
+            } else {
+                // Should never happen.
+                log.error("Unable to obtain a valid scenario before preview - Something has gone wrong for caseId: ", caseData.getCcdCaseId());
+                response.addError("Unable to obtain a valid scenario - something has gone wrong");
+            }
+        }
     }
 
     @Override
     protected void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
 
-        String dailyLivingAwardType = caseData.getPipWriteFinalDecisionDailyLivingQuestion();
-        String mobilityAwardType = caseData.getPipWriteFinalDecisionMobilityQuestion();
+        String dailyLivingAwardType = caseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion();
+        String mobilityAwardType = caseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion();
 
         if (dailyLivingAwardType != null) {
             builder.dailyLivingAwardRate(join(
@@ -94,7 +133,7 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         builder.isDescriptorFlow(caseData.isDailyLivingAndOrMobilityDecision());
 
         List<String> dailyLivingAnswers = PipActivityType.DAILY_LIVING.getAnswersExtractor().apply(caseData);
-        if (dailyLivingAnswers != null && !AwardType.NOT_CONSIDERED.getKey().equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
+        if (dailyLivingAnswers != null && !AwardType.NOT_CONSIDERED.getKey().equals(caseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion())) {
 
             List<Descriptor> dailyLivingDescriptors = getPipDescriptorsFromQuestionKeys(caseData, dailyLivingAnswers);
 
@@ -107,7 +146,7 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         }
 
         List<String> mobilityAnswers = PipActivityType.MOBILITY.getAnswersExtractor().apply(caseData);
-        if (mobilityAnswers != null && !AwardType.NOT_CONSIDERED.getKey().equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+        if (mobilityAnswers != null && !AwardType.NOT_CONSIDERED.getKey().equals(caseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion())) {
             List<Descriptor> mobilityDescriptors = getPipDescriptorsFromQuestionKeys(caseData, mobilityAnswers);
 
             builder.mobilityDescriptors(mobilityDescriptors);
@@ -135,11 +174,11 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
 
     private List<String> getConsideredComparisonsWithDwp(SscsCaseData caseData) {
         List<String> consideredComparissons = new ArrayList<>();
-        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
-            consideredComparissons.add(caseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
+        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion())) {
+            consideredComparissons.add(caseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
         }
-        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
-            consideredComparissons.add(caseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion())) {
+            consideredComparissons.add(caseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
         }
         return consideredComparissons;
     }

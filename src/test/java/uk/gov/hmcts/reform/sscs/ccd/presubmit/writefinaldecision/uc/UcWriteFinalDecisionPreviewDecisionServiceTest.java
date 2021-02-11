@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -75,7 +74,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -100,7 +99,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -151,7 +150,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -176,7 +175,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -218,7 +217,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -242,7 +241,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -282,7 +281,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
@@ -304,7 +303,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
@@ -331,7 +330,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -368,7 +367,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
@@ -394,7 +393,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -431,7 +430,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -454,7 +453,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -492,7 +491,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
@@ -519,7 +518,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -556,7 +555,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(NO);
+        sscsCaseData.setWcaAppeal(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -578,7 +577,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, false, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertFalse(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertFalse(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -616,7 +615,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(NO);
+        sscsCaseData.setWcaAppeal(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -636,7 +635,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, false, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertFalse(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertFalse(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -679,7 +678,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -707,7 +706,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -756,7 +755,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -784,7 +783,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -833,7 +832,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -865,7 +864,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -893,7 +892,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -942,7 +941,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -970,7 +969,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -1011,7 +1010,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -1040,7 +1039,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1068,7 +1067,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -1141,7 +1140,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -1165,12 +1164,12 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         if ("no".equalsIgnoreCase(value)) {
             sscsCaseData.setDwpReassessTheAward("doNotReassess");
         }
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("no".equalsIgnoreCase(value) ? NO : YES);
+        sscsCaseData.setWcaAppeal("no".equalsIgnoreCase(value) ? NO : YES);
     }
 
     @Override
     protected boolean getDescriptorFlowIndicator(WriteFinalDecisionTemplateBody body) {
-        return body.isLcwaAppeal();
+        return body.isWcaAppeal();
     }
 
     @Override
@@ -1242,7 +1241,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1270,7 +1269,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -1311,7 +1310,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1339,7 +1338,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -1380,7 +1379,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1407,7 +1406,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -1448,7 +1447,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1475,7 +1474,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -1515,7 +1514,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1540,7 +1539,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -1581,7 +1580,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1608,7 +1607,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -1649,7 +1648,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1675,7 +1674,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -1715,7 +1714,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1737,7 +1736,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -1778,7 +1777,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1805,7 +1804,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -1854,7 +1853,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -1882,7 +1881,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1907,7 +1906,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -1950,7 +1949,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -1977,7 +1976,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -2004,7 +2003,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -2053,7 +2052,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -2081,7 +2080,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -2111,7 +2110,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -2137,7 +2136,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -2180,7 +2179,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -2207,7 +2206,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("uc").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isLcwaAppeal());
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -2256,7 +2255,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -2275,9 +2274,8 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
     }
 
-    @Test
-    @Ignore
-    public void givenWelsh_GeneratedDateIsAlreadySet_thenDoNotSetNewGeneratedDate() {
-        // Ignoring this test until Welsh is implemented
+    @Override
+    protected boolean isDescriptorFlowSupported() {
+        return true;
     }
 }
