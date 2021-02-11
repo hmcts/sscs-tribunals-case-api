@@ -42,8 +42,10 @@ public class PipWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if ((!equalsIgnoreCase(AwardType.NO_AWARD.getKey(), sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion())
-            || !equalsIgnoreCase(AwardType.NO_AWARD.getKey(), sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion()))
+        if (((!equalsIgnoreCase(AwardType.NO_AWARD.getKey(), sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion())
+            && !equalsIgnoreCase(AwardType.NOT_CONSIDERED.getKey(), sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion()))
+            || ((!equalsIgnoreCase(AwardType.NO_AWARD.getKey(), sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion())
+            && !equalsIgnoreCase(AwardType.NOT_CONSIDERED.getKey(), sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion()))))
             &&  sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingActivitiesQuestion() != null
             &&  sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityActivitiesQuestion() != null
             &&  sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingActivitiesQuestion().isEmpty()

@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
@@ -47,13 +46,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
 
     private String getBenefitTypeFromCallback(Callback<SscsCaseData> callback) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        if (caseData.getAppeal() != null) {
-            BenefitType benefitType = caseData.getAppeal().getBenefitType();
-            if (benefitType != null && benefitType.getCode() != null) {
-                return benefitType.getCode();
-            }
-        }
-        return null;
+        return WriteFinalDecisionBenefitTypeHelper.getBenefitType(caseData);
     }
 
     @Override
