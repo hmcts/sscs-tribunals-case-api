@@ -179,7 +179,7 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
 
         assertNull(caseData.getSscsWelshPreviewNextEvent());
         assertEquals(RequestOutcome.IN_PROGRESS, caseData.getReinstatementOutcome());
-        assertNull(caseData.getInterlocReviewState());
+        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), caseData.getInterlocReviewState());
         assertEquals(State.APPEAL_CREATED, caseData.getPreviousState());
     }
 
@@ -234,7 +234,7 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
 
         assertNull(caseData.getSscsWelshPreviewNextEvent());
         assertEquals(RequestOutcome.IN_PROGRESS, caseData.getReinstatementOutcome());
-        assertNull(caseData.getInterlocReviewState());
+        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), caseData.getInterlocReviewState());
         assertEquals(State.APPEAL_CREATED, caseData.getPreviousState());
     }
 
@@ -260,7 +260,7 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
 
         assertNull(caseData.getSscsWelshPreviewNextEvent());
         assertEquals(RequestOutcome.IN_PROGRESS, caseData.getReinstatementOutcome());
-        assertNull(caseData.getInterlocReviewState());
+        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), caseData.getInterlocReviewState());
         assertEquals(State.APPEAL_CREATED, caseData.getPreviousState());
     }
 
