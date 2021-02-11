@@ -24,6 +24,10 @@ public abstract class DecisionNoticeQuestionService {
     private String benefitType;
     private List<Class<? extends PointsCondition<?>>> pointsConditionClasses;
 
+    protected DecisionNoticeQuestionService(String benefitType) {
+        this.benefitType = benefitType;
+    }
+
     protected DecisionNoticeQuestionService(String benefitType, List<Class<? extends PointsCondition<?>>> pointsConditionClasses) throws IOException {
         String decisionNoticeQuestions = IOUtils.resourceToString("reference-data/" + benefitType.toLowerCase() + "-decision-notice-questions.txt",
             StandardCharsets.UTF_8, Thread.currentThread().getContextClassLoader());

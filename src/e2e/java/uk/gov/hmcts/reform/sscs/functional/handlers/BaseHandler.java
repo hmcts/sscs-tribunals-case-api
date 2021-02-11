@@ -2,9 +2,13 @@ package uk.gov.hmcts.reform.sscs.functional.handlers;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 
+import feign.FeignException;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -13,15 +17,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
+@Slf4j
 public class BaseHandler {
 
     protected static final String CREATED_BY_FUNCTIONAL_TEST = "created by functional test";
@@ -44,24 +51,53 @@ public class BaseHandler {
         idamTokens = idamService.getIdamTokens();
     }
 
-    protected SscsCaseDetails createCaseInResponseReceivedState() throws Exception {
+    protected SscsCaseDetails createCaseInResponseReceivedState(int retry) throws Exception {
         SscsCaseDetails caseDetails = ccdService.createCase(buildSscsCaseDataForTesting("Mercury", "JK 77 33 22 Z"),
                 EventType.CREATE_TEST_CASE.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
                 CREATED_BY_FUNCTIONAL_TEST, idamTokens);
 
-        return ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), EventType.DWP_RESPOND.getCcdType(),
+        return updateCase(retry, caseDetails.getData(), caseDetails.getId(), EventType.DWP_RESPOND.getCcdType(),
                 CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
     }
 
-    public SscsCaseDetails createCaseInWithDwpState() throws Exception {
+    protected SscsCaseDetails createCaseInWithDwpState(int retry) throws Exception {
         SscsCaseDetails caseDetails = ccdService.createCase(buildSscsCaseDataForTesting("Lennon", "BB 22 55 66 B"),
                 EventType.CREATE_TEST_CASE.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
                 CREATED_BY_FUNCTIONAL_TEST, idamTokens);
 
-        Thread.sleep(5000);
-
-        return ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), EventType.SENT_TO_DWP.getCcdType(),
+        return updateCase(retry, caseDetails.getData(), caseDetails.getId(), EventType.SENT_TO_DWP.getCcdType(),
                 CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
+    }
+
+    protected String getMyaResponse(int retry, Long caseId) {
+        Response response = null;
+        while (retry > 0 && (response == null || response.statusCode() != HttpStatus.OK.value())) {
+            response = RestAssured
+                    .given()
+                    .when()
+                    .get("appeals?mya=true&caseId=" + caseId);
+            retry--;
+        }
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        return response.then().extract().body().asString();
+    }
+
+    private SscsCaseDetails updateCase(int retry, SscsCaseData caseData, Long caseId, String eventType, String summary, String description, IdamTokens idamTokens) throws Exception {
+        while (retry > 0) {
+            retry--;
+            Thread.sleep(5000);
+            try {
+                log.info("UpdateCase for caseId {} retry count {}", caseId, retry);
+                return ccdService.updateCase(caseData, caseId, eventType, summary, description, idamTokens);
+            } catch (FeignException feignException) {
+                log.info("UpdateCase failed for caseId {} with error {}", caseId, feignException.getMessage());
+                if (feignException.status() < HttpStatus.INTERNAL_SERVER_ERROR.value() || retry <= 0) {
+                    throw feignException;
+                }
+            }
+        }
+        throw new Exception("UpdateCase failed for caseId:" + caseId);
     }
 
 
