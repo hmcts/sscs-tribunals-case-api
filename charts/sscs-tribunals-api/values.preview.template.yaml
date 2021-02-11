@@ -13,50 +13,50 @@ java:
     IDAM_S2S_AUTH: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
     IDAM_API_JWK_URL: https://idam-api.aat.platform.hmcts.net/jwks
-#    MANAGE_CASE_UI_BASE_URL: https://xui-${SERVICE_FQDN}
+    MANAGE_CASE_UI_BASE_URL: https://xui-${SERVICE_FQDN}
 
-#idam-pr:
-#  releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
-#  enabled: true
-#  redirect_uris:
-#    XUI:
-#      - http://xui-${SERVICE_FQDN}/oauth2/callback
-#
-#xui-webapp:
-#  enabled: true
-#  nodejs:
-#    imagePullPolicy: Always
-#    releaseNameOverride: ${SERVICE_NAME}-xui-webapp
-#    image: hmctspublic.azurecr.io/xui/webapp:latest
-#    ingressHost: xui-${SERVICE_FQDN}
-#    memoryLimits: 1836Mi
-#    cpuLimits: 1900m
-#    environment:
-#      HEALTH_CCD_COMPONENT_API: http://gateway-${SERVICE_FQDN}/health
-#      HEALTH_CCD_DATA_API: http://${SERVICE_NAME}-ccd-data-store-api/health
-#      HEALTH_TERMS_AND_CONDITIONS_API: http://xui-terms-and-conditions-${SERVICE_FQDN}.service.core-compute-preview.internal/health
-#      SERVICES_CCD_COMPONENT_API: http://gateway-${SERVICE_FQDN}
-#      SERVICES_CCD_DATA_STORE_API: http://${SERVICE_NAME}-ccd-data-store-api
-#      SERVICES_TERMS_AND_CONDITIONS: http://xui-terms-and-conditions-${SERVICE_FQDN}.service.core-compute-preview.internal
-#      JURISDICTIONS: SSCS
-#      LAUNCH_DARKLY_CLIENT_ID: 5de6610b23ce5408280f2268
-#      FEATURE_REDIS_ENABLED: false
-#      FEATURE_APP_INSIGHTS_ENABLED: false
-#      FEATURE_SECURE_COOKIE_ENABLED: false
-#      FEATURE_PROXY_ENABLED: false
-#      FEATURE_TERMS_AND_CONDITIONS_ENABLED: false
-#      FEATURE_HELMET_ENABLED: false
-#      FEATURE_OIDC_ENABLED: false
-#      NOW: false
-#      REDISCLOUD_URL: http://dummyrediscloudurl
-#      UV_THREADPOOL_SIZE: 128
-#      PROTOCOL: http
-#    keyVaults:
-#      rpx:
-#        resourceGroup: rpx
-#        secrets:
-#          - mc-s2s-client-secret
-#          - mc-idam-client-secret
+idam-pr:
+  releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
+  enabled: true
+  redirect_uris:
+    XUI:
+      - http://xui-${SERVICE_FQDN}/oauth2/callback
+
+xui-webapp:
+  enabled: true
+  nodejs:
+    imagePullPolicy: Always
+    releaseNameOverride: ${SERVICE_NAME}-xui-webapp
+    image: hmctspublic.azurecr.io/xui/webapp:latest
+    ingressHost: xui-${SERVICE_FQDN}
+    memoryLimits: 1836Mi
+    cpuLimits: 1900m
+    environment:
+      HEALTH_CCD_COMPONENT_API: http://gateway-${SERVICE_FQDN}/health
+      HEALTH_CCD_DATA_API: http://${SERVICE_NAME}-ccd-data-store-api/health
+      HEALTH_TERMS_AND_CONDITIONS_API: http://xui-terms-and-conditions-${SERVICE_FQDN}.service.core-compute-preview.internal/health
+      SERVICES_CCD_COMPONENT_API: http://gateway-${SERVICE_FQDN}
+      SERVICES_CCD_DATA_STORE_API: http://${SERVICE_NAME}-ccd-data-store-api
+      SERVICES_TERMS_AND_CONDITIONS: http://xui-terms-and-conditions-${SERVICE_FQDN}.service.core-compute-preview.internal
+      JURISDICTIONS: SSCS
+      LAUNCH_DARKLY_CLIENT_ID: 5de6610b23ce5408280f2268
+      FEATURE_REDIS_ENABLED: false
+      FEATURE_APP_INSIGHTS_ENABLED: false
+      FEATURE_SECURE_COOKIE_ENABLED: false
+      FEATURE_PROXY_ENABLED: false
+      FEATURE_TERMS_AND_CONDITIONS_ENABLED: false
+      FEATURE_HELMET_ENABLED: false
+      FEATURE_OIDC_ENABLED: false
+      NOW: false
+      REDISCLOUD_URL: http://dummyrediscloudurl
+      UV_THREADPOOL_SIZE: 128
+      PROTOCOL: http
+    keyVaults:
+      rpx:
+        resourceGroup: rpx
+        secrets:
+          - mc-s2s-client-secret
+          - mc-idam-client-secret
 
 ccd:
   ccd:
