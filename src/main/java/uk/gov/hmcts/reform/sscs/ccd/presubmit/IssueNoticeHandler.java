@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionBenefitTypeHelper;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 
 @Slf4j
@@ -43,9 +44,7 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
         setGeneratedDateIfRequired(sscsCaseData, callback.getEvent());
 
         try {
-            String benefitType = sscsCaseData.getAppeal() == null ? null :
-                sscsCaseData.getAppeal().getBenefitType() == null ? null :
-                    sscsCaseData.getAppeal().getBenefitType().getCode();
+            String benefitType = WriteFinalDecisionBenefitTypeHelper.getBenefitType(sscsCaseData);
 
             if (benefitType == null) {
                 throw new IllegalStateException("Unable to determine benefit type");

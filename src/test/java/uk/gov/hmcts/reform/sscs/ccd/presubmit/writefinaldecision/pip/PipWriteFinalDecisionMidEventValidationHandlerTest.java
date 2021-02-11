@@ -771,6 +771,36 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    public void shouldExhibitBenefitSpecificBehaviourWhenNoAwardAndNotConsideredAreGivenAndNoActivitiesAreSelected() {
+
+        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(AwardType.NO_AWARD.getKey());
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(AwardType.NOT_CONSIDERED.getKey());
+        setEmptyActivitiesListScenario(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(0, response.getErrors().size());
+        assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+    }
+
+    @Test
+    public void shouldExhibitBenefitSpecificBehaviourWhenNotConsideredAndNoAwardAreGivenAndNoActivitiesAreSelected3() {
+
+        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(AwardType.NOT_CONSIDERED.getKey());
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(AwardType.NO_AWARD.getKey());
+        setEmptyActivitiesListScenario(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(0, response.getErrors().size());
+        assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+    }
+
+    @Test
     public void shouldNotDisplayActivitiesErrorWhenActivitiesAreNotYetSelected() {
 
         setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");

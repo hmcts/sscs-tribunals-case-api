@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 
 @RunWith(JUnitParamsRunner.class)
 public class DwpRaiseExceptionAboutToSubmitHandlerTest {
@@ -60,10 +61,33 @@ public class DwpRaiseExceptionAboutToSubmitHandlerTest {
     @Test
     public void setMoveToGapsFields() {
         sscsCaseData = sscsCaseData.toBuilder().state(State.WITH_DWP).build();
+        assertIsProgressingToGaps();
+    }
 
+    @Test
+    public void setMoveToGapsFieldsIfInterlocReviewStateIsEmptyString() {
+        sscsCaseData = sscsCaseData.toBuilder().state(State.WITH_DWP).build();
+        sscsCaseData.setInterlocReviewState("");
+        assertIsProgressingToGaps();
+    }
+
+    private void assertIsProgressingToGaps() {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("Yes", response.getData().getIsProgressingViaGaps());
     }
+
+    @Test
+    public void setInterlocReviewStateToNone() {
+        sscsCaseData = sscsCaseData.toBuilder().state(State.WITH_DWP).build();
+        sscsCaseData.setInterlocReviewState("valueAlreadySet");
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("Yes", response.getData().getIsProgressingViaGaps());
+        assertEquals(InterlocReviewState.NONE.getId(), response.getData().getInterlocReviewState());
+    }
+
 }
