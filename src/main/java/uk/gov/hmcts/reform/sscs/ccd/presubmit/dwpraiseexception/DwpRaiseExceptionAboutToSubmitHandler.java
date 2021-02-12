@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
@@ -29,6 +30,10 @@ public class DwpRaiseExceptionAboutToSubmitHandler implements PreSubmitCallbackH
         }
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+
+        if (sscsCaseData.getInterlocReviewState() != null && !sscsCaseData.getInterlocReviewState().isEmpty()) {
+            sscsCaseData.setInterlocReviewState(InterlocReviewState.NONE.getId());
+        }
 
         sscsCaseData.setIsProgressingViaGaps("Yes");
 

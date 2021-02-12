@@ -28,29 +28,18 @@ public class CreateEditedBundleAboutToSubmitHandler implements PreSubmitCallback
     private String bundleEditedConfig;
     private String bundleWelshEditedConfig;
 
-    //FIXME to be remove after dwpDocumentsBundleFeature turned on
-    private String bundleNewEditedConfig;
-    private String bundleNewWelshEditedConfig;
-    private boolean dwpDocumentsBundleFeature;
-
     private static String CREATE_BUNDLE_ENDPOINT = "/api/new-bundle";
 
     @Autowired
     public CreateEditedBundleAboutToSubmitHandler(ServiceRequestExecutor serviceRequestExecutor,
                                                   @Value("${bundle.url}") String bundleUrl,
                                                   @Value("${bundle.edited.config}") String bundleEditedConfig,
-                                                  @Value("${bundle.welsh.edited.config}") String bundleWelshEditedConfig,
-                                                  @Value("${bundle.new.edited.config}") String bundleNewEditedConfig,
-                                                  @Value("${bundle.new.welsh.edited.config}") String bundleNewWelshEditedConfig,
-                                                  @Value("${feature.dwp-documents-bundle.enabled}") boolean dwpDocumentsBundleFeature) {
+                                                  @Value("${bundle.welsh.edited.config}") String bundleWelshEditedConfig) {
 
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bundleUrl = bundleUrl;
         this.bundleEditedConfig = bundleEditedConfig;
         this.bundleWelshEditedConfig = bundleWelshEditedConfig;
-        this.bundleNewEditedConfig = bundleNewEditedConfig;
-        this.bundleNewWelshEditedConfig = bundleNewWelshEditedConfig;
-        this.dwpDocumentsBundleFeature = dwpDocumentsBundleFeature;
     }
 
     @Override
@@ -74,14 +63,8 @@ public class CreateEditedBundleAboutToSubmitHandler implements PreSubmitCallback
         PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(
                 callback.getCaseDetails().getCaseData());
 
-        if (dwpDocumentsBundleFeature) {
-            if ((checkMandatoryFilesMissing(sscsCaseData))) {
-                errorResponse.addError("The edited bundle cannot be created as mandatory edited DWP documents are missing");
-            }
-        } else {
-            if ((checkMandatoryFilesMissingOld(sscsCaseData))) {
-                errorResponse.addError("The edited bundle cannot be created as mandatory edited DWP documents are missing");
-            }
+        if (checkMandatoryFilesMissing(sscsCaseData)) {
+            errorResponse.addError("The edited bundle cannot be created as mandatory edited DWP documents are missing");
         }
 
         if (checkPhmeStatusIsNotGranted(sscsCaseData)) {
@@ -99,19 +82,10 @@ public class CreateEditedBundleAboutToSubmitHandler implements PreSubmitCallback
                 }
             }
 
-            if (dwpDocumentsBundleFeature) {
-                //FIXME to be removed after dwpDocumentsBundleFeature turned on
-                if (sscsCaseData.isLanguagePreferenceWelsh()) {
-                    sscsCaseData.setBundleConfiguration(bundleNewWelshEditedConfig);
-                } else {
-                    sscsCaseData.setBundleConfiguration(bundleNewEditedConfig);
-                }
+            if (sscsCaseData.isLanguagePreferenceWelsh()) {
+                sscsCaseData.setBundleConfiguration(bundleWelshEditedConfig);
             } else {
-                if (sscsCaseData.isLanguagePreferenceWelsh()) {
-                    sscsCaseData.setBundleConfiguration(bundleWelshEditedConfig);
-                } else {
-                    sscsCaseData.setBundleConfiguration(bundleEditedConfig);
-                }
+                sscsCaseData.setBundleConfiguration(bundleEditedConfig);
             }
 
             log.info("Setting the edited bundleConfiguration on the case {} for case id {}", sscsCaseData.getBundleConfiguration(), callback.getCaseDetails().getId());
@@ -123,13 +97,6 @@ public class CreateEditedBundleAboutToSubmitHandler implements PreSubmitCallback
     protected boolean checkPhmeStatusIsNotGranted(SscsCaseData sscsCaseData) {
 
         return sscsCaseData.getPhmeGranted() == null || sscsCaseData.getPhmeGranted().getValue().equals("No");
-    }
-
-    private boolean checkMandatoryFilesMissingOld(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getDwpEditedResponseDocument() == null
-                || sscsCaseData.getDwpEditedResponseDocument().getDocumentLink() == null
-                || sscsCaseData.getDwpEditedEvidenceBundleDocument() == null
-                || sscsCaseData.getDwpEditedEvidenceBundleDocument().getDocumentLink() == null;
     }
 
     private boolean checkMandatoryFilesMissing(SscsCaseData sscsCaseData) {
