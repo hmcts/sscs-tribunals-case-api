@@ -109,7 +109,9 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
 
     private void moveDraftsToSscsDocs(SscsCaseData caseData) {
         List<ScannedDocument> newScannedDocs = getNewScannedDocuments(caseData);
-        mergeNewScannedDocs(caseData, newScannedDocs);
+        if (!newScannedDocs.isEmpty()) {
+            mergeNewScannedDocs(caseData, newScannedDocs);
+        }
     }
 
     private void mergeNewScannedDocs(SscsCaseData caseData, List<ScannedDocument> newScannedDocs) {
