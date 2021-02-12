@@ -64,10 +64,12 @@ public abstract class DecisionNoticeOutcomeService {
         performPreOutcomeIntegrityAdjustments(sscsCaseData);
 
         List<String> validationErrorMessages = new ArrayList<>();
-        for (Class<? extends PointsCondition<?>> pointsConditionEnumClass : questionService.getPointsConditionEnumClasses()) {
-            if (validationErrorMessages.isEmpty()) {
-                getDecisionNoticePointsValidationErrorMessages(pointsConditionEnumClass, questionService, sscsCaseData)
-                    .forEach(validationErrorMessages::add);
+        if (questionService.getPointsConditionEnumClasses() != null) {
+            for (Class<? extends PointsCondition<?>> pointsConditionEnumClass : questionService.getPointsConditionEnumClasses()) {
+                if (validationErrorMessages.isEmpty()) {
+                    getDecisionNoticePointsValidationErrorMessages(pointsConditionEnumClass, questionService, sscsCaseData)
+                        .forEach(validationErrorMessages::add);
+                }
             }
         }
 
@@ -77,7 +79,7 @@ public abstract class DecisionNoticeOutcomeService {
 
             // Validate that we can determine an outcome
             Outcome outcome = determineOutcomeWithValidation(preSubmitCallbackResponse.getData());
-            if ("ESA".equals(getBenefitType()) && outcome == null) {
+            if (("ESA".equals(getBenefitType()) || "UC".equals(getBenefitType())) && outcome == null) {
                 throw new IllegalStateException("Unable to determine a validated outcome");
             }
         }

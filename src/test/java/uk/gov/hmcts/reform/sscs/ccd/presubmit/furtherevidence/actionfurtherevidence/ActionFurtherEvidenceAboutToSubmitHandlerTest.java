@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
@@ -63,6 +60,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -169,6 +167,35 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         if (null != furtherEvidenceActionList && null != originalSender) {
             assertHappyPaths(expectedDocumentType, response);
         }
+    }
+
+    @Test
+    public void givenAConfidentialCaseWithScannedDocumentsAndEditedDocument_shouldMoveToSscsDocumentsWithEditedDocument() {
+        sscsCaseData.setIsConfidentialCase(YesNo.YES);
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder()
+                        .fileName("bla3.pdf")
+                        .subtype("sscs1")
+                        .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                        .editedUrl(DocumentLink.builder().documentUrl("www.edited.com").build())
+                        .scannedDate("2020-06-13T00:00:00.000")
+                        .controlNumber("123")
+                        .build()).build();
+
+        scannedDocumentList.add(scannedDocument);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(0).getValue();
+        assertEquals("Other document received on 13-06-2020", sscsDocumentDetail.getDocumentFileName());
+        assertEquals("Other document", sscsDocumentDetail.getDocumentType());
+        assertEquals("www.test.com", sscsDocumentDetail.getDocumentLink().getDocumentUrl());
+        assertEquals("www.edited.com", sscsDocumentDetail.getEditedDocumentLink().getDocumentUrl());
+        assertEquals("2020-06-13", sscsDocumentDetail.getDocumentDateAdded());
+        assertEquals("123", sscsDocumentDetail.getControlNumber());
+        assertEquals(NO, response.getData().getSscsDocument().get(1).getValue().getEvidenceIssued());
+        assertNull(response.getData().getScannedDocuments());
+        assertEquals(YES, response.getData().getEvidenceHandled());
     }
 
     @Test
@@ -356,6 +383,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals("Other document received on 13-06-2019", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
         assertEquals("2019-06-13", response.getData().getSscsDocument().get(1).getValue().getDocumentDateAdded());
         assertEquals("exist.pdf", response.getData().getSscsDocument().get(2).getValue().getDocumentFileName());
+        assertNotNull(response.getData().getSscsDocument().get(0).getValue().getControlNumber());
         assertNull(response.getData().getScannedDocuments());
     }
 
@@ -431,7 +459,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             .appeal(Appeal.builder().appellant(Appellant.builder().address(Address.builder().line1("My Road").postcode("TS1 2BA").build()).build()).build())
             .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-            State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now());
+                State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now());
         return new Callback<>(caseDetails, Optional.empty(), EventType.ACTION_FURTHER_EVIDENCE, false);
     }
 
@@ -512,6 +540,47 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         for (String error : response.getErrors()) {
             assertEquals("No document URL so could not process", error);
         }
+    }
+
+    @Test
+    public void givenANonConfidentialCaseAndEditedDocumentPopulated_thenAddAnErrorToResponse() {
+        List<ScannedDocument> docs = new ArrayList<>();
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder().fileName("Testing.jpg").url(DocumentLink.builder().documentUrl("test.com").build())
+                        .editedUrl(DocumentLink.builder().documentUrl("test").build()).build()).build();
+
+        docs.add(scannedDocument);
+
+        sscsCaseData.setScannedDocuments(docs);
+        sscsCaseData.setIsConfidentialCase(YesNo.NO);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+
+        for (String error : response.getErrors()) {
+            assertEquals("Case is not marked as confidential so cannot upload an edited document", error);
+        }
+    }
+
+    @Test
+    public void givenAConfidentialCaseAndEditedDocumentPopulated_thenDoNotAddAnErrorToResponse() {
+        List<ScannedDocument> docs = new ArrayList<>();
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder().fileName("Testing.jpg").url(DocumentLink.builder().documentUrl("test.com").build())
+                        .editedUrl(DocumentLink.builder().documentUrl("test").build()).build()).build();
+
+        docs.add(scannedDocument);
+
+        sscsCaseData.setScannedDocuments(docs);
+        sscsCaseData.setIsConfidentialCase(YesNo.YES);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+
     }
 
     @Test
@@ -727,6 +796,78 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant().getRequestOutcome());
         assertEquals(createDatedRequestOutcome(RequestOutcome.GRANTED), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
         assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestOutcomeAppellant().getDate());
+    }
+
+    @Test
+    public void givenAnAppellantHasConfidentialityRequestGrantedAndAppellantSendsFurtherEvidence_thenDisplayWarningWhenActionFurtherEvidenceEventTriggered() {
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
+        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+        List<ScannedDocument> docs = new ArrayList<>();
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+
+        assertEquals(1, response.getWarnings().size());
+        assertEquals("This case has a confidentiality flag, ensure any evidence from the appellant (or appointee) has confidential information redacted", response.getWarnings().iterator().next());
+    }
+
+    @Test
+    public void givenAJointPartyHasConfidentialityRequestGrantedAndJointPartySendsFurtherEvidence_thenDisplayWarningWhenActionFurtherEvidenceEventTriggered() {
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
+        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(JOINT_PARTY.getCode(), JOINT_PARTY.getLabel()));
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+        List<ScannedDocument> docs = new ArrayList<>();
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+
+        assertEquals(1, response.getWarnings().size());
+        assertEquals("This case has a confidentiality flag, ensure any evidence from the joint party has confidential information redacted", response.getWarnings().iterator().next());
+    }
+
+    @Test
+    public void givenAnAppellantHasConfidentialityRequestGrantedAndJointPartySendsFurtherEvidence_thenDisplayWarningWhenActionFurtherEvidenceEventTriggered() {
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
+        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(JOINT_PARTY.getCode(), JOINT_PARTY.getLabel()));
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+        List<ScannedDocument> docs = new ArrayList<>();
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size());
+    }
+
+    @Test
+    public void givenAJointPartyHasConfidentialityRequestGrantedAndAppellantSendsFurtherEvidence_thenDoNotDisplayWarningWhenActionFurtherEvidenceEventTriggered() {
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
+        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+        List<ScannedDocument> docs = new ArrayList<>();
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size());
     }
 
     @Test

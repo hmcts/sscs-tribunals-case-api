@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
+
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -34,20 +36,20 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
         int totalPoints = decisionNoticeService.getQuestionService("ESA").getTotalPoints(sscsCaseData, EsaPointsRegulationsAndSchedule3ActivitiesCondition.getAllAnswersExtractor().apply(sscsCaseData));
 
         if (isWcaNotSupportGroupOnly(sscsCaseData) && EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
-            sscsCaseData.getSscsEsaCaseData().setShowRegulation29Page(YesNo.YES);
-            if (YesNo.YES.equals(sscsCaseData.getSscsEsaCaseData().getDoesRegulation29Apply())) {
-                sscsCaseData.getSscsEsaCaseData().setShowSchedule3ActivitiesPage(YesNo.YES);
-            } else if (YesNo.NO.equals(sscsCaseData.getSscsEsaCaseData().getDoesRegulation29Apply())) {
-                sscsCaseData.getSscsEsaCaseData().setShowSchedule3ActivitiesPage(YesNo.NO);
+            sscsCaseData.getSscsEsaCaseData().setShowRegulation29Page(YES);
+            if (YES.equals(sscsCaseData.getSscsEsaCaseData().getDoesRegulation29Apply())) {
+                sscsCaseData.getSscsEsaCaseData().setShowSchedule3ActivitiesPage(YES);
+            } else if (NO.equals(sscsCaseData.getSscsEsaCaseData().getDoesRegulation29Apply())) {
+                sscsCaseData.getSscsEsaCaseData().setShowSchedule3ActivitiesPage(NO);
             }
         } else {
-            sscsCaseData.getSscsEsaCaseData().setShowRegulation29Page(YesNo.NO);
-            sscsCaseData.getSscsEsaCaseData().setShowSchedule3ActivitiesPage(YesNo.YES);
+            sscsCaseData.getSscsEsaCaseData().setShowRegulation29Page(NO);
+            sscsCaseData.getSscsEsaCaseData().setShowSchedule3ActivitiesPage(YES);
         }
     }
 
     private boolean isWcaNotSupportGroupOnly(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getSscsEsaCaseData().isWcaAppeal() && !sscsCaseData.isSupportGroupOnlyAppeal();
+        return sscsCaseData.isWcaAppeal() && !sscsCaseData.isSupportGroupOnlyAppeal();
     }
 
     @Override
@@ -62,10 +64,22 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getSscsEsaCaseData().getWcaAppeal() != null && sscsCaseData.getSscsEsaCaseData().getWcaAppeal().equalsIgnoreCase(YesNo.NO.getValue())) {
-            sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES);
+        if (sscsCaseData.getWcaAppeal() != null && NO.equals(sscsCaseData.getWcaAppeal())) {
+            sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YES);
             return;
         }
-        sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.NO);
+        sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(NO);
+    }
+
+    @Override
+    protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData) {
+
+        if (YesNo.YES.getValue().equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionGenerateNotice())
+                && sscsCaseData.isWcaAppeal()
+                && "allowed".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionAllowedOrRefused())) {
+            sscsCaseData.setShowDwpReassessAwardPage(YesNo.YES);
+            return;
+        }
+        sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
     }
 }

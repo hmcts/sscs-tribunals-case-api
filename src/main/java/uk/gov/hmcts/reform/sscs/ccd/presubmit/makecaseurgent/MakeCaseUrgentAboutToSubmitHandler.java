@@ -28,7 +28,8 @@ public class MakeCaseUrgentAboutToSubmitHandler implements PreSubmitCallbackHand
         return callbackType == CallbackType.ABOUT_TO_SUBMIT
             && callback.getEvent() == EventType.MAKE_CASE_URGENT
             && Objects.nonNull(callback.getCaseDetails())
-            && Objects.nonNull(callback.getCaseDetails().getCaseData());
+            && Objects.nonNull(callback.getCaseDetails().getCaseData())
+            && !"Yes".equalsIgnoreCase(callback.getCaseDetails().getCaseData().getUrgentCase());
     }
 
     @Override

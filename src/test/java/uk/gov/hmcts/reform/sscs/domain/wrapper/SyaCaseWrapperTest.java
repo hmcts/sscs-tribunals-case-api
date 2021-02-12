@@ -30,7 +30,8 @@ public class SyaCaseWrapperTest {
 
         return new Object[]{
             new Object[]{caseWithNullAppellantAndNullAppointee, nullValue()},
-            new Object[]{caseWithAppellantWithSameAddressAsAppointeeAndNullAppointee, nullValue()},
+            new Object[]{caseWithAppellantWithSameAddressAsAppointeeAndNullAppointee,
+                    equalTo(caseWithAppellantWithSameAddressAsAppointeeAndNullAppointee.getAppellant().getContactDetails())},
             new Object[]{caseWithAppellantAndAppointee,
                 equalTo(caseWithAppellantAndAppointee.getAppellant().getContactDetails())}
         };
@@ -39,6 +40,8 @@ public class SyaCaseWrapperTest {
     private SyaCaseWrapper buildCaseWithAppellantAndNullAppointee() {
         SyaCaseWrapper caseWithAppellantAndNullAppointee = new SyaCaseWrapper();
         caseWithAppellantAndNullAppointee.setAppellant(buildSyaAppellant(true));
+        caseWithAppellantAndNullAppointee.setIsAppointee(true);
+        caseWithAppellantAndNullAppointee.setIsAppointee(true);
         caseWithAppellantAndNullAppointee.setAppointee(null);
         return caseWithAppellantAndNullAppointee;
     }

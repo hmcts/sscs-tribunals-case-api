@@ -134,20 +134,44 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Test
     @Parameters({
-            "Yes, NO",
-            "No,YES",
+            "YES, NO",
+            "NO,YES",
             "null, NO"
     })
     public void givenEsaCaseWithWcaAppealFlow_thenSetShowSummaryOfOutcomePage(
-            @Nullable String wcaFlow, YesNo expectedShowResult) {
+            @Nullable YesNo wcaFlow, YesNo expectedShowResult) {
 
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(wcaFlow);
+        sscsCaseData.setWcaAppeal(wcaFlow);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(expectedShowResult, response.getData().getShowFinalDecisionNoticeSummaryOfOutcomePage());
+    }
+
+    @Test
+    @Parameters({
+            "YES, allowed, YES",
+            "YES, refused, NO",
+            "NO, allowed, NO",
+            "NO, refused, NO",
+            "null, allowed, NO",
+            "NO, null, NO",
+            "null, null, NO",
+    })
+    public void givenEsaCaseWithWcaAppealFlowAndAllowedFlow_thenSetShowDwpReassessAwardPage(
+            @Nullable YesNo wcaFlow, @Nullable String allowedFlow, YesNo expectedShowResult) {
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setWcaAppeal(wcaFlow);
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused(allowedFlow);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(expectedShowResult, response.getData().getShowDwpReassessAwardPage());
     }
 
     @Test
@@ -165,6 +189,19 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Test
     public void shouldExhibitBenefitSpecificBehaviourWhenNoAwardsAreGivenAndNoActivitiesAreSelected() {
+
+        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        setNoAwardsScenario(sscsCaseData);
+        setEmptyActivitiesListScenario(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void shouldNotDisplayErrorWhenNoAwardIsGivenAndEitherDailyLivingOrMobilityIsNotConsideredAndNoActivitiesAreSelected() {
 
         setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
         setNoAwardsScenario(sscsCaseData);

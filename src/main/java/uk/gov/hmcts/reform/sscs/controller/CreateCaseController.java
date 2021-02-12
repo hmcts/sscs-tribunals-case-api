@@ -61,8 +61,8 @@ public class CreateCaseController {
     ) throws URISyntaxException {
         SscsCaseDetails caseDetails = ccdService.createCase(
                 createSscsCase(email, mobile, hearingType),
-                EventType.SYA_APPEAL_CREATED.getCcdType(),
-                "SSCS - appeal created event", "Created SSCS",
+                EventType.CREATE_TEST_CASE.getCcdType(),
+                "SSCS - create test case event", "Created SSCS",
                 idamService.getIdamTokens()
         );
 
@@ -72,6 +72,9 @@ public class CreateCaseController {
         body.put("appellant_tya", caseDetails.getData().getSubscriptions().getAppellantSubscription().getTya());
         if (caseDetails.getData().getSubscriptions().getJointPartySubscription() != null) {
             body.put("joint_party_tya", caseDetails.getData().getSubscriptions().getJointPartySubscription().getTya());
+        }
+        if (caseDetails.getData().getSubscriptions().getRepresentativeSubscription() != null) {
+            body.put("representative_tya", caseDetails.getData().getSubscriptions().getRepresentativeSubscription().getTya());
         }
         return ResponseEntity.created(new URI("case/someId")).body(body);
     }
@@ -113,7 +116,17 @@ public class CreateCaseController {
                                                     .subscribeSms((mobile != null) ? "yes" : "no")
                                                     .tya(UUID.randomUUID().toString())
                                                     .build()
-                                    ).build()
+                                    )
+                                    .representativeSubscription(
+                                            Subscription.builder()
+                                                    .email(email)
+                                                    .mobile(mobile)
+                                                    .subscribeEmail("yes")
+                                                    .subscribeSms((mobile != null) ? "yes" : "no")
+                                                    .tya(UUID.randomUUID().toString())
+                                                    .build()
+                                    )
+                                    .build()
                     )
                     .build();
             sscsCaseData.getAppeal().setHearingType(hearingType);

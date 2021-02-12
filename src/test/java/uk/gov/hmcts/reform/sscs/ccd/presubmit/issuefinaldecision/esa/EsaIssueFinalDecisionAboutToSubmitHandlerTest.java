@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -42,7 +43,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsEsaCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.IssueFinalDecisionAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeOutcomeService;
@@ -121,12 +121,12 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
                 .esaWriteFinalDecisionReachingQuestion("")
                 .esaWriteFinalDecisionSocialEngagementQuestion("")
                 .esaWriteFinalDecisionStandingAndSittingQuestion("")
-                .showRegulation29Page(YesNo.YES)
-                .showSchedule3ActivitiesPage(YesNo.YES)
-                .doesRegulation35Apply(YesNo.YES)
-                .doesRegulation29Apply(YesNo.YES)
+                .showRegulation29Page(YES)
+                .showSchedule3ActivitiesPage(YES)
+                .doesRegulation35Apply(YES)
+                .doesRegulation29Apply(YES)
                 .build())
-            .showFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES)
+            .showFinalDecisionNoticeSummaryOfOutcomePage(YES)
             .writeFinalDecisionStartDate("")
             .writeFinalDecisionEndDateType("")
             .writeFinalDecisionEndDate("")
@@ -150,7 +150,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     public void givenAnIssueFinalDecisionEventForGenerateNoticeFlowWhenAllowedOrRefusedIsNull_ThenDisplayAnError() {
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().getSscsEsaCaseData().setWcaAppeal("Yes");
+        callback.getCaseDetails().getCaseData().setWcaAppeal(YES);
         callback.getCaseDetails().getCaseData().setSupportGroupOnlyAppeal("Yes");
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionAllowedOrRefused(null);
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionGenerateNotice("yes");
@@ -170,7 +170,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         assertNotNull(sscsCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
         assertNotNull(sscsCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
         assertNull(sscsCaseData.getWriteFinalDecisionAllowedOrRefused());
-        assertNotNull(sscsCaseData.getSscsEsaCaseData().getWcaAppeal());
+        assertNotNull(sscsCaseData.getWcaAppeal());
         assertNotNull(sscsCaseData.getSupportGroupOnlyAppeal());
         assertNotNull(sscsCaseData.getWriteFinalDecisionStartDate());
         assertNotNull(sscsCaseData.getWriteFinalDecisionEndDateType());
@@ -202,7 +202,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         assertNotNull(sscsCaseData.getWriteFinalDecisionPageSectionReference());
         assertNotNull(sscsCaseData.getWriteFinalDecisionPreviewDocument());
         assertNull(sscsCaseData.getWriteFinalDecisionGeneratedDate());
-        assertNotNull(sscsCaseData.getSscsEsaCaseData().getWcaAppeal());
+        assertNotNull(sscsCaseData.getWcaAppeal());
         assertNotNull(sscsCaseData.getSscsEsaCaseData().getShowRegulation29Page());
         assertNotNull(sscsCaseData.getSscsEsaCaseData().getShowSchedule3ActivitiesPage());
         assertNotNull(sscsCaseData.getShowFinalDecisionNoticeSummaryOfOutcomePage());
@@ -216,7 +216,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     public void givenAnIssueFinalDecisionEventForGenerateNoticeFlowWhenAllowedOrRefusedIsNotNull_ThenDoNotDisplayAnError() {
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().getSscsEsaCaseData().setWcaAppeal("Yes");
+        callback.getCaseDetails().getCaseData().setWcaAppeal(YES);
         callback.getCaseDetails().getCaseData().setSupportGroupOnlyAppeal("Yes");
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionGenerateNotice("yes");
@@ -236,7 +236,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
         assertNull(sscsCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
         assertNull(sscsCaseData.getWriteFinalDecisionAllowedOrRefused());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getWcaAppeal());
+        assertNull(sscsCaseData.getWcaAppeal());
         assertNull(sscsCaseData.getSupportGroupOnlyAppeal());
         assertNull(sscsCaseData.getWriteFinalDecisionStartDate());
         assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
@@ -269,7 +269,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getWriteFinalDecisionPreviewDocument());
         assertNull(sscsCaseData.getWriteFinalDecisionGeneratedDate());
         assertNull(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getWcaAppeal());
+        assertNull(sscsCaseData.getWcaAppeal());
         assertNull(sscsCaseData.getSupportGroupOnlyAppeal());
         assertNull(sscsCaseData.getSscsEsaCaseData().getDoesRegulation35Apply());
         assertNull(sscsCaseData.getSscsEsaCaseData().getDoesRegulation29Apply());
@@ -304,7 +304,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
         assertNull(sscsCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
         assertNull(sscsCaseData.getWriteFinalDecisionAllowedOrRefused());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getWcaAppeal());
+        assertNull(sscsCaseData.getWcaAppeal());
         assertNull(sscsCaseData.getSupportGroupOnlyAppeal());
         assertNull(sscsCaseData.getWriteFinalDecisionStartDate());
         assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
@@ -337,7 +337,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getWriteFinalDecisionPreviewDocument());
         assertNull(sscsCaseData.getWriteFinalDecisionGeneratedDate());
         assertNull(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getWcaAppeal());
+        assertNull(sscsCaseData.getWcaAppeal());
         assertNull(sscsCaseData.getSupportGroupOnlyAppeal());
         assertNull(sscsCaseData.getSscsEsaCaseData().getDoesRegulation35Apply());
         assertNull(sscsCaseData.getSscsEsaCaseData().getDoesRegulation29Apply());
@@ -363,8 +363,8 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         sscsCaseData.setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionGenerateNotice("yes");
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 

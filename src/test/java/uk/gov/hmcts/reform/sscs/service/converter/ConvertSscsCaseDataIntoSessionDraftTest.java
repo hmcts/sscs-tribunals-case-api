@@ -337,6 +337,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             )
             .sscsDocument(Collections.emptyList())
             .evidencePresent("no")
+            .ccdCaseId("123456")
             .build();
 
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
@@ -370,6 +371,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("Underpayment", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getWhatYouDisagreeWith());
         assertEquals("I can't think of anything else", actual.getOtherReasonForAppealing().getOtherReasonForAppealing());
         assertEquals("no", actual.getEvidenceProvide().getEvidenceProvide());
+        assertEquals("123456", actual.getCcdCaseId());
         assertNull(actual.getRepresentativeDetails());
     }
 

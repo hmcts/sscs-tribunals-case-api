@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.createwelshnotice;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -21,10 +23,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
@@ -44,16 +44,17 @@ import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private static final String DM_STORE_USER_ID = "sscs";
-    private String directionTemplatePath;
-    private DocmosisPdfService docmosisPdfService;
-    private EvidenceManagementService evidenceManagementService;
-    private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-    private WelshFooterService welshFooterService;
-    private static Map<String, String> nextEventMap = new HashMap<>();
+    private final String directionTemplatePath;
+    private final DocmosisPdfService docmosisPdfService;
+    private final EvidenceManagementService evidenceManagementService;
+    private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+    private final WelshFooterService welshFooterService;
+    private static final Map<String, String> NEXT_EVENT_MAP = new HashMap<>();
 
     static {
-        nextEventMap.put(DocumentType.DECISION_NOTICE.getValue(), EventType.DECISION_ISSUED_WELSH.getCcdType());
-        nextEventMap.put(DocumentType.DIRECTION_NOTICE.getValue(), EventType.DIRECTION_ISSUED_WELSH.getCcdType());
+        NEXT_EVENT_MAP.put(DECISION_NOTICE.getValue(), DECISION_ISSUED_WELSH.getCcdType());
+        NEXT_EVENT_MAP.put(DIRECTION_NOTICE.getValue(), DIRECTION_ISSUED_WELSH.getCcdType());
+        NEXT_EVENT_MAP.put(ADJOURNMENT_NOTICE.getValue(), ISSUE_ADJOURNMENT_NOTICE_WELSH.getCcdType());
     }
 
     @Autowired
@@ -73,7 +74,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
         requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent().equals(EventType.CREATE_WELSH_NOTICE);
+                && callback.getEvent().equals(CREATE_WELSH_NOTICE);
     }
 
     @Override
@@ -106,7 +107,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
         if (uploadResponse != null) {
             String location = uploadResponse.getEmbedded().getDocuments().get(0).links.self.href;
             newDocLink = DocumentLink.builder().documentFilename(filename).documentUrl(location).documentBinaryUrl(location + "/binary").build();
-            final FooterDetails footerDetails = welshFooterService.addFooterToExistingToContentAndCreateNewUrl(newDocLink, caseData.getSscsWelshDocuments(), DocumentType.fromValue(caseData.getDocumentTypes().getValue().getCode()), null, LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
+            final FooterDetails footerDetails = welshFooterService.addFooterToExistingToContentAndCreateNewUrl(newDocLink, caseData.getSscsWelshDocuments(), fromValue(caseData.getDocumentTypes().getValue().getCode()), null, LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
 
             SscsWelshDocumentDetails sscsWelshDocumentDetails = SscsWelshDocumentDetails.builder()
                     .documentType(caseData.getDocumentTypes().getValue().getCode())
@@ -176,7 +177,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
     }
 
     private String getNextEvent(String documentType) {
-        return nextEventMap.get(documentType);
+        return NEXT_EVENT_MAP.get(documentType);
     }
 
     private String getWelshNoticeType(String noticeType) {

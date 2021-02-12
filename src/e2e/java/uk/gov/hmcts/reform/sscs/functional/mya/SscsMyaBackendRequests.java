@@ -53,6 +53,11 @@ public class SscsMyaBackendRequests {
         String uri = (StringUtils.isNotBlank(tya)) ? "/api/citizen/" + tya : "/api/citizen";
         HttpResponse getOnlineHearingResponse = getRequest(uri, email);
 
+        // Retry if failed first time
+        if (getOnlineHearingResponse.getStatusLine().getStatusCode() != HttpStatus.OK.value()) {
+            getOnlineHearingResponse = getRequest(uri, email);
+        }
+
         assertThat(getOnlineHearingResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
 
         String responseBody = EntityUtils.toString(getOnlineHearingResponse.getEntity());
@@ -91,7 +96,8 @@ public class SscsMyaBackendRequests {
         return new CreatedCcdCase(
                 jsonObject.getString("id"),
                 jsonObject.getString("appellant_tya"),
-                jsonObject.getString("joint_party_tya")
+                jsonObject.getString("joint_party_tya"),
+                jsonObject.getString("representative_tya")
         );
     }
 

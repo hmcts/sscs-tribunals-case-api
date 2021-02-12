@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFurtherEvidenceDoc;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
@@ -59,7 +60,10 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
         moveDraftsToSscsDocs(caseData);
         initDraftSscsFurtherEvidenceDocument(caseData);
         caseData.setEvidenceHandled("No");
-        caseData.setDwpState(DwpState.FE_RECEIVED.getId());
+
+        if (!State.WITH_DWP.equals(callback.getCaseDetails().getState())) {
+            caseData.setDwpState(DwpState.FE_RECEIVED.getId());
+        }
 
         return new PreSubmitCallbackResponse<>(caseData);
     }

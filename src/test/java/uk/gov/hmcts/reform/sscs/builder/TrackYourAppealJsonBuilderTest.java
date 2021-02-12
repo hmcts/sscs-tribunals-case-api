@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.*;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.Before;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
@@ -67,6 +68,15 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     @Test
+    public void shouldReturnHideHearingFlagInTheMyaResponseWithHearingTypePaper() {
+        SscsCaseData caseData = DWP_RESPOND_CCD.getDeserializeMessage();
+        caseData.getAppeal().setHearingType(HearingType.PAPER.getValue());
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter(), 1L, true, "responseReceived");
+        assertJsonEquals(DWP_RESPOND_MYA_FOR_PAPER_HEARING_TYPE.getSerializedMessage(), objectNode);
+    }
+
+    @Test
     public void shouldReturnAdjournmentHearingOutcomeDocumentData() {
         SscsCaseData caseData = ADJOURNMENT_NOTICE_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
@@ -80,6 +90,15 @@ public class TrackYourAppealJsonBuilderTest {
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter(), 1L, true, "responseReceived");
         assertJsonEquals(FINAL_DECISION_NOTICE_MYA.getSerializedMessage(), objectNode);
+    }
+
+    @Test
+    public void shouldReturnDwpRespondStatesForPaperTypeInHearingStatusCaseInTheMyaResponse() {
+        SscsCaseData caseData = HEARING_CCD.getDeserializeMessage();
+        caseData.getAppeal().setHearingType(HearingType.PAPER.getValue());
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter(), 1L, true, "hearing");
+        assertJsonEquals(HEARING_PAPER_MYA.getSerializedMessage(), objectNode);
     }
 
     private RegionalProcessingCenter populateRegionalProcessingCenter() {

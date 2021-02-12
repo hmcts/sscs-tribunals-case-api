@@ -45,9 +45,12 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         String issueCode = isDraft ? null : generateIssueCode();
         String caseCode = isDraft ? null : generateCaseCode(benefitCode, issueCode);
 
+        String ccdCaseId = StringUtils.isEmpty(syaCaseWrapper.getCcdCaseId()) ? null : syaCaseWrapper.getCcdCaseId();
+
         List<SscsDocument> sscsDocuments = getEvidenceDocumentDetails(syaCaseWrapper);
         return SscsCaseData.builder()
                 .caseCreated(LocalDate.now().toString())
+                .isSaveAndReturn(syaCaseWrapper.getIsSaveAndReturn())
                 .appeal(appeal)
                 .subscriptions(getSubscriptions(syaCaseWrapper))
                 .sscsDocument(sscsDocuments.isEmpty() ? Collections.emptyList() : sscsDocuments)
@@ -62,6 +65,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .translationWorkOutstanding(booleanToYesNull(!sscsDocuments.isEmpty()
                         && syaCaseWrapper.getLanguagePreferenceWelsh() != null
                         && syaCaseWrapper.getLanguagePreferenceWelsh()))
+                .ccdCaseId(ccdCaseId)
                 .build();
     }
 

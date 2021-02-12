@@ -296,6 +296,24 @@ public class CitizenLoginServiceTest {
     @Test
     public void cannotAssociatesUserWithCaseAsPostcodeIncorrect() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppellantSubscription(tya);
+        assertThatUserIsNotAddedToCase(expectedCase);
+    }
+
+    @Test
+    public void cannotAssociateUserWithCaseAsCasePostcodeIsEmpty() {
+        SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppellantSubscription(tya);
+        expectedCase.getData().getAppeal().getAppellant().getAddress().setPostcode("");
+        assertThatUserIsNotAddedToCase(expectedCase);
+    }
+
+    @Test
+    public void cannotAssociateUserWithCaseAsCasePostcodeIsNull() {
+        SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppellantSubscription(tya);
+        expectedCase.getData().getAppeal().getAppellant().getAddress().setPostcode(null);
+        assertThatUserIsNotAddedToCase(expectedCase);
+    }
+
+    private void assertThatUserIsNotAddedToCase(SscsCaseDetails expectedCase) {
         when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens))
                 .thenReturn(expectedCase);
         Optional<OnlineHearing> sscsCaseDetails = underTest.associateCaseToCitizen(

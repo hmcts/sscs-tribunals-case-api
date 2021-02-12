@@ -250,7 +250,7 @@
       },
       "interlocReviewState": "reviewByTcw",
       "region": "BIRMINGHAM",
-      "createdInGapsFrom": "validAppeal",
+      "createdInGapsFrom": "readyToList",
       "issueCode": "DD"
     },
     "data_classification": {

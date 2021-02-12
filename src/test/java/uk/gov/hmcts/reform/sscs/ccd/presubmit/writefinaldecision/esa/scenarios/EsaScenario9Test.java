@@ -48,14 +48,14 @@ public class EsaScenario9Test {
             + "\n"
             + "Felix Sydney is to be treated as having limited capability for work and has limited capability for work-related activity.\n"
             + "\n"
-            + "This is because insufficient points were scored under Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008 to meet the threshold for the Work Capability Assessment, but the tribunal applied regulation 29.\n"
+            + "This is because insufficient points were scored under Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008 to meet the threshold for the Work Capability Assessment.\n"
             + "\n"
             + "Mobilising Unaided\tc.1\t9\n"
             + "\n"
             + "\n"
             + "The tribunal applied regulation 29 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work.\n"
             + "\n"
-            + "The following activity and descriptor from Schedule 3 applied:\n"
+            + "The following activity and descriptor from Schedule 3 of the ESA Regulations applied:\n"
             + "\n"
             + "My schedule 3 descriptor\n"
             + "\n"
@@ -68,6 +68,7 @@ public class EsaScenario9Test {
             + "\n"
             + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n";
+
 
         Assert.assertEquals(12, content.getComponents().size());
 

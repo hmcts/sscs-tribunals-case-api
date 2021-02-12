@@ -30,6 +30,7 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
 
     static {
         nextEventMap.put(DocumentType.SSCS1.getValue(), EventType.SEND_TO_DWP.getCcdType());
+        nextEventMap.put(DocumentType.URGENT_HEARING_REQUEST.getValue(), EventType.UPDATE_CASE_ONLY.getCcdType());
         nextEventMap.put(DocumentType.DECISION_NOTICE.getValue(), EventType.DECISION_ISSUED_WELSH.getCcdType());
         nextEventMap.put(DocumentType.DIRECTION_NOTICE.getValue(), EventType.DIRECTION_ISSUED_WELSH.getCcdType());
     }
@@ -85,7 +86,7 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
                     LocalDateTime.now().format(DateTimeFormatter.ISO_DATE));
             }
             if (DocumentType.APPELLANT_EVIDENCE.getValue().equals(previewDocumentType)) {
-                log.info("Set up Applant Evidence welsh document for caseId:  {}", caseData.getCcdCaseId());
+                log.info("Set up Appellant Evidence welsh document for caseId:  {}", caseData.getCcdCaseId());
                 Optional<SscsDocument> sscsDocumentByTypeAndName = getSscsDocumentByTypeAndName(DocumentType.APPELLANT_EVIDENCE, sscsWelshPreviewDocument.getValue().getOriginalDocumentFileName(), caseData);
                 sscsDocumentByTypeAndName.ifPresent(sscsDocument -> {
                     if (StringUtils.isNotEmpty(sscsDocument.getValue().getBundleAddition())) {
@@ -134,7 +135,9 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
 
     private Optional<SscsDocument> getSscsDocumentByTypeAndName(DocumentType documentType, String fileName, SscsCaseData caseData) {
         return Optional.ofNullable(caseData.getSscsDocument()).map(Collection::stream).orElseGet(Stream::empty)
-            .filter(doc -> doc.getValue().getDocumentType().equals(documentType.getValue()) && doc.getValue().getDocumentLink().getDocumentFilename().equals(fileName))
+            .filter(doc -> (doc.getValue().getDocumentType().equals(documentType.getValue())
+                    || doc.getValue().getDocumentType().equals(DocumentType.OTHER_DOCUMENT.getValue()))
+                    && doc.getValue().getDocumentLink().getDocumentFilename().equals(fileName))
             .sorted()
             .findFirst();
     }

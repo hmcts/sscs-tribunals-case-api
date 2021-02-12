@@ -68,7 +68,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
     protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response, SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish,
         String userAuthorisation) {
 
-        String benefitType = caseData.getAppeal().getBenefitType() == null ? null : caseData.getAppeal().getBenefitType().getCode();
+        String benefitType = WriteFinalDecisionBenefitTypeHelper.getBenefitType(caseData);
 
         if (benefitType == null) {
             throw new IllegalStateException("Unable to determine benefit type");

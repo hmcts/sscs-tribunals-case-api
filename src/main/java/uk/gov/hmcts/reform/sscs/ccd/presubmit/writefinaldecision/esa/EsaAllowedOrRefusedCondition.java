@@ -141,7 +141,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
     List<FieldCondition> validationConditions;
     Optional<EsaPointsCondition> validationPointsCondition;
 
-    
+
     EsaAllowedOrRefusedCondition(AllowedOrRefusedCondition allowedOrRefusedCondition, YesNoFieldCondition wcaAppealCondition, Optional<YesNoFieldCondition> supportGroupOnlyCondition, Optional<EsaPointsCondition> primaryPointsCondition, Optional<StringListPredicate> schedule3ActivitiesSelected,
         FieldCondition...validationConditions) {
         this(allowedOrRefusedCondition, wcaAppealCondition, supportGroupOnlyCondition, primaryPointsCondition, schedule3ActivitiesSelected, isAnyPoints(), validationConditions);
@@ -157,7 +157,11 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
         } else if ((ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED == this && isRegulation35(UNSPECIFIED).isSatisified(caseData)) || ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_SELECTED == this) {
             return EsaScenario.SCENARIO_4;
         }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS == this && caseData.getSscsEsaCaseData().getSchedule3Selections().isEmpty()) {
-            return EsaScenario.SCENARIO_5;
+            if (isRegulation35(TRUE).isSatisified(caseData)) {
+                return EsaScenario.SCENARIO_12;
+            } else {
+                return EsaScenario.SCENARIO_5;
+            }
         } else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS == this && !caseData.getSscsEsaCaseData().getSchedule3Selections().isEmpty()) {
             return EsaScenario.SCENARIO_6;
         }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && caseData.getSscsEsaCaseData().getSchedule3Selections().isEmpty() && isRegulation35(FALSE).isSatisified(caseData)) {
@@ -210,7 +214,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
 
     static YesNoFieldCondition isWcaAppeal(Predicate<YesNo> predicate, boolean displayIsSatisfiedMessage) {
         return new YesNoFieldCondition("Wca Appeal", predicate,
-            s -> s.getSscsEsaCaseData().isWcaAppeal() ? YesNo.YES : YesNo.NO, displayIsSatisfiedMessage);
+            s -> s.isWcaAppeal() ? YesNo.YES : YesNo.NO, displayIsSatisfiedMessage);
     }
 
     static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {

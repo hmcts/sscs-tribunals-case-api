@@ -12,6 +12,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REINSTATEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome.GRANTED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
@@ -30,20 +32,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.ScannedDocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
@@ -54,7 +43,7 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private static final String FURTHER_EVIDENCE_RECEIVED = "furtherEvidenceReceived";
     private static final String COVERSHEET = "coversheet";
-    public static final String YES = "Yes";
+    public static final String YES = YesNo.YES.getValue();
 
     private final FooterService footerService;
     private final BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder;
@@ -88,8 +77,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (!callback.isIgnoreWarnings() && YES.equalsIgnoreCase(sscsCaseData.getIsProgressingViaGaps())) {
-            preSubmitCallbackResponse.addWarning("This case is progressing via GAPS. Please ensure any documents are emailed to the Regional Processing Centre to be attached to the paper file.");
+        if (!callback.isIgnoreWarnings()) {
+            checkForWarnings(preSubmitCallbackResponse);
         }
 
         if (isIssueFurtherEvidenceToAllParties(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction())) {
@@ -100,11 +89,28 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             }
 
             sscsCaseData.setDwpFurtherEvidenceStates(FURTHER_EVIDENCE_RECEIVED);
+
         }
 
         buildSscsDocumentFromScan(sscsCaseData, caseDetails.getState(), callback.isIgnoreWarnings(), preSubmitCallbackResponse);
 
         return preSubmitCallbackResponse;
+    }
+
+    private void checkForWarnings(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (YES.equalsIgnoreCase(preSubmitCallbackResponse.getData().getIsProgressingViaGaps())) {
+            preSubmitCallbackResponse.addWarning("This case is progressing via GAPS. Please ensure any documents are emailed to the Regional Processing Centre to be attached to the paper file.");
+        }
+
+        if ((null != preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeAppellant()
+                && GRANTED.equals(preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeAppellant().getRequestOutcome())
+                && OriginalSenderItemList.APPELLANT.getCode().equals(preSubmitCallbackResponse.getData().getOriginalSender().getValue().getCode()))
+                || (null != preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeJointParty()
+                && GRANTED.equals(preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeJointParty().getRequestOutcome())
+                && OriginalSenderItemList.JOINT_PARTY.getCode().equals(preSubmitCallbackResponse.getData().getOriginalSender().getValue().getCode()))) {
+            preSubmitCallbackResponse.addWarning("This case has a confidentiality flag, ensure any evidence from the "
+                    + preSubmitCallbackResponse.getData().getOriginalSender().getValue().getLabel().toLowerCase() + " has confidential information redacted");
+        }
     }
 
     private boolean isIssueFurtherEvidenceToAllParties(DynamicList furtherEvidenceActionList) {
@@ -249,6 +255,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             preSubmitCallbackResponse.addError("No document URL so could not process");
         }
 
+        if (!YesNo.YES.equals(preSubmitCallbackResponse.getData().getIsConfidentialCase()) && scannedDocument.getValue().getEditedUrl() != null) {
+            preSubmitCallbackResponse.addError("Case is not marked as confidential so cannot upload an edited document");
+        }
+
         if (isBlank(scannedDocument.getValue().getFileName())) {
             preSubmitCallbackResponse.addError("No document file name so could not process");
         }
@@ -306,7 +316,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         String bundleAddition = null;
 
         if (caseState != null
-            && isIssueFurtherEvidenceToAllParties(sscsCaseData.getFurtherEvidenceAction())
+            && (isIssueFurtherEvidenceToAllParties(sscsCaseData.getFurtherEvidenceAction())
+                || (isOtherDocumentTypeActionManually(sscsCaseData.getFurtherEvidenceAction()) && "Yes".equalsIgnoreCase(scannedDocument.getValue().getIncludeInBundle())))
             && isCaseStateAddtitionValid(caseState)) {
 
             log.info("adding footer appendix document link: {} and caseId {}", url, sscsCaseData.getCcdCaseId());
@@ -326,6 +337,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             .documentFileName(fileName)
             .bundleAddition(bundleAddition)
             .documentLink(url)
+            .editedDocumentLink(scannedDocument.getValue().getEditedUrl())
             .documentDateAdded(scannedDate)
             .controlNumber(scannedDocument.getValue().getControlNumber())
             .evidenceIssued("No")

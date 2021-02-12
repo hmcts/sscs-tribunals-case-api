@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.functional.handlers.uploaddocument;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 
@@ -35,7 +34,6 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandler {
             .then()
             .statusCode(HttpStatus.SC_OK)
             .log().all(true)
-            .assertThat().body("data.dwpState", equalTo("feReceived"))
             .assertThat().body("data", not(hasKey("draftSscsFurtherEvidenceDocument")))
             .assertThat().body("data.sscsDocument", hasSize(2))
             .assertThat().body("data.scannedDocuments", hasSize(2))
