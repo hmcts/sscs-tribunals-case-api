@@ -52,21 +52,15 @@ public class BaseHandler {
     }
 
     protected SscsCaseDetails createCaseInResponseReceivedState(int retry) throws Exception {
-        SscsCaseDetails caseDetails = ccdService.createCase(buildSscsCaseDataForTesting("Mercury", "JK 77 33 22 Z"),
-                EventType.CREATE_TEST_CASE.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
+        return ccdService.createCase(buildSscsCaseDataForTesting("Mercury", "JK 77 33 22 Z"),
+                EventType.CREATE_RESPONSE_RECEIVED_TEST_CASE.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
                 CREATED_BY_FUNCTIONAL_TEST, idamTokens);
-
-        return updateCase(retry, caseDetails.getData(), caseDetails.getId(), EventType.DWP_RESPOND.getCcdType(),
-                CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
     }
 
     protected SscsCaseDetails createCaseInWithDwpState(int retry) throws Exception {
-        SscsCaseDetails caseDetails = ccdService.createCase(buildSscsCaseDataForTesting("Lennon", "BB 22 55 66 B"),
-                EventType.CREATE_TEST_CASE.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
+        return ccdService.createCase(buildSscsCaseDataForTesting("Lennon", "BB 22 55 66 B"),
+                EventType.CREATE_WITH_DWP_TEST_CASE.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
                 CREATED_BY_FUNCTIONAL_TEST, idamTokens);
-
-        return updateCase(retry, caseDetails.getData(), caseDetails.getId(), EventType.SENT_TO_DWP.getCcdType(),
-                CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
     }
 
     protected String getMyaResponse(int retry, Long caseId) {
