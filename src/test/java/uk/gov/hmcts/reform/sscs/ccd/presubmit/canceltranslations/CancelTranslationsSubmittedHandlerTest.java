@@ -104,7 +104,6 @@ public class CancelTranslationsSubmittedHandlerTest {
         verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.MAKE_CASE_URGENT.getCcdType(),
                 "Send a case to urgent hearing", OTHER_DOCUMENT_MANUAL.getLabel(), idamTokens);
         assertNull(caseData.getSscsWelshPreviewNextEvent());
-
     }
 
     @Test
@@ -133,6 +132,16 @@ public class CancelTranslationsSubmittedHandlerTest {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
         caseData.setSscsWelshPreviewNextEvent(EventType.UPDATE_CASE_ONLY.getCcdType());
 
+        SscsDocument sscsDocument = SscsDocument.builder().value(
+                SscsDocumentDetails
+                        .builder()
+                        .documentType(DocumentType.DIRECTION_NOTICE.getValue())
+                        .documentDateAdded(LocalDateTime.now().minusDays(7).toString())
+                        .build())
+                .build();
+
+        caseData.getSscsDocument().add(sscsDocument);
+
         when(ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
                 EventType.UPDATE_CASE_ONLY.getCcdType(), "Set Reinstatement Request",
                 "Set Reinstatement Request", idamTokens))
@@ -142,6 +151,36 @@ public class CancelTranslationsSubmittedHandlerTest {
 
         verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.UPDATE_CASE_ONLY.getCcdType(),
                 "Set Reinstatement Request", "Set Reinstatement Request", idamTokens);
+        assertNull(caseData.getSscsWelshPreviewNextEvent());
+    }
+
+    @Test
+    public void shouldNotCallUpdateCaseWithReinstatementRequestWhenReinstatementRequestIsOld() {
+        SscsCaseData caseData = buildDataWithDocumentType(DocumentType.DIRECTION_NOTICE.getValue());
+
+        SscsDocument sscsDocument = SscsDocument.builder().value(
+                SscsDocumentDetails
+                        .builder()
+                        .documentType(DocumentType.REINSTATEMENT_REQUEST.getValue())
+                        .documentDateAdded(LocalDateTime.now().minusDays(7).toString())
+                        .build())
+                .build();
+
+        caseData.getSscsDocument().add(sscsDocument);
+
+        IdamTokens idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+        caseData.setSscsWelshPreviewNextEvent(EventType.UPDATE_CASE_ONLY.getCcdType());
+
+        when(ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+                EventType.UPDATE_CASE_ONLY.getCcdType(), "Cancel welsh translations",
+                "Cancel welsh translations", idamTokens))
+                .thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.UPDATE_CASE_ONLY.getCcdType(),
+                "Cancel welsh translations", "Cancel welsh translations", idamTokens);
         assertNull(caseData.getSscsWelshPreviewNextEvent());
     }
 
@@ -165,7 +204,12 @@ public class CancelTranslationsSubmittedHandlerTest {
     }
 
     private SscsCaseData buildDataWithDocumentType(String documentType) {
-        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(documentType).build()).build();
+        SscsDocument sscsDocument = SscsDocument.builder().value(
+                SscsDocumentDetails
+                        .builder()
+                        .documentType(documentType)
+                        .documentDateAdded(LocalDateTime.now().toString())
+                        .build()).build();
         List<SscsDocument> sscsDocuments = new ArrayList<>();
         sscsDocuments.add(sscsDocument);
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();

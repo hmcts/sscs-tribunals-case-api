@@ -320,7 +320,13 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
     }
 
     private SscsCaseData buildDataWithUrgentRequestDocument() {
-        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(DocumentType.URGENT_HEARING_REQUEST.getValue()).build()).build();
+        SscsDocument sscsDocument = SscsDocument.builder().value(
+                SscsDocumentDetails
+                        .builder()
+                        .documentType(DocumentType.URGENT_HEARING_REQUEST.getValue())
+                        .documentDateAdded(LocalDateTime.now().toString())
+                        .build())
+                .build();
         List<SscsDocument> sscsDocuments = new ArrayList<>();
         sscsDocuments.add(sscsDocument);
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();

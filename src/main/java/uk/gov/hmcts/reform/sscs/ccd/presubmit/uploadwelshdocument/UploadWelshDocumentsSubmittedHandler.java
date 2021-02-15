@@ -6,6 +6,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,11 +80,16 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
     private boolean isReinstatementRequest(SscsCaseData caseData) {
 
         Boolean isTranslationsOutstanding = (StringUtils.isEmpty(caseData.getTranslationWorkOutstanding()) || "No".equalsIgnoreCase(caseData.getTranslationWorkOutstanding()));
-        Boolean isDocReinstatement = !CollectionUtils.isEmpty(caseData.getSscsDocument()) && caseData.getSscsDocument().stream().anyMatch(d -> REINSTATEMENT_REQUEST.getValue().equals(d.getValue().getDocumentType()));
-        Boolean isWelshReinstatement = (!CollectionUtils.isEmpty(caseData.getSscsWelshDocuments()) && caseData.getSscsWelshDocuments().stream().anyMatch(d -> REINSTATEMENT_REQUEST.getValue().equals(d.getValue().getDocumentType())));
+        Boolean isDocReinstatement = !CollectionUtils.isEmpty(caseData.getSscsDocument()) && isLastDocReinstatementReq(caseData.getSscsDocument());
+        Boolean isWelshReinstatement = (!CollectionUtils.isEmpty(caseData.getSscsWelshDocuments()) && isLastDocReinstatementReq(caseData.getSscsWelshDocuments()));
 
-        log.info("Is Reinstatement Request: translationOutstanding = {}. isCorReintstatement = {}. isWelshDocReinstatement = {}",isTranslationsOutstanding, isDocReinstatement, isWelshReinstatement);
+        log.info("Is Reinstatement Request: translationOutstanding = {}. isEngReintstatement = {}. isWelshDocReinstatement = {}",isTranslationsOutstanding, isDocReinstatement, isWelshReinstatement);
         return (isTranslationsOutstanding && (isDocReinstatement || isWelshReinstatement));
+    }
+
+    private <T extends AbstractDocument> boolean isLastDocReinstatementReq(List<T> documents) {
+        Collections.sort(documents);
+        return REINSTATEMENT_REQUEST.getValue().equals(documents.get(0).getValue().getDocumentType());
     }
 
     private SscsCaseDetails setMakeCaseUrgentTriggerEvent(
