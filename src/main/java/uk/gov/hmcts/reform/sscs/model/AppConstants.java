@@ -29,7 +29,8 @@ public class AppConstants {
     public static final int MAX_DWP_RESPONSE_DAYS = 35;
     public static final int PAST_HEARING_BOOKED_IN_WEEKS = 8;
 
-    public static final String DWP_DOCUMENT_AT38_FILENAME_PREFIX = "AT38 received ";
+    public static final String DWP_DOCUMENT_AT38_FILENAME_PREFIX = "AT38 received";
+    public static final String DWP_DOCUMENT_APPENDIX12_FILENAME_PREFIX = "Appendix 12 received";
     public static final String DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX = "DWP response received";
     public static final String DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX = "DWP evidence received";
     public static final String DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX = "DWP edited response received";

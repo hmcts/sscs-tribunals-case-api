@@ -425,7 +425,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     public void givenUcCaseWithAppendix12Document_thenMoveDocumentToDwpDocumentsCollection() {
-        callback.getCaseDetails().getCaseData().setAppendix12Doc(DwpResponseDocument.builder().documentFileName("testA").documentLink(DocumentLink.builder().build()).build());
+        callback.getCaseDetails().getCaseData().setAppendix12Doc(DwpResponseDocument.builder().documentFileName("testA").documentLink(DocumentLink.builder().documentFilename("My document name.pdf").build()).build());
         List<DwpDocument> dwpResponseDocuments = new ArrayList<>();
         dwpResponseDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentFileName("existingDoc").documentDateAdded(LocalDate.now().minusDays(1).toString()).build()).build());
 
@@ -435,7 +435,10 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         assertEquals(2, response.getData().getDwpDocuments().size());
 
-        assertEquals("Appendix 12 document", response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
+        String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+
+        assertEquals("Appendix 12 received on " + todayDate, response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
+        assertEquals("Appendix 12 received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentFilename());
         assertEquals(DwpDocumentType.APPENDIX_12.getValue(), response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
         assertEquals("existingDoc", response.getData().getDwpDocuments().get(1).getValue().getDocumentFileName());
     }

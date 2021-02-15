@@ -52,21 +52,15 @@ public class BaseHandler {
     }
 
     protected SscsCaseDetails createCaseInResponseReceivedState(int retry) throws Exception {
-        SscsCaseDetails caseDetails = ccdService.createCase(buildSscsCaseDataForTesting("Mercury", "JK 77 33 22 Z"),
-                EventType.CREATE_TEST_CASE.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
+        return ccdService.createCase(buildSscsCaseDataForTesting("Mercury", "JK 77 33 22 Z"),
+                EventType.CREATE_RESPONSE_RECEIVED_TEST_CASE.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
                 CREATED_BY_FUNCTIONAL_TEST, idamTokens);
-
-        return updateCase(retry, caseDetails.getData(), caseDetails.getId(), EventType.DWP_RESPOND.getCcdType(),
-                CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
     }
 
     protected SscsCaseDetails createCaseInWithDwpState(int retry) throws Exception {
-        SscsCaseDetails caseDetails = ccdService.createCase(buildSscsCaseDataForTesting("Lennon", "BB 22 55 66 B"),
-                EventType.CREATE_TEST_CASE.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
+        return ccdService.createCase(buildSscsCaseDataForTesting("Lennon", "BB 22 55 66 B"),
+                EventType.CREATE_WITH_DWP_TEST_CASE.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
                 CREATED_BY_FUNCTIONAL_TEST, idamTokens);
-
-        return updateCase(retry, caseDetails.getData(), caseDetails.getId(), EventType.SENT_TO_DWP.getCcdType(),
-                CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
     }
 
     protected String getMyaResponse(int retry, Long caseId) {
@@ -121,32 +115,32 @@ public class BaseHandler {
 
         Subscription appellantSubscription = Subscription.builder()
                 .tya("app-appeal-number")
-                .email("appellant@email.com")
-                .mobile("07700 900555")
+                .email("sscstest+notify@greencroftconsulting.com")
+                .mobile("07398785050")
                 .subscribeEmail(YES)
                 .subscribeSms(YES)
                 .reason("")
                 .build();
         Subscription appointeeSubscription = Subscription.builder()
                 .tya("appointee-appeal-number")
-                .email("appointee@hmcts.net")
-                .mobile("07700 900555")
+                .email("sscstest+notify@greencroftconsulting.com")
+                .mobile("07398785050")
                 .subscribeEmail(YES)
                 .subscribeSms(YES)
                 .reason("")
                 .build();
         Subscription supporterSubscription = Subscription.builder()
                 .tya("")
-                .email("supporter@email.com")
-                .mobile("07700 900555")
+                .email("sscstest+notify@greencroftconsulting.com")
+                .mobile("07398785050")
                 .subscribeEmail("")
                 .subscribeSms("")
                 .reason("")
                 .build();
         Subscription representativeSubscription = Subscription.builder()
                 .tya("rep-appeal-number")
-                .email("representative@email.com")
-                .mobile("07700 900555")
+                .email("sscstest+notify@greencroftconsulting.com")
+                .mobile("07398785050")
                 .subscribeEmail(YES)
                 .subscribeSms(YES)
                 .build();
@@ -179,7 +173,7 @@ public class BaseHandler {
                 .line2("Off Hairy Park")
                 .town("Hairyfield")
                 .county("Kent")
-                .postcode("TN32 6PL")
+                .postcode("TS1 1ST")
                 .build();
         Contact contact = Contact.builder()
                 .email("mail@email.com")
