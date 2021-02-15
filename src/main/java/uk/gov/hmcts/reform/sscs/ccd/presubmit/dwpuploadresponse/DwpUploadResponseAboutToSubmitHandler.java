@@ -157,8 +157,13 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         dwpDocumentService.moveDwpEvidenceBundleToDwpDocumentCollection(sscsCaseData);
 
         if (sscsCaseData.getAppendix12Doc() != null && sscsCaseData.getAppendix12Doc().getDocumentLink() != null) {
-            sscsCaseData.getAppendix12Doc().setDocumentFileName(DwpDocumentType.APPENDIX_12.getLabel());
-            dwpDocumentService.addToDwpDocuments(sscsCaseData, sscsCaseData.getAppendix12Doc(), DwpDocumentType.APPENDIX_12);
+            DwpResponseDocument appendix12 = buildDwpResponseDocumentWithDate(
+                    AppConstants.DWP_DOCUMENT_APPENDIX12_FILENAME_PREFIX,
+                    todayDate,
+                    sscsCaseData.getAppendix12Doc().getDocumentLink());
+
+            dwpDocumentService.addToDwpDocuments(sscsCaseData, appendix12, DwpDocumentType.APPENDIX_12);
+            sscsCaseData.setAppendix12Doc(null);
         }
     }
 
