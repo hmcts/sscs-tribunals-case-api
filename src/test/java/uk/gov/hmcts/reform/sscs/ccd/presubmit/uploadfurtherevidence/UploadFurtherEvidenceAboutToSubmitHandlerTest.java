@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 
 @RunWith(JUnitParamsRunner.class)
 public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
@@ -61,7 +62,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
         MockitoAnnotations.openMocks(this);
         handler = new UploadFurtherEvidenceAboutToSubmitHandler(true);
         when(callback.getEvent()).thenReturn(EventType.UPLOAD_FURTHER_EVIDENCE);
-        sscsCaseData = SscsCaseData.builder().state(State.VALID_APPEAL).appeal(Appeal.builder().build()).build();
+        sscsCaseData = SscsCaseData.builder().state(State.VALID_APPEAL).interlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId()).appeal(Appeal.builder().build()).build();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
@@ -117,7 +118,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
     @NotNull
     private List<DraftSscsDocument> getDraftSscsDocuments(String nullField, String fileName) {
         final DraftSscsDocument doc = DraftSscsDocument.builder().value(DraftSscsDocumentDetails.builder()
-                .documentFileName(nullField.contains("fileName") ? null : "File1.pdf")
+                .documentFileName(nullField.contains("fileName") ? null : fileName)
                 .documentType(nullField.contains("documentType") ? null : "documentType")
                 .documentLink(nullField.contains("documentLink") ? null : DocumentLink.builder().documentUrl(
                         nullField.equals("documentUrl") ? null : "documentUrl").documentFilename(fileName).build())
@@ -136,7 +137,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"pdf", "PDF", "mp3", "MP3", "mp4", "MP4"})
-    public void shouldMoveOneDraftUploadsToSscsDocuments(String fileType) {
+    public void shouldMoveOneDraftUploadsToSscsDocumentsOrAudioVideoEvidence(String fileType) {
         sscsCaseData.setDraftFurtherEvidenceDocuments(getDraftSscsDocuments("", format("document.%s", fileType)));
         sscsCaseData.setSscsDocument(null);
 
@@ -144,7 +145,13 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getData().getDraftFurtherEvidenceDocuments(), is(nullValue()));
-        assertThat(response.getData().getSscsDocument().size(), is(1));
+        if (fileType.equalsIgnoreCase("pdf")) {
+            assertThat(response.getData().getSscsDocument().size(), is(1));
+            assertThat(response.getData().getAudioVideoEvidence(), is(nullValue()));
+        } else {
+            assertThat(response.getData().getSscsDocument(), is(nullValue()));
+            assertThat(response.getData().getAudioVideoEvidence().size(), is(1));
+        }
     }
 
     @Test
@@ -158,6 +165,35 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getData().getDraftFurtherEvidenceDocuments(), is(nullValue()));
         assertThat(response.getData().getSscsDocument().size(), is(3));
+    }
+
+    @Test
+    @Parameters({"doc.mp4", "doc.mp3"})
+    public void shouldNotOnlyAllowAudioVisualFilesWhenInterlocReviewStateIsNotReviewByTcw(String fileName) {
+        final List<DraftSscsDocument> draftDocs = getDraftSscsDocuments("", fileName);
+        sscsCaseData.setDraftFurtherEvidenceDocuments(draftDocs);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getErrors().iterator().next(), is("As you have uploaded an MP3 or MP4 file, please set interlocutory review state to 'Review by TCW'"));
+        assertThat(response.getData().getDraftFurtherEvidenceDocuments(), is(draftDocs));
+        assertThat(response.getData().getSscsDocument(), is(nullValue()));
+    }
+
+    @Test
+    @Parameters({"REVIEW_BY_TCW", "AWAITING_INFORMATION", "REVIEW_BY_JUDGE", "NONE", "AWAITING_ADMIN_ACTION", "WELSH_TRANSLATION"})
+    public void shouldMovePdfFilesToSscsDocumentsForAnyInterlocReviewState(InterlocReviewState interlocReviewState) {
+        final List<DraftSscsDocument> draftDocs = getDraftSscsDocuments("", "doc.pdf");
+        sscsCaseData.setDraftFurtherEvidenceDocuments(draftDocs);
+        sscsCaseData.setInterlocReviewState(interlocReviewState.getId());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getData().getDraftFurtherEvidenceDocuments(), is(nullValue()));
+        assertThat(response.getData().getSscsDocument().size(), is(1));
+        assertThat(response.getData().getAudioVideoEvidence(), is(nullValue()));
     }
 
     @Test
