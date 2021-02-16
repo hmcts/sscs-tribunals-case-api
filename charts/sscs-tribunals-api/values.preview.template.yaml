@@ -185,37 +185,37 @@ logstash:
   livenessProbe:
     initialDelaySeconds: 90
 
-importer:
-  userprofile:
-    enabled: true
-    jurisdictions:
-      - SSCS
-    users:
-      - system.update@hmcts.net|SSCS|Benefit|appealCreated
-    userProfileDatabaseHost: ${SERVICE_NAME}-postgresql
-    userProfileDatabasePort: 5432
-    userProfileDatabaseUser: hmcts
-    userProfileDatabasePassword: hmcts
-    userProfileDatabaseName: user-profile
-  definition:
-    enabled: true
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.7.44
-    kvSecretRef: kvcreds
-    gitSecretRef: kvcreds
-    redirectUri: https://case-management-web-${SERVICE_FQDN}/oauth2redirect
-    definitionFilename: sscs-ccd.xlsx
-    userRoles:
-      - citizen
-      - caseworker
-      - caseworker-sscs
-      - caseworker-sscs-systemupdate
-      - caseworker-sscs-anonymouscitizen
-      - caseworker-sscs-callagent
-      - caseworker-sscs-judge
-      - caseworker-sscs-clerk
-      - caseworker-sscs-dwpresponsewriter
-      - caseworker-sscs-registrar
-      - caseworker-sscs-superuser
-      - caseworker-sscs-teamleader
-      - caseworker-sscs-panelmember
-      - caseworker-sscs-bulkscan
+#importer:
+#  userprofile:
+#    enabled: true
+#    jurisdictions:
+#      - SSCS
+#    users:
+#      - system.update@hmcts.net|SSCS|Benefit|appealCreated
+#    userProfileDatabaseHost: ${SERVICE_NAME}-postgresql
+#    userProfileDatabasePort: 5432
+#    userProfileDatabaseUser: hmcts
+#    userProfileDatabasePassword: hmcts
+#    userProfileDatabaseName: user-profile
+#  definition:
+#    enabled: true
+#    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.7.44
+#    kvSecretRef: kvcreds
+#    gitSecretRef: kvcreds
+#    redirectUri: https://case-management-web-${SERVICE_FQDN}/oauth2redirect
+#    definitionFilename: sscs-ccd.xlsx
+#    userRoles:
+#      - citizen
+#      - caseworker
+#      - caseworker-sscs
+#      - caseworker-sscs-systemupdate
+#      - caseworker-sscs-anonymouscitizen
+#      - caseworker-sscs-callagent
+#      - caseworker-sscs-judge
+#      - caseworker-sscs-clerk
+#      - caseworker-sscs-dwpresponsewriter
+#      - caseworker-sscs-registrar
+#      - caseworker-sscs-superuser
+#      - caseworker-sscs-teamleader
+#      - caseworker-sscs-panelmember
+#      - caseworker-sscs-bulkscan
