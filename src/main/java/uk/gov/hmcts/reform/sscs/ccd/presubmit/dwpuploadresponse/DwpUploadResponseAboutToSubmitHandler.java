@@ -1,18 +1,19 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
+import static java.util.Collections.*;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.callback.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -65,11 +66,44 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         handleEditedDocuments(sscsCaseData, todayDate, preSubmitCallbackResponse);
 
+        handleAudioVideoDocuments(sscsCaseData);
+
         moveDocsToCorrectCollection(sscsCaseData, todayDate);
 
         checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
 
         return preSubmitCallbackResponse;
+    }
+
+    protected void handleAudioVideoDocuments(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getDwpUploadAudioVideoEvidence() == null || sscsCaseData.getDwpUploadAudioVideoEvidence().isEmpty()) {
+            return;
+        }
+
+        List<AudioVideoEvidence> audioVideoEvidence = sscsCaseData.getAudioVideoEvidence();
+        if (audioVideoEvidence == null) {
+            audioVideoEvidence = new ArrayList<>();
+            sscsCaseData.setAudioVideoEvidence(audioVideoEvidence);
+        }
+
+        List<AudioVideoEvidence> dwpAudioVideoEvidence = sscsCaseData.getDwpUploadAudioVideoEvidence();
+
+        for (AudioVideoEvidence audioVideo: dwpAudioVideoEvidence) {
+            audioVideo.getValue().setDateAdded(LocalDate.now());
+            audioVideo.getValue().setFileName(audioVideo.getValue().getDocumentLink().getDocumentFilename());
+            audioVideo.getValue().setDocumentType(DocumentType.DWP_EVIDENCE.getValue());
+            sscsCaseData.getAudioVideoEvidence().add(audioVideo);
+        }
+        log.info("DWP audio video documents moved into case audio video {}", sscsCaseData.getCcdCaseId());
+        sort(sscsCaseData.getAudioVideoEvidence());
+        
+        sscsCaseData.setDwpUploadAudioVideoEvidence(null);
+
+        if (StringUtils.equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "phme")) {
+            sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
+        } else {
+            sscsCaseData.setInterlocReviewState(REVIEW_BY_TCW.getId());
+        }
     }
 
     private PreSubmitCallbackResponse<SscsCaseData> checkErrors(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
@@ -123,8 +157,13 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         dwpDocumentService.moveDwpEvidenceBundleToDwpDocumentCollection(sscsCaseData);
 
         if (sscsCaseData.getAppendix12Doc() != null && sscsCaseData.getAppendix12Doc().getDocumentLink() != null) {
-            sscsCaseData.getAppendix12Doc().setDocumentFileName(DwpDocumentType.APPENDIX_12.getLabel());
-            dwpDocumentService.addToDwpDocuments(sscsCaseData, sscsCaseData.getAppendix12Doc(), DwpDocumentType.APPENDIX_12);
+            DwpResponseDocument appendix12 = buildDwpResponseDocumentWithDate(
+                    AppConstants.DWP_DOCUMENT_APPENDIX12_FILENAME_PREFIX,
+                    todayDate,
+                    sscsCaseData.getAppendix12Doc().getDocumentLink());
+
+            dwpDocumentService.addToDwpDocuments(sscsCaseData, appendix12, DwpDocumentType.APPENDIX_12);
+            sscsCaseData.setAppendix12Doc(null);
         }
     }
 
