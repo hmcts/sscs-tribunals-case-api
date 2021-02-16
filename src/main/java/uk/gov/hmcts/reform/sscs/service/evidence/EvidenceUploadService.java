@@ -377,7 +377,7 @@ public class EvidenceUploadService {
                 emptyIfNull(scannedDocuments));
         sscsCaseData.setScannedDocuments(newScannedDocumentsList);
 
-        if (audioVideoEvidence.isEmpty()) {
+        if (!audioVideoEvidence.isEmpty()) {
             List<AudioVideoEvidence> newAudioVideoEvidenceList = union(emptyIfNull(sscsCaseData.getAudioVideoEvidence()),
                     emptyIfNull(audioVideoEvidence));
             sscsCaseData.setAudioVideoEvidence(newAudioVideoEvidenceList);
