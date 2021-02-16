@@ -20,12 +20,14 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 
 @RunWith(JUnitParamsRunner.class)
 public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String UPLOAD_DOCUMENT_FE_CALLBACK_JSON = "uploaddocument/uploadDocumentFECallback.json";
-    private UploadDocumentFurtherEvidenceHandler handler = new UploadDocumentFurtherEvidenceHandler();
+    private static final String UPLOAD_AUDIO_VIDEO_DOCUMENT_FE_CALLBACK_JSON = "uploaddocument/uploadAudioVideoDocumentFECallback.json";
+    private UploadDocumentFurtherEvidenceHandler handler = new UploadDocumentFurtherEvidenceHandler(true);
 
     @Test
     @Parameters({
@@ -80,6 +82,25 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
     }
 
     @Test
+    public void handleHappyPathWhenAudioVideoFileUploaded() throws IOException {
+        Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,"appealCreated",
+                DocumentType.OTHER_EVIDENCE.getId(), DocumentType.APPELLANT_EVIDENCE.getId(), UPLOAD_AUDIO_VIDEO_DOCUMENT_FE_CALLBACK_JSON);
+
+        PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(ABOUT_TO_SUBMIT, callback,
+                USER_AUTHORISATION);
+
+        assertEquals(1, actualCaseData.getData().getScannedDocuments().size());
+        assertEquals("reps-some-name.pdf", actualCaseData.getData().getScannedDocuments().get(0).getValue().getFileName());
+        assertEquals("other", actualCaseData.getData().getScannedDocuments().get(0).getValue().getType());
+        assertEquals(1, actualCaseData.getData().getAudioVideoEvidence().size());
+        assertEquals("appellant-some-name.mp3", actualCaseData.getData().getAudioVideoEvidence().get(0).getValue().getFileName());
+        assertEquals(DocumentType.APPELLANT_EVIDENCE.getId(), actualCaseData.getData().getAudioVideoEvidence().get(0).getValue().getDocumentType());
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), actualCaseData.getData().getInterlocReviewState());
+        assertEquals("feReceived", actualCaseData.getData().getDwpState());
+        assertNull(actualCaseData.getData().getDraftSscsFurtherEvidenceDocument());
+    }
+
+    @Test
     public void dwpStateIsNotSetWhenStateIsWithDwp() throws IOException {
         Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,"withDwp",
                 "representativeEvidence", "appellantEvidence", UPLOAD_DOCUMENT_FE_CALLBACK_JSON);
@@ -129,6 +150,7 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
 
     @Test
     public void handleDocumentUploadWhereUploadedFileIsNotAPdf() throws IOException {
+        UploadDocumentFurtherEvidenceHandler handler = new UploadDocumentFurtherEvidenceHandler(false);
         Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,
                 "withDwp",
                 "representativeEvidence", "appellantEvidence",
@@ -153,10 +175,35 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
         assertEquals(1, numberOfExpectedError);
     }
 
+    @Test
+    public void handleDocumentUploadWhereUploadedFileIsNotAValid() throws IOException {
+        Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,
+                "withDwp",
+                "representativeEvidence", "appellantEvidence",
+                UPLOAD_DOCUMENT_FE_CALLBACK_JSON);
+        List<SscsFurtherEvidenceDoc> draftDocuments = Collections.singletonList(SscsFurtherEvidenceDoc.builder()
+                .value(SscsFurtherEvidenceDocDetails.builder()
+                        .documentFileName("word.docx")
+                        .documentType("representativeEvidence")
+                        .documentLink(DocumentLink.builder()
+                                .documentUrl("http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655")
+                                .documentFilename("word.docx").build())
+                        .build())
+                .build());
+        callback.getCaseDetails().getCaseData().setDraftSscsFurtherEvidenceDocument(draftDocuments);
+        PreSubmitCallbackResponse<SscsCaseData> actualResponse = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThatJson(actualResponse.getData()).isEqualTo(callback.getCaseDetails().getCaseData());
+        assertNull(actualResponse.getData().getDwpState());
+        assertNull(actualResponse.getData().getDraftSscsFurtherEvidenceDocument());
+        long numberOfExpectedError = actualResponse.getErrors().stream()
+                .filter(error -> error.equalsIgnoreCase("You need to upload PDF,MP3 or MP4 file only"))
+                .count();
+        assertEquals(1, numberOfExpectedError);
+    }
+
     private String getExpectedResponse() throws IOException {
         String expectedResponse = fetchData("uploaddocument/" + "expectedUploadDocumentFECallbackResponse.json");
-        return expectedResponse.replace("DOCUMENT_DATE_ADDED_PLACEHOLDER", LocalDate.now().atStartOfDay()
-            .toString());
+        return expectedResponse.replace("DOCUMENT_DATE_ADDED_PLACEHOLDER", LocalDate.now().atStartOfDay().toString());
     }
 
     @Test(expected = IllegalStateException.class)
