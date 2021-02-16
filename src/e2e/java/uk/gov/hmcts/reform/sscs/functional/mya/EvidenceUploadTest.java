@@ -8,6 +8,7 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 
@@ -65,10 +66,11 @@ public class EvidenceUploadTest extends BaseFunctionTest {
 
         List<ScannedDocument> scannedDocument = caseDetails.getData().getScannedDocuments();
         assertThat(scannedDocument.size(), is(1));
-        assertThat(caseDetails.getData().getAudioVideoEvidence().size(), is(1));
+        List<AudioVideoEvidence> audioVideoEvidences = caseDetails.getData().getAudioVideoEvidence();
+        assertThat(audioVideoEvidences.size(), is(1));
         String expectedEvidenceUploadFilename = String.format("Appellant upload 1 - %s.pdf", caseDetails.getId());
         assertThat(scannedDocument.get(0).getValue().getFileName(), is(expectedEvidenceUploadFilename));
-        assertThat(scannedDocument.get(1).getValue().getFileName(), is("evidence.mp3"));
+        assertThat(audioVideoEvidences.get(0).getValue().getFileName(), is("evidence.mp3"));
     }
 
     @Test
