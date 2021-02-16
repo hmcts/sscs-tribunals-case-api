@@ -135,7 +135,6 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.MAKE_CASE_URGENT.getCcdType(),
                 "Send a case to urgent hearing", OTHER_DOCUMENT_MANUAL.getLabel(), idamTokens);
         assertNull(caseData.getSscsWelshPreviewNextEvent());
-
     }
 
     @Test

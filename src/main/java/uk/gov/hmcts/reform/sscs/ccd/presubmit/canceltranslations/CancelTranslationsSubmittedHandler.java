@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
 import java.time.LocalDate;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -78,14 +77,7 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
     private boolean isValidResinstatementRequestDocument(SscsCaseData caseData) {
         return (StringUtils.isEmpty(caseData.getTranslationWorkOutstanding()) || "No".equalsIgnoreCase(caseData.getTranslationWorkOutstanding()))
                 && caseData.getReinstatementOutcome() == null
-                && (!CollectionUtils.isEmpty(caseData.getSscsDocument()) && isLastDocReinstatementRequest(caseData.getSscsDocument()));
-    }
-
-    private boolean isLastDocReinstatementRequest(List<SscsDocument> docs) {
-        int lastIndex = docs.size() - 1;
-        String lastDocType = docs.get(lastIndex).getValue().getDocumentType();
-        log.info("Last Doc Type is {}", lastDocType);
-        return REINSTATEMENT_REQUEST.getValue().equals(lastDocType);
+                && (!CollectionUtils.isEmpty(caseData.getSscsDocument()) && caseData.getSscsDocument().stream().anyMatch(d -> REINSTATEMENT_REQUEST.getValue().equals(d.getValue().getDocumentType())));
     }
 
     private SscsCaseDetails setMakeCaseUrgentTriggerEvent(

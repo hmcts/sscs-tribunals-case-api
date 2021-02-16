@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
 import java.time.LocalDate;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,18 +78,11 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
     private boolean isReinstatementRequest(SscsCaseData caseData) {
 
         Boolean isTranslationsOutstanding = (StringUtils.isEmpty(caseData.getTranslationWorkOutstanding()) || "No".equalsIgnoreCase(caseData.getTranslationWorkOutstanding()));
-        Boolean isDocReinstatement = !CollectionUtils.isEmpty(caseData.getSscsDocument()) && isLastDocReinstatementReq(caseData.getSscsDocument());
-        Boolean isWelshReinstatement = (!CollectionUtils.isEmpty(caseData.getSscsWelshDocuments()) && isLastDocReinstatementReq(caseData.getSscsWelshDocuments()));
+        Boolean isDocReinstatement = !CollectionUtils.isEmpty(caseData.getSscsDocument()) && caseData.getSscsDocument().stream().anyMatch(d -> REINSTATEMENT_REQUEST.getValue().equals(d.getValue().getDocumentType()));
+        Boolean isWelshReinstatement = (!CollectionUtils.isEmpty(caseData.getSscsWelshDocuments()) && caseData.getSscsWelshDocuments().stream().anyMatch(d -> REINSTATEMENT_REQUEST.getValue().equals(d.getValue().getDocumentType())));
 
         log.info("Is Reinstatement Request: translationOutstanding = {}. isEngReintstatement = {}. isWelshDocReinstatement = {}",isTranslationsOutstanding, isDocReinstatement, isWelshReinstatement);
         return (isTranslationsOutstanding && (isDocReinstatement || isWelshReinstatement));
-    }
-
-    private <T extends AbstractDocument> boolean isLastDocReinstatementReq(List<T> documents) {
-        int lastIndex = documents.size() - 1;
-        String lastDocType = documents.get(lastIndex).getValue().getDocumentType();
-        log.info("Last Doc Type is {}", lastDocType);
-        return REINSTATEMENT_REQUEST.getValue().equals(lastDocType);
     }
 
     private SscsCaseDetails setMakeCaseUrgentTriggerEvent(

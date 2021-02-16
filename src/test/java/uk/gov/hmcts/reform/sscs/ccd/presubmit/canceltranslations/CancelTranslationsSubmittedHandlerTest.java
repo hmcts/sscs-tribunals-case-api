@@ -153,7 +153,7 @@ public class CancelTranslationsSubmittedHandlerTest {
     }
 
     @Test
-    public void shouldNotCallUpdateCaseWithReinstatementRequestWhenReinstatementRequestIsOld() {
+    public void shouldNotCallUpdateCaseWithReinstatementRequestWhenReinstatementRequestIsAlreadySet() {
         SscsCaseData caseData = buildDataWithDocumentType(DocumentType.REINSTATEMENT_REQUEST.getValue());
 
         SscsDocument sscsDocument = SscsDocument.builder().value(
@@ -165,6 +165,7 @@ public class CancelTranslationsSubmittedHandlerTest {
                 .build();
 
         caseData.getSscsDocument().add(sscsDocument);
+        caseData.setReinstatementOutcome(RequestOutcome.GRANTED);
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
