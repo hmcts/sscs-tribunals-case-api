@@ -62,11 +62,11 @@ public class EvidenceDocumentUploadEndpointIt {
     }
 
     @Test
-    public void shouldThrow404ErrorIfNotEvidenceDocumentSubmitted() throws Exception {
+    public void shouldThrow400ErrorIfNotEvidenceDocumentSubmitted() throws Exception {
 
         MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         mockMvc.perform(MockMvcRequestBuilders.multipart("/evidence/upload"))
-            .andExpect(status().is(404));
+            .andExpect(status().is(400));
 
     }
 
