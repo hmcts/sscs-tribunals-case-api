@@ -377,9 +377,11 @@ public class EvidenceUploadService {
                 emptyIfNull(scannedDocuments));
         sscsCaseData.setScannedDocuments(newScannedDocumentsList);
 
-        List<AudioVideoEvidence> newAudioVideoEvidenceList = union(emptyIfNull(sscsCaseData.getAudioVideoEvidence()),
-                emptyIfNull(audioVideoEvidence));
-        sscsCaseData.setAudioVideoEvidence(newAudioVideoEvidenceList);
+        if (audioVideoEvidence.isEmpty()) {
+            List<AudioVideoEvidence> newAudioVideoEvidenceList = union(emptyIfNull(sscsCaseData.getAudioVideoEvidence()),
+                    emptyIfNull(audioVideoEvidence));
+            sscsCaseData.setAudioVideoEvidence(newAudioVideoEvidenceList);
+        }
     }
 
     @NotNull
