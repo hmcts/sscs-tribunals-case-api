@@ -19,6 +19,7 @@ import org.apache.http.util.EntityUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,6 +50,7 @@ public class GenDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
     @Test
     @Parameters(named = "allowed")
+    @Ignore //Ignore this test until we support additional benefit types
     public void nonDescriptorFlow_shouldGeneratePdfWithExpectedText(boolean allowed) throws IOException {
 
         String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/dlaScenarioCallbackNonDescriptorFlow.json", Arrays.asList("ALLOWED_OR_REFUSED"),
