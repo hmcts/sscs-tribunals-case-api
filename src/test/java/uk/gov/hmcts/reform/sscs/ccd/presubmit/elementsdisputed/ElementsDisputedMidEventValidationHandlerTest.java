@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -19,6 +20,7 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
@@ -413,7 +415,20 @@ public class ElementsDisputedMidEventValidationHandlerTest {
     public void givenUniversalCreditCaseWithFurtherInfoSetToYesAndNoAT38Document_thenShowError() {
         sscsCaseData.getAppeal().getBenefitType().setCode("UC");
         sscsCaseData.setDwpFurtherInfo("Yes");
-        sscsCaseData.setDwpAT38Document(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("AT38 document is missing", error);
+    }
+
+    @Test
+    public void givenUniversalCreditCaseWithFurtherInfoSetToYesAndNoAT38DocumentWithCollection_thenShowError() {
+        sscsCaseData.getAppeal().getBenefitType().setCode("UC");
+        sscsCaseData.setDwpFurtherInfo("Yes");
+        sscsCaseData.setDwpDocuments(Collections.singletonList(DwpDocument.builder().value(
+                DwpDocumentDetails.builder().documentType(DocumentType.DWP_RESPONSE.getValue()).build()
+        ).build()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -425,7 +440,6 @@ public class ElementsDisputedMidEventValidationHandlerTest {
     public void givenUniversalCreditCaseWithFurtherInfoSetToNoAndAT38DocumentExists_thenDoNotShowError() {
         sscsCaseData.getAppeal().getBenefitType().setCode("UC");
         sscsCaseData.setDwpFurtherInfo("No");
-        sscsCaseData.setDwpAT38Document(DwpResponseDocument.builder().build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -435,7 +449,19 @@ public class ElementsDisputedMidEventValidationHandlerTest {
     @Test
     public void givenNonUniversalCreditCaseWithNoAT38Document_thenShowError() {
         sscsCaseData.getAppeal().getBenefitType().setCode("PIP");
-        sscsCaseData.setDwpAT38Document(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("AT38 document is missing", error);
+    }
+
+    @Test
+    public void givenNonUniversalCreditCaseWithNoAT38DocumentInCollection_thenShowError() {
+        sscsCaseData.getAppeal().getBenefitType().setCode("PIP");
+        sscsCaseData.setDwpDocuments(Collections.singletonList(DwpDocument.builder().value(
+                DwpDocumentDetails.builder().documentType(DocumentType.DWP_RESPONSE.getValue()).build()
+        ).build()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -446,7 +472,9 @@ public class ElementsDisputedMidEventValidationHandlerTest {
     @Test
     public void givenNonUniversalCreditCaseWithAT38Document_thenDoNotShowError() {
         sscsCaseData.getAppeal().getBenefitType().setCode("PIP");
-        sscsCaseData.setDwpAT38Document(DwpResponseDocument.builder().build());
+        sscsCaseData.setDwpDocuments(Collections.singletonList(DwpDocument.builder().value(
+                DwpDocumentDetails.builder().documentType(DocumentType.AT38.getValue()).build()
+        ).build()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
