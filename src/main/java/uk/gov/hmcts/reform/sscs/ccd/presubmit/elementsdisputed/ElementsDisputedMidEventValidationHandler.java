@@ -70,18 +70,20 @@ public class ElementsDisputedMidEventValidationHandler implements PreSubmitCallb
     
     private void checkAt38DocIsPresent(SscsCaseData sscsCaseData) {
         if ((!"uc".equalsIgnoreCase(sscsCaseData.getAppeal().getBenefitType().getCode())
-                && documentsAt38IsMissing(sscsCaseData.getDwpDocuments()))
+                && documentsAt38IsMissing(sscsCaseData))
             || ("uc".equalsIgnoreCase(sscsCaseData.getAppeal().getBenefitType().getCode())
                 && "yes".equalsIgnoreCase(sscsCaseData.getDwpFurtherInfo())
-                && documentsAt38IsMissing(sscsCaseData.getDwpDocuments()))) {
+                && documentsAt38IsMissing(sscsCaseData))) {
 
             preSubmitCallbackResponse.addError("AT38 document is missing");
         }
     }
-    
-    private boolean documentsAt38IsMissing(List<DwpDocument> dwpDocuments) {
+
+    protected boolean documentsAt38IsMissing(SscsCaseData sscsCaseData) {
+        List<DwpDocument> dwpDocuments = sscsCaseData.getDwpDocuments();
         if (dwpDocuments == null) {
-            return true;
+            //FIXME Can be removed when all cases have dwpDocuments
+            return sscsCaseData.getDwpAT38Document() == null;
         }
         for (DwpDocument dwpDocument: dwpDocuments) {
             if (dwpDocument.getValue().getDocumentType().equals(DocumentType.AT38.getValue())) {

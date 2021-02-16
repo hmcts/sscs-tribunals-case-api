@@ -436,6 +436,19 @@ public class ElementsDisputedMidEventValidationHandlerTest {
         assertEquals("AT38 document is missing", error);
     }
 
+    //FIXME Can be removed when all cases have dwpDocuments
+    @Test
+    public void givenUniversalCreditCaseWithFurtherInfoSetToYesAndNoAT38DocumentOld_thenShowError() {
+        sscsCaseData.getAppeal().getBenefitType().setCode("UC");
+        sscsCaseData.setDwpFurtherInfo("Yes");
+        sscsCaseData.setDwpAT38Document(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("AT38 document is missing", error);
+    }
+
     @Test
     public void givenUniversalCreditCaseWithFurtherInfoSetToNoAndAT38DocumentExists_thenDoNotShowError() {
         sscsCaseData.getAppeal().getBenefitType().setCode("UC");
@@ -470,6 +483,17 @@ public class ElementsDisputedMidEventValidationHandlerTest {
     }
 
     @Test
+    public void givenNonUniversalCreditCaseWithNoAT38DocumentOld_thenShowError() {
+        sscsCaseData.getAppeal().getBenefitType().setCode("PIP");
+        sscsCaseData.setDwpAT38Document(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("AT38 document is missing", error);
+    }
+
+    @Test
     public void givenNonUniversalCreditCaseWithAT38Document_thenDoNotShowError() {
         sscsCaseData.getAppeal().getBenefitType().setCode("PIP");
         sscsCaseData.setDwpDocuments(Collections.singletonList(DwpDocument.builder().value(
@@ -479,7 +503,19 @@ public class ElementsDisputedMidEventValidationHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertTrue(response.getErrors().isEmpty());
+    }
 
+    //FIXME Can be removed when all cases have dwpDocuments
+    @Test
+    public void givenNonUniversalCreditCaseWithAT38DocumentOld_thenDoNotShowError() {
+        sscsCaseData.getAppeal().getBenefitType().setCode("PIP");
+        sscsCaseData.setDwpDocuments(Collections.singletonList(DwpDocument.builder().value(
+                DwpDocumentDetails.builder().documentType(DocumentType.AT38.getValue()).build()
+        ).build()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().isEmpty());
     }
 
     @Test(expected = IllegalStateException.class)
