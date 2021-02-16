@@ -9,9 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CANCEL_TRANSLATIONS;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -127,7 +125,7 @@ public class CancelTranslationsSubmittedHandlerTest {
 
     @Test
     public void shouldCallUpdateCaseWithReinstatementRequest() {
-        SscsCaseData caseData = buildDataWithDocumentType(DocumentType.REINSTATEMENT_REQUEST.getValue());
+        SscsCaseData caseData = buildDataWithDocumentType(DocumentType.DIRECTION_NOTICE.getValue());
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
         caseData.setSscsWelshPreviewNextEvent(EventType.UPDATE_CASE_ONLY.getCcdType());
@@ -135,8 +133,8 @@ public class CancelTranslationsSubmittedHandlerTest {
         SscsDocument sscsDocument = SscsDocument.builder().value(
                 SscsDocumentDetails
                         .builder()
-                        .documentType(DocumentType.DIRECTION_NOTICE.getValue())
-                        .documentDateAdded(LocalDateTime.now().minusDays(7).toString())
+                        .documentType(DocumentType.REINSTATEMENT_REQUEST.getValue())
+                        .documentDateAdded(LocalDateTime.now().toString())
                         .build())
                 .build();
 
@@ -156,13 +154,13 @@ public class CancelTranslationsSubmittedHandlerTest {
 
     @Test
     public void shouldNotCallUpdateCaseWithReinstatementRequestWhenReinstatementRequestIsOld() {
-        SscsCaseData caseData = buildDataWithDocumentType(DocumentType.DIRECTION_NOTICE.getValue());
+        SscsCaseData caseData = buildDataWithDocumentType(DocumentType.REINSTATEMENT_REQUEST.getValue());
 
         SscsDocument sscsDocument = SscsDocument.builder().value(
                 SscsDocumentDetails
                         .builder()
-                        .documentType(DocumentType.REINSTATEMENT_REQUEST.getValue())
-                        .documentDateAdded(LocalDateTime.now().minusDays(7).toString())
+                        .documentType(DocumentType.DIRECTION_NOTICE.getValue())
+                        .documentDateAdded(LocalDateTime.now().toString())
                         .build())
                 .build();
 

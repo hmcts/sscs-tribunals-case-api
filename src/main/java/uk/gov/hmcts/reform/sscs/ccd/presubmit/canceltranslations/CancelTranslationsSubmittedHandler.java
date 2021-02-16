@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -83,8 +82,10 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
     }
 
     private boolean isLastDocReinstatementRequest(List<SscsDocument> docs) {
-        Collections.sort(docs);
-        return REINSTATEMENT_REQUEST.getValue().equals(docs.get(0).getValue().getDocumentType());
+        int lastIndex = docs.size() - 1;
+        String lastDocType = docs.get(lastIndex).getValue().getDocumentType();
+        log.info("Last Doc Type is {}", lastDocType);
+        return REINSTATEMENT_REQUEST.getValue().equals(lastDocType);
     }
 
     private SscsCaseDetails setMakeCaseUrgentTriggerEvent(
