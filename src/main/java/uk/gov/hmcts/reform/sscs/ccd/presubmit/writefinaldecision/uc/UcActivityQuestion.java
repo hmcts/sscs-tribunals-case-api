@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityType;
  */
 public class UcActivityQuestion implements ActivityQuestion {
 
-    final UcQuestionKey key;
+    final UcQuestionKey<String> key;
     final String value;
 
     public UcActivityQuestion(UcQuestionKey key, String value) {

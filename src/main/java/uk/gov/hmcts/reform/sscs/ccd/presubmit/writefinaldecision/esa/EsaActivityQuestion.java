@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityType;
  */
 public class EsaActivityQuestion implements ActivityQuestion {
 
-    final EsaQuestionKey key;
+    final EsaQuestionKey<String> key;
     final String value;
 
     public EsaActivityQuestion(EsaQuestionKey key, String value) {
