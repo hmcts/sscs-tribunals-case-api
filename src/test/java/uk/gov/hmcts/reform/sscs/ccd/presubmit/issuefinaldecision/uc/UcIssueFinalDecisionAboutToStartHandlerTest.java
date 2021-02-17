@@ -138,25 +138,16 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
 
         when(generateFile.assemble(any())).thenReturn(URL);
 
-        Map<EventType, String> englishEventTypePipDocs = new HashMap<>();
-        englishEventTypePipDocs.put(EventType.ISSUE_FINAL_DECISION, TEMPLATE_ID);
+        Map<EventType, String> englishEventTypeDocs = new HashMap<>();
+        englishEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, UC_TEMPLATE_ID);
 
-        Map<EventType, String> englishEventTypeUcDocs = new HashMap<>();
-        englishEventTypeUcDocs.put(EventType.ISSUE_FINAL_DECISION, UC_TEMPLATE_ID);
+        Map<EventType, String> welshEventTypeDocs = new HashMap<>();
+        welshEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-WEL-00485.docx");
 
-        Map<EventType, String> welshEventTypePipDocs = new HashMap<>();
-        welshEventTypePipDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-WEL-00485.docx");
-
-        Map<LanguagePreference, Map<EventType, String>> pipDocuments =  new HashMap<>();
-        Map<LanguagePreference, Map<EventType, String>> ucDocuments =  new HashMap<>();
-        pipDocuments.put(LanguagePreference.ENGLISH, englishEventTypePipDocs);
-        pipDocuments.put(LanguagePreference.WELSH, welshEventTypePipDocs);
-        ucDocuments.put(LanguagePreference.ENGLISH, englishEventTypeUcDocs);
-        Map<String, Map<LanguagePreference, Map<EventType, String>>> benefitSpecificDocuments = new HashMap<>();
-        benefitSpecificDocuments.put("pip", pipDocuments);
-        benefitSpecificDocuments.put("uc", ucDocuments);
-
-        documentConfiguration.setBenefitSpecificDocuments(benefitSpecificDocuments);
+        Map<LanguagePreference, Map<EventType, String>> documents =  new HashMap<>();
+        documents.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
+        documents.put(LanguagePreference.WELSH, welshEventTypeDocs);
+        documentConfiguration.setDocuments(documents);
     }
 
     @Test
