@@ -410,6 +410,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         Assert.assertNull(sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertNotNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
         Assert.assertNotNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
+        Assert.assertNull(sscsCaseData.getIsConfidentialCase());
 
     }
 
@@ -429,6 +430,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         Assert.assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.GRANTED), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
         Assert.assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.GRANTED), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), sscsCaseData.getInterlocReviewState());
+        Assert.assertEquals(YesNo.YES, sscsCaseData.getIsConfidentialCase());
     }
 
     @Test
@@ -447,6 +449,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         Assert.assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.REFUSED), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
         Assert.assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.GRANTED), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), sscsCaseData.getInterlocReviewState());
+        Assert.assertEquals(YesNo.YES, sscsCaseData.getIsConfidentialCase());
     }
 
     @Test
@@ -465,6 +468,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         Assert.assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.GRANTED), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
         Assert.assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.REFUSED), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), sscsCaseData.getInterlocReviewState());
+        Assert.assertEquals(YesNo.YES, sscsCaseData.getIsConfidentialCase());
     }
 
     @Test
@@ -483,6 +487,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         Assert.assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.REFUSED), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
         Assert.assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.REFUSED), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.NONE.getId(), sscsCaseData.getInterlocReviewState());
+        Assert.assertNull(sscsCaseData.getIsConfidentialCase());
     }
 
     @Parameters(named = "populatedRequestReviewValues")
@@ -504,6 +509,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
         Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
+        Assert.assertNull(sscsCaseData.getIsConfidentialCase());
     }
 
     @Test

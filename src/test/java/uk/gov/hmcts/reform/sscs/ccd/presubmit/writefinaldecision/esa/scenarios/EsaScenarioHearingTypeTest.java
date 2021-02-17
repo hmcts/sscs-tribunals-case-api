@@ -18,13 +18,14 @@ public class EsaScenarioHearingTypeTest {
     @SuppressWarnings("unused")
     private Object[] allNextHearingTypeParameters() {
         return new Object[] {
+            new Object[] {"triage", false, false, "The tribunal considered the appeal bundle to page A1.\n"},
             new Object[] {"faceToFace", true, true, "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"},
             new Object[] {"faceToFace", true, false, "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. No Presenting Officer attended on behalf of the Respondent.\n"},
             new Object[] {"faceToFace", false, true, "Felix Sydney requested an oral hearing but did not attend today. A Presenting Officer attended on behalf of the Respondent."
                     + "\n\n" + "Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today. \n"},
             new Object[] {"faceToFace", false, false, "Felix Sydney requested an oral hearing but did not attend today. No Presenting Officer attended on behalf of the Respondent."
                     + "\n\n" + "Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today. \n"},
-            new Object[] {"paper", false, false, "No party has objected to the matter being decided without a hearing.\n\nHaving considered the appeal bundle to page A1 and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.\n"},
+            new Object[] {"paper", false, false, "No party has objected to the matter being decided without a hearing.\n\nHaving considered the appeal bundle to page A1 and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.\n"},
             new Object[] {"telephone", true, true, "This has been a remote hearing in the form of a telephone hearing. Felix Sydney attended and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"},
             new Object[] {"telephone", true, false, "This has been a remote hearing in the form of a telephone hearing. Felix Sydney attended and the Tribunal considered the appeal bundle to page A1. No Presenting Officer attended on behalf of the Respondent.\n"},
             new Object[] {"telephone", false, true, "This has been a remote hearing in the form of a telephone hearing. Felix Sydney did not attend the hearing today. A Presenting Officer attended on behalf of the Respondent.\n"
@@ -72,11 +73,11 @@ public class EsaScenarioHearingTypeTest {
                 + "\n"
                 + "Felix Sydney is to be treated as having limited capability for work-related activity.\n"
                 + "\n"
-                + "The Secretary of State has accepted that Felix Sydney has limited capability for work related activity. This was not in issue.\n"
+                + "The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not in issue.\n"
                 + "\n"
-                + "No descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 was satisfied but regulation 35 applied.\n"
+                + "No activity or descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 was satisfied but regulation 35 of the ESA Regulations applied.\n"
                 + "\n"
-                + "The tribunal applied regulation 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity.\n"
+                + "The tribunal applied regulation 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work-related activity.\n"
                 + "\n"
                 + "My first reasons\n"
                 + "\n"
@@ -87,7 +88,7 @@ public class EsaScenarioHearingTypeTest {
                 + expectedHearingType
                 + "\n";
 
-        Assert.assertEquals(appellantAttended ? 10 : 11, content.getComponents().size());
+        Assert.assertEquals(appellantAttended || "triage".equals(hearingType) ? 10 : 11, content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
     }

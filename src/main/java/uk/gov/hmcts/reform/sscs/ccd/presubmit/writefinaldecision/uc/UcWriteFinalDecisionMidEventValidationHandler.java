@@ -49,7 +49,7 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
     }
 
     private boolean isWcaNotSupportGroupOnly(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getSscsUcCaseData().isLcwaAppeal() && !sscsCaseData.isSupportGroupOnlyAppeal();
+        return sscsCaseData.isWcaAppeal() && !sscsCaseData.isSupportGroupOnlyAppeal();
     }
 
     @Override
@@ -64,7 +64,7 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
 
     @Override
     protected void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getSscsUcCaseData().getLcwaAppeal() != null && NO.equals(sscsCaseData.getSscsUcCaseData().getLcwaAppeal())) {
+        if (sscsCaseData.getWcaAppeal() != null && NO.equals(sscsCaseData.getWcaAppeal())) {
             sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YES);
             return;
         }
@@ -75,7 +75,7 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData) {
 
         if (YesNo.YES.getValue().equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionGenerateNotice())
-                && sscsCaseData.getSscsUcCaseData().isLcwaAppeal()
+                && sscsCaseData.isWcaAppeal()
                 && "allowed".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionAllowedOrRefused())) {
             sscsCaseData.setShowDwpReassessAwardPage(YesNo.YES);
             return;

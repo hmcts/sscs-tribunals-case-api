@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService.getFirstHalfOfPostcode;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
 import feign.FeignException;
@@ -10,13 +12,14 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -27,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.exception.DuplicateCaseException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
@@ -39,50 +43,62 @@ public class SubmitAppealService {
 
     private final CcdService ccdService;
     private final CitizenCcdService citizenCcdService;
-    private final SscsPdfService sscsPdfService;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
     private final ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
-    private final List<String> offices;
+    private final AirLookupService airLookupService;
 
     @SuppressWarnings("squid:S107")
     @Autowired
     SubmitAppealService(CcdService ccdService,
                         CitizenCcdService citizenCcdService,
-                        SscsPdfService sscsPdfService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
                         ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
-                        @Value("#{'${readyToList.offices}'.split(',')}") List<String> offices) {
+                        AirLookupService airLookupService) {
 
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
-        this.sscsPdfService = sscsPdfService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.idamService = idamService;
         this.convertAIntoBService = convertAIntoBService;
-        this.offices = offices;
+        this.airLookupService = airLookupService;
     }
 
     public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
         SscsCaseData caseData = convertAppealToSscsCaseData(appeal);
         EventType event = findEventType(caseData);
         IdamTokens idamTokens = idamService.getIdamTokens();
+
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, event, idamTokens);
-        postCreateCaseInCcdProcess(caseData, idamTokens, caseDetails, userToken);
+
+        postCreateCaseInCcdProcess(caseData, idamTokens, caseDetails, userToken, toLongO(appeal.getCcdCaseId()), appeal);
+
+        if (appeal.getIsSaveAndReturn() != null && appeal.getIsSaveAndReturn().equals("No")) {
+            log.info("Case {} created from cache, setting isSaveAndReturn to No", caseDetails.getData().getCcdCaseId());
+        }
         // in case of duplicate case the caseDetails will be null
         return caseDetails.getId();
     }
 
-    public Optional<SaveCaseResult> submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal) {
+    private Optional<Long> toLongO(String in) {
+        try {
+            return Optional.of(Long.valueOf(in));
+        } catch (NumberFormatException nfe) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<SaveCaseResult> submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal, Boolean forceCreate) {
         appeal.setCaseType("draft");
 
         IdamTokens idamTokens = getUserTokens(oauth2Token);
         if (!hasValidCitizenRole(idamTokens)) {
             throw new ApplicationErrorException(new Exception("User has a invalid role"));
         }
+
         try {
-            return Optional.of(saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal), idamTokens));
+            return Optional.of(saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal), idamTokens, forceCreate));
         } catch (FeignException e) {
             if (e.status() == HttpStatus.SC_CONFLICT) {
                 log.error("The case data has been altered outside of this transaction for case with nino {} and idam id {}",
@@ -96,23 +112,97 @@ public class SubmitAppealService {
 
     }
 
+    public Optional<SaveCaseResult> updateDraftAppeal(String oauth2Token, SyaCaseWrapper appeal) {
+        appeal.setCaseType("draft");
+
+        IdamTokens idamTokens = getUserTokens(oauth2Token);
+        if (!hasValidCitizenRole(idamTokens)) {
+            throw new ApplicationErrorException(new Exception("User has a invalid role"));
+        }
+
+        try {
+            SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal);
+
+            CaseDetails caseDetails = citizenCcdService.updateCase(sscsCaseData, EventType.UPDATE_DRAFT.getCcdType(), "Update draft",
+                    "Update draft in CCD", idamTokens, appeal.getCcdCaseId());
+
+            return Optional.of(SaveCaseResult.builder()
+                    .caseDetailsId(caseDetails.getId())
+                    .saveCaseOperation(SaveCaseOperation.UPDATE)
+                    .build());
+
+        } catch (FeignException e) {
+
+            if (e.status() == HttpStatus.SC_CONFLICT) {
+                log.error("The case data has been altered outside of this transaction for case with nino {} and idam id {}",
+                        appeal.getAppellant().getNino(),
+                        idamTokens.getUserId());
+                return Optional.empty();
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    public Optional<SaveCaseResult> archiveDraftAppeal(String oauth2Token, SyaCaseWrapper appeal, Long ccdCaseId) {
+        appeal.setCaseType("draft");
+
+        IdamTokens idamTokens = getUserTokens(oauth2Token);
+
+        if (!hasValidCitizenRole(idamTokens)) {
+            throw new ApplicationErrorException(new Exception("User has a invalid role"));
+        }
+
+        try {
+            SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal);
+            citizenCcdService.archiveDraft(sscsCaseData, idamTokens, ccdCaseId);
+
+            return Optional.of(SaveCaseResult.builder()
+                    .caseDetailsId(ccdCaseId)
+                    .saveCaseOperation(SaveCaseOperation.ARCHIVE)
+                    .build());
+
+        } catch (FeignException e) {
+            throw e;
+        }
+    }
+
     public Optional<SessionDraft> getDraftAppeal(String oauth2Token) {
         SscsCaseData caseDetails = null;
         SessionDraft sessionDraft = null;
         IdamTokens idamTokens = getUserTokens(oauth2Token);
+
+        if (!hasValidCitizenRole(idamTokens)) {
+            throw new ApplicationErrorException(new Exception("User has a invalid role"));
+        }
+
+        List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(idamTokens);
+
+        if (isNotEmpty(caseDetailsList)) {
+            caseDetails = caseDetailsList.get(0);
+            sessionDraft = convertAIntoBService.convert(caseDetails);
+        }
+
+        log.info("GET Draft case with CCD Id {} , IDAM Id {} and roles {} ",
+                (caseDetails == null) ? null : caseDetails.getCcdCaseId(), idamTokens.getUserId(),
+            idamTokens.getRoles());
+
+        return (sessionDraft != null) ? Optional.of(sessionDraft) : Optional.empty();
+    }
+
+    public List<SessionDraft> getDraftAppeals(String oauth2Token) {
+        IdamTokens idamTokens = getUserTokens(oauth2Token);
+
         if (!hasValidCitizenRole(idamTokens)) {
             throw new ApplicationErrorException(new Exception("User has a invalid role"));
         }
         List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(idamTokens);
 
-        if (CollectionUtils.isNotEmpty(caseDetailsList)) {
-            caseDetails = caseDetailsList.get(0);
-            sessionDraft = convertAIntoBService.convert(caseDetails);
-        }
-        log.info("GET Draft case with CCD Id {} , IDAM Id {} and roles {} ",
-                (caseDetails == null) ? null : caseDetails.getCcdCaseId(), idamTokens.getUserId(),
-            idamTokens.getRoles());
-        return (sessionDraft != null) ? Optional.of(sessionDraft) : Optional.empty();
+        log.info("GET all Draft cases with IDAM Id {} and roles {}", idamTokens.getUserId(), idamTokens.getRoles());
+
+        return caseDetailsList.stream()
+                .map(convertAIntoBService::convert)
+                .collect(toList());
     }
 
     private IdamTokens getUserTokens(String oauth2Token) {
@@ -129,24 +219,49 @@ public class SubmitAppealService {
     private boolean hasValidCitizenRole(IdamTokens idamTokens) {
         boolean hasRole = false;
         if (idamTokens != null && !CollectionUtils.isEmpty(idamTokens.getRoles())) {
-            hasRole = idamTokens.getRoles().stream().anyMatch(role -> CITIZEN_ROLE.equalsIgnoreCase(role));
+            hasRole = idamTokens.getRoles().stream().anyMatch(CITIZEN_ROLE::equalsIgnoreCase);
         }
         return hasRole;
     }
 
     private void postCreateCaseInCcdProcess(SscsCaseData caseData,
-                                            IdamTokens idamTokens, SscsCaseDetails caseDetails,
-                                            String userToken) {
+                                            IdamTokens idamTokens,
+                                            SscsCaseDetails caseDetails,
+                                            String userToken,
+                                            Optional<Long> draftCaseId,
+                                            SyaCaseWrapper appeal) {
         if (null != caseDetails && StringUtils.isNotEmpty(userToken)) {
-            citizenCcdService.draftArchived(caseData, getUserTokens(userToken), idamTokens);
+
+            Optional<Long> deletedDraftId;
+
+            if (! draftCaseId.isPresent()) {
+                Optional<SscsCaseDetails> draftDetails =
+                        citizenCcdService.draftArchivedFirst(caseData, getUserTokens(userToken), idamTokens);
+                log.info("Archived First found draft for created case {}", caseDetails.getId());
+                deletedDraftId = draftDetails.map(caseDetail -> caseDetail.getId());
+
+            } else {
+                appeal.setCaseType("draft");
+                SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal);
+
+                citizenCcdService.archiveDraft(sscsCaseData, getUserTokens(userToken), draftCaseId.get());
+                log.info("Archived draft {} for created case {}", draftCaseId.get(), caseDetails.getId());
+                deletedDraftId = draftCaseId;
+            }
+
             citizenCcdService.associateCaseToCitizen(getUserTokens(userToken), caseDetails.getId(), idamTokens);
+
+            if (caseDetails.getData() != null && caseDetails.getData().getIsSaveAndReturn() != null
+                    && caseDetails.getData().getIsSaveAndReturn().equals("Yes") && deletedDraftId.isPresent()) {
+                log.info("Case {} created from draft {}, setting isSaveAndReturn to Yes", caseDetails.getId(), deletedDraftId.get());
+            }
         }
     }
 
     SscsCaseData convertAppealToSscsCaseData(SyaCaseWrapper appeal) {
 
-        String firstHalfOfPostcode = regionalProcessingCenterService
-            .getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
+        String postCode = appeal.getContactDetails().getPostCode();
+        String firstHalfOfPostcode = getFirstHalfOfPostcode(postCode);
         RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);
 
         SscsCaseData sscsCaseData;
@@ -156,47 +271,26 @@ public class SubmitAppealService {
             sscsCaseData = convertSyaToCcdCaseData(appeal, rpc.getName(), rpc);
         }
 
-        setCreatedInGapsFromField(sscsCaseData);
+        sscsCaseData.setCreatedInGapsFrom(READY_TO_LIST.getId());
+        sscsCaseData.setProcessingVenue(airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType()));
+
+        log.info("{} - setting venue name to {}", sscsCaseData.getAppeal().getAppellant().getIdentity().getNino(), sscsCaseData.getProcessingVenue());
 
         return sscsCaseData;
-    }
-
-    private SscsCaseData setCreatedInGapsFromField(SscsCaseData sscsCaseData) {
-        String createdInGapsFrom = offices.contains(sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice())
-            ? READY_TO_LIST.getId() : VALID_APPEAL.getId();
-        sscsCaseData.setCreatedInGapsFrom(createdInGapsFrom);
-        return sscsCaseData;
-    }
-
-    String getFirstHalfOfPostcode(String postcode) {
-        if (postcode != null && postcode.length() > 3) {
-            return postcode.substring(0, postcode.length() - 3).trim();
-        }
-        return "";
     }
 
     private SscsCaseDetails createCaseInCcd(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
         SscsCaseDetails caseDetails = null;
+
         try {
-            caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(
-                    caseData.getAppeal().getAppellant().getIdentity().getNino(),
-                    caseData.getAppeal().getBenefitType().getCode(),
-                    caseData.getAppeal().getMrnDetails().getMrnDate(),
-                    idamTokens);
+            List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(caseData.getAppeal().getAppellant().getIdentity().getNino(), idamTokens);
+            caseDetails = matchedByNinoCases.stream().filter(createNinoAndBenefitTypeAndMrnDatePredicate(caseData)).findFirst().orElse(null);
 
             if (caseDetails == null) {
-
-                if (caseData.getAppeal().getAppellant().getIdentity() != null
-                    && !StringUtils.isEmpty(caseData.getAppeal().getAppellant().getIdentity().getNino())) {
-
-                    String nino = caseData.getAppeal().getAppellant().getIdentity().getNino();
-                    List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(nino, idamTokens);
-
-                    if (!matchedByNinoCases.isEmpty()) {
-                        log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + nino);
-
-                        caseData = addAssociatedCases(caseData, matchedByNinoCases);
-                    }
+                if (!matchedByNinoCases.isEmpty()) {
+                    log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino "
+                            + caseData.getAppeal().getAppellant().getIdentity().getNino());
+                    caseData = addAssociatedCases(caseData, matchedByNinoCases);
                 }
 
                 log.info("About to attempt creating case in CCD for benefit type {} and event {} and isScottish {} and languagePreference {}",
@@ -234,6 +328,7 @@ public class SubmitAppealService {
     }
 
     protected List<SscsCaseDetails> getMatchedCases(String nino, IdamTokens idamTokens) {
+        log.info("Find matching cases for Nino " + nino);
         return ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens);
     }
 
@@ -255,12 +350,30 @@ public class SubmitAppealService {
         }
     }
 
-    private SaveCaseResult saveDraftCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
-        SaveCaseResult result = citizenCcdService.saveCase(caseData, idamTokens);
+
+    private Predicate<SscsCaseDetails> createNinoAndBenefitTypeAndMrnDatePredicate(SscsCaseData caseData) {
+        return c -> c.getData().getAppeal().getAppellant().getIdentity().getNino().equalsIgnoreCase(caseData.getAppeal().getAppellant().getIdentity().getNino())
+                && c.getData().getAppeal().getBenefitType().getCode().equals(caseData.getAppeal().getBenefitType().getCode())
+                && c.getData().getAppeal().getMrnDetails().getMrnDate() != null
+                && c.getData().getAppeal().getMrnDetails().getMrnDate().equalsIgnoreCase(caseData.getAppeal().getMrnDetails().getMrnDate());
+    }
+
+
+    private SaveCaseResult saveDraftCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens, Boolean forceCreate) {
+
+        SaveCaseResult result;
+
+        if (Boolean.TRUE.equals(forceCreate)) {
+            result = citizenCcdService.createDraft(caseData, idamTokens);
+        } else {
+            result = citizenCcdService.saveCase(caseData, idamTokens);
+        }
+
         log.info("POST Draft case with CCD Id {} , IDAM id {} and roles {} ",
                 result.getCaseDetailsId(),
                 idamTokens.getUserId(),
                 idamTokens.getRoles());
+
         log.info("Draft Case {} successfully {} in CCD", result.getCaseDetailsId(), result.getSaveCaseOperation().name());
         return result;
     }

@@ -56,7 +56,6 @@ public class DwpRaiseExceptionHandlerTest {
                 .statusCode(HttpStatus.OK.value())
                 .rootPath("data")
                 .assertThat().body("isProgressingViaGaps", equalTo("Yes"))
-                .assertThat().body("state", equalTo("notListable"))
-                .assertThat().body("createdInGapsFrom", equalTo("validAppeal"));
+                .assertThat().body("createdInGapsFrom", equalTo("readyToList"));
     }
 }

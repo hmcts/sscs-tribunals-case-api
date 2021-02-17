@@ -28,7 +28,7 @@ public class EsaScenario2Test {
                         .anythingElse("Something else").build();
 
         EsaTemplateContent content = EsaScenario.SCENARIO_2.getContent(body);
-
+        /*
         String expectedContent = "The appeal is refused.\n"
                 + "\n"
                 + "The decision made by the Secretary of State on 20/09/2020 is confirmed.\n"
@@ -44,7 +44,29 @@ public class EsaScenario2Test {
                 + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
                 + "\n";
 
-        Assert.assertEquals(7, content.getComponents().size());
+         */
+
+
+        String expectedContent = "The appeal is refused.\n"
+            + "\n"
+            + "The decision made by the Secretary of State on 20/09/2020 is confirmed.\n"
+            + "\n"
+            + "Felix Sydney continues to have limited capability for work but does not have limited capability for work-related activity and cannot be treated as having limited capability for work-related activity.\n"
+            + "\n"
+            + "This is because no descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 applied. Regulation 35 did not apply.\n"
+            + "\n"
+            + "The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not in issue.\n"
+            + "\n"
+            + "My first reasons\n"
+            + "\n"
+            + "My second reasons\n"
+            + "\n"
+            + "Something else\n"
+            + "\n"
+            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
+            + "\n";
+
+        Assert.assertEquals(9, content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
 

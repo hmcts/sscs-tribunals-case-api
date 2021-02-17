@@ -1,16 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createwelshnotice;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
-import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import junitparams.converters.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -79,20 +79,20 @@ public class CreateWelshNoticeAboutToStartHandlerTest {
     }
 
     @Test
-    @Parameters(method = "generateSscsCaseData")
-    public void originalDocumentDropDownWhenSscsDocumentTranslationStatusIsSet(@Nullable List<SscsDocument> sscsDocuments) {
+    @Parameters({"DIRECTION_NOTICE", "ADJOURNMENT_NOTICE", "DECISION_NOTICE"})
+    public void originalDocumentDropDownWhenSscsDocumentTranslationStatusIsSet(DocumentType documentType) {
         sscsCaseData = SscsCaseData.builder()
-                .sscsDocument(sscsDocuments)
+                .sscsDocument(getSscsDocument(documentType))
                 .appeal(Appeal.builder().build())
                 .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertEquals(response.getData().getDocumentTypes().getValue().getCode(),"Direction Notice");
+        assertEquals(response.getData().getDocumentTypes().getValue().getCode(),documentType.getValue());
         assertEquals(response.getData().getOriginalNoticeDocuments().getValue().getCode(),"test.pdf");
     }
 
 
-    public Object[] generateSscsCaseData() {
+    public List<SscsDocument> getSscsDocument(DocumentType documentType) {
         SscsDocument sscs1Doc = SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
                         .documentLink(DocumentLink.builder()
@@ -100,15 +100,10 @@ public class CreateWelshNoticeAboutToStartHandlerTest {
                                 .documentFilename("test.pdf")
                                 .build())
                         .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)
-                        .documentType("Direction Notice")
+                        .documentType(documentType.getValue())
                         .build())
                 .build();
 
-        List<SscsDocument> oneDoc = new ArrayList<>();
-        oneDoc.add(sscs1Doc);
-
-        return new Object[] {
-            new Object[]{oneDoc}
-        };
+        return singletonList(sscs1Doc);
     }
 }

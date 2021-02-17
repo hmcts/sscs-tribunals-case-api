@@ -24,7 +24,6 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
-      "wcaAppeal" : "Yes",
       "writeFinalDecisionGenerateNotice": "Yes",
       "wcaAppeal" : "Yes",
       "supportGroupOnlyAppeal" : "No",

@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsPipCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityAnswer;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
@@ -23,7 +24,7 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 public class PipPointsConditionTest {
 
     @Mock
-    private SscsCaseData sscsCaseData;
+    private SscsPipCaseData sscsPipCaseData;
 
     @Mock
     private DecisionNoticeQuestionService decisionNoticeQuestionService;
@@ -65,7 +66,8 @@ public class PipPointsConditionTest {
         List<String> answers = Arrays.asList("preparingFood");
 
         SscsCaseData caseData = SscsCaseData.builder()
-            .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build();
+                .pipSscsCaseData(SscsPipCaseData.builder()
+            .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build()).build();
 
         Mockito.when(decisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData, "preparingFood")).thenReturn(answer);
 
@@ -85,15 +87,17 @@ public class PipPointsConditionTest {
         List<String> answers = Arrays.asList("preparingFood");
 
         SscsCaseData caseData = SscsCaseData.builder()
-            .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build();
+                .pipSscsCaseData(SscsPipCaseData.builder()
+            .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build()).build();
 
         Mockito.when(decisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData, "preparingFood")).thenReturn(answer);
 
         Optional<String> optionalErrorMessage = pointsCondition
             .getOptionalErrorMessage(this.decisionNoticeQuestionService,
                 SscsCaseData.builder()
+                        .pipSscsCaseData(SscsPipCaseData.builder()
                     .pipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f")
-                    .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build());
+                    .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build()).build());
 
         Assert.assertTrue(optionalErrorMessage.isPresent());
         Assert.assertEquals(pointsCondition.getErrorMessage(), optionalErrorMessage.get());
@@ -110,7 +114,8 @@ public class PipPointsConditionTest {
         List<String> answers = Arrays.asList("preparingFood");
 
         SscsCaseData caseData = SscsCaseData.builder()
-            .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build();
+                .pipSscsCaseData(SscsPipCaseData.builder()
+            .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build()).build();
 
         Mockito.when(decisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData, "preparingFood")).thenReturn(Optional.empty());
 
@@ -119,7 +124,8 @@ public class PipPointsConditionTest {
         Optional<String> optionalErrorMessage = pointsCondition
             .getOptionalErrorMessage(this.decisionNoticeQuestionService,
                 SscsCaseData.builder()
-                    .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build());
+                        .pipSscsCaseData(SscsPipCaseData.builder()
+                    .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build()).build());
 
         Assert.assertTrue(optionalErrorMessage.isPresent());
         Assert.assertEquals(pointsCondition.getErrorMessage(), optionalErrorMessage.get());
@@ -136,7 +142,8 @@ public class PipPointsConditionTest {
         List<String> answers = Arrays.asList("preparingFood", "someothercategory");
 
         SscsCaseData caseData = SscsCaseData.builder()
-            .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build();
+                .pipSscsCaseData(SscsPipCaseData.builder()
+            .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build()).build();
 
         Mockito.when(decisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData, "preparingFood")).thenReturn(Optional.empty());
         Mockito.when(decisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData, "preparingFood")).thenReturn(answer);
@@ -147,7 +154,8 @@ public class PipPointsConditionTest {
         Optional<String> optionalErrorMessage = pointsCondition
             .getOptionalErrorMessage(this.decisionNoticeQuestionService,
                 SscsCaseData.builder()
-                    .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build());
+                        .pipSscsCaseData(SscsPipCaseData.builder()
+                    .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build()).build());
 
         Assert.assertFalse(optionalErrorMessage.isPresent());
 
@@ -162,7 +170,8 @@ public class PipPointsConditionTest {
         List<String> answers = Arrays.asList();
 
         SscsCaseData caseData = SscsCaseData.builder()
-            .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build();
+                .pipSscsCaseData(SscsPipCaseData.builder()
+            .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build()).build();
 
         Mockito.when(decisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData, "preparingFood")).thenReturn(answer);
 
@@ -170,8 +179,9 @@ public class PipPointsConditionTest {
         Optional<String> optionalErrorMessage = pointsCondition
             .getOptionalErrorMessage(this.decisionNoticeQuestionService,
                 SscsCaseData.builder()
+                        .pipSscsCaseData(SscsPipCaseData.builder()
                     .pipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f")
-                    .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build());
+                    .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build()).build());
 
         Assert.assertTrue(optionalErrorMessage.isEmpty());
     }
@@ -227,8 +237,11 @@ public class PipPointsConditionTest {
 
         int maxPoints = 100;
 
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion()).thenReturn("noAward");
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()).thenReturn("noAward");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionDailyLivingQuestion()).thenReturn("noAward");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionMobilityQuestion()).thenReturn("noAward");
+
+        SscsCaseData sscsCaseData = SscsCaseData.builder().pipSscsCaseData(sscsPipCaseData).build();
+
 
         for (int dailyLivingPoints = 0; dailyLivingPoints < maxPoints; dailyLivingPoints++) {
             for (int mobilityPoints = 0; mobilityPoints < maxPoints; mobilityPoints++) {
@@ -278,8 +291,10 @@ public class PipPointsConditionTest {
 
         int maxPoints = 100;
 
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion()).thenReturn("noAward");
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()).thenReturn("standardRate");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionDailyLivingQuestion()).thenReturn("noAward");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionMobilityQuestion()).thenReturn("standardRate");
+
+        SscsCaseData sscsCaseData = SscsCaseData.builder().pipSscsCaseData(sscsPipCaseData).build();
 
         for (int dailyLivingPoints = 0; dailyLivingPoints < maxPoints; dailyLivingPoints++) {
             for (int mobilityPoints = 0; mobilityPoints < maxPoints; mobilityPoints++) {
@@ -334,8 +349,10 @@ public class PipPointsConditionTest {
 
         int maxPoints = 100;
 
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion()).thenReturn("noAward");
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()).thenReturn("enhancedRate");
+        SscsCaseData sscsCaseData = SscsCaseData.builder().pipSscsCaseData(sscsPipCaseData).build();
+
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionDailyLivingQuestion()).thenReturn("noAward");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionMobilityQuestion()).thenReturn("enhancedRate");
 
         for (int dailyLivingPoints = 0; dailyLivingPoints < maxPoints; dailyLivingPoints++) {
             for (int mobilityPoints = 0; mobilityPoints < maxPoints; mobilityPoints++) {
@@ -390,8 +407,10 @@ public class PipPointsConditionTest {
 
         int maxPoints = 100;
 
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion()).thenReturn("standardRate");
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()).thenReturn("noAward");
+        SscsCaseData sscsCaseData = SscsCaseData.builder().pipSscsCaseData(sscsPipCaseData).build();
+
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionDailyLivingQuestion()).thenReturn("standardRate");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionMobilityQuestion()).thenReturn("noAward");
 
         for (int dailyLivingPoints = 0; dailyLivingPoints < maxPoints; dailyLivingPoints++) {
             for (int mobilityPoints = 0; mobilityPoints < maxPoints; mobilityPoints++) {
@@ -447,8 +466,10 @@ public class PipPointsConditionTest {
 
         int maxPoints = 100;
 
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion()).thenReturn("standardRate");
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()).thenReturn("standardRate");
+        SscsCaseData sscsCaseData = SscsCaseData.builder().pipSscsCaseData(sscsPipCaseData).build();
+
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionDailyLivingQuestion()).thenReturn("standardRate");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionMobilityQuestion()).thenReturn("standardRate");
 
         for (int dailyLivingPoints = 0; dailyLivingPoints < maxPoints; dailyLivingPoints++) {
             for (int mobilityPoints = 0; mobilityPoints < maxPoints; mobilityPoints++) {
@@ -512,8 +533,10 @@ public class PipPointsConditionTest {
 
         int maxPoints = 100;
 
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion()).thenReturn("standardRate");
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()).thenReturn("enhancedRate");
+        SscsCaseData sscsCaseData = SscsCaseData.builder().pipSscsCaseData(sscsPipCaseData).build();
+
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionDailyLivingQuestion()).thenReturn("standardRate");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionMobilityQuestion()).thenReturn("enhancedRate");
 
         for (int dailyLivingPoints = 0; dailyLivingPoints < maxPoints; dailyLivingPoints++) {
             for (int mobilityPoints = 0; mobilityPoints < maxPoints; mobilityPoints++) {
@@ -571,8 +594,10 @@ public class PipPointsConditionTest {
 
         int maxPoints = 100;
 
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion()).thenReturn("enhancedRate");
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()).thenReturn("noAward");
+        SscsCaseData sscsCaseData = SscsCaseData.builder().pipSscsCaseData(sscsPipCaseData).build();
+
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionDailyLivingQuestion()).thenReturn("enhancedRate");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionMobilityQuestion()).thenReturn("noAward");
 
         for (int dailyLivingPoints = 0; dailyLivingPoints < maxPoints; dailyLivingPoints++) {
             for (int mobilityPoints = 0; mobilityPoints < maxPoints; mobilityPoints++) {
@@ -622,8 +647,10 @@ public class PipPointsConditionTest {
 
         int maxPoints = 100;
 
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion()).thenReturn("enhancedRate");
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()).thenReturn("standardRate");
+        SscsCaseData sscsCaseData = SscsCaseData.builder().pipSscsCaseData(sscsPipCaseData).build();
+
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionDailyLivingQuestion()).thenReturn("enhancedRate");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionMobilityQuestion()).thenReturn("standardRate");
 
         for (int dailyLivingPoints = 0; dailyLivingPoints < maxPoints; dailyLivingPoints++) {
             for (int mobilityPoints = 0; mobilityPoints < maxPoints; mobilityPoints++) {
@@ -679,8 +706,10 @@ public class PipPointsConditionTest {
 
         int maxPoints = 100;
 
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion()).thenReturn("enhancedRate");
-        Mockito.when(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()).thenReturn("enhancedRate");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionDailyLivingQuestion()).thenReturn("enhancedRate");
+        Mockito.when(sscsPipCaseData.getPipWriteFinalDecisionMobilityQuestion()).thenReturn("enhancedRate");
+
+        SscsCaseData sscsCaseData = SscsCaseData.builder().pipSscsCaseData(sscsPipCaseData).build();
 
         for (int dailyLivingPoints = 0; dailyLivingPoints < maxPoints; dailyLivingPoints++) {
             for (int mobilityPoints = 0; mobilityPoints < maxPoints; mobilityPoints++) {

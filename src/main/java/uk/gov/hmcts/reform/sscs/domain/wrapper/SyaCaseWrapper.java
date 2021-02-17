@@ -1,11 +1,12 @@
 package uk.gov.hmcts.reform.sscs.domain.wrapper;
 
+import static java.util.Optional.ofNullable;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-
 
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -53,17 +54,22 @@ public class SyaCaseWrapper {
 
     private String evidenceProvide;
 
+    @JsonProperty("isSaveAndReturn")
+    private String isSaveAndReturn;
+
     @JsonProperty("languagePreferenceWelsh")
     private Boolean languagePreferenceWelsh;
+
+    @JsonProperty("ccdCaseId")
+    private String ccdCaseId;
 
     public SyaContactDetails getContactDetails() {
         if (null == appellant && null == appointee) {
             return null;
         }
-        return (null != appellant && null != appellant.getIsAddressSameAsAppointee()
-            && appellant.getIsAddressSameAsAppointee())
-            ? appointee != null ? appointee.getContactDetails() : null
-            : appellant != null ? appellant.getContactDetails() : null;
+        return null != appellant && null != appointee && ofNullable(isAppointee).orElse(false)
+                ? appointee.getContactDetails()
+                : appellant != null ? appellant.getContactDetails() : null;
     }
 
 }

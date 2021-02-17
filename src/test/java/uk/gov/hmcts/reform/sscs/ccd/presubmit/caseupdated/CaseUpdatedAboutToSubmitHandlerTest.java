@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -44,17 +45,21 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @Mock
     private RegionalProcessingCenterService regionalProcessingCenterService;
 
+    @Mock
+    private AirLookupService airLookupService;
+
     private AssociatedCaseLinkHelper associatedCaseLinkHelper;
 
     @Before
     public void setUp() {
         openMocks(this);
         associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService);
-        handler = new CaseUpdatedAboutToSubmitHandler(regionalProcessingCenterService, associatedCaseLinkHelper);
+        handler = new CaseUpdatedAboutToSubmitHandler(regionalProcessingCenterService, associatedCaseLinkHelper, airLookupService);
 
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code("PIP").build())
                 .appellant(Appellant.builder().address(Address.builder().postcode("CM120NS").build()).build()).build())
                 .benefitCode("002")
                 .issueCode("DD")
@@ -158,7 +163,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         assertEquals("Yes", matchingCase2.getData().getLinkedCasesBoolean());
         assertEquals("ccdId", matchingCase2.getData().getAssociatedCase().get(0).getValue().getCaseReference());
     }
-  
+
     @Test
     @Parameters({"Birmingham,Glasgow,Yes", "Glasgow,Birmingham,No"})
     public void givenChangeInRpcChangeIsScottish(String oldRpcName, String newRpcName, String expected) {
@@ -196,5 +201,109 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         assertEquals(newRpcName, response.getData().getRegionalProcessingCenter().getName());
         assertEquals(expectedIsScottish, response.getData().getIsScottishCase());
+    }
+
+    @Test
+    public void givenAnAppealWithNewAppellantPostcodeAndNoAppointee_thenUpdateProcessingVenue() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB1200B");
+
+        when(airLookupService.lookupAirVenueNameByPostCode("AB1200B", sscsCaseData.getAppeal().getBenefitType())).thenReturn("VenueB");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("VenueB", response.getData().getProcessingVenue());
+    }
+
+    @Test
+    public void givenAnAppealWithNewAppointeePostcode_thenUpdateProcessingVenueWithAppointeeVenue() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().address(Address.builder().postcode("AB1200B").build()).build());
+
+        when(airLookupService.lookupAirVenueNameByPostCode("AB1200B", sscsCaseData.getAppeal().getBenefitType())).thenReturn("VenueB");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("VenueB", response.getData().getProcessingVenue());
+    }
+
+    @Test
+    public void givenAnAppealWithNewAppointeeButEmptyPostcode_thenUpdateProcessingVenueWithAppellantVenue() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB1200B");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().address(Address.builder().postcode(null).build()).build());
+
+        when(airLookupService.lookupAirVenueNameByPostCode("AB1200B", sscsCaseData.getAppeal().getBenefitType())).thenReturn("VenueB");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("VenueB", response.getData().getProcessingVenue());
+    }
+
+    @Test
+    @Parameters({". House, House, House, House",
+            "., ~101 House, House, House",
+            " Ho.use, ., \"101 House, House",
+            " ., ãHouse, âHouse, &101 House"})
+    public void givenACaseUpdateEventWithInvalidAppellantAddressDetails_thenReturnError(String line1, String line2, String town, String county) {
+        Address appellantAddress = callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress();
+        appellantAddress.setLine1(line1);
+        appellantAddress.setLine2(line2);
+        appellantAddress.setCounty(county);
+        appellantAddress.setTown(town);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        long numberOfExpectedError = getNumberOfExpectedError(response);
+        assertEquals(1, numberOfExpectedError);
+    }
+
+    @Test
+    @Parameters({".House, House, House, House",
+            "., ~101 House, House, House",
+            " Ho.use, ., \"101 House, House",
+            " ., ãHouse, âHouse, &101 House"})
+    public void givenACaseUpdateEventWithInvalidRepresentativeAddressDetails_thenReturnError(String line1, String line2, String town, String county) {
+        Representative representative = Representative.builder().address(buildAddress(line1, line2, county, town)).build();
+        callback.getCaseDetails().getCaseData().getAppeal().setRep(representative);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        long numberOfExpectedError = getNumberOfExpectedError(response);
+        assertEquals(1, numberOfExpectedError);
+    }
+
+    @Test
+    @Parameters({".House, House, House, House",
+            "., ~101 House, House, House",
+            " Ho.use, ., \"101 House, House",
+            " ., ãHouse, âHouse, &101 House"})
+    public void givenACaseUpdateEventWithInvalidAppointeeAddressDetails_thenReturnError(String line1, String line2, String town, String county) {
+        Appointee appointee = Appointee.builder().address(buildAddress(line1, line2, county, town)).build();
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(appointee);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        long numberOfExpectedError = getNumberOfExpectedError(response);
+        assertEquals(1, numberOfExpectedError);
+    }
+
+    @Test
+    @Parameters({".House, House, House, House",
+            "., ~101 House, House, House",
+            " Ho.use, ., \"101 House, House",
+            " ., ãHouse, âHouse, &101 House"})
+    public void givenACaseUpdateEventWithInvalidJointPartyAddressDetails_thenReturnError(String line1, String line2, String town, String county) {
+        callback.getCaseDetails().getCaseData().setJointPartyAddress(buildAddress(line1, line2, county, town));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        long numberOfExpectedError = getNumberOfExpectedError(response);
+        assertEquals(1, numberOfExpectedError);
+    }
+
+    private long getNumberOfExpectedError(PreSubmitCallbackResponse<SscsCaseData> response) {
+        return response.getErrors().stream()
+                .filter(error -> error.equalsIgnoreCase("Invalid characters are being used at the beginning of address fields, please correct"))
+                .count();
+    }
+
+    private Address buildAddress(String line1, String line2, String county, String town) {
+        return Address.builder().line1(line1).line2(line2).county(county).town(town).build();
     }
 }

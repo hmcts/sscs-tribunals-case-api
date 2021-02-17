@@ -17,12 +17,56 @@ import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionComponentId;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class WriteFinalDecisionTemplateContent {
+public abstract class WriteFinalDecisionTemplateContent {
 
     protected static DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @JsonProperty("template_content")
     private List<TemplateComponent<?>> components;
+
+    private boolean isBenefitTypeAlreadyMentioned;
+    private boolean isRegulationsAlreadyMentioned;
+
+    protected abstract String getBenefitTypeNameWithoutInitials();
+
+    protected abstract String getBenefitTypeInitials();
+
+    /**
+     * Please note, this method is not idempotent.
+     *
+     * <p>The first time this method is called, the string returned should be the fully expanded
+     * benefit type with the initials in brackets.  eg ("Employment Support Allowance (ESA)")</p>
+     *
+     * <p>Subsequently, it should return just the initials eg ("ESA")</p>
+     * @return The usage dependent benefit type string.
+     */
+    protected String getUsageDependentBenefitTypeString() {
+        String prefix = isBenefitTypeAlreadyMentioned ? "" : (getBenefitTypeNameWithoutInitials() + " ");
+        String suffix = isBenefitTypeAlreadyMentioned ? getBenefitTypeInitials() : ("(" + getBenefitTypeInitials() + ")");
+        isBenefitTypeAlreadyMentioned = true;
+        return prefix + suffix;
+    }
+
+    protected abstract String getRegulationsYear();
+
+    /**
+     * Please note, this method is not idempotent.
+     *
+     * <p></p>The first time this method is called it should return the usage-dependent
+     * benefit type string (see getUsageDependentBenefitTypeString method) followed by:</p>
+     *
+     * <p></p>a) The word "Regulations" followed by the year of the regulations
+     * on first method call (eg. "ESA Regulations 2008", or "Employment and Support Allowance (ESA) Regulations 2008" ).</p>
+     * or
+     * b) The word "Regulations" only ( without the year) for subsequent method calls
+     * eg. (eg. "ESA Regulations", or "Employment and Support Allowance (ESA) Regulations" )
+     * @return The usage dependent benefit type regulations string.
+     */
+    protected String getUsageDependentBenefitTypeRegulationsString() {
+        String value = isRegulationsAlreadyMentioned ? (getUsageDependentBenefitTypeString() + " Regulations") : (getUsageDependentBenefitTypeString() + " Regulations " + getRegulationsYear());
+        isRegulationsAlreadyMentioned = true;
+        return value;
+    }
 
     public WriteFinalDecisionTemplateContent() {
         this.components = new ArrayList<>();
@@ -82,7 +126,7 @@ public class WriteFinalDecisionTemplateContent {
 
     public List<String> getHearingTypeSentences(String appellantName, String bundlePage, String hearingType, boolean appellantAttended, boolean presentingOfficerAttened) {
         if (equalsIgnoreCase("paper", hearingType)) {
-            return asList("No party has objected to the matter being decided without a hearing.", "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.");
+            return asList("No party has objected to the matter being decided without a hearing.", "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.");
         } else  {
             return getFaceToFaceTelephoneVideoHearingTypeSentences(hearingType, appellantName, bundlePage, appellantAttended, presentingOfficerAttened);
         }
@@ -121,12 +165,18 @@ public class WriteFinalDecisionTemplateContent {
         return "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify " + appellantName + " of the hearing and that it is in the interests of justice to proceed today. ";
     }
 
+    protected String getTriageConsideredParagraph(String bundlePage) {
+        return "The tribunal considered the appeal bundle to page " + bundlePage + ".";
+    }
+
     public List<String> getFaceToFaceTelephoneVideoHearingTypeSentences(String hearingType, String appellantName, String bundlePage,
         boolean appellantAttended, boolean presentingOfifficerAttened) {
         if (appellantAttended) {
             if (equalsIgnoreCase("faceToFace", hearingType)) {
                 return singletonList("This has been an oral (face to face) hearing. "
                     + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
+            } else if (equalsIgnoreCase("triage", hearingType)) {
+                return singletonList(getTriageConsideredParagraph(bundlePage));
             } else {
                 return singletonList("This has been a remote hearing in the form of a " + hearingType + " hearing. "
                     + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
@@ -136,6 +186,8 @@ public class WriteFinalDecisionTemplateContent {
                 return asList(appellantName + " requested an oral hearing but did not attend today. "
                         + (presentingOfifficerAttened ? "A " : "No ") + "Presenting Officer attended on behalf of the Respondent.",
                     getConsideredParagraph(bundlePage, appellantName));
+            } else if (equalsIgnoreCase("triage", hearingType)) {
+                return singletonList(getTriageConsideredParagraph(bundlePage));
             } else {
                 return asList("This has been a remote hearing in the form of a " + hearingType + " hearing. " + appellantName + " did not attend the hearing today. "
                         + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.",

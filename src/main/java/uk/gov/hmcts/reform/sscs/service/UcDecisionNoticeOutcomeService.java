@@ -32,7 +32,7 @@ public class UcDecisionNoticeOutcomeService extends DecisionNoticeOutcomeService
 
             SscsUcCaseData ucCaseData = sscsCaseData.getSscsUcCaseData();
 
-            if (sscsCaseData.getSscsUcCaseData().isLcwaAppeal()) {
+            if (sscsCaseData.isWcaAppeal()) {
 
                 if (sscsCaseData.isSupportGroupOnlyAppeal()) {
                     ucCaseData.setDoesSchedule8Paragraph4Apply(null);
@@ -72,6 +72,8 @@ public class UcDecisionNoticeOutcomeService extends DecisionNoticeOutcomeService
                 ucCaseData.setDoesSchedule8Paragraph4Apply(null);
                 sscsCaseData.setSupportGroupOnlyAppeal(null);
                 sscsCaseData.setDwpReassessTheAward(null);
+                sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(null);
+                sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMentalAssessmentQuestion(null);
                 sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(null);
                 sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(null);
             }

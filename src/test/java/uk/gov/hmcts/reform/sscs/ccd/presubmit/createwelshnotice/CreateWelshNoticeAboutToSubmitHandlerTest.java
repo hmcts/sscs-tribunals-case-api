@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createwelshnotice;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -8,14 +10,13 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_WELSH_NOTICE;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,6 +53,7 @@ import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 public class CreateWelshNoticeAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
+    private static final String ENGLISH_PDF = "english.pdf";
 
     private CreateWelshNoticeAboutToSubmitHandler handler;
 
@@ -88,7 +90,10 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void handleMethodCallsCorrectServicesAndSetsDataCorrectly() {
+    @Parameters({"DIRECTION_NOTICE, DIRECTION_ISSUED_WELSH",
+            "DECISION_NOTICE, DECISION_ISSUED_WELSH",
+            "ADJOURNMENT_NOTICE, ISSUE_ADJOURNMENT_NOTICE_WELSH"})
+    public void handleMethodCallsCorrectServicesAndSetsDataCorrectly(DocumentType documentType, EventType eventType) {
         byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
 
         UploadResponse uploadResponse = createUploadResponse();
@@ -97,28 +102,29 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
         FooterDetails footerDetails = new FooterDetails(DocumentLink.builder().build(), "bundleAddition", "bundleFilename");
         when(welshFooterService.addFooterToExistingToContentAndCreateNewUrl(any(),any(), any(), any(), any())).thenReturn(footerDetails);
 
-        Callback<SscsCaseData> callback = buildCallback("english.pdf", CREATE_WELSH_NOTICE, buildSscsDocuments(),
-                buildSscsWelshDocuments(DocumentType.DIRECTION_NOTICE.getValue()));
+        Callback<SscsCaseData> callback = buildCallback(buildSscsDocuments(documentType),
+                buildSscsWelshDocuments(documentType.getValue()));
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-                USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertNull(response.getData().getEnglishBodyContent());
         assertNull(response.getData().getWelshBodyContent());
-        assertEquals(EventType.DIRECTION_ISSUED_WELSH.getCcdType(), response.getData().getSscsWelshPreviewNextEvent());
+        assertEquals(eventType.getCcdType(), response.getData().getSscsWelshPreviewNextEvent());
         assertEquals("No",response.getData().getTranslationWorkOutstanding());
-        assertEquals("english.pdf",response.getData().getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
+        assertEquals(ENGLISH_PDF,response.getData().getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
     }
 
-    private Callback<SscsCaseData> buildCallback(String dynamicListItemCode, EventType eventType,
-                                                 List<SscsDocument> sscsDocuments, List<SscsWelshDocument> welshDocuments) {
+    private Callback<SscsCaseData> buildCallback(List<SscsDocument> sscsDocuments, List<SscsWelshDocument> welshDocuments) {
 
-        final DynamicList dynamicDocumentTypeList = new DynamicList(new DynamicListItem("Direction Notice",
-                "Direction Notice"),
-                Collections.singletonList(new DynamicListItem("Direction Notice", "Direction Notice")));
+        DocumentType selectedDocumentType = DocumentType.fromValue(welshDocuments.get(0).getValue().getDocumentType());
 
-        final DynamicList originalNoticeTypeList = new DynamicList(new DynamicListItem(dynamicListItemCode,
-                dynamicListItemCode),
-                Collections.singletonList(new DynamicListItem(dynamicListItemCode, dynamicListItemCode)));
+        final DynamicList dynamicDocumentTypeList = new DynamicList(new DynamicListItem(selectedDocumentType.getValue(),
+                selectedDocumentType.getValue()),
+                asList(new DynamicListItem(DocumentType.DIRECTION_NOTICE.getValue(), DocumentType.DIRECTION_NOTICE.getLabel()),
+                        new DynamicListItem(DocumentType.DECISION_NOTICE.getValue(), DocumentType.DECISION_NOTICE.getLabel()),
+                        new DynamicListItem(DocumentType.ADJOURNMENT_NOTICE.getValue(), DocumentType.ADJOURNMENT_NOTICE.getLabel())));
+
+        final DynamicList originalNoticeTypeList = new DynamicList(new DynamicListItem(ENGLISH_PDF, ENGLISH_PDF),
+                singletonList(new DynamicListItem(ENGLISH_PDF, ENGLISH_PDF)));
 
         SscsCaseData sscsCaseData = CaseDataUtils.buildMinimalCaseData();
         sscsCaseData.setDocumentTypes(dynamicDocumentTypeList);
@@ -128,18 +134,18 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
 
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
                 State.VALID_APPEAL, sscsCaseData, LocalDateTime.now());
-        return new Callback<>(caseDetails, Optional.empty(), eventType, false);
+        return new Callback<>(caseDetails, Optional.empty(), EventType.CREATE_WELSH_NOTICE, false);
     }
 
-    private List<SscsDocument> buildSscsDocuments() {
-        SscsDocument sscs1Doc = buildSscsDocument();
+    private List<SscsDocument> buildSscsDocuments(DocumentType documentType) {
+        SscsDocument sscs1Doc = buildSscsDocument(documentType);
         List<SscsDocument> sscsDocuments = new ArrayList<>();
         sscsDocuments.add(sscs1Doc);
         return sscsDocuments;
     }
 
     private List<SscsWelshDocument> buildSscsWelshDocuments(String documentType) {
-        return Collections.singletonList(SscsWelshDocument.builder()
+        return singletonList(SscsWelshDocument.builder()
                 .value(SscsWelshDocumentDetails.builder()
                         .documentLink(DocumentLink.builder()
                                 .documentUrl("/anotherUrl")
@@ -151,15 +157,15 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
                 .build());
     }
 
-    private SscsDocument buildSscsDocument() {
+    private SscsDocument buildSscsDocument(DocumentType documentType) {
         return SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
                         .documentLink(DocumentLink.builder()
                                 .documentUrl("/anotherUrl")
-                                .documentFilename("english.pdf")
+                                .documentFilename(ENGLISH_PDF)
                                 .build())
                         .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)
-                        .documentType(DocumentType.DIRECTION_NOTICE.getValue())
+                        .documentType(documentType.getValue())
                         .build())
                 .build();
     }
@@ -169,7 +175,7 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
         UploadResponse.Embedded embedded = mock(UploadResponse.Embedded.class);
         when(response.getEmbedded()).thenReturn(embedded);
         Document document = createDocument();
-        when(embedded.getDocuments()).thenReturn(Collections.singletonList(document));
+        when(embedded.getDocuments()).thenReturn(singletonList(document));
         return response;
     }
 

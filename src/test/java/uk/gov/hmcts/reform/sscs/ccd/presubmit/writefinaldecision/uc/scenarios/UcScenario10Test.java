@@ -12,6 +12,7 @@ import junitparams.Parameters;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcTemplateContent;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
@@ -19,8 +20,8 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody
 public class UcScenario10Test {
 
     @Test
-    @Parameters({"true, allowed, has limited capability for work", "false, refused, does not have limited capability for work and cannot be treated as having limited capability for work"})
-    public void testScenario10(boolean isAllowed, String allowedText, String capabilityText) {
+    @Parameters({"true, allowed", "false, refused"})
+    public void testScenario10(boolean isAllowed, String allowedText) {
 
         List<Descriptor> schedule6Descriptors =
             Arrays.asList(Descriptor.builder()
@@ -34,7 +35,7 @@ public class UcScenario10Test {
                 .attendedHearing(true)
                 .presentingOfficerAttended(true)
                 .isAllowed(isAllowed)
-                .lcwaAppeal(false)
+                .wcaAppeal(false)
                 .dateOfDecision("2020-09-20")
                 .ucNumberOfPoints(0)
                 .pageNumber("A1")
@@ -42,7 +43,6 @@ public class UcScenario10Test {
                 .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
                 .anythingElse("Something else")
                 .summaryOfOutcomeDecision("This is the summary of outcome decision")
-                .dwpReassessTheAward("noRecommendation")
                 .schedule8Paragraph4Applicable(true)
                 .ucSchedule6Descriptors(schedule6Descriptors).build();
 
@@ -51,8 +51,6 @@ public class UcScenario10Test {
         String expectedContent = format("The appeal is %s.\n"
                 + "\n"
                 + "The decision made by the Secretary of State on 20/09/2020 is confirmed.\n"
-                + "\n"
-                + "Felix Sydney %s.\n"
                 + "\n"
                 + "This is the summary of outcome decision\n"
                 + "\n"
@@ -63,9 +61,9 @@ public class UcScenario10Test {
                 + "Something else\n"
                 + "\n"
                 + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n\n",
-            allowedText, capabilityText);
+            allowedText);
 
-        assertEquals(8, content.getComponents().size());
+        assertEquals(7, content.getComponents().size());
 
         assertThat(content.toString(), is(expectedContent));
 
