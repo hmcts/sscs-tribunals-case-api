@@ -88,7 +88,7 @@ ccd:
       imagePullPolicy: Always
       environment:
         ADDRESS_LOOKUP_TOKEN: ${ADDRESS_LOOKUP_TOKEN}
-        IDAM_SERVICE_KEY: ${API_GATEWAY_S2S_KEY}
+        IDAM_SERVICE_KEY: ${CCD_API_GATEWAY_S2S_SECRET}
         IDAM_OAUTH2_CLIENT_SECRET: ${API_GATEWAY_IDAM_SECRET}
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
       ingressHost: gateway-${SERVICE_FQDN}
@@ -101,7 +101,7 @@ ccd:
       cpuRequests: '900m'
       environment:
         DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
-        DATA_STORE_IDAM_KEY: ${DATA_STORE_S2S_KEY}
+        DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
         CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES: sscs
         ELASTIC_SEARCH_ENABLED: true
@@ -123,7 +123,7 @@ ccd:
       imagePullPolicy: Always
       environment:
         DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
-        DEFINITION_STORE_IDAM_KEY: ${DEFINITION_STORE_S2S_KEY}
+        DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
