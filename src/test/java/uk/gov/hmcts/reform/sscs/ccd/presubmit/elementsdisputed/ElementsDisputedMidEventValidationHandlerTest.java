@@ -453,6 +453,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
     public void givenUniversalCreditCaseWithFurtherInfoSetToNoAndAT38DocumentExists_thenDoNotShowError() {
         sscsCaseData.getAppeal().getBenefitType().setCode("UC");
         sscsCaseData.setDwpFurtherInfo("No");
+        sscsCaseData.setDwpAT38Document(DwpResponseDocument.builder().build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
