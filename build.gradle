@@ -296,7 +296,6 @@ dependencies {
     compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.0'
 
     compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.4'
-    compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
     compile group: 'uk.gov.hmcts.reform', name: 'logging-spring', version: versions.reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'logging-httpcomponents', version: versions.reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
