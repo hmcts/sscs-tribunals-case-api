@@ -312,8 +312,8 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.22'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
-    compile 'org.projectlombok:lombok:1.18.16'
-    annotationProcessor 'org.projectlombok:lombok:1.18.14'
+    compile 'org.projectlombok:lombok:1.18.18'
+    annotationProcessor 'org.projectlombok:lombok:1.18.18'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.5.RELEASE'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.7.7'
@@ -333,7 +333,7 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.16'
     testAnnotationProcessor "org.projectlombok:lombok:1.18.14"
     e2eCompile 'org.projectlombok:lombok:1.18.16'
-    e2eAnnotationProcessor "org.projectlombok:lombok:1.18.8"
+    e2eAnnotationProcessor "org.projectlombok:lombok:1.18.18"
 
     testCompile "org.junit.jupiter:junit-jupiter-api:5.7.0"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:5.6.2"
