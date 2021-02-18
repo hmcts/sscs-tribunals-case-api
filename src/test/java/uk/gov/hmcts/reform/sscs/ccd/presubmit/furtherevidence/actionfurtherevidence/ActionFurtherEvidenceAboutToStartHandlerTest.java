@@ -8,8 +8,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import junitparams.converters.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,47 +57,28 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
     }
 
     @Test
-    @Parameters({
-        "any, 4, true, true, true, true, false, false",
-        "null, 4, true, true, false, false, true, true",
-        ", 4, true, true, false, false, true, true"
-    })
-    public void givenActionFurtherEvidenceAboutToStart_populateFurtherEvidenceDropdown(
-        @Nullable String interlocReviewState,
-        int expectedListItemSize,
-        boolean issueFurtherEvidenceItem,
-        boolean otherDocumentManualItem,
-        boolean informationReceivedForInterlocJudgeItem,
-        boolean informationReceivedForInterlocTcwItem,
-        boolean sendToInterlocJudgeItem,
-        boolean sendToInterlocTcwItem
-    ) {
+    public void givenActionFurtherEvidenceAboutToStart_populateFurtherEvidenceDropdown() {
 
-        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build())
-            .interlocReviewState(interlocReviewState).build();
+        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals(issueFurtherEvidenceItem, "issueFurtherEvidence".equals(getItemCodeInList(
-            response.getData().getFurtherEvidenceAction(), "issueFurtherEvidence")));
+        assertEquals("issueFurtherEvidence", getItemCodeInList(
+                response.getData().getFurtherEvidenceAction(), "issueFurtherEvidence"));
 
-        assertEquals(otherDocumentManualItem, "otherDocumentManual".equals(getItemCodeInList(
-            response.getData().getFurtherEvidenceAction(), "otherDocumentManual")));
+        assertEquals("otherDocumentManual", getItemCodeInList(
+                response.getData().getFurtherEvidenceAction(), "otherDocumentManual"));
 
-        assertEquals(informationReceivedForInterlocJudgeItem, "informationReceivedForInterlocJudge".equals(
-            getItemCodeInList(response.getData().getFurtherEvidenceAction(), "informationReceivedForInterlocJudge")));
+        assertEquals("informationReceivedForInterlocJudge", getItemCodeInList(response.getData().getFurtherEvidenceAction(), "informationReceivedForInterlocJudge"));
 
-        assertEquals(informationReceivedForInterlocTcwItem, "informationReceivedForInterlocTcw".equals(
-            getItemCodeInList(response.getData().getFurtherEvidenceAction(), "informationReceivedForInterlocTcw")));
+        assertEquals("informationReceivedForInterlocTcw", getItemCodeInList(response.getData().getFurtherEvidenceAction(), "informationReceivedForInterlocTcw"));
 
-        assertEquals(sendToInterlocJudgeItem, "sendToInterlocReviewByJudge".equals(
-            getItemCodeInList(response.getData().getFurtherEvidenceAction(), "sendToInterlocReviewByJudge")));
+        assertEquals("sendToInterlocReviewByJudge", getItemCodeInList(response.getData().getFurtherEvidenceAction(), "sendToInterlocReviewByJudge"));
 
-        assertEquals(sendToInterlocTcwItem, "sendToInterlocReviewByTcw".equals(
-            getItemCodeInList(response.getData().getFurtherEvidenceAction(), "sendToInterlocReviewByTcw")));
+        assertEquals("sendToInterlocReviewByTcw", getItemCodeInList(response.getData().getFurtherEvidenceAction(), "sendToInterlocReviewByTcw"));
 
-        assertEquals(expectedListItemSize, response.getData().getFurtherEvidenceAction().getListItems().size());
+        assertEquals(6, response.getData().getFurtherEvidenceAction().getListItems().size());
     }
 
     private String getItemCodeInList(DynamicList dynamicList, String item) {
