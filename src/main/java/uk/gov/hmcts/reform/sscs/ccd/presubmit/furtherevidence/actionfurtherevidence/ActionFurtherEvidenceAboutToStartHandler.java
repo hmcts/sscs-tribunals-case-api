@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurth
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -45,16 +44,9 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
     private void setFurtherEvidenceActionDropdown(SscsCaseData sscsCaseData) {
         List<DynamicListItem> listOptions = new ArrayList<>();
 
-        populateListWithItems(listOptions, ISSUE_FURTHER_EVIDENCE);
-        populateListWithItems(listOptions, OTHER_DOCUMENT_MANUAL);
-
-        if (StringUtils.isNotBlank(sscsCaseData.getInterlocReviewState())) {
-            populateListWithItems(listOptions, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,
-                INFORMATION_RECEIVED_FOR_INTERLOC_TCW);
-        } else {
-            populateListWithItems(listOptions, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
-                SEND_TO_INTERLOC_REVIEW_BY_TCW);
-        }
+        populateListWithItems(listOptions, ISSUE_FURTHER_EVIDENCE, OTHER_DOCUMENT_MANUAL,
+                INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, INFORMATION_RECEIVED_FOR_INTERLOC_TCW,
+                SEND_TO_INTERLOC_REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_TCW);
 
         sscsCaseData.setFurtherEvidenceAction(new DynamicList(listOptions.get(0), listOptions));
     }
