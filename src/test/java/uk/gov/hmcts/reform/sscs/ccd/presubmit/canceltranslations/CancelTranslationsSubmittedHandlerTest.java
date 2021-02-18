@@ -9,9 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CANCEL_TRANSLATIONS;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -90,7 +88,7 @@ public class CancelTranslationsSubmittedHandlerTest {
 
     @Test
     public void shouldCallUpdateCaseWithUrgentCaseEvent() {
-        SscsCaseData caseData = buildDataWithUrgentRequestDocument();
+        SscsCaseData caseData = buildDataWithDocumentType(DocumentType.URGENT_HEARING_REQUEST.getValue());
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
@@ -104,12 +102,11 @@ public class CancelTranslationsSubmittedHandlerTest {
         verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.MAKE_CASE_URGENT.getCcdType(),
                 "Send a case to urgent hearing", OTHER_DOCUMENT_MANUAL.getLabel(), idamTokens);
         assertNull(caseData.getSscsWelshPreviewNextEvent());
-
     }
 
     @Test
     public void shouldCallUpdateButNotCallUpdateUrgentCaseEventWhenUrgentCaseIsYes() {
-        SscsCaseData caseData = buildDataWithUrgentRequestDocument();
+        SscsCaseData caseData = buildDataWithDocumentType(DocumentType.URGENT_HEARING_REQUEST.getValue());
         caseData.setUrgentCase("Yes");
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -124,7 +121,66 @@ public class CancelTranslationsSubmittedHandlerTest {
         verify(ccdService, never()).updateCase(caseData, callback.getCaseDetails().getId(), EventType.MAKE_CASE_URGENT.getCcdType(),
                 "Send a case to urgent hearing", OTHER_DOCUMENT_MANUAL.getLabel(), idamTokens);
         assertNull(caseData.getSscsWelshPreviewNextEvent());
+    }
 
+    @Test
+    public void shouldCallUpdateCaseWithReinstatementRequest() {
+        SscsCaseData caseData = buildDataWithDocumentType(DocumentType.DIRECTION_NOTICE.getValue());
+        IdamTokens idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+        caseData.setSscsWelshPreviewNextEvent(EventType.UPDATE_CASE_ONLY.getCcdType());
+
+        SscsDocument sscsDocument = SscsDocument.builder().value(
+                SscsDocumentDetails
+                        .builder()
+                        .documentType(DocumentType.REINSTATEMENT_REQUEST.getValue())
+                        .documentDateAdded(LocalDateTime.now().toString())
+                        .build())
+                .build();
+
+        caseData.getSscsDocument().add(sscsDocument);
+
+        when(ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+                EventType.UPDATE_CASE_ONLY.getCcdType(), "Set Reinstatement Request",
+                "Set Reinstatement Request", idamTokens))
+                .thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.UPDATE_CASE_ONLY.getCcdType(),
+                "Set Reinstatement Request", "Set Reinstatement Request", idamTokens);
+        assertNull(caseData.getSscsWelshPreviewNextEvent());
+    }
+
+    @Test
+    public void shouldNotCallUpdateCaseWithReinstatementRequestWhenReinstatementRequestIsAlreadySet() {
+        SscsCaseData caseData = buildDataWithDocumentType(DocumentType.REINSTATEMENT_REQUEST.getValue());
+
+        SscsDocument sscsDocument = SscsDocument.builder().value(
+                SscsDocumentDetails
+                        .builder()
+                        .documentType(DocumentType.DIRECTION_NOTICE.getValue())
+                        .documentDateAdded(LocalDateTime.now().toString())
+                        .build())
+                .build();
+
+        caseData.getSscsDocument().add(sscsDocument);
+        caseData.setReinstatementOutcome(RequestOutcome.GRANTED);
+
+        IdamTokens idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+        caseData.setSscsWelshPreviewNextEvent(EventType.UPDATE_CASE_ONLY.getCcdType());
+
+        when(ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+                EventType.UPDATE_CASE_ONLY.getCcdType(), "Cancel welsh translations",
+                "Cancel welsh translations", idamTokens))
+                .thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.UPDATE_CASE_ONLY.getCcdType(),
+                "Cancel welsh translations", "Cancel welsh translations", idamTokens);
+        assertNull(caseData.getSscsWelshPreviewNextEvent());
     }
 
     private Object[] generateCanHandleScenarios() {
@@ -146,8 +202,13 @@ public class CancelTranslationsSubmittedHandlerTest {
         return new Callback<>(caseDetails, Optional.empty(), CANCEL_TRANSLATIONS, false);
     }
 
-    private SscsCaseData buildDataWithUrgentRequestDocument() {
-        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(DocumentType.URGENT_HEARING_REQUEST.getValue()).build()).build();
+    private SscsCaseData buildDataWithDocumentType(String documentType) {
+        SscsDocument sscsDocument = SscsDocument.builder().value(
+                SscsDocumentDetails
+                        .builder()
+                        .documentType(documentType)
+                        .documentDateAdded(LocalDateTime.now().toString())
+                        .build()).build();
         List<SscsDocument> sscsDocuments = new ArrayList<>();
         sscsDocuments.add(sscsDocument);
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();

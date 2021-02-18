@@ -102,18 +102,25 @@ public class SubmitAppealTest {
         "ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS, validAppeal"
     })
     public void appealShouldBeSavedViaSya(SyaJsonMessageSerializer syaJsonMessageSerializer, String expectedState) {
+
         String body = syaJsonMessageSerializer.getSerializedMessage();
         String nino = submitHelper.getRandomNino();
         body = submitHelper.setNino(body, nino);
+
         LocalDate now = LocalDate.now();
         LocalDate interlocutoryReviewDate = now.minusMonths(13).minusDays(1);
         LocalDate mrnDate = expectedState.equals("interlocutoryReviewState") ? interlocutoryReviewDate :
             expectedState.equals("incompleteApplication") ? null : now;
+
         body = submitHelper.setLatestMrnDate(body, mrnDate);
+
         SyaCaseWrapper wrapper = syaJsonMessageSerializer.getDeserializeMessage();
+
         wrapper.getAppellant().setNino(nino);
         wrapper.getMrn().setDate(mrnDate);
+
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
+
         Appeal expected = convertSyaToCcdCaseData(wrapper, rpc.getName(), rpc).getAppeal();
 
         Response response = RestAssured.given()
@@ -122,11 +129,14 @@ public class SubmitAppealTest {
             .post("/appeals");
 
         response.then().statusCode(HttpStatus.SC_CREATED);
+
         final Long id = getCcdIdFromLocationHeader(response.getHeader("Location"));
         SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, idamTokens);
+
         if (expected.getAppellant().getAppointee() == null) {
             sscsCaseDetails.getData().getAppeal().getAppellant().setAppointee(null);
         }
+
         log.info(String.format("SYA created with CCD ID %s", id));
         assertEquals(expected, sscsCaseDetails.getData().getAppeal());
         assertEquals(expectedState, sscsCaseDetails.getState());
