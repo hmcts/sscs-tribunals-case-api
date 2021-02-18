@@ -235,13 +235,17 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private void setReinstateCaseFields(SscsCaseData sscsCaseData) {
-        sscsCaseData.setReinstatementRegistered(LocalDate.now());
-        sscsCaseData.setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
-        State previousState = sscsCaseData.getPreviousState();
-        if (previousState == null || State.DORMANT_APPEAL_STATE == previousState || State.VOID_STATE == previousState) {
-            log.info("{} setting previousState from {}} to interlocutoryReviewState}", sscsCaseData.getCcdCaseId(), previousState);
-            sscsCaseData.setPreviousState(State.INTERLOCUTORY_REVIEW_STATE);
+        if (!sscsCaseData.isLanguagePreferenceWelsh()) {
+            sscsCaseData.setReinstatementRegistered(LocalDate.now());
+            sscsCaseData.setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
+            sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
+            State previousState = sscsCaseData.getPreviousState();
+            if (previousState == null || State.DORMANT_APPEAL_STATE == previousState || State.VOID_STATE == previousState) {
+                log.info("{} setting previousState from {}} to interlocutoryReviewState}", sscsCaseData.getCcdCaseId(), previousState);
+                sscsCaseData.setPreviousState(State.INTERLOCUTORY_REVIEW_STATE);
+            }
+        } else {
+            log.info("{} supressing reinstatement request fields for welsh case", sscsCaseData.getCcdCaseId());
         }
     }
 
