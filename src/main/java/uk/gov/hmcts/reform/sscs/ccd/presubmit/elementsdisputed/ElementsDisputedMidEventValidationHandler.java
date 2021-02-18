@@ -12,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ElementDisputed;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -68,13 +70,27 @@ public class ElementsDisputedMidEventValidationHandler implements PreSubmitCallb
     
     private void checkAt38DocIsPresent(SscsCaseData sscsCaseData) {
         if ((!"uc".equalsIgnoreCase(sscsCaseData.getAppeal().getBenefitType().getCode())
-                && sscsCaseData.getDwpAT38Document() == null)
+                && documentsAt38IsMissing(sscsCaseData))
             || ("uc".equalsIgnoreCase(sscsCaseData.getAppeal().getBenefitType().getCode())
                 && "yes".equalsIgnoreCase(sscsCaseData.getDwpFurtherInfo())
-                && sscsCaseData.getDwpAT38Document() == null)) {
+                && documentsAt38IsMissing(sscsCaseData))) {
 
             preSubmitCallbackResponse.addError("AT38 document is missing");
         }
+    }
+
+    protected boolean documentsAt38IsMissing(SscsCaseData sscsCaseData) {
+        List<DwpDocument> dwpDocuments = sscsCaseData.getDwpDocuments();
+        if (dwpDocuments == null) {
+            //FIXME Can be removed when all cases have dwpDocuments
+            return sscsCaseData.getDwpAT38Document() == null;
+        }
+        for (DwpDocument dwpDocument: dwpDocuments) {
+            if (dwpDocument.getValue().getDocumentType().equals(DocumentType.AT38.getValue())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void checkForDuplicateIssueCodes(SscsCaseData sscsCaseData) {
