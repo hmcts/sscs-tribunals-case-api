@@ -32,20 +32,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.ScannedDocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
@@ -56,6 +43,7 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private static final String FURTHER_EVIDENCE_RECEIVED = "furtherEvidenceReceived";
     private static final String COVERSHEET = "coversheet";
+    public static final String YES = YesNo.YES.getValue();
 
     private final FooterService footerService;
     private final BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder;
@@ -110,10 +98,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private void checkForWarnings(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (YES.getValue().equalsIgnoreCase(preSubmitCallbackResponse.getData().getIsProgressingViaGaps())) {
-            preSubmitCallbackResponse.addWarning("This case is progressing via GAPS. Please ensure any documents are emailed to the Regional Processing Centre to be attached to the paper file.");
-        }
-
         if ((null != preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeAppellant()
                 && GRANTED.equals(preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeAppellant().getRequestOutcome())
                 && OriginalSenderItemList.APPELLANT.getCode().equals(preSubmitCallbackResponse.getData().getOriginalSender().getValue().getCode()))
@@ -152,7 +136,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private boolean isAppellantOrAppointeeAddressInvalid(SscsCaseData caseData) {
-        if (null != caseData.getAppeal().getAppellant() && YES.getValue().equalsIgnoreCase(caseData.getAppeal().getAppellant().getIsAppointee())) {
+        if (null != caseData.getAppeal().getAppellant() && YES.equalsIgnoreCase(caseData.getAppeal().getAppellant().getIsAppointee())) {
             return null == caseData.getAppeal().getAppellant().getAppointee()
                 || isAddressInvalid(caseData.getAppeal().getAppellant().getAppointee().getAddress());
         } else {
@@ -165,7 +149,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         Representative rep = caseData.getAppeal().getRep();
 
         return null != rep
-            && YES.getValue().equalsIgnoreCase(rep.getHasRepresentative())
+            && YES.equalsIgnoreCase(rep.getHasRepresentative())
             && isAddressInvalid(rep.getAddress());
     }
 
@@ -225,7 +209,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             documents.add(sscsDocument);
 
             if (sscsCaseData.isLanguagePreferenceWelsh()) {
-                sscsCaseData.setTranslationWorkOutstanding(YES.getValue());
+                sscsCaseData.setTranslationWorkOutstanding(YES);
                 log.info("Set the TranslationWorkOutstanding flag to YES,  for case id : {}", sscsCaseData.getCcdCaseId());
             }
         }
@@ -237,7 +221,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             sscsCaseData.setSscsDocument(documents);
         }
 
-        sscsCaseData.setEvidenceHandled(YES.getValue());
+        sscsCaseData.setEvidenceHandled(YES);
     }
 
     private void setConfidentialCaseFields(SscsCaseData sscsCaseData) {
@@ -267,6 +251,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             preSubmitCallbackResponse.addError("No document URL so could not process");
         }
 
+        if (!YesNo.YES.equals(preSubmitCallbackResponse.getData().getIsConfidentialCase()) && scannedDocument.getValue().getEditedUrl() != null) {
+            preSubmitCallbackResponse.addError("Case is not marked as confidential so cannot upload an edited document");
+        }
+
         if (isBlank(scannedDocument.getValue().getFileName())) {
             preSubmitCallbackResponse.addError("No document file name so could not process");
         }
@@ -288,7 +276,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         if (ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
 
-            if (!YES.getValue().equalsIgnoreCase(sscsCaseData.getJointParty())) {
+            if (!YES.equalsIgnoreCase(sscsCaseData.getJointParty())) {
                 preSubmitCallbackResponse.addError("Document type \"Confidentiality Request\" is invalid as there is no joint party on the case");
             }
 
@@ -324,7 +312,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         String bundleAddition = null;
 
         if (caseState != null
-            && isIssueFurtherEvidenceToAllParties(sscsCaseData.getFurtherEvidenceAction())
+            && (isIssueFurtherEvidenceToAllParties(sscsCaseData.getFurtherEvidenceAction())
+                || (isOtherDocumentTypeActionManually(sscsCaseData.getFurtherEvidenceAction()) && "Yes".equalsIgnoreCase(scannedDocument.getValue().getIncludeInBundle())))
             && isCaseStateAddtitionValid(caseState)) {
 
             log.info("adding footer appendix document link: {} and caseId {}", url, sscsCaseData.getCcdCaseId());
@@ -344,6 +333,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             .documentFileName(fileName)
             .bundleAddition(bundleAddition)
             .documentLink(url)
+            .editedDocumentLink(scannedDocument.getValue().getEditedUrl())
             .documentDateAdded(scannedDate)
             .controlNumber(scannedDocument.getValue().getControlNumber())
             .evidenceIssued("No")

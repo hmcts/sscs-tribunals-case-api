@@ -40,21 +40,21 @@ public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
     protected void setValidPointsAndActivitiesScenario(SscsCaseData caseData, String descriptorFlowValue) {
 
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow(descriptorFlowValue);
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("noAward");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("noAward");
 
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
             Arrays.asList("preparingFood"));
 
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(
             Arrays.asList("movingAround"));
 
 
         // 8 points - correct for daily living standard award
-        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
 
         // 0 points - correct for mobility no award
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12a");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMovingAroundQuestion("movingAround12a");
 
     }
 
@@ -82,20 +82,20 @@ public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(
             Arrays.asList("movingAround"));
 
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
             Arrays.asList("preparingFood"));
 
         // 8 points - correct for mobility standard award
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
 
         // 0 points - too low for daily living standard award
-        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1a");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1a");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -110,21 +110,21 @@ public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(
             Arrays.asList("movingAround"));
 
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
             Arrays.asList("preparingFood", "takingNutrition"));
 
         // 8 points - correct for mobility standard award
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
 
         // 18 points total - too high for daily living standard award
-        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
-        sscsCaseData.setPipWriteFinalDecisionTakingNutritionQuestion("takingNutrition2f"); // 10 points
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionTakingNutritionQuestion("takingNutrition2f"); // 10 points
 
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -140,20 +140,20 @@ public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(
             Arrays.asList("movingAround"));
 
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
             Arrays.asList("preparingFood", "takingNutrition"));
 
         // 8 points - correct for mobility standard award
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
 
         // 8 points total - correct for daily living standard award
-        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -168,20 +168,20 @@ public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("enhancedRate");
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("enhancedRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(
             Arrays.asList("movingAround"));
 
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
             Arrays.asList("preparingFood"));
 
         // 8 points - correct for mobility standard award
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
 
         // 8 points - too low for daily living enhanced award
-        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -197,21 +197,21 @@ public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("enhancedRate");
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("enhancedRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(
             Arrays.asList("movingAround"));
 
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
             Arrays.asList("preparingFood", "takingNutrition"));
 
         // 8 points - correct for mobility standard award
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
 
         // 18 points total - correct for daily living enhanced award
-        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
-        sscsCaseData.setPipWriteFinalDecisionTakingNutritionQuestion("takingNutrition2f"); // 10 points
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionTakingNutritionQuestion("takingNutrition2f"); // 10 points
 
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -227,20 +227,20 @@ public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("noAward");
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("noAward");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(
             Arrays.asList("movingAround"));
 
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
             Arrays.asList("preparingFood", "takingNutrition"));
 
         // 8 points - correct for mobility standard award
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
 
         // 8 points total - too high for no  award
-        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
 
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -256,20 +256,20 @@ public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("noAward");
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("noAward");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(
             Arrays.asList("movingAround"));
 
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
             Arrays.asList("preparingFood", "takingNutrition"));
 
         // 8 points - correct for mobility standard award
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
 
         // 0 points total - correct for daily living no award
-        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1a");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1a");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -290,20 +290,20 @@ public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
             Arrays.asList("preparingFood"));
 
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(
             Arrays.asList("movingAround"));
 
         // 8 points - correct for daily living standard award
-        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
 
         // 0 points - too low for mobility standard award
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12a");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMovingAroundQuestion("movingAround12a");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -318,20 +318,20 @@ public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
             Arrays.asList("preparingFood"));
 
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(
             Arrays.asList("movingAround"));
 
         // 8 points - correct for daily living standard award
-        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
 
         // 12 points - too high for mobility standard award
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12f");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMovingAroundQuestion("movingAround12f");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -346,19 +346,19 @@ public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
 
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
             Arrays.asList("preparingFood"));
 
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(
             Arrays.asList("movingAround"));
 
         // 8 points - correct for daily living standard award
-        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
 
         // 8 points - correct for mobility standard award
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -373,20 +373,20 @@ public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("enhancedRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("enhancedRate");
 
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(
             Arrays.asList("movingAround"));
 
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
             Arrays.asList("preparingFood"));
 
         // 8 points - correct for daily living standard award
-        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
 
         // 8 points - too low for mobility enhanced award
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12c");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMovingAroundQuestion("movingAround12c");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -402,20 +402,20 @@ public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("enhancedRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("enhancedRate");
 
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
             Arrays.asList("preparingFood"));
 
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(
             Arrays.asList("movingAround"));
 
         // 8 points - correct for daily living standard award
-        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
 
         // 12 points - correct for mobility enhanced award
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12f");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMovingAroundQuestion("movingAround12f");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -430,20 +430,20 @@ public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("noAward");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("noAward");
 
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
             Arrays.asList("preparingFood"));
 
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(
             Arrays.asList("movingAround"));
 
         // 8 points - correct for daily living standard award
-        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
 
         // 8 points - too high for mobility no award
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12c");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMovingAroundQuestion("movingAround12c");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -458,21 +458,21 @@ public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("noAward");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("noAward");
 
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
             Arrays.asList("preparingFood"));
 
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(
             Arrays.asList("movingAround"));
 
 
         // 8 points - correct for daily living standard award
-        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
 
         // 0 points - correct for mobility no award
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12a");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMovingAroundQuestion("movingAround12a");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -487,13 +487,13 @@ public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
             Arrays.asList("preparingFood"));
 
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(
             Arrays.asList("movingAround"));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

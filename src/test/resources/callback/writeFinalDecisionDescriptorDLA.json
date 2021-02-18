@@ -24,18 +24,11 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
-      "lcwaAppeal" : "No",
+      "writeFinalDecisionIsDescriptorFlow" : "Yes",
       "writeFinalDecisionGenerateNotice": "Yes",
-      "supportGroupOnlyAppeal" : "No",
-      "writeFinalDecisionDetailsOfDecision" : "This is my summary.",
-      "writeFinalDecisionAllowedOrRefused" : "ALLOWED_OR_REFUSED",
+      "writeFinalDecisionGeneratedDate" : "GENERATED_DATE",
       "writeFinalDecisionDisabilityQualifiedPanelMemberName": "Panel Member 1",
       "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Panel Member 2",
-      "ucWriteFinalDecisionPhysicalDisabilitiesQuestion" : ["mobilisingUnaided", "standingAndSitting"],
-      "ucWriteFinalDecisionMobilisingUnaidedQuestion" : "mobilisingUnaided1a",
-      "ucWriteFinalDecisionStandingAndSittingQuestion" : "standingAndSitting2b",
-      "ucWriteFinalDecisionSchedule7ActivitiesApply" : "No",
-      "doesSchedule9Paragraph4Apply" : "No",
       "writeFinalDecisionDateOfDecision" : "2018-09-01",
       "writeFinalDecisionStartDate": "START_DATE_PLACEHOLDER",
       "writeFinalDecisionEndDate": "2018-11-10",
@@ -46,10 +39,6 @@
         "document_binary_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c/binary",
         "document_filename": "decisionIssued.pdf"
       },
-      "writeFinalDecisionPresentingOfficerAttendedQuestion": "Yes",
-      "writeFinalDecisionAppellantAttendedQuestion": "Yes",
-      "writeFinalDecisionPageSectionReference": "A1",
-      "writeFinalDecisionTypeOfHearing": "faceToFace",
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
@@ -183,8 +172,8 @@
           "isAddressSameAsAppointee": null
         },
         "benefitType": {
-          "code": "UC",
-          "description": "Employment Support Allowance"
+          "code": "DLA",
+          "description": "Disablility Living Allowance"
         },
         "receivedVia": "PAPER",
         "hearingOptions": {
@@ -761,17 +750,10 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
-      "wcaAppeal" : "Yes",
+      "writeFinalDecisionIsDescriptorFlow" : "Yes",
       "writeFinalDecisionGenerateNotice": "Yes",
-      "wcaAppeal" : "Yes",
-      "supportGroupOnlyAppeal" : "No",
-      "writeFinalDecisionAllowedOrRefused" : "allowed",
       "writeFinalDecisionDisabilityQualifiedPanelMemberName": "Panel Member 1",
       "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Panel Member 2",
-      "ucWriteFinalDecisionPhysicalDisabilitiesQuestion" : ["mobilisingUnaided"],
-      "ucWriteFinalDecisionMobilisingUnaidedQuestion" : "mobilisingUnaided1a",
-      "ucWriteFinalDecisionSchedule7ActivitiesApply" : "No",
-      "doesSchedule9Paragraph4Apply" : "No",
       "writeFinalDecisionDateOfDecision" : "2018-09-01",
       "writeFinalDecisionStartDate": "START_DATE_PLACEHOLDER",
       "writeFinalDecisionEndDate": "2018-11-10",
@@ -915,8 +897,8 @@
           "isAddressSameAsAppointee": null
         },
         "benefitType": {
-          "code": "UC",
-          "description": "Employment Support Allowance"
+          "code": "DLA",
+          "description": "Disablility Living Allowance"
         },
         "receivedVia": "PAPER",
         "hearingOptions": {

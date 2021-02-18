@@ -37,12 +37,11 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest extends BaseHandl
     @Rule
     public final SpringMethodRule smr = new SpringMethodRule();
 
-
     @Test
     @Parameters({
         "NON_COMPLIANT, informationReceivedForInterlocJudge, interlocutoryReviewState, awaitingAdminAction",
-        "SYA_APPEAL_CREATED, sendToInterlocReviewByJudge, appealCreated, reviewByJudge",
-        "SYA_APPEAL_CREATED, sendToInterlocReviewByTcw, appealCreated, reviewByTcw"
+        "CREATE_WITH_DWP_TEST_CASE, sendToInterlocReviewByJudge, withDwp, reviewByJudge",
+        "CREATE_WITH_DWP_TEST_CASE, sendToInterlocReviewByTcw, withDwp, reviewByTcw"
     })
     public void givenSubmittedCallbackForActionFurtherEvidence_shouldUpdateFieldAndTriggerEvent(
         EventType eventType,

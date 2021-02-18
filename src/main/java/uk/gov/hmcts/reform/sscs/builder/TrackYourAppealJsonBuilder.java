@@ -96,13 +96,16 @@ public class TrackYourAppealJsonBuilder {
         Map<Event, Hearing> eventHearingMap = buildEventHearingMap(caseData);
 
         if (mya) {
-            log.info("Is MYA case with state {}", state);
+            log.info("Is MYA case {} with state {}", caseId, state);
             List<String> appealReceivedStates = Arrays.asList("incompleteApplication",
                     "incompleteApplicationInformationReqsted", "interlocutoryReviewState", "pendingAppeal");
 
             List<String> withDwpStates = Arrays.asList("appealCreated", "validAppeal", "withDwp");
 
-            List<String> dwpRespondStates = Arrays.asList("readyToList", "responseReceived", NOT_LISTABLE);
+            List<String> dwpRespondStates = new ArrayList<>(List.of("readyToList", "responseReceived", NOT_LISTABLE));
+            if (getHearingType(caseData).equals(PAPER)) {
+                dwpRespondStates.addAll(List.of("hearing", "outcome"));
+            }
 
             List<String> hearingStates = Arrays.asList("hearing", "outcome");
 
@@ -123,7 +126,9 @@ public class TrackYourAppealJsonBuilder {
                 caseNode.put("status", "CLOSED");
             }
 
-            caseNode.put("hideHearing", hearingAdjourned || NOT_LISTABLE.equalsIgnoreCase(state));
+            caseNode.put("hideHearing", hearingAdjourned
+                    || NOT_LISTABLE.equalsIgnoreCase(state)
+                    || HearingType.PAPER.getValue().equalsIgnoreCase(caseData.getAppeal().getHearingType()));
 
             ArrayNode outcomeNode = getHearingOutcome(caseData.getSscsDocument());
             if (!outcomeNode.isEmpty()) {

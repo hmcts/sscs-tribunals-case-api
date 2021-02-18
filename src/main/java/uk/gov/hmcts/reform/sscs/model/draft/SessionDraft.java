@@ -125,4 +125,7 @@ public class SessionDraft {
 
     @JsonProperty("LanguagePreference")
     SessionLanguagePreferenceWelsh languagePreferenceWelsh;
+
+    @JsonProperty("ccdCaseId")
+    String ccdCaseId;
 }

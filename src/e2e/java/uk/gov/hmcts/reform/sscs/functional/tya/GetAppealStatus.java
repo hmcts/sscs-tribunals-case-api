@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -32,42 +31,27 @@ public class GetAppealStatus extends BaseHandler {
     @Test
     public void testDwpRespond() throws Exception {
 
-        SscsCaseDetails sscsCaseDetails = createCaseInWithDwpState();
+        SscsCaseDetails sscsCaseDetails = createCaseInWithDwpState(2);
 
         RestAssured.baseURI = testUrl;
         RestAssured.useRelaxedHTTPSValidation();
 
         log.info("Get appeals for case {}", sscsCaseDetails.getId());
 
-        String response = RestAssured
-                .given()
-                .when()
-                .get("appeals?mya=true&caseId=" + sscsCaseDetails.getId())
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .and()
-                .extract().body().asString();
+        String response = getMyaResponse(2, sscsCaseDetails.getId());
         assertThat(response).contains("status\":\"WITH_DWP");
     }
 
     @Test
     public void testResponseReceived() throws Exception {
-        SscsCaseDetails sscsCaseDetails = createCaseInResponseReceivedState();
+        SscsCaseDetails sscsCaseDetails = createCaseInResponseReceivedState(2);
 
         RestAssured.baseURI = testUrl;
         RestAssured.useRelaxedHTTPSValidation();
 
         log.info("Get appeals for case {}", sscsCaseDetails.getId());
 
-        String response = RestAssured
-                .given()
-                .when()
-                .get("appeals?mya=true&caseId=" + sscsCaseDetails.getId())
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .and()
-                .extract().body().asString();
+        String response = getMyaResponse(2, sscsCaseDetails.getId());
         assertThat(response).contains("status\":\"DWP_RESPOND");
-
     }
 }

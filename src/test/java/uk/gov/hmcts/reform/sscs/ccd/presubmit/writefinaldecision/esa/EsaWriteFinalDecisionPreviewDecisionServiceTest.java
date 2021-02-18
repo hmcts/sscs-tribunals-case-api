@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -15,12 +18,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceTestBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
@@ -69,7 +74,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -92,7 +97,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = false;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -145,7 +150,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -168,7 +173,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = false;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -212,7 +217,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -234,7 +239,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = false;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -276,7 +281,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
@@ -298,7 +303,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YES);
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(NO);
@@ -323,7 +328,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = false;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -362,7 +367,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YES);
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(NO);
@@ -386,7 +391,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = false;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -425,7 +430,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -446,7 +451,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = false;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -486,7 +491,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YES);
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(NO);
@@ -511,7 +516,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = false;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -550,7 +555,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(NO);
+        sscsCaseData.setWcaAppeal(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -570,7 +575,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = false;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, false, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, false, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertFalse(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -610,7 +615,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(NO);
+        sscsCaseData.setWcaAppeal(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -628,7 +633,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = true;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, false, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, false, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertFalse(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -673,7 +678,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(NO);
 
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -699,7 +704,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = true;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -750,7 +755,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(NO);
 
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -782,7 +787,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(NO);
 
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -808,7 +813,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = true;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-                appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+                appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -859,7 +864,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YES);
 
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -885,7 +890,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = true;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -936,7 +941,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YES);
 
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -965,7 +970,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided", "schedule3AppropriatenessOfBehaviour"));
 
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -991,7 +996,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = true;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -1066,7 +1071,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided", "schedule3AppropriatenessOfBehaviour"));
 
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -1090,7 +1095,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         if ("no".equalsIgnoreCase(value)) {
             sscsCaseData.setDwpReassessTheAward("doNotReassess");
         }
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal("no".equalsIgnoreCase(value) ? NO : YES);
+        sscsCaseData.setWcaAppeal("no".equalsIgnoreCase(value) ? NO : YES);
     }
 
     @Override
@@ -1119,7 +1124,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true, false, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true, false, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
     }
@@ -1135,7 +1140,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true,
-            true, false, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, false, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
     }
@@ -1151,7 +1156,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",  true, true, true,
-            false, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            false, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
     }
@@ -1166,7 +1171,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YES);
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1192,7 +1197,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = true;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -1235,7 +1240,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided", "schedule3AppropriatenessOfBehaviour"));
 
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1261,7 +1266,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = true;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -1304,7 +1309,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YES);
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YES);
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1329,7 +1334,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = true;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -1372,7 +1377,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YES);
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YES);
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1397,7 +1402,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = true;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -1439,7 +1444,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YES);
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1462,7 +1467,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = true;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -1505,7 +1510,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided", "schedule3AppropriatenessOfBehaviour"));
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YES);
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1530,7 +1535,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = true;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -1573,7 +1578,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided", "schedule3AppropriatenessOfBehaviour"));
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YES);
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1597,7 +1602,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = true;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -1639,7 +1644,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided", "schedule3AppropriatenessOfBehaviour"));
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1659,7 +1664,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = true;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -1702,7 +1707,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YES);
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(NO);
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1727,7 +1732,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = true;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -1778,7 +1783,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YES);
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(NO);
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -1806,7 +1811,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YES);
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(NO);
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1829,7 +1834,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = true;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -1874,7 +1879,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YES);
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(NO);
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -1901,7 +1906,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YES);
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YES);
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1926,7 +1931,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = true;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -1977,7 +1982,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YES);
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YES);
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -2005,7 +2010,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YES);
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YES);
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -2035,7 +2040,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YES);
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YES);
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -2059,7 +2064,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = true;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -2104,7 +2109,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided", "schedule3AppropriatenessOfBehaviour"));
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YES);
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -2129,7 +2134,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = true;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
 
@@ -2180,7 +2185,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided", "schedule3AppropriatenessOfBehaviour"));
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YES);
-        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -2199,9 +2204,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
     }
 
-    @Test
-    @Ignore
-    public void givenWelsh_GeneratedDateIsAlreadySet_thenDoNotSetNewGeneratedDate() {
-        // Ignoring this test until Welsh is implemented
+    @Override
+    protected boolean isDescriptorFlowSupported() {
+        return true;
     }
 }

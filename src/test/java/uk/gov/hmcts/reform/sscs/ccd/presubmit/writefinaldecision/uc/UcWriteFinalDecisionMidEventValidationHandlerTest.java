@@ -141,7 +141,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     public void givenUcCaseWithWcaAppealFlow_thenSetShowSummaryOfOutcomePage(
             @Nullable YesNo wcaFlow, YesNo expectedShowResult) {
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(wcaFlow);
+        sscsCaseData.setWcaAppeal(wcaFlow);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -160,11 +160,11 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
             "NO, null, NO",
             "null, null, NO",
     })
-    public void givenUcCaseWithLcwaAppealFlowAndAllowedFlow_thenSetShowDwpReassessAwardPage(
+    public void givenUcCaseWithWcaAppealFlowAndAllowedFlow_thenSetShowDwpReassessAwardPage(
             @Nullable YesNo wcaFlow, @Nullable String allowedFlow, YesNo expectedShowResult) {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(wcaFlow);
+        sscsCaseData.setWcaAppeal(wcaFlow);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused(allowedFlow);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
