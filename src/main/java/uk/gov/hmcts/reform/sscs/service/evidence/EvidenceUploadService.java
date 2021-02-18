@@ -205,6 +205,7 @@ public class EvidenceUploadService {
                                                                        String filename) {
         removeStatementDocFromDocumentTab(sscsCaseData, storePdfContext.getDocument().getData().getSscsDocument());
         List<SscsDocument> audioVideoMedia = pullAudioVideoFilesFromDraft(storePdfContext.getDocument().getData().getDraftSscsDocument());
+
         if (audioVideoMedia.size() > 0) {
             sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId());
         }
@@ -345,8 +346,8 @@ public class EvidenceUploadService {
         return fileName.startsWith("Appellant upload") || fileName.startsWith("Representative upload");
     }
 
+
     protected void buildScannedDocumentByGivenSscsDoc(SscsCaseData sscsCaseData, SscsDocument draftSscsDocument,
-                                                      List<SscsDocument> audioVideoMedia) {
         LocalDate ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(),
             DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
@@ -361,6 +362,7 @@ public class EvidenceUploadService {
 
         List<ScannedDocument> scannedDocuments = new ArrayList<>();
         scannedDocuments.add(scannedDocument);
+
         List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>();
 
         for (SscsDocument audioVideoDocument: audioVideoMedia) {

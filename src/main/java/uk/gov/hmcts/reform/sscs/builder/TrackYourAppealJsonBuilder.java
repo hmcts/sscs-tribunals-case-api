@@ -96,7 +96,7 @@ public class TrackYourAppealJsonBuilder {
         Map<Event, Hearing> eventHearingMap = buildEventHearingMap(caseData);
 
         if (mya) {
-            log.info("Is MYA case with state {}", state);
+            log.info("Is MYA case {} with state {}", caseId, state);
             List<String> appealReceivedStates = Arrays.asList("incompleteApplication",
                     "incompleteApplicationInformationReqsted", "interlocutoryReviewState", "pendingAppeal");
 

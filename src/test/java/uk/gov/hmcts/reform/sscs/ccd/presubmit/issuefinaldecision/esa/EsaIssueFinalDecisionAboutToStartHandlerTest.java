@@ -65,7 +65,6 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
     private IssueFinalDecisionAboutToStartHandler handler;
     private static final String URL = "http://dm-store/documents/123";
     private static final String TEMPLATE_ID = "nuts.docx";
-    private static final String ESA_TEMPLATE_ID = "esanuts.docx";
 
     @Mock
     private IdamClient idamClient;
@@ -138,25 +137,16 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
 
         when(generateFile.assemble(any())).thenReturn(URL);
 
-        Map<EventType, String> englishEventTypePipDocs = new HashMap<>();
-        englishEventTypePipDocs.put(EventType.ISSUE_FINAL_DECISION, TEMPLATE_ID);
+        Map<EventType, String> englishEventTypeDocs = new HashMap<>();
+        englishEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, TEMPLATE_ID);
 
-        Map<EventType, String> englishEventTypeEsaDocs = new HashMap<>();
-        englishEventTypeEsaDocs.put(EventType.ISSUE_FINAL_DECISION, ESA_TEMPLATE_ID);
+        Map<EventType, String> welshEventTypeDocs = new HashMap<>();
+        welshEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-WEL-00485.docx");
 
-        Map<EventType, String> welshEventTypePipDocs = new HashMap<>();
-        welshEventTypePipDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-WEL-00485.docx");
-
-        Map<LanguagePreference, Map<EventType, String>> pipDocuments =  new HashMap<>();
-        Map<LanguagePreference, Map<EventType, String>> esaDocuments =  new HashMap<>();
-        pipDocuments.put(LanguagePreference.ENGLISH, englishEventTypePipDocs);
-        pipDocuments.put(LanguagePreference.WELSH, welshEventTypePipDocs);
-        esaDocuments.put(LanguagePreference.ENGLISH, englishEventTypeEsaDocs);
-        Map<String, Map<LanguagePreference, Map<EventType, String>>> benefitSpecificDocuments = new HashMap<>();
-        benefitSpecificDocuments.put("pip", pipDocuments);
-        benefitSpecificDocuments.put("esa", esaDocuments);
-
-        documentConfiguration.setBenefitSpecificDocuments(benefitSpecificDocuments);
+        Map<LanguagePreference, Map<EventType, String>> documents =  new HashMap<>();
+        documents.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
+        documents.put(LanguagePreference.WELSH, welshEventTypeDocs);
+        documentConfiguration.setDocuments(documents);
     }
 
     @Test
