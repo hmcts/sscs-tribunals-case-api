@@ -309,13 +309,55 @@ public class EvidenceUploadServiceTest {
 
     @Test
     public void testBuildScannedDocumentByGivenSscsDoc() {
+        SscsCaseData sscsCaseData = createSscsCaseDetailsDraftDocsJustDescription("EvidenceDescription.pdf").getData();
         List<SscsDocument> audioVideoDocuments = new ArrayList<>();
 
-        SscsDocument draftSscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentDateAdded("2021-01-30")
-                .documentLink(DocumentLink.builder().documentBinaryUrl("url/binary").documentFilename("coversheet").documentUrl("url").build()).build()).build();
+        SscsDocument evidenceDescriptionDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentDateAdded("2021-01-30")
+                .documentLink(DocumentLink.builder().documentBinaryUrl("url/binary").documentFilename("description.pdf").documentUrl("url").build()).build()).build();
 
-        List<ScannedDocument> scannedDocuments = evidenceUploadService.buildScannedDocumentByGivenSscsDoc(draftSscsDocument, audioVideoDocuments);
-        assertEquals(1, scannedDocuments.size());
+        SscsDocument draftSscsAudioDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentDateAdded("2021-01-30")
+                .documentLink(DocumentLink.builder().documentBinaryUrl("url/binary").documentFilename("audio.mp3").documentUrl("url").build()).build()).build();
+        SscsDocument draftSscsVideoDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentDateAdded("2021-01-30")
+                .documentLink(DocumentLink.builder().documentBinaryUrl("url/binary").documentFilename("video.mp4").documentUrl("url").build()).build()).build();
+
+        audioVideoDocuments.add(draftSscsAudioDocument);
+        audioVideoDocuments.add(draftSscsVideoDocument);
+
+        evidenceUploadService.buildScannedDocumentByGivenSscsDoc(sscsCaseData, evidenceDescriptionDocument, audioVideoDocuments);
+        assertEquals(1, sscsCaseData.getScannedDocuments().size());
+        assertEquals(2, sscsCaseData.getAudioVideoEvidence().size());
+    }
+
+    private SscsCaseDetails createSscsCaseDetailsDraftDocsJustDescription(String fileName) {
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder()
+                .id(someCcdCaseId)
+                .data(SscsCaseData.builder()
+                        .draftSscsDocument(singletonList(SscsDocument.builder()
+                                .value(SscsDocumentDetails.builder()
+                                        .documentFileName(fileName)
+                                        .documentLink(DocumentLink.builder()
+                                                .documentUrl(documentUrl)
+                                                .build())
+                                        .documentDateAdded(convertCreatedOnDate(evidenceCreatedOn))
+                                        .build())
+                                .build()))
+                        .build())
+                .build();
+
+        return sscsCaseDetails;
+    }
+
+    @Test
+    public void testBuildScannedDocumentByGivenSscsDocNoAudioVideo() {
+        SscsCaseData sscsCaseData = createSscsCaseDetailsDraftDocsJustDescription("EvidenceDescription.pdf").getData();
+        List<SscsDocument> audioVideoDocuments = new ArrayList<>();
+
+        SscsDocument evidenceDescriptionDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentDateAdded("2021-01-30")
+                .documentLink(DocumentLink.builder().documentBinaryUrl("url/binary").documentFilename("description.pdf").documentUrl("url").build()).build()).build();
+
+        evidenceUploadService.buildScannedDocumentByGivenSscsDoc(sscsCaseData, evidenceDescriptionDocument, audioVideoDocuments);
+        assertEquals(1, sscsCaseData.getScannedDocuments().size());
+        assertNull(sscsCaseData.getAudioVideoEvidence());
     }
 
     @Test
@@ -328,8 +370,11 @@ public class EvidenceUploadServiceTest {
         SscsDocument draftSscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentDateAdded("2021-01-30")
                 .documentLink(DocumentLink.builder().documentBinaryUrl("url/binary").documentFilename("coversheet").documentUrl("url").build()).build()).build();
 
-        List<ScannedDocument> scannedDocuments = evidenceUploadService.buildScannedDocumentByGivenSscsDoc(draftSscsDocument, audioVideoDocuments);
-        assertEquals(4, scannedDocuments.size());
+        SscsCaseData sscsCaseData = createSscsCaseDetailsDraftDocsJustDescription("EvidenceDescription.pdf").getData();
+
+        evidenceUploadService.buildScannedDocumentByGivenSscsDoc(sscsCaseData, draftSscsDocument, audioVideoDocuments);
+        assertEquals(3, sscsCaseData.getAudioVideoEvidence().size());
+        assertEquals(1, sscsCaseData.getScannedDocuments().size());
     }
 
     private SscsDocument getCombinedEvidenceDoc(String combinedEvidenceFilename, String otherEvidenceDocType) {
