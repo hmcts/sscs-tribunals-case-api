@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.canceltranslations;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REINSTATEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
+import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -52,6 +55,10 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
         if (isValidUrgentDocument(callback.getCaseDetails().getCaseData())) {
             setMakeCaseUrgentTriggerEvent(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(),
                     OTHER_DOCUMENT_MANUAL, EventType.MAKE_CASE_URGENT, "Send a case to urgent hearing");
+        } else if (isValidResinstatementRequestDocument(callback.getCaseDetails().getCaseData())) {
+
+            updateForReinstatementRequestEvent(caseData, callback.getCaseDetails().getId(), sscsWelshPreviewNextEvent);
+
         } else {
             ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
                             sscsWelshPreviewNextEvent, "Cancel welsh translations", "Cancel welsh translations",
@@ -67,11 +74,29 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
                 && (!CollectionUtils.isEmpty(caseData.getSscsDocument()) && caseData.getSscsDocument().stream().anyMatch(d -> URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType()))));
     }
 
+    private boolean isValidResinstatementRequestDocument(SscsCaseData caseData) {
+        return (StringUtils.isEmpty(caseData.getTranslationWorkOutstanding()) || "No".equalsIgnoreCase(caseData.getTranslationWorkOutstanding()))
+                && caseData.getReinstatementOutcome() == null
+                && (!CollectionUtils.isEmpty(caseData.getSscsDocument()) && caseData.getSscsDocument().stream().anyMatch(d -> REINSTATEMENT_REQUEST.getValue().equals(d.getValue().getDocumentType())));
+    }
+
     private SscsCaseDetails setMakeCaseUrgentTriggerEvent(
             SscsCaseData caseData, Long caseId,
             FurtherEvidenceActionDynamicListItems interlocType, EventType eventType, String summary) {
         return ccdService.updateCase(caseData, caseId,
                 eventType.getCcdType(), summary,
                 interlocType.getLabel(), idamService.getIdamTokens());
+    }
+
+    private SscsCaseDetails updateForReinstatementRequestEvent(
+            SscsCaseData caseData, Long caseId,
+            String sscsWelshPreviewNextEvent) {
+
+        caseData.setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
+        caseData.setReinstatementRegistered(LocalDate.now());
+        caseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
+
+        return  ccdService.updateCase(caseData, caseId, sscsWelshPreviewNextEvent, "Set Reinstatement Request", "Set Reinstatement Request",
+                idamService.getIdamTokens());
     }
 }

@@ -151,6 +151,19 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void shouldUpdateWithDecisionIssuedWelshNextEventCorrectlyBasedOnReinstatementRequestDocumentType() {
+
+        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("filename", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.REINSTATEMENT_REQUEST.getValue(), "A")), buildSscsWelshDocuments(DocumentType.REINSTATEMENT_REQUEST.getValue()), State.VALID_APPEAL);
+
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setState(State.VALID_APPEAL);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(EventType.UPDATE_CASE_ONLY.getCcdType(), caseData.getSscsWelshPreviewNextEvent());
+    }
+
+    @Test
     public void shouldUpdateWithUploadWelshDocumentEventCorrectlyBasedOnAppellantEvidenceDocumentType() {
 
         Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("filename", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.APPELLANT_EVIDENCE.getValue(), null)), buildSscsWelshDocuments(DocumentType.APPELLANT_EVIDENCE.getValue()), State.VALID_APPEAL);
