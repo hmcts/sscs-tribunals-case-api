@@ -98,10 +98,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private void checkForWarnings(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (YES.equalsIgnoreCase(preSubmitCallbackResponse.getData().getIsProgressingViaGaps())) {
-            preSubmitCallbackResponse.addWarning("This case is progressing via GAPS. Please ensure any documents are emailed to the Regional Processing Centre to be attached to the paper file.");
-        }
-
         if ((null != preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeAppellant()
                 && GRANTED.equals(preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeAppellant().getRequestOutcome())
                 && OriginalSenderItemList.APPELLANT.getCode().equals(preSubmitCallbackResponse.getData().getOriginalSender().getValue().getCode()))
