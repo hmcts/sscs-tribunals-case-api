@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.model.AppConstants;
 
 @Service
 public class DwpDocumentService {
@@ -57,5 +58,63 @@ public class DwpDocumentService {
         if (null != sscsCaseData.getDwpDocuments()) {
             sscsCaseData.getDwpDocuments().removeIf(e -> docType.getValue().equals(e.getValue().getDocumentType()));
         }
+    }
+
+    public void moveDocsToCorrectCollection(SscsCaseData sscsCaseData, String todayDate) {
+        if (sscsCaseData.getDwpAT38Document() != null) {
+            DwpResponseDocument at38 = buildDwpResponseDocumentWithDate(
+                    AppConstants.DWP_DOCUMENT_AT38_FILENAME_PREFIX,
+                    todayDate,
+                    sscsCaseData.getDwpAT38Document().getDocumentLink());
+
+            addToDwpDocuments(sscsCaseData, at38, DwpDocumentType.AT_38);
+            sscsCaseData.setDwpAT38Document(null);
+        }
+
+        if (sscsCaseData.getDwpResponseDocument() != null) {
+            sscsCaseData.setDwpResponseDocument(buildDwpResponseDocumentWithDate(
+                    AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX,
+                    todayDate,
+                    sscsCaseData.getDwpResponseDocument().getDocumentLink()));
+
+            moveDwpResponseDocumentToDwpDocumentCollection(sscsCaseData);
+        }
+
+        if (sscsCaseData.getDwpEvidenceBundleDocument() != null) {
+            sscsCaseData.setDwpEvidenceBundleDocument(buildDwpResponseDocumentWithDate(
+                    AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX,
+                    todayDate,
+                    sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink()));
+
+            moveDwpEvidenceBundleToDwpDocumentCollection(sscsCaseData);
+        }
+
+        if (sscsCaseData.getAppendix12Doc() != null && sscsCaseData.getAppendix12Doc().getDocumentLink() != null) {
+            DwpResponseDocument appendix12 = buildDwpResponseDocumentWithDate(
+                    AppConstants.DWP_DOCUMENT_APPENDIX12_FILENAME_PREFIX,
+                    todayDate,
+                    sscsCaseData.getAppendix12Doc().getDocumentLink());
+
+            addToDwpDocuments(sscsCaseData, appendix12, DwpDocumentType.APPENDIX_12);
+            sscsCaseData.setAppendix12Doc(null);
+        }
+    }
+
+    private DwpResponseDocument buildDwpResponseDocumentWithDate(String documentType, String dateForFile, DocumentLink documentLink) {
+
+        if (documentLink.getDocumentFilename() == null) {
+            return null;
+        }
+
+        String fileExtension = documentLink.getDocumentFilename().substring(documentLink.getDocumentFilename().lastIndexOf("."));
+        return (DwpResponseDocument.builder()
+                .documentFileName(documentType + " on " + dateForFile)
+                .documentLink(
+                        DocumentLink.builder()
+                                .documentBinaryUrl(documentLink.getDocumentBinaryUrl())
+                                .documentUrl(documentLink.getDocumentUrl())
+                                .documentFilename(documentType + " on " + dateForFile + fileExtension)
+                                .build()
+                ).build());
     }
 }
