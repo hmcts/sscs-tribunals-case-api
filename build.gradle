@@ -19,7 +19,7 @@ plugins {
     id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.5.2'
     id 'org.owasp.dependencycheck' version '6.0.3'
-    id 'au.com.dius.pact' version '4.1.11'
+    id 'au.com.dius.pact' version '4.2.0'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -248,7 +248,7 @@ dependencyManagement {
         }
 
         // CVE-2020-17521
-        dependencySet(group: 'org.codehaus.groovy', version: '2.5.14') {
+        dependencySet(group: 'org.codehaus.groovy', version: '3.0.7') {
             entry 'groovy'
             entry 'groovy-json'
             entry 'groovy-xml'
@@ -312,15 +312,15 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.22'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
-    compile 'org.projectlombok:lombok:1.18.16'
-    annotationProcessor 'org.projectlombok:lombok:1.18.14'
+    compile 'org.projectlombok:lombok:1.18.18'
+    annotationProcessor 'org.projectlombok:lombok:1.18.18'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.5.RELEASE'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.7.7'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.24.0'
-    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.6.28'
+    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.7.7'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
-    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.21.0'
+    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.24.0'
     testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
     // Added to fix CVE-2020-13934, CVE-2020-13935, CVE-2020-17527
@@ -333,7 +333,7 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.16'
     testAnnotationProcessor "org.projectlombok:lombok:1.18.14"
     e2eCompile 'org.projectlombok:lombok:1.18.16'
-    e2eAnnotationProcessor "org.projectlombok:lombok:1.18.8"
+    e2eAnnotationProcessor "org.projectlombok:lombok:1.18.18"
 
     testCompile "org.junit.jupiter:junit-jupiter-api:5.7.0"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:5.6.2"

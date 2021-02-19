@@ -38,28 +38,21 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
     protected WriteFinalDecisionPreviewDecisionServiceBase(GenerateFile generateFile, IdamClient idamClient,
         DecisionNoticeQuestionService decisionNoticeQuestionService,  DecisionNoticeOutcomeService decisionNoticeOutcomeService, DocumentConfiguration documentConfiguration) {
-        super(generateFile, idamClient, languagePreferenceAndBenefit -> getTemplateId(documentConfiguration, languagePreferenceAndBenefit.getRight(), languagePreferenceAndBenefit.getLeft()));
+        super(generateFile, idamClient, languagePreference -> getTemplateId(documentConfiguration, languagePreference));
         this.decisionNoticeQuestionService = decisionNoticeQuestionService;
         this.decisionNoticeOutcomeService = decisionNoticeOutcomeService;
     }
 
     public abstract String getBenefitType();
 
-    private static String getTemplateId(final DocumentConfiguration documentConfiguration, final String benefitType, final LanguagePreference languagePreference) {
-        if (benefitType == null) {
-            throw new IllegalStateException("Benefit type cannot be null");
-        }
-        Map<LanguagePreference, Map<EventType, String>> benefitSpecificDocuments = documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase());
-        if (benefitSpecificDocuments == null) {
-            throw new IllegalStateException("Unable to obtain benefit specific documents for benefit type:" + benefitType.toLowerCase() + " and language:" + languagePreference);
-        }
-        Map<EventType, String> eventTypeStringMap = benefitSpecificDocuments.get(languagePreference);
+    private static String getTemplateId(final DocumentConfiguration documentConfiguration, final LanguagePreference languagePreference) {
+        Map<EventType, String> eventTypeStringMap = documentConfiguration.getDocuments().get(languagePreference);
         if (eventTypeStringMap == null) {
-            throw new IllegalStateException("Unable to obtain benefit specific documents for benefit type:" + benefitType.toLowerCase() + " and language:" + languagePreference);
+            throw new IllegalStateException("Unable to obtain benefit specific documents for language:" + languagePreference);
         }
         String templateId = eventTypeStringMap.get(EventType.ISSUE_FINAL_DECISION);
         if (templateId == null) {
-            throw new IllegalStateException("Unable to obtain template id for benefit type:" + benefitType + " and language:" + languagePreference);
+            throw new IllegalStateException("Unable to obtain template id for ISSUE_FINAL_DECISION and language:" + languagePreference);
         }
         return templateId;
     }

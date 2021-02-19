@@ -2,8 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -11,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
@@ -19,15 +19,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.callback.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 
 @RunWith(JUnitParamsRunner.class)
 public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private HmctsResponseReviewedAboutToSubmitHandler handler;
+
+    private DwpDocumentService dwpDocumentService;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -39,7 +40,8 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new HmctsResponseReviewedAboutToSubmitHandler();
+        dwpDocumentService = new DwpDocumentService();
+        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService);
 
         when(callback.getEvent()).thenReturn(EventType.HMCTS_RESPONSE_REVIEWED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -121,10 +123,13 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     public void givenAUcCaseWithSingleElementSelected_thenSetCaseCodeToUs() {
         List<String> elementList = new ArrayList<>();
         elementList.add("testElement");
+        sscsCaseData.setIssueCode("DD");
         sscsCaseData.setElementsDisputedList(elementList);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("uc").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
 
         assertEquals("US", response.getData().getIssueCode());
         assertEquals("001", response.getData().getBenefitCode());
@@ -136,10 +141,13 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
         List<String> elementList = new ArrayList<>();
         elementList.add("testElement");
         elementList.add("testElement2");
+        sscsCaseData.setIssueCode("DD");
         sscsCaseData.setElementsDisputedList(elementList);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("uc").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
 
         assertEquals("UM", response.getData().getIssueCode());
         assertEquals("001", response.getData().getBenefitCode());
@@ -185,5 +193,77 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
+
+    @Test
+    public void givenDwpDocumentIsUpdated_thenDwpCollectionIsUpdated() {
+        DwpDocument dwpResponseDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("response.pdf").documentBinaryUrl("/responsebinaryurl").documentUrl("/responseurl").build())
+                .documentType(DwpDocumentType.DWP_RESPONSE.getValue()).build()).build();
+        DwpDocument dwpAt38Document = DwpDocument.builder().value(DwpDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("at38.pdf").documentBinaryUrl("/binaryurl").documentUrl("/url").build()).documentType(DwpDocumentType.AT_38.getValue()).build()).build();
+        DwpDocument dwpEvidenceDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("evidence.pdf").documentBinaryUrl("/evidencebinaryurl").documentUrl("/evidenceurl").build())
+                .documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue()).build()).build();
+
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(dwpResponseDocument);
+        dwpDocuments.add(dwpAt38Document);
+        dwpDocuments.add(dwpEvidenceDocument);
+
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
+        callback.getCaseDetails().getCaseData().setDwpResponseDocument(new DwpResponseDocument(dwpResponseDocument.getValue().getDocumentLink(), dwpResponseDocument.getValue().getDocumentFileName()));
+        callback.getCaseDetails().getCaseData().setDwpAT38Document(new DwpResponseDocument(
+                DocumentLink.builder().documentUrl("/newurl").documentBinaryUrl("/newbinaryurl").documentFilename("newfilename.pdf").build(), "newfilename"));
+        callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(new DwpResponseDocument(dwpEvidenceDocument.getValue().getDocumentLink(), dwpEvidenceDocument.getValue().getDocumentFileName()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String todayDate = java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+
+        assertEquals("/newurl", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("/newbinaryurl", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentBinaryUrl());
+        assertEquals("AT38 received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentFilename());
+        assertEquals("AT38 received on " + todayDate, response.getData().getDwpDocuments().get(1).getValue().getDocumentFileName());
+        assertNull(response.getData().getDwpResponseDocument());
+        assertNull(response.getData().getDwpAT38Document());
+        assertNull(response.getData().getDwpEvidenceBundleDocument());
+    }
+
+    @Test
+    public void givenNoDwpDocument_thenDwpUploadedCollectionIsUpdated() {
+        DwpDocument dwpResponseDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("response.pdf").documentBinaryUrl("/responsebinaryurl").documentUrl("/responseurl").build())
+                .documentType(DwpDocumentType.DWP_RESPONSE.getValue()).build()).build();
+        DwpDocument dwpAt38Document = DwpDocument.builder().value(DwpDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("at38.pdf").documentBinaryUrl("/binaryurl").documentUrl("/url").build()).documentType(DwpDocumentType.AT_38.getValue()).build()).build();
+        DwpDocument dwpEvidenceDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("evidence.pdf").documentBinaryUrl("/evidencebinaryurl").documentUrl("/evidenceurl").build())
+                .documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue()).build()).build();
+
+        callback.getCaseDetails().getCaseData().setDwpResponseDocument(new DwpResponseDocument(dwpResponseDocument.getValue().getDocumentLink(), dwpResponseDocument.getValue().getDocumentFileName()));
+        callback.getCaseDetails().getCaseData().setDwpAT38Document(new DwpResponseDocument(dwpAt38Document.getValue().getDocumentLink(), dwpAt38Document.getValue().getDocumentFileName()));
+        callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(new DwpResponseDocument(dwpEvidenceDocument.getValue().getDocumentLink(), dwpEvidenceDocument.getValue().getDocumentFileName()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        String todayDate = java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+
+        assertEquals("/evidenceurl", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("/evidencebinaryurl", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentBinaryUrl());
+        assertEquals("DWP evidence received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentFilename());
+
+        assertEquals("/url", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("/binaryurl", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentBinaryUrl());
+        assertEquals("AT38 received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentFilename());
+        assertEquals("AT38 received on " + todayDate, response.getData().getDwpDocuments().get(1).getValue().getDocumentFileName());
+
+        assertEquals("/responseurl", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("/responsebinaryurl", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentBinaryUrl());
+        assertEquals("DWP response received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentFilename());
+
+        assertNull(response.getData().getDwpResponseDocument());
+        assertNull(response.getData().getDwpAT38Document());
+        assertNull(response.getData().getDwpEvidenceBundleDocument());
+    }
+
 
 }

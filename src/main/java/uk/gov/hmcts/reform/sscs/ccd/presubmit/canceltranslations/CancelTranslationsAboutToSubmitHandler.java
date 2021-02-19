@@ -27,6 +27,7 @@ public class CancelTranslationsAboutToSubmitHandler implements PreSubmitCallback
         nextEventMap.put(DocumentType.URGENT_HEARING_REQUEST.getValue(), EventType.UPDATE_CASE_ONLY.getCcdType());
         nextEventMap.put(DocumentType.DECISION_NOTICE.getValue(), EventType.DECISION_ISSUED_WELSH.getCcdType());
         nextEventMap.put(DocumentType.DIRECTION_NOTICE.getValue(), EventType.DIRECTION_ISSUED_WELSH.getCcdType());
+        nextEventMap.put(DocumentType.REINSTATEMENT_REQUEST.getValue(), EventType.UPDATE_CASE_ONLY.getCcdType());
     }
 
     @Override
@@ -48,7 +49,7 @@ public class CancelTranslationsAboutToSubmitHandler implements PreSubmitCallback
         log.info("Can handle for case id : {}", caseData.getCcdCaseId());
         if (!callback.getCaseDetails().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)) {
             setWelshNextEvent(caseData);
-            log.info("Set Welsh next event to : {} for case id: {}", caseData.getWelshInterlocNextReviewState(), caseData.getCcdCaseId());
+            log.info("Set Welsh next event to : {} for case id: {}", caseData.getSscsWelshPreviewNextEvent(), caseData.getCcdCaseId());
         } else {
             caseData.setInterlocReviewState(caseData.getWelshInterlocNextReviewState());
             caseData.setWelshInterlocNextReviewState(null);

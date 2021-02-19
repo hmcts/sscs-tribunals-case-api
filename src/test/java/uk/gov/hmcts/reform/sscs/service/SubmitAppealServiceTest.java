@@ -149,6 +149,9 @@ public class SubmitAppealServiceTest {
     @Before
     public void setUp() {
 
+
+        appealData.getMrn().setDate(LocalDate.now().minusMonths(1));
+
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, regionalProcessingCenterService,
             idamService, convertAIntoBService, airLookupService);

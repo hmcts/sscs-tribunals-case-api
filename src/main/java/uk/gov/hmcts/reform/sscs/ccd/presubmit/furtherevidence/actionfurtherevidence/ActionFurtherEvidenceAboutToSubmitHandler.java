@@ -98,10 +98,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private void checkForWarnings(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (YES.equalsIgnoreCase(preSubmitCallbackResponse.getData().getIsProgressingViaGaps())) {
-            preSubmitCallbackResponse.addWarning("This case is progressing via GAPS. Please ensure any documents are emailed to the Regional Processing Centre to be attached to the paper file.");
-        }
-
         if ((null != preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeAppellant()
                 && GRANTED.equals(preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeAppellant().getRequestOutcome())
                 && OriginalSenderItemList.APPELLANT.getCode().equals(preSubmitCallbackResponse.getData().getOriginalSender().getValue().getCode()))
@@ -239,13 +235,17 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private void setReinstateCaseFields(SscsCaseData sscsCaseData) {
-        sscsCaseData.setReinstatementRegistered(LocalDate.now());
-        sscsCaseData.setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
-        State previousState = sscsCaseData.getPreviousState();
-        if (previousState == null || State.DORMANT_APPEAL_STATE == previousState || State.VOID_STATE == previousState) {
-            log.info("{} setting previousState from {}} to interlocutoryReviewState}", sscsCaseData.getCcdCaseId(), previousState);
-            sscsCaseData.setPreviousState(State.INTERLOCUTORY_REVIEW_STATE);
+        if (!sscsCaseData.isLanguagePreferenceWelsh()) {
+            sscsCaseData.setReinstatementRegistered(LocalDate.now());
+            sscsCaseData.setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
+            sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
+            State previousState = sscsCaseData.getPreviousState();
+            if (previousState == null || State.DORMANT_APPEAL_STATE == previousState || State.VOID_STATE == previousState) {
+                log.info("{} setting previousState from {}} to interlocutoryReviewState}", sscsCaseData.getCcdCaseId(), previousState);
+                sscsCaseData.setPreviousState(State.INTERLOCUTORY_REVIEW_STATE);
+            }
+        } else {
+            log.info("{} supressing reinstatement request fields for welsh case", sscsCaseData.getCcdCaseId());
         }
     }
 

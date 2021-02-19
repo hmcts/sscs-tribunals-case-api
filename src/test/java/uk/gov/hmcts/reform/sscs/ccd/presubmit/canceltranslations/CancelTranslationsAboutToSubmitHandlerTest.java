@@ -89,6 +89,7 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
                 response.getData().getSscsDocument().get(3).getValue().getDocumentTranslationStatus());
         assertNull(response.getData().getSscsDocument().get(4).getValue().getDocumentTranslationStatus());
         assertNull(response.getData().getSscsDocument().get(5).getValue().getDocumentTranslationStatus());
+        assertNull(response.getData().getSscsDocument().get(6).getValue().getDocumentTranslationStatus());
         assertEquals("No", response.getData().getTranslationWorkOutstanding());
 
         assertEquals(EventType.DECISION_ISSUED_WELSH.getCcdType(), response.getData().getSscsWelshPreviewNextEvent());
@@ -107,6 +108,7 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
                 response.getData().getSscsDocument().get(3).getValue().getDocumentTranslationStatus());
         assertNull(response.getData().getSscsDocument().get(4).getValue().getDocumentTranslationStatus());
         assertNull(response.getData().getSscsDocument().get(5).getValue().getDocumentTranslationStatus());
+        assertNull(response.getData().getSscsDocument().get(6).getValue().getDocumentTranslationStatus());
         assertEquals("No", response.getData().getTranslationWorkOutstanding());
 
         assertEquals("reviewByTcw", response.getData().getInterlocReviewState());
@@ -141,7 +143,12 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
                         DocumentType.DIRECTION_NOTICE
                                 .getValue(), LocalDate.now().minusDays(2));
 
-        List<SscsDocument> docs = Arrays.asList(ssc0Doc, sscs1Doc, sscs2Doc, sscs3Doc, sscs4Doc, sscs5Doc);
+        SscsDocument sscs6Doc =
+                buildSscsDocument("anything.pdf", SscsDocumentTranslationStatus.TRANSLATION_REQUIRED,
+                        DocumentType.REINSTATEMENT_REQUEST
+                                .getValue(), LocalDate.now().minusDays(2));
+
+        List<SscsDocument> docs = Arrays.asList(ssc0Doc, sscs1Doc, sscs2Doc, sscs3Doc, sscs4Doc, sscs5Doc, sscs6Doc);
 
         SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .sscsDocument(docs)
