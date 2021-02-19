@@ -297,6 +297,31 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         assertEquals(1, numberOfExpectedError);
     }
 
+    @Test
+    public void givenACaseUpdateEventWithBlankWithSpaceAddressDetails_thenReturnError() {
+        Address address = buildAddress(" ", "  ", "  ", "  ");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAddress(address);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        long numberOfExpectedError = getNumberOfExpectedError(response);
+        assertEquals(0, numberOfExpectedError);
+
+        Representative representative = Representative.builder().address(address).build();
+        callback.getCaseDetails().getCaseData().getAppeal().toBuilder().rep(representative).build();
+        response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        numberOfExpectedError = getNumberOfExpectedError(response);
+        assertEquals(0, numberOfExpectedError);
+
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().toBuilder().appointee(Appointee.builder().address(address).build()).build();
+        response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        numberOfExpectedError = getNumberOfExpectedError(response);
+        assertEquals(0, numberOfExpectedError);
+
+        callback.getCaseDetails().getCaseData().setJointPartyAddress(buildAddress("  ", "  "," ", " "));
+        response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        numberOfExpectedError = getNumberOfExpectedError(response);
+        assertEquals(0, numberOfExpectedError);
+    }
+
     private long getNumberOfExpectedError(PreSubmitCallbackResponse<SscsCaseData> response) {
         return response.getErrors().stream()
                 .filter(error -> error.equalsIgnoreCase("Invalid characters are being used at the beginning of address fields, please correct"))
