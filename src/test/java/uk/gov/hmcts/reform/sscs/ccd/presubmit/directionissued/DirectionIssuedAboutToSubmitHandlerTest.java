@@ -406,6 +406,52 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenDirectionTypeOfGrantReinstatementForWelshCaseDont_setStates() {
+
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService);
+
+        callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
+        callback.getCaseDetails().getCaseData().setPreviousState(State.APPEAL_CREATED);
+        callback.getCaseDetails().getCaseData().setInterlocReviewState(null);
+        callback.getCaseDetails().getCaseData().setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
+        callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("yes");
+
+
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionTypeItemList.GRANT_REINSTATEMENT.getCode()));
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getData().getState().equals(State.DORMANT_APPEAL_STATE));
+        assertTrue(response.getData().getReinstatementOutcome().equals(RequestOutcome.IN_PROGRESS));
+        assertEquals(DwpState.LAPSED.getId(), response.getData().getDwpState());
+        assertEquals(InterlocReviewState.WELSH_TRANSLATION.getId(), response.getData().getInterlocReviewState());
+        assertEquals("Yes", response.getData().getTranslationWorkOutstanding());
+    }
+
+    @Test
+    public void givenDirectionTypeOfRefuseReinstatementForWelshCaseDont_setStates() {
+
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService);
+
+        callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
+        callback.getCaseDetails().getCaseData().setPreviousState(State.APPEAL_CREATED);
+        callback.getCaseDetails().getCaseData().setInterlocReviewState(null);
+        callback.getCaseDetails().getCaseData().setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
+        callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("yes");
+
+
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionTypeItemList.REFUSE_REINSTATEMENT.getCode()));
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getData().getState().equals(State.DORMANT_APPEAL_STATE));
+        assertTrue(response.getData().getReinstatementOutcome().equals(RequestOutcome.IN_PROGRESS));
+        assertEquals(DwpState.LAPSED.getId(), response.getData().getDwpState());
+        assertEquals(InterlocReviewState.WELSH_TRANSLATION.getId(), response.getData().getInterlocReviewState());
+        assertEquals("Yes", response.getData().getTranslationWorkOutstanding());
+    }
+
+    @Test
     public void givenDirectionTypeOfGrantUrgentHearingAndInterlocReview_setState() {
 
         handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService);
