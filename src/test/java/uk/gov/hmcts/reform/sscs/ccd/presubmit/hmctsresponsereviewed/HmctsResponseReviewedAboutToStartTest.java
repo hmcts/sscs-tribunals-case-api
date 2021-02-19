@@ -5,7 +5,9 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -13,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
@@ -114,6 +117,55 @@ public class HmctsResponseReviewedAboutToStartTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals("This event cannot be run for cases created in GAPS at valid appeal", response.getErrors().toArray()[0]);
+    }
+
+    @Test
+    public void givenResponseEventWithDwpDocumentsInCollection_thenPopulateLegacyFields() {
+        DwpDocument dwpResponseDocument = DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DwpDocumentType.DWP_RESPONSE.getValue()).build()).build();
+        DwpDocument dwpAt38Document = DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DwpDocumentType.AT_38.getValue()).build()).build();
+        DwpDocument dwpEvidenceDocument = DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue()).build()).build();
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(dwpResponseDocument);
+        dwpDocuments.add(dwpAt38Document);
+        dwpDocuments.add(dwpEvidenceDocument);
+
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertNotNull(response.getData().getDwpResponseDocument());
+        assertNotNull(response.getData().getDwpAT38Document());
+        assertNotNull(response.getData().getDwpEvidenceBundleDocument());
+    }
+
+
+    @Test
+    public void givenResponseEventWithDwpDocumentsAndEditedInCollection_thenPopulateLegacyFields() {
+        DwpDocument dwpResponseDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("response").documentBinaryUrl("/responsebinaryurl").documentUrl("/responseurl").build())
+                .dwpEditedEvidenceReason("phme")
+                .editedDocumentLink(DocumentLink.builder().documentFilename("editedresponse").documentBinaryUrl("/responseeditedbinaryurl").documentUrl("/responseeditedurl").build()).documentType(DwpDocumentType.DWP_RESPONSE.getValue()).build()).build();
+        DwpDocument dwpAt38Document = DwpDocument.builder().value(DwpDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("at38").documentBinaryUrl("/binaryurl").documentUrl("/url").build()).documentType(DwpDocumentType.AT_38.getValue()).build()).build();
+        DwpDocument dwpEvidenceDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("evidence").documentBinaryUrl("/evidencebinaryurl").documentUrl("/evidenceurl").build())
+                .dwpEditedEvidenceReason("phme")
+                .editedDocumentLink(DocumentLink.builder().documentFilename("editedevidence").documentBinaryUrl("/evidenceeditedbinaryurl").documentUrl("/evidenceeditedurl").build()).documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue()).build()).build();
+
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(dwpResponseDocument);
+        dwpDocuments.add(dwpAt38Document);
+        dwpDocuments.add(dwpEvidenceDocument);
+
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertNotNull(response.getData().getDwpResponseDocument());
+        assertNotNull(response.getData().getDwpAT38Document());
+        assertNotNull(response.getData().getDwpEvidenceBundleDocument());
+        assertNotNull(response.getData().getDwpEditedResponseDocument());
+        assertNotNull(response.getData().getDwpEditedEvidenceBundleDocument());
     }
 
 }
