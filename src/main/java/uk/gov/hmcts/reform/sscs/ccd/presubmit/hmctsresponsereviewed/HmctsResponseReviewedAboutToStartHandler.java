@@ -67,6 +67,10 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
                     if (dwpDocument.getValue().getEditedDocumentLink() != null) {
                         sscsCaseData.setDwpEditedEvidenceBundleDocument(new DwpResponseDocument(dwpDocument.getValue().getEditedDocumentLink(), dwpDocument.getValue().getDocumentFileName()));
                     }
+                } else if (dwpDocument.getValue().getDocumentType().equals(DwpDocumentType.APPENDIX_12.getValue())) {
+                    sscsCaseData.setAppendix12Doc(new DwpResponseDocument(dwpDocument.getValue().getDocumentLink(), dwpDocument.getValue().getDocumentFileName()));
+                } else if (dwpDocument.getValue().getDocumentType().equals(DwpDocumentType.UCB.getValue())) {
+                    sscsCaseData.setDwpUcbEvidenceDocument(dwpDocument.getValue().getDocumentLink());
                 }
             }
         }
