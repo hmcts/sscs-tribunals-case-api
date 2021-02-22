@@ -49,7 +49,10 @@ public class CreateAndUpdateCaseInCcdTest {
     public void givenASyaCase_shouldBeSavedIntoCcdInCorrectState() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
+
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, rpc.getName(), rpc);
+        caseData.setCreatedInGapsFrom("readyToList");
+
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, CREATE_TEST_CASE.getCcdType(),
                 "Test case created from functional test", "Test case created description", idamTokens);
         assertNotNull(caseDetails);
@@ -60,6 +63,8 @@ public class CreateAndUpdateCaseInCcdTest {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
 
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
+        caseData.setCreatedInGapsFrom("readyToList");
+
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, CREATE_TEST_CASE.getCcdType(), "Test case created from functional test", "Test case created from givenASyaCaseWithoutAMatchingRpcShouldBeSavedIntoCcd", idamTokens);
         assertNotNull(caseDetails);
     }
@@ -79,6 +84,7 @@ public class CreateAndUpdateCaseInCcdTest {
         evidence.add(evidenceReceivedInformation);
         caseData.setEvidenceReceived(EvidenceReceived.builder().appellantInfoRequestCollection(evidence).build());
 
+        caseData.setCreatedInGapsFrom("readyToList");
         caseData.setUrgentCase("Yes");
         caseData.setDocumentSentToDwp("Yes");
         caseData.setDirectionDueDate("2019-10-10");
