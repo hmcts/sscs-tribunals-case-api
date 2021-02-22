@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.addnote;
 
+import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -26,6 +27,11 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Slf4j
 public class AddNoteAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    public static final List<EventType> EVENTS_WITH_NOTES = asList(EventType.ADD_NOTE,
+            EventType.INTERLOC_SEND_TO_TCW, EventType.ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE,
+            EventType.SEND_TO_ADMIN, EventType.TCW_REFER_TO_JUDGE, EventType.NON_COMPLIANT_SEND_TO_INTERLOC,
+            EventType.ADMIN_APPEAL_WITHDRAWN);
+
     protected final IdamClient idamClient;
 
     @Autowired
@@ -38,8 +44,7 @@ public class AddNoteAboutToSubmitHandler implements PreSubmitCallbackHandler<Ssc
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() == EventType.ADD_NOTE;
+        return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT) && EVENTS_WITH_NOTES.contains(callback.getEvent());
     }
 
     @Override

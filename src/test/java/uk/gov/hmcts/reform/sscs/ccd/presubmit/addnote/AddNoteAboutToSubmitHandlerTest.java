@@ -95,7 +95,10 @@ public class AddNoteAboutToSubmitHandlerTest {
 
     @Test
     public void givenValidCallback_thenReturnTrue() {
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+        for (EventType eventType : AddNoteAboutToSubmitHandler.EVENTS_WITH_NOTES) {
+            when(callback.getEvent()).thenReturn(eventType);
+            assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+        }
     }
 
     @Test
