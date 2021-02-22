@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -102,15 +103,15 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private boolean isInvalidAddress(Address address) {
-        Pattern p = Pattern.compile("^\\.$|^[a-zA-ZÀ-ž0-9]{1}[a-zA-ZÀ-ž0-9 \\r\\n\\.“”\",’\\?\\!\\[\\]\\(\\)/£:\\\\_+\\-%&;]{1,}$");
-        if (address.getLine1() != null && !address.getLine1().isEmpty() && !p.matcher(address.getLine1()).find()) {
+        Pattern p = Pattern.compile("^\\.$|^[a-zA-ZÀ-ž0-9]{1}[a-zA-ZÀ-ž0-9 \\r\\n\\.“”\",’\\?\\!\\[\\]\\(\\)/£:\\\\_+\\-%&;]{0,}$");
+        if (address.getLine1() != null && !StringUtils.isEmpty(StringUtils.trimWhitespace(address.getLine1())) && !p.matcher(address.getLine1()).find()) {
             return true;
-        } else if (address.getLine2() != null && !address.getLine2().isEmpty() && !p.matcher(address.getLine2()).find()) {
+        } else if (address.getLine2() != null && !StringUtils.isEmpty(StringUtils.trimWhitespace(address.getLine2())) && !p.matcher(address.getLine2()).find()) {
             return true;
-        } else if (address.getTown() != null && !address.getTown().isEmpty() && !p.matcher(address.getTown()).find()) {
+        } else if (address.getTown() != null && !StringUtils.isEmpty(StringUtils.trimWhitespace(address.getTown())) && !p.matcher(address.getTown()).find()) {
             return true;
         } else {
-            return address.getCounty() != null && !address.getCounty().isEmpty() && !p.matcher(address.getCounty()).find();
+            return address.getCounty() != null && !StringUtils.isEmpty(StringUtils.trimWhitespace(address.getCounty())) && !p.matcher(address.getCounty()).find();
         }
     }
 
