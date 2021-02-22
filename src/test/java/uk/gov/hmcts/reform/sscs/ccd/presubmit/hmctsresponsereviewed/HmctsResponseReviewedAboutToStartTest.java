@@ -121,51 +121,64 @@ public class HmctsResponseReviewedAboutToStartTest {
 
     @Test
     public void givenResponseEventWithDwpDocumentsInCollection_thenPopulateLegacyFields() {
-        DwpDocument dwpResponseDocument = DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DwpDocumentType.DWP_RESPONSE.getValue()).build()).build();
-        DwpDocument dwpAt38Document = DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DwpDocumentType.AT_38.getValue()).build()).build();
-        DwpDocument dwpEvidenceDocument = DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue()).build()).build();
+        DwpDocument dwpResponseDocument = DwpDocument.builder().value(DwpDocumentDetails.builder().documentLink(DocumentLink.builder().documentFilename("dwpresponse").build()).documentType(DwpDocumentType.DWP_RESPONSE.getValue()).build()).build();
+        DwpDocument dwpAt38Document = DwpDocument.builder().value(DwpDocumentDetails.builder().documentLink(DocumentLink.builder().documentFilename("at38").build()).documentType(DwpDocumentType.AT_38.getValue()).build()).build();
+        DwpDocument dwpEvidenceDocument = DwpDocument.builder().value(DwpDocumentDetails.builder().documentLink(DocumentLink.builder().documentFilename("dwpevidence").build()).documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue()).build()).build();
+        DwpDocument dwpAppendix12 = DwpDocument.builder().value(DwpDocumentDetails.builder().documentLink(DocumentLink.builder().documentFilename("dwpappendix12").build()).documentType(DwpDocumentType.APPENDIX_12.getValue()).build()).build();
+        DwpDocument dwpUcbDocument = DwpDocument.builder().value(DwpDocumentDetails.builder().documentLink(DocumentLink.builder().documentFilename("dwpucb").build()).documentType(DwpDocumentType.UCB.getValue()).build()).build();
         List<DwpDocument> dwpDocuments = new ArrayList<>();
         dwpDocuments.add(dwpResponseDocument);
         dwpDocuments.add(dwpAt38Document);
         dwpDocuments.add(dwpEvidenceDocument);
+        dwpDocuments.add(dwpAppendix12);
+        dwpDocuments.add(dwpUcbDocument);
 
         callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertNotNull(response.getData().getDwpResponseDocument());
-        assertNotNull(response.getData().getDwpAT38Document());
-        assertNotNull(response.getData().getDwpEvidenceBundleDocument());
+        assertEquals("dwpresponse", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentFilename());
+        assertEquals("at38", response.getData().getDwpAT38Document().getDocumentLink().getDocumentFilename());
+        assertEquals("dwpevidence", response.getData().getDwpEvidenceBundleDocument().getDocumentLink().getDocumentFilename());
+        assertEquals("dwpappendix12", response.getData().getAppendix12Doc().getDocumentLink().getDocumentFilename());
+        assertEquals("dwpucb", response.getData().getDwpUcbEvidenceDocument().getDocumentFilename());
     }
 
 
     @Test
     public void givenResponseEventWithDwpDocumentsAndEditedInCollection_thenPopulateLegacyFields() {
         DwpDocument dwpResponseDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
-                .documentLink(DocumentLink.builder().documentFilename("response").documentBinaryUrl("/responsebinaryurl").documentUrl("/responseurl").build())
+                .documentLink(DocumentLink.builder().documentFilename("dwpresponse").documentBinaryUrl("/responsebinaryurl").documentUrl("/responseurl").build())
                 .dwpEditedEvidenceReason("phme")
                 .editedDocumentLink(DocumentLink.builder().documentFilename("editedresponse").documentBinaryUrl("/responseeditedbinaryurl").documentUrl("/responseeditedurl").build()).documentType(DwpDocumentType.DWP_RESPONSE.getValue()).build()).build();
         DwpDocument dwpAt38Document = DwpDocument.builder().value(DwpDocumentDetails.builder()
                 .documentLink(DocumentLink.builder().documentFilename("at38").documentBinaryUrl("/binaryurl").documentUrl("/url").build()).documentType(DwpDocumentType.AT_38.getValue()).build()).build();
         DwpDocument dwpEvidenceDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
-                .documentLink(DocumentLink.builder().documentFilename("evidence").documentBinaryUrl("/evidencebinaryurl").documentUrl("/evidenceurl").build())
+                .documentLink(DocumentLink.builder().documentFilename("dwpevidence").documentBinaryUrl("/evidencebinaryurl").documentUrl("/evidenceurl").build())
                 .dwpEditedEvidenceReason("phme")
                 .editedDocumentLink(DocumentLink.builder().documentFilename("editedevidence").documentBinaryUrl("/evidenceeditedbinaryurl").documentUrl("/evidenceeditedurl").build()).documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue()).build()).build();
+        DwpDocument dwpAppendix12 = DwpDocument.builder().value(DwpDocumentDetails.builder().documentLink(DocumentLink.builder().documentFilename("dwpappendix12").build()).documentType(DwpDocumentType.APPENDIX_12.getValue()).build()).build();
+        DwpDocument dwpUcbDocument = DwpDocument.builder().value(DwpDocumentDetails.builder().documentLink(DocumentLink.builder().documentFilename("dwpucb").build()).documentType(DwpDocumentType.UCB.getValue()).build()).build();
 
         List<DwpDocument> dwpDocuments = new ArrayList<>();
         dwpDocuments.add(dwpResponseDocument);
         dwpDocuments.add(dwpAt38Document);
         dwpDocuments.add(dwpEvidenceDocument);
+        dwpDocuments.add(dwpAppendix12);
+        dwpDocuments.add(dwpUcbDocument);
 
         callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertNotNull(response.getData().getDwpResponseDocument());
-        assertNotNull(response.getData().getDwpAT38Document());
-        assertNotNull(response.getData().getDwpEvidenceBundleDocument());
-        assertNotNull(response.getData().getDwpEditedResponseDocument());
-        assertNotNull(response.getData().getDwpEditedEvidenceBundleDocument());
+        assertEquals("dwpresponse", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentFilename());
+        assertEquals("at38", response.getData().getDwpAT38Document().getDocumentLink().getDocumentFilename());
+        assertEquals("dwpevidence", response.getData().getDwpEvidenceBundleDocument().getDocumentLink().getDocumentFilename());
+        assertEquals("editedresponse", response.getData().getDwpEditedResponseDocument().getDocumentLink().getDocumentFilename());
+        assertEquals("editedevidence", response.getData().getDwpEditedEvidenceBundleDocument().getDocumentLink().getDocumentFilename());
+        assertEquals("dwpappendix12", response.getData().getAppendix12Doc().getDocumentLink().getDocumentFilename());
+        assertEquals("dwpucb", response.getData().getDwpUcbEvidenceDocument().getDocumentFilename());
+
     }
 
 }
