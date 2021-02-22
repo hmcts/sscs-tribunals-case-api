@@ -227,20 +227,6 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpUcbEvidenceDocument(ucbDocument.getValue().getDocumentLink());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        String todayDate = java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-
-        assertEquals("/url", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals("/binaryurl", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentBinaryUrl());
-        assertEquals("AT38 received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentFilename());
-        assertEquals("AT38 received on " + todayDate, response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
-
-        assertEquals("/responseurl", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals("/responsebinaryurl", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentBinaryUrl());
-        assertEquals("DWP response received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentFilename());
-
-        assertEquals("/evidenceurl", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals("/evidencebinaryurl", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentBinaryUrl());
-        assertEquals("DWP evidence received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentFilename());
 
         assertNull(response.getData().getDwpResponseDocument());
         assertNull(response.getData().getDwpAT38Document());
