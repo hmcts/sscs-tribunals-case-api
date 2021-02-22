@@ -78,7 +78,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private void updateDwpRegionalCentre(SscsCaseData caseData) {
         Appeal appeal = caseData.getAppeal();
 
-        if (appeal != null && appeal.getBenefitType() != null && (appeal.getMrnDetails() == null || appeal.getMrnDetails().getDwpIssuingOffice() == null)) {
+        if (appeal != null && appeal.getBenefitType() != null && (appeal.getMrnDetails() == null || appeal.getMrnDetails().getDwpIssuingOffice() == null || appeal.getMrnDetails().getDwpIssuingOffice().isEmpty())) {
             Optional<OfficeMapping> defaultOfficeMapping = dwpAddressLookupService.getDefaultDwpMappingByOffice(appeal.getBenefitType().getCode());
             if (defaultOfficeMapping.isPresent()) {
                 String defaultDwpIssuingOffice = defaultOfficeMapping.get().getMapping().getCcd();
