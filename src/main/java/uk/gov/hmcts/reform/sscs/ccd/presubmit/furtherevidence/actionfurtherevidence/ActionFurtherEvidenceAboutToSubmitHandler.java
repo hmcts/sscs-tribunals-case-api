@@ -249,7 +249,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
     }
 
-    private void checkWarningsAndErrors(SscsCaseData sscsCaseData, ScannedDocument scannedDocument, String caseId, boolean ignoreWarnings, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+    public static void checkWarningsAndErrors(SscsCaseData sscsCaseData, ScannedDocument scannedDocument, String caseId, boolean ignoreWarnings, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
 
         if (scannedDocument.getValue().getUrl() == null) {
             preSubmitCallbackResponse.addError("No document URL so could not process");
