@@ -6,9 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.callback.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
@@ -45,12 +43,37 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
 
         setOfficeDropdowns(sscsCaseData);
         setDefaultFieldValues(sscsCaseData);
+        setDwpDocuments(sscsCaseData);
 
         if (sscsCaseData.getCreatedInGapsFrom() == null || !sscsCaseData.getCreatedInGapsFrom().equals("readyToList")) {
             preSubmitCallbackResponse.addError("This event cannot be run for cases created in GAPS at valid appeal");
         }
 
         return preSubmitCallbackResponse;
+    }
+
+    protected void setDwpDocuments(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getDwpDocuments() != null && !sscsCaseData.getDwpDocuments().isEmpty()) {
+            for (DwpDocument dwpDocument: sscsCaseData.getDwpDocuments()) {
+                if (dwpDocument.getValue().getDocumentType().equals(DwpDocumentType.DWP_RESPONSE.getValue())) {
+                    sscsCaseData.setDwpResponseDocument(new DwpResponseDocument(dwpDocument.getValue().getDocumentLink(), dwpDocument.getValue().getDocumentFileName()));
+                    if (dwpDocument.getValue().getEditedDocumentLink() != null) {
+                        sscsCaseData.setDwpEditedResponseDocument(new DwpResponseDocument(dwpDocument.getValue().getEditedDocumentLink(), dwpDocument.getValue().getDocumentFileName()));
+                    }
+                } else if (dwpDocument.getValue().getDocumentType().equals(DwpDocumentType.AT_38.getValue())) {
+                    sscsCaseData.setDwpAT38Document(new DwpResponseDocument(dwpDocument.getValue().getDocumentLink(), dwpDocument.getValue().getDocumentFileName()));
+                } else if (dwpDocument.getValue().getDocumentType().equals(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue())) {
+                    sscsCaseData.setDwpEvidenceBundleDocument(new DwpResponseDocument(dwpDocument.getValue().getDocumentLink(), dwpDocument.getValue().getDocumentFileName()));
+                    if (dwpDocument.getValue().getEditedDocumentLink() != null) {
+                        sscsCaseData.setDwpEditedEvidenceBundleDocument(new DwpResponseDocument(dwpDocument.getValue().getEditedDocumentLink(), dwpDocument.getValue().getDocumentFileName()));
+                    }
+                } else if (dwpDocument.getValue().getDocumentType().equals(DwpDocumentType.APPENDIX_12.getValue())) {
+                    sscsCaseData.setAppendix12Doc(new DwpResponseDocument(dwpDocument.getValue().getDocumentLink(), dwpDocument.getValue().getDocumentFileName()));
+                } else if (dwpDocument.getValue().getDocumentType().equals(DwpDocumentType.UCB.getValue())) {
+                    sscsCaseData.setDwpUcbEvidenceDocument(dwpDocument.getValue().getDocumentLink());
+                }
+            }
+        }
     }
 
     public void setOfficeDropdowns(SscsCaseData sscsCaseData) {

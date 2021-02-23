@@ -280,16 +280,15 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
         appeal.setBenefitType(BenefitType.builder().code("PIP").build());
         appeal.setMrnDetails(MrnDetails.builder().build());
-        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()));
-        when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
-        when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
+        assertDefaultRegionalCentre();
+    }
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
-        assertNotNull(response.getData().getDateSentToDwp());
-        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
-        assertEquals(DUMMY_REGIONAL_CENTER, response.getData().getDwpRegionalCentre());
+    @Test
+    public void givenDirectionTypeOfAppealToProceedWhenDwpIssuingOfficeIsEmpty_shouldSetDefaultDwpRegionalCentre() {
+        Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
+        appeal.setBenefitType(BenefitType.builder().code("PIP").build());
+        appeal.setMrnDetails(MrnDetails.builder().dwpIssuingOffice("").build());
+        assertDefaultRegionalCentre();
     }
 
     @Test
@@ -297,6 +296,10 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
         appeal.setBenefitType(BenefitType.builder().code("PIP").build());
         appeal.setMrnDetails(null);
+        assertDefaultRegionalCentre();
+    }
+
+    private void assertDefaultRegionalCentre() {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()));
         when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
         when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
@@ -307,7 +310,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertNotNull(response.getData().getDateSentToDwp());
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
         assertEquals(DUMMY_REGIONAL_CENTER, response.getData().getDwpRegionalCentre());
-
     }
 
     @Test
@@ -401,6 +403,52 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertTrue(response.getData().getReinstatementOutcome().equals(RequestOutcome.REFUSED));
         assertNull(response.getData().getInterlocReviewState());
         assertEquals(DwpState.REINSTATEMENT_REFUSED.getId(), response.getData().getDwpState());
+    }
+
+    @Test
+    public void givenDirectionTypeOfGrantReinstatementForWelshCaseDont_setStates() {
+
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService);
+
+        callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
+        callback.getCaseDetails().getCaseData().setPreviousState(State.APPEAL_CREATED);
+        callback.getCaseDetails().getCaseData().setInterlocReviewState(null);
+        callback.getCaseDetails().getCaseData().setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
+        callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("yes");
+
+
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionTypeItemList.GRANT_REINSTATEMENT.getCode()));
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getData().getState().equals(State.DORMANT_APPEAL_STATE));
+        assertTrue(response.getData().getReinstatementOutcome().equals(RequestOutcome.IN_PROGRESS));
+        assertEquals(DwpState.LAPSED.getId(), response.getData().getDwpState());
+        assertEquals(InterlocReviewState.WELSH_TRANSLATION.getId(), response.getData().getInterlocReviewState());
+        assertEquals("Yes", response.getData().getTranslationWorkOutstanding());
+    }
+
+    @Test
+    public void givenDirectionTypeOfRefuseReinstatementForWelshCaseDont_setStates() {
+
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService);
+
+        callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
+        callback.getCaseDetails().getCaseData().setPreviousState(State.APPEAL_CREATED);
+        callback.getCaseDetails().getCaseData().setInterlocReviewState(null);
+        callback.getCaseDetails().getCaseData().setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
+        callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("yes");
+
+
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionTypeItemList.REFUSE_REINSTATEMENT.getCode()));
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getData().getState().equals(State.DORMANT_APPEAL_STATE));
+        assertTrue(response.getData().getReinstatementOutcome().equals(RequestOutcome.IN_PROGRESS));
+        assertEquals(DwpState.LAPSED.getId(), response.getData().getDwpState());
+        assertEquals(InterlocReviewState.WELSH_TRANSLATION.getId(), response.getData().getInterlocReviewState());
+        assertEquals("Yes", response.getData().getTranslationWorkOutstanding());
     }
 
     @Test

@@ -78,7 +78,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private void updateDwpRegionalCentre(SscsCaseData caseData) {
         Appeal appeal = caseData.getAppeal();
 
-        if (appeal != null && appeal.getBenefitType() != null && (appeal.getMrnDetails() == null || appeal.getMrnDetails().getDwpIssuingOffice() == null)) {
+        if (appeal != null && appeal.getBenefitType() != null && (appeal.getMrnDetails() == null || appeal.getMrnDetails().getDwpIssuingOffice() == null || appeal.getMrnDetails().getDwpIssuingOffice().isEmpty())) {
             Optional<OfficeMapping> defaultOfficeMapping = dwpAddressLookupService.getDefaultDwpMappingByOffice(appeal.getBenefitType().getCode());
             if (defaultOfficeMapping.isPresent()) {
                 String defaultDwpIssuingOffice = defaultOfficeMapping.get().getMapping().getCcd();
@@ -98,7 +98,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         }
     }
-    
+
     private Optional<PreSubmitCallbackResponse<SscsCaseData>> validateDirectionType(SscsCaseData caseData) {
         if (caseData.getDirectionTypeDl() == null || caseData.getDirectionTypeDl().getValue() == null) {
             PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
@@ -149,10 +149,10 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             caseData = updateCaseAfterExtensionRefused(caseData, null, State.WITH_DWP);
 
         } else if (DirectionTypeItemList.GRANT_REINSTATEMENT.getCode().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
-            caseData = updateCaseAfterReinstatementGranted(caseData);
+            caseData = updateCaseAfterReinstatementGranted(caseData, documentTranslationStatus);
 
         } else if (DirectionTypeItemList.REFUSE_REINSTATEMENT.getCode().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
-            caseData = updateCaseAfterReinstatementRefused(caseData);
+            caseData = updateCaseAfterReinstatementRefused(caseData, documentTranslationStatus);
 
         } else if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)
             && DirectionTypeItemList.GRANT_URGENT_HEARING.getCode().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
@@ -168,25 +168,33 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         return caseData;
     }
 
-    private SscsCaseData updateCaseAfterReinstatementGranted(SscsCaseData caseData) {
+    private SscsCaseData updateCaseAfterReinstatementGranted(SscsCaseData caseData, SscsDocumentTranslationStatus documentTranslationStatus) {
 
-        caseData.setReinstatementOutcome(RequestOutcome.GRANTED);
-        caseData.setDwpState(DwpState.REINSTATEMENT_GRANTED.getId());
+        if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
+            caseData.setReinstatementOutcome(RequestOutcome.GRANTED);
+            caseData.setDwpState(DwpState.REINSTATEMENT_GRANTED.getId());
 
-        updateStateIfInterLockReviewState(caseData);
+            updateStateIfInterLockReviewState(caseData);
 
-        log.info("Case ID {} reinstatement granted on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
+            log.info("Case ID {} reinstatement granted on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
 
+        } else {
+            log.info("Case ID {} reinstatement granted held pending Direction Translation {}", caseData.getCcdCaseId(), LocalDate.now().toString());
+        }
         return caseData;
     }
 
 
 
-    private SscsCaseData updateCaseAfterReinstatementRefused(SscsCaseData caseData) {
+    private SscsCaseData updateCaseAfterReinstatementRefused(SscsCaseData caseData, SscsDocumentTranslationStatus documentTranslationStatus) {
 
-        caseData.setReinstatementOutcome(RequestOutcome.REFUSED);
-        caseData.setDwpState(DwpState.REINSTATEMENT_REFUSED.getId());
-        log.info("Case ID {} reinstatement refused on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
+        if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
+            caseData.setReinstatementOutcome(RequestOutcome.REFUSED);
+            caseData.setDwpState(DwpState.REINSTATEMENT_REFUSED.getId());
+            log.info("Case ID {} reinstatement refused on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
+        } else {
+            log.info("Case ID {} reinstatement refused held pending Direction Translation {}", caseData.getCcdCaseId(), LocalDate.now().toString());
+        }
         return caseData;
     }
 
@@ -246,20 +254,26 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         }
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
+
             if (DirectionType.PROVIDE_INFORMATION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
                 caseData.setInterlocReviewState(AWAITING_INFORMATION.getId());
+
             } else if (getPreValidStates().contains(caseDetails.getState()) && DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
                 caseData.setDateSentToDwp(LocalDate.now().toString());
                 caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
+
             } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
                     && ExtensionNextEvent.SEND_TO_LISTING.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
                 updateCaseAfterExtensionRefused(caseData, AWAITING_ADMIN_ACTION.getId(), State.RESPONSE_RECEIVED);
+
             } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
                     && ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
                 updateCaseAfterExtensionRefused(caseData, null, State.WITH_DWP);
+
             } else {
                 caseData.setInterlocReviewState(null);
             }
+
         }
         return buildResponse(callback, caseDetails, caseData, sscsCaseDataPreSubmitCallbackResponse, url, documentTranslationStatus);
     }
