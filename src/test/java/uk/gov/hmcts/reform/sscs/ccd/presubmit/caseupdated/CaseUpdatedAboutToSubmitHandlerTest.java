@@ -299,8 +299,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"  ,   ,   ,   ",
-             "St. Vincent's CSL, St. Vincent's CSL, St. Vincent's CSL, St. Vincent's CSL"})
-    public void givenACaseUpdateEventWithBlankWithSpaceAddressDetails_thenShoudNotReturnError(String line1, String line2, String town, String county) {
+             "Ts. Test's Ltd, Ts. Test's Ltd, Ts. Test's Ltd, Ts. Test's Ltd"})
+    public void givenACaseUpdateEventWithAddressDetails_thenShouldNotReturnError(String line1, String line2, String town, String county) {
         Address address = buildAddress(line1, line2, county, town);
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAddress(address);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
