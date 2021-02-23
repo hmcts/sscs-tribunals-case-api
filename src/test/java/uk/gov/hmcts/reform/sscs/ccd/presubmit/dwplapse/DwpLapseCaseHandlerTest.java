@@ -80,10 +80,10 @@ public class DwpLapseCaseHandlerTest {
 
         assertNull(response.getData().getDwpLT203());
         assertNull(response.getData().getDwpLapseLetter());
-        assertEquals("lt203Link", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals(DwpDocumentType.DWP_LT_203.getValue(), response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
-        assertEquals("lapseLink", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals(DwpDocumentType.DWP_LAPSE_LETTER.getValue(), response.getData().getDwpDocuments().get(1).getValue().getDocumentType());
+        assertEquals("lapseLink", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals(DwpDocumentType.DWP_LAPSE_LETTER.getValue(), response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
+        assertEquals("lt203Link", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals(DwpDocumentType.DWP_LT_203.getValue(), response.getData().getDwpDocuments().get(1).getValue().getDocumentType());
         assertEquals("awaitingAdminAction", response.getData().getInterlocReviewState());
         assertEquals("lapsed", response.getData().getDwpState());
     }
@@ -104,10 +104,10 @@ public class DwpLapseCaseHandlerTest {
         assertNull(response.getData().getDwpLT203());
         assertNull(response.getData().getDwpLapseLetter());
         assertEquals(3, response.getData().getDwpDocuments().size());
-        assertEquals("lt203Link", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals(DwpDocumentType.DWP_LT_203.getValue(), response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
-        assertEquals("lapseLink", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals(DwpDocumentType.DWP_LAPSE_LETTER.getValue(), response.getData().getDwpDocuments().get(1).getValue().getDocumentType());
+        assertEquals("lapseLink", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals(DwpDocumentType.DWP_LAPSE_LETTER.getValue(), response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
+        assertEquals("lt203Link", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals(DwpDocumentType.DWP_LT_203.getValue(), response.getData().getDwpDocuments().get(1).getValue().getDocumentType());
         assertEquals("existing.com", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentUrl());
         assertEquals("awaitingAdminAction", response.getData().getInterlocReviewState());
         assertEquals("lapsed", response.getData().getDwpState());
