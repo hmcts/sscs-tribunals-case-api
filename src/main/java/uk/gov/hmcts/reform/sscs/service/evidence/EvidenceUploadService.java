@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -124,7 +125,19 @@ public class EvidenceUploadService {
                     documentExtract.setDocuments().accept(caseDetails.getData(), newDocuments);
 
                     ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), eventType.getCcdType(), summary, UPDATED_SSCS, idamService.getIdamTokens());
+                    String md5Checksum = "";
+                    String filename = "";
 
+                    try {
+                        md5Checksum = DigestUtils.md5DigestAsHex(file.getBytes()).toUpperCase();
+                        filename = file.getOriginalFilename();
+                        log.info("uploadEvidence: for case ID Case({}): User has uploaded the file ({}) with a checksum of ({})", caseDetails.getId(), filename, md5Checksum);
+                    } catch (IOException ioException) {
+                        log.error(ioException.getMessage()
+                                + ". Something has gone wrong for caseId: ", caseDetails.getId()
+                                + " when logging uploadEvidence for file (" + filename
+                                + ") with a checksum of (" + md5Checksum + ")");
+                    }
                     return new Evidence(document.links.self.href, document.originalDocumentName, getCreatedDate(document));
                 });
     }
