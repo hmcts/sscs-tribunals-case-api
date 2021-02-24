@@ -127,6 +127,7 @@ public class EvidenceUploadService {
                     ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), eventType.getCcdType(), summary, UPDATED_SSCS, idamService.getIdamTokens());
                     String md5Checksum = "";
                     String filename = "";
+
                     try {
                         md5Checksum = DigestUtils.md5DigestAsHex(file.getBytes()).toUpperCase();
                         filename = file.getOriginalFilename();

@@ -162,6 +162,28 @@ public class EvidenceUploadServiceTest {
     }
 
     @Test
+    public void handlesBadFileRead() throws IOException {
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+
+        when(file.getOriginalFilename()).thenReturn(fileName);
+        when(file.getBytes()).thenThrow(new IOException());
+        Optional<Evidence> evidenceOptional = evidenceUploadService.uploadDraftHearingEvidence(someOnlineHearingId, file);
+
+        assertThat(evidenceOptional.isPresent(), is(true));
+        Evidence evidence = evidenceOptional.get();
+        assertThat(evidence, is(new Evidence(documentUrl, fileName, convertCreatedOnDate(evidenceCreatedOn))));
+        verify(ccdService).updateCase(
+                hasDraftSscsDocument(0, documentUrl, fileName),
+                eq(someCcdCaseId),
+                eq("uploadDraftDocument"),
+                eq("SSCS - upload document from MYA"),
+                eq("Updated SSCS"),
+                eq(idamTokens)
+        );
+    }
+
+    @Test
     public void uploadEvidenceForAHearingThatDoesNotExist() {
         String nonExistentHearingId = "nonExistentHearingId";
         when(onlineHearingService.getCcdCase(nonExistentHearingId)).thenReturn(Optional.empty());
