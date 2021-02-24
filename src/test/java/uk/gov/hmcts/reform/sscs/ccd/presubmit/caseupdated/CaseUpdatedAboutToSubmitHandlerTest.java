@@ -299,7 +299,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"  ,   ,   ,   ",
-             "Ts. Test's Ltd, Ts. Test's Ltd, Ts. Test's Ltd, Ts. Test's Ltd"})
+             "Ts. Test's Ltd, Ts. Test's Ltd, Ts. Test's Ltd, Ts. Test's Ltd",
+            "A“”\\\"’'\\\\?\\\\!\\\\[\\\\]\\\\(\\\\)/£:\\\\\\\\_+\\\\-%&, A“”\\\"’'\\\\?\\\\!\\\\[\\\\]\\\\(\\\\)/£:\\\\\\\\_+\\\\-%&, A“”\\\"’'\\\\?\\\\!\\\\[\\\\]\\\\(\\\\)/£:\\\\\\\\_+\\\\-%&, A“”\\\"’'\\\\?\\\\!\\\\[\\\\]\\\\(\\\\)/£:\\\\\\\\_+\\\\-%&"})
     public void givenACaseUpdateEventWithAddressDetails_thenShouldNotReturnError(String line1, String line2, String town, String county) {
         Address address = buildAddress(line1, line2, county, town);
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAddress(address);
