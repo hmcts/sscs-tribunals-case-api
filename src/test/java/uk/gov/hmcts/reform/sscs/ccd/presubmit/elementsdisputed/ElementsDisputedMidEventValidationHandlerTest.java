@@ -436,7 +436,20 @@ public class ElementsDisputedMidEventValidationHandlerTest {
         assertEquals("AT38 document is missing", error);
     }
 
-    //FIXME Can be removed when all cases have dwpDocuments
+    @Test
+    public void givenUniversalCreditCaseWithFurtherInfoSetToYesAndNoAT38DocumentWithCollectionFieldSet_thenShowError() {
+        sscsCaseData.getAppeal().getBenefitType().setCode("UC");
+        sscsCaseData.setDwpFurtherInfo("Yes");
+        sscsCaseData.setDwpDocuments(Collections.singletonList(DwpDocument.builder().value(
+                DwpDocumentDetails.builder().documentType(DocumentType.DWP_RESPONSE.getValue()).build()
+        ).build()));
+        sscsCaseData.setDwpAT38Document(DwpResponseDocument.builder().build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().isEmpty());
+    }
+
     @Test
     public void givenUniversalCreditCaseWithFurtherInfoSetToYesAndNoAT38DocumentOld_thenShowError() {
         sscsCaseData.getAppeal().getBenefitType().setCode("UC");
@@ -496,6 +509,8 @@ public class ElementsDisputedMidEventValidationHandlerTest {
 
     @Test
     public void givenNonUniversalCreditCaseWithAT38Document_thenDoNotShowError() {
+        when(callback.getEvent()).thenReturn(EventType.AMEND_ELEMENTS_ISSUES);
+
         sscsCaseData.getAppeal().getBenefitType().setCode("PIP");
         sscsCaseData.setDwpDocuments(Collections.singletonList(DwpDocument.builder().value(
                 DwpDocumentDetails.builder().documentType(DocumentType.AT38.getValue()).build()
@@ -506,13 +521,10 @@ public class ElementsDisputedMidEventValidationHandlerTest {
         assertTrue(response.getErrors().isEmpty());
     }
 
-    //FIXME Can be removed when all cases have dwpDocuments
     @Test
     public void givenNonUniversalCreditCaseWithAT38DocumentOld_thenDoNotShowError() {
         sscsCaseData.getAppeal().getBenefitType().setCode("PIP");
-        sscsCaseData.setDwpDocuments(Collections.singletonList(DwpDocument.builder().value(
-                DwpDocumentDetails.builder().documentType(DocumentType.AT38.getValue()).build()
-        ).build()));
+        sscsCaseData.setDwpAT38Document(DwpResponseDocument.builder().build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
