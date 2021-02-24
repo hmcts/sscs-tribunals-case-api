@@ -5,6 +5,8 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -178,7 +180,58 @@ public class HmctsResponseReviewedAboutToStartTest {
         assertEquals("editedevidence", response.getData().getDwpEditedEvidenceBundleDocument().getDocumentLink().getDocumentFilename());
         assertEquals("dwpappendix12", response.getData().getAppendix12Doc().getDocumentLink().getDocumentFilename());
         assertEquals("dwpucb", response.getData().getDwpUcbEvidenceDocument().getDocumentFilename());
+    }
 
+    private DwpDocument buildDocument(DwpDocumentType documentType, String filename, LocalDate dateAdded) {
+        return DwpDocument.builder().value(DwpDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename(filename).documentBinaryUrl("/binaryurl")
+                        .documentFilename(filename).documentUrl("/url").build()).documentType(documentType.getValue())
+                .documentDateAdded(dateAdded.toString()).build()).build();
+    }
+
+    private DwpDocument buildDocument(DwpDocumentType documentType, String filename, LocalDateTime dateTimeAdded) {
+        return DwpDocument.builder().value(DwpDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename(filename).documentBinaryUrl("/binaryurl")
+                        .documentFilename(filename).documentUrl("/url").build()).documentType(documentType.getValue())
+                .documentDateTimeAdded(dateTimeAdded).build()).build();
+    }
+
+    @Test
+    @Parameters({"AT_38", "APPENDIX_12", "DWP_EVIDENCE_BUNDLE", "DWP_RESPONSE", "UCB"})
+    public void givenResponseEventWithDwpDocumentsWithMultipleDates_thenPopulateLegacyFields(DwpDocumentType documentType) {
+
+        DwpDocument docAtStartOfToday = buildDocument(documentType, "file-startOfToday", LocalDate.now());
+        DwpDocument latestAtDoc = buildDocument(documentType, "file-latest", LocalDateTime.now());
+        DwpDocument doc10MinutesAgo = buildDocument(documentType, "file-latest", LocalDateTime.now().minusMinutes(10));
+        DwpDocument doc2DaysAgo = buildDocument(documentType, "file-2DaysAgo", LocalDate.now().minusDays(2));
+        DwpDocument docYesterday = buildDocument(documentType, "file-yesterday", LocalDateTime.now().minusDays(1));
+
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(docAtStartOfToday);
+        dwpDocuments.add(latestAtDoc);
+        dwpDocuments.add(doc10MinutesAgo);
+        dwpDocuments.add(doc2DaysAgo);
+        dwpDocuments.add(docYesterday);
+
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
+        callback.getCaseDetails().getCaseData().sortCollections();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        DocumentLink documentLink = null;
+        if (documentType == DwpDocumentType.AT_38) {
+            documentLink = response.getData().getDwpAT38Document().getDocumentLink();
+        } else if (documentType == DwpDocumentType.APPENDIX_12) {
+            documentLink = response.getData().getAppendix12Doc().getDocumentLink();
+        } else if (documentType == DwpDocumentType.DWP_RESPONSE) {
+            documentLink = response.getData().getDwpResponseDocument().getDocumentLink();
+        } else if (documentType == DwpDocumentType.DWP_EVIDENCE_BUNDLE) {
+            documentLink = response.getData().getDwpEvidenceBundleDocument().getDocumentLink();
+        } else if (documentType == DwpDocumentType.UCB) {
+            documentLink = response.getData().getDwpUcbEvidenceDocument();
+        }
+        assertNotNull(documentLink);
+        assertEquals("file-latest", documentLink.getDocumentFilename());
     }
 
 }
