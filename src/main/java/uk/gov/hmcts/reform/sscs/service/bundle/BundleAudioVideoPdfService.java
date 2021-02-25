@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.PdfService;
 @Service
 public class BundleAudioVideoPdfService {
     private final PdfService pdfService;
-    private static final String TEMPLATE = "TB-SCS-GNO-ENG-00670-2.docx";
+    private static final String TEMPLATE = "TB-SCS-GNO-ENG-00670.docx";
     private final EvidenceManagementService evidenceManagementService;
     private static final String DM_STORE_USER_ID = "sscs";
     private String dmGatewayUrl;
