@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.service.bundle;
 import static java.util.Collections.singletonList;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,6 +27,7 @@ public class BundleAudioVideoPdfService {
     private static final String DM_STORE_USER_ID = "sscs";
     private String dmGatewayUrl;
     private String documentManagementUrl;
+    protected static DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     public BundleAudioVideoPdfService(
             @Qualifier("docmosisPdfService") PdfService pdfService,
@@ -64,7 +67,7 @@ public class BundleAudioVideoPdfService {
 
     private List<PdfTableDescriptor> buildAudioVideoEvidenceDescriptorsForTable(SscsCaseData caseData) {
         return caseData.getAudioVideoEvidence().stream()
-                .filter(e -> AudioVideoStatus.INCLUDED.equals(e.getValue().getStatus()))
+                //                .filter(e -> AudioVideoStatus.INCLUDED.equals(e.getValue().getStatus()))
                 .map(evidence -> buildDescriptorsFromAudioVideoEvidence(evidence))
                 .collect(Collectors.toList());
     }
@@ -73,14 +76,15 @@ public class BundleAudioVideoPdfService {
     private PdfTableDescriptor buildDescriptorsFromAudioVideoEvidence(AudioVideoEvidence audioVideoEvidence) {
 
         if (audioVideoEvidence != null) {
-            String dateApproved = audioVideoEvidence.getValue().getDateApproved() != null ? audioVideoEvidence.getValue().getDateApproved().toString() : "";
-            String uploadParty = audioVideoEvidence.getValue().getPartyUploaded() != null ? AudioVideoUploadParty.fromValue(audioVideoEvidence.getValue().getPartyUploaded().getValue()).getLabel() : "";
+
+            String dateApproved = audioVideoEvidence.getValue().getDateApproved() != null ? DATEFORMATTER.format(LocalDate.parse(audioVideoEvidence.getValue().getDateApproved().toString())) : "";
+            String uploadParty = audioVideoEvidence.getValue().getPartyUploaded() != null ? audioVideoEvidence.getValue().getPartyUploaded().getLabel() : "";
 
             String docUrl = audioVideoEvidence.getValue().getDocumentLink().getDocumentBinaryUrl().replace(documentManagementUrl, dmGatewayUrl);
 
             return PdfTableDescriptor.builder().documentType(DocumentType.fromValue(audioVideoEvidence.getValue().getDocumentType()).getLabel())
                     .documentUrl(audioVideoEvidence.getValue().getDocumentLink().getDocumentFilename() + "|" + docUrl)
-                    .dateAdded(audioVideoEvidence.getValue().getDateAdded().toString())
+                    .dateAdded(DATEFORMATTER.format(LocalDate.parse(audioVideoEvidence.getValue().getDateAdded().toString())))
                     .dateApproved(dateApproved)
                     .uploadParty(uploadParty)
                     .build();
