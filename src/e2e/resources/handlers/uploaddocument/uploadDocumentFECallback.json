@@ -109,8 +109,8 @@
           "value": {
             "documentType": "appellantEvidence",
             "documentLink": {
-              "document_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655",
-              "document_binary_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655/binary",
+              "document_url": "http://dm-store:5005/documents/86b8a478-e798-462c-a584-a91190ef687f",
+              "document_binary_url": "http://dm-store:5005/documents/86b8a478-e798-462c-a584-a91190ef687f/binary",
               "document_filename": "appellant-some-name.pdf"
             },
             "documentFileName": "appellant-some-name.pdf"
@@ -120,8 +120,8 @@
           "value": {
             "documentType": "representativeEvidence",
             "documentLink": {
-              "document_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655",
-              "document_binary_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655/binary",
+              "document_url": "http://dm-store:5005/documents/86b8a478-e798-462c-a584-a91190ef687f",
+              "document_binary_url": "http://dm-store:5005/documents/86b8a478-e798-462c-a584-a91190ef687f/binary",
               "document_filename": "reps-some-name.pdf"
             },
             "documentFileName": "reps-some-name.pdf"
