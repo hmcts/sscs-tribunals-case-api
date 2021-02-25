@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.FileUploadScenario.*;
@@ -14,20 +16,45 @@ import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.service.exceptions.PdfPasswordException;
 
 @RunWith(JUnitParamsRunner.class)
 public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
+
+    @Mock
+    private FooterService footerService;
+
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String UPLOAD_DOCUMENT_FE_CALLBACK_JSON = "uploaddocument/uploadDocumentFECallback.json";
     private static final String UPLOAD_AUDIO_VIDEO_DOCUMENT_FE_CALLBACK_JSON = "uploaddocument/uploadAudioVideoDocumentFECallback.json";
-    private UploadDocumentFurtherEvidenceHandler handler = new UploadDocumentFurtherEvidenceHandler(true);
+
+    UploadDocumentFurtherEvidenceHandler handler;
+
+    @Before
+    public void setUp() {
+
+        MockitoAnnotations.openMocks(this);
+        handler = new UploadDocumentFurtherEvidenceHandler(true, footerService);
+
+        try {
+            when(footerService.isReadablePdf(any())).thenReturn(true);
+        } catch (Exception e) {
+            // continue
+        }
+
+        super.setUp();
+    }
 
     @Test
     @Parameters({
@@ -150,7 +177,7 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
 
     @Test
     public void handleDocumentUploadWhereUploadedFileIsNotAPdf() throws IOException {
-        UploadDocumentFurtherEvidenceHandler handler = new UploadDocumentFurtherEvidenceHandler(false);
+        UploadDocumentFurtherEvidenceHandler handler = new UploadDocumentFurtherEvidenceHandler(false, footerService);
         Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,
                 "withDwp",
                 "representativeEvidence", "appellantEvidence",
@@ -197,6 +224,71 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
         assertNull(actualResponse.getData().getDraftSscsFurtherEvidenceDocument());
         long numberOfExpectedError = actualResponse.getErrors().stream()
                 .filter(error -> error.equalsIgnoreCase("You need to upload PDF,MP3 or MP4 file only"))
+                .count();
+        assertEquals(1, numberOfExpectedError);
+    }
+
+
+    @Test
+    public void handleDocumentUploadWhereUploadedFileIsNotAReadablePdf() throws Exception {
+        Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,
+                "withDwp",
+                "representativeEvidence", "appellantEvidence",
+                UPLOAD_DOCUMENT_FE_CALLBACK_JSON);
+
+        List<SscsFurtherEvidenceDoc> draftDocuments = Collections.singletonList(SscsFurtherEvidenceDoc.builder()
+                .value(SscsFurtherEvidenceDocDetails.builder()
+                        .documentFileName("badPdf.pdf")
+                        .documentType("representativeEvidence")
+                        .documentLink(DocumentLink.builder()
+                                .documentUrl("http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655")
+                                .documentFilename("bdPdf.pdf").build())
+                        .build())
+                .build());
+
+        when(footerService.isReadablePdf(any())).thenThrow(new Exception());
+
+        callback.getCaseDetails().getCaseData().setDraftSscsFurtherEvidenceDocument(draftDocuments);
+        PreSubmitCallbackResponse<SscsCaseData> actualResponse = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThatJson(actualResponse.getData()).isEqualTo(callback.getCaseDetails().getCaseData());
+        assertNull(actualResponse.getData().getDwpState());
+        assertNull(actualResponse.getData().getDraftSscsFurtherEvidenceDocument());
+
+        long numberOfExpectedError = actualResponse.getErrors().stream()
+                .filter(error -> error.equalsIgnoreCase("Your PDF Document is not readable."))
+                .count();
+        assertEquals(1, numberOfExpectedError);
+    }
+
+    @Test
+    public void handleDocumentUploadWhereUploadedFileIsPasswordProtectedPdf() throws Exception {
+        Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,
+                "withDwp",
+                "representativeEvidence", "appellantEvidence",
+                UPLOAD_DOCUMENT_FE_CALLBACK_JSON);
+
+        List<SscsFurtherEvidenceDoc> draftDocuments = Collections.singletonList(SscsFurtherEvidenceDoc.builder()
+                .value(SscsFurtherEvidenceDocDetails.builder()
+                        .documentFileName("badPdf.pdf")
+                        .documentType("representativeEvidence")
+                        .documentLink(DocumentLink.builder()
+                                .documentUrl("http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655")
+                                .documentFilename("bdPdf.pdf").build())
+                        .build())
+                .build());
+
+        when(footerService.isReadablePdf(any())).thenThrow(new PdfPasswordException("not allowed bro"));
+
+        callback.getCaseDetails().getCaseData().setDraftSscsFurtherEvidenceDocument(draftDocuments);
+        PreSubmitCallbackResponse<SscsCaseData> actualResponse = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThatJson(actualResponse.getData()).isEqualTo(callback.getCaseDetails().getCaseData());
+        assertNull(actualResponse.getData().getDwpState());
+        assertNull(actualResponse.getData().getDraftSscsFurtherEvidenceDocument());
+
+        long numberOfExpectedError = actualResponse.getErrors().stream()
+                .filter(error -> error.equalsIgnoreCase("Your PDF Document cannot be password protected."))
                 .count();
         assertEquals(1, numberOfExpectedError);
     }
