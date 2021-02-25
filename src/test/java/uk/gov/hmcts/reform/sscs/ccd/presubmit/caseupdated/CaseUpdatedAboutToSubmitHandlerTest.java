@@ -298,8 +298,11 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenACaseUpdateEventWithBlankWithSpaceAddressDetails_thenReturnError() {
-        Address address = buildAddress(" ", "  ", "  ", "  ");
+    @Parameters({"  ,   ,   ,   ",
+             "Ts. Test's Ltd, Ts. Test's Ltd, Ts. Test's Ltd, Ts. Test's Ltd",
+            "A“”\\\"’'\\\\?\\\\!\\\\[\\\\]\\\\(\\\\)/£:\\\\\\\\_+\\\\-%&, A“”\\\"’'\\\\?\\\\!\\\\[\\\\]\\\\(\\\\)/£:\\\\\\\\_+\\\\-%&, A“”\\\"’'\\\\?\\\\!\\\\[\\\\]\\\\(\\\\)/£:\\\\\\\\_+\\\\-%&, A“”\\\"’'\\\\?\\\\!\\\\[\\\\]\\\\(\\\\)/£:\\\\\\\\_+\\\\-%&"})
+    public void givenACaseUpdateEventWithAddressDetails_thenShouldNotReturnError(String line1, String line2, String town, String county) {
+        Address address = buildAddress(line1, line2, county, town);
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAddress(address);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         long numberOfExpectedError = getNumberOfExpectedError(response);
@@ -316,7 +319,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         numberOfExpectedError = getNumberOfExpectedError(response);
         assertEquals(0, numberOfExpectedError);
 
-        callback.getCaseDetails().getCaseData().setJointPartyAddress(buildAddress("  ", "  "," ", " "));
+        callback.getCaseDetails().getCaseData().setJointPartyAddress(address);
         response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         numberOfExpectedError = getNumberOfExpectedError(response);
         assertEquals(0, numberOfExpectedError);

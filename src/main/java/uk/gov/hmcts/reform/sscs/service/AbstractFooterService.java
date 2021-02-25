@@ -11,13 +11,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ComparatorUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
+import uk.gov.hmcts.reform.sscs.pdf.PdfACompliance;
 import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
+import uk.gov.hmcts.reform.sscs.service.exceptions.PdfPasswordException;
 
 @Component
 @Slf4j
@@ -118,5 +122,19 @@ public abstract class AbstractFooterService<D extends AbstractDocument> {
                 URI.create(documentUrl),
                 DM_STORE_USER_ID
         );
+    }
+
+    public boolean isReadablePdf(String documentUrl) throws Exception {
+        try (PDDocument document = PDDocument.load(toBytes(documentUrl))) {
+
+            PdfACompliance p1a = new PdfACompliance();
+            p1a.makeCompliant(document);
+            return true;
+
+        } catch (InvalidPasswordException ipe) {
+            throw new PdfPasswordException(ipe.getMessage());
+        } catch (Exception e) {
+            throw e;
+        }
     }
 }
