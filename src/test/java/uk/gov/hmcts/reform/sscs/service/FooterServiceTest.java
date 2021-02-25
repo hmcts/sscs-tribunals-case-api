@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
+import uk.gov.hmcts.reform.sscs.service.exceptions.PdfPasswordException;
 
 @RunWith(JUnitParamsRunner.class)
 public class FooterServiceTest {
@@ -273,5 +274,32 @@ public class FooterServiceTest {
         String result = footerService.buildBundleAdditionFileName("A", "I am the right text");
 
         assertEquals("Addition A - I am the right text.pdf", result);
+    }
+
+    @Test
+    public void isReadablePdfReturnTrueForReadablePdf() throws Exception {
+        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
+        when(evidenceManagementService.download(any(), anyString())).thenReturn(pdfBytes);
+
+        boolean result = footerService.isReadablePdf("url.pdf");
+        assertTrue(result);
+    }
+
+    @Test(expected = IOException.class)
+    public void isReadablePdfReturnFalseForGarbledBytes() throws Exception {
+        byte[] pdfBytes = new byte[0];
+        when(evidenceManagementService.download(any(), anyString())).thenReturn(pdfBytes);
+
+        boolean result = footerService.isReadablePdf("url.pdf");
+        assertFalse(result);
+    }
+
+    @Test(expected = PdfPasswordException.class)
+    public void isReadablePdfReturnFalseForPasswordProtectedPdf() throws Exception {
+        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/test-protected.pdf"));
+        when(evidenceManagementService.download(any(), anyString())).thenReturn(pdfBytes);
+
+        boolean result = footerService.isReadablePdf("url.pdf");
+        assertFalse(result);
     }
 }

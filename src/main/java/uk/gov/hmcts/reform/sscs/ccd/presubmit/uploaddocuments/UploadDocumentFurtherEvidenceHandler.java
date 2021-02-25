@@ -16,16 +16,20 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.service.exceptions.PdfPasswordException;
 import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
 
 @Service
 public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final boolean uploadAudioVideoEvidenceEnabled;
+    private FooterService footerService;
 
     @Autowired
-    public UploadDocumentFurtherEvidenceHandler(@Value("${feature.upload-audio-video-evidence.enabled}") boolean uploadAudioVideoEvidenceEnabled) {
+    public UploadDocumentFurtherEvidenceHandler(@Value("${feature.upload-audio-video-evidence.enabled}") boolean uploadAudioVideoEvidenceEnabled, FooterService footerService) {
         this.uploadAudioVideoEvidenceEnabled = uploadAudioVideoEvidenceEnabled;
+        this.footerService = footerService;
     }
 
     @Override
@@ -55,14 +59,26 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
             response.addError("You need to upload PDF documents only");
         } else if (uploadAudioVideoEvidenceEnabled && !isFileUploadedAValid(caseData.getDraftSscsFurtherEvidenceDocument())) {
             response.addError("You need to upload PDF,MP3 or MP4 file only");
-        } else {
-            moveDraftsToSscsDocs(caseData);
-            moveDraftsToAudioVideoEvidence(caseData);
-            caseData.setEvidenceHandled("No");
+        }
 
-            if (!State.WITH_DWP.equals(callback.getCaseDetails().getState())) {
-                caseData.setDwpState(DwpState.FE_RECEIVED.getId());
-            }
+        try {
+            isPdfReadable(caseData.getDraftSscsFurtherEvidenceDocument());
+        } catch (PdfPasswordException e) {
+            initDraftSscsFurtherEvidenceDocument(caseData);
+            response.addError("Your PDF Document cannot be password protected.");
+            return response;
+        } catch (Exception ioE) {
+            initDraftSscsFurtherEvidenceDocument(caseData);
+            response.addError("Your PDF Document is not readable.");
+            return response;
+        }
+
+        moveDraftsToSscsDocs(caseData);
+        moveDraftsToAudioVideoEvidence(caseData);
+        caseData.setEvidenceHandled("No");
+
+        if (!State.WITH_DWP.equals(callback.getCaseDetails().getState())) {
+            caseData.setDwpState(DwpState.FE_RECEIVED.getId());
         }
 
         initDraftSscsFurtherEvidenceDocument(caseData);
@@ -89,6 +105,18 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
         return draftSscsFurtherEvidenceDocuments.stream().allMatch(doc ->
                 DocumentUtil.isFileAPdf(doc.getValue().getDocumentLink())
                         || DocumentUtil.isFileAMedia(doc.getValue().getDocumentLink()));
+    }
+
+    private boolean isPdfReadable(List<SscsFurtherEvidenceDoc> docs) throws Exception {
+        for (SscsFurtherEvidenceDoc doc : docs) {
+            isPdfReadable(doc);
+        }
+        return true;
+    }
+
+    private boolean isPdfReadable(SscsFurtherEvidenceDoc doc) throws Exception {
+        return doc.getValue().getDocumentLink() != null
+            && footerService.isReadablePdf(doc.getValue().getDocumentLink().getDocumentUrl());
     }
 
     private boolean isFileUploaded(SscsFurtherEvidenceDoc doc) {
