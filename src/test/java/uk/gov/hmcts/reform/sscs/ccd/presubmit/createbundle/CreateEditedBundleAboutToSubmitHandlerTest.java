@@ -138,7 +138,6 @@ public class CreateEditedBundleAboutToSubmitHandlerTest {
 
         List<AudioVideoEvidence> audioVideoEvidences = new ArrayList<>();
         audioVideoEvidences.add(AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
-                .status(AudioVideoStatus.INCLUDED)
                 .documentType("appellantEvidence")
                 .partyUploaded(AudioVideoUploadParty.APPELLANT)
                 .dateApproved(LocalDate.now())

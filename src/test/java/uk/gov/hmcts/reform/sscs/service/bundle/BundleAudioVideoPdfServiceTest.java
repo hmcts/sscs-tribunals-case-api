@@ -72,7 +72,6 @@ public class BundleAudioVideoPdfServiceTest {
     public void givenAudioVideoEvidenceThatIsIncluded_thenCreateAudioVideoPdfAndWriteToCase() {
         List<AudioVideoEvidence> audioVideoEvidences = new ArrayList<>();
         audioVideoEvidences.add(AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
-                .status(AudioVideoStatus.INCLUDED)
                 .documentType("appellantEvidence")
                 .partyUploaded(AudioVideoUploadParty.APPELLANT)
                 .dateApproved(now)
@@ -90,7 +89,7 @@ public class BundleAudioVideoPdfServiceTest {
         assertEquals(nowFormatted, capture.getValue().getContent().get(0).getDateAdded());
         assertEquals("Myfilename.mp3|gateway-link/123/binary", capture.getValue().getContent().get(0).getDocumentUrl());
 
-        assertEquals("Audio-video-bundle-document.pdf", caseDetails.getCaseData().getAudioVideoEvidenceBundleDocument().getDocumentFilename());
+        assertEquals("Audio-video-bundle-document.pdf", caseDetails.getCaseData().getAudioVideoEvidenceBundleDocument().getDocumentLink().getDocumentFilename());
     }
 
     //    @Test
@@ -113,10 +112,9 @@ public class BundleAudioVideoPdfServiceTest {
     //    }
 
     @Test
-    public void givenMultipleAudioVideoEvidence_thenDoNotCreateAudioVideoPdf() {
+    public void givenMultipleAudioVideoEvidence_thenCreateAudioVideoPdf() {
         List<AudioVideoEvidence> audioVideoEvidences = new ArrayList<>();
         audioVideoEvidences.add(AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
-                .status(AudioVideoStatus.INCLUDED)
                 .documentType("appellantEvidence")
                 .partyUploaded(AudioVideoUploadParty.APPELLANT)
                 .dateApproved(now.minusDays(1))
@@ -125,7 +123,6 @@ public class BundleAudioVideoPdfServiceTest {
                 .build());
 
         audioVideoEvidences.add(AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
-                .status(AudioVideoStatus.INCLUDED)
                 .documentType("dwpEvidence")
                 .partyUploaded(AudioVideoUploadParty.DWP)
                 .dateApproved(now)
@@ -134,7 +131,6 @@ public class BundleAudioVideoPdfServiceTest {
                 .build());
 
         audioVideoEvidences.add(AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
-                .status(AudioVideoStatus.INCLUDED)
                 .documentType("appellantEvidence")
                 .partyUploaded(AudioVideoUploadParty.CTSC)
                 .dateApproved(now)
@@ -143,7 +139,6 @@ public class BundleAudioVideoPdfServiceTest {
                 .build());
 
         audioVideoEvidences.add(AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
-                .status(AudioVideoStatus.EXCLUDED)
                 .documentType("representativeEvidence")
                 .partyUploaded(AudioVideoUploadParty.REP)
                 .dateApproved(now)
@@ -174,7 +169,7 @@ public class BundleAudioVideoPdfServiceTest {
         assertEquals(nowFormatted, capture.getValue().getContent().get(2).getDateAdded());
         assertEquals("Myfilename3.mp3|gateway-link/356/binary", capture.getValue().getContent().get(2).getDocumentUrl());
 
-        assertEquals("Audio-video-bundle-document.pdf", caseDetails.getCaseData().getAudioVideoEvidenceBundleDocument().getDocumentFilename());
+        assertEquals("Audio-video-bundle-document.pdf", caseDetails.getCaseData().getAudioVideoEvidenceBundleDocument().getDocumentLink().getDocumentFilename());
 
     }
 

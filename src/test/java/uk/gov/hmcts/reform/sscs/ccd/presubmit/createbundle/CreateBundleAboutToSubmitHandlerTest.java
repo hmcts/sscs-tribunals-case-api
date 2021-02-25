@@ -140,7 +140,7 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verifyNoMoreInteractions(bundleAudioVideoPdfService);
+        verify(bundleAudioVideoPdfService).createAudioVideoPdf(sscsCaseData);
         verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
     }
 
@@ -153,7 +153,6 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
         List<AudioVideoEvidence> audioVideoEvidences = new ArrayList<>();
         audioVideoEvidences.add(AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
-                .status(AudioVideoStatus.INCLUDED)
                 .documentType("appellantEvidence")
                 .partyUploaded(AudioVideoUploadParty.APPELLANT)
                 .dateApproved(LocalDate.now())
