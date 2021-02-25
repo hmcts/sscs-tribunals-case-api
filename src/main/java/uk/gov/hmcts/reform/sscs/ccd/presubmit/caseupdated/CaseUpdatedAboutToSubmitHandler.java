@@ -103,7 +103,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private boolean isInvalidAddress(Address address) {
-        Pattern p = Pattern.compile("^\\.$|^[a-zA-ZÀ-ž0-9]{1}.{0,}$");
+        Pattern p = Pattern.compile("^\\.$|^[a-zA-ZÀ-ž0-9 .,]{1}.{1,}$");
         if (address.getLine1() != null && !StringUtils.isEmpty(StringUtils.trimWhitespace(address.getLine1())) && !p.matcher(address.getLine1()).find()) {
             return true;
         } else if (address.getLine2() != null && !StringUtils.isEmpty(StringUtils.trimWhitespace(address.getLine2())) && !p.matcher(address.getLine2()).find()) {

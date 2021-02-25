@@ -240,8 +240,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({". House, House, House, House",
-            "., ~101 House, House, House",
+    @Parameters({"!. House, House, House, House",
+            "~., 101 House, House, House",
             " Ho.use, ., \"101 House, House",
             " ., ãHouse, âHouse, &101 House"})
     public void givenACaseUpdateEventWithInvalidAppellantAddressDetails_thenReturnError(String line1, String line2, String town, String county) {
@@ -257,8 +257,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({".House, House, House, House",
-            "., ~101 House, House, House",
+    @Parameters({"!. House, House, House, House",
+            "~., 101 House, House, House",
             " Ho.use, ., \"101 House, House",
             " ., ãHouse, âHouse, &101 House"})
     public void givenACaseUpdateEventWithInvalidRepresentativeAddressDetails_thenReturnError(String line1, String line2, String town, String county) {
@@ -271,8 +271,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({".House, House, House, House",
-            "., ~101 House, House, House",
+    @Parameters({"!. House, House, House, House",
+            "~., 101 House, House, House",
             " Ho.use, ., \"101 House, House",
             " ., ãHouse, âHouse, &101 House"})
     public void givenACaseUpdateEventWithInvalidAppointeeAddressDetails_thenReturnError(String line1, String line2, String town, String county) {
@@ -285,8 +285,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({".House, House, House, House",
-            "., ~101 House, House, House",
+    @Parameters({"!. House, House, House, House",
+            "~., 101 House, House, House",
             " Ho.use, ., \"101 House, House",
             " ., ãHouse, âHouse, &101 House"})
     public void givenACaseUpdateEventWithInvalidJointPartyAddressDetails_thenReturnError(String line1, String line2, String town, String county) {
@@ -300,7 +300,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @Test
     @Parameters({"  ,   ,   ,   ",
              "Ts. Test's Ltd, Ts. Test's Ltd, Ts. Test's Ltd, Ts. Test's Ltd",
-            "A“”\\\"’'\\\\?\\\\!\\\\[\\\\]\\\\(\\\\)/£:\\\\\\\\_+\\\\-%&, A“”\\\"’'\\\\?\\\\!\\\\[\\\\]\\\\(\\\\)/£:\\\\\\\\_+\\\\-%&, A“”\\\"’'\\\\?\\\\!\\\\[\\\\]\\\\(\\\\)/£:\\\\\\\\_+\\\\-%&, A“”\\\"’'\\\\?\\\\!\\\\[\\\\]\\\\(\\\\)/£:\\\\\\\\_+\\\\-%&"})
+            "A“”\"’'?![]()/£:_+-%&, A“”\"’'?![]()/£:_+-%&, A“”\"’'?![]()/£:_+-%&, A“”\"’'?![]()/£:_+-%&",
+            "\\,Test Street,\\,Test Street,\\,Test Street,\\,Test Street"})
     public void givenACaseUpdateEventWithAddressDetails_thenShouldNotReturnError(String line1, String line2, String town, String county) {
         Address address = buildAddress(line1, line2, county, town);
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAddress(address);
