@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
 
 @Service
@@ -32,10 +33,13 @@ import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
 public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final boolean uploadAudioVideoEvidenceEnabled;
+    private final IdamService idamService;
 
     @Autowired
-    public UploadFurtherEvidenceAboutToSubmitHandler(@Value("${feature.upload-audio-video-evidence.enabled}") boolean uploadAudioVideoEvidenceEnabled) {
+    public UploadFurtherEvidenceAboutToSubmitHandler(@Value("${feature.upload-audio-video-evidence.enabled}") boolean uploadAudioVideoEvidenceEnabled,
+                                                     IdamService idamService) {
         this.uploadAudioVideoEvidenceEnabled = uploadAudioVideoEvidenceEnabled;
+        this.idamService = idamService;
     }
 
     @Override
@@ -77,7 +81,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             }
             if (isEmpty(preSubmitCallbackResponse.getErrors())) {
                 addToSscsDocuments(sscsCaseData);
-                addToAudioVideoEvidence(sscsCaseData);
+                addToAudioVideoEvidence(sscsCaseData, userAuthorisation);
             }
         }
         if (isEmpty(preSubmitCallbackResponse.getErrors())) {
@@ -104,7 +108,9 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
     }
 
-    private void addToAudioVideoEvidence(SscsCaseData sscsCaseData) {
+    private void addToAudioVideoEvidence(SscsCaseData sscsCaseData, String userAuthorisation) {
+        AudioVideoUploadParty uploader = DocumentUtil.getUploader(idamService.getUserDetails(userAuthorisation));
+
         List<AudioVideoEvidence> newAudioVideoEvidence = sscsCaseData.getDraftFurtherEvidenceDocuments().stream()
                 .filter(doc -> DocumentUtil.isFileAMedia(doc.getValue().getDocumentLink()))
                 .map(doc ->
@@ -113,6 +119,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                                 .fileName(doc.getValue().getDocumentFileName())
                                 .documentType(doc.getValue().getDocumentType())
                                 .dateAdded(LocalDate.now())
+                                .partyUploaded(uploader)
                                 .build()).build()).collect(toList());
         if (!newAudioVideoEvidence.isEmpty()) {
             List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>(ofNullable(sscsCaseData.getAudioVideoEvidence()).orElse(emptyList()));

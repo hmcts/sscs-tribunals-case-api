@@ -28,17 +28,10 @@ import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DraftSscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DraftSscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
 @RunWith(JUnitParamsRunner.class)
 public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
@@ -55,16 +48,20 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private IdamService idamService;
+
     private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        handler = new UploadFurtherEvidenceAboutToSubmitHandler(true);
+        handler = new UploadFurtherEvidenceAboutToSubmitHandler(true, idamService);
         when(callback.getEvent()).thenReturn(EventType.UPLOAD_FURTHER_EVIDENCE);
         sscsCaseData = SscsCaseData.builder().state(State.VALID_APPEAL).interlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId()).appeal(Appeal.builder().build()).build();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().roles(List.of("caseworker-sscs-dwpresponsewriter")).build());
     }
 
     @Test
@@ -151,6 +148,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
         } else {
             assertThat(response.getData().getSscsDocument(), is(nullValue()));
             assertThat(response.getData().getAudioVideoEvidence().size(), is(1));
+            assertThat(response.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded(), is(AudioVideoUploadParty.DWP));
         }
     }
 
@@ -199,7 +197,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
     @Test
     @Parameters({"doc.mp4", "doc.mp3"})
     public void shouldOnlyUploadPdfFilesWhenFeatureFlagIsFalse(String fileName) {
-        handler = new UploadFurtherEvidenceAboutToSubmitHandler(false);
+        handler = new UploadFurtherEvidenceAboutToSubmitHandler(false, idamService);
         final List<DraftSscsDocument> draftDocs = getDraftSscsDocuments("", fileName);
         sscsCaseData.setDraftFurtherEvidenceDocuments(draftDocs);
 

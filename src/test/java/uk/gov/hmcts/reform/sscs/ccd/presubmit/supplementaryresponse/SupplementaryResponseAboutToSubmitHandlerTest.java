@@ -19,6 +19,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
 @RunWith(JUnitParamsRunner.class)
 public class SupplementaryResponseAboutToSubmitHandlerTest {
@@ -33,12 +35,15 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private IdamService idamService;
+
     private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new SupplementaryResponseAboutToSubmitHandler();
+        handler = new SupplementaryResponseAboutToSubmitHandler(idamService);
 
         when(callback.getEvent()).thenReturn(EventType.DWP_SUPPLEMENTARY_RESPONSE);
 
@@ -49,6 +54,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().roles(List.of("caseworker-sscs-dwpresponsewriter")).build());
     }
 
     @Test
@@ -194,6 +200,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         assertEquals("myurl2", response.getData().getAudioVideoEvidence().get(0).getValue().getDocumentLink().getDocumentUrl());
         assertEquals("myurl3", response.getData().getAudioVideoEvidence().get(0).getValue().getRip1Document().getDocumentUrl());
         assertEquals(DocumentType.OTHER_DOCUMENT.getValue(), response.getData().getAudioVideoEvidence().get(0).getValue().getDocumentType());
+        assertEquals(AudioVideoUploadParty.DWP, response.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded());
 
         assertEquals("supplementaryResponse", response.getData().getDwpState());
         assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), response.getData().getInterlocReviewState());

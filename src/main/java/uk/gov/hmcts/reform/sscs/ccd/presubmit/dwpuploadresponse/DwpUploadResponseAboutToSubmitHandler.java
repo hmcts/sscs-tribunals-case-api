@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
@@ -85,7 +84,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             return;
         }
 
-        UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
+        AudioVideoUploadParty uploader = DocumentUtil.getUploader(idamService.getUserDetails(userAuthorisation));
         List<AudioVideoEvidence> audioVideoEvidence = sscsCaseData.getAudioVideoEvidence();
         if (audioVideoEvidence == null) {
             audioVideoEvidence = new ArrayList<>();
@@ -98,7 +97,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             audioVideo.getValue().setDateAdded(LocalDate.now());
             audioVideo.getValue().setFileName(audioVideo.getValue().getDocumentLink().getDocumentFilename());
             audioVideo.getValue().setDocumentType(DocumentType.DWP_EVIDENCE.getValue());
-            audioVideo.getValue().setPartyUploaded(DocumentUtil.getUploader(userDetails.getRoles()));
+            audioVideo.getValue().setPartyUploaded(uploader);
             sscsCaseData.getAudioVideoEvidence().add(audioVideo);
         }
         log.info("DWP audio video documents moved into case audio video {}", sscsCaseData.getCcdCaseId());

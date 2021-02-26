@@ -59,7 +59,14 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
             response.addError("You need to upload PDF documents only");
         } else if (uploadAudioVideoEvidenceEnabled && !isFileUploadedAValid(caseData.getDraftSscsFurtherEvidenceDocument())) {
             response.addError("You need to upload PDF,MP3 or MP4 file only");
+<<<<<<< HEAD
         }
+=======
+        } else {
+            moveDraftsToSscsDocs(caseData);
+            moveDraftsToAudioVideoEvidence(caseData, userAuthorisation);
+            caseData.setEvidenceHandled("No");
+>>>>>>> SSCS-8751: Upload Audio/Video Evidence - Save Uploader
 
         try {
             isPdfReadable(caseData.getDraftSscsFurtherEvidenceDocument());
@@ -172,7 +179,9 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
                     .build();
     }
 
-    private void moveDraftsToAudioVideoEvidence(SscsCaseData sscsCaseData) {
+    private void moveDraftsToAudioVideoEvidence(SscsCaseData sscsCaseData, String userAuthorisation) {
+        AudioVideoUploadParty uploader = DocumentUtil.getUploader(idamService.getUserDetails(userAuthorisation));
+
         List<AudioVideoEvidence> newAudioVideoEvidence = sscsCaseData.getDraftSscsFurtherEvidenceDocument().stream()
                 .filter(doc -> DocumentUtil.isFileAMedia(doc.getValue().getDocumentLink()))
                 .map(doc ->
@@ -181,6 +190,7 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
                                 .fileName(doc.getValue().getDocumentFileName())
                                 .documentType(doc.getValue().getDocumentType())
                                 .dateAdded(LocalDate.now())
+                                .partyUploaded(uploader)
                                 .build()).build()).collect(toList());
 
         if (!newAudioVideoEvidence.isEmpty()) {
