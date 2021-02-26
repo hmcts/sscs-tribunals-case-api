@@ -87,9 +87,7 @@ public class CreateEditedBundleAboutToSubmitHandler implements PreSubmitCallback
                 }
             }
 
-            if (sscsCaseData.getAudioVideoEvidence() != null && sscsCaseData.getAudioVideoEvidence().size() > 0) {
-                bundleAudioVideoPdfService.createAudioVideoPdf(sscsCaseData);
-            }
+            bundleAudioVideoPdfService.createAudioVideoPdf(sscsCaseData);
 
             if (sscsCaseData.isLanguagePreferenceWelsh()) {
                 sscsCaseData.setBundleConfiguration(bundleWelshEditedConfig);

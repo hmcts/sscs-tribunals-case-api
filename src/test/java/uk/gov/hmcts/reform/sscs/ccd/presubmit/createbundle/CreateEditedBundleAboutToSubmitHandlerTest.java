@@ -124,8 +124,6 @@ public class CreateEditedBundleAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verifyNoMoreInteractions(bundleAudioVideoPdfService);
-
         verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
     }
 
