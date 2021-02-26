@@ -158,6 +158,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getSignedRole());
         assertNull(response.getData().getGenerateNotice());
         assertNull(response.getData().getDateAdded());
+        assertNull(response.getData().getReservedToJudge());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(DocumentType.DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         assertNull(response.getData().getInterlocReviewState());
