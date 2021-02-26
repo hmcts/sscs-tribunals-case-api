@@ -66,10 +66,13 @@ public class BundleAudioVideoPdfService {
     }
 
     private List<PdfTableDescriptor> buildAudioVideoEvidenceDescriptorsForTable(SscsCaseData caseData) {
-        return caseData.getAudioVideoEvidence().stream()
-                //                .filter(e -> AudioVideoStatus.INCLUDED.equals(e.getValue().getStatus()))
-                .map(evidence -> buildDescriptorsFromAudioVideoEvidence(evidence))
-                .collect(Collectors.toList());
+        if (caseData.getAudioVideoEvidence() != null) {
+            return caseData.getAudioVideoEvidence().stream()
+                    //                .filter(e -> AudioVideoStatus.INCLUDED.equals(e.getValue().getStatus()))
+                    .map(evidence -> buildDescriptorsFromAudioVideoEvidence(evidence))
+                    .collect(Collectors.toList());
+        }
+        return null;
 
         //        return caseData.getSscsDocument().stream()
         //                .filter(e -> e.getValue().getDocumentLink().getDocumentFilename().endsWith(".mp3") || e.getValue().getDocumentLink().getDocumentFilename().endsWith(".mp4"))
