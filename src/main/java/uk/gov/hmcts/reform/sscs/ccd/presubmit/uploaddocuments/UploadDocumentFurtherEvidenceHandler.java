@@ -59,12 +59,7 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
             response.addError("You need to upload PDF documents only");
         } else if (uploadAudioVideoEvidenceEnabled && !isFileUploadedAValid(caseData.getDraftSscsFurtherEvidenceDocument())) {
             response.addError("You need to upload PDF,MP3 or MP4 file only");
-        } else {
-            moveDraftsToSscsDocs(caseData);
-            moveDraftsToAudioVideoEvidence(caseData);
-            caseData.setEvidenceHandled("No");
         }
-
 
         try {
             isPdfReadable(caseData.getDraftSscsFurtherEvidenceDocument());
