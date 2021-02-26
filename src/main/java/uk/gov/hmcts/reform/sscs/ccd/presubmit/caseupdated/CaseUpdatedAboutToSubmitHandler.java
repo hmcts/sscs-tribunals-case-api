@@ -77,7 +77,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         }
 
-        return checkFirstCharacterForEachAddressField(sscsCaseData, new PreSubmitCallbackResponse<>(sscsCaseData));
+        // FIXME: commented out as case loader is failing on this validation checks, we need to do another data exercise to clean the data
+        //return checkFirstCharacterForEachAddressField(sscsCaseData, new PreSubmitCallbackResponse<>(sscsCaseData));
+        return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
     private PreSubmitCallbackResponse<SscsCaseData> checkFirstCharacterForEachAddressField(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
