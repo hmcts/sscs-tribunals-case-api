@@ -61,7 +61,7 @@ public class ProcessAudioVideoEvidenceAboutToStartHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getEvent()).thenReturn(EventType.PROCESS_AUDIO_VIDEO);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(idamService.getUserDetails(eq(USER_AUTHORISATION))).thenReturn(userDetails);
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
     }
 
     @Test
