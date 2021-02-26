@@ -30,8 +30,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 
@@ -48,16 +46,13 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
-    @Mock
-    private IdamService idamService;
-
     private DwpDocumentService dwpDocumentService;
 
     @Before
     public void setUp() {
         openMocks(this);
         dwpDocumentService = new DwpDocumentService();
-        dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService, idamService);
+        dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService);
 
         when(callback.getEvent()).thenReturn(EventType.DWP_UPLOAD_RESPONSE);
 
@@ -74,7 +69,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getId()).thenReturn(Long.valueOf(sscsCaseData.getCcdCaseId()));
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().roles(List.of("caseworker-sscs-dwpresponsewriter")).build());
     }
 
     @Test
@@ -510,7 +504,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.setDwpUploadAudioVideoEvidence(Collections
                 .singletonList(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build()));
 
-        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData, USER_AUTHORISATION);
+        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
 
         assertNull(callback.getCaseDetails().getCaseData().getDwpUploadAudioVideoEvidence());
         assertEquals(1, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
@@ -532,7 +526,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.setDwpUploadAudioVideoEvidence(Collections
                 .singletonList(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build()));
 
-        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData, USER_AUTHORISATION);
+        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
 
         assertNull(callback.getCaseDetails().getCaseData().getDwpUploadAudioVideoEvidence());
         assertEquals(1, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
@@ -548,14 +542,14 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     public void givenHandleNullAudioVideoDocuments_thenNoAudioVideoList() {
-        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData, USER_AUTHORISATION);
+        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
         assertNull(sscsCaseData.getAudioVideoEvidence());
     }
 
     @Test
     public void givenHandleEmptyAudioVideoDocuments_thenNoAudioVideoList() {
         sscsCaseData.setDwpUploadAudioVideoEvidence(Collections.emptyList());
-        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData, USER_AUTHORISATION);
+        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
         assertNull(sscsCaseData.getAudioVideoEvidence());
     }
 
@@ -575,7 +569,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.setDwpUploadAudioVideoEvidence(new ArrayList<>(
                 Arrays.asList(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build())));
 
-        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData, USER_AUTHORISATION);
+        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
 
         assertNull(callback.getCaseDetails().getCaseData().getDwpUploadAudioVideoEvidence());
         assertEquals(2, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
@@ -594,7 +588,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         sscsCaseData.setDwpEditedEvidenceReason("phme");
 
-        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData, USER_AUTHORISATION);
+        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
 
         assertNull(callback.getCaseDetails().getCaseData().getDwpUploadAudioVideoEvidence());
         assertEquals(1, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());

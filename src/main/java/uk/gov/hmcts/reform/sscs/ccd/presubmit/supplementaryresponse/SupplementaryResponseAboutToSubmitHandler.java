@@ -18,18 +18,11 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
 
 @Service
 @Slf4j
 public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
-    private final IdamService idamService;
-
-    public SupplementaryResponseAboutToSubmitHandler(IdamService idamService) {
-        this.idamService = idamService;
-    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -62,7 +55,7 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
 
         if (sscsCaseData.getDwpOtherDoc() != null && sscsCaseData.getDwpOtherDoc().getDocumentLink() != null) {
             if (DocumentUtil.isFileAMedia(sscsCaseData.getDwpOtherDoc().getDocumentLink())) {
-                addAudioVideoEvidence(sscsCaseData, userAuthorisation);
+                addAudioVideoEvidence(sscsCaseData);
                 sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId());
             } else {
                 responseDocuments.add(sscsCaseData.getDwpOtherDoc());
@@ -82,9 +75,7 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
         return callbackResponse;
     }
 
-    private void addAudioVideoEvidence(SscsCaseData sscsCaseData, String userAuthorisation) {
-        AudioVideoUploadParty uploader = DocumentUtil.getUploader(idamService.getUserDetails(userAuthorisation));
-
+    private void addAudioVideoEvidence(SscsCaseData sscsCaseData) {
         AudioVideoEvidence audioVideoEvidence = AudioVideoEvidence.builder()
                 .value(AudioVideoEvidenceDetails.builder()
                         .documentType(DocumentType.OTHER_DOCUMENT.getValue())
@@ -92,7 +83,7 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
                         .fileName(sscsCaseData.getDwpOtherDoc().getDocumentLink().getDocumentFilename())
                         .rip1Document(sscsCaseData.getRip1Doc())
                         .dateAdded(LocalDate.now())
-                        .partyUploaded(uploader)
+                        .partyUploaded(AudioVideoUploadParty.DWP)
                         .build())
                 .build();
 

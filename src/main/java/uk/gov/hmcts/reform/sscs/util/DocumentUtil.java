@@ -6,9 +6,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.Arrays;
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoUploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
 public class DocumentUtil {
 
@@ -30,12 +28,5 @@ public class DocumentUtil {
 
     public static String userFriendlyName(String documentType) {
         return StringUtils.capitalize(StringUtils.join(Arrays.stream(StringUtils.splitByCharacterTypeCamelCase(documentType)).map(StringUtils::uncapitalize).toArray(String[]::new), " "));
-    }
-
-    public static AudioVideoUploadParty getUploader(UserDetails userDetails) {
-        if (userDetails == null || userDetails.getRoles() == null) {
-            return null;
-        }
-        return Arrays.stream(AudioVideoUploadParty.values()).sequential().filter(i -> userDetails.getRoles().contains(i.getValue())).findFirst().orElse(null);
     }
 }
