@@ -115,6 +115,18 @@
           }
         }
       ],
+      "sscsDocument" : [ {
+        "value" : {
+          "documentType" : "appellantEvidence",
+          "documentFileName" : "11111.pdf",
+          "documentDateAdded" : "2021-02-21",
+          "documentLink" : {
+            "document_binary_url": "http://dm-store:5005/documents/093c9722-403c-42be-9af0-778291cbfb16/binary",
+            "document_filename": "my-file.mp3",
+            "document_url": "http://dm-store:5005/documents/093c9722-403c-42be-9af0-778291cbfb16"
+          }
+        }
+      }],
       "benefitCode": "011",
       "bundleConfiguration": "sscs-bundle-unedited-config.yaml",
       "caseCode": "011CC",
