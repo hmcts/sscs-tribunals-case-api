@@ -96,6 +96,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         caseData.setBodyContent(null);
         caseData.setPreviewDocument(null);
         caseData.setGenerateNotice(null);
+        caseData.setReservedToJudge(null);
         caseData.setGenerateNotice(null);
         caseData.setSignedBy(null);
         caseData.setSignedRole(null);
