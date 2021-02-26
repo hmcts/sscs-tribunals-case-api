@@ -1,10 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.procesaudiovideo;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.EXCLUDE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.ISSUE_DIRECTIONS_NOTICE;
 
+import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
@@ -22,6 +27,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoEvidenceAboutToStartHandler;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
 @RunWith(JUnitParamsRunner.class)
 public class ProcessAudioVideoEvidenceAboutToStartHandlerTest {
@@ -36,18 +43,25 @@ public class ProcessAudioVideoEvidenceAboutToStartHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private IdamService idamService;
+
     private SscsCaseData sscsCaseData;
+
+    private final UserDetails userDetails = UserDetails.builder().roles(new ArrayList<>(asList("caseworker-sscs", "caseworker-sscs-superuser"))).build();
+
 
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new ProcessAudioVideoEvidenceAboutToStartHandler();
+        handler = new ProcessAudioVideoEvidenceAboutToStartHandler(idamService);
 
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getEvent()).thenReturn(EventType.PROCESS_AUDIO_VIDEO);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(idamService.getUserDetails(eq(USER_AUTHORISATION))).thenReturn(userDetails);
     }
 
     @Test
@@ -74,7 +88,18 @@ public class ProcessAudioVideoEvidenceAboutToStartHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         SscsCaseData responseData = response.getData();
         assertEquals(1, responseData.getProcessAudioVideoAction().getListItems().size());
-        assertEquals("issueDirectionsNotice", getItemCodeInList(responseData.getProcessAudioVideoAction(), "issueDirectionsNotice"));
+        assertEquals(ISSUE_DIRECTIONS_NOTICE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), ISSUE_DIRECTIONS_NOTICE.getCode()));
+    }
+
+    @Test
+    public void givenJudgeRole_thenUserCanProcessMoreAudioVideoActions() {
+        userDetails.getRoles().add("caseworker-sscs-judge");
+        sscsCaseData.setAudioVideoEvidence(List.of(AudioVideoEvidence.builder().build()));
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        SscsCaseData responseData = response.getData();
+        assertEquals(2, responseData.getProcessAudioVideoAction().getListItems().size());
+        assertEquals(ISSUE_DIRECTIONS_NOTICE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), ISSUE_DIRECTIONS_NOTICE.getCode()));
+        assertEquals(EXCLUDE_EVIDENCE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), EXCLUDE_EVIDENCE.getCode()));
     }
 
     private String getItemCodeInList(DynamicList dynamicList, String item) {
