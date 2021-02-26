@@ -77,12 +77,12 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         }
 
-        // FIXME: commented out as case loader is failing on this validation checks, we need to do another data exercise to clean the data
-        //return checkFirstCharacterForEachAddressField(sscsCaseData, new PreSubmitCallbackResponse<>(sscsCaseData));
+        /* FIXME: commented out as case loader is failing on this validation checks, we need to do another data exercise to clean the data
+        return checkFirstCharacterForEachAddressField(sscsCaseData, new PreSubmitCallbackResponse<>(sscsCaseData));*/
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    private PreSubmitCallbackResponse<SscsCaseData> checkFirstCharacterForEachAddressField(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+    /*private PreSubmitCallbackResponse<SscsCaseData> checkFirstCharacterForEachAddressField(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
 
         Appeal appeal = sscsCaseData.getAppeal();
         String caseId = sscsCaseData.getCcdCaseId();
@@ -121,7 +121,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         log.error(format("caseUpdated event failed for case id %s: Invalid characters are being used at the beginning of %s address fields", caseId, party));
         response.addError("Invalid characters are being used at the beginning of address fields, please correct");
         return response;
-    }
+    }*/
 
     public void maybeChangeIsScottish(RegionalProcessingCenter oldRpc, RegionalProcessingCenter newRpc, SscsCaseData caseData) {
         if (oldRpc != newRpc) {
