@@ -1,14 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
-import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Optional;
-import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
