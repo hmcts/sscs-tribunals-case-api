@@ -68,7 +68,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
 
         footerService.createFooterAndAddDocToCase(url, caseData, DocumentType.DIRECTION_NOTICE,
                 Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now())
-                        .format(DateTimeFormatter.ofPattern("dd-MM-YYYY")),
+                        .format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
                 caseData.getDateAdded(), null, null);
 
         caseData.setInterlocReviewState(AWAITING_INFORMATION.getId());
