@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAu
 import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoEvidenceAboutToStartHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.idam.UserRole;
 
 @RunWith(JUnitParamsRunner.class)
 public class ProcessAudioVideoEvidenceAboutToStartHandlerTest {
@@ -47,8 +49,7 @@ public class ProcessAudioVideoEvidenceAboutToStartHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    private final UserDetails userDetails = UserDetails.builder().roles(new ArrayList<>(asList("caseworker-sscs", "caseworker-sscs-superuser"))).build();
-
+    private final UserDetails userDetails = UserDetails.builder().roles(new ArrayList<>(asList("caseworker-sscs", UserRole.CTSC_CLERK.getValue()))).build();
 
     @Before
     public void setUp() {
@@ -91,8 +92,9 @@ public class ProcessAudioVideoEvidenceAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenJudgeRole_thenUserCanProcessMoreAudioVideoActions() {
-        userDetails.getRoles().add("caseworker-sscs-judge");
+    @Parameters({"JUDGE", "SUPER_USER"})
+    public void givenJudgeOrSuperUserRole_thenUserCanProcessMoreAudioVideoActions(UserRole userRole) {
+        userDetails.getRoles().add(userRole.getValue());
         sscsCaseData.setAudioVideoEvidence(List.of(AudioVideoEvidence.builder().build()));
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         SscsCaseData responseData = response.getData();

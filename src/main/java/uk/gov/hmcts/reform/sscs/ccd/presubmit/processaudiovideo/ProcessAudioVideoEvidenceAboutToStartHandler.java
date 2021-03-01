@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.*;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.JUDGE;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,18 +55,19 @@ public class ProcessAudioVideoEvidenceAboutToStartHandler implements PreSubmitCa
             return errorResponse;
         }
         final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
-        final boolean hasJudgeRole = userDetails.hasJudgeRole();
-        setProcessAudioVideoActionDropdown(sscsCaseData, hasJudgeRole);
+        final boolean hasJudgeRole = userDetails.hasRole(JUDGE);
+        final boolean hasSuperUserRole = userDetails.hasRole(SUPER_USER);
+        setProcessAudioVideoActionDropdown(sscsCaseData, hasJudgeRole, hasSuperUserRole);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    private void setProcessAudioVideoActionDropdown(SscsCaseData sscsCaseData, boolean hasJudgeRole) {
+    private void setProcessAudioVideoActionDropdown(SscsCaseData sscsCaseData, boolean hasJudgeRole, boolean hasSuperUserRole) {
         List<DynamicListItem> listOptions = new ArrayList<>();
 
         populateListWithItems(listOptions, ISSUE_DIRECTIONS_NOTICE);
 
-        if (hasJudgeRole) {
+        if (hasJudgeRole || hasSuperUserRole) {
             populateListWithItems(listOptions, EXCLUDE_EVIDENCE);
         }
 
