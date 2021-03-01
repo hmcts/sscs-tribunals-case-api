@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -36,7 +36,8 @@ public class ResponseEventsAboutToSubmit {
     private void addToDwpDocuments(SscsCaseData sscsCaseData, DocumentLink dwpUcbEvidenceDocument) {
         DwpDocumentDetails dwpDocumentDetails = new DwpDocumentDetails(DwpDocumentType.UCB.getValue(),
                 "UCB document",
-                LocalDate.now().toString(),
+                null,
+                LocalDateTime.now(),
                 dwpUcbEvidenceDocument, null, null, null, null, null);
         DwpDocument dwpDocument = new DwpDocument(dwpDocumentDetails);
         if (isNull(sscsCaseData.getDwpDocuments())) {
