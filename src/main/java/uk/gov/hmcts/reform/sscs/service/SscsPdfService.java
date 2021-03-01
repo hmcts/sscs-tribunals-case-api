@@ -63,11 +63,12 @@ public class SscsPdfService {
         } catch (IOException e) {
             throw new PdfGenerationException("Error getting template", e);
         }
+
         PdfWrapper pdfWrapper = PdfWrapper.builder().sscsCaseData(sscsCaseData).ccdCaseId(caseDetailsId)
                 .isSignLanguageInterpreterRequired(sscsCaseData.getAppeal().getHearingOptions().wantsSignLanguageInterpreter())
                 .isHearingLoopRequired(sscsCaseData.getAppeal().getHearingOptions().wantsHearingLoop())
                 .isAccessibleHearingRoomRequired(sscsCaseData.getAppeal().getHearingOptions().wantsAccessibleHearingRoom())
-                .currentDate(LocalDate.now())
+                .currentDate(LocalDate.parse(sscsCaseData.getCaseCreated()))
                 .repFullName(getRepFullName(sscsCaseData.getAppeal().getRep())).build();
 
         Map<String, Object> placeholders = new HashMap<>();
