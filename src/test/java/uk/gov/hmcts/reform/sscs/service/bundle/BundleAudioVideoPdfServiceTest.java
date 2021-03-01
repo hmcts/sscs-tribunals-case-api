@@ -91,21 +91,21 @@ public class BundleAudioVideoPdfServiceTest {
         assertEquals("Audio-video-bundle-document.pdf", caseDetails.getCaseData().getAudioVideoEvidenceBundleDocument().getDocumentLink().getDocumentFilename());
     }
 
-        @Test
-        public void givenNoAudioVideoDocuments_thenDoNotCreateAudioVideoPdf() {
-            List<SscsDocument> audioVideoDocuments = new ArrayList<>();
-            audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
-                    .documentType("appellantEvidence")
-                    .documentDateAdded(now.toString())
-                    .documentLink(DocumentLink.builder().documentFilename("Myfilename.pdf").documentUrl("test.com").documentBinaryUrl("test.com/binary").build()).build())
-                    .build());
-            caseDetails.getCaseData().setSscsDocument(audioVideoDocuments);
+    @Test
+    public void givenNoAudioVideoDocuments_thenDoNotCreateAudioVideoPdf() {
+        List<SscsDocument> audioVideoDocuments = new ArrayList<>();
+        audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentType("appellantEvidence")
+                .documentDateAdded(now.toString())
+                .documentLink(DocumentLink.builder().documentFilename("Myfilename.pdf").documentUrl("test.com").documentBinaryUrl("test.com/binary").build()).build())
+                .build());
+        caseDetails.getCaseData().setSscsDocument(audioVideoDocuments);
 
-            service.createAudioVideoPdf(caseDetails.getCaseData());
+        service.createAudioVideoPdf(caseDetails.getCaseData());
 
-            assertNull(caseDetails.getCaseData().getAudioVideoEvidenceBundleDocument());
-            verifyNoInteractions(docmosisPdfService);
-        }
+        assertNull(caseDetails.getCaseData().getAudioVideoEvidenceBundleDocument());
+        verifyNoInteractions(docmosisPdfService);
+    }
 
     @Test
     public void givenMultipleAudioVideoEvidence_thenOnlyCreateAudioVideoPdfFromMp3OrMp4() {
