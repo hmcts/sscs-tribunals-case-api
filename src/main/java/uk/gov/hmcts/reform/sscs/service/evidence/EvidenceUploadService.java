@@ -424,9 +424,12 @@ public class EvidenceUploadService {
         AudioVideoUploadParty uploader = AudioVideoUploadParty.APPELLANT;
         Subscriptions subscriptions = caseData.getSubscriptions();
         if (subscriptions != null) {
+            Subscription appointeeSubs = subscriptions.getAppointeeSubscription();
             Subscription repSubs = subscriptions.getRepresentativeSubscription();
             Subscription jpSubs = subscriptions.getJointPartySubscription();
-            if (repSubs != null && idamEmail.equalsIgnoreCase(repSubs.getEmail())) {
+            if (appointeeSubs != null && idamEmail.equalsIgnoreCase(appointeeSubs.getEmail())) {
+                uploader = AudioVideoUploadParty.APPOINTEE;
+            } else if (repSubs != null && idamEmail.equalsIgnoreCase(repSubs.getEmail())) {
                 uploader = AudioVideoUploadParty.REP;
             } else if (jpSubs != null && idamEmail.equalsIgnoreCase(jpSubs.getEmail())) {
                 uploader = AudioVideoUploadParty.JOINT_PARTY;

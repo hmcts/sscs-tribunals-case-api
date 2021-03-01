@@ -109,7 +109,9 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
 
     private boolean isPdfReadable(List<SscsFurtherEvidenceDoc> docs) throws Exception {
         for (SscsFurtherEvidenceDoc doc : docs) {
-            isPdfReadable(doc);
+            if (DocumentUtil.isFileAPdf(doc.getValue().getDocumentLink())) {
+                isPdfReadable(doc);
+            }
         }
         return true;
     }
