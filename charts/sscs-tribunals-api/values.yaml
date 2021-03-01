@@ -51,3 +51,4 @@ java:
     IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     IDAM_API_JWK_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net/jwks
     BUNDLE_URL: http://em-ccd-orchestrator-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    DM_GATEWAY_URL: https://gateway-ccd.{{ .Values.global.environment }}.platform.hmcts.net/documents

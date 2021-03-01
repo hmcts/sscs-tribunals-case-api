@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
+import uk.gov.hmcts.reform.sscs.service.bundle.BundleAudioVideoPdfService;
 
 
 @Service
@@ -30,13 +31,17 @@ public class CreateEditedBundleAboutToSubmitHandler implements PreSubmitCallback
 
     private static String CREATE_BUNDLE_ENDPOINT = "/api/new-bundle";
 
+    private final BundleAudioVideoPdfService bundleAudioVideoPdfService;
+
     @Autowired
     public CreateEditedBundleAboutToSubmitHandler(ServiceRequestExecutor serviceRequestExecutor,
+                                                  BundleAudioVideoPdfService bundleAudioVideoPdfService,
                                                   @Value("${bundle.url}") String bundleUrl,
                                                   @Value("${bundle.edited.config}") String bundleEditedConfig,
                                                   @Value("${bundle.welsh.edited.config}") String bundleWelshEditedConfig) {
 
         this.serviceRequestExecutor = serviceRequestExecutor;
+        this.bundleAudioVideoPdfService = bundleAudioVideoPdfService;
         this.bundleUrl = bundleUrl;
         this.bundleEditedConfig = bundleEditedConfig;
         this.bundleWelshEditedConfig = bundleWelshEditedConfig;
@@ -81,6 +86,8 @@ public class CreateEditedBundleAboutToSubmitHandler implements PreSubmitCallback
                     }
                 }
             }
+
+            bundleAudioVideoPdfService.createAudioVideoPdf(sscsCaseData);
 
             if (sscsCaseData.isLanguagePreferenceWelsh()) {
                 sscsCaseData.setBundleConfiguration(bundleWelshEditedConfig);
