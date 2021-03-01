@@ -37,8 +37,9 @@ java:
     CREATE_CCD_ENDPOINT: false
     MAX_FILE_SIZE: "10MB"
     MAX_REQUEST_SIZE: "10MB"
-    PDF_SERVICE_CONVERT_URL: https://docmosis-development.platform.hmcts.net/rs/convert
-    PDF_SERVICE_HEALTH_URL: https://docmosis-development.platform.hmcts.net/rs/status
+    PDF_SERVICE_CONVERT_URL: https://docmosis.aat.platform.hmcts.net/rs/convert
+    PDF_SERVICE_HEALTH_URL: https://docmosis.aat.platform.hmcts.net/rs/status
+    DOCMOSIS_SERVICE_BASE_URL: https://docmosis.aat.platform.hmcts.net/rs/render
     PDF_SERVICE_ACCESS_KEY: ${PDF_SERVICE_ACCESS_KEY}
     DOC_ASSEMBLY_URL: "http://dg-docassembly-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     IDAM_OAUTH2_REDIRECT_URL: "https://evidence-sharing-preprod.sscs.reform.hmcts.net"
