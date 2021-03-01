@@ -151,15 +151,13 @@ public class CreateBundleAboutToSubmitHandlerTest {
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
         callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
 
-        List<AudioVideoEvidence> audioVideoEvidences = new ArrayList<>();
-        audioVideoEvidences.add(AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
+        List<SscsDocument> audioVideoEvidences = new ArrayList<>();
+        audioVideoEvidences.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentType("appellantEvidence")
-                .partyUploaded(AudioVideoUploadParty.APPELLANT)
-                .dateApproved(LocalDate.now())
-                .dateAdded(LocalDate.now())
+                .documentDateAdded(LocalDate.now().toString())
                 .documentLink(DocumentLink.builder().documentFilename("Myfilename.mp3").documentUrl("dm-store-url/123").documentBinaryUrl("dm-store-url/123/binary").build()).build())
                 .build());
-        caseDetails.getCaseData().setAudioVideoEvidence(audioVideoEvidences);
+        caseDetails.getCaseData().setSscsDocument(audioVideoEvidences);
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

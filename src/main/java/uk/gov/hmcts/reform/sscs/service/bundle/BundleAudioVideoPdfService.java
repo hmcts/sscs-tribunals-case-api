@@ -66,56 +66,32 @@ public class BundleAudioVideoPdfService {
     }
 
     private List<PdfTableDescriptor> buildAudioVideoEvidenceDescriptorsForTable(SscsCaseData caseData) {
-        if (caseData.getAudioVideoEvidence() != null) {
-            return caseData.getAudioVideoEvidence().stream()
-                    .map(evidence -> buildDescriptorsFromAudioVideoEvidence(evidence))
+
+        if (caseData.getSscsDocument() != null) {
+            return caseData.getSscsDocument().stream()
+                    .filter(e -> e.getValue().getDocumentLink().getDocumentFilename().endsWith(".mp3") || e.getValue().getDocumentLink().getDocumentFilename().endsWith(".mp4"))
+                    .map(audioVideoDocument -> buildDescriptorsFromAudioVideoEvidence(audioVideoDocument))
                     .collect(Collectors.toList());
         }
-
-        //        if (caseData.getSscsDocument() != null) {
-        //            return caseData.getSscsDocument().stream()
-        //                    .filter(e -> e.getValue().getDocumentLink().getDocumentFilename().endsWith(".mp3") || e.getValue().getDocumentLink().getDocumentFilename().endsWith(".mp4"))
-        //                    .map(audioVideoDocument -> buildDescriptorsFromAudioVideoEvidence(audioVideoDocument))
-        //                    .collect(Collectors.toList());
-        //        }
         return null;
     }
 
-    private PdfTableDescriptor buildDescriptorsFromAudioVideoEvidence(AudioVideoEvidence audioVideoEvidence) {
 
-        if (audioVideoEvidence != null) {
+    private PdfTableDescriptor buildDescriptorsFromAudioVideoEvidence(SscsDocument sscsDocument) {
 
-            String dateApproved = audioVideoEvidence.getValue().getDateApproved() != null ? DATEFORMATTER.format(LocalDate.parse(audioVideoEvidence.getValue().getDateApproved().toString())) : "";
-            String uploadParty = audioVideoEvidence.getValue().getPartyUploaded() != null ? audioVideoEvidence.getValue().getPartyUploaded().getLabel() : "";
+        if (sscsDocument != null) {
 
-            String docUrl = audioVideoEvidence.getValue().getDocumentLink().getDocumentBinaryUrl().replace(documentManagementUrl, dmGatewayUrl);
+            //FIXME: replace placeholders for date approved and upload party once implemented
 
-            return PdfTableDescriptor.builder().documentType(DocumentType.fromValue(audioVideoEvidence.getValue().getDocumentType()).getLabel())
-                    .documentUrl(audioVideoEvidence.getValue().getDocumentLink().getDocumentFilename() + "|" + docUrl)
-                    .dateAdded(DATEFORMATTER.format(LocalDate.parse(audioVideoEvidence.getValue().getDateAdded().toString())))
-                    .dateApproved(dateApproved)
-                    .uploadParty(uploadParty)
-                    .build();
+            String docUrl = sscsDocument.getValue().getDocumentLink().getDocumentBinaryUrl().replace(documentManagementUrl, dmGatewayUrl);
+
+            return PdfTableDescriptor.builder().documentType(DocumentType.fromValue(sscsDocument.getValue().getDocumentType()).getLabel())
+                    .documentUrl(sscsDocument.getValue().getDocumentLink().getDocumentFilename() + "|" + docUrl)
+                    .dateAdded(DATEFORMATTER.format(LocalDate.parse(sscsDocument.getValue().getDocumentDateAdded())))
+                    .dateApproved("PLACEHOLDER")
+                    .uploadParty("PLACEHOLDER")
+                    .   build();
         }
         return null;
     }
-
-
-    //        private PdfTableDescriptor buildDescriptorsFromAudioVideoEvidence(SscsDocument sscsDocument) {
-    //
-    //            if (sscsDocument != null) {
-    //
-    //                //FIXME: replace placeholders for date approved and upload party once implemented
-    //
-    //                String docUrl = sscsDocument.getValue().getDocumentLink().getDocumentBinaryUrl().replace(documentManagementUrl, dmGatewayUrl);
-    //
-    //                return PdfTableDescriptor.builder().documentType(DocumentType.fromValue(sscsDocument.getValue().getDocumentType()).getLabel())
-    //                        .documentUrl(sscsDocument.getValue().getDocumentLink().getDocumentFilename() + "|" + docUrl)
-    //                        .dateAdded(DATEFORMATTER.format(LocalDate.parse(sscsDocument.getValue().getDocumentDateAdded())))
-    //                        .dateApproved("PLACEHOLDER")
-    //                        .uploadParty("PLACEHOLDER")
-    //                        .build();
-    //            }
-    //            return null;
-    //        }
 }
