@@ -69,114 +69,114 @@ public class BundleAudioVideoPdfServiceTest {
         yesterdayFormatted = DATEFORMATTER.format(LocalDate.parse(now.minusDays(1).toString()));
     }
 
+    @Test
+    public void givenAudioVideoEvidenceThatIsIncluded_thenCreateAudioVideoPdfAndWriteToCase() {
+        List<SscsDocument> audioVideoDocuments = new ArrayList<>();
+        audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentType("appellantEvidence")
+                .documentDateAdded(now.toString())
+                .documentLink(DocumentLink.builder().documentFilename("Myfilename.mp3").documentUrl("dm-store-url/123").documentBinaryUrl("dm-store-url/123/binary").build()).build())
+                .build());
+        caseDetails.getCaseData().setSscsDocument(audioVideoDocuments);
+
+        service.createAudioVideoPdf(caseDetails.getCaseData());
+
+        assertEquals(1, capture.getValue().getContent().size());
+        assertEquals("Appellant evidence", capture.getValue().getContent().get(0).getDocumentType());
+        assertEquals("PLACEHOLDER", capture.getValue().getContent().get(0).getUploadParty());
+        assertEquals("PLACEHOLDER", capture.getValue().getContent().get(0).getDateApproved());
+        assertEquals(nowFormatted, capture.getValue().getContent().get(0).getDateAdded());
+        assertEquals("Myfilename.mp3|gateway-link/123/binary", capture.getValue().getContent().get(0).getDocumentUrl());
+
+        assertEquals("Audio-video-bundle-document.pdf", caseDetails.getCaseData().getAudioVideoEvidenceBundleDocument().getDocumentLink().getDocumentFilename());
+    }
+
         @Test
-        public void givenAudioVideoEvidenceThatIsIncluded_thenCreateAudioVideoPdfAndWriteToCase() {
+        public void givenNoAudioVideoDocuments_thenDoNotCreateAudioVideoPdf() {
             List<SscsDocument> audioVideoDocuments = new ArrayList<>();
             audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
                     .documentType("appellantEvidence")
                     .documentDateAdded(now.toString())
-                    .documentLink(DocumentLink.builder().documentFilename("Myfilename.mp3").documentUrl("dm-store-url/123").documentBinaryUrl("dm-store-url/123/binary").build()).build())
+                    .documentLink(DocumentLink.builder().documentFilename("Myfilename.pdf").documentUrl("test.com").documentBinaryUrl("test.com/binary").build()).build())
                     .build());
             caseDetails.getCaseData().setSscsDocument(audioVideoDocuments);
 
             service.createAudioVideoPdf(caseDetails.getCaseData());
 
-            assertEquals(1, capture.getValue().getContent().size());
-            assertEquals("Appellant evidence", capture.getValue().getContent().get(0).getDocumentType());
-            assertEquals("PLACEHOLDER", capture.getValue().getContent().get(0).getUploadParty());
-            assertEquals("PLACEHOLDER", capture.getValue().getContent().get(0).getDateApproved());
-            assertEquals(nowFormatted, capture.getValue().getContent().get(0).getDateAdded());
-            assertEquals("Myfilename.mp3|gateway-link/123/binary", capture.getValue().getContent().get(0).getDocumentUrl());
-
-            assertEquals("Audio-video-bundle-document.pdf", caseDetails.getCaseData().getAudioVideoEvidenceBundleDocument().getDocumentLink().getDocumentFilename());
+            assertNull(caseDetails.getCaseData().getAudioVideoEvidenceBundleDocument());
+            verifyNoInteractions(docmosisPdfService);
         }
 
-            @Test
-            public void givenNoAudioVideoDocuments_thenDoNotCreateAudioVideoPdf() {
-                List<SscsDocument> audioVideoDocuments = new ArrayList<>();
-                audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
-                        .documentType("appellantEvidence")
-                        .documentDateAdded(now.toString())
-                        .documentLink(DocumentLink.builder().documentFilename("Myfilename.pdf").documentUrl("test.com").documentBinaryUrl("test.com/binary").build()).build())
-                        .build());
-                caseDetails.getCaseData().setSscsDocument(audioVideoDocuments);
+    @Test
+    public void givenMultipleAudioVideoEvidence_thenOnlyCreateAudioVideoPdfFromMp3OrMp4() {
+        List<SscsDocument> audioVideoDocuments = new ArrayList<>();
+        audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentType("appellantEvidence")
+                .documentDateAdded(now.minusDays(1).toString())
+                .documentLink(DocumentLink.builder().documentFilename("Myfilename1.mp4").documentUrl("dm-store-url/123").documentBinaryUrl("dm-store-url/123/binary").build()).build())
+                .build());
 
-                service.createAudioVideoPdf(caseDetails.getCaseData());
+        audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentType("dwpEvidence")
+                .documentDateAdded(now.toString())
+                .documentLink(DocumentLink.builder().documentFilename("Myfilename2.mp3").documentUrl("dm-store-url/456").documentBinaryUrl("dm-store-url/456/binary").build()).build())
+                .build());
 
-                assertNull(caseDetails.getCaseData().getAudioVideoEvidenceBundleDocument());
-                verifyNoInteractions(docmosisPdfService);
-            }
+        audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentType("appellantEvidence")
+                .documentDateAdded(now.toString())
+                .documentLink(DocumentLink.builder().documentFilename("Myfilename3.pdf").documentUrl("dm-store-url/356").documentBinaryUrl("dm-store-url/356/binary").build()).build())
+                .build());
 
-        @Test
-        public void givenMultipleAudioVideoEvidence_thenOnlyCreateAudioVideoPdfFromMp3OrMp4() {
-            List<SscsDocument> audioVideoDocuments = new ArrayList<>();
-            audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
-                    .documentType("appellantEvidence")
-                    .documentDateAdded(now.minusDays(1).toString())
-                    .documentLink(DocumentLink.builder().documentFilename("Myfilename1.mp4").documentUrl("dm-store-url/123").documentBinaryUrl("dm-store-url/123/binary").build()).build())
-                    .build());
+        audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentType("representativeEvidence")
+                .documentDateAdded(now.toString())
+                .documentLink(DocumentLink.builder().documentFilename("Myfilename4.mp3").documentUrl("dm-store-url/789").documentBinaryUrl("dm-store-url/789/binary").build()).build())
+                .build());
 
-            audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
-                    .documentType("dwpEvidence")
-                    .documentDateAdded(now.toString())
-                    .documentLink(DocumentLink.builder().documentFilename("Myfilename2.mp3").documentUrl("dm-store-url/456").documentBinaryUrl("dm-store-url/456/binary").build()).build())
-                    .build());
+        caseDetails.getCaseData().setSscsDocument(audioVideoDocuments);
 
-            audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
-                    .documentType("appellantEvidence")
-                    .documentDateAdded(now.toString())
-                    .documentLink(DocumentLink.builder().documentFilename("Myfilename3.pdf").documentUrl("dm-store-url/356").documentBinaryUrl("dm-store-url/356/binary").build()).build())
-                    .build());
+        service.createAudioVideoPdf(caseDetails.getCaseData());
 
-            audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
-                    .documentType("representativeEvidence")
-                    .documentDateAdded(now.toString())
-                    .documentLink(DocumentLink.builder().documentFilename("Myfilename4.mp3").documentUrl("dm-store-url/789").documentBinaryUrl("dm-store-url/789/binary").build()).build())
-                    .build());
+        assertEquals(3, capture.getValue().getContent().size());
+        assertEquals("Appellant evidence", capture.getValue().getContent().get(0).getDocumentType());
+        assertEquals("PLACEHOLDER", capture.getValue().getContent().get(0).getUploadParty());
+        assertEquals("PLACEHOLDER", capture.getValue().getContent().get(0).getDateApproved());
+        assertEquals(yesterdayFormatted, capture.getValue().getContent().get(0).getDateAdded());
+        assertEquals("Myfilename1.mp4|gateway-link/123/binary", capture.getValue().getContent().get(0).getDocumentUrl());
 
-            caseDetails.getCaseData().setSscsDocument(audioVideoDocuments);
+        assertEquals("DWP evidence", capture.getValue().getContent().get(1).getDocumentType());
+        assertEquals("PLACEHOLDER", capture.getValue().getContent().get(1).getUploadParty());
+        assertEquals("PLACEHOLDER", capture.getValue().getContent().get(1).getDateApproved());
+        assertEquals(nowFormatted, capture.getValue().getContent().get(1).getDateAdded());
+        assertEquals("Myfilename2.mp3|gateway-link/456/binary", capture.getValue().getContent().get(1).getDocumentUrl());
 
-            service.createAudioVideoPdf(caseDetails.getCaseData());
+        assertEquals("Representative evidence", capture.getValue().getContent().get(2).getDocumentType());
+        assertEquals("PLACEHOLDER", capture.getValue().getContent().get(2).getUploadParty());
+        assertEquals("PLACEHOLDER", capture.getValue().getContent().get(2).getDateApproved());
+        assertEquals(nowFormatted, capture.getValue().getContent().get(2).getDateAdded());
+        assertEquals("Myfilename4.mp3|gateway-link/789/binary", capture.getValue().getContent().get(2).getDocumentUrl());
 
-            assertEquals(3, capture.getValue().getContent().size());
-            assertEquals("Appellant evidence", capture.getValue().getContent().get(0).getDocumentType());
-            assertEquals("PLACEHOLDER", capture.getValue().getContent().get(0).getUploadParty());
-            assertEquals("PLACEHOLDER", capture.getValue().getContent().get(0).getDateApproved());
-            assertEquals(yesterdayFormatted, capture.getValue().getContent().get(0).getDateAdded());
-            assertEquals("Myfilename1.mp4|gateway-link/123/binary", capture.getValue().getContent().get(0).getDocumentUrl());
+        assertEquals("Audio-video-bundle-document.pdf", caseDetails.getCaseData().getAudioVideoEvidenceBundleDocument().getDocumentLink().getDocumentFilename());
 
-            assertEquals("DWP evidence", capture.getValue().getContent().get(1).getDocumentType());
-            assertEquals("PLACEHOLDER", capture.getValue().getContent().get(1).getUploadParty());
-            assertEquals("PLACEHOLDER", capture.getValue().getContent().get(1).getDateApproved());
-            assertEquals(nowFormatted, capture.getValue().getContent().get(1).getDateAdded());
-            assertEquals("Myfilename2.mp3|gateway-link/456/binary", capture.getValue().getContent().get(1).getDocumentUrl());
+    }
 
-            assertEquals("Representative evidence", capture.getValue().getContent().get(2).getDocumentType());
-            assertEquals("PLACEHOLDER", capture.getValue().getContent().get(2).getUploadParty());
-            assertEquals("PLACEHOLDER", capture.getValue().getContent().get(2).getDateApproved());
-            assertEquals(nowFormatted, capture.getValue().getContent().get(2).getDateAdded());
-            assertEquals("Myfilename4.mp3|gateway-link/789/binary", capture.getValue().getContent().get(2).getDocumentUrl());
+    private UploadResponse createUploadResponse() {
+        UploadResponse response = mock(UploadResponse.class);
+        UploadResponse.Embedded embedded = mock(UploadResponse.Embedded.class);
+        when(response.getEmbedded()).thenReturn(embedded);
+        Document document = createDocument();
+        when(embedded.getDocuments()).thenReturn(singletonList(document));
+        return response;
+    }
 
-            assertEquals("Audio-video-bundle-document.pdf", caseDetails.getCaseData().getAudioVideoEvidenceBundleDocument().getDocumentLink().getDocumentFilename());
-
-        }
-
-        private UploadResponse createUploadResponse() {
-            UploadResponse response = mock(UploadResponse.class);
-            UploadResponse.Embedded embedded = mock(UploadResponse.Embedded.class);
-            when(response.getEmbedded()).thenReturn(embedded);
-            Document document = createDocument();
-            when(embedded.getDocuments()).thenReturn(singletonList(document));
-            return response;
-        }
-
-        private static Document createDocument() {
-            Document document = new Document();
-            Document.Links links = new Document.Links();
-            Document.Link link = new Document.Link();
-            link.href = "some location";
-            links.self = link;
-            document.links = links;
-            return document;
-        }
+    private static Document createDocument() {
+        Document document = new Document();
+        Document.Links links = new Document.Links();
+        Document.Link link = new Document.Link();
+        link.href = "some location";
+        links.self = link;
+        document.links = links;
+        return document;
+    }
 }
