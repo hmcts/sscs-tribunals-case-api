@@ -224,7 +224,7 @@ dependencyManagement {
         dependency group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.68'
 
         // resolves: CVE-2019-10101, CVE-2019-10102, CVE-2019-10103, CVE-2020-15824
-        dependencySet(group: 'org.jetbrains.kotlin', version: '1.4.30') {
+        dependencySet(group: 'org.jetbrains.kotlin', version: '1.4.31') {
             entry 'kotlin-stdlib'
             entry 'kotlin-stdlib-common'
             entry 'kotlin-stdlib-jdk8'
@@ -309,16 +309,16 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.2.18'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.23'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.24'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
     compile 'org.projectlombok:lombok:1.18.18'
     annotationProcessor 'org.projectlombok:lombok:1.18.18'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.5.RELEASE'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.7.7'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.8.0'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.24.0'
-    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.7.7'
+    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.8.0'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.24.0'
     testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
@@ -347,7 +347,7 @@ dependencies {
     contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.6.1")
     contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.6.2')
 
-    contractTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.27') {
+    contractTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.28') {
         force = true
     }
 
