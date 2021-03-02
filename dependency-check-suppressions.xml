@@ -41,4 +41,10 @@
         <cve>CVE-2020-11022</cve>
         <cve>CVE-2020-11023</cve>
     </suppress>
+    <suppress until="2021-03-03">
+        <notes><![CDATA[spring-security-config-5.3.5.RELEASE.jar
+         Suppressing til tomorrow to get properties file through
+        ]]></notes>
+        <cve>CVE-2021-22112</cve>
+    </suppress>
 </suppressions>
