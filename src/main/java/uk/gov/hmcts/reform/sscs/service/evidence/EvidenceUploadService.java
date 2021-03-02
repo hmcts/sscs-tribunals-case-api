@@ -188,7 +188,7 @@ public class EvidenceUploadService {
         String filename = getFilenameForTheNextUploadEvidence(caseDetails, ccdCaseId, storePdfContext, idamEmail);
 
         appendEvidenceUploadsToStatementAndStoreIt(sscsCaseData, storePdfContext,
-            filename);
+            filename, idamEmail);
 
         sscsCaseData.setDraftSscsDocument(Collections.emptyList());
         sscsCaseData.setEvidenceHandled("No");
@@ -214,8 +214,9 @@ public class EvidenceUploadService {
     }
 
     private void appendEvidenceUploadsToStatementAndStoreIt(SscsCaseData sscsCaseData,
-                                                                       MyaEventActionContext storePdfContext,
-                                                                       String filename) {
+                                                            MyaEventActionContext storePdfContext,
+                                                            String filename,
+                                                            String idamEmail) {
         removeStatementDocFromDocumentTab(sscsCaseData, storePdfContext.getDocument().getData().getSscsDocument());
         List<SscsDocument> audioVideoMedia = pullAudioVideoFilesFromDraft(storePdfContext.getDocument().getData().getDraftSscsDocument());
 
@@ -228,7 +229,7 @@ public class EvidenceUploadService {
         byte[] combinedContent = appendEvidenceUploadsToStatement(statementContent.getByteArray(), contentUploads,
                 sscsCaseData.getCcdCaseId());
         SscsDocument combinedPdfEvidence = pdfStoreService.store(combinedContent, filename, "Other evidence").get(0);
-        buildScannedDocumentByGivenSscsDoc(sscsCaseData, combinedPdfEvidence, audioVideoMedia);
+        buildScannedDocumentByGivenSscsDoc(sscsCaseData, combinedPdfEvidence, audioVideoMedia, idamEmail);
     }
 
     private ByteArrayResource getContentFromTheStatement(MyaEventActionContext storePdfContext) {
@@ -361,7 +362,7 @@ public class EvidenceUploadService {
 
 
     protected void buildScannedDocumentByGivenSscsDoc(SscsCaseData sscsCaseData, SscsDocument draftSscsDocument,
-                                                      List<SscsDocument> audioVideoMedia) {
+                                                      List<SscsDocument> audioVideoMedia, String idamEmail) {
         LocalDate ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(),
             DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
@@ -378,6 +379,7 @@ public class EvidenceUploadService {
         scannedDocuments.add(scannedDocument);
 
         List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>();
+        AudioVideoUploadParty uploader = workOutAudioVideoUploadParty(sscsCaseData, idamEmail);
 
         for (SscsDocument audioVideoDocument: audioVideoMedia) {
             audioVideoEvidence.add(AudioVideoEvidence.builder()
@@ -386,6 +388,7 @@ public class EvidenceUploadService {
                             .documentLink(audioVideoDocument.getValue().getDocumentLink())
                             .dateAdded(ldt.toLocalDate())
                             .fileName(audioVideoDocument.getValue().getDocumentFileName())
+                            .partyUploaded(uploader)
                             .build())
                     .build());
         }
@@ -414,6 +417,25 @@ public class EvidenceUploadService {
             }
         }
         return fileNamePrefix;
+    }
+
+    @NotNull
+    private AudioVideoUploadParty workOutAudioVideoUploadParty(SscsCaseData caseData, String idamEmail) {
+        AudioVideoUploadParty uploader = AudioVideoUploadParty.APPELLANT;
+        Subscriptions subscriptions = caseData.getSubscriptions();
+        if (subscriptions != null) {
+            Subscription appointeeSubs = subscriptions.getAppointeeSubscription();
+            Subscription repSubs = subscriptions.getRepresentativeSubscription();
+            Subscription jpSubs = subscriptions.getJointPartySubscription();
+            if (appointeeSubs != null && idamEmail.equalsIgnoreCase(appointeeSubs.getEmail())) {
+                uploader = AudioVideoUploadParty.APPOINTEE;
+            } else if (repSubs != null && idamEmail.equalsIgnoreCase(repSubs.getEmail())) {
+                uploader = AudioVideoUploadParty.REP;
+            } else if (jpSubs != null && idamEmail.equalsIgnoreCase(jpSubs.getEmail())) {
+                uploader = AudioVideoUploadParty.JOINT_PARTY;
+            }
+        }
+        return uploader;
     }
 
     private List<String> getFileNames(SscsCaseData sscsCaseData) {
