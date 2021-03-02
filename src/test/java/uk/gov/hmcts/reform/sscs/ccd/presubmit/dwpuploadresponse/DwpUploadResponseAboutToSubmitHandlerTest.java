@@ -512,6 +512,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("/url", audioVideoEvidence.getValue().getDocumentLink().getDocumentUrl());
         assertEquals("rip1", audioVideoEvidence.getValue().getRip1Document().getDocumentFilename());
         assertEquals("filename", audioVideoEvidence.getValue().getFileName());
+        assertEquals(AudioVideoUploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
         assertNotNull(audioVideoEvidence.getValue().getDateAdded());
         assertEquals(DocumentType.DWP_EVIDENCE.getValue(), audioVideoEvidence.getValue().getDocumentType());
         assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
@@ -533,6 +534,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("/url", audioVideoEvidence.getValue().getDocumentLink().getDocumentUrl());
         assertNull("rip1", audioVideoEvidence.getValue().getRip1Document());
         assertEquals("filename", audioVideoEvidence.getValue().getFileName());
+        assertEquals(AudioVideoUploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
         assertNotNull(audioVideoEvidence.getValue().getDateAdded());
         assertEquals(DocumentType.DWP_EVIDENCE.getValue(), audioVideoEvidence.getValue().getDocumentType());
         assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
@@ -594,6 +596,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("/url", audioVideoEvidence.getValue().getDocumentLink().getDocumentUrl());
         assertEquals("rip1", audioVideoEvidence.getValue().getRip1Document().getDocumentFilename());
         assertEquals("filename", audioVideoEvidence.getValue().getFileName());
+        assertEquals(AudioVideoUploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
         assertNotNull(audioVideoEvidence.getValue().getDateAdded());
         assertEquals(DocumentType.DWP_EVIDENCE.getValue(), audioVideoEvidence.getValue().getDocumentType());
         assertEquals(REVIEW_BY_JUDGE.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());

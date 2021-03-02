@@ -194,6 +194,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         assertEquals("myurl2", response.getData().getAudioVideoEvidence().get(0).getValue().getDocumentLink().getDocumentUrl());
         assertEquals("myurl3", response.getData().getAudioVideoEvidence().get(0).getValue().getRip1Document().getDocumentUrl());
         assertEquals(DocumentType.OTHER_DOCUMENT.getValue(), response.getData().getAudioVideoEvidence().get(0).getValue().getDocumentType());
+        assertEquals(AudioVideoUploadParty.DWP, response.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded());
 
         assertEquals("supplementaryResponse", response.getData().getDwpState());
         assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), response.getData().getInterlocReviewState());

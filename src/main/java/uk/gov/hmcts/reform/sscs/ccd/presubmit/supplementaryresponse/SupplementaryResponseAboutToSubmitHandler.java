@@ -83,6 +83,7 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
                         .fileName(sscsCaseData.getDwpOtherDoc().getDocumentLink().getDocumentFilename())
                         .rip1Document(sscsCaseData.getRip1Doc())
                         .dateAdded(LocalDate.now())
+                        .partyUploaded(AudioVideoUploadParty.DWP)
                         .build())
                 .build();
 

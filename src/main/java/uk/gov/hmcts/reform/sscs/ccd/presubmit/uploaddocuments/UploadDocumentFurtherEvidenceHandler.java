@@ -109,7 +109,9 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
 
     private boolean isPdfReadable(List<SscsFurtherEvidenceDoc> docs) throws Exception {
         for (SscsFurtherEvidenceDoc doc : docs) {
-            isPdfReadable(doc);
+            if (DocumentUtil.isFileAPdf(doc.getValue().getDocumentLink())) {
+                isPdfReadable(doc);
+            }
         }
         return true;
     }
@@ -181,6 +183,7 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
                                 .fileName(doc.getValue().getDocumentFileName())
                                 .documentType(doc.getValue().getDocumentType())
                                 .dateAdded(LocalDate.now())
+                                .partyUploaded(AudioVideoUploadParty.CTSC)
                                 .build()).build()).collect(toList());
 
         if (!newAudioVideoEvidence.isEmpty()) {
