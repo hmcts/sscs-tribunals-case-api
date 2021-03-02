@@ -71,6 +71,10 @@ public class ProcessAudioVideoEvidenceAboutToStartHandler implements PreSubmitCa
             populateListWithItems(listOptions, EXCLUDE_EVIDENCE);
         }
 
+        if (!hasJudgeRole || hasSuperUserRole) {
+            populateListWithItems(listOptions, SEND_TO_JUDGE);
+        }
+
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(listOptions.get(0), listOptions));
     }
 
