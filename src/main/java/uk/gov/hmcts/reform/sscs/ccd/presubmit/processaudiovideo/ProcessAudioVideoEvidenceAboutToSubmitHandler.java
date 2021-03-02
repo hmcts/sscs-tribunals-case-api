@@ -69,6 +69,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         processIfIssueDirectionNotice(caseData);
         processIfExcludeEvidence(caseData);
         processIfSendToJudge(caseData);
+        processIfSendToAdmin(caseData);
 
         clearTransientFields(caseData);
 
@@ -107,6 +108,18 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
                 caseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
             }
             caseData.setInterlocReferralDate(LocalDate.now().toString());
+        }
+    }
+
+    private void processIfSendToAdmin(SscsCaseData caseData) {
+        if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), SEND_TO_ADMIN.getCode())) {
+            caseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION.getId());
+            if (caseData.isLanguagePreferenceWelsh()) {
+                caseData.setWelshInterlocNextReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION.getId());
+                caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
+            } else {
+                caseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION.getId());
+            }
         }
     }
 
