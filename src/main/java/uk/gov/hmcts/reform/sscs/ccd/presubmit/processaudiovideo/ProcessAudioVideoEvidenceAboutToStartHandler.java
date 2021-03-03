@@ -69,9 +69,6 @@ public class ProcessAudioVideoEvidenceAboutToStartHandler implements PreSubmitCa
 
         if (hasJudgeRole || hasSuperUserRole) {
             populateListWithItems(listOptions, INCLUDE_EVIDENCE);
-        }
-
-        if (hasJudgeRole || hasSuperUserRole) {
             populateListWithItems(listOptions, EXCLUDE_EVIDENCE);
         }
 
