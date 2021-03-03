@@ -182,6 +182,17 @@ public class Sscs1PdfHandlerTest {
         sscs1PdfHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 
+    @Test
+    public void shouldReturnErrorIfNullCreatedDate() throws CcdException {
+        when(emailHelper.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant())).thenReturn("Test");
+
+        callback.getCaseDetails().getCaseData().setCaseCreated(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = sscs1PdfHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+    }
+
     private SscsCaseData buildCaseDataWithoutPdf() {
         SscsCaseData caseData = CaseDataUtils.buildCaseData();
         caseData.setSscsDocument(Collections.emptyList());

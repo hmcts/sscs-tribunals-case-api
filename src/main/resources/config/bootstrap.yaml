@@ -17,3 +17,4 @@ spring:
         docmosis-api-key: PDF_SERVICE_ACCESS_KEY
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
         bundle-url: BUNDLE_URL
+        dm-gateway-url: DM_GATEWAY_URL

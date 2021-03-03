@@ -54,6 +54,9 @@ import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.DocumentManagement
 public class EvidenceUploadServiceTest {
 
     public static final String HTTP_ANOTHER_URL = "http://anotherUrl";
+    private static final String JP_EMAIL = "jp@gmail.com";
+    private static final String REP_EMAIL = "rep@gmail.com";
+    private static final String APPELLANT_EMAIL = "app@gmail.com";
     private EvidenceUploadService evidenceUploadService;
     private CcdService ccdService;
     private OnlineHearingService onlineHearingService;
@@ -115,10 +118,13 @@ public class EvidenceUploadServiceTest {
     }
 
     @Test
-    public void uploadsEvidenceAndAddsItToDraftSscsDocumentsInCcd() {
+    public void uploadsEvidenceAndAddsItToDraftSscsDocumentsInCcd() throws IOException {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
         final int originalNumberOfSscsDocuments = sscsCaseDetails.getData().getDraftSscsDocument().size();
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+
+        when(file.getOriginalFilename()).thenReturn(fileName);
+        when(file.getBytes()).thenReturn(fileName.getBytes());
 
         Optional<Evidence> evidenceOptional = evidenceUploadService.uploadDraftHearingEvidence(someOnlineHearingId, file);
 
@@ -137,10 +143,12 @@ public class EvidenceUploadServiceTest {
     }
 
     @Test
-    public void uploadsEvidenceWhenThereAreNotAlreadySscsDocumentsInCcd() {
+    public void uploadsEvidenceWhenThereAreNotAlreadySscsDocumentsInCcd() throws IOException {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
+        when(file.getOriginalFilename()).thenReturn(fileName);
+        when(file.getBytes()).thenReturn(fileName.getBytes());
         Optional<Evidence> evidenceOptional = evidenceUploadService.uploadDraftHearingEvidence(someOnlineHearingId, file);
 
         assertThat(evidenceOptional.isPresent(), is(true));
@@ -323,9 +331,23 @@ public class EvidenceUploadServiceTest {
         audioVideoDocuments.add(draftSscsAudioDocument);
         audioVideoDocuments.add(draftSscsVideoDocument);
 
-        evidenceUploadService.buildScannedDocumentByGivenSscsDoc(sscsCaseData, evidenceDescriptionDocument, audioVideoDocuments);
+        evidenceUploadService.buildScannedDocumentByGivenSscsDoc(sscsCaseData, evidenceDescriptionDocument, audioVideoDocuments, null);
         assertEquals(1, sscsCaseData.getScannedDocuments().size());
         assertEquals(2, sscsCaseData.getAudioVideoEvidence().size());
+    }
+
+    @Test
+    public void handlesBadFileRead() throws IOException {
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+
+        when(file.getOriginalFilename()).thenReturn(fileName);
+        when(file.getBytes()).thenThrow(new IOException());
+        Optional<Evidence> evidenceOptional = evidenceUploadService.uploadDraftHearingEvidence(someOnlineHearingId, file);
+
+        assertThat(evidenceOptional.isPresent(), is(true));
+        Evidence evidence = evidenceOptional.get();
+        assertThat(evidence, is(new Evidence(documentUrl, fileName, convertCreatedOnDate(evidenceCreatedOn))));
     }
 
     private SscsCaseDetails createSscsCaseDetailsDraftDocsJustDescription(String fileName) {
@@ -355,7 +377,7 @@ public class EvidenceUploadServiceTest {
         SscsDocument evidenceDescriptionDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentDateAdded("2021-01-30")
                 .documentLink(DocumentLink.builder().documentBinaryUrl("url/binary").documentFilename("description.pdf").documentUrl("url").build()).build()).build();
 
-        evidenceUploadService.buildScannedDocumentByGivenSscsDoc(sscsCaseData, evidenceDescriptionDocument, audioVideoDocuments);
+        evidenceUploadService.buildScannedDocumentByGivenSscsDoc(sscsCaseData, evidenceDescriptionDocument, audioVideoDocuments, null);
         assertEquals(1, sscsCaseData.getScannedDocuments().size());
         assertNull(sscsCaseData.getAudioVideoEvidence());
     }
@@ -372,9 +394,23 @@ public class EvidenceUploadServiceTest {
 
         SscsCaseData sscsCaseData = createSscsCaseDetailsDraftDocsJustDescription("EvidenceDescription.pdf").getData();
 
-        evidenceUploadService.buildScannedDocumentByGivenSscsDoc(sscsCaseData, draftSscsDocument, audioVideoDocuments);
+        evidenceUploadService.buildScannedDocumentByGivenSscsDoc(sscsCaseData, draftSscsDocument, audioVideoDocuments, null);
         assertEquals(3, sscsCaseData.getAudioVideoEvidence().size());
         assertEquals(1, sscsCaseData.getScannedDocuments().size());
+    }
+
+    @Test
+    @Parameters({JP_EMAIL + ", JOINT_PARTY", REP_EMAIL + ", REP", APPELLANT_EMAIL + ", APPELLANT"})
+    public void givenSscsDocAndAudio_thenSetTheUploaderFromSubscriptionEmail(String idamEmail, AudioVideoUploadParty uploader) {
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithCcdDocumentsSubscription();
+        List<SscsDocument> audioVideoDocuments = new ArrayList<>();
+        audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("audio2.mp3").build()).build());
+        SscsDocument draftSscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentDateAdded("2021-01-30")
+                .documentLink(DocumentLink.builder().documentBinaryUrl("url/binary").documentFilename("coversheet").documentUrl("url").build()).build()).build();
+
+        evidenceUploadService.buildScannedDocumentByGivenSscsDoc(sscsCaseDetails.getData(), draftSscsDocument, audioVideoDocuments, idamEmail);
+        assertEquals(1, sscsCaseDetails.getData().getAudioVideoEvidence().size());
+        assertEquals(uploader, sscsCaseDetails.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded());
     }
 
     private SscsDocument getCombinedEvidenceDoc(String combinedEvidenceFilename, String otherEvidenceDocType) {
@@ -647,6 +683,22 @@ public class EvidenceUploadServiceTest {
 
     private SscsCaseDetails createSscsCaseDetailsWithoutCcdDocuments() {
         return SscsCaseDetails.builder().id(someCcdCaseId).data(SscsCaseData.builder().build()).build();
+    }
+
+    private SscsCaseDetails createSscsCaseDetailsWithCcdDocumentsSubscription() {
+        return SscsCaseDetails.builder().id(someCcdCaseId).data(SscsCaseData.builder()
+                .subscriptions(Subscriptions.builder()
+                        .jointPartySubscription(Subscription.builder()
+                                .email(JP_EMAIL)
+                                .build())
+                        .representativeSubscription(Subscription.builder()
+                                .email(REP_EMAIL)
+                                .build())
+                        .appellantSubscription(Subscription.builder()
+                                .email(APPELLANT_EMAIL)
+                                .build())
+                        .build())
+                .build()).build();
     }
 
     private String convertCreatedOnDate(Date date) {

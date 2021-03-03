@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.isNull;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
@@ -25,7 +25,8 @@ public class DwpDocumentService {
 
             DwpDocumentDetails dwpDocumentDetails = new DwpDocumentDetails(docType.getValue(),
                     documentFileName,
-                    LocalDate.now().toString(),
+                    null,
+                    LocalDateTime.now(),
                     dwpDocument.getDocumentLink(), editedDocumentLink, editedReason, null, null, null);
 
             DwpDocument doc = new DwpDocument(dwpDocumentDetails);

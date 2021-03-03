@@ -2,7 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.*;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
+import uk.gov.hmcts.reform.sscs.service.bundle.BundleAudioVideoPdfService;
 
 @Service
 @Slf4j
@@ -35,9 +37,12 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
     private DwpDocumentService dwpDocumentService;
 
+    private final BundleAudioVideoPdfService bundleAudioVideoPdfService;
+
     @Autowired
     public CreateBundleAboutToSubmitHandler(ServiceRequestExecutor serviceRequestExecutor,
                                             DwpDocumentService dwpDocumentService,
+                                            BundleAudioVideoPdfService bundleAudioVideoPdfService,
                                             @Value("${bundle.url}") String bundleUrl,
                                             @Value("${bundle.english.config}") String bundleEnglishConfig,
                                             @Value("${bundle.welsh.config}") String bundleWelshConfig,
@@ -45,6 +50,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
                                             @Value("${bundle.welsh.unedited.config}") String bundleWelshUnEditedConfig) {
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.dwpDocumentService = dwpDocumentService;
+        this.bundleAudioVideoPdfService = bundleAudioVideoPdfService;
         this.bundleUrl = bundleUrl;
         this.bundleEnglishConfig = bundleEnglishConfig;
         this.bundleWelshConfig = bundleWelshConfig;
@@ -98,6 +104,8 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
                     }
                 }
             }
+
+            bundleAudioVideoPdfService.createAudioVideoPdf(sscsCaseData);
 
             setBundleConfig(sscsCaseData);
 
@@ -156,4 +164,6 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
             dwpDocumentService.moveDwpEvidenceBundleToDwpDocumentCollection(sscsCaseData);
         }
     }
+
+
 }
