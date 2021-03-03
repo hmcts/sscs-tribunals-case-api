@@ -176,7 +176,6 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertThat(response.getWarnings().size(), is(0));
         assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_JUDGE.getId()));
         assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now().toString()));
-
     }
 
     @Test
@@ -211,5 +210,24 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
 
         assertThat(response.getData().getWelshInterlocNextReviewState(), is(InterlocReviewState.AWAITING_ADMIN_ACTION.getId()));
         assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.WELSH_TRANSLATION.getId()));
+    }
+
+    @Test
+    @Parameters({
+            "SEND_TO_JUDGE", "SEND_TO_ADMIN"
+    })
+    public void shouldAddNote_whenActionIsSelected(ProcessAudioVideoActionDynamicListItems action) {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(action.getCode()));
+        final String note = "This is a note";
+        sscsCaseData.setAppealNote(note);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verifyNoInteractions(footerService);
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(0));
+        assertNull(response.getData().getAppealNote());
+        assertThat(response.getData().getAppealNotePad().getNotesCollection().size(), is(1));
+        assertThat(response.getData().getAppealNotePad().getNotesCollection().get(0), is(Note.builder().value(NoteDetails.builder().noteDate(LocalDate.now().toString()).noteDetail(note).build()).build()));
     }
 }

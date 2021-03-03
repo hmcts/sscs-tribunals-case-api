@@ -9,6 +9,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAu
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
@@ -91,6 +93,15 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         }
     }
 
+    private void addToNotesIfNoteExists(SscsCaseData caseData) {
+        if (StringUtils.isNoneBlank(caseData.getAppealNote())) {
+            ArrayList<Note> notes = new ArrayList<>(Optional.ofNullable(caseData.getAppealNotePad()).flatMap(f -> Optional.ofNullable(f.getNotesCollection())).orElse(Collections.emptyList()));
+            final NoteDetails noteDetail = NoteDetails.builder().noteDetail(caseData.getAppealNote()).noteDate(LocalDate.now().toString()).build();
+            notes.add(Note.builder().value(noteDetail).build());
+            caseData.setAppealNotePad(NotePad.builder().notesCollection(notes).build());
+        }
+    }
+
     private void processIfExcludeEvidence(SscsCaseData caseData) {
         if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), EXCLUDE_EVIDENCE.getCode())) {
             caseData.setInterlocReviewState(null);
@@ -108,6 +119,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
                 caseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
             }
             caseData.setInterlocReferralDate(LocalDate.now().toString());
+            addToNotesIfNoteExists(caseData);
         }
     }
 
@@ -120,6 +132,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
             } else {
                 caseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION.getId());
             }
+            addToNotesIfNoteExists(caseData);
         }
     }
 
@@ -132,5 +145,6 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         caseData.setSignedBy(null);
         caseData.setSignedRole(null);
         caseData.setDateAdded(null);
+        caseData.setAppealNote(null);
     }
 }
