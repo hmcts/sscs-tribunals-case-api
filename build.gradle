@@ -255,12 +255,16 @@ dependencyManagement {
             entry 'groovy-xml'
         }
 
-        dependencySet(group: 'org.springframework.security', version: versions.springSecurity) {
-            entry 'spring-security-crypto'
-        }
 
         dependencySet(group: 'org.apache.xmlgraphics', version: '1.1.14') {
             entry 'batik-all'
+
+        //CVE-2021-22112
+        dependencySet(group: 'org.springframework.security', version: '5.3.8.RELEASE') {
+            entry 'spring-security-crypto'
+            entry 'spring-security-config'
+            entry 'spring-security-core'
+            entry 'spring-security-web'
         }
 
         imports {
@@ -326,7 +330,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.2.19'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.24'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.25'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
     compile 'org.projectlombok:lombok:1.18.18'
