@@ -121,6 +121,16 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         verifyNoInteractions(generateFile);
     }
 
+    @Test
+    public void giveSendToAdmin_thenDoNotSetPreviewDocument() {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.SEND_TO_ADMIN.getCode()));
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getData().getPreviewDocument(), is(nullValue()));
+        verifyNoInteractions(generateFile);
+    }
+
     private void verifyTemplateBody(String templateId) {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
         var value = capture.getValue();
