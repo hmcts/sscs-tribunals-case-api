@@ -117,9 +117,11 @@
       ],
       "sscsDocument" : [ {
         "value" : {
-          "documentType" : "appellantEvidence",
-          "documentFileName" : "11111.pdf",
+          "documentType" : "audioDocument",
+          "documentFileName" : "11111.mp3",
           "documentDateAdded" : "2021-02-21",
+          "dateApproved" : "2021-02-21",
+          "partyUploaded" : "appellant",
           "documentLink" : {
             "document_binary_url": "http://dm-store:5005/documents/093c9722-403c-42be-9af0-778291cbfb16/binary",
             "document_filename": "my-file.mp3",
@@ -132,6 +134,20 @@
       "caseCode": "011CC",
       "dateSentToDwp": "2021-02-12",
       "dwpDocuments": [
+        {
+          "value" : {
+            "documentType" : "videoDocument",
+            "documentFileName" : "11111.mp4",
+            "documentDateAdded" : "2021-02-21",
+            "dateApproved" : "2021-02-21",
+            "partyUploaded" : "dwp",
+            "documentLink" : {
+              "document_binary_url": "http://dm-store:5005/documents/093c9722-403c-42be-9af0-778291cbfb16/binary",
+              "document_filename": "my-file.mp4",
+              "document_url": "http://dm-store:5005/documents/093c9722-403c-42be-9af0-778291cbfb16"
+            }
+          }
+        },
         {
           "value": {
             "documentDateAdded": "2021-02-12",

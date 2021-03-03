@@ -111,9 +111,8 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                         AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
                                 .documentLink(doc.getValue().getDocumentLink())
                                 .fileName(doc.getValue().getDocumentFileName())
-                                .documentType(doc.getValue().getDocumentType())
                                 .dateAdded(LocalDate.now())
-                                .partyUploaded(AudioVideoUploadParty.CTSC)
+                                .partyUploaded(UploadParty.CTSC)
                                 .build()).build()).collect(toList());
         if (!newAudioVideoEvidence.isEmpty()) {
             List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>(ofNullable(sscsCaseData.getAudioVideoEvidence()).orElse(emptyList()));

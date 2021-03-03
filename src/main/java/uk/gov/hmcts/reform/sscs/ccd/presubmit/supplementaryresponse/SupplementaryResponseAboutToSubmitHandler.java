@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentSubtype;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
@@ -78,12 +77,11 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
     private void addAudioVideoEvidence(SscsCaseData sscsCaseData) {
         AudioVideoEvidence audioVideoEvidence = AudioVideoEvidence.builder()
                 .value(AudioVideoEvidenceDetails.builder()
-                        .documentType(DocumentType.OTHER_DOCUMENT.getValue())
                         .documentLink(sscsCaseData.getDwpOtherDoc().getDocumentLink())
                         .fileName(sscsCaseData.getDwpOtherDoc().getDocumentLink().getDocumentFilename())
                         .rip1Document(sscsCaseData.getRip1Doc())
                         .dateAdded(LocalDate.now())
-                        .partyUploaded(AudioVideoUploadParty.DWP)
+                        .partyUploaded(UploadParty.DWP)
                         .build())
                 .build();
 

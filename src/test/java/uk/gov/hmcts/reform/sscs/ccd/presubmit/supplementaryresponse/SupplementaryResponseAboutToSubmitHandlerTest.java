@@ -15,7 +15,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentSubtype;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
@@ -168,7 +167,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         assertEquals(1, response.getData().getAudioVideoEvidence().size());
         assertEquals("test2.mp3", response.getData().getAudioVideoEvidence().get(0).getValue().getFileName());
         assertEquals("myurl2", response.getData().getAudioVideoEvidence().get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals(DocumentType.OTHER_DOCUMENT.getValue(), response.getData().getAudioVideoEvidence().get(0).getValue().getDocumentType());
+        assertEquals(UploadParty.DWP, response.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded());
 
         assertEquals("supplementaryResponse", response.getData().getDwpState());
         assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), response.getData().getInterlocReviewState());
@@ -193,8 +192,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         assertEquals("test2.mp3", response.getData().getAudioVideoEvidence().get(0).getValue().getFileName());
         assertEquals("myurl2", response.getData().getAudioVideoEvidence().get(0).getValue().getDocumentLink().getDocumentUrl());
         assertEquals("myurl3", response.getData().getAudioVideoEvidence().get(0).getValue().getRip1Document().getDocumentUrl());
-        assertEquals(DocumentType.OTHER_DOCUMENT.getValue(), response.getData().getAudioVideoEvidence().get(0).getValue().getDocumentType());
-        assertEquals(AudioVideoUploadParty.DWP, response.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded());
+        assertEquals(UploadParty.DWP, response.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded());
 
         assertEquals("supplementaryResponse", response.getData().getDwpState());
         assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), response.getData().getInterlocReviewState());

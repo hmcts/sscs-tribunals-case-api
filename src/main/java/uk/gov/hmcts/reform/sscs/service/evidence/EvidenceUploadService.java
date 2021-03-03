@@ -31,7 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Evidence;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.EvidenceDescription;
@@ -379,12 +378,11 @@ public class EvidenceUploadService {
         scannedDocuments.add(scannedDocument);
 
         List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>();
-        AudioVideoUploadParty uploader = workOutAudioVideoUploadParty(sscsCaseData, idamEmail);
+        UploadParty uploader = workOutAudioVideoUploadParty(sscsCaseData, idamEmail);
 
         for (SscsDocument audioVideoDocument: audioVideoMedia) {
             audioVideoEvidence.add(AudioVideoEvidence.builder()
                     .value(AudioVideoEvidenceDetails.builder()
-                            .documentType(DocumentType.APPELLANT_EVIDENCE.getId())
                             .documentLink(audioVideoDocument.getValue().getDocumentLink())
                             .dateAdded(ldt.toLocalDate())
                             .fileName(audioVideoDocument.getValue().getDocumentFileName())
@@ -420,19 +418,19 @@ public class EvidenceUploadService {
     }
 
     @NotNull
-    private AudioVideoUploadParty workOutAudioVideoUploadParty(SscsCaseData caseData, String idamEmail) {
-        AudioVideoUploadParty uploader = AudioVideoUploadParty.APPELLANT;
+    private UploadParty workOutAudioVideoUploadParty(SscsCaseData caseData, String idamEmail) {
+        UploadParty uploader = UploadParty.APPELLANT;
         Subscriptions subscriptions = caseData.getSubscriptions();
         if (subscriptions != null) {
             Subscription appointeeSubs = subscriptions.getAppointeeSubscription();
             Subscription repSubs = subscriptions.getRepresentativeSubscription();
             Subscription jpSubs = subscriptions.getJointPartySubscription();
             if (appointeeSubs != null && idamEmail.equalsIgnoreCase(appointeeSubs.getEmail())) {
-                uploader = AudioVideoUploadParty.APPOINTEE;
+                uploader = UploadParty.APPOINTEE;
             } else if (repSubs != null && idamEmail.equalsIgnoreCase(repSubs.getEmail())) {
-                uploader = AudioVideoUploadParty.REP;
+                uploader = UploadParty.REP;
             } else if (jpSubs != null && idamEmail.equalsIgnoreCase(jpSubs.getEmail())) {
-                uploader = AudioVideoUploadParty.JOINT_PARTY;
+                uploader = UploadParty.JOINT_PARTY;
             }
         }
         return uploader;

@@ -142,7 +142,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
         } else {
             assertThat(response.getData().getSscsDocument(), is(nullValue()));
             assertThat(response.getData().getAudioVideoEvidence().size(), is(1));
-            assertThat(response.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded(), is(AudioVideoUploadParty.CTSC));
+            assertThat(response.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded(), is(UploadParty.CTSC));
         }
     }
 
