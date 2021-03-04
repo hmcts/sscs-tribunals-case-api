@@ -154,7 +154,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
                 .documentFilename(rip1FileName)
                 .documentUrl(audioVideoEvidence.getRip1Document().getDocumentUrl())
                 .documentBinaryUrl(audioVideoEvidence.getRip1Document().getDocumentBinaryUrl())
-            .build();
+                .build();
 
     }
 
