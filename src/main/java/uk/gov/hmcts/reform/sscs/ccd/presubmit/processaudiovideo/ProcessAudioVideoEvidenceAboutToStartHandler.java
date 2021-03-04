@@ -2,8 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.*;
-import static uk.gov.hmcts.reform.sscs.idam.UserRole.JUDGE;
-import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,13 +55,14 @@ public class ProcessAudioVideoEvidenceAboutToStartHandler implements PreSubmitCa
         }
         final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
         final boolean hasJudgeRole = userDetails.hasRole(JUDGE);
+        final boolean hasTcwRole = userDetails.hasRole(TCW);
         final boolean hasSuperUserRole = userDetails.hasRole(SUPER_USER);
-        setProcessAudioVideoActionDropdown(sscsCaseData, hasJudgeRole, hasSuperUserRole);
+        setProcessAudioVideoActionDropdown(sscsCaseData, hasJudgeRole, hasTcwRole, hasSuperUserRole);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    private void setProcessAudioVideoActionDropdown(SscsCaseData sscsCaseData, boolean hasJudgeRole, boolean hasSuperUserRole) {
+    private void setProcessAudioVideoActionDropdown(SscsCaseData sscsCaseData, boolean hasJudgeRole, boolean hasTcwRole, boolean hasSuperUserRole) {
         List<DynamicListItem> listOptions = new ArrayList<>();
 
         populateListWithItems(listOptions, ISSUE_DIRECTIONS_NOTICE);
@@ -70,6 +70,15 @@ public class ProcessAudioVideoEvidenceAboutToStartHandler implements PreSubmitCa
         if (hasJudgeRole || hasSuperUserRole) {
             populateListWithItems(listOptions, EXCLUDE_EVIDENCE);
         }
+
+        if (!hasJudgeRole || hasSuperUserRole) {
+            populateListWithItems(listOptions, SEND_TO_JUDGE);
+        }
+
+        if (hasTcwRole || hasJudgeRole || hasSuperUserRole) {
+            populateListWithItems(listOptions, SEND_TO_ADMIN);
+        }
+
 
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(listOptions.get(0), listOptions));
     }

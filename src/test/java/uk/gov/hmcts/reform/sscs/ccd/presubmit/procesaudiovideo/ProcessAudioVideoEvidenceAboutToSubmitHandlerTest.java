@@ -6,8 +6,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
@@ -136,7 +135,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("There action to process the audio/video evidence"));
+        assertThat(response.getErrors().iterator().next(), is("Select an action to process the audio/video evidence"));
     }
 
     @Test
@@ -164,5 +163,71 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getInterlocReviewState());
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
         assertNull(response.getData().getAudioVideoEvidence());
+    }
+
+    @Test
+    public void sendToJudge_shouldSetInterlocReviewState_toReviewByJudge() {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.SEND_TO_JUDGE.getCode()));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verifyNoInteractions(footerService);
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(0));
+        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_JUDGE.getId()));
+        assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now().toString()));
+    }
+
+    @Test
+    public void sendToJudgeForWelshAppeal_shouldSetWelshInterlocReviewState_toReviewByJudge() {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.SEND_TO_JUDGE.getCode()));
+        sscsCaseData.setLanguagePreferenceWelsh(YesNo.YES.getValue());
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verifyNoInteractions(footerService);
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(0));
+        assertThat(response.getData().getWelshInterlocNextReviewState(), is(InterlocReviewState.REVIEW_BY_JUDGE.getId()));
+        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.WELSH_TRANSLATION.getId()));
+        assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now().toString()));
+    }
+
+    @Test
+    public void givenSendToAdminEventSelected_verifySetInterlocReviewState() {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.SEND_TO_ADMIN.getCode()));
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.AWAITING_ADMIN_ACTION.getId()));
+    }
+
+    @Test
+    public void givenSendToAdminEventSelectedForWelshAppeal_verifySetWelshInterlocNextReviewState() {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.SEND_TO_ADMIN.getCode()));
+        sscsCaseData.setLanguagePreferenceWelsh(YesNo.YES.getValue());
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getWelshInterlocNextReviewState(), is(InterlocReviewState.AWAITING_ADMIN_ACTION.getId()));
+        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.WELSH_TRANSLATION.getId()));
+    }
+
+    @Test
+    @Parameters({
+            "SEND_TO_JUDGE", "SEND_TO_ADMIN"
+    })
+    public void shouldAddNote_whenActionIsSelected(ProcessAudioVideoActionDynamicListItems action) {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(action.getCode()));
+        final String note = "This is a note";
+        sscsCaseData.setAppealNote(note);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verifyNoInteractions(footerService);
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(0));
+        assertNull(response.getData().getAppealNote());
+        assertThat(response.getData().getAppealNotePad().getNotesCollection().size(), is(1));
+        assertThat(response.getData().getAppealNotePad().getNotesCollection().get(0), is(Note.builder().value(NoteDetails.builder().noteDate(LocalDate.now().toString()).noteDetail(note).build()).build()));
     }
 }
