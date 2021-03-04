@@ -262,6 +262,10 @@ dependencyManagement {
             entry 'spring-security-web'
         }
 
+        dependencySet(group: 'org.apache.xmlgraphics', version: '1.14') {
+            entry 'batik-all'
+        }
+
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
         }
