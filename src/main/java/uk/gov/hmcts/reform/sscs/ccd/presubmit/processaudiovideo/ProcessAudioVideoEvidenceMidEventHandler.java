@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 
-
 @Component
 public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
@@ -60,7 +59,10 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
         }
 
         AudioVideoEvidence selectedAudioVideoEvidence = caseData.getAudioVideoEvidence().stream().filter(evidence -> isSelectedEvidence(evidence, caseData)).findFirst().orElse(null);
-        selectedAudioVideoEvidenceDetails = buildSelectedAudioVideoEvidenceDetails(selectedAudioVideoEvidence);
+
+        if (nonNull(selectedAudioVideoEvidence)) {
+            selectedAudioVideoEvidenceDetails = buildSelectedAudioVideoEvidenceDetails(selectedAudioVideoEvidence.getValue());
+        }
 
         caseData.setSelectedAudioVideoEvidenceDetails(selectedAudioVideoEvidenceDetails);
         return new PreSubmitCallbackResponse<>(caseData);
@@ -70,8 +72,7 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
         return evidence.getValue().getDocumentLink().getDocumentUrl().equals(caseData.getSelectedAudioVideoEvidence().getValue().getCode());
     }
 
-    private SelectedAudioVideoEvidenceDetails buildSelectedAudioVideoEvidenceDetails(AudioVideoEvidence audioVideoEvidence) {
-        AudioVideoEvidenceDetails evidence = audioVideoEvidence.getValue();
+    private SelectedAudioVideoEvidenceDetails buildSelectedAudioVideoEvidenceDetails(AudioVideoEvidenceDetails evidence) {
         String documentType = null;
         String partyUploaded = null;
         if (nonNull(evidence.getPartyUploaded())) {
