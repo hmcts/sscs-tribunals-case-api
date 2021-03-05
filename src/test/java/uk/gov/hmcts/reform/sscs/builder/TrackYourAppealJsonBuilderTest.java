@@ -101,6 +101,14 @@ public class TrackYourAppealJsonBuilderTest {
         assertJsonEquals(HEARING_PAPER_MYA.getSerializedMessage(), objectNode);
     }
 
+    @Test
+    public void shouldReturnApprovedAudioVideoEvidenceInMyaResponse() {
+        SscsCaseData caseData = AUDIO_VIDEO_EVIDENCE_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter(), 1L, true, "appealCreated");
+        assertJsonEquals(AUDIO_VIDEO_EVIDENCE_MYA.getSerializedMessage(), objectNode);
+    }
+
     private RegionalProcessingCenter populateRegionalProcessingCenter() {
         return RegionalProcessingCenter.builder()
             .name("LIVERPOOL")

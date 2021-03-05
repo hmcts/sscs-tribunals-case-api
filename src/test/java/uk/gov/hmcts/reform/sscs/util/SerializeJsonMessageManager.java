@@ -83,6 +83,8 @@ public enum SerializeJsonMessageManager {
     ADJOURNMENT_NOTICE_MYA("tya/adjournmentNoticeCaseMya.json"),
     FINAL_DECISION_NOTICE_CCD("tya/finalDecisionCaseCcd.json"),
     FINAL_DECISION_NOTICE_MYA("tya/finalDecisionCaseMya.json"),
+    AUDIO_VIDEO_EVIDENCE_CCD("tya/audioVideoEvidenceCcd.json"),
+    AUDIO_VIDEO_EVIDENCE_MYA("tya/audioVideoEvidenceMya.json"),
     SESSION_SAMPLE("drafts/session-sample.json"),
     SESSION_SAMPLE_ESA("drafts/session-sample-esa.json"),
     SESSION_SAMPLE_WITH_APPOINTEE("drafts/session-sample-with-appointee.json"),

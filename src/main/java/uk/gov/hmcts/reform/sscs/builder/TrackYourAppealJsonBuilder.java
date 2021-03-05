@@ -37,6 +37,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Predicate;
+
 import lombok.extern.slf4j.Slf4j;
 import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
@@ -134,6 +136,8 @@ public class TrackYourAppealJsonBuilder {
             if (!outcomeNode.isEmpty()) {
                 caseNode.putArray("hearingOutcome").addAll(outcomeNode);
             }
+
+            caseNode.putArray("audioVideoEvidence").addAll(buildEvidenceLinks(caseData.getSscsDocument()));
         } else {
             caseNode.put("status", getAppealStatus(caseData.getEvents()));
         }
@@ -168,6 +172,31 @@ public class TrackYourAppealJsonBuilder {
         root.set("subscriptions", buildSubscriptions(caseData.getSubscriptions()));
 
         return root;
+    }
+
+    private ArrayNode buildEvidenceLinks(List<SscsDocument> avEvidenceList) {
+        ArrayNode avEvidenceNode = JsonNodeFactory.instance.arrayNode();
+        if (avEvidenceList == null) {
+            return avEvidenceNode;
+        }
+
+        avEvidenceList.stream().filter(filterEvidence()).forEach(d -> {
+            ObjectNode documentNode = JsonNodeFactory.instance.objectNode();
+            documentNode.put("name", d.getValue().getDocumentFileName());
+            documentNode.put("type", d.getValue().getDocumentType());
+            documentNode.put("url", d.getValue().getDocumentLink().getDocumentBinaryUrl());
+            avEvidenceNode.add(documentNode);
+        });
+
+        return avEvidenceNode;
+    }
+
+    private Predicate<? super SscsDocument> filterEvidence() {
+        return (d) -> (DocumentType.AUDIO_DOCUMENT.getValue().equalsIgnoreCase(d.getValue().getDocumentType())
+                || DocumentType.VIDEO_DOCUMENT.getValue().equalsIgnoreCase(d.getValue().getDocumentType()))
+                && (UploadParty.APPELLANT.equals(d.getValue().getPartyUploaded())
+                || UploadParty.APPOINTEE.equals(d.getValue().getPartyUploaded()));
+
     }
 
     private ArrayNode getHearingOutcome(List<SscsDocument> sscsDocument) {
