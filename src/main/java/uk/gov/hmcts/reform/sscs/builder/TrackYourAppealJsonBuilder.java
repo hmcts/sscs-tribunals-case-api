@@ -38,7 +38,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Predicate;
-
 import lombok.extern.slf4j.Slf4j;
 import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
@@ -137,7 +136,10 @@ public class TrackYourAppealJsonBuilder {
                 caseNode.putArray("hearingOutcome").addAll(outcomeNode);
             }
 
-            caseNode.putArray("audioVideoEvidence").addAll(buildEvidenceLinks(caseData.getSscsDocument()));
+            ArrayNode avEvidence = buildEvidenceLinks(caseData.getSscsDocument());
+            if (!avEvidence.isEmpty()) {
+                caseNode.putArray("audioVideoEvidence").addAll(avEvidence);
+            }
         } else {
             caseNode.put("status", getAppealStatus(caseData.getEvents()));
         }
