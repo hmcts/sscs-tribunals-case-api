@@ -128,8 +128,8 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
                     caseData.setSscsDocument(sscsDocuments);
 
                     caseData.getAudioVideoEvidence().remove(audioVideoEvidence);
+                    break;
                 }
-                break;
             }
         }
     }
