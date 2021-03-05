@@ -27,7 +27,6 @@ def secrets = [
         secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
     ],
     's2s-${env}'      : [
-        secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
         secret('microservicekey-ccd-data', 'CCD_DATA_STORE_S2S_SECRET'),
         secret('microservicekey-ccd-definition', 'CCD_DEFINITION_STORE_S2S_SECRET')
     ],
