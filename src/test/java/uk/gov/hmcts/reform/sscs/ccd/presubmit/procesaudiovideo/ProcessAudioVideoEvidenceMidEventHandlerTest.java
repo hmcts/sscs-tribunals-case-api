@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.procesaudiovideo;
 
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -77,6 +78,16 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
                 .generateNotice("Yes")
                 .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
                 .processAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.ISSUE_DIRECTIONS_NOTICE.getCode()))
+                .selectedAudioVideoEvidence(new DynamicList("test.com"))
+                .audioVideoEvidence(singletonList(AudioVideoEvidence.builder().value(
+                        AudioVideoEvidenceDetails.builder()
+                                .documentLink(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
+                                .fileName("music.mp3")
+                                .partyUploaded(UploadParty.APPELLANT)
+                                .dateAdded(LocalDate.now())
+                                .build())
+                        .build()))
+                .selectedAudioVideoEvidenceDetails(SelectedAudioVideoEvidenceDetails.builder().build())
                 .appeal(Appeal.builder()
                         .appellant(Appellant.builder()
                                 .name(Name.builder().firstName("APPELLANT")

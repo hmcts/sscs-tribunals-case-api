@@ -21,7 +21,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidenceDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -57,7 +59,10 @@ public class ProcessAudioVideoEvidenceAboutToStartHandlerTest {
         openMocks(this);
         handler = new ProcessAudioVideoEvidenceAboutToStartHandler(idamService);
 
-        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
+        DocumentLink documentLink = DocumentLink.builder().documentUrl("url/1234").build();
+        AudioVideoEvidenceDetails details = AudioVideoEvidenceDetails.builder().fileName("filename.mp4").documentLink(documentLink).build();
+
+        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).audioVideoEvidence(List.of(AudioVideoEvidence.builder().value(details).build())).build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getEvent()).thenReturn(EventType.PROCESS_AUDIO_VIDEO);
@@ -85,7 +90,6 @@ public class ProcessAudioVideoEvidenceAboutToStartHandlerTest {
 
     @Test
     public void givenAudioEvidenceListIsNotEmpty_ProcessAudioVideoActionListIsCreated() {
-        sscsCaseData.setAudioVideoEvidence(List.of(AudioVideoEvidence.builder().build()));
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         SscsCaseData responseData = response.getData();
         assertEquals(2, responseData.getProcessAudioVideoAction().getListItems().size());
@@ -96,7 +100,6 @@ public class ProcessAudioVideoEvidenceAboutToStartHandlerTest {
     @Test
     public void givenJudgeRole_thenUserCanProcessMoreAudioVideoActions() {
         userDetails.getRoles().add(JUDGE.getValue());
-        sscsCaseData.setAudioVideoEvidence(List.of(AudioVideoEvidence.builder().build()));
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         SscsCaseData responseData = response.getData();
         assertEquals(4, responseData.getProcessAudioVideoAction().getListItems().size());
@@ -109,7 +112,6 @@ public class ProcessAudioVideoEvidenceAboutToStartHandlerTest {
     @Test
     public void superUser_willGetAllActions() {
         userDetails.getRoles().add(SUPER_USER.getValue());
-        sscsCaseData.setAudioVideoEvidence(List.of(AudioVideoEvidence.builder().build()));
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         SscsCaseData responseData = response.getData();
         assertEquals(5, responseData.getProcessAudioVideoAction().getListItems().size());
@@ -123,7 +125,6 @@ public class ProcessAudioVideoEvidenceAboutToStartHandlerTest {
     @Test
     public void givenTcwRole_verifyUserActions() {
         userDetails.getRoles().add(TCW.getValue());
-        sscsCaseData.setAudioVideoEvidence(List.of(AudioVideoEvidence.builder().build()));
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         SscsCaseData responseData = response.getData();
         assertEquals(3, responseData.getProcessAudioVideoAction().getListItems().size());

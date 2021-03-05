@@ -4,6 +4,9 @@ import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessedAction.DIRECTION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessedAction.SENT_TO_ADMIN;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessedAction.SENT_TO_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.*;
 
@@ -91,6 +94,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), ISSUE_DIRECTIONS_NOTICE.getCode())) {
             caseData.setInterlocReviewState(AWAITING_INFORMATION.getId());
             caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
+            addProcessedActionToSelectedEvidence(caseData, DIRECTION_ISSUED);
         }
     }
 
@@ -103,27 +107,30 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
             List<DwpDocument> dwpDocuments = new ArrayList<>();
 
             for (AudioVideoEvidence audioVideoEvidence : caseData.getAudioVideoEvidence()) {
+                if (isSelectedEvidence(audioVideoEvidence, caseData)) {
 
-                if (UploadParty.DWP.equals(audioVideoEvidence.getValue().getPartyUploaded())) {
-                    dwpDocuments.add(buildAudioVideoDwpDocument(audioVideoEvidence, response));
-                } else {
-                    sscsDocuments.add(buildAudioVideoSscsDocument(audioVideoEvidence, response));
+                    if (UploadParty.DWP.equals(audioVideoEvidence.getValue().getPartyUploaded())) {
+                        dwpDocuments.add(buildAudioVideoDwpDocument(audioVideoEvidence, response));
+                    } else {
+                        sscsDocuments.add(buildAudioVideoSscsDocument(audioVideoEvidence, response));
+                    }
+
+                    if (caseData.getDwpDocuments() != null) {
+                        dwpDocuments.addAll(caseData.getDwpDocuments());
+                    }
+
+                    caseData.setDwpDocuments(dwpDocuments);
+
+                    if (caseData.getSscsDocument() != null) {
+                        sscsDocuments.addAll(caseData.getSscsDocument());
+                    }
+
+                    caseData.setSscsDocument(sscsDocuments);
+
+                    caseData.getAudioVideoEvidence().remove(audioVideoEvidence);
                 }
+                break;
             }
-
-            if (caseData.getDwpDocuments() != null) {
-                dwpDocuments.addAll(caseData.getDwpDocuments());
-            }
-
-            caseData.setDwpDocuments(dwpDocuments);
-
-            if (caseData.getSscsDocument() != null) {
-                sscsDocuments.addAll(caseData.getSscsDocument());
-            }
-
-            caseData.setSscsDocument(sscsDocuments);
-
-            caseData.setAudioVideoEvidence(null);
         }
     }
 
@@ -195,7 +202,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), EXCLUDE_EVIDENCE.getCode())) {
             caseData.setInterlocReviewState(null);
             caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
-            caseData.setAudioVideoEvidence(null);
+            caseData.getAudioVideoEvidence().removeIf(evidence -> isSelectedEvidence(evidence, caseData));
         }
     }
 
@@ -209,6 +216,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
             }
             caseData.setInterlocReferralDate(LocalDate.now().toString());
             addToNotesIfNoteExists(caseData);
+            addProcessedActionToSelectedEvidence(caseData, SENT_TO_JUDGE);
         }
     }
 
@@ -222,7 +230,13 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
                 caseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION.getId());
             }
             addToNotesIfNoteExists(caseData);
+            addProcessedActionToSelectedEvidence(caseData, SENT_TO_ADMIN);
         }
+    }
+
+    private void addProcessedActionToSelectedEvidence(SscsCaseData caseData, ProcessedAction processedAction) {
+        caseData.getAudioVideoEvidence().stream().filter(evidence -> isSelectedEvidence(evidence, caseData))
+                .forEach(evidence -> evidence.getValue().setProcessedAction(processedAction));
     }
 
     private void clearTransientFields(SscsCaseData caseData) {
@@ -235,5 +249,10 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         caseData.setSignedRole(null);
         caseData.setDateAdded(null);
         caseData.setAppealNote(null);
+        caseData.setSelectedAudioVideoEvidence(null);
+    }
+
+    private boolean isSelectedEvidence(AudioVideoEvidence evidence, SscsCaseData caseData) {
+        return evidence.getValue().getDocumentLink().getDocumentUrl().equals(caseData.getSelectedAudioVideoEvidence().getValue().getCode());
     }
 }
