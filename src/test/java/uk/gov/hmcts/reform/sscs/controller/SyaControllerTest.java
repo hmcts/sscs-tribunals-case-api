@@ -692,8 +692,11 @@ public class SyaControllerTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testLoggingMethod() throws Exception {
+    public void testLoggingMethodNullBenefitType() throws Exception {
         SyaAppellant appellant = new SyaAppellant();
+        appellant.setTitle("Mr");
+        appellant.setLastName("Lastname");
+
         SyaContactDetails contactDetails = new SyaContactDetails();
         contactDetails.setEmailAddress("appellant@test.com");
         appellant.setContactDetails(contactDetails);
@@ -711,8 +714,24 @@ public class SyaControllerTest {
         caseWithNullBenefitCode.setReasonsForAppealing(reasons);
 
         controller.createAppeals(null, caseWithNullBenefitCode);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testLoggingMethodNullNino() throws Exception {
+        SyaAppellant appellant = new SyaAppellant();
+        SyaContactDetails contactDetails = new SyaContactDetails();
+        contactDetails.setEmailAddress("appellant@test.com");
+        appellant.setContactDetails(contactDetails);
+
+        SyaCaseWrapper caseWithNullNino = new SyaCaseWrapper();
+        caseWithNullNino.setBenefitType(new SyaBenefitType("Universal Credit", "UC"));
+        caseWithNullNino.setAppellant(appellant);
+        caseWithNullNino.setCcdCaseId("123456");
+
+        controller.createAppeals(null, caseWithNullNino);
 
     }
+
 
     private String getSyaCaseWrapperJson(String resourcePath) throws IOException, URISyntaxException {
         URL resource = getClass().getClassLoader().getResource(resourcePath);
