@@ -249,7 +249,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         caseData.setSignedRole(null);
         caseData.setDateAdded(null);
         caseData.setAppealNote(null);
-        caseData.setSelectedAudioVideoEvidence(null);
+        caseData.setSelectedAudioVideoEvidenceDetails(null);
     }
 
     private boolean isSelectedEvidence(AudioVideoEvidence evidence, SscsCaseData caseData) {
