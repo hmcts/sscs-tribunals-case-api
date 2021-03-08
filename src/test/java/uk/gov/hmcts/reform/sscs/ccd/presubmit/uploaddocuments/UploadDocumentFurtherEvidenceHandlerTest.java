@@ -121,8 +121,7 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
         assertEquals("other", actualCaseData.getData().getScannedDocuments().get(0).getValue().getType());
         assertEquals(1, actualCaseData.getData().getAudioVideoEvidence().size());
         assertEquals("appellant-some-name.mp3", actualCaseData.getData().getAudioVideoEvidence().get(0).getValue().getFileName());
-        assertEquals(DocumentType.APPELLANT_EVIDENCE.getId(), actualCaseData.getData().getAudioVideoEvidence().get(0).getValue().getDocumentType());
-        assertEquals(AudioVideoUploadParty.CTSC, actualCaseData.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded());
+        assertEquals(UploadParty.CTSC, actualCaseData.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded());
         assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), actualCaseData.getData().getInterlocReviewState());
         assertEquals("feReceived", actualCaseData.getData().getDwpState());
         assertNull(actualCaseData.getData().getDraftSscsFurtherEvidenceDocument());
