@@ -14,8 +14,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidenceDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SelectedAudioVideoEvidenceDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
@@ -51,7 +51,7 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
 
         final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         final DynamicList processAudioVideoAction = caseData.getProcessAudioVideoAction();
-        SelectedAudioVideoEvidenceDetails selectedAudioVideoEvidenceDetails = caseData.getSelectedAudioVideoEvidenceDetails();
+        AudioVideoEvidenceDetails selectedAudioVideoEvidenceDetails = caseData.getSelectedAudioVideoEvidenceDetails();
 
         if (nonNull(selectedAudioVideoEvidenceDetails) && nonNull(processAudioVideoAction) && ACTIONS_THAT_REQUIRES_NOTICE.contains(processAudioVideoAction.getValue().getCode())) {
             String templateId = documentConfiguration.getDocuments().get(caseData.getLanguagePreference()).get(EventType.DIRECTION_ISSUED);
@@ -72,19 +72,20 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
         return evidence.getValue().getDocumentLink().getDocumentUrl().equals(caseData.getSelectedAudioVideoEvidence().getValue().getCode());
     }
 
-    private SelectedAudioVideoEvidenceDetails buildSelectedAudioVideoEvidenceDetails(AudioVideoEvidenceDetails evidence) {
+    private AudioVideoEvidenceDetails buildSelectedAudioVideoEvidenceDetails(AudioVideoEvidenceDetails evidence) {
         String documentType = null;
-        String partyUploaded = null;
+        UploadParty partyUploaded = null;
         if (nonNull(evidence.getPartyUploaded())) {
-            partyUploaded = evidence.getPartyUploaded().getLabel();
+            partyUploaded = evidence.getPartyUploaded();
         }
         if (evidence.getDocumentLink().getDocumentFilename().toLowerCase().contains("mp3")) {
             documentType = DocumentType.AUDIO_DOCUMENT.getLabel();
         } else if (evidence.getDocumentLink().getDocumentFilename().toLowerCase().contains("mp4")) {
             documentType = DocumentType.VIDEO_DOCUMENT.getLabel();
         }
-        return SelectedAudioVideoEvidenceDetails.builder()
+        return AudioVideoEvidenceDetails.builder()
                 .documentType(documentType)
+                .fileName(evidence.getFileName())
                 .documentLink(evidence.getDocumentLink())
                 .dateAdded(evidence.getDateAdded())
                 .rip1Document(evidence.getRip1Document())

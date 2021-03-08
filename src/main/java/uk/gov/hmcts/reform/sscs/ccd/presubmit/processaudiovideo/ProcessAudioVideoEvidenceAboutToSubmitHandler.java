@@ -106,48 +106,44 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
             List<SscsDocument> sscsDocuments = new ArrayList<>();
             List<DwpDocument> dwpDocuments = new ArrayList<>();
 
-            for (AudioVideoEvidence audioVideoEvidence : caseData.getAudioVideoEvidence()) {
-                if (isSelectedEvidence(audioVideoEvidence, caseData)) {
+            AudioVideoEvidenceDetails selectedAudioVideoEvidenceDetails = caseData.getSelectedAudioVideoEvidenceDetails();
 
-                    if (UploadParty.DWP.equals(audioVideoEvidence.getValue().getPartyUploaded())) {
-                        dwpDocuments.add(buildAudioVideoDwpDocument(audioVideoEvidence, response));
-                    } else {
-                        sscsDocuments.add(buildAudioVideoSscsDocument(audioVideoEvidence, response));
-                    }
-
-                    if (caseData.getDwpDocuments() != null) {
-                        dwpDocuments.addAll(caseData.getDwpDocuments());
-                    }
-
-                    caseData.setDwpDocuments(dwpDocuments);
-
-                    if (caseData.getSscsDocument() != null) {
-                        sscsDocuments.addAll(caseData.getSscsDocument());
-                    }
-
-                    caseData.setSscsDocument(sscsDocuments);
-
-                    caseData.getAudioVideoEvidence().remove(audioVideoEvidence);
-                    break;
-                }
+            if (UploadParty.DWP.equals(selectedAudioVideoEvidenceDetails.getPartyUploaded())) {
+                dwpDocuments.add(buildAudioVideoDwpDocument(selectedAudioVideoEvidenceDetails, response));
+            } else {
+                sscsDocuments.add(buildAudioVideoSscsDocument(selectedAudioVideoEvidenceDetails, response));
             }
+
+            if (caseData.getDwpDocuments() != null) {
+                dwpDocuments.addAll(caseData.getDwpDocuments());
+            }
+
+            caseData.setDwpDocuments(dwpDocuments);
+
+            if (caseData.getSscsDocument() != null) {
+                sscsDocuments.addAll(caseData.getSscsDocument());
+            }
+
+            caseData.setSscsDocument(sscsDocuments);
+
+            caseData.getAudioVideoEvidence().removeIf(evidence -> isSelectedEvidence(evidence, caseData));
         }
     }
 
-    private DwpDocument buildAudioVideoDwpDocument(AudioVideoEvidence audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response) {
+    private DwpDocument buildAudioVideoDwpDocument(AudioVideoEvidenceDetails audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response) {
 
         DocumentLink rip1Doc = null;
-        if (audioVideoEvidence.getValue().getRip1Document() != null) {
-            rip1Doc = buildRip1Doc(audioVideoEvidence.getValue());
+        if (audioVideoEvidence.getRip1Document() != null) {
+            rip1Doc = buildRip1Doc(audioVideoEvidence);
         }
 
         return DwpDocument.builder().value(
                 DwpDocumentDetails.builder()
-                        .documentLink(audioVideoEvidence.getValue().getDocumentLink())
-                        .documentFileName(audioVideoEvidence.getValue().getFileName())
+                        .documentLink(audioVideoEvidence.getDocumentLink())
+                        .documentFileName(audioVideoEvidence.getFileName())
                         .documentType(findAudioVideoDocumentType(audioVideoEvidence, response))
-                        .documentDateAdded(audioVideoEvidence.getValue().getDateAdded().toString())
-                        .partyUploaded(audioVideoEvidence.getValue().getPartyUploaded())
+                        .documentDateAdded(audioVideoEvidence.getDateAdded().toString())
+                        .partyUploaded(audioVideoEvidence.getPartyUploaded())
                         .dateApproved(LocalDate.now().toString())
                         .rip1DocumentLink(rip1Doc)
                         .build())
@@ -165,23 +161,23 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
 
     }
 
-    private SscsDocument buildAudioVideoSscsDocument(AudioVideoEvidence audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response) {
+    private SscsDocument buildAudioVideoSscsDocument(AudioVideoEvidenceDetails audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response) {
         return SscsDocument.builder().value(
                 SscsDocumentDetails.builder()
-                        .documentLink(audioVideoEvidence.getValue().getDocumentLink())
-                        .documentFileName(audioVideoEvidence.getValue().getFileName())
+                        .documentLink(audioVideoEvidence.getDocumentLink())
+                        .documentFileName(audioVideoEvidence.getFileName())
                         .documentType(findAudioVideoDocumentType(audioVideoEvidence, response))
-                        .documentDateAdded(audioVideoEvidence.getValue().getDateAdded().toString())
-                        .partyUploaded(audioVideoEvidence.getValue().getPartyUploaded())
+                        .documentDateAdded(audioVideoEvidence.getDateAdded().toString())
+                        .partyUploaded(audioVideoEvidence.getPartyUploaded())
                         .dateApproved(LocalDate.now().toString())
                         .build())
                 .build();
     }
 
-    private String findAudioVideoDocumentType(AudioVideoEvidence audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response) {
-        if (audioVideoEvidence.getValue().getDocumentLink().getDocumentFilename().toLowerCase().contains("mp3")) {
+    private String findAudioVideoDocumentType(AudioVideoEvidenceDetails audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response) {
+        if (audioVideoEvidence.getDocumentLink().getDocumentFilename().toLowerCase().contains("mp3")) {
             return DocumentType.AUDIO_DOCUMENT.getValue();
-        } else if (audioVideoEvidence.getValue().getDocumentLink().getDocumentFilename().toLowerCase().contains("mp4")) {
+        } else if (audioVideoEvidence.getDocumentLink().getDocumentFilename().toLowerCase().contains("mp4")) {
             return DocumentType.VIDEO_DOCUMENT.getValue();
         } else {
             response.addError("Evidence cannot be included as it is not in .mp3 or .mp4 format");

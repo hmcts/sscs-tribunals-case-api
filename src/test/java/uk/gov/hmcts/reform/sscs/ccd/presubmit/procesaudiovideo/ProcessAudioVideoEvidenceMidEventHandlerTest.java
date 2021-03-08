@@ -91,7 +91,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
                                 .dateAdded(DATE)
                                 .build())
                         .build()))
-                .selectedAudioVideoEvidenceDetails(SelectedAudioVideoEvidenceDetails.builder().build())
+                .selectedAudioVideoEvidenceDetails(AudioVideoEvidenceDetails.builder().build())
                 .appeal(Appeal.builder()
                         .appellant(Appellant.builder()
                                 .name(Name.builder().firstName("APPELLANT")
@@ -152,11 +152,12 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         sscsCaseData.setSelectedAudioVideoEvidenceDetails(null);
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        final SelectedAudioVideoEvidenceDetails expectedEvidenceDetails = SelectedAudioVideoEvidenceDetails.builder()
-                .partyUploaded("Appellant")
+        final AudioVideoEvidenceDetails expectedEvidenceDetails = AudioVideoEvidenceDetails.builder()
+                .partyUploaded(UploadParty.APPELLANT)
                 .dateAdded(DATE)
                 .documentType("Audio document")
                 .documentLink(DOCUMENT_LINK)
+                .fileName("music.mp3")
                 .build();
 
         assertThat(response.getErrors().size(), is(0));

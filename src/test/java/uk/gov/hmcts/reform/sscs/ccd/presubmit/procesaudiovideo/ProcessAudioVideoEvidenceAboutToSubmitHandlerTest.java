@@ -91,7 +91,12 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
                         .documentFilename("directionIssued.pdf")
                         .build())
                 .interlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId())
-                .selectedAudioVideoEvidence(new DynamicList("test.com"))
+                .selectedAudioVideoEvidence(new DynamicList("test.com")).selectedAudioVideoEvidenceDetails(AudioVideoEvidenceDetails.builder()
+                        .documentLink(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
+                        .fileName("music.mp3")
+                        .partyUploaded(UploadParty.APPELLANT)
+                        .dateAdded(LocalDate.now())
+                        .build())
                 .audioVideoEvidence(new ArrayList<>(Arrays.asList(AudioVideoEvidence.builder().value(
                         AudioVideoEvidenceDetails.builder()
                                 .documentLink(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
@@ -230,14 +235,16 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     public void givenIncludeEvidenceIsNotAnMp3OrMp4_thenDisplayError() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.INCLUDE_EVIDENCE.getCode()));
 
-        List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(
-                AudioVideoEvidenceDetails.builder()
-                        .documentLink(DocumentLink.builder().documentFilename("nonvideo.pdf").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
-                        .fileName("nonvideo.pdf")
-                        .partyUploaded(UploadParty.DWP)
-                        .dateAdded(LocalDate.now())
-                        .build())
-                .build()));
+        AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("nonvideo.pdf").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
+                .fileName("nonvideo.pdf")
+                .partyUploaded(UploadParty.DWP)
+                .dateAdded(LocalDate.now())
+                .build();
+
+        sscsCaseData.setSelectedAudioVideoEvidenceDetails(evidenceDetails);
+
+        List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(evidenceDetails).build()));
 
         sscsCaseData.setAudioVideoEvidence(videoList);
 
@@ -252,14 +259,16 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     public void givenIncludeEvidenceFromDwp_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToDwpDocumentsCollection() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.INCLUDE_EVIDENCE.getCode()));
 
-        List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(
-                AudioVideoEvidenceDetails.builder()
-                        .documentLink(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
-                        .fileName("video.mp4")
-                        .partyUploaded(UploadParty.DWP)
-                        .dateAdded(LocalDate.now())
-                        .build())
-                .build()));
+        AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
+                .fileName("video.mp4")
+                .partyUploaded(UploadParty.DWP)
+                .dateAdded(LocalDate.now())
+                .build();
+
+        List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(evidenceDetails).build()));
+
+        sscsCaseData.setSelectedAudioVideoEvidenceDetails(evidenceDetails);
 
         sscsCaseData.setAudioVideoEvidence(videoList);
 
@@ -288,15 +297,17 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     public void givenIncludeEvidenceFromDwpWithRip1Document_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToDwpDocumentsCollection() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.INCLUDE_EVIDENCE.getCode()));
 
-        List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(
-                AudioVideoEvidenceDetails.builder()
-                        .documentLink(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
-                        .fileName("video.mp4")
-                        .partyUploaded(UploadParty.DWP)
-                        .dateAdded(LocalDate.now())
-                        .rip1Document(DocumentLink.builder().documentFilename("rip1.pdf").documentUrl("rip1.com").documentBinaryUrl("rip1.com/binary").build())
-                        .build())
-                .build()));
+        AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
+                .fileName("video.mp4")
+                .partyUploaded(UploadParty.DWP)
+                .dateAdded(LocalDate.now())
+                .rip1Document(DocumentLink.builder().documentFilename("rip1.pdf").documentUrl("rip1.com").documentBinaryUrl("rip1.com/binary").build())
+                .build();
+
+        sscsCaseData.setSelectedAudioVideoEvidenceDetails(evidenceDetails);
+
+        List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(evidenceDetails).build()));
 
         sscsCaseData.setAudioVideoEvidence(videoList);
 
@@ -326,14 +337,16 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     public void givenIncludeEvidenceFromDwpWithExistingDwpDocuments_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToDwpDocumentsCollection() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.INCLUDE_EVIDENCE.getCode()));
 
-        List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(
-                AudioVideoEvidenceDetails.builder()
-                        .documentLink(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
-                        .fileName("video.mp4")
-                        .partyUploaded(UploadParty.DWP)
-                        .dateAdded(LocalDate.now())
-                        .build())
-                .build()));
+        AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
+                .fileName("video.mp4")
+                .partyUploaded(UploadParty.DWP)
+                .dateAdded(LocalDate.now())
+                .build();
+
+        List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(evidenceDetails).build()));
+
+        sscsCaseData.setSelectedAudioVideoEvidenceDetails(evidenceDetails);
 
         sscsCaseData.setAudioVideoEvidence(videoList);
 
