@@ -43,6 +43,10 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
 
     private static final String URL = "http://dm-store/documents/123";
 
+    private static final LocalDate DATE = LocalDate.of(2021, 1,1);
+
+    private static final DocumentLink DOCUMENT_LINK = DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build();
+
     private ProcessAudioVideoEvidenceMidEventHandler handler;
 
     @Spy
@@ -81,10 +85,10 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
                 .selectedAudioVideoEvidence(new DynamicList("test.com"))
                 .audioVideoEvidence(singletonList(AudioVideoEvidence.builder().value(
                         AudioVideoEvidenceDetails.builder()
-                                .documentLink(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
+                                .documentLink(DOCUMENT_LINK)
                                 .fileName("music.mp3")
                                 .partyUploaded(UploadParty.APPELLANT)
-                                .dateAdded(LocalDate.now())
+                                .dateAdded(DATE)
                                 .build())
                         .build()))
                 .selectedAudioVideoEvidenceDetails(SelectedAudioVideoEvidenceDetails.builder().build())
@@ -140,6 +144,25 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getData().getPreviewDocument(), is(nullValue()));
         verifyNoInteractions(generateFile);
+    }
+
+    @Test
+    public void givenSelectedAudioVideoEvidenceDetailsIsNull_thenDoNotSetPreviewDocument_AndBuildNewSelectedAudioVideoEvidenceDetailsObject() {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.SEND_TO_ADMIN.getCode()));
+        sscsCaseData.setSelectedAudioVideoEvidenceDetails(null);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        final SelectedAudioVideoEvidenceDetails expectedEvidenceDetails = SelectedAudioVideoEvidenceDetails.builder()
+                .partyUploaded("Appellant")
+                .dateAdded(DATE)
+                .documentType("Audio document")
+                .documentLink(DOCUMENT_LINK)
+                .build();
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getData().getPreviewDocument(), is(nullValue()));
+        verifyNoInteractions(generateFile);
+        assertEquals(response.getData().getSelectedAudioVideoEvidenceDetails(), expectedEvidenceDetails);
     }
 
     private void verifyTemplateBody(String templateId) {

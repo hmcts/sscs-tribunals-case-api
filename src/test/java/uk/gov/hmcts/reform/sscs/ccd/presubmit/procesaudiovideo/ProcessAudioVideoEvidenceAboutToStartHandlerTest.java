@@ -98,6 +98,14 @@ public class ProcessAudioVideoEvidenceAboutToStartHandlerTest {
     }
 
     @Test
+    public void givenAudioEvidenceListIsNotEmpty_SelectedAudioVideoEvidenceListIsCreated() {
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        SscsCaseData responseData = response.getData();
+        assertEquals(responseData.getSelectedAudioVideoEvidence().getValue().getCode(), "url/1234");
+        assertEquals(responseData.getSelectedAudioVideoEvidence().getValue().getLabel(), "filename.mp4");
+    }
+
+    @Test
     public void givenJudgeRole_thenUserCanProcessMoreAudioVideoActions() {
         userDetails.getRoles().add(JUDGE.getValue());
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
