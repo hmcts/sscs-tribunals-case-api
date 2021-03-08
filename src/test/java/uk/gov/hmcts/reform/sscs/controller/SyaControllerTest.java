@@ -691,6 +691,16 @@ public class SyaControllerTest {
                 .andExpect(status().isNoContent());
     }
 
+    @Test
+    public void testLoggingMethod() throws Exception {
+        String json = getSyaCaseWrapperJson("json/sya_with_ccdId_null_benefit_type.json");
+
+        mockMvc.perform(post("/appeals")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isBadRequest());
+    }
+
     private String getSyaCaseWrapperJson(String resourcePath) throws IOException, URISyntaxException {
         URL resource = getClass().getClassLoader().getResource(resourcePath);
         return String.join("\n", Files.readAllLines(Paths.get(Objects.requireNonNull(resource).toURI())));

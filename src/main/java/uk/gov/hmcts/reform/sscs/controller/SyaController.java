@@ -46,9 +46,10 @@ public class SyaController {
     public ResponseEntity<String> createAppeals(@RequestHeader(value = AUTHORIZATION, required = false)
                                                     String authorisation, @RequestBody SyaCaseWrapper syaCaseWrapper) {
 
-        if (syaCaseWrapper.getAppellant() == null || syaCaseWrapper.getBenefitType() == null) {
+        if (syaCaseWrapper.getAppellant() == null || syaCaseWrapper.getAppellant().getNino()
+                || syaCaseWrapper.getBenefitType() == null || syaCaseWrapper.getBenefitType().getCode() == null) {
             logBadRequest(syaCaseWrapper);
-            if (syaCaseWrapper.getAppellant() == null) {
+            if (syaCaseWrapper.getAppellant() == null || syaCaseWrapper.getAppellant().getNino()) {
                 throw new IllegalStateException("Appeal must have a Nino");
             } else {
                 throw new IllegalStateException("Appeal must have a benefit type");
@@ -74,13 +75,13 @@ public class SyaController {
         stringBuilder.append("SYA data for bad request: ");
         if (syaCaseWrapper.getBenefitType() != null) {
             stringBuilder.append(" Benefit code ").append(syaCaseWrapper.getBenefitType().getCode());
-            stringBuilder.append(" Benefit code ").append(syaCaseWrapper.getBenefitType().getDescription());
+            stringBuilder.append(" Benefit description ").append(syaCaseWrapper.getBenefitType().getDescription());
         }
-        if (syaCaseWrapper.getAppellant() != null) {
+        if (syaCaseWrapper.getAppellant() != null && syaCaseWrapper.getAppellant().getNino() != null) {
             stringBuilder.append(" Nino ").append(syaCaseWrapper.getAppellant().getNino());
         }
         if (syaCaseWrapper.getCcdCaseId() != null) {
-            stringBuilder.append(" CCD ID ").append(syaCaseWrapper.getAppellant().getNino());
+            stringBuilder.append(" CCD ID ").append(syaCaseWrapper.getCcdCaseId());
         }
         if (syaCaseWrapper.getAppellant() != null && syaCaseWrapper.getAppellant().getTitle() != null) {
             stringBuilder.append(" Appellant title ").append(syaCaseWrapper.getAppellant().getTitle());
