@@ -195,10 +195,7 @@ public class TrackYourAppealJsonBuilder {
 
     private Predicate<? super SscsDocument> filterEvidence() {
         return (d) -> (DocumentType.AUDIO_DOCUMENT.getValue().equalsIgnoreCase(d.getValue().getDocumentType())
-                || DocumentType.VIDEO_DOCUMENT.getValue().equalsIgnoreCase(d.getValue().getDocumentType()))
-                && (UploadParty.APPELLANT.equals(d.getValue().getPartyUploaded())
-                || UploadParty.APPOINTEE.equals(d.getValue().getPartyUploaded()));
-
+                || DocumentType.VIDEO_DOCUMENT.getValue().equalsIgnoreCase(d.getValue().getDocumentType()));
     }
 
     private ArrayNode getHearingOutcome(List<SscsDocument> sscsDocument) {
