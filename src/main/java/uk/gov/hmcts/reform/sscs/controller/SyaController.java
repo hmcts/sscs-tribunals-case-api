@@ -46,10 +46,10 @@ public class SyaController {
     public ResponseEntity<String> createAppeals(@RequestHeader(value = AUTHORIZATION, required = false)
                                                     String authorisation, @RequestBody SyaCaseWrapper syaCaseWrapper) {
 
-        if (syaCaseWrapper.getAppellant() == null || syaCaseWrapper.getAppellant().getNino()
+        if (syaCaseWrapper.getAppellant() == null || syaCaseWrapper.getAppellant().getNino() == null
                 || syaCaseWrapper.getBenefitType() == null || syaCaseWrapper.getBenefitType().getCode() == null) {
             logBadRequest(syaCaseWrapper);
-            if (syaCaseWrapper.getAppellant() == null || syaCaseWrapper.getAppellant().getNino()) {
+            if (syaCaseWrapper.getAppellant() == null || syaCaseWrapper.getAppellant().getNino() != null) {
                 throw new IllegalStateException("Appeal must have a Nino");
             } else {
                 throw new IllegalStateException("Appeal must have a benefit type");

@@ -34,7 +34,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
@@ -691,14 +691,27 @@ public class SyaControllerTest {
                 .andExpect(status().isNoContent());
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void testLoggingMethod() throws Exception {
-        String json = getSyaCaseWrapperJson("json/sya_with_ccdId_null_benefit_type.json");
+        SyaAppellant appellant = new SyaAppellant();
+        SyaContactDetails contactDetails = new SyaContactDetails();
+        contactDetails.setEmailAddress("appellant@test.com");
+        appellant.setContactDetails(contactDetails);
+        appellant.setNino("1234");
 
-        mockMvc.perform(post("/appeals")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-                .andExpect(status().isBadRequest());
+        SyaCaseWrapper caseWithNullBenefitCode = new SyaCaseWrapper();
+        caseWithNullBenefitCode.setAppellant(appellant);
+        caseWithNullBenefitCode.setCcdCaseId("123456");
+
+        SyaReasonsForAppealing reasons = new SyaReasonsForAppealing();
+        Reason reason = new Reason();
+        reason.setReasonForAppealing("my reason");
+        reason.setWhatYouDisagreeWith("i disagree");
+        reasons.setReasons(Collections.singletonList(reason));
+        caseWithNullBenefitCode.setReasonsForAppealing(reasons);
+
+        controller.createAppeals(null, caseWithNullBenefitCode);
+
     }
 
     private String getSyaCaseWrapperJson(String resourcePath) throws IOException, URISyntaxException {
