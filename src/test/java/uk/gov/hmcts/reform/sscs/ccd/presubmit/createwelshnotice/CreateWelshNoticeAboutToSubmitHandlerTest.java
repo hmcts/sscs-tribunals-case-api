@@ -92,7 +92,9 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
     @Test
     @Parameters({"DIRECTION_NOTICE, DIRECTION_ISSUED_WELSH",
             "DECISION_NOTICE, DECISION_ISSUED_WELSH",
-            "ADJOURNMENT_NOTICE, ISSUE_ADJOURNMENT_NOTICE_WELSH"})
+            "ADJOURNMENT_NOTICE, ISSUE_ADJOURNMENT_NOTICE_WELSH",
+            "AUDIO_VIDEO_NOTICE, PROCESS_AUDIO_VIDEO_WELSH"
+    })
     public void handleMethodCallsCorrectServicesAndSetsDataCorrectly(DocumentType documentType, EventType eventType) {
         byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
 
