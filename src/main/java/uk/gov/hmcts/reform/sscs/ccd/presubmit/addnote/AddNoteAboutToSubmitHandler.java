@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.addnote;
 import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,12 +38,19 @@ public class AddNoteAboutToSubmitHandler  implements PreSubmitCallbackHandler<Ss
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+        if (!canHandle(callbackType, callback)) {
+            throw new IllegalStateException("Cannot handle callback");
+        }
+
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         String note = sscsCaseData.getTempNoteDetail();
         Note newNote = Note.builder().value(NoteDetails.builder().noteDetail(note).noteDate(LocalDate.now().toString())
                 .author(buildLoggedInUserName(userAuthorisation)).build()).build();
+        if (sscsCaseData.getAppealNotePad() == null) {
+            sscsCaseData.setAppealNotePad(NotePad.builder().notesCollection(new ArrayList<Note>()).build());
+        }
         sscsCaseData.getAppealNotePad().getNotesCollection().add(newNote);
 
         sscsCaseData.setTempNoteDetail(null);
