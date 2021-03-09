@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidenceDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
@@ -71,8 +70,8 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
             } else {
                 caseData.setShowRip1DocPage(NO);
             }
-
-            selectedAudioVideoEvidenceDetails = buildSelectedAudioVideoEvidenceDetails(selectedAudioVideoEvidence.getValue());
+            setDocumentType(selectedAudioVideoEvidence.getValue());
+            selectedAudioVideoEvidenceDetails = selectedAudioVideoEvidence.getValue();
         }
 
         caseData.setSelectedAudioVideoEvidenceDetails(selectedAudioVideoEvidenceDetails);
@@ -80,7 +79,7 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
         return new PreSubmitCallbackResponse<>(caseData);
     }
 
-    private AudioVideoEvidenceDetails buildSelectedAudioVideoEvidenceDetails(AudioVideoEvidenceDetails evidence) {
+    private void setDocumentType(AudioVideoEvidenceDetails evidence) {
         DocumentType documentType = getDocumentType(evidence);
 
         String documentTypeLabel = null;
@@ -89,18 +88,6 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
             documentTypeLabel = documentType.getLabel();
         }
 
-        UploadParty partyUploaded = null;
-        if (nonNull(evidence.getPartyUploaded())) {
-            partyUploaded = evidence.getPartyUploaded();
-        }
-
-        return AudioVideoEvidenceDetails.builder()
-                .documentType(documentTypeLabel)
-                .fileName(evidence.getFileName())
-                .documentLink(evidence.getDocumentLink())
-                .dateAdded(evidence.getDateAdded())
-                .rip1Document(evidence.getRip1Document())
-                .partyUploaded(partyUploaded)
-                .build();
+        evidence.setDocumentType(documentTypeLabel);
     }
 }
