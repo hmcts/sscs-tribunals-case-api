@@ -2,8 +2,11 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoEvidenceAboutToSubmitHandler.ACTIONS_THAT_REQUIRES_NOTICE;
-import static uk.gov.hmcts.reform.sscs.util.FileExtensionUtil.getDocumentType;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.getDocumentType;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.isSelectedEvidence;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,10 +16,12 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidenceDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
@@ -62,15 +67,19 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
         AudioVideoEvidence selectedAudioVideoEvidence = caseData.getAudioVideoEvidence().stream().filter(evidence -> isSelectedEvidence(evidence, caseData)).findFirst().orElse(null);
 
         if (nonNull(selectedAudioVideoEvidence)) {
+
+            if (nonNull(selectedAudioVideoEvidence.getValue().getRip1Document())) {
+                caseData.setShowRip1DocPage(YES);
+            } else {
+                caseData.setShowRip1DocPage(NO);
+            }
+
             selectedAudioVideoEvidenceDetails = buildSelectedAudioVideoEvidenceDetails(selectedAudioVideoEvidence.getValue());
         }
 
         caseData.setSelectedAudioVideoEvidenceDetails(selectedAudioVideoEvidenceDetails);
-        return new PreSubmitCallbackResponse<>(caseData);
-    }
 
-    private boolean isSelectedEvidence(AudioVideoEvidence evidence, SscsCaseData caseData) {
-        return evidence.getValue().getDocumentLink().getDocumentUrl().equals(caseData.getSelectedAudioVideoEvidence().getValue().getCode());
+        return new PreSubmitCallbackResponse<>(caseData);
     }
 
     private AudioVideoEvidenceDetails buildSelectedAudioVideoEvidenceDetails(AudioVideoEvidenceDetails evidence) {

@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidenceDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
-public class FileExtensionUtil {
+public class AudioVideoEvidenceUtil {
 
-    private FileExtensionUtil() {
+    private AudioVideoEvidenceUtil() {
         //
     }
 
@@ -16,5 +18,9 @@ public class FileExtensionUtil {
             return DocumentType.VIDEO_DOCUMENT;
         }
         return null;
+    }
+
+    public static boolean isSelectedEvidence(AudioVideoEvidence evidence, SscsCaseData caseData) {
+        return evidence.getValue().getDocumentLink().getDocumentUrl().equals(caseData.getSelectedAudioVideoEvidence().getValue().getCode());
     }
 }

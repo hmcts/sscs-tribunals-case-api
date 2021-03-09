@@ -9,7 +9,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessedAction.SENT_TO_ADMIN;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessedAction.SENT_TO_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.*;
-import static uk.gov.hmcts.reform.sscs.util.FileExtensionUtil.getDocumentType;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.getDocumentType;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.isSelectedEvidence;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -247,9 +248,6 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         caseData.setDateAdded(null);
         caseData.setAppealNote(null);
         caseData.setSelectedAudioVideoEvidenceDetails(null);
-    }
-
-    private boolean isSelectedEvidence(AudioVideoEvidence evidence, SscsCaseData caseData) {
-        return evidence.getValue().getDocumentLink().getDocumentUrl().equals(caseData.getSelectedAudioVideoEvidence().getValue().getCode());
+        caseData.setShowRip1DocPage(null);
     }
 }
