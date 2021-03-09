@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessedAction.SENT_TO_ADMIN;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessedAction.SENT_TO_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.*;
+import static uk.gov.hmcts.reform.sscs.util.FileExtensionUtil.getDocumentType;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -175,13 +176,13 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     }
 
     private String findAudioVideoDocumentType(AudioVideoEvidenceDetails audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response) {
-        if (audioVideoEvidence.getDocumentLink().getDocumentFilename().toLowerCase().contains("mp3")) {
-            return DocumentType.AUDIO_DOCUMENT.getValue();
-        } else if (audioVideoEvidence.getDocumentLink().getDocumentFilename().toLowerCase().contains("mp4")) {
-            return DocumentType.VIDEO_DOCUMENT.getValue();
-        } else {
+        DocumentType documentType = getDocumentType(audioVideoEvidence);
+
+        if (isNull(documentType)) {
             response.addError("Evidence cannot be included as it is not in .mp3 or .mp4 format");
             return null;
+        } else {
+            return documentType.getValue();
         }
     }
 

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoEvidenceAboutToSubmitHandler.ACTIONS_THAT_REQUIRES_NOTICE;
+import static uk.gov.hmcts.reform.sscs.util.FileExtensionUtil.getDocumentType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -73,18 +74,21 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
     }
 
     private AudioVideoEvidenceDetails buildSelectedAudioVideoEvidenceDetails(AudioVideoEvidenceDetails evidence) {
-        String documentType = null;
+        DocumentType documentType = getDocumentType(evidence);
+
+        String documentTypeLabel = null;
+
+        if (nonNull(documentType)) {
+            documentTypeLabel = documentType.getLabel();
+        }
+
         UploadParty partyUploaded = null;
         if (nonNull(evidence.getPartyUploaded())) {
             partyUploaded = evidence.getPartyUploaded();
         }
-        if (evidence.getDocumentLink().getDocumentFilename().toLowerCase().contains("mp3")) {
-            documentType = DocumentType.AUDIO_DOCUMENT.getLabel();
-        } else if (evidence.getDocumentLink().getDocumentFilename().toLowerCase().contains("mp4")) {
-            documentType = DocumentType.VIDEO_DOCUMENT.getLabel();
-        }
+
         return AudioVideoEvidenceDetails.builder()
-                .documentType(documentType)
+                .documentType(documentTypeLabel)
                 .fileName(evidence.getFileName())
                 .documentLink(evidence.getDocumentLink())
                 .dateAdded(evidence.getDateAdded())
