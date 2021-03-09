@@ -111,7 +111,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
             AudioVideoEvidenceDetails selectedAudioVideoEvidenceDetails = caseData.getSelectedAudioVideoEvidenceDetails();
 
             if (UploadParty.DWP.equals(selectedAudioVideoEvidenceDetails.getPartyUploaded())) {
-                dwpDocuments.add(buildAudioVideoDwpDocument(selectedAudioVideoEvidenceDetails, response));
+                dwpDocuments.add(buildAudioVideoDwpDocument(selectedAudioVideoEvidenceDetails, response, caseData.isLanguagePreferenceWelsh()));
             } else {
                 sscsDocuments.add(buildAudioVideoSscsDocument(selectedAudioVideoEvidenceDetails, response));
             }
@@ -121,6 +121,10 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
             }
 
             caseData.setDwpDocuments(dwpDocuments);
+
+            if (caseData.isLanguagePreferenceWelsh() && isAnyRip1Doc(dwpDocuments)) {
+                caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
+            }
 
             if (caseData.getSscsDocument() != null) {
                 sscsDocuments.addAll(caseData.getSscsDocument());
@@ -132,11 +136,18 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         }
     }
 
-    private DwpDocument buildAudioVideoDwpDocument(AudioVideoEvidenceDetails audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response) {
+    private boolean isAnyRip1Doc(List<DwpDocument> dwpDocuments) {
+        return dwpDocuments.stream().anyMatch(d -> d.getValue().getRip1DocumentLink() != null);
+    }
 
+    private DwpDocument buildAudioVideoDwpDocument(AudioVideoEvidenceDetails audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response, boolean isWelshCase) {
         DocumentLink rip1Doc = null;
+        SscsDocumentTranslationStatus status = null;
         if (audioVideoEvidence.getRip1Document() != null) {
             rip1Doc = buildRip1Doc(audioVideoEvidence);
+            if (isWelshCase) {
+                status = SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
+            }
         }
 
         return DwpDocument.builder().value(
@@ -148,6 +159,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
                         .partyUploaded(audioVideoEvidence.getPartyUploaded())
                         .dateApproved(LocalDate.now().toString())
                         .rip1DocumentLink(rip1Doc)
+                        .documentTranslationStatus(status)
                         .build())
                 .build();
     }
