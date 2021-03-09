@@ -118,12 +118,11 @@ public class SubmitDraftTest {
         SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
         draftAppeal.setCaseType("draft");
         draftAppeal.setBenefitType(new SyaBenefitType("Personal Independence Payment", "PIP"));
-        draftAppeal.setCcdCaseId("123456");
         return draftAppeal;
     }
 
     @Test
-    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToNewcastle() throws InterruptedException {
+    public void givenDraftAppealIsSubmitted_shouldSetDwpRegionalCentre() throws InterruptedException {
         String expectedDwpRegionalCentre = "Newcastle";
 
         RestAssured.given()
@@ -132,65 +131,6 @@ public class SubmitDraftTest {
             .header(new Header(AUTHORIZATION, citizenToken))
             .body(getAllDetailsDwpRegionalCentre("PIP", "DWP PIP (1)"))
             .put("/drafts");
-
-        SscsCaseData draft = findCase(citizenIdamTokens).get(0);
-        assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
-    }
-
-    @Test
-    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToGlasgow() throws InterruptedException {
-        String expectedDwpRegionalCentre = "Glasgow";
-
-        RestAssured.given()
-                .log().method().log().headers().log().uri().log().body(true)
-                .contentType(ContentType.JSON)
-                .header(new Header(AUTHORIZATION, citizenToken))
-                .body(getAllDetailsDwpRegionalCentre("PIP", "DWP PIP (2)"))
-                .put("/drafts");
-
-        SscsCaseData draft = findCase(citizenIdamTokens).get(0);
-        assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
-    }
-
-    @Test
-    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToInvernessDrt() throws InterruptedException {
-        String expectedDwpRegionalCentre = "Inverness DRT";
-
-        RestAssured.given()
-                .log().method().log().headers().log().uri().log().body(true)
-                .contentType(ContentType.JSON)
-                .header(new Header(AUTHORIZATION, citizenToken))
-                .body(getAllDetailsDwpRegionalCentre("ESA", expectedDwpRegionalCentre))
-                .put("/drafts");
-
-        SscsCaseData draft = findCase(citizenIdamTokens).get(0);
-        assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
-    }
-
-    @Test
-    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToCoatbridgeBenefitCentre() throws InterruptedException {
-        String expectedDwpRegionalCentre = "Coatbridge Benefit Centre";
-
-        RestAssured.given()
-                .log().method().log().headers().log().uri().log().body(true)
-                .contentType(ContentType.JSON)
-                .header(new Header(AUTHORIZATION, citizenToken))
-                .body(getAllDetailsDwpRegionalCentre("ESA", expectedDwpRegionalCentre))
-                .put("/drafts");
-
-        SscsCaseData draft = findCase(citizenIdamTokens).get(0);
-        assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
-    }
-
-    @Test
-    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToUniversalCredit() throws InterruptedException {
-        String expectedDwpRegionalCentre = "Universal Credit";
-        RestAssured.given()
-                .log().method().log().headers().log().uri().log().body(true)
-                .contentType(ContentType.JSON)
-                .header(new Header(AUTHORIZATION, citizenToken))
-                .body(getAllDetailsDwpRegionalCentre("UC", ""))
-                .put("/drafts");
 
         SscsCaseData draft = findCase(citizenIdamTokens).get(0);
         assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());

@@ -5,7 +5,6 @@ import static uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator.generateApp
 import static uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil.cleanPhoneNumber;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,7 +49,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
         List<SscsDocument> sscsDocuments = getEvidenceDocumentDetails(syaCaseWrapper);
         return SscsCaseData.builder()
-                .caseCreated(LocalDateTime.now().toString())
+                .caseCreated(LocalDate.now().toString())
                 .isSaveAndReturn(syaCaseWrapper.getIsSaveAndReturn())
                 .appeal(appeal)
                 .subscriptions(getSubscriptions(syaCaseWrapper))
