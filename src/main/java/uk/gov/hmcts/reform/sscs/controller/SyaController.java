@@ -49,11 +49,6 @@ public class SyaController {
         if (syaCaseWrapper.getAppellant() == null || syaCaseWrapper.getAppellant().getNino() == null
                 || syaCaseWrapper.getBenefitType() == null || syaCaseWrapper.getBenefitType().getCode() == null) {
             logBadRequest(syaCaseWrapper);
-            if (syaCaseWrapper.getAppellant() == null || syaCaseWrapper.getAppellant().getNino() != null) {
-                throw new IllegalStateException("Appeal must have a Nino");
-            } else {
-                throw new IllegalStateException("Appeal must have a benefit type");
-            }
         }
         log.info("Appeal with Nino - {} and benefit type {} received", syaCaseWrapper.getAppellant().getNino(),
             syaCaseWrapper.getBenefitType().getCode());

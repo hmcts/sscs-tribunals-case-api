@@ -691,7 +691,7 @@ public class SyaControllerTest {
                 .andExpect(status().isNoContent());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = NullPointerException.class)
     public void testLoggingMethodNullBenefitType() throws Exception {
         SyaAppellant appellant = new SyaAppellant();
         appellant.setTitle("Mr");
@@ -716,16 +716,10 @@ public class SyaControllerTest {
         controller.createAppeals(null, caseWithNullBenefitCode);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = NullPointerException.class)
     public void testLoggingMethodNullNino() throws Exception {
-        SyaAppellant appellant = new SyaAppellant();
-        SyaContactDetails contactDetails = new SyaContactDetails();
-        contactDetails.setEmailAddress("appellant@test.com");
-        appellant.setContactDetails(contactDetails);
-
         SyaCaseWrapper caseWithNullNino = new SyaCaseWrapper();
         caseWithNullNino.setBenefitType(new SyaBenefitType("Universal Credit", "UC"));
-        caseWithNullNino.setAppellant(appellant);
         caseWithNullNino.setCcdCaseId("123456");
 
         controller.createAppeals(null, caseWithNullNino);
