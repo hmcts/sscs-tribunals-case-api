@@ -118,6 +118,7 @@ public class SubmitDraftTest {
         SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
         draftAppeal.setCaseType("draft");
         draftAppeal.setBenefitType(new SyaBenefitType("Personal Independence Payment", "PIP"));
+        draftAppeal.setCcdCaseId("123456");
         return draftAppeal;
     }
 
@@ -274,7 +275,7 @@ public class SubmitDraftTest {
     }
 
     private void archiveDraft(SscsCaseData draftAppeal) {
-        citizenCcdService.draftArchivedFirst(draftAppeal, citizenIdamTokens, userIdamTokens);
+        citizenCcdService.archiveDraft(draftAppeal, citizenIdamTokens, Long.valueOf(draftAppeal.getCcdCaseId()));
     }
 
     public String getIdamOauth2Token(String username, String password) {
