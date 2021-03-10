@@ -28,7 +28,7 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 @Service
 public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    public static final List<String> ACTIONS_THAT_REQUIRES_NOTICE = asList(ISSUE_DIRECTIONS_NOTICE.getCode(), EXCLUDE_EVIDENCE.getCode());
+    public static final List<String> ACTIONS_THAT_REQUIRES_NOTICE = asList(ISSUE_DIRECTIONS_NOTICE.getCode(), EXCLUDE_EVIDENCE.getCode(), INCLUDE_EVIDENCE.getCode());
 
     private final FooterService footerService;
 
@@ -69,6 +69,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
             return response;
         }
         processIfIssueDirectionNotice(caseData);
+        processIfIncludeEvidence(caseData, response);
         processIfExcludeEvidence(caseData);
         processIfSendToJudge(caseData);
         processIfSendToAdmin(caseData);
@@ -90,6 +91,94 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), ISSUE_DIRECTIONS_NOTICE.getCode())) {
             caseData.setInterlocReviewState(AWAITING_INFORMATION.getId());
             caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
+        }
+    }
+
+    private void processIfIncludeEvidence(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), INCLUDE_EVIDENCE.getCode())) {
+            caseData.setInterlocReviewState(null);
+            caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
+
+            List<SscsDocument> sscsDocuments = new ArrayList<>();
+            List<DwpDocument> dwpDocuments = new ArrayList<>();
+
+            for (AudioVideoEvidence audioVideoEvidence : caseData.getAudioVideoEvidence()) {
+
+                if (UploadParty.DWP.equals(audioVideoEvidence.getValue().getPartyUploaded())) {
+                    dwpDocuments.add(buildAudioVideoDwpDocument(audioVideoEvidence, response));
+                } else {
+                    sscsDocuments.add(buildAudioVideoSscsDocument(audioVideoEvidence, response));
+                }
+            }
+
+            if (caseData.getDwpDocuments() != null) {
+                dwpDocuments.addAll(caseData.getDwpDocuments());
+            }
+
+            caseData.setDwpDocuments(dwpDocuments);
+
+            if (caseData.getSscsDocument() != null) {
+                sscsDocuments.addAll(caseData.getSscsDocument());
+            }
+
+            caseData.setSscsDocument(sscsDocuments);
+
+            caseData.setAudioVideoEvidence(null);
+        }
+    }
+
+    private DwpDocument buildAudioVideoDwpDocument(AudioVideoEvidence audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response) {
+
+        DocumentLink rip1Doc = null;
+        if (audioVideoEvidence.getValue().getRip1Document() != null) {
+            rip1Doc = buildRip1Doc(audioVideoEvidence.getValue());
+        }
+
+        return DwpDocument.builder().value(
+                DwpDocumentDetails.builder()
+                        .documentLink(audioVideoEvidence.getValue().getDocumentLink())
+                        .documentFileName(audioVideoEvidence.getValue().getFileName())
+                        .documentType(findAudioVideoDocumentType(audioVideoEvidence, response))
+                        .documentDateAdded(audioVideoEvidence.getValue().getDateAdded().toString())
+                        .partyUploaded(audioVideoEvidence.getValue().getPartyUploaded())
+                        .dateApproved(LocalDate.now().toString())
+                        .rip1DocumentLink(rip1Doc)
+                        .build())
+                .build();
+    }
+
+    private DocumentLink buildRip1Doc(AudioVideoEvidenceDetails audioVideoEvidence) {
+        String rip1FileName = "RIP 1 document uploaded on " + audioVideoEvidence.getDateAdded().toString() + ".pdf";
+
+        return DocumentLink.builder()
+                .documentFilename(rip1FileName)
+                .documentUrl(audioVideoEvidence.getRip1Document().getDocumentUrl())
+                .documentBinaryUrl(audioVideoEvidence.getRip1Document().getDocumentBinaryUrl())
+                .build();
+
+    }
+
+    private SscsDocument buildAudioVideoSscsDocument(AudioVideoEvidence audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response) {
+        return SscsDocument.builder().value(
+                SscsDocumentDetails.builder()
+                        .documentLink(audioVideoEvidence.getValue().getDocumentLink())
+                        .documentFileName(audioVideoEvidence.getValue().getFileName())
+                        .documentType(findAudioVideoDocumentType(audioVideoEvidence, response))
+                        .documentDateAdded(audioVideoEvidence.getValue().getDateAdded().toString())
+                        .partyUploaded(audioVideoEvidence.getValue().getPartyUploaded())
+                        .dateApproved(LocalDate.now().toString())
+                        .build())
+                .build();
+    }
+
+    private String findAudioVideoDocumentType(AudioVideoEvidence audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response) {
+        if (audioVideoEvidence.getValue().getDocumentLink().getDocumentFilename().toLowerCase().contains("mp3")) {
+            return DocumentType.AUDIO_DOCUMENT.getValue();
+        } else if (audioVideoEvidence.getValue().getDocumentLink().getDocumentFilename().toLowerCase().contains("mp4")) {
+            return DocumentType.VIDEO_DOCUMENT.getValue();
+        } else {
+            response.addError("Evidence cannot be included as it is not in .mp3 or .mp4 format");
+            return null;
         }
     }
 

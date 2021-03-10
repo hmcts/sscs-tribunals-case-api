@@ -5,6 +5,7 @@ import static org.springframework.http.MediaType.APPLICATION_PDF;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -67,30 +68,40 @@ public class BundleAudioVideoPdfService {
 
     private List<PdfTableDescriptor> buildAudioVideoEvidenceDescriptorsForTable(SscsCaseData caseData) {
 
+        List<PdfTableDescriptor> pdfTableDescriptorList = new ArrayList<>();
+
         if (caseData.getSscsDocument() != null) {
-            return caseData.getSscsDocument().stream()
-                    .filter(e -> e.getValue().getDocumentLink().getDocumentFilename().endsWith(".mp3") || e.getValue().getDocumentLink().getDocumentFilename().endsWith(".mp4"))
-                    .map(audioVideoDocument -> buildDescriptorsFromAudioVideoEvidence(audioVideoDocument))
-                    .collect(Collectors.toList());
+            pdfTableDescriptorList.addAll(buildDescriptorsUsingDocuments(caseData.getSscsDocument()));
         }
-        return null;
+
+        if (caseData.getDwpDocuments() != null) {
+            pdfTableDescriptorList.addAll(buildDescriptorsUsingDocuments(caseData.getDwpDocuments()));
+        }
+
+        return pdfTableDescriptorList;
     }
 
+    public List<PdfTableDescriptor> buildDescriptorsUsingDocuments(List<? extends AbstractDocument> abstractDocument) {
 
-    private PdfTableDescriptor buildDescriptorsFromAudioVideoEvidence(SscsDocument sscsDocument) {
+        return abstractDocument.stream()
+                .filter(e -> e.getValue().getDocumentLink().getDocumentFilename().endsWith(".mp3") || e.getValue().getDocumentLink().getDocumentFilename().endsWith(".mp4"))
+                .map(audioVideoDocument -> buildDescriptorsFromAudioVideoEvidence(audioVideoDocument))
+                .collect(Collectors.toList());
 
-        if (sscsDocument != null) {
+    }
 
-            //FIXME: replace placeholders for date approved and upload party once implemented
+    private PdfTableDescriptor buildDescriptorsFromAudioVideoEvidence(AbstractDocument document) {
 
-            String docUrl = sscsDocument.getValue().getDocumentLink().getDocumentBinaryUrl().replace(documentManagementUrl, dmGatewayUrl);
+        if (document != null) {
 
-            return PdfTableDescriptor.builder().documentType(DocumentType.fromValue(sscsDocument.getValue().getDocumentType()).getLabel())
-                    .documentUrl(sscsDocument.getValue().getDocumentLink().getDocumentFilename() + "|" + docUrl)
-                    .dateAdded(DATEFORMATTER.format(LocalDate.parse(sscsDocument.getValue().getDocumentDateAdded())))
-                    .dateApproved("PLACEHOLDER")
-                    .uploadParty("PLACEHOLDER")
-                    .   build();
+            String docUrl = document.getValue().getDocumentLink().getDocumentBinaryUrl().replace(documentManagementUrl, dmGatewayUrl);
+
+            return PdfTableDescriptor.builder().documentType(DocumentType.fromValue(document.getValue().getDocumentType()).getLabel())
+                    .documentUrl(document.getValue().getDocumentLink().getDocumentFilename() + "|" + docUrl)
+                    .dateAdded(DATEFORMATTER.format(LocalDate.parse(document.getValue().getDocumentDateAdded())))
+                    .dateApproved(DATEFORMATTER.format(LocalDate.parse(document.getValue().getDateApproved())))
+                    .uploadParty(document.getValue().getPartyUploaded().getLabel())
+                    .build();
         }
         return null;
     }

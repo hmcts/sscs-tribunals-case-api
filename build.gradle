@@ -17,9 +17,9 @@ plugins {
     id 'com.gorylenko.gradle-git-properties' version '2.2.4'
     id 'com.github.ben-manes.versions' version '0.36.0'
     id 'net.ltgt.apt' version '0.21'
-    id "info.solidsoft.pitest" version '1.5.2'
+    id "info.solidsoft.pitest" version '1.6.0'
     id 'org.owasp.dependencycheck' version '6.1.1'
-    id 'au.com.dius.pact' version '4.2.0'
+    id 'au.com.dius.pact' version '4.2.1'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -232,8 +232,8 @@ dependencyManagement {
             entry 'kotlin-stdlib-jdk7'
             entry 'kotlin-reflect'
         }
-        // CVE-2020-13934, CVE-2020-13935, CVE-2020-17527, CVE-2020-17527
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.40') {
+        // CVE-2020-13934, CVE-2020-13935, CVE-2020-17527, CVE-2020-17527,
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.43') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -256,7 +256,7 @@ dependencyManagement {
         }
 
         //CVE-2021-22112
-        dependencySet(group: 'org.springframework.security', version: '5.3.8.RELEASE') {
+        dependencySet(group: 'org.springframework.security', version: '5.4.5') {
             entry 'spring-security-crypto'
             entry 'spring-security-config'
             entry 'spring-security-core'
@@ -298,8 +298,8 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.4'
 
     // Added to fix CVE-2020-13934, CVE-2020-13935, CVE-2020-17527
-    compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.40'
-    compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.40'
+    compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.43'
+    compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.43'
     compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.2'
 
     // Safe to remove once Spring update their dependencies - see CVE-2019-14439 and add 'com.fasterxml.jackson.core' configurations.all above
@@ -321,7 +321,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.07'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.2.21'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.2.22'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.25'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'

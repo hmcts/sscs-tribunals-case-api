@@ -181,9 +181,8 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
                         AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
                                 .documentLink(doc.getValue().getDocumentLink())
                                 .fileName(doc.getValue().getDocumentFileName())
-                                .documentType(doc.getValue().getDocumentType())
                                 .dateAdded(LocalDate.now())
-                                .partyUploaded(AudioVideoUploadParty.CTSC)
+                                .partyUploaded(UploadParty.CTSC)
                                 .build()).build()).collect(toList());
 
         if (!newAudioVideoEvidence.isEmpty()) {

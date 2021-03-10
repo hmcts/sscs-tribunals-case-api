@@ -25,7 +25,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -512,9 +511,8 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("/url", audioVideoEvidence.getValue().getDocumentLink().getDocumentUrl());
         assertEquals("rip1", audioVideoEvidence.getValue().getRip1Document().getDocumentFilename());
         assertEquals("filename", audioVideoEvidence.getValue().getFileName());
-        assertEquals(AudioVideoUploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
+        assertEquals(UploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
         assertNotNull(audioVideoEvidence.getValue().getDateAdded());
-        assertEquals(DocumentType.DWP_EVIDENCE.getValue(), audioVideoEvidence.getValue().getDocumentType());
         assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
     }
 
@@ -534,9 +532,8 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("/url", audioVideoEvidence.getValue().getDocumentLink().getDocumentUrl());
         assertNull("rip1", audioVideoEvidence.getValue().getRip1Document());
         assertEquals("filename", audioVideoEvidence.getValue().getFileName());
-        assertEquals(AudioVideoUploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
+        assertEquals(UploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
         assertNotNull(audioVideoEvidence.getValue().getDateAdded());
-        assertEquals(DocumentType.DWP_EVIDENCE.getValue(), audioVideoEvidence.getValue().getDocumentType());
         assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
     }
 
@@ -596,9 +593,8 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("/url", audioVideoEvidence.getValue().getDocumentLink().getDocumentUrl());
         assertEquals("rip1", audioVideoEvidence.getValue().getRip1Document().getDocumentFilename());
         assertEquals("filename", audioVideoEvidence.getValue().getFileName());
-        assertEquals(AudioVideoUploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
+        assertEquals(UploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
         assertNotNull(audioVideoEvidence.getValue().getDateAdded());
-        assertEquals(DocumentType.DWP_EVIDENCE.getValue(), audioVideoEvidence.getValue().getDocumentType());
         assertEquals(REVIEW_BY_JUDGE.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
     }
 

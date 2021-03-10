@@ -99,8 +99,9 @@ public class ProcessAudioVideoEvidenceAboutToStartHandlerTest {
         sscsCaseData.setAudioVideoEvidence(List.of(AudioVideoEvidence.builder().build()));
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         SscsCaseData responseData = response.getData();
-        assertEquals(3, responseData.getProcessAudioVideoAction().getListItems().size());
+        assertEquals(4, responseData.getProcessAudioVideoAction().getListItems().size());
         assertEquals(ISSUE_DIRECTIONS_NOTICE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), ISSUE_DIRECTIONS_NOTICE.getCode()));
+        assertEquals(INCLUDE_EVIDENCE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), INCLUDE_EVIDENCE.getCode()));
         assertEquals(EXCLUDE_EVIDENCE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), EXCLUDE_EVIDENCE.getCode()));
         assertEquals(SEND_TO_ADMIN.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), SEND_TO_ADMIN.getCode()));
     }
@@ -111,8 +112,9 @@ public class ProcessAudioVideoEvidenceAboutToStartHandlerTest {
         sscsCaseData.setAudioVideoEvidence(List.of(AudioVideoEvidence.builder().build()));
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         SscsCaseData responseData = response.getData();
-        assertEquals(4, responseData.getProcessAudioVideoAction().getListItems().size());
+        assertEquals(5, responseData.getProcessAudioVideoAction().getListItems().size());
         assertEquals(ISSUE_DIRECTIONS_NOTICE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), ISSUE_DIRECTIONS_NOTICE.getCode()));
+        assertEquals(INCLUDE_EVIDENCE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), INCLUDE_EVIDENCE.getCode()));
         assertEquals(EXCLUDE_EVIDENCE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), EXCLUDE_EVIDENCE.getCode()));
         assertEquals(SEND_TO_JUDGE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), SEND_TO_JUDGE.getCode()));
         assertEquals(SEND_TO_ADMIN.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), SEND_TO_ADMIN.getCode()));
