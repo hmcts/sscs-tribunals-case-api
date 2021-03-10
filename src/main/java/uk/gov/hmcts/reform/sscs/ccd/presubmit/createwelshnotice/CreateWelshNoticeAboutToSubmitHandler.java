@@ -176,20 +176,17 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
     }
 
     private String getEnglishNoticeType(String noticeType) {
-        if (AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE.getValue().equals(noticeType)) {
-            return DIRECTION_NOTICE.getValue();
-        }
-        if (ADJOURNMENT_NOTICE.getValue().equals(noticeType)) {
-            return "ADJOURNMENT NOTICE";
+        if (AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE.getLabel().equals(noticeType)) {
+            return DIRECTION_NOTICE.getLabel();
         }
         return noticeType;
     }
 
     private String getWelshNoticeType(String noticeType) {
-        if (noticeType.equalsIgnoreCase(DECISION_NOTICE.getValue())) {
+        if (noticeType.equalsIgnoreCase(DECISION_NOTICE.getLabel())) {
             return "Hysbysiad o Benderfyniad".toUpperCase();
         }
-        if (noticeType.equalsIgnoreCase(DIRECTION_NOTICE.getValue())) {
+        if (noticeType.equalsIgnoreCase(DIRECTION_NOTICE.getLabel())) {
             return "Hysbysiad Cyfarwyddiadau".toUpperCase();
         }
         return noticeType.toUpperCase();

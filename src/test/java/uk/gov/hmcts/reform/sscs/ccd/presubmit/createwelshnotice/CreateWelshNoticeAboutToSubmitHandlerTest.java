@@ -92,10 +92,10 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"DIRECTION_NOTICE, DIRECTION_ISSUED_WELSH, DIRECTION NOTICE, HYSBYSIAD CYFARWYDDIADAU",
+    @Parameters({"DIRECTION_NOTICE, DIRECTION_ISSUED_WELSH, DIRECTIONS NOTICE, HYSBYSIAD CYFARWYDDIADAU",
             "DECISION_NOTICE, DECISION_ISSUED_WELSH, DECISION NOTICE, HYSBYSIAD O BENDERFYNIAD",
             "ADJOURNMENT_NOTICE, ISSUE_ADJOURNMENT_NOTICE_WELSH, ADJOURNMENT NOTICE, ADJOURNMENT NOTICE",
-            "AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE, PROCESS_AUDIO_VIDEO_WELSH, DIRECTION NOTICE, HYSBYSIAD CYFARWYDDIADAU"
+            "AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE, PROCESS_AUDIO_VIDEO_WELSH, DIRECTIONS NOTICE, HYSBYSIAD CYFARWYDDIADAU"
     })
     public void handleMethodCallsCorrectServicesAndSetsDataCorrectly(DocumentType documentType, EventType eventType, String expectedType, String expectedWelshType) {
         byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
@@ -126,7 +126,7 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
         DocumentType selectedDocumentType = DocumentType.fromValue(welshDocuments.get(0).getValue().getDocumentType());
 
         final DynamicList dynamicDocumentTypeList = new DynamicList(new DynamicListItem(selectedDocumentType.getValue(),
-                selectedDocumentType.getValue()),
+                selectedDocumentType.getLabel()),
                 asList(new DynamicListItem(DocumentType.DIRECTION_NOTICE.getValue(), DocumentType.DIRECTION_NOTICE.getLabel()),
                         new DynamicListItem(DocumentType.DECISION_NOTICE.getValue(), DocumentType.DECISION_NOTICE.getLabel()),
                         new DynamicListItem(DocumentType.ADJOURNMENT_NOTICE.getValue(), DocumentType.ADJOURNMENT_NOTICE.getLabel())));

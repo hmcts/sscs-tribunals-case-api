@@ -88,6 +88,7 @@ public class CreateWelshNoticeAboutToStartHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertEquals(response.getData().getDocumentTypes().getValue().getCode(),documentType.getValue());
+        assertEquals(response.getData().getDocumentTypes().getValue().getLabel(),documentType.getLabel());
         assertEquals(response.getData().getOriginalNoticeDocuments().getValue().getCode(),"test.pdf");
     }
 

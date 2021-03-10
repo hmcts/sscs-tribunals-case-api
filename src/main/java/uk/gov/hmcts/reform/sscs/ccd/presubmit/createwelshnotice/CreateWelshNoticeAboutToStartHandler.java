@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
@@ -70,7 +71,7 @@ public class CreateWelshNoticeAboutToStartHandler implements PreSubmitCallbackHa
                 sscsDocument.getValue().getDocumentLink().getDocumentFilename())));
 
         sscsDocuments.forEach(sscsDocument -> listDocumentTypeOptions.add(new DynamicListItem(sscsDocument.getValue().getDocumentType(),
-                sscsDocument.getValue().getDocumentType())));
+                DocumentType.fromValue(sscsDocument.getValue().getDocumentType()).getLabel())));
 
         if (listNoticeDocumentOptions.size() > 0) {
             requireNonNull(sscsCaseData).setOriginalNoticeDocuments(new DynamicList(listNoticeDocumentOptions.get(0), listNoticeDocumentOptions));
