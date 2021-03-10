@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -21,6 +22,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnit;
@@ -90,17 +92,18 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"DIRECTION_NOTICE, DIRECTION_ISSUED_WELSH",
-            "DECISION_NOTICE, DECISION_ISSUED_WELSH",
-            "ADJOURNMENT_NOTICE, ISSUE_ADJOURNMENT_NOTICE_WELSH",
-            "AUDIO_VIDEO_NOTICE, PROCESS_AUDIO_VIDEO_WELSH"
+    @Parameters({"DIRECTION_NOTICE, DIRECTION_ISSUED_WELSH, DIRECTION NOTICE, HYSBYSIAD CYFARWYDDIADAU",
+            "DECISION_NOTICE, DECISION_ISSUED_WELSH, DECISION NOTICE, HYSBYSIAD O BENDERFYNIAD",
+            "ADJOURNMENT_NOTICE, ISSUE_ADJOURNMENT_NOTICE_WELSH, ADJOURNMENT NOTICE, ADJOURNMENT NOTICE",
+            "AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE, PROCESS_AUDIO_VIDEO_WELSH, DIRECTION NOTICE, HYSBYSIAD CYFARWYDDIADAU"
     })
-    public void handleMethodCallsCorrectServicesAndSetsDataCorrectly(DocumentType documentType, EventType eventType) {
+    public void handleMethodCallsCorrectServicesAndSetsDataCorrectly(DocumentType documentType, EventType eventType, String expectedType, String expectedWelshType) {
         byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
 
         UploadResponse uploadResponse = createUploadResponse();
         when(evidenceManagementService.upload(any(), anyString())).thenReturn(uploadResponse);
-        when(docmosisPdfService.createPdf(any(),any())).thenReturn(expectedPdf);
+        ArgumentCaptor<Object> capture = ArgumentCaptor.forClass(Object.class);
+        when(docmosisPdfService.createPdf(capture.capture(),any())).thenReturn(expectedPdf);
         FooterDetails footerDetails = new FooterDetails(DocumentLink.builder().build(), "bundleAddition", "bundleFilename");
         when(welshFooterService.addFooterToExistingToContentAndCreateNewUrl(any(),any(), any(), any(), any())).thenReturn(footerDetails);
 
@@ -113,6 +116,9 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
         assertEquals(eventType.getCcdType(), response.getData().getSscsWelshPreviewNextEvent());
         assertEquals("No",response.getData().getTranslationWorkOutstanding());
         assertEquals(ENGLISH_PDF,response.getData().getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
+        Map<String, Object> placeholders = (Map<String, Object>) capture.getValue();
+        assertEquals(expectedType, placeholders.get("en_notice_type"));
+        assertEquals(expectedWelshType, placeholders.get("cy_notice_type"));
     }
 
     private Callback<SscsCaseData> buildCallback(List<SscsDocument> sscsDocuments, List<SscsWelshDocument> welshDocuments) {

@@ -4,7 +4,7 @@ import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.AUDIO_VIDEO_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.DIRECTION_ACTION_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
@@ -86,7 +86,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     private void addDirectionNotice(SscsCaseData caseData) {
         DocumentLink url = caseData.getPreviewDocument();
         SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
-        footerService.createFooterAndAddDocToCase(url, caseData, AUDIO_VIDEO_NOTICE,
+        footerService.createFooterAndAddDocToCase(url, caseData, AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE,
                 Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now())
                         .format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
                 caseData.getDateAdded(), null, documentTranslationStatus);

@@ -10,7 +10,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.AUDIO_VIDEO_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.DIRECTION_ACTION_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.INCLUDE_EVIDENCE;
@@ -114,7 +114,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
                         .documentFileName(sscsCaseData.getPreviewDocument().getDocumentFilename())
                         .documentLink(sscsCaseData.getPreviewDocument())
                         .documentDateAdded(LocalDate.now().minusDays(1).toString())
-                        .documentType(AUDIO_VIDEO_NOTICE.getValue())
+                        .documentType(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE.getValue())
                         .build()).build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -170,7 +170,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getDateAdded());
         assertNull(response.getData().getReservedToJudge());
 
-        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_NOTICE), any(), any(), eq(null), eq(null));
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         assertNull(response.getData().getInterlocReviewState());
         assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
         assertNull(response.getData().getAudioVideoEvidence());
@@ -205,7 +205,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getDateAdded());
         assertNull(response.getData().getReservedToJudge());
 
-        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_NOTICE), any(), any(), eq(null), eq(null));
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         assertNull(response.getData().getInterlocReviewState());
         assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
         assertNull(response.getData().getAudioVideoEvidence());
@@ -263,7 +263,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getDateAdded());
         assertNull(response.getData().getReservedToJudge());
 
-        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_NOTICE), any(), any(), eq(null), eq(null));
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         assertNull(response.getData().getInterlocReviewState());
         assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
         assertNull(response.getData().getAudioVideoEvidence());
@@ -300,7 +300,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getDateAdded());
         assertNull(response.getData().getReservedToJudge());
 
-        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_NOTICE), any(), any(), eq(null), eq(null));
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         assertNull(response.getData().getInterlocReviewState());
         assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
         assertNull(response.getData().getAudioVideoEvidence());
@@ -347,7 +347,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getDateAdded());
         assertNull(response.getData().getReservedToJudge());
 
-        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_NOTICE), any(), any(), eq(null), eq(null));
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         assertNull(response.getData().getInterlocReviewState());
         assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
         assertNull(response.getData().getAudioVideoEvidence());
@@ -372,7 +372,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getDateAdded());
         assertNull(response.getData().getReservedToJudge());
 
-        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_NOTICE), any(), any(), eq(null), eq(null));
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         assertNull(response.getData().getInterlocReviewState());
         assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
         assertNull(response.getData().getAudioVideoEvidence());
@@ -398,7 +398,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_NOTICE), any(), any(), eq(null), eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getWarnings().size(), is(0));
