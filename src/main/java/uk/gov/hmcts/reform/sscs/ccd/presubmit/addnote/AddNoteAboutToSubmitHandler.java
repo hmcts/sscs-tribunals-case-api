@@ -47,7 +47,7 @@ public class AddNoteAboutToSubmitHandler  implements PreSubmitCallbackHandler<Ss
         String note = sscsCaseData.getTempNoteDetail();
         Note newNote = Note.builder().value(NoteDetails.builder().noteDetail(note).noteDate(LocalDate.now().toString())
                 .author(buildLoggedInUserName(userAuthorisation)).build()).build();
-        if (sscsCaseData.getAppealNotePad() == null) {
+        if (sscsCaseData.getAppealNotePad() == null || sscsCaseData.getAppealNotePad().getNotesCollection() == null) {
             sscsCaseData.setAppealNotePad(NotePad.builder().notesCollection(new ArrayList<Note>()).build());
         }
         sscsCaseData.getAppealNotePad().getNotesCollection().add(newNote);
