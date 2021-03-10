@@ -26,10 +26,10 @@ def secrets = [
         secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
         secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
     ],
-//    's2s-${env}'      : [
-//        secret('microservicekey-ccd-data', 'CCD_DATA_STORE_S2S_SECRET'),
-//        secret('microservicekey-ccd-definition', 'CCD_DEFINITION_STORE_S2S_SECRET')
-//    ],
+    's2s-${env}'      : [
+        secret('microservicekey-ccd-data', 'CCD_DATA_STORE_S2S_SECRET'),
+        secret('microservicekey-ccd-definition', 'CCD_DEFINITION_STORE_S2S_SECRET')
+    ],
     'ccd-${env}'      : [
         secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_IDAM_CLIENT_SECRET'),
         secret('postcode-info-address-lookup-token', 'ADDRESS_LOOKUP_TOKEN')
