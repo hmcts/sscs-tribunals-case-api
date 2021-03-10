@@ -78,7 +78,7 @@ public class AddNoteAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void testTempNoteFilledIn_thenNoteAddedToNullCollection() {
+    public void testTempNoteFilledIn_thenNoteAddedToNullNotePad() {
         sscsCaseData.setTempNoteDetail("Here is my note");
 
         PreSubmitCallbackResponse<SscsCaseData> response =
@@ -97,6 +97,24 @@ public class AddNoteAboutToSubmitHandlerTest {
                 .author("A user").build()).build();
 
         sscsCaseData.setAppealNotePad(NotePad.builder().notesCollection(new ArrayList<Note>()).build());
+        sscsCaseData.getAppealNotePad().getNotesCollection().add(oldNote);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(2, response.getData().getAppealNotePad().getNotesCollection().size());
+        assertEquals("Here is my note", response.getData().getAppealNotePad().getNotesCollection().get(1).getValue().getNoteDetail());
+        assertEquals("Chris Davis", response.getData().getAppealNotePad().getNotesCollection().get(1).getValue().getAuthor());
+        assertEquals(LocalDate.now().toString(), response.getData().getAppealNotePad().getNotesCollection().get(1).getValue().getNoteDate());
+    }
+
+    @Test
+    public void testTempNoteFilledIn_thenNoteAddedToNullCollection() {
+        sscsCaseData.setTempNoteDetail("Here is my note");
+        Note oldNote = Note.builder().value(NoteDetails.builder().noteDetail("Existing note").noteDate(LocalDate.now().toString())
+                .author("A user").build()).build();
+
+        sscsCaseData.setAppealNotePad(NotePad.builder().notesCollection(null).build());
         sscsCaseData.getAppealNotePad().getNotesCollection().add(oldNote);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
