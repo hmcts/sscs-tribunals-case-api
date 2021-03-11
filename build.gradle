@@ -300,7 +300,7 @@ dependencies {
     // Added to fix CVE-2020-13934, CVE-2020-13935, CVE-2020-17527
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.43'
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.43'
-    compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.2'
+    compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.4'
 
     // Safe to remove once Spring update their dependencies - see CVE-2019-14439 and add 'com.fasterxml.jackson.core' configurations.all above
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
@@ -339,7 +339,7 @@ dependencies {
     // Added to fix CVE-2020-13934, CVE-2020-13935, CVE-2020-17527
     testCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.40'
     testCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.40'
-    testCompile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '9.0.40'
+    testCompile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.4'
 
     testCompile 'pl.pragmatists:JUnitParams:1.1.1'
 
