@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
@@ -35,6 +37,11 @@ public class AdminSendToWithDwpAboutToSubmitHandler implements PreSubmitCallback
 
         log.info("Setting date sent to dwp for case id {} for AdminSendToWithDwpHandler" + callback.getCaseDetails().getId());
         caseData.setDateSentToDwp(LocalDate.now().toString());
+
+        if (InterlocReferralReason.PHME_REQUEST.getId().equals(caseData.getInterlocReferralReason())) {
+            caseData.setInterlocReviewState(InterlocReviewState.NONE.getId());
+            caseData.setInterlocReferralReason(InterlocReferralReason.NONE.getId());
+        }
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 

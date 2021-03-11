@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.phmereview;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.reviewphme;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
@@ -21,9 +21,9 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 
 
 @RunWith(JUnitParamsRunner.class)
-public class PhmeReviewAboutToSubmitHandlerTest {
+public class ReviewPhmeAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
-    private PhmeReviewAboutToSubmitHandler handler;
+    private ReviewPhmeAboutToSubmitHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -35,7 +35,7 @@ public class PhmeReviewAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new PhmeReviewAboutToSubmitHandler();
+        handler = new ReviewPhmeAboutToSubmitHandler();
 
         when(callback.getEvent()).thenReturn(EventType.REVIEW_PHME_REQUEST);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
