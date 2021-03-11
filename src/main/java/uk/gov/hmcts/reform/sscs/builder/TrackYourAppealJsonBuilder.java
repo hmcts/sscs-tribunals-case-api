@@ -37,6 +37,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
@@ -134,6 +136,11 @@ public class TrackYourAppealJsonBuilder {
             if (!outcomeNode.isEmpty()) {
                 caseNode.putArray("hearingOutcome").addAll(outcomeNode);
             }
+
+            ArrayNode avEvidence = buildEvidenceLinks(caseData.getSscsDocument(), caseData.getDwpDocuments());
+            if (!avEvidence.isEmpty()) {
+                caseNode.putArray("audioVideoEvidence").addAll(avEvidence);
+            }
         } else {
             caseNode.put("status", getAppealStatus(caseData.getEvents()));
         }
@@ -168,6 +175,35 @@ public class TrackYourAppealJsonBuilder {
         root.set("subscriptions", buildSubscriptions(caseData.getSubscriptions()));
 
         return root;
+    }
+
+    private ArrayNode buildEvidenceLinks(List<SscsDocument> sscsDocuments, List<DwpDocument> dwpDocuments) {
+        ArrayNode avEvidenceNode = JsonNodeFactory.instance.arrayNode();
+
+        if (sscsDocuments != null) {
+            sscsDocuments.stream().filter(filterEvidence()).forEach(createDocumentNode(avEvidenceNode));
+        }
+
+        if (dwpDocuments != null) {
+            dwpDocuments.stream().filter(filterEvidence()).forEach(createDocumentNode(avEvidenceNode));
+        }
+
+        return avEvidenceNode;
+    }
+
+    private Consumer<? super AbstractDocument> createDocumentNode(ArrayNode avEvidenceNode) {
+        return (d) -> {
+            ObjectNode documentNode = JsonNodeFactory.instance.objectNode();
+            documentNode.put("name", d.getValue().getDocumentFileName());
+            documentNode.put("type", d.getValue().getDocumentType());
+            documentNode.put("url", d.getValue().getDocumentLink().getDocumentBinaryUrl());
+            avEvidenceNode.add(documentNode);
+        };
+    }
+
+    private Predicate<? super AbstractDocument> filterEvidence() {
+        return (d) -> (DocumentType.AUDIO_DOCUMENT.getValue().equalsIgnoreCase(d.getValue().getDocumentType())
+                || DocumentType.VIDEO_DOCUMENT.getValue().equalsIgnoreCase(d.getValue().getDocumentType()));
     }
 
     private ArrayNode getHearingOutcome(List<SscsDocument> sscsDocument) {
