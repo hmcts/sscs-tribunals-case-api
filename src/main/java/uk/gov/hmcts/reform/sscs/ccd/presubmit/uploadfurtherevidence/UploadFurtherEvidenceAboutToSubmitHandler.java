@@ -10,6 +10,7 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
 
 import java.time.LocalDate;
@@ -74,6 +75,9 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             });
             if (!equalsIgnoreCase(sscsCaseData.getInterlocReviewState(), REVIEW_BY_TCW.getId()) && hasMp3OrMp4(sscsCaseData.getDraftFurtherEvidenceDocuments())) {
                 preSubmitCallbackResponse.addError("As you have uploaded an MP3 or MP4 file, please set interlocutory review state to 'Review by TCW'");
+            }
+            if (equalsIgnoreCase(callback.getCaseDetailsBefore().get().getCaseData().getInterlocReviewState(), REVIEW_BY_JUDGE.getId())) {
+                sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
             }
             if (isEmpty(preSubmitCallbackResponse.getErrors())) {
                 addToSscsDocuments(sscsCaseData);
