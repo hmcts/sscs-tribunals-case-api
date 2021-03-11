@@ -61,7 +61,7 @@ public class DocumentDownloadService {
             response = documentDownloadClientApi.downloadBinary(
                     OAUTH2_TOKEN,
                     authTokenGenerator.generate(),
-                    "",
+                    "caseworker,citizen",
                     USER_ID,
                     getDownloadUrl(urlString)
             );

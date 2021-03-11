@@ -86,7 +86,7 @@ public class TyaEndpointsIt {
     @Test
     public void shouldReturnTheDocumentGivenADmStoreUrl() throws Exception {
         when(authTokenGenerator.generate()).thenReturn(AUTH_TOKEN);
-        when(documentDownloadClientApi.downloadBinary("oauth2Token", AUTH_TOKEN,"","sscs", URL))
+        when(documentDownloadClientApi.downloadBinary("oauth2Token", AUTH_TOKEN,"caseworker,citizen","sscs", URL))
                 .thenReturn(ResponseEntity.of(Optional.of(new ByteArrayResource(PDF.getBytes()))));
 
         MvcResult mvcResult = mockMvc.perform(get("/document?url=" + URL))
