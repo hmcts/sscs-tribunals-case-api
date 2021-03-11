@@ -57,6 +57,7 @@ public class ProcessAudioVideoEvidenceAboutToStartHandler implements PreSubmitCa
         final boolean hasJudgeRole = userDetails.hasRole(JUDGE);
         final boolean hasTcwRole = userDetails.hasRole(TCW);
         final boolean hasSuperUserRole = userDetails.hasRole(SUPER_USER);
+        setSelectedAudioVideoEvidence(sscsCaseData);
         setProcessAudioVideoActionDropdown(sscsCaseData, hasJudgeRole, hasTcwRole, hasSuperUserRole);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
@@ -90,5 +91,15 @@ public class ProcessAudioVideoEvidenceAboutToStartHandler implements PreSubmitCa
         for (ProcessAudioVideoActionDynamicListItems item : items) {
             listOptions.add(new DynamicListItem(item.getCode(), item.getLabel()));
         }
+    }
+
+    private void setSelectedAudioVideoEvidence(SscsCaseData sscsCaseData) {
+        List<DynamicListItem> listOptions = new ArrayList<>();
+
+        sscsCaseData.getAudioVideoEvidence().forEach(audioVideoEvidence ->
+                  listOptions.add(new DynamicListItem(audioVideoEvidence.getValue().getDocumentLink().getDocumentUrl(),
+                          audioVideoEvidence.getValue().getFileName())));
+
+        sscsCaseData.setSelectedAudioVideoEvidence(new DynamicList(listOptions.get(0), listOptions));
     }
 }
