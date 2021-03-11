@@ -35,6 +35,7 @@ public class UpdateNotListableAboutToSubmitHandler implements PreSubmitCallbackH
         if ("yes".equalsIgnoreCase(sscsCaseData.getUpdateNotListableDirectionsFulfilled())) {
             sscsCaseData.setState(State.READY_TO_LIST);
             sscsCaseData.setNotListableProvideReasons(null);
+            sscsCaseData.setDirectionDueDate(null);
         }
 
         if ("yes".equalsIgnoreCase(sscsCaseData.getUpdateNotListableInterlocReview())) {
@@ -45,6 +46,10 @@ public class UpdateNotListableAboutToSubmitHandler implements PreSubmitCallbackH
 
         if ("yes".equalsIgnoreCase(sscsCaseData.getUpdateNotListableSetNewDueDate())) {
             sscsCaseData.setDirectionDueDate(sscsCaseData.getUpdateNotListableDueDate());
+        }
+
+        if ("no".equalsIgnoreCase(sscsCaseData.getUpdateNotListableSetNewDueDate())) {
+            sscsCaseData.setDirectionDueDate(null);
         }
 
         if (null != sscsCaseData.getUpdateNotListableWhereShouldCaseMoveTo()) {

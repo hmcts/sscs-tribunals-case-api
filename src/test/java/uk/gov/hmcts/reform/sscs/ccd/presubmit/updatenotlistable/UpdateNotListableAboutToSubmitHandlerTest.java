@@ -44,7 +44,7 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.UPDATE_NOT_LISTABLE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
-            .appeal(Appeal.builder().build())
+            .appeal(Appeal.builder().build()).directionDueDate(LocalDate.now().toString())
             .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
@@ -65,6 +65,7 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
 
         assertNull(response.getData().getNotListableProvideReasons());
         assertEquals(READY_TO_LIST, response.getData().getState());
+        assertNull(response.getData().getDirectionDueDate());
     }
 
     @Test
@@ -120,7 +121,7 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
     public void givenUpdateNotListableSetNewDueDateNo_thenDirectionDueDateFieldIsNull() {
         String tomorrowDate = LocalDate.now().plus(1, ChronoUnit.DAYS).toString();
         sscsCaseData.setUpdateNotListableSetNewDueDate("No");
-        sscsCaseData.setUpdateNotListableDueDate(tomorrowDate);
+        sscsCaseData.setUpdateNotListableDueDate(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
