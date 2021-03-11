@@ -34,7 +34,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
@@ -690,6 +690,42 @@ public class SyaControllerTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
+
+    @Test(expected = NullPointerException.class)
+    public void testLoggingMethodNullBenefitType() throws Exception {
+        SyaAppellant appellant = new SyaAppellant();
+        appellant.setTitle("Mr");
+        appellant.setLastName("Lastname");
+
+        SyaContactDetails contactDetails = new SyaContactDetails();
+        contactDetails.setEmailAddress("appellant@test.com");
+        appellant.setContactDetails(contactDetails);
+        appellant.setNino("1234");
+
+        SyaCaseWrapper caseWithNullBenefitCode = new SyaCaseWrapper();
+        caseWithNullBenefitCode.setAppellant(appellant);
+        caseWithNullBenefitCode.setCcdCaseId("123456");
+
+        SyaReasonsForAppealing reasons = new SyaReasonsForAppealing();
+        Reason reason = new Reason();
+        reason.setReasonForAppealing("my reason");
+        reason.setWhatYouDisagreeWith("i disagree");
+        reasons.setReasons(Collections.singletonList(reason));
+        caseWithNullBenefitCode.setReasonsForAppealing(reasons);
+
+        controller.createAppeals(null, caseWithNullBenefitCode);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testLoggingMethodNullNino() throws Exception {
+        SyaCaseWrapper caseWithNullNino = new SyaCaseWrapper();
+        caseWithNullNino.setBenefitType(new SyaBenefitType("Universal Credit", "UC"));
+        caseWithNullNino.setCcdCaseId("123456");
+
+        controller.createAppeals(null, caseWithNullNino);
+
+    }
+
 
     private String getSyaCaseWrapperJson(String resourcePath) throws IOException, URISyntaxException {
         URL resource = getClass().getClassLoader().getResource(resourcePath);
