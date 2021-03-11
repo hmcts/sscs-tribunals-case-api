@@ -470,15 +470,17 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.INCLUDE_EVIDENCE.getCode()));
         sscsCaseData.setLanguagePreferenceWelsh("Yes");
 
-        List<AudioVideoEvidence> videoList = singletonList(AudioVideoEvidence.builder().value(
-                AudioVideoEvidenceDetails.builder()
-                        .documentLink(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
-                        .fileName("video.mp4")
-                        .partyUploaded(UploadParty.DWP)
-                        .dateAdded(LocalDate.now())
-                        .rip1Document(DocumentLink.builder().documentFilename("rip1.pdf").documentUrl("rip1.com").documentBinaryUrl("rip1.com/binary").build())
-                        .build())
-                .build());
+        AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
+                .fileName("video.mp4")
+                .partyUploaded(UploadParty.DWP)
+                .dateAdded(LocalDate.now())
+                .rip1Document(DocumentLink.builder().documentFilename("rip1.pdf").documentUrl("rip1.com").documentBinaryUrl("rip1.com/binary").build())
+                .build();
+
+        sscsCaseData.setSelectedAudioVideoEvidenceDetails(evidenceDetails);
+
+        List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(evidenceDetails).build()));
 
         sscsCaseData.setAudioVideoEvidence(videoList);
 
@@ -493,7 +495,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(DocumentType.DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.WELSH_TRANSLATION.getId()));
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
-        assertNull(response.getData().getAudioVideoEvidence());
+        assertTrue(response.getData().getAudioVideoEvidence().isEmpty());
         assertEquals(1, response.getData().getDwpDocuments().size());
         assertEquals(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getDwpDocuments().get(0).getValue().getDocumentLink());
         assertEquals(LocalDate.now().toString(), response.getData().getDwpDocuments().get(0).getValue().getDateApproved());
