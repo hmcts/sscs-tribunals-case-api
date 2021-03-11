@@ -9,7 +9,6 @@ import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToC
 
 import feign.FeignException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -285,7 +284,7 @@ public class SubmitAppealService {
                         caseData.getLanguagePreference().getCode());
 
                 if (eventType == DRAFT_TO_VALID_APPEAL_CREATED || eventType == DRAFT_TO_INCOMPLETE_APPLICATION || eventType == DRAFT_TO_NON_COMPLIANT) {
-                    caseData.setCaseCreated(LocalDateTime.now().toString());
+                    caseData.setCaseCreated(LocalDate.now().toString());
 
                     caseDetails = ccdService.updateCase(caseData,
                             Long.valueOf(caseData.getCcdCaseId()),
