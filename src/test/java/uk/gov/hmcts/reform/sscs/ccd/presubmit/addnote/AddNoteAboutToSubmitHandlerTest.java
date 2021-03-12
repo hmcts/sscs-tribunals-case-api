@@ -142,8 +142,17 @@ public class AddNoteAboutToSubmitHandlerTest {
         assertEquals(LocalDate.now().toString(), response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDate());
     }
 
-    @Test
-    public void testTempNoteFilledIn_thenNoteAddedToCollectionWithexistingNotes() {
+    @Test(expected = IllegalStateException.class)
+    public void testNoUserDetails_thenThrowsException() {
+        when(idamClient.getUserDetails(USER_AUTHORISATION)).thenReturn(null);
 
+        sscsCaseData.setTempNoteDetail("Here is my note");
+        Note oldNote = Note.builder().value(NoteDetails.builder().noteDetail("Existing note").noteDate(LocalDate.now().toString())
+                .author("A user").build()).build();
+
+        sscsCaseData.setAppealNotePad(NotePad.builder().notesCollection(null).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 }
