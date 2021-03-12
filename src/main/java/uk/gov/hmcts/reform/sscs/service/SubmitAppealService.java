@@ -90,6 +90,8 @@ public class SubmitAppealService {
             caseData = convertAppealToSscsCaseData(appeal);
         }
 
+        caseData.setIsSaveAndReturn(appeal.getIsSaveAndReturn());
+
         EventType event = findEventType(caseData, saveAndReturnCase);
         SscsCaseDetails caseDetails = createOrUpdateCase(caseData, event, idamTokens);
 
