@@ -178,7 +178,8 @@ public class SubmitAppealServiceTest {
 
         submitAppealService.submitAppeal(appealData, userToken);
 
-        verify(ccdService).createCase(any(SscsCaseData.class), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(ccdService).createCase(capture.capture(), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals("No", capture.getValue().getIsSaveAndReturn());
     }
 
     @Test
@@ -190,9 +191,12 @@ public class SubmitAppealServiceTest {
         given(ccdService.getByCaseId(eq(123L), any())).willReturn(SscsCaseDetails.builder().build());
 
         appealData.setCcdCaseId("123");
+        appealData.setIsSaveAndReturn("Yes");
         submitAppealService.submitAppeal(appealData, userToken);
 
-        verify(ccdService).updateCase(any(SscsCaseData.class), eq(123L), eq(DRAFT_TO_VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(ccdService).updateCase(capture.capture(), eq(123L), eq(DRAFT_TO_VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals("Yes", capture.getValue().getIsSaveAndReturn());
+
     }
 
     @Test
@@ -254,8 +258,9 @@ public class SubmitAppealServiceTest {
 
         submitAppealService.submitAppeal(appealData, userToken);
 
-        verify(ccdService).createCase(any(SscsCaseData.class), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(ccdService).createCase(capture.capture(), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         verify(ccdService, times(0)).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals("No", capture.getValue().getIsSaveAndReturn());
     }
 
     @Test
@@ -270,9 +275,12 @@ public class SubmitAppealServiceTest {
         given(ccdService.getByCaseId(eq(123L), any())).willReturn(SscsCaseDetails.builder().build());
 
         appealData.setCcdCaseId("123");
+        appealData.setIsSaveAndReturn("Yes");
         submitAppealService.submitAppeal(appealData, userToken);
 
-        verify(ccdService).updateCase(any(SscsCaseData.class), eq(123L), eq(DRAFT_TO_INCOMPLETE_APPLICATION.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(ccdService).updateCase(capture.capture(), eq(123L), eq(DRAFT_TO_INCOMPLETE_APPLICATION.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals("Yes", capture.getValue().getIsSaveAndReturn());
+
     }
 
     @Test
@@ -286,7 +294,8 @@ public class SubmitAppealServiceTest {
 
         submitAppealService.submitAppeal(appealData, userToken);
 
-        verify(ccdService).createCase(any(SscsCaseData.class), eq(NON_COMPLIANT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(ccdService).createCase(capture.capture(), eq(NON_COMPLIANT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals("No", capture.getValue().getIsSaveAndReturn());
     }
 
     @Test
@@ -301,9 +310,11 @@ public class SubmitAppealServiceTest {
         given(ccdService.getByCaseId(eq(123L), any())).willReturn(SscsCaseDetails.builder().build());
 
         appealData.setCcdCaseId("123");
+        appealData.setIsSaveAndReturn("Yes");
         submitAppealService.submitAppeal(appealData, userToken);
 
-        verify(ccdService).updateCase(any(SscsCaseData.class), eq(123L), eq(DRAFT_TO_NON_COMPLIANT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(ccdService).updateCase(capture.capture(), eq(123L), eq(DRAFT_TO_NON_COMPLIANT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals("Yes", capture.getValue().getIsSaveAndReturn());
     }
 
     @Test

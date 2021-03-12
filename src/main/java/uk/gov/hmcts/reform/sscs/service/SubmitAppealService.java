@@ -78,7 +78,7 @@ public class SubmitAppealService {
             log.info("Finding case from draft store for case id: {}", caseId);
             SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(caseId, idamTokens);
             if (sscsCaseDetails != null) {
-                log.info("Found case from draft store for case id: {} save and return case {} ", caseId, sscsCaseDetails.getData().getIsSaveAndReturn());
+                log.info("Found case from draft store for case id: {}", caseId);
                 caseData = sscsCaseDetails.getData();
                 saveAndReturnCase = true;
             } else {
@@ -288,16 +288,12 @@ public class SubmitAppealService {
                 if (eventType == DRAFT_TO_VALID_APPEAL_CREATED || eventType == DRAFT_TO_INCOMPLETE_APPLICATION || eventType == DRAFT_TO_NON_COMPLIANT) {
                     caseData.setCaseCreated(LocalDate.now().toString());
 
-                    log.info("Save and return case value: {}", caseData.getIsSaveAndReturn());
-
                     caseDetails = ccdService.updateCase(caseData,
                             Long.valueOf(caseData.getCcdCaseId()),
                             eventType.getCcdType(),
                             "SSCS - new case created",
                             "Created SSCS case from Submit Your Appeal online draft with event " + eventType.getCcdType(),
                             idamTokens);
-
-                    log.info("Save and return case value after save: {}", caseDetails.getData().getIsSaveAndReturn());
 
                     log.info("Case {} successfully converted from Draft to SSCS case in CCD for benefit type {} with event {}",
                             caseDetails.getId(),
@@ -375,11 +371,10 @@ public class SubmitAppealService {
             result = citizenCcdService.saveCase(caseData, idamTokens);
         }
 
-        log.info("POST Draft case with CCD Id {} , IDAM id {} and roles {} and saveAndReturnCase {} ",
+        log.info("POST Draft case with CCD Id {} , IDAM id {} and roles {} ",
                 result.getCaseDetailsId(),
                 idamTokens.getUserId(),
-                idamTokens.getRoles(),
-                caseData.getIsSaveAndReturn());
+                idamTokens.getRoles());
 
         log.info("Draft Case {} successfully {} in CCD", result.getCaseDetailsId(), result.getSaveCaseOperation().name());
         return result;
