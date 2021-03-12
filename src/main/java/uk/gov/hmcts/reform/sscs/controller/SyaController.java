@@ -46,6 +46,10 @@ public class SyaController {
     public ResponseEntity<String> createAppeals(@RequestHeader(value = AUTHORIZATION, required = false)
                                                     String authorisation, @RequestBody SyaCaseWrapper syaCaseWrapper) {
 
+        if (syaCaseWrapper.getAppellant() == null || syaCaseWrapper.getAppellant().getNino() == null
+                || syaCaseWrapper.getBenefitType() == null || syaCaseWrapper.getBenefitType().getCode() == null) {
+            logBadRequest(syaCaseWrapper);
+        }
         log.info("Appeal with Nino - {} and benefit type {} received", syaCaseWrapper.getAppellant().getNino(),
             syaCaseWrapper.getBenefitType().getCode());
         Long caseId = submitAppealService.submitAppeal(syaCaseWrapper, authorisation);
@@ -59,6 +63,31 @@ public class SyaController {
 
         log.info(location.toString());
         return created(location).build();
+    }
+
+    private void logBadRequest(SyaCaseWrapper syaCaseWrapper) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("SYA data for bad request: ");
+        if (syaCaseWrapper.getBenefitType() != null) {
+            stringBuilder.append(" Benefit code ").append(syaCaseWrapper.getBenefitType().getCode());
+            stringBuilder.append(" Benefit description ").append(syaCaseWrapper.getBenefitType().getDescription());
+        }
+        if (syaCaseWrapper.getAppellant() != null && syaCaseWrapper.getAppellant().getNino() != null) {
+            stringBuilder.append(" Nino ").append(syaCaseWrapper.getAppellant().getNino());
+        }
+        if (syaCaseWrapper.getCcdCaseId() != null) {
+            stringBuilder.append(" CCD ID ").append(syaCaseWrapper.getCcdCaseId());
+        }
+        if (syaCaseWrapper.getAppellant() != null && syaCaseWrapper.getAppellant().getTitle() != null) {
+            stringBuilder.append(" Appellant title ").append(syaCaseWrapper.getAppellant().getTitle());
+        }
+        if (syaCaseWrapper.getAppellant() != null && syaCaseWrapper.getAppellant().getLastName() != null) {
+            stringBuilder.append(" Has last name? ").append(syaCaseWrapper.getAppellant().getLastName() != null);
+        }
+        if (syaCaseWrapper.getReasonsForAppealing() != null && syaCaseWrapper.getReasonsForAppealing().getReasons() != null) {
+            stringBuilder.append(" Has entered reasons ").append(syaCaseWrapper.getReasonsForAppealing().getReasons().size());
+        }
+        log.info(stringBuilder.toString());
     }
 
     @ApiOperation(value = "getDraftAppeals", notes = "Get all draft appeals", response = Draft.class)

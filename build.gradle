@@ -293,14 +293,14 @@ dependencies {
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
     compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.1'
     compile group: 'com.google.guava', name: 'guava', version: '30.1-jre'
-    compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.11.1'
+    compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.11.2'
 
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.4'
 
     // Added to fix CVE-2020-13934, CVE-2020-13935, CVE-2020-17527
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.43'
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.43'
-    compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.2'
+    compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.4'
 
     // Safe to remove once Spring update their dependencies - see CVE-2019-14439 and add 'com.fasterxml.jackson.core' configurations.all above
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
@@ -321,7 +321,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.07'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.2.23-RC-SSCS-8752-3'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.2.26'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.25'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
@@ -339,7 +339,7 @@ dependencies {
     // Added to fix CVE-2020-13934, CVE-2020-13935, CVE-2020-17527
     testCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.40'
     testCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.40'
-    testCompile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '9.0.40'
+    testCompile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.4'
 
     testCompile 'pl.pragmatists:JUnitParams:1.1.1'
 
