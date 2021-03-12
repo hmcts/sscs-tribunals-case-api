@@ -39,12 +39,12 @@
       "documentTypes": {
         "value": {
           "code": "Direction Notice",
-          "label": "Direction Notice"
+          "label": "Directions Notice"
         },
         "list_items": [
           {
             "code": "Direction Notice",
-            "label": "Direction Notice"
+            "label": "Directions Notice"
           }
         ]
       },
