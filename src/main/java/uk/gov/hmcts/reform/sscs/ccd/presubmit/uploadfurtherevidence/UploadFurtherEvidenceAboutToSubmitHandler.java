@@ -76,9 +76,13 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             if (!equalsIgnoreCase(sscsCaseData.getInterlocReviewState(), REVIEW_BY_TCW.getId()) && hasMp3OrMp4(sscsCaseData.getDraftFurtherEvidenceDocuments())) {
                 preSubmitCallbackResponse.addError("As you have uploaded an MP3 or MP4 file, please set interlocutory review state to 'Review by TCW'");
             }
-            if (callback.getCaseDetailsBefore() != null && callback.getCaseDetailsBefore().filter(e -> e.getCaseData().getInterlocReviewState().equals(REVIEW_BY_JUDGE.getId())) != null) {
+
+            SscsCaseData beforeData = callback.getCaseDetailsBefore().map(CaseDetails::getCaseData).orElse(null);
+
+            if (beforeData != null && REVIEW_BY_JUDGE.getId().equals(beforeData.getInterlocReviewState())) {
                 sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
             }
+
             if (isEmpty(preSubmitCallbackResponse.getErrors())) {
                 addToSscsDocuments(sscsCaseData);
                 addToAudioVideoEvidence(sscsCaseData);
