@@ -168,7 +168,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
     public void shouldNotOnlyAllowAudioVisualFilesWhenInterlocReviewStateIsNotReviewByTcw(String fileName) {
         final List<DraftSscsDocument> draftDocs = getDraftSscsDocuments("", fileName);
         sscsCaseData.setDraftFurtherEvidenceDocuments(draftDocs);
-        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION.getId());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -176,6 +176,18 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
         assertThat(response.getErrors().iterator().next(), is("As you have uploaded an MP3 or MP4 file, please set interlocutory review state to 'Review by TCW'"));
         assertThat(response.getData().getDraftFurtherEvidenceDocuments(), is(draftDocs));
         assertThat(response.getData().getSscsDocument(), is(nullValue()));
+    }
+
+    @Test
+    @Parameters({"REVIEW_BY_TCW, doc.mp4", "REVIEW_BY_TCW, doc.mp3", "REVIEW_BY_JUDGE, doc.mp4", "REVIEW_BY_JUDGE, doc.mp3"})
+    public void shouldAllowAudioVisualFilesWhenInterlocReviewStateIsValid(InterlocReviewState interlocReviewState, String fileName) {
+        final List<DraftSscsDocument> draftDocs = getDraftSscsDocuments("", fileName);
+        sscsCaseData.setDraftFurtherEvidenceDocuments(draftDocs);
+        sscsCaseData.setInterlocReviewState(interlocReviewState.getId());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
     }
 
     @Test

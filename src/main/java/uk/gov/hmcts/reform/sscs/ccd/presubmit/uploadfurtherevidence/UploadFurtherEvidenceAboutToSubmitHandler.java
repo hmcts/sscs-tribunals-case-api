@@ -73,7 +73,9 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     preSubmitCallbackResponse.addError("You need to upload PDF, MP3 or MP4 documents only");
                 }
             });
-            if (!equalsIgnoreCase(sscsCaseData.getInterlocReviewState(), REVIEW_BY_TCW.getId()) && hasMp3OrMp4(sscsCaseData.getDraftFurtherEvidenceDocuments())) {
+            if (!equalsIgnoreCase(sscsCaseData.getInterlocReviewState(), REVIEW_BY_TCW.getId())
+                    && !equalsIgnoreCase(sscsCaseData.getInterlocReviewState(), REVIEW_BY_JUDGE.getId())
+                    && hasMp3OrMp4(sscsCaseData.getDraftFurtherEvidenceDocuments())) {
                 preSubmitCallbackResponse.addError("As you have uploaded an MP3 or MP4 file, please set interlocutory review state to 'Review by TCW'");
             }
 
