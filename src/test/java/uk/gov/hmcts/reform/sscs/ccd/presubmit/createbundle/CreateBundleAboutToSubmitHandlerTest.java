@@ -124,7 +124,7 @@ public class CreateBundleAboutToSubmitHandlerTest {
         caseData.setLanguagePreferenceWelsh(languagePreference);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(configFile, response.getData().getMultiBundleConfiguration().get(0));
+        assertEquals(configFile, response.getData().getMultiBundleConfiguration().get(0).getValue());
     }
 
 
@@ -267,8 +267,8 @@ public class CreateBundleAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(2, response.getData().getMultiBundleConfiguration().size());
-        assertEquals("bundleEditedConfig", response.getData().getMultiBundleConfiguration().get(0));
-        assertEquals("bundleUnEditedConfig", response.getData().getMultiBundleConfiguration().get(1));
+        assertEquals("bundleEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
+        assertEquals("bundleUnEditedConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
     }
 
     @Test
@@ -284,8 +284,8 @@ public class CreateBundleAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(2, response.getData().getMultiBundleConfiguration().size());
-        assertEquals("bundleWelshEditedConfig", response.getData().getMultiBundleConfiguration().get(0));
-        assertEquals("bundleWelshUnEditedConfig", response.getData().getMultiBundleConfiguration().get(1));
+        assertEquals("bundleWelshEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
+        assertEquals("bundleWelshUnEditedConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
     }
 
 }

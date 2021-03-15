@@ -149,7 +149,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     }
 
     private void setMultiBundleConfig(SscsCaseData sscsCaseData) {
-        List<String> configs = new ArrayList<>();
+        List<MultiBundleConfig> configs = new ArrayList<>();
 
         if (sscsCaseData.getDwpDocuments().stream().filter(f -> (f.getValue().getDocumentType().equals(DwpDocumentType.DWP_RESPONSE.getValue())
                 && f.getValue().getEditedDocumentLink() != null)
@@ -157,18 +157,18 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
                 && f.getValue().getEditedDocumentLink() != null).count() > 0) {
 
             if (sscsCaseData.isLanguagePreferenceWelsh()) {
-                configs.add(bundleWelshEditedConfig);
-                configs.add(bundleWelshUnEditedConfig);
+                configs.add(MultiBundleConfig.builder().value(bundleWelshEditedConfig).build());
+                configs.add(MultiBundleConfig.builder().value(bundleWelshUnEditedConfig).build());
             } else {
-                configs.add(bundleEditedConfig);
-                configs.add(bundleUnEditedConfig);
+                configs.add(MultiBundleConfig.builder().value(bundleEditedConfig).build());
+                configs.add(MultiBundleConfig.builder().value(bundleUnEditedConfig).build());
             }
 
         } else {
             if (sscsCaseData.isLanguagePreferenceWelsh()) {
-                configs.add(bundleWelshConfig);
+                configs.add(MultiBundleConfig.builder().value(bundleWelshConfig).build());
             } else {
-                configs.add(bundleEnglishConfig);
+                configs.add(MultiBundleConfig.builder().value(bundleEnglishConfig).build());
             }
         }
         sscsCaseData.setMultiBundleConfiguration(configs);
