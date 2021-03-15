@@ -24,13 +24,7 @@ import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
@@ -54,6 +48,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
     static {
         NEXT_EVENT_MAP.put(DECISION_NOTICE.getValue(), DECISION_ISSUED_WELSH.getCcdType());
         NEXT_EVENT_MAP.put(DIRECTION_NOTICE.getValue(), DIRECTION_ISSUED_WELSH.getCcdType());
+        NEXT_EVENT_MAP.put(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE.getValue(), PROCESS_AUDIO_VIDEO_WELSH.getCcdType());
         NEXT_EVENT_MAP.put(ADJOURNMENT_NOTICE.getValue(), ISSUE_ADJOURNMENT_NOTICE_WELSH.getCcdType());
     }
 
@@ -146,7 +141,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
     private Map<String, Object> caseDataMap(SscsCaseData caseData) {
         Map<String, Object> dataMap = new HashMap<>();
         LocalDate dateAdded = Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now());
-        String documentTypeLabel = caseData.getDocumentTypes().getValue().getLabel() != null ? caseData.getDocumentTypes().getValue().getLabel() : caseData.getDocumentTypes().getValue().getCode();
+        String documentTypeLabel = getEnglishNoticeType(caseData.getDocumentTypes().getValue().getLabel() != null ? caseData.getDocumentTypes().getValue().getLabel() : caseData.getDocumentTypes().getValue().getCode());
 
         dataMap.put("appellant_full_name", buildFullName(caseData));
         dataMap.put("case_id", caseData.getCcdCaseId());
@@ -180,11 +175,18 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
         return NEXT_EVENT_MAP.get(documentType);
     }
 
+    private String getEnglishNoticeType(String noticeType) {
+        if (AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE.getLabel().equals(noticeType)) {
+            return DIRECTION_NOTICE.getLabel();
+        }
+        return noticeType;
+    }
+
     private String getWelshNoticeType(String noticeType) {
-        if (noticeType.equalsIgnoreCase("Decision Notice")) {
+        if (noticeType.equalsIgnoreCase(DECISION_NOTICE.getLabel())) {
             return "Hysbysiad o Benderfyniad".toUpperCase();
         }
-        if (noticeType.equalsIgnoreCase("Direction Notice")) {
+        if (noticeType.equalsIgnoreCase(DIRECTION_NOTICE.getLabel())) {
             return "Hysbysiad Cyfarwyddiadau".toUpperCase();
         }
         return noticeType.toUpperCase();

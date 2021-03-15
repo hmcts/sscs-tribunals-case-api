@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createwelshnotice;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.ADJOURNMENT_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DECISION_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DIRECTION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +12,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
@@ -64,6 +63,7 @@ public class CreateWelshNoticeAboutToStartHandler implements PreSubmitCallbackHa
                 .filter(a -> Objects.nonNull(a.getValue().getDocumentType())
                         && (a.getValue().getDocumentType().equals(DECISION_NOTICE.getValue())
                         || a.getValue().getDocumentType().equals(ADJOURNMENT_NOTICE.getValue())
+                        || a.getValue().getDocumentType().equals(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE.getValue())
                         || a.getValue().getDocumentType().equals(DIRECTION_NOTICE.getValue())))
                 .collect(Collectors.toList());
 
@@ -71,7 +71,7 @@ public class CreateWelshNoticeAboutToStartHandler implements PreSubmitCallbackHa
                 sscsDocument.getValue().getDocumentLink().getDocumentFilename())));
 
         sscsDocuments.forEach(sscsDocument -> listDocumentTypeOptions.add(new DynamicListItem(sscsDocument.getValue().getDocumentType(),
-                sscsDocument.getValue().getDocumentType())));
+                DocumentType.fromValue(sscsDocument.getValue().getDocumentType()).getLabel())));
 
         if (listNoticeDocumentOptions.size() > 0) {
             requireNonNull(sscsCaseData).setOriginalNoticeDocuments(new DynamicList(listNoticeDocumentOptions.get(0), listNoticeDocumentOptions));

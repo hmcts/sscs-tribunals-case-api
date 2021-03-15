@@ -103,8 +103,8 @@ public class CreateWelshNoticeIt extends AbstractEventIt {
         );
 
         DynamicList expectedDocumentType = new DynamicList(
-                new DynamicListItem("Direction Notice", "Direction Notice"),
-                Collections.singletonList(new DynamicListItem("Direction Notice", "Direction Notice"))
+                new DynamicListItem("Direction Notice", "Directions Notice"),
+                Collections.singletonList(new DynamicListItem("Direction Notice", "Directions Notice"))
         );
 
         assertTrue(result.getData().isLanguagePreferenceWelsh());

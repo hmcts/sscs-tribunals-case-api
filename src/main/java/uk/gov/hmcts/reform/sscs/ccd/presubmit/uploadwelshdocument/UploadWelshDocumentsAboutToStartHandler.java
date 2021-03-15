@@ -62,7 +62,7 @@ public class UploadWelshDocumentsAboutToStartHandler implements PreSubmitCallbac
             .filter(a -> Objects.nonNull(a.getValue().getDocumentTranslationStatus())
                 &&
                 a.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED))
-            .filter(b -> !Arrays.asList(DocumentType.DECISION_NOTICE.getValue(), DocumentType.DIRECTION_NOTICE.getValue())
+            .filter(b -> !Arrays.asList(DocumentType.DECISION_NOTICE.getValue(), DocumentType.AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE, DocumentType.DIRECTION_NOTICE.getValue())
                 .contains(b.getValue().getDocumentType()))
             .collect(Collectors.toList());
 
