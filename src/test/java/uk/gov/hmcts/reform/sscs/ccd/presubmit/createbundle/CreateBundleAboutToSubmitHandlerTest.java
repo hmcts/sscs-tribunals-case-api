@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -52,8 +53,8 @@ public class CreateBundleAboutToSubmitHandlerTest {
     public void setUp() {
         openMocks(this);
         dwpDocumentService = new DwpDocumentService();
-        handler = new CreateBundleAboutToSubmitHandler(serviceRequestExecutor, dwpDocumentService, bundleAudioVideoPdfService,"bundleUrl.com", "bundleEnglishConfig", "bundleWelshConfig",
-                "bundleUnEditedConfig", "bundleWelshUnEditedConfig");
+        handler = new CreateBundleAboutToSubmitHandler(serviceRequestExecutor, dwpDocumentService, bundleAudioVideoPdfService,false, "bundleUrl.com", "bundleEnglishConfig", "bundleWelshConfig",
+                "bundleEditedConfig", "bundleWelshEditedConfig", "bundleUnEditedConfig", "bundleWelshUnEditedConfig");
 
         when(callback.getEvent()).thenReturn(EventType.CREATE_BUNDLE);
 
@@ -107,6 +108,23 @@ public class CreateBundleAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(configFile, response.getData().getBundleConfiguration());
+    }
+
+    @Test
+    @Parameters({"Yes, bundleWelshConfig", " No, bundleEnglishConfig"})
+    public void givenWelshCaseWithMultiBundleFeatureOn_thenPopulateWelshConfigFileName(String languagePreference, String configFile) {
+        ReflectionTestUtils.setField(handler, "multiBundleFeature", true);
+
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().build()).build()).build());
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
+        caseData.setDwpDocuments(dwpDocuments);
+
+        caseData.setLanguagePreferenceWelsh(languagePreference);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(configFile, response.getData().getMultiBundleConfiguration().get(0).getValue());
     }
 
 
@@ -223,7 +241,7 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"Yes, bundleWelshUnEditedConfig", " No, bundleUnEditedConfig"})
-    public void givenWelshWithEdited_thenPopulateUneditedWelshConfigFileName(String languagePreference, String configFile) {
+    public void givenCaseWithEdited_thenPopulateUneditedConfigFileName(String languagePreference, String configFile) {
 
         List<DwpDocument> dwpDocuments = new ArrayList<>();
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
@@ -234,6 +252,40 @@ public class CreateBundleAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(configFile, response.getData().getBundleConfiguration());
+    }
+
+    @Test
+    public void givenEnglishCaseWithEditedAndMultiBundleFeatureSwitchedOn_thenPopulateEnglishEditedAndUneditedConfigFileName() {
+        ReflectionTestUtils.setField(handler, "multiBundleFeature", true);
+
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
+
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("No");
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(2, response.getData().getMultiBundleConfiguration().size());
+        assertEquals("bundleEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
+        assertEquals("bundleUnEditedConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
+    }
+
+    @Test
+    public void givenWelshCaseWithEditedAndMultiBundleFeatureSwitchedOn_thenPopulateWelshEditedAndUneditedConfigFileName() {
+        ReflectionTestUtils.setField(handler, "multiBundleFeature", true);
+
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
+
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("Yes");
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(2, response.getData().getMultiBundleConfiguration().size());
+        assertEquals("bundleWelshEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
+        assertEquals("bundleWelshUnEditedConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
     }
 
 }
