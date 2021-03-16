@@ -24,6 +24,7 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
+      "languagePreferenceWelsh" : "Yes",
       "appeal": {
         "appealReasons": {
           "reasons": []
@@ -98,8 +99,21 @@
         },
         "signer": null
       },
+      "sscsDocument" : [ {
+        "value" : {
+          "documentType" : "audioDocument",
+          "documentFileName" : "11111.mp3",
+          "documentDateAdded" : "2021-02-21",
+          "dateApproved" : "2021-02-21",
+          "partyUploaded" : "appellant",
+          "documentLink" : {
+            "document_binary_url": "http://dm-store:5005/documents/093c9722-403c-42be-9af0-778291cbfb16/binary",
+            "document_filename": "my-file.mp3",
+            "document_url": "http://dm-store:5005/documents/093c9722-403c-42be-9af0-778291cbfb16"
+          }
+        }
+      }],
       "benefitCode": "011",
-      "bundleConfiguration": "sscs-bundle-unedited-config.yaml",
       "caseCode": "011CC",
       "dateSentToDwp": "2021-02-12",
       "dwpDocuments": [
@@ -124,7 +138,13 @@
               "document_filename": "DWP response received on 12-02-2021.pdf",
               "document_url": "http://dm-store:5005/documents/e6bdae57-3227-444e-8117-657285ecb849"
             },
-            "documentType": "dwpResponse"
+            "documentType": "dwpResponse",
+            "dwpEditedEvidenceReason": "phme",
+            "editedDocumentLink": {
+              "document_binary_url": "http://dm-store:5005/documents/d4f19467-f440-4235-8884-9feeb9dab944/binary",
+              "document_filename": "DWP edited response received on 12-02-2021.pdf",
+              "document_url": "http://dm-store:5005/documents/d4f19467-f440-4235-8884-9feeb9dab944"
+            }
           }
         },
         {
@@ -136,7 +156,13 @@
               "document_filename": "DWP evidence received on 12-02-2021.pdf",
               "document_url": "http://dm-store:5005/documents/ac5c2471-0c37-4754-a034-8c4a0bdc9073"
             },
-            "documentType": "dwpEvidenceBundle"
+            "documentType": "dwpEvidenceBundle",
+            "dwpEditedEvidenceReason": "phme",
+            "editedDocumentLink": {
+              "document_binary_url": "http://dm-store:5005/documents/a05ca916-28aa-40df-a7cd-7a38adaef68a/binary",
+              "document_filename": "DWP edited evidence received on 12-02-2021.pdf",
+              "document_url": "http://dm-store:5005/documents/a05ca916-28aa-40df-a7cd-7a38adaef68a"
+            }
           }
         },
         {
