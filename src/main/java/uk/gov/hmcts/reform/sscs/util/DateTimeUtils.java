@@ -24,6 +24,13 @@ public final class DateTimeUtils {
 
     }
 
+
+    public static LocalDateTime getLocalDateTime(String localDateStr, String localTimeStr) {
+        LocalDate localDate = LocalDate.parse(localDateStr);
+        LocalTime localTime = LocalTime.parse(localTimeStr);
+        return LocalDateTime.of(localDate, localTime);
+    }
+
     public static String convertLocalDateTimetoUtc(LocalDateTime localDateTime) {
 
         ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, ZoneId.of(EUROPE_LONDON));
