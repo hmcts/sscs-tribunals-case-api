@@ -598,4 +598,29 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(REVIEW_BY_JUDGE.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
     }
 
+    @Test
+    public void givenHandleAudioVideoDocumentsAndInterlocReviewStateAlreadyReviewByJudge_thenLeaveAsReviewByJudge() {
+        AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
+                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
+                .rip1Document(DocumentLink.builder()
+                        .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("surveillance").build()).build();
+
+        List audioVideoList = new ArrayList<>();
+        audioVideoList.add(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build());
+
+        sscsCaseData.setAudioVideoEvidence(new ArrayList<>(
+                Arrays.asList(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build())));
+
+        sscsCaseData.setDwpUploadAudioVideoEvidence(new ArrayList<>(
+                Arrays.asList(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build())));
+
+        sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
+
+        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
+
+        assertNull(callback.getCaseDetails().getCaseData().getDwpUploadAudioVideoEvidence());
+        assertEquals(2, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
+        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
+    }
+
 }

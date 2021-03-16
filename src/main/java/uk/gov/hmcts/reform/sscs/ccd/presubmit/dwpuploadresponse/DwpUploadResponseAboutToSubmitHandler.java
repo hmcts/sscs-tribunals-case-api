@@ -101,7 +101,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         if (StringUtils.equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "phme")) {
             sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
-        } else {
+        } else if (!REVIEW_BY_JUDGE.getId().equals(sscsCaseData.getInterlocReviewState())) {
             sscsCaseData.setInterlocReviewState(REVIEW_BY_TCW.getId());
         }
     }
