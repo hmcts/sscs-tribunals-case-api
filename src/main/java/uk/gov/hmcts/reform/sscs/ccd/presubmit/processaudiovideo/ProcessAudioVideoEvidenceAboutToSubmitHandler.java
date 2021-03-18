@@ -270,7 +270,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
                 case REVIEW_BY_JUDGE:
                     caseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
                     break;
-                case AWAITING_ADMIN_RESPONSE:
+                case AWAITING_ADMIN_ACTION:
                     caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
                     break;
                 case CLEAR_INTERLOC_REVIEW_STATE:
