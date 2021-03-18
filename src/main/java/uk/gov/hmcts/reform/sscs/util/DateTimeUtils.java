@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.util;
 import static java.time.format.DateTimeFormatter.ofPattern;
 
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 
 
 public final class DateTimeUtils {
@@ -10,6 +11,7 @@ public final class DateTimeUtils {
     private static final String EUROPE_LONDON = "Europe/London";
     private static final String UTC = "UTC";
     private static final String UTC_STRING_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    public static DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     private DateTimeUtils() {
         //

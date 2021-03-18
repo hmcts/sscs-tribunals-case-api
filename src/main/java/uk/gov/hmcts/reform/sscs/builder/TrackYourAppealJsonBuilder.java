@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.sscs.model.AppConstants.PAST_HEARING_BOOKED_IN
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.POSTCODE;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.TYPE;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.VENUE_NAME;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.DATEFORMATTER;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDateTime;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -473,8 +474,6 @@ public class TrackYourAppealJsonBuilder {
     private String getUtcDate(Event event) {
         return formatDateTime(parse(event.getValue().getDate()));
     }
-
-    protected static DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     private String getLocalDate(Event event) {
         return DATEFORMATTER.format(parse(event.getValue().getDate()));
