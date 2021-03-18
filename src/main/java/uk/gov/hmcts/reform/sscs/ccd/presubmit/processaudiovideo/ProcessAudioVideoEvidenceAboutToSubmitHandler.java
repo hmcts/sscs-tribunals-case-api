@@ -82,6 +82,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         processIfExcludeEvidence(caseData);
         processIfSendToJudge(caseData);
         processIfSendToAdmin(caseData);
+        overrideInterlocReviewStateIfSelected(caseData);
 
         clearTransientFields(caseData);
 
@@ -244,7 +245,6 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
 
     private void processIfSendToAdmin(SscsCaseData caseData) {
         if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), SEND_TO_ADMIN.getCode())) {
-            caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
             if (caseData.isLanguagePreferenceWelsh()) {
                 caseData.setWelshInterlocNextReviewState(AWAITING_ADMIN_ACTION.getId());
                 caseData.setInterlocReviewState(WELSH_TRANSLATION.getId());
@@ -261,6 +261,28 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
                 .forEach(evidence -> evidence.getValue().setProcessedAction(processedAction));
     }
 
+    private void overrideInterlocReviewStateIfSelected(SscsCaseData caseData) {
+        if (caseData.getProcessAudioVideoReviewState() != null) {
+            switch (caseData.getProcessAudioVideoReviewState()) {
+                case AWAITING_INFORMATION:
+                    caseData.setInterlocReviewState(AWAITING_INFORMATION.getId());
+                    break;
+                case REVIEW_BY_JUDGE:
+                    caseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
+                    break;
+                case AWAITING_ADMIN_ACTION:
+                    caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
+                    break;
+                case CLEAR_INTERLOC_REVIEW_STATE:
+                    caseData.setInterlocReviewState(null);
+                    break;
+                default:
+                    break;
+            }
+
+        }
+    }
+
     private void clearTransientFields(SscsCaseData caseData) {
         caseData.setBodyContent(null);
         caseData.setPreviewDocument(null);
@@ -273,5 +295,6 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         caseData.setAppealNote(null);
         caseData.setSelectedAudioVideoEvidenceDetails(null);
         caseData.setShowRip1DocPage(null);
+        caseData.setProcessAudioVideoReviewState(null);
     }
 }
