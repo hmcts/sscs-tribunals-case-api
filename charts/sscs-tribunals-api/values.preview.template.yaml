@@ -57,6 +57,8 @@ xui-webapp:
         secrets:
           - mc-s2s-client-secret
           - mc-idam-client-secret
+          - system-user-name
+          - system-user-password
 
 ccd:
   ccd:
@@ -199,7 +201,7 @@ importer:
     userProfileDatabaseName: user-profile
   definition:
     enabled: true
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.7.44
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.7.69
     kvSecretRef: kvcreds
     gitSecretRef: kvcreds
     redirectUri: https://case-management-web-${SERVICE_FQDN}/oauth2redirect
