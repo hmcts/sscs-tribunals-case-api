@@ -91,8 +91,8 @@ public class DwpChallengeValidityAboutToSubmitHandlerTest {
 
         assertNull(response.getData().getDwpChallengeValidityDocument());
         assertEquals(2, response.getData().getDwpDocuments().size());
-        assertEquals("challengeValidityLink", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals(DwpDocumentType.DWP_CHALLENGE_VALIDITY.getValue(), response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
+        assertEquals("challengeValidityLink", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals(DwpDocumentType.DWP_CHALLENGE_VALIDITY.getValue(), response.getData().getDwpDocuments().get(1).getValue().getDocumentType());
     }
 
     @Test(expected = IllegalStateException.class)

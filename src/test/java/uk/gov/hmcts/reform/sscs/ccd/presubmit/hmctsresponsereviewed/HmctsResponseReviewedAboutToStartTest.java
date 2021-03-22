@@ -231,7 +231,7 @@ public class HmctsResponseReviewedAboutToStartTest {
             documentLink = response.getData().getDwpUcbEvidenceDocument();
         }
         assertNotNull(documentLink);
-        assertEquals("file-latest", documentLink.getDocumentFilename());
+        assertEquals("file-startOfToday", documentLink.getDocumentFilename());
     }
 
 }

@@ -92,7 +92,7 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
         assertNull(response.getData().getSscsDocument().get(6).getValue().getDocumentTranslationStatus());
         assertEquals("No", response.getData().getTranslationWorkOutstanding());
 
-        assertEquals(EventType.DECISION_ISSUED_WELSH.getCcdType(), response.getData().getSscsWelshPreviewNextEvent());
+        assertEquals(EventType.SEND_TO_DWP.getCcdType(), response.getData().getSscsWelshPreviewNextEvent());
     }
 
     @Test
