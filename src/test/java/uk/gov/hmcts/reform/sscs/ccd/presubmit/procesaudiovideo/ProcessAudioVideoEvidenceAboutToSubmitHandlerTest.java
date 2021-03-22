@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -523,6 +524,42 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertEquals("DWP", response.getData().getDwpDocuments().get(0).getValue().getPartyUploaded().getLabel());
         assertEquals(DocumentLink.builder().documentFilename("RIP 1 document uploaded on " + LocalDate.now().toString() + ".pdf").documentUrl("rip1.com").documentBinaryUrl("rip1.com/binary").build(), response.getData().getDwpDocuments().get(0).getValue().getRip1DocumentLink());
         assertEquals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED, response.getData().getDwpDocuments().get(0).getValue().getDocumentTranslationStatus());
+    }
+
+    @Test
+    @Parameters({"INCLUDE_EVIDENCE, AWAITING_INFORMATION, AWAITING_INFORMATION",
+            "INCLUDE_EVIDENCE, REVIEW_BY_JUDGE, REVIEW_BY_JUDGE",
+            "INCLUDE_EVIDENCE, AWAITING_ADMIN_ACTION, AWAITING_ADMIN_ACTION",
+            "SEND_TO_ADMIN, CLEAR_INTERLOC_REVIEW_STATE, null",
+            "SEND_TO_ADMIN, null, AWAITING_ADMIN_ACTION",
+    })
+    public void givenProcessAudioVideoReviewStateSelected_overrideTheInterlocReviewState(ProcessAudioVideoActionDynamicListItems action,
+                                                                                         @Nullable ProcessAudioVideoReviewState overrideState,
+                                                                                         @Nullable InterlocReviewState finalState) {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(action.getCode()));
+        sscsCaseData.setProcessAudioVideoReviewState(overrideState);
+
+        AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
+                .fileName("video.mp4")
+                .partyUploaded(UploadParty.DWP)
+                .dateAdded(LocalDate.now())
+                .rip1Document(DocumentLink.builder().documentFilename("rip1.pdf").documentUrl("rip1.com").documentBinaryUrl("rip1.com/binary").build())
+                .build();
+
+        sscsCaseData.setSelectedAudioVideoEvidenceDetails(evidenceDetails);
+
+        List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(evidenceDetails).build()));
+
+        sscsCaseData.setAudioVideoEvidence(videoList);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertNull(response.getData().getProcessAudioVideoReviewState());
+        if (finalState == null) {
+            assertNull(response.getData().getInterlocReviewState());
+        } else {
+            assertThat(response.getData().getInterlocReviewState(), is(finalState.getId()));
+        }
     }
 
 }
