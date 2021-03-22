@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +58,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         if (sscsCaseData.getAppeal().getAppellant() != null
                 && sscsCaseData.getAppeal().getAppellant().getAddress() != null
-                && sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode() != null) {
+                && isNotBlank(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode())) {
 
             RegionalProcessingCenter newRpc =
                     regionalProcessingCenterService.getByPostcode(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
