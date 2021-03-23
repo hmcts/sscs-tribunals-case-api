@@ -327,7 +327,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.07'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.2.35'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.2.36'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.28'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
