@@ -241,7 +241,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
             State previousState = sscsCaseData.getPreviousState();
             if (previousState == null || State.DORMANT_APPEAL_STATE == previousState || State.VOID_STATE == previousState) {
-                log.info("{} setting previousState from {}} to interlocutoryReviewState}", sscsCaseData.getCcdCaseId(), previousState);
+                log.info("{} setting previousState from {} to interlocutoryReviewState", sscsCaseData.getCcdCaseId(), previousState);
                 sscsCaseData.setPreviousState(State.INTERLOCUTORY_REVIEW_STATE);
             }
         } else {
