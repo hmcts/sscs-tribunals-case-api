@@ -14,7 +14,7 @@
         "adjournedDate": "2017-06-24T16:27:50.297Z",
         "adjournedLetterReceivedByDate": "2017-07-01T16:27:50.297Z",
         "hearingContactDate": "2017-08-05T16:27:50.297Z",
-        "date": "2017-06-24T16:27:50.297Z",
+        "date": "2017-06-24T17:27:50.297Z",
         "type": "ADJOURNED",
         "contentKey": "status.adjourned"
       }
@@ -23,7 +23,7 @@
       {
         "postcode": "CH1 2XA",
         "venueName": "Chester Magistrate's Court",
-        "hearingDateTime": "2017-07-17T22:00:00.000Z",
+        "hearingDateTime": "2017-07-17T23:00:00.000Z",
         "addressLine1": "Grosvenor Street",
         "addressLine2": "Chester",
         "addressLine3": null,

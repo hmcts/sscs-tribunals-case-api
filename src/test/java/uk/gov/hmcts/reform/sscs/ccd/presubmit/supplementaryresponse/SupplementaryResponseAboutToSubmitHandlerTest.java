@@ -201,4 +201,16 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         assertNull(response.getData().getRip1Doc());
         assertNull(response.getData().getShowRip1DocPage());
     }
+
+    @Test
+    public void givenASupplementaryResponseAndInterlocReviewStateAlreadyReviewByJudge_thenLeaveAsReviewByJudge() {
+        sscsCaseData.setDwpSupplementaryResponseDoc(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("test1.doc").documentUrl("myurl1").build()).build());
+        sscsCaseData.setDwpOtherDoc(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("test2.mp3").documentUrl("myurl2").build()).build());
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("supplementaryResponse", response.getData().getDwpState());
+        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
+    }
 }
