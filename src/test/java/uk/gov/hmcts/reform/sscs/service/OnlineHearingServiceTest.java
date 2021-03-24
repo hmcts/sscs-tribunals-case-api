@@ -6,7 +6,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
 import org.junit.Before;
@@ -81,7 +80,7 @@ public class OnlineHearingServiceTest {
                         "other arrangements"
                 ),
                 new AppellantDetails(new AddressDetails("line1","line2","town", "county","postcode"), "email", "012", "120"),
-                new AppealDetails(sscsCaseDetails.getCreatedDate().format(DateTimeFormatter.ISO_LOCAL_DATE), "12-12-2019", "PIP")
+                new AppealDetails(sscsCaseDetails.getData().getCaseCreated(), "12-12-2019", "PIP")
         )));
     }
 
@@ -95,6 +94,7 @@ public class OnlineHearingServiceTest {
                 .createdDate(LocalDateTime.now())
                 .data(SscsCaseData.builder()
                         .caseReference(expectedCaseReference)
+                        .caseCreated(LocalDateTime.now().toString())
                         .appeal(Appeal.builder()
                                 .hearingType(hearingType)
                                 .appellant(Appellant.builder()
