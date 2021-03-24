@@ -91,7 +91,7 @@ public class SscsPdfService {
                 }
                 placeholders.put("welsh_exclude_dates", welshExcludesDates);
             }
-            placeholders.put("welshCurtrentDate", LocalDateToWelshStringConverter.convert(LocalDate.now()));
+            placeholders.put("welshCurrentDate", LocalDateToWelshStringConverter.convert(sscsCaseData.getCaseCreated()));
             String benefitType;
             benefitType = welshBenefitTypeTranslator.translate(sscsCaseData);
             placeholders.put("welshBenefitType", benefitType);
