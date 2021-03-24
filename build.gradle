@@ -13,13 +13,13 @@ plugins {
     id 'org.sonarqube' version '3.1.1'
     id 'jacoco'
     id 'org.springframework.boot' version '2.3.5.RELEASE'
-    id 'uk.gov.hmcts.java' version '0.12.5'
+    id 'uk.gov.hmcts.java' version '0.12.6'
     id 'com.gorylenko.gradle-git-properties' version '2.2.4'
     id 'com.github.ben-manes.versions' version '0.36.0'
     id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.6.0'
-    id 'org.owasp.dependencycheck' version '6.1.1'
-    id 'au.com.dius.pact' version '4.2.1'
+    id 'org.owasp.dependencycheck' version '6.1.2'
+    id 'au.com.dius.pact' version '4.2.2'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -217,8 +217,8 @@ ext {
 dependencyManagement {
     dependencies {
         dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
-        dependency group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.0'
-        dependency group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.14.0'
+        dependency group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
+        dependency group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.14.1'
         // resolves: CVE-2020-9489
         dependency group: 'org.apache.tika', name: 'tika-core', version: '1.25'
         // resolves: CVE-2020-28052
@@ -321,8 +321,8 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.07'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.2.25.RC-SSCS-8770-1'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.25'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.2.33'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.28'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
     compile 'org.projectlombok:lombok:1.18.18'
@@ -330,7 +330,7 @@ dependencies {
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.5.RELEASE'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.8.0'
-    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.24.0'
+    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.25.0'
     testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.8.0'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.24.0'

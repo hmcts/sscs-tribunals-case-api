@@ -124,13 +124,7 @@
               "document_filename": "DWP response received on 12-02-2021.pdf",
               "document_url": "http://dm-store:5005/documents/e6bdae57-3227-444e-8117-657285ecb849"
             },
-            "documentType": "dwpResponse",
-            "dwpEditedEvidenceReason": "phme",
-            "editedDocumentLink": {
-              "document_binary_url": "http://dm-store:5005/documents/d4f19467-f440-4235-8884-9feeb9dab944/binary",
-              "document_filename": "DWP edited response received on 12-02-2021.pdf",
-              "document_url": "http://dm-store:5005/documents/d4f19467-f440-4235-8884-9feeb9dab944"
-            }
+            "documentType": "dwpResponse"
           }
         },
         {
@@ -142,13 +136,7 @@
               "document_filename": "DWP evidence received on 12-02-2021.pdf",
               "document_url": "http://dm-store:5005/documents/ac5c2471-0c37-4754-a034-8c4a0bdc9073"
             },
-            "documentType": "dwpEvidenceBundle",
-            "dwpEditedEvidenceReason": "phme",
-            "editedDocumentLink": {
-              "document_binary_url": "http://dm-store:5005/documents/a05ca916-28aa-40df-a7cd-7a38adaef68a/binary",
-              "document_filename": "DWP edited evidence received on 12-02-2021.pdf",
-              "document_url": "http://dm-store:5005/documents/a05ca916-28aa-40df-a7cd-7a38adaef68a"
-            }
+            "documentType": "dwpEvidenceBundle"
           }
         },
         {

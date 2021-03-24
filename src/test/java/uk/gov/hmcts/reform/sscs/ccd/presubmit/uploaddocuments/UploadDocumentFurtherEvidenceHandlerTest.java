@@ -128,6 +128,19 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
     }
 
     @Test
+    public void givenUploadDocumentFurtherEvidenceAndInterlocReviewStateAlreadyReviewByJudge_thenLeaveAsReviewByJudge() throws IOException {
+        Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,"appealCreated",
+                DocumentType.OTHER_EVIDENCE.getId(), DocumentType.APPELLANT_EVIDENCE.getId(), UPLOAD_AUDIO_VIDEO_DOCUMENT_FE_CALLBACK_JSON);
+
+        callback.getCaseDetails().getCaseData().setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
+
+        PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(ABOUT_TO_SUBMIT, callback,
+                USER_AUTHORISATION);
+
+        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), actualCaseData.getData().getInterlocReviewState());
+    }
+
+    @Test
     public void dwpStateIsNotSetWhenStateIsWithDwp() throws IOException {
         Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,"withDwp",
                 "representativeEvidence", "appellantEvidence", UPLOAD_DOCUMENT_FE_CALLBACK_JSON);

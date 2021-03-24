@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.*;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.collections4.ListUtils.union;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService.TEMP_UNIQUE_ID;
 
 import java.io.ByteArrayOutputStream;
@@ -219,7 +220,7 @@ public class EvidenceUploadService {
         removeStatementDocFromDocumentTab(sscsCaseData, storePdfContext.getDocument().getData().getSscsDocument());
         List<SscsDocument> audioVideoMedia = pullAudioVideoFilesFromDraft(storePdfContext.getDocument().getData().getDraftSscsDocument());
 
-        if (audioVideoMedia.size() > 0) {
+        if (audioVideoMedia.size() > 0 && !REVIEW_BY_JUDGE.getId().equals(sscsCaseData.getInterlocReviewState())) {
             sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId());
         }
 

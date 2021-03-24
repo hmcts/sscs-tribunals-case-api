@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.jetbrains.annotations.NotNull;
@@ -45,6 +46,9 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
+
+    @Mock
+    private CaseDetails<SscsCaseData> caseDetailsBefore;
 
     private SscsCaseData sscsCaseData;
 
@@ -164,7 +168,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
     public void shouldNotOnlyAllowAudioVisualFilesWhenInterlocReviewStateIsNotReviewByTcw(String fileName) {
         final List<DraftSscsDocument> draftDocs = getDraftSscsDocuments("", fileName);
         sscsCaseData.setDraftFurtherEvidenceDocuments(draftDocs);
-        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION.getId());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -172,6 +176,34 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
         assertThat(response.getErrors().iterator().next(), is("As you have uploaded an MP3 or MP4 file, please set interlocutory review state to 'Review by TCW'"));
         assertThat(response.getData().getDraftFurtherEvidenceDocuments(), is(draftDocs));
         assertThat(response.getData().getSscsDocument(), is(nullValue()));
+    }
+
+    @Test
+    @Parameters({"REVIEW_BY_TCW, doc.mp4", "REVIEW_BY_TCW, doc.mp3", "REVIEW_BY_JUDGE, doc.mp4", "REVIEW_BY_JUDGE, doc.mp3"})
+    public void shouldAllowAudioVisualFilesWhenInterlocReviewStateIsValid(InterlocReviewState interlocReviewState, String fileName) {
+        final List<DraftSscsDocument> draftDocs = getDraftSscsDocuments("", fileName);
+        sscsCaseData.setDraftFurtherEvidenceDocuments(draftDocs);
+        sscsCaseData.setInterlocReviewState(interlocReviewState.getId());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+    }
+
+    @Test
+    public void givenFurtherEvidenceReceivedAndInterlocReviewStateAlreadyReviewByJudge_thenLeaveStateAsReviewByJudge() {
+        SscsCaseData sscsCaseDataBefore = SscsCaseData.builder().state(State.VALID_APPEAL).interlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId()).appeal(Appeal.builder().build()).build();
+
+        when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+
+        final List<DraftSscsDocument> draftDocs = getDraftSscsDocuments("", "doc.mp3");
+        sscsCaseData.setDraftFurtherEvidenceDocuments(draftDocs);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_JUDGE.getId()));
     }
 
     @Test

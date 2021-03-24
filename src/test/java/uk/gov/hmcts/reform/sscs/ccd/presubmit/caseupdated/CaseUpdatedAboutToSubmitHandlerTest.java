@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -225,6 +226,22 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("VenueB", response.getData().getProcessingVenue());
+    }
+
+    @Test
+    @Parameters({"null", " ", ""})
+    public void givenAnAppealWithNullOrEmptyPostcode_thenDoNotUpdateProcessingVenue(@Nullable String postcode) {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB1200B");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode(postcode);
+        callback.getCaseDetails().getCaseData().setRegionalProcessingCenter(RegionalProcessingCenter.builder().name("rpc1").build());
+        callback.getCaseDetails().getCaseData().setProcessingVenue("VenueA");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verifyNoInteractions(airLookupService);
+        assertEquals("VenueA", response.getData().getProcessingVenue());
+        assertEquals("rpc1", response.getData().getRegionalProcessingCenter().getName());
     }
 
     @Test
