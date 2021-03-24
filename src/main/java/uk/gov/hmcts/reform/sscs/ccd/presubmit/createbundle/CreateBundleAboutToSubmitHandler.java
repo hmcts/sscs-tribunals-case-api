@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +29,11 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
     private String bundleUrl;
 
+    private boolean multiBundleFeature;
     private String bundleEnglishConfig;
     private String bundleWelshConfig;
+    private String bundleEditedConfig;
+    private String bundleWelshEditedConfig;
     private String bundleUnEditedConfig;
     private String bundleWelshUnEditedConfig;
 
@@ -43,17 +47,23 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     public CreateBundleAboutToSubmitHandler(ServiceRequestExecutor serviceRequestExecutor,
                                             DwpDocumentService dwpDocumentService,
                                             BundleAudioVideoPdfService bundleAudioVideoPdfService,
+                                            @Value("${feature.multi-bundle-feature.enabled}") boolean multiBundleFeature,
                                             @Value("${bundle.url}") String bundleUrl,
                                             @Value("${bundle.english.config}") String bundleEnglishConfig,
                                             @Value("${bundle.welsh.config}") String bundleWelshConfig,
+                                            @Value("${bundle.edited.config}") String bundleEditedConfig,
+                                            @Value("${bundle.welsh.edited.config}") String bundleWelshEditedConfig,
                                             @Value("${bundle.unedited.config}") String bundleUnEditedConfig,
                                             @Value("${bundle.welsh.unedited.config}") String bundleWelshUnEditedConfig) {
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.dwpDocumentService = dwpDocumentService;
         this.bundleAudioVideoPdfService = bundleAudioVideoPdfService;
+        this.multiBundleFeature = multiBundleFeature;
         this.bundleUrl = bundleUrl;
         this.bundleEnglishConfig = bundleEnglishConfig;
         this.bundleWelshConfig = bundleWelshConfig;
+        this.bundleEditedConfig = bundleEditedConfig;
+        this.bundleWelshEditedConfig = bundleWelshEditedConfig;
         this.bundleUnEditedConfig = bundleUnEditedConfig;
         this.bundleWelshUnEditedConfig = bundleWelshUnEditedConfig;
     }
@@ -107,7 +117,11 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
             bundleAudioVideoPdfService.createAudioVideoPdf(sscsCaseData);
 
-            setBundleConfig(sscsCaseData);
+            if (multiBundleFeature) {
+                setMultiBundleConfig(sscsCaseData);
+            } else {
+                setBundleConfig(sscsCaseData);
+            }
 
             log.info("Setting the bundleConfiguration on the case {} for case id {}", sscsCaseData.getBundleConfiguration(), callback.getCaseDetails().getId());
 
@@ -132,6 +146,32 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
                 sscsCaseData.setBundleConfiguration(bundleEnglishConfig);
             }
         }
+    }
+
+    private void setMultiBundleConfig(SscsCaseData sscsCaseData) {
+        List<MultiBundleConfig> configs = new ArrayList<>();
+
+        if (sscsCaseData.getDwpDocuments().stream().filter(f -> (f.getValue().getDocumentType().equals(DwpDocumentType.DWP_RESPONSE.getValue())
+                && f.getValue().getEditedDocumentLink() != null)
+                || f.getValue().getDocumentType().equals(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue())
+                && f.getValue().getEditedDocumentLink() != null).count() > 0) {
+
+            if (sscsCaseData.isLanguagePreferenceWelsh()) {
+                configs.add(MultiBundleConfig.builder().value(bundleWelshEditedConfig).build());
+                configs.add(MultiBundleConfig.builder().value(bundleWelshUnEditedConfig).build());
+            } else {
+                configs.add(MultiBundleConfig.builder().value(bundleEditedConfig).build());
+                configs.add(MultiBundleConfig.builder().value(bundleUnEditedConfig).build());
+            }
+
+        } else {
+            if (sscsCaseData.isLanguagePreferenceWelsh()) {
+                configs.add(MultiBundleConfig.builder().value(bundleWelshConfig).build());
+            } else {
+                configs.add(MultiBundleConfig.builder().value(bundleEnglishConfig).build());
+            }
+        }
+        sscsCaseData.setMultiBundleConfiguration(configs);
     }
 
 

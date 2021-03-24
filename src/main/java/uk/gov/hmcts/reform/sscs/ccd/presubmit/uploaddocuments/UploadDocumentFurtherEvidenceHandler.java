@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -190,7 +191,9 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
                 sscsCaseData.setAudioVideoEvidence(new ArrayList<>());
             }
             sscsCaseData.getAudioVideoEvidence().addAll(newAudioVideoEvidence);
-            sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId());
+            if (!REVIEW_BY_JUDGE.getId().equals(sscsCaseData.getInterlocReviewState())) {
+                sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId());
+            }
         }
     }
 }

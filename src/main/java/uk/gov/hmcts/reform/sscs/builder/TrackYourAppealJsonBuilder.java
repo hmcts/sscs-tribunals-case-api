@@ -28,7 +28,8 @@ import static uk.gov.hmcts.reform.sscs.model.AppConstants.PAST_HEARING_BOOKED_IN
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.POSTCODE;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.TYPE;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.VENUE_NAME;
-import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.convertLocalDateLocalTimetoUtc;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.DATEFORMATTER;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDateTime;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -362,7 +363,7 @@ public class TrackYourAppealJsonBuilder {
         for (Event event : events) {
             ObjectNode eventNode = JsonNodeFactory.instance.objectNode();
 
-            eventNode.put(DATE, getUtcDate((event)));
+            eventNode.put(DATE, getLocalDate((event)));
             eventNode.put(TYPE, getEventType(event).toString());
             eventNode.put(CONTENT_KEY, "status." + getEventType(event).getType());
 
@@ -439,7 +440,7 @@ public class TrackYourAppealJsonBuilder {
                 if (hearing != null) {
                     eventNode.put(POSTCODE, hearing.getValue().getVenue().getAddress().getPostcode());
                     eventNode.put(HEARING_DATETIME,
-                        convertLocalDateLocalTimetoUtc(hearing.getValue().getHearingDate(), hearing.getValue().getTime()));
+                            DATEFORMATTER.format(getLocalDateTime(hearing.getValue().getHearingDate(), hearing.getValue().getTime())));
                     eventNode.put(VENUE_NAME, hearing.getValue().getVenue().getName());
                     eventNode.put(ADDRESS_LINE_1, hearing.getValue().getVenue().getAddress().getLine1());
                     eventNode.put(ADDRESS_LINE_2, hearing.getValue().getVenue().getAddress().getLine2());
@@ -472,6 +473,10 @@ public class TrackYourAppealJsonBuilder {
 
     private String getUtcDate(Event event) {
         return formatDateTime(parse(event.getValue().getDate()));
+    }
+
+    private String getLocalDate(Event event) {
+        return DATEFORMATTER.format(parse(event.getValue().getDate()));
     }
 
     private String getCalculatedDate(Event event, int days, boolean isDays) {

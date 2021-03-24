@@ -68,15 +68,11 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
 
     private void updateCase(Callback<SscsCaseData> callback, SscsCaseData caseData) {
         String previewDocumentType = null;
+
         log.info("Set the Translation Status to complete for originalDocs for caseID:  {}", caseData.getCcdCaseId());
-        for (SscsDocument sscsDocument : caseData.getSscsDocument()) {
-            if (sscsDocument.getValue().getDocumentTranslationStatus() != null
-                && sscsDocument.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)) {
-                if (sscsDocument.getValue().getDocumentLink().getDocumentFilename().equals(caseData.getOriginalDocuments().getValue().getCode())) {
-                    sscsDocument.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE);
-                }
-            }
-        }
+        updateTranslationStatusOfSscsDocument(caseData);
+        updateTranslationStatusOfDwpDocument(caseData);
+
         log.info("Set up welsh document for caseId:  {}", caseData.getCcdCaseId());
         for (SscsWelshDocument sscsWelshPreviewDocument : caseData.getSscsWelshPreviewDocuments()) {
             sscsWelshPreviewDocument.getValue().setOriginalDocumentFileName(caseData.getOriginalDocuments().getValue().getCode());
@@ -116,6 +112,30 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         } else if (!caseData.isTranslationWorkOutstanding()) {
             caseData.setInterlocReviewState(caseData.getWelshInterlocNextReviewState());
             caseData.setWelshInterlocNextReviewState(null);
+        }
+    }
+
+    private void updateTranslationStatusOfSscsDocument(SscsCaseData caseData) {
+        if (caseData.getSscsDocument() != null) {
+            for (SscsDocument sscsDocument : caseData.getSscsDocument()) {
+                if (SscsDocumentTranslationStatus.TRANSLATION_REQUESTED.equals(sscsDocument.getValue().getDocumentTranslationStatus())) {
+                    if (sscsDocument.getValue().getDocumentLink().getDocumentFilename().equals(caseData.getOriginalDocuments().getValue().getCode())) {
+                        sscsDocument.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE);
+                    }
+                }
+            }
+        }
+    }
+
+    private void updateTranslationStatusOfDwpDocument(SscsCaseData caseData) {
+        if (caseData.getDwpDocuments() != null) {
+            for (DwpDocument dwpDocument : caseData.getDwpDocuments()) {
+                if (SscsDocumentTranslationStatus.TRANSLATION_REQUESTED.equals(dwpDocument.getValue().getDocumentTranslationStatus())) {
+                    if (dwpDocument.getValue().getRip1DocumentLink().getDocumentFilename().equals(caseData.getOriginalDocuments().getValue().getCode())) {
+                        dwpDocument.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE);
+                    }
+                }
+            }
         }
     }
 
