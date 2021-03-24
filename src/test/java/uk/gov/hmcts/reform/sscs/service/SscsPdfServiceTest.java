@@ -57,6 +57,7 @@ public class SscsPdfServiceTest {
         given(welshBenefitTranslator.translate(caseData)).willReturn("Taliad Annibyniaeth Personol (PIP)");
         caseData.setLanguagePreferenceWelsh("Yes");
         caseData.getAppeal().getAppellant().getIdentity().setDob("2000-12-31");
+        caseData.setCaseCreated("2020-12-31");
         service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");
 
         ArgumentCaptor<Map> argumentCaptor = ArgumentCaptor.forClass(Map.class);
@@ -71,6 +72,7 @@ public class SscsPdfServiceTest {
         assertEquals("31 Rhagfyr 2000",argumentCaptor.getValue().get("appellant_appointee_identity_dob"));
         assertEquals("31 Rhagfyr 2000",argumentCaptor.getValue().get("appellant_identity_dob"));
         assertEquals("29 Mehefin 2018",argumentCaptor.getValue().get("date_of_decision"));
+        assertEquals("31 Rhagfyr 2020",argumentCaptor.getValue().get("welshCurrentDate"));
         assertEquals("Taliad Annibyniaeth Personol (PIP)",argumentCaptor.getValue().get("welshBenefitType"));
         assertEquals("nac ydw",argumentCaptor.getValue().get("welshEvidencePresent"));
         assertEquals("ydw",argumentCaptor.getValue().get("welshWantsToAttend"));

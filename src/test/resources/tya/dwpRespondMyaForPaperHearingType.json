@@ -13,12 +13,12 @@
       {
         "evidenceType": "EvidenceType2",
         "evidenceProvidedBy": "Appellant2",
-        "date": "2017-04-12T00:00:00.000Z",
+        "date": "2017-04-12T01:00:00.000Z",
         "type": "EVIDENCE_RECEIVED",
         "contentKey": "status.evidenceReceived"
       },
       {
-        "date": "2017-04-10T11:01:47.620Z",
+        "date": "2017-04-10T12:01:47.620Z",
         "type": "DWP_RESPOND",
         "contentKey": "status.dwpRespond",
         "hearingContactDate": "2017-06-05T11:01:47.620Z"
