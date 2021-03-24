@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 @RunWith(JUnitParamsRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @SpringBootTest
-public class ProcessAudioVideoEvidenceAboutToStartHandlerTest extends BaseHandler {
+public class ProcessAudioVideoEvidenceAboutToStartHandlerFunctionalTest extends BaseHandler {
 
     @ClassRule
     public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
