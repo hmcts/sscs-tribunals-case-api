@@ -12,6 +12,7 @@ For versions and complete list of dependencies see build.gradle
 * Spring Boot
 * Gradle
  
+
 ## Building and deploying the application 
   
 ### Building the application
