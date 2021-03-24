@@ -112,7 +112,7 @@ public class SubmitDraftTest {
 
     private UserDetails getUserDetails(String userToken) {
         return new UserDetailsTransformer(idamApiClient.getUserInfo(userToken)).asLocalUserDetails();
-    }
+    }SubmitYourAppealToCcdCaseDataDeserializer.java
 
     private SyaCaseWrapper buildTestDraftAppeal() {
         SyaCaseWrapper draftAppeal = new SyaCaseWrapper();

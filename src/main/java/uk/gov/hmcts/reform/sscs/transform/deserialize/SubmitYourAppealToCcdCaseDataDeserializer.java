@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CARERS_ALLOWANCE;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.*;
 import static uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator.generateAppealNumber;
 import static uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil.cleanPhoneNumber;
@@ -69,11 +70,14 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .build();
     }
 
-    public static String getDwpRegionalCenterGivenDwpIssuingOffice(String benefitTypeCode, String dwpIssuingOffice) {
-        if (dwpIssuingOffice == null) {
+    private static String getDwpRegionalCenterGivenDwpIssuingOffice(String benefitTypeCode, String dwpIssuingOffice) {
+        DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
+
+        if (CARERS_ALLOWANCE == Benefit.getBenefitByCode(benefitTypeCode)) {
+            dwpAddressLookupService.getDefaultDwpRegionalCenterByBenefitTypeAndOffice(benefitTypeCode);
+        } else if (dwpIssuingOffice == null) {
             return null;
         }
-        DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
         return dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(benefitTypeCode, dwpIssuingOffice);
     }
 
@@ -181,16 +185,21 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static String getDwpIssuingOffice(SyaCaseWrapper syaCaseWrapper) {
+        DwpAddressLookupService dwpLookup = new DwpAddressLookupService();
         String benefitType = syaCaseWrapper.getBenefitType().getCode();
+
         if (benefitType.equalsIgnoreCase("uc")
                 && (syaCaseWrapper.getMrn() == null
                 || syaCaseWrapper.getMrn().getDwpIssuingOffice() == null)) {
             return "Universal Credit";
+
+        } else if (CARERS_ALLOWANCE == Benefit.getBenefitByCode(benefitType)) {
+            return dwpLookup.getDefaultDwpRegionalCenterByBenefitTypeAndOffice(benefitType);
         } else {
             if (!mrnIsNotProvided(syaCaseWrapper)) {
                 String dwpIssuingOffice = syaCaseWrapper.getMrn().getDwpIssuingOffice();
                 if (dwpIssuingOffice != null) {
-                    return new DwpAddressLookupService().getDwpMappingByOffice(benefitType, dwpIssuingOffice)
+                    return dwpLookup.getDwpMappingByOffice(benefitType, dwpIssuingOffice)
                             .map(office -> office.getMapping().getCcd())
                             .orElse(null);
                 }
