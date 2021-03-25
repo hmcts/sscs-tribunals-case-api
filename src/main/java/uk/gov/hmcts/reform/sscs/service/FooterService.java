@@ -22,11 +22,6 @@ public class FooterService extends AbstractFooterService<SscsDocument> {
         super(evidenceManagementService, alter);
     }
 
-    public void createFooterAndAddDocToCase(DocumentLink url, SscsCaseData caseData, DocumentType documentType, String dateIssued, LocalDate dateAdded, String overrideFileName) {
-        this.createFooterAndAddDocToCase(url, caseData, documentType, dateIssued, dateAdded, overrideFileName, null);
-        ;
-    }
-
     public void createFooterAndAddDocToCase(DocumentLink url, SscsCaseData caseData, DocumentType documentType, String dateIssued, LocalDate dateAdded, String overrideFileName, SscsDocumentTranslationStatus documentTranslationStatus) {
 
         String label = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
