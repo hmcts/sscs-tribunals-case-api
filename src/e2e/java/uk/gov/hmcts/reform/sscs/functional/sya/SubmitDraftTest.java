@@ -244,6 +244,16 @@ public class SubmitDraftTest {
     }
 
     @Test
+    public void getAllDrafts_shouldReturn200() {
+        saveDraft(draftAppeal);
+        RestAssured.given()
+            .header(new Header(AUTHORIZATION, citizenToken))
+            .get("/drafts/all")
+            .then()
+            .statusCode(HttpStatus.SC_OK);
+    }
+
+    @Test
     public void onceADraftIsArchived_itCannotBeRetrievedByTheCitizenUser() throws InterruptedException {
         saveDraft(draftAppeal);
 
