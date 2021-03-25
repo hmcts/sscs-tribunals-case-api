@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -12,7 +11,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_ARCHIVED;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -87,21 +85,6 @@ public class CitizenCcdServiceTest {
         verify(citizenCcdClient).startEventForCitizen(eq(IDAM_TOKENS), eq(caseId.toString()), eq(UPDATE_DRAFT));
         verify(citizenCcdClient).submitEventForCitizen(eq(IDAM_TOKENS), eq(caseId.toString()), eq(caseDataContent));
         verifyNoMoreInteractions(citizenCcdClient);
-    }
-
-    @Test
-    public void shouldArchiveFristDraftCase() {
-        SscsCaseData caseData = SscsCaseData.builder().build();
-        Long caseId = 123L;
-        when(citizenCcdClient.searchForCitizen(eq(IDAM_TOKENS))).thenReturn(Collections.singletonList(CaseDetails.builder().id(caseId).build()));
-
-        when(ccdService.updateCase(eq(caseData), eq(caseId), eq(DRAFT_ARCHIVED.getCcdType()),
-                eq("SSCS - draft archived"), eq("SSCS - draft archived"), eq(IDAM_TOKENS)))
-                .thenReturn(SscsCaseDetails.builder().build());
-        Optional<SscsCaseDetails> sscsCaseDetails = citizenCcdService.draftArchivedFirst(caseData, IDAM_TOKENS, IDAM_TOKENS);
-
-        assertNotNull(sscsCaseDetails);
-        assertTrue(sscsCaseDetails.isPresent());
     }
 
     @Test

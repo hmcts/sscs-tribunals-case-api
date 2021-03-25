@@ -225,7 +225,7 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
 
         assertEquals(0, response.getErrors().size());
 
-        verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(FINAL_DECISION_NOTICE), any(), eq(null), eq(null));
+        verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(FINAL_DECISION_NOTICE), any(), eq(null), eq(null), eq(null));
         assertEquals(FINAL_DECISION_ISSUED.getId(), response.getData().getDwpState());
 
         assertEquals("decisionInFavourOfAppellant", response.getData().getOutcome());
@@ -293,7 +293,7 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
 
         assertEquals(0, response.getErrors().size());
 
-        verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(FINAL_DECISION_NOTICE), any(), eq(null), eq(null));
+        verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(FINAL_DECISION_NOTICE), any(), eq(null), eq(null), eq(null));
         assertEquals(FINAL_DECISION_ISSUED.getId(), response.getData().getDwpState());
 
         assertEquals(expectedOutcome, response.getData().getOutcome());
