@@ -10,13 +10,10 @@
     </suppress>
     <suppress until="2021-04-01">
         <notes><![CDATA[
-         file name: sscs-pdf-email-common-1.4.14.jar
-         Jquery included from SpringCloud. We are on latest release awaiting patch (Hoxton SR8)
+         file name: kotlin-stdlib-common-1.4.30.jar
         ]]></notes>
-        <cve>CVE-2015-9251</cve>
-        <cve>CVE-2019-11358</cve>
-        <cve>CVE-2019-11358</cve>
-        <cve>CVE-2020-11022</cve>
-        <cve>CVE-2020-11023</cve>
+        <gav regex="true">^org\.jetbrains\.kotlin:*:.*$</gav>
+        <cve>CVE-2020-15824</cve>
+        <cve>CVE-2020-29582</cve>
     </suppress>
 </suppressions>
