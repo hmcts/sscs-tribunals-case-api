@@ -72,9 +72,12 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     @Parameters({"DWP PIP ( 9),PIP,DWP PIP (9)", "null,carersAllowance,Tyneview Park DRT"})
     @Test
     public void syaDwpIssuingOfficeTest(String issuingOffice, String beneiftCode, String expectedIssuing) {
+
+        String actIssuingOffice = "null".equals(issuingOffice) ? null : issuingOffice;
+
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         syaCaseWrapper.getBenefitType().setCode(beneiftCode);
-        syaCaseWrapper.getMrn().setDwpIssuingOffice(issuingOffice);
+        syaCaseWrapper.getMrn().setDwpIssuingOffice(actIssuingOffice);
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
             regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertEquals(expectedIssuing, caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
