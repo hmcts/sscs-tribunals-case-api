@@ -8,7 +8,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -80,7 +79,7 @@ public class AddNoteAboutToSubmitHandlerTest {
 
     @Test
     public void testTempNoteFilledIn_thenNoteAddedToNullNotePad() {
-        sscsCaseData.setAppealNote("Here is my note");
+        sscsCaseData.setTempNoteDetail("Here is my note");
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -92,33 +91,8 @@ public class AddNoteAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void testTempNoteFilledIsNull_thenNotePadIsNull() {
-        sscsCaseData.setAppealNote(null);
-
-        PreSubmitCallbackResponse<SscsCaseData> response =
-                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertNull(response.getData().getAppealNotePad());;
-    }
-
-    @Test
-    public void testTempNoteFilledIsNull_thenNoNoteAddedToCollection() {
-        sscsCaseData.setAppealNote(null);
-
-        Note oldNote = Note.builder().value(NoteDetails.builder().noteDetail("Existing note").noteDate(LocalDate.now().toString())
-                .author("A user").build()).build();
-
-        sscsCaseData.setAppealNotePad(NotePad.builder().notesCollection(List.of(oldNote)).build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response =
-                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
-    }
-
-    @Test
     public void testTempNoteFilledIn_thenNoteAddedToEmptyCollection() {
-        sscsCaseData.setAppealNote("Here is my note");
+        sscsCaseData.setTempNoteDetail("Here is my note");
         Note oldNote = Note.builder().value(NoteDetails.builder().noteDetail("Existing note").noteDate(LocalDate.now().toString())
                 .author("A user").build()).build();
 
@@ -135,7 +109,7 @@ public class AddNoteAboutToSubmitHandlerTest {
 
     @Test
     public void testTempNoteFilledIn_thenNoteAddedToCollectionOfOne() {
-        sscsCaseData.setAppealNote("Here is my note");
+        sscsCaseData.setTempNoteDetail("Here is my note");
         Note oldNote = Note.builder().value(NoteDetails.builder().noteDetail("Existing note").noteDate(LocalDate.now().toString())
                 .author("A user").build()).build();
 
@@ -153,7 +127,7 @@ public class AddNoteAboutToSubmitHandlerTest {
 
     @Test
     public void testTempNoteFilledIn_thenNoteAddedToNullCollection() {
-        sscsCaseData.setAppealNote("Here is my note");
+        sscsCaseData.setTempNoteDetail("Here is my note");
         Note oldNote = Note.builder().value(NoteDetails.builder().noteDetail("Existing note").noteDate(LocalDate.now().toString())
                 .author("A user").build()).build();
 
@@ -172,7 +146,7 @@ public class AddNoteAboutToSubmitHandlerTest {
     public void testNoUserDetails_thenThrowsException() {
         when(idamClient.getUserDetails(USER_AUTHORISATION)).thenReturn(null);
 
-        sscsCaseData.setAppealNote("Here is my note");
+        sscsCaseData.setTempNoteDetail("Here is my note");
         Note oldNote = Note.builder().value(NoteDetails.builder().noteDetail("Existing note").noteDate(LocalDate.now().toString())
                 .author("A user").build()).build();
 

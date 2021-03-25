@@ -20,14 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 
 @RunWith(JUnitParamsRunner.class)
@@ -80,7 +73,7 @@ public class UploadWelshDocumentsAboutToStartHandlerTest {
     }
 
     @Test
-    @Parameters(method = "generateSscsCaseData")
+    @Parameters(method = "generateSscsDocuments")
     public void originalDocumentDropDownWhenSscsDocumentTranslationStatusIsSet(@Nullable List<SscsDocument> sscsDocuments) {
         sscsCaseData = SscsCaseData.builder()
                 .sscsDocument(sscsDocuments)
@@ -88,11 +81,29 @@ public class UploadWelshDocumentsAboutToStartHandlerTest {
                 .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertEquals(response.getData().getOriginalDocuments().getValue().getCode(),"test.pdf");
+        assertEquals(1, response.getData().getOriginalDocuments().getListItems().size());
+        assertEquals("test.pdf", response.getData().getOriginalDocuments().getValue().getCode());
+        assertEquals("test.pdf", response.getData().getOriginalDocuments().getListItems().get(0).getCode());
+    }
+
+    @Test
+    @Parameters(method = "generateDwpDocuments")
+    public void setOriginalDocumentDropDownWhenDwpDocumentTranslationStatusIsSet(List<DwpDocument> dwpDocuments) {
+
+        sscsCaseData = SscsCaseData.builder()
+                .dwpDocuments(dwpDocuments)
+                .appeal(Appeal.builder().build())
+                .build();
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertEquals(1, response.getData().getOriginalDocuments().getListItems().size());
+        assertEquals("rip1.pdf", response.getData().getOriginalDocuments().getValue().getCode());
+        assertEquals("rip1.pdf", response.getData().getOriginalDocuments().getListItems().get(0).getCode());
     }
 
 
-    public Object[] generateSscsCaseData() {
+    public Object[] generateSscsDocuments() {
         SscsDocument sscs1Doc = SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
                         .documentLink(DocumentLink.builder()
@@ -116,6 +127,40 @@ public class UploadWelshDocumentsAboutToStartHandlerTest {
             .build();
 
         List<SscsDocument> docs = Arrays.asList(sscs1Doc,sscs2Doc);
+
+        return new Object[] {
+            new Object[]{docs}
+        };
+    }
+
+    public Object[] generateDwpDocuments() {
+        DwpDocument dwpDocument = DwpDocument.builder()
+                .value(DwpDocumentDetails.builder()
+                        .documentLink(DocumentLink.builder()
+                                .documentUrl("/anotherUrl")
+                                .documentFilename("test.pdf")
+                                .build())
+                        .rip1DocumentLink(DocumentLink.builder()
+                                .documentUrl("/rip1Url")
+                                .documentFilename("rip1.pdf")
+                                .build())
+                        .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)
+                        .documentType(DocumentType.AUDIO_DOCUMENT.getValue())
+                        .build())
+                .build();
+
+        DwpDocument dwpDocument2 = DwpDocument.builder()
+                .value(DwpDocumentDetails.builder()
+                        .documentLink(DocumentLink.builder()
+                                .documentUrl("/anotherUrl")
+                                .documentFilename("directionNotice.pdf")
+                                .build())
+                        .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)
+                        .documentType(DocumentType.AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE.getValue())
+                        .build())
+                .build();
+
+        List<DwpDocument> docs = Arrays.asList(dwpDocument,dwpDocument2);
 
         return new Object[] {
             new Object[]{docs}

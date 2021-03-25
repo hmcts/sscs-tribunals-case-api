@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @Service
+@Slf4j
 public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     public static final List<String> ACTIONS_THAT_REQUIRES_NOTICE = asList(ISSUE_DIRECTIONS_NOTICE.getCode(), EXCLUDE_EVIDENCE.getCode(), INCLUDE_EVIDENCE.getCode());
@@ -85,6 +87,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         overrideInterlocReviewStateIfSelected(caseData);
 
         clearTransientFields(caseData);
+        caseData.updateTranslationWorkOutstandingFlag();
 
         return response;
     }
@@ -135,10 +138,6 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
 
             caseData.setDwpDocuments(dwpDocuments);
 
-            if (caseData.isLanguagePreferenceWelsh() && isAnyRip1Doc(dwpDocuments)) {
-                caseData.setInterlocReviewState(WELSH_TRANSLATION.getId());
-            }
-
             if (caseData.getSscsDocument() != null) {
                 sscsDocuments.addAll(caseData.getSscsDocument());
             }
@@ -149,16 +148,13 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         }
     }
 
-    private boolean isAnyRip1Doc(List<DwpDocument> dwpDocuments) {
-        return dwpDocuments.stream().anyMatch(d -> d.getValue().getRip1DocumentLink() != null);
-    }
-
     private DwpDocument buildAudioVideoDwpDocument(AudioVideoEvidenceDetails audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response, boolean isWelshCase) {
         DocumentLink rip1Doc = null;
         SscsDocumentTranslationStatus status = null;
         if (audioVideoEvidence.getRip1Document() != null) {
             rip1Doc = buildRip1Doc(audioVideoEvidence);
             if (isWelshCase) {
+                response.getData().setInterlocReviewState(WELSH_TRANSLATION.getId());
                 status = SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
             }
         }

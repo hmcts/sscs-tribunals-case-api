@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.addnote;
 
-import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDate;
@@ -33,13 +32,7 @@ public class AddNoteAboutToSubmitHandler  implements PreSubmitCallbackHandler<Ss
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && (callback.getEvent() == EventType.ADD_NOTE
-                || callback.getEvent() == EventType.NON_COMPLIANT_SEND_TO_INTERLOC
-                || callback.getEvent() == EventType.ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE
-                || callback.getEvent() == EventType.INTERLOC_SEND_TO_TCW
-                || callback.getEvent() == EventType.TCW_REFER_TO_JUDGE
-                || callback.getEvent() == EventType.SEND_TO_ADMIN
-                || callback.getEvent() == EventType.ADMIN_APPEAL_WITHDRAWN);
+                && callback.getEvent() == EventType.ADD_NOTE;
     }
 
     @Override
@@ -51,17 +44,15 @@ public class AddNoteAboutToSubmitHandler  implements PreSubmitCallbackHandler<Ss
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        String note = sscsCaseData.getAppealNote();
-        if (nonNull(note)) {
-            Note newNote = Note.builder().value(NoteDetails.builder().noteDetail(note).noteDate(LocalDate.now().toString())
-                    .author(buildLoggedInUserName(userAuthorisation)).build()).build();
-            if (sscsCaseData.getAppealNotePad() == null || sscsCaseData.getAppealNotePad().getNotesCollection() == null) {
-                sscsCaseData.setAppealNotePad(NotePad.builder().notesCollection(new ArrayList<Note>()).build());
-            }
-            sscsCaseData.getAppealNotePad().getNotesCollection().add(newNote);
-
-            sscsCaseData.setAppealNote(null);
+        String note = sscsCaseData.getTempNoteDetail();
+        Note newNote = Note.builder().value(NoteDetails.builder().noteDetail(note).noteDate(LocalDate.now().toString())
+                .author(buildLoggedInUserName(userAuthorisation)).build()).build();
+        if (sscsCaseData.getAppealNotePad() == null || sscsCaseData.getAppealNotePad().getNotesCollection() == null) {
+            sscsCaseData.setAppealNotePad(NotePad.builder().notesCollection(new ArrayList<Note>()).build());
         }
+        sscsCaseData.getAppealNotePad().getNotesCollection().add(newNote);
+
+        sscsCaseData.setTempNoteDetail(null);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
