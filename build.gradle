@@ -349,16 +349,21 @@ dependencies {
     e2eAnnotationProcessor "org.projectlombok:lombok:1.18.18"
 
     testCompile "org.junit.jupiter:junit-jupiter-api:5.7.1"
-    testRuntime "org.junit.jupiter:junit-jupiter-engine:5.6.2"
+    testRuntime "org.junit.jupiter:junit-jupiter-engine:5.7.1"
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.7.1"
-
+    
     //pact contract testing
-    contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
-    contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
-
-    contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.7.0")
-    contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.6.1")
-    contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.6.2')
+    contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.1.7'
+    contractTestCompile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.0'
+    contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.7'
+    contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.1.7'
+    contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'java8',  version: '4.1.7'
+    contractTestRuntime group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.0'
+    contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+    contractTestCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.1'
+    contractTestRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.1'
+    contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.1'
+    contractTestRuntime "org.junit.platform:junit-platform-commons:1.7.0"
 
     contractTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.28') {
         force = true
@@ -366,23 +371,6 @@ dependencies {
 
     contractTestCompile sourceSets.main.runtimeClasspath
     contractTestCompile sourceSets.test.runtimeClasspath
-}
-
-project.ext {
-    pactVersion = getCheckedOutGitCommitHash()
-}
-
-pact {
-    publish {
-        pactDirectory = 'target/pacts'
-        pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
-        tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
-        version = project.pactVersion
-    }
-}
-
-static def getCheckedOutGitCommitHash() {
-    'git rev-parse --verify --short HEAD'.execute().text.trim()
 }
 
 // this is required to force Java running on the Azure Windows Server OS into using
@@ -429,6 +417,41 @@ task contract(type: Test, description: 'Runs the pact contract tests.', group: '
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
 }
+
+
+
+project.ext {
+    pacticipant = 'sscs_tribunalsCaseApi'
+    pacticipantVersion = getCheckedOutGitCommitHash()
+}
+
+task runAndPublishConsumerPactTests(type: Test){
+    logger.lifecycle("Runs pact Tests")
+    testClassesDirs = sourceSets.contractTest.output.classesDirs
+    classpath = sourceSets.contractTest.runtimeClasspath
+
+}
+
+runAndPublishConsumerPactTests.dependsOn contract
+
+runAndPublishConsumerPactTests.finalizedBy pactPublish
+
+pact {
+    broker {
+        pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+    }
+    publish {
+        pactDirectory = 'pacts'
+        tags = [System.getenv("PACT_BRANCH_NAME") ?:'Dev']
+        version = project.pacticipantVersion
+    }
+}
+
+
+static def getCheckedOutGitCommitHash() {
+    'git rev-parse --verify --short HEAD'.execute().text.trim()
+}
+
 
 run {
     def debug = System.getProperty("debug")
