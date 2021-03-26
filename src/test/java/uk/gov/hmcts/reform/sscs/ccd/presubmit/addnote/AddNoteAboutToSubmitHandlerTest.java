@@ -79,7 +79,7 @@ public class AddNoteAboutToSubmitHandlerTest {
 
     @Test
     public void testTempNoteFilledIn_thenNoteAddedToNullNotePad() {
-        sscsCaseData.setAppealNote("Here is my note");
+        sscsCaseData.setTempNoteDetail("Here is my note");
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -92,7 +92,7 @@ public class AddNoteAboutToSubmitHandlerTest {
 
     @Test
     public void testTempNoteFilledIn_thenNoteAddedToEmptyCollection() {
-        sscsCaseData.setAppealNote("Here is my note");
+        sscsCaseData.setTempNoteDetail("Here is my note");
         Note oldNote = Note.builder().value(NoteDetails.builder().noteDetail("Existing note").noteDate(LocalDate.now().toString())
                 .author("A user").build()).build();
 
@@ -109,7 +109,7 @@ public class AddNoteAboutToSubmitHandlerTest {
 
     @Test
     public void testTempNoteFilledIn_thenNoteAddedToCollectionOfOne() {
-        sscsCaseData.setAppealNote("Here is my note");
+        sscsCaseData.setTempNoteDetail("Here is my note");
         Note oldNote = Note.builder().value(NoteDetails.builder().noteDetail("Existing note").noteDate(LocalDate.now().toString())
                 .author("A user").build()).build();
 
@@ -127,7 +127,7 @@ public class AddNoteAboutToSubmitHandlerTest {
 
     @Test
     public void testTempNoteFilledIn_thenNoteAddedToNullCollection() {
-        sscsCaseData.setAppealNote("Here is my note");
+        sscsCaseData.setTempNoteDetail("Here is my note");
         Note oldNote = Note.builder().value(NoteDetails.builder().noteDetail("Existing note").noteDate(LocalDate.now().toString())
                 .author("A user").build()).build();
 
@@ -146,7 +146,7 @@ public class AddNoteAboutToSubmitHandlerTest {
     public void testNoUserDetails_thenThrowsException() {
         when(idamClient.getUserDetails(USER_AUTHORISATION)).thenReturn(null);
 
-        sscsCaseData.setAppealNote("Here is my note");
+        sscsCaseData.setTempNoteDetail("Here is my note");
         Note oldNote = Note.builder().value(NoteDetails.builder().noteDetail("Existing note").noteDate(LocalDate.now().toString())
                 .author("A user").build()).build();
 
