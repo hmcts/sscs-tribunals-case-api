@@ -276,13 +276,6 @@ dependencyManagement {
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
         }
-
-        //CVE-2021-27807
-        dependencySet(group: 'org.apache.pdfbox', version: '2.0.23') {
-            entry 'pdfbox'
-            entry 'pdfbox-tools'
-            entry 'preflight'
-        }
     }
 }
 
