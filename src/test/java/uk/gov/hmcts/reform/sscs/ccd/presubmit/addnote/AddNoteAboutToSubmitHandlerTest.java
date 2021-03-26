@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -55,6 +56,31 @@ public class AddNoteAboutToSubmitHandlerTest {
 
         when(idamClient.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
                 .forename("Chris").surname("Davis").build());
+    }
+
+    @Test
+    public void testTempNoteFilledIsNull_thenNotePadIsNull() {
+        sscsCaseData.setTempNoteDetail(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getAppealNotePad());;
+    }
+
+    @Test
+    public void testTempNoteFilledIsNull_thenNoNoteAddedToCollection() {
+        sscsCaseData.setTempNoteDetail(null);
+
+        Note oldNote = Note.builder().value(NoteDetails.builder().noteDetail("Existing note").noteDate(LocalDate.now().toString())
+                .author("A user").build()).build();
+
+        sscsCaseData.setAppealNotePad(NotePad.builder().notesCollection(List.of(oldNote)).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
     }
 
     @Test
