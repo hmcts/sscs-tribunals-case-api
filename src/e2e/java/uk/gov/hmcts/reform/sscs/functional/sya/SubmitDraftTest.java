@@ -207,6 +207,30 @@ public class SubmitDraftTest {
     }
 
     @Test
+    public void deleteDraft() throws InterruptedException {
+        String expectedState = "validAppeal";
+        LocalDate now = LocalDate.now();
+        LocalDate interlocutoryReviewDate = now.minusMonths(13).minusDays(1);
+        LocalDate mrnDate = expectedState.equals("interlocutoryReviewState") ? interlocutoryReviewDate :
+                expectedState.equals("incompleteApplication") ? null : now;
+        String nino = submitHelper.getRandomNino();
+        RestAssured.given()
+                .log().method().log().headers().log().uri().log().body(true)
+                .contentType(ContentType.JSON)
+                .header(new Header(AUTHORIZATION, citizenToken))
+                .body(setDraftCaseJson(mrnDate, nino))
+                .put("/drafts");
+        SscsCaseData draft = findCase(citizenIdamTokens).get(0);
+        String caseId = draft.getCcdCaseId();
+        RestAssured.given()
+                .header(new Header(AUTHORIZATION, citizenToken))
+                .delete("/drafts/" + caseId)
+                .then()
+                .statusCode(HttpStatus.SC_OK);
+        assertEquals(0, citizenCcdService.findCase(citizenIdamTokens).size());
+    }
+
+    @Test
     public void givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser() {
         Response response = saveDraft(draftAppeal);
         response.then()
