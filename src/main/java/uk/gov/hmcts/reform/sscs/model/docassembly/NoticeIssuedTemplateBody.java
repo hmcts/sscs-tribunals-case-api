@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.docassembly.domain.FormPayload;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class NoticeIssuedTemplateBody implements FormPayload {
     @JsonIgnore
-    public static final String SCOTTISH_IMAGE = "[userImage:schmcts2.png]";
+    public static final String SCOTTISH_IMAGE = "[userImage:schmcts.png]";
     @JsonIgnore
     public static final String ENGLISH_IMAGE = "[userImage:enhmcts.png]";
     @JsonIgnore
