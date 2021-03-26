@@ -263,6 +263,12 @@ dependencyManagement {
             entry 'spring-security-web'
         }
 
+        //CVE-2021-27807
+        dependencySet(group: 'org.apache.pdfbox', version: '2.0.23') {
+            entry 'pdfbox-tools'
+            entry 'preflight'
+        }
+
         dependencySet(group: 'org.apache.xmlgraphics', version: '1.14') {
             entry 'batik-all'
         }
