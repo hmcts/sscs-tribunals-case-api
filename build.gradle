@@ -328,7 +328,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.2.37-RC-SSCS-8855'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.29-RC3-SSCS-8855'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.29-RC-8855-4'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
     compile 'org.projectlombok:lombok:1.18.18'
