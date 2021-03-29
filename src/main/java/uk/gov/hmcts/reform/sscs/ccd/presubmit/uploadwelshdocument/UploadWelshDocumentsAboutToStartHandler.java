@@ -10,17 +10,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
+import uk.gov.hmcts.reform.sscs.ccd.callback.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Component
@@ -55,20 +46,18 @@ public class UploadWelshDocumentsAboutToStartHandler implements PreSubmitCallbac
     private void setOriginalDocumentDropdown(SscsCaseData sscsCaseData) {
         listOptions = new ArrayList<>();
 
-        List<SscsDocument> sscsDocuments = Optional.ofNullable(sscsCaseData).map(SscsCaseData::getSscsDocument)
-            .orElse(Collections.emptyList())
-            .stream()
-            .filter(Objects::nonNull)
-            .filter(a -> Objects.nonNull(a.getValue().getDocumentTranslationStatus())
-                &&
-                a.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED))
-            .filter(b -> !Arrays.asList(DocumentType.DECISION_NOTICE.getValue(), DocumentType.AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE, DocumentType.DIRECTION_NOTICE.getValue())
-                .contains(b.getValue().getDocumentType()))
-            .collect(Collectors.toList());
+        List<SscsDocument> sscsDocuments = buildSscsDocumentsForTranslation(sscsCaseData);
 
-        sscsDocuments.forEach(sscsDocument -> {
-            listOptions.add(new DynamicListItem(sscsDocument.getValue().getDocumentLink().getDocumentFilename(),
-                sscsDocument.getValue().getDocumentLink().getDocumentFilename()));
+        sscsDocuments.forEach(sscsDocument ->
+                listOptions.add(new DynamicListItem(sscsDocument.getValue().getDocumentLink().getDocumentFilename(), sscsDocument.getValue().getDocumentLink().getDocumentFilename())));
+
+        List<DwpDocument> dwpDocuments = buildDwpDocumentsForTranslation(sscsCaseData);
+
+        dwpDocuments.forEach(dwpDocument -> {
+            if (dwpDocument.getValue().getRip1DocumentLink() != null) {
+                listOptions.add(new DynamicListItem(dwpDocument.getValue().getRip1DocumentLink().getDocumentFilename(),
+                        dwpDocument.getValue().getRip1DocumentLink().getDocumentFilename()));
+            }
         });
 
         if (listOptions.size() > 0) {
@@ -77,5 +66,27 @@ public class UploadWelshDocumentsAboutToStartHandler implements PreSubmitCallbac
             listOptions.add(new DynamicListItem("-", "No original file"));
             sscsCaseData.setOriginalDocuments(new DynamicList(listOptions.get(0), listOptions));
         }
+    }
+
+    private List<SscsDocument> buildSscsDocumentsForTranslation(SscsCaseData sscsCaseData) {
+        return Optional.ofNullable(sscsCaseData).map(SscsCaseData::getSscsDocument)
+                .orElse(Collections.emptyList())
+                .stream()
+                .filter(Objects::nonNull)
+                .filter(a -> Objects.nonNull(a.getValue().getDocumentTranslationStatus())
+                        && a.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED))
+                .filter(b -> !Arrays.asList(DocumentType.DECISION_NOTICE.getValue(), DocumentType.AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE, DocumentType.DIRECTION_NOTICE.getValue())
+                        .contains(b.getValue().getDocumentType()))
+                .collect(Collectors.toList());
+    }
+
+    private List<DwpDocument> buildDwpDocumentsForTranslation(SscsCaseData sscsCaseData) {
+        return Optional.ofNullable(sscsCaseData).map(SscsCaseData::getDwpDocuments)
+                .orElse(Collections.emptyList())
+                .stream()
+                .filter(Objects::nonNull)
+                .filter(a -> Objects.nonNull(a.getValue().getDocumentTranslationStatus())
+                        && a.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED))
+                .collect(Collectors.toList());
     }
 }
