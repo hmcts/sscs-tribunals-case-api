@@ -6,6 +6,7 @@ import static java.util.Objects.requireNonNull;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -47,7 +48,7 @@ public class AddNoteAboutToSubmitHandler  implements PreSubmitCallbackHandler<Ss
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         String note = sscsCaseData.getTempNoteDetail();
-        if (nonNull(note)) {
+        if (nonNull(note) && StringUtils.isNoneBlank(note)) {
             Note newNote = Note.builder().value(NoteDetails.builder().noteDetail(note).noteDate(LocalDate.now().toString())
                     .author(buildLoggedInUserName(userAuthorisation)).build()).build();
             if (sscsCaseData.getAppealNotePad() == null || sscsCaseData.getAppealNotePad().getNotesCollection() == null) {
