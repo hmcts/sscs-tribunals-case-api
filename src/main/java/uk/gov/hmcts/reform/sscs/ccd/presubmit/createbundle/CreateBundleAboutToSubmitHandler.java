@@ -115,6 +115,8 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
                 }
             }
 
+            callback.getCaseDetails().getCaseData().setCaseBundles(null);
+
             bundleAudioVideoPdfService.createAudioVideoPdf(sscsCaseData);
 
             if (multiBundleFeature) {
