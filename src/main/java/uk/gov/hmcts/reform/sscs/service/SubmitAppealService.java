@@ -66,38 +66,27 @@ public class SubmitAppealService {
     }
 
     public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
-
+        SscsCaseData caseData = convertAppealToSscsCaseData(appeal);
+        EventType event = findEventType(caseData);
         IdamTokens idamTokens = idamService.getIdamTokens();
 
-        Long caseId = appeal.getCcdCaseId() != null ? Long.valueOf(appeal.getCcdCaseId()) : null;
+        SscsCaseDetails caseDetails = createCaseInCcd(caseData, event, idamTokens);
 
-        SscsCaseData caseData = null;
-        boolean saveAndReturnCase = false;
+        postCreateCaseInCcdProcess(caseData, idamTokens, caseDetails, userToken, toLongO(appeal.getCcdCaseId()), appeal);
 
-        if (caseId != null) {
-            log.info("Finding case from draft store for case id: {}", caseId);
-            SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(caseId, idamTokens);
-            if (sscsCaseDetails != null) {
-                log.info("Found case from draft store for case id: {}", caseId);
-                caseData = sscsCaseDetails.getData();
-                saveAndReturnCase = true;
-            } else {
-                log.info("Could not find case from draft store for case id: {}", caseId);
-            }
+        if (appeal.getIsSaveAndReturn() != null && appeal.getIsSaveAndReturn().equals("No")) {
+            log.info("Case {} created from cache, setting isSaveAndReturn to No", caseDetails.getData().getCcdCaseId());
         }
-        if (caseData == null) {
-            log.info("Converting sya appeal data to sscs case");
-            caseData = convertAppealToSscsCaseData(appeal);
-        }
-
-        caseData.setIsSaveAndReturn(appeal.getIsSaveAndReturn());
-
-        EventType event = findEventType(caseData, saveAndReturnCase);
-        SscsCaseDetails caseDetails = createOrUpdateCase(caseData, event, idamTokens);
-
-        associateCase(idamTokens, caseDetails, userToken);
-
+        // in case of duplicate case the caseDetails will be null
         return caseDetails.getId();
+    }
+
+    private Optional<Long> toLongO(String in) {
+        try {
+            return Optional.of(Long.valueOf(in));
+        } catch (NumberFormatException nfe) {
+            return Optional.empty();
+        }
     }
 
     public Optional<SaveCaseResult> submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal, Boolean forceCreate) {
@@ -235,11 +224,37 @@ public class SubmitAppealService {
         return hasRole;
     }
 
-    private void associateCase(IdamTokens idamTokens,
-                               SscsCaseDetails caseDetails,
-                               String userToken) {
+    private void postCreateCaseInCcdProcess(SscsCaseData caseData,
+                                            IdamTokens idamTokens,
+                                            SscsCaseDetails caseDetails,
+                                            String userToken,
+                                            Optional<Long> draftCaseId,
+                                            SyaCaseWrapper appeal) {
         if (null != caseDetails && StringUtils.isNotEmpty(userToken)) {
+
+            Optional<Long> deletedDraftId;
+
+            if (! draftCaseId.isPresent()) {
+                Optional<SscsCaseDetails> draftDetails =
+                        citizenCcdService.draftArchivedFirst(caseData, getUserTokens(userToken), idamTokens);
+                log.info("Archived First found draft for created case {}", caseDetails.getId());
+                deletedDraftId = draftDetails.map(caseDetail -> caseDetail.getId());
+
+            } else {
+                appeal.setCaseType("draft");
+                SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal);
+
+                citizenCcdService.archiveDraft(sscsCaseData, getUserTokens(userToken), draftCaseId.get());
+                log.info("Archived draft {} for created case {}", draftCaseId.get(), caseDetails.getId());
+                deletedDraftId = draftCaseId;
+            }
+
             citizenCcdService.associateCaseToCitizen(getUserTokens(userToken), caseDetails.getId(), idamTokens);
+
+            if (caseDetails.getData() != null && caseDetails.getData().getIsSaveAndReturn() != null
+                    && caseDetails.getData().getIsSaveAndReturn().equals("Yes") && deletedDraftId.isPresent()) {
+                log.info("Case {} created from draft {}, setting isSaveAndReturn to Yes", caseDetails.getId(), deletedDraftId.get());
+            }
         }
     }
 
@@ -264,7 +279,7 @@ public class SubmitAppealService {
         return sscsCaseData;
     }
 
-    private SscsCaseDetails createOrUpdateCase(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
+    private SscsCaseDetails createCaseInCcd(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
         SscsCaseDetails caseDetails = null;
 
         try {
@@ -278,38 +293,21 @@ public class SubmitAppealService {
                     caseData = addAssociatedCases(caseData, matchedByNinoCases);
                 }
 
-                log.info("About to attempt creating case or updating draft case in CCD with event {} for benefit type {} and event {} and isScottish {} and languagePreference {}",
-                        eventType,
+                log.info("About to attempt creating case in CCD for benefit type {} and event {} and isScottish {} and languagePreference {}",
                         caseData.getAppeal().getBenefitType().getCode(),
                         eventType,
                         caseData.getIsScottishCase(),
                         caseData.getLanguagePreference().getCode());
 
-                if (eventType == DRAFT_TO_VALID_APPEAL_CREATED || eventType == DRAFT_TO_INCOMPLETE_APPLICATION || eventType == DRAFT_TO_NON_COMPLIANT) {
-                    caseData.setCaseCreated(LocalDate.now().toString());
-
-                    caseDetails = ccdService.updateCase(caseData,
-                            Long.valueOf(caseData.getCcdCaseId()),
-                            eventType.getCcdType(),
-                            "SSCS - new case created",
-                            "Created SSCS case from Submit Your Appeal online draft with event " + eventType.getCcdType(),
-                            idamTokens);
-
-                    log.info("Case {} successfully converted from Draft to SSCS case in CCD for benefit type {} with event {}",
-                            caseDetails.getId(),
-                            caseData.getAppeal().getBenefitType().getCode(),
-                            eventType);
-                } else {
-                    caseDetails = ccdService.createCase(caseData,
-                            eventType.getCcdType(),
-                            "SSCS - new case created",
-                            "Created SSCS case from Submit Your Appeal online with event " + eventType.getCcdType(),
-                            idamTokens);
-                    log.info("Case {} successfully created in CCD for benefit type {} with event {}",
-                            caseDetails.getId(),
-                            caseData.getAppeal().getBenefitType().getCode(),
-                            eventType);
-                }
+                caseDetails = ccdService.createCase(caseData,
+                    eventType.getCcdType(),
+                    "SSCS - new case created",
+                    "Created SSCS case from Submit Your Appeal online with event " + eventType.getCcdType(),
+                    idamTokens);
+                log.info("Case {} successfully created in CCD for benefit type {} with event {}",
+                    caseDetails.getId(),
+                    caseData.getAppeal().getBenefitType().getCode(),
+                    eventType);
                 return caseDetails;
             }
         } catch (Exception e) {
@@ -380,7 +378,7 @@ public class SubmitAppealService {
         return result;
     }
 
-    private EventType findEventType(SscsCaseData caseData, boolean saveAndReturnCase) {
+    private EventType findEventType(SscsCaseData caseData) {
 
         if (caseData.getAppeal().getMrnDetails() != null && caseData.getAppeal().getMrnDetails().getMrnDate() != null) {
             LocalDate mrnDate = LocalDate.parse(caseData.getAppeal().getMrnDetails().getMrnDate());
@@ -388,17 +386,17 @@ public class SubmitAppealService {
 
             if (moveToNoneCompliant) {
                 log.info("Moving case for NINO {} to non-compliant as MRN Date is older than 13 months", caseData.getAppeal().getAppellant().getIdentity().getNino());
-                return saveAndReturnCase ? DRAFT_TO_NON_COMPLIANT : NON_COMPLIANT;
+                return NON_COMPLIANT;
             } else {
                 log.info("Valid appeal to be created for case with NINO {}", caseData.getAppeal().getAppellant().getIdentity().getNino());
-                return saveAndReturnCase ? DRAFT_TO_VALID_APPEAL_CREATED : VALID_APPEAL_CREATED;
+                return VALID_APPEAL_CREATED;
             }
         } else {
             log.info("Moving case for NINO {} to incomplete due to MRN Details {} present and MRN Date {} present",
                 caseData.getAppeal().getAppellant().getIdentity().getNino(),
                 (caseData.getAppeal().getMrnDetails() != null ? "" : "not"),
                 (caseData.getAppeal().getMrnDetails().getMrnDate() != null ? "" : "not"));
-            return saveAndReturnCase ? DRAFT_TO_INCOMPLETE_APPLICATION : INCOMPLETE_APPLICATION_RECEIVED;
+            return INCOMPLETE_APPLICATION_RECEIVED;
         }
     }
 }
