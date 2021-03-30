@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.format.DateTimeFormatter;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
+import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 
 
@@ -45,7 +47,7 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
 
         setCaseCode(sscsCaseData, callback.getEvent());
         checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
-        clearDwpDocuments(sscsCaseData);
+        setDwpDocuments(sscsCaseData);
 
         if (sscsCaseData.getDwpResponseDate() == null) {
             sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
@@ -54,14 +56,44 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
         return preSubmitCallbackResponse;
     }
 
-    private void clearDwpDocuments(SscsCaseData sscsCaseData) {
-        sscsCaseData.setDwpResponseDocument(null);
-        sscsCaseData.setDwpAT38Document(null);
-        sscsCaseData.setDwpEvidenceBundleDocument(null);
-        sscsCaseData.setDwpEditedEvidenceBundleDocument(null);
-        sscsCaseData.setDwpEditedResponseDocument(null);
-        sscsCaseData.setAppendix12Doc(null);
-        sscsCaseData.setDwpUcbEvidenceDocument(null);
+    protected void setDwpDocuments(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getDwpDocuments() != null) {
+            for (DwpDocument dwpDocument : sscsCaseData.getDwpDocuments()) {
+                if (dwpDocument.getValue().getDocumentType().equals(DwpDocumentType.DWP_RESPONSE.getValue())) {
+                    updateDocument(dwpDocument, sscsCaseData.getDwpResponseDocument(), AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX);
+                    sscsCaseData.setDwpResponseDocument(null);
+                } else if (dwpDocument.getValue().getDocumentType().equals(DwpDocumentType.AT_38.getValue())) {
+                    updateDocument(dwpDocument, sscsCaseData.getDwpAT38Document(), AppConstants.DWP_DOCUMENT_AT38_FILENAME_PREFIX);
+                    sscsCaseData.setDwpAT38Document(null);
+                } else if (dwpDocument.getValue().getDocumentType().equals(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue())) {
+                    updateDocument(dwpDocument, sscsCaseData.getDwpEvidenceBundleDocument(), AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX);
+                    sscsCaseData.setDwpEvidenceBundleDocument(null);
+                }
+            }
+        }
+
+        if (sscsCaseData.getDwpAT38Document() != null || sscsCaseData.getDwpEvidenceBundleDocument() != null || sscsCaseData.getDwpResponseDocument() != null) {
+            String todayDate = java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+            dwpDocumentService.moveDocsToCorrectCollection(sscsCaseData, todayDate);
+        }
+    }
+
+    private void updateDocument(DwpDocument dwpDocument, DwpResponseDocument dwpResponseDocument, String documentTypePrefix) {
+        String todayDate = java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        String fileExtension = dwpResponseDocument.getDocumentLink().getDocumentFilename()
+                .substring(dwpResponseDocument.getDocumentLink().getDocumentFilename().lastIndexOf("."));
+        if (dwpResponseDocument != null) {
+            if (!dwpDocument.getValue().getDocumentLink().getDocumentUrl()
+                    .equals(dwpResponseDocument.getDocumentLink().getDocumentUrl())) {
+                dwpDocument.getValue().setDocumentLink(DocumentLink.builder()
+                        .documentBinaryUrl(dwpResponseDocument.getDocumentLink().getDocumentBinaryUrl())
+                        .documentUrl(dwpResponseDocument.getDocumentLink().getDocumentUrl())
+                        .documentFilename(documentTypePrefix + " on " + todayDate + fileExtension)
+                        .build());
+                dwpDocument.getValue().setDocumentDateAdded(java.time.LocalDate.now().toString());
+                dwpDocument.getValue().setDocumentFileName(documentTypePrefix + " on " + todayDate);
+            }
+        }
     }
 
 }
