@@ -261,7 +261,7 @@ public class SubmitDraftTest {
                 .header(new Header(AUTHORIZATION, citizenToken))
                 .delete("/drafts/123456")
                 .then()
-                .statusCode(HttpStatus.SC_OK);
+                .statusCode(HttpStatus.SC_NO_CONTENT);
     }
 
     @Test
