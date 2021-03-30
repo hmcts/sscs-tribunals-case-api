@@ -259,7 +259,10 @@ public class SubmitDraftTest {
         saveDraft(draftAppeal);
         RestAssured.given()
                 .header(new Header(AUTHORIZATION, citizenToken))
-                .delete("/drafts/123456")
+                .delete("/drafts/123456");
+        RestAssured.given()
+                .header(new Header(AUTHORIZATION, citizenToken))
+                .get("/drafts/all")
                 .then()
                 .statusCode(HttpStatus.SC_NO_CONTENT);
     }
