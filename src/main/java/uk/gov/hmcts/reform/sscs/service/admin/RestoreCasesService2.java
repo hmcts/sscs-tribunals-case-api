@@ -165,15 +165,16 @@ public class RestoreCasesService2 {
     }
 
     private void triggerEvent(SscsCaseDetails caseDetails, IdamTokens idamTokens) {
-        log.info("About to update case with {} event for id {}", EventType.UPDATE_CASE_ONLY, caseDetails.getId());
+        EventType eventToTrigger = caseDetails.getState().equals(State.WITH_DWP.getId()) ?  EventType.APPEAL_RECEIVED : EventType.UPDATE_CASE_ONLY;
+
+        log.info("About to update case with {} event for id {}", eventToTrigger, caseDetails.getId());
         try {
-            EventType eventToTrigger = caseDetails.getState().equals(State.WITH_DWP.getId()) ?  EventType.APPEAL_RECEIVED : EventType.UPDATE_CASE_ONLY;
             ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), eventToTrigger.getCcdType(), "Restore case details", "Automatically restore missing case details", idamTokens);
 
-            log.info("Case updated with {} event for id {}", EventType.UPDATE_CASE_ONLY, caseDetails.getId());
+            log.info("Case updated with {} event for id {}", eventToTrigger, caseDetails.getId());
 
         } catch (FeignException.UnprocessableEntity e) {
-            log.error(format("%s event failed for caseId %s, root cause is %s", EventType.UPDATE_CASE_ONLY, caseDetails.getId(), getRootCauseMessage(e)), e);
+            log.error(format("%s event failed for caseId %s, root cause is %s", eventToTrigger, caseDetails.getId(), getRootCauseMessage(e)), e);
             throw e;
         }
     }
