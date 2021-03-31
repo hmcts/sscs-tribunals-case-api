@@ -127,7 +127,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         when(response.getErrors()).thenReturn(emptySet());
 
         when(dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(anyString(), anyString())).thenReturn(DUMMY_REGIONAL_CENTER);
-        when(dwpAddressLookupService.getDefaultDwpMappingByOffice(anyString())).thenReturn(Optional.of(OfficeMapping.builder().isDefault(true).mapping(Mapping.builder().ccd("DWP PIP (1)").build()).build()));
+        when(dwpAddressLookupService.getDefaultDwpMappingByBenefitType(anyString())).thenReturn(Optional.of(OfficeMapping.builder().isDefault(true).mapping(Mapping.builder().ccd("DWP PIP (1)").build()).build()));
     }
 
     @Test
