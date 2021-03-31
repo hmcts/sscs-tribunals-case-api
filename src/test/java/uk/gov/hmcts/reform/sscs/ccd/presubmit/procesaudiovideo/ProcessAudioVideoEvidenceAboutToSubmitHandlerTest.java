@@ -512,7 +512,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(SEND_TO_ADMIN.getCode()));
         final String note = "This is a note";
-        sscsCaseData.setAppealNote(note);
+        sscsCaseData.setTempNoteDetail(note);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
