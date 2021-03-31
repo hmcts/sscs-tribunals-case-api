@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @Service
 @Slf4j
@@ -42,10 +43,12 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     public static final List<String> ACTIONS_THAT_REQUIRES_NOTICE = asList(ISSUE_DIRECTIONS_NOTICE.getCode(), EXCLUDE_EVIDENCE.getCode(), INCLUDE_EVIDENCE.getCode());
 
     private final FooterService footerService;
+    protected final UserDetailsService userDetailsService;
 
     @Autowired
-    public ProcessAudioVideoEvidenceAboutToSubmitHandler(FooterService footerService) {
+    public ProcessAudioVideoEvidenceAboutToSubmitHandler(FooterService footerService, UserDetailsService userDetailsService) {
         this.footerService = footerService;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -82,8 +85,8 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         processIfIssueDirectionNotice(caseData);
         processIfIncludeEvidence(caseData, response);
         processIfExcludeEvidence(caseData);
-        processIfSendToJudge(caseData);
-        processIfSendToAdmin(caseData);
+        processIfSendToJudge(caseData, userAuthorisation);
+        processIfSendToAdmin(caseData, userAuthorisation);
         overrideInterlocReviewStateIfSelected(caseData);
 
         clearTransientFields(caseData);
@@ -208,10 +211,10 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         }
     }
 
-    private void addToNotesIfNoteExists(SscsCaseData caseData) {
+    private void addToNotesIfNoteExists(SscsCaseData caseData, String userAuthorisation) {
         if (StringUtils.isNoneBlank(caseData.getAppealNote())) {
             ArrayList<Note> notes = new ArrayList<>(Optional.ofNullable(caseData.getAppealNotePad()).flatMap(f -> Optional.ofNullable(f.getNotesCollection())).orElse(Collections.emptyList()));
-            final NoteDetails noteDetail = NoteDetails.builder().noteDetail(caseData.getAppealNote()).noteDate(LocalDate.now().toString()).build();
+            final NoteDetails noteDetail = NoteDetails.builder().noteDetail(caseData.getAppealNote()).noteDate(LocalDate.now().toString()).author(userDetailsService.buildLoggedInUserName(userAuthorisation)).build();
             notes.add(Note.builder().value(noteDetail).build());
             caseData.setAppealNotePad(NotePad.builder().notesCollection(notes).build());
         }
@@ -225,7 +228,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         }
     }
 
-    private void processIfSendToJudge(SscsCaseData caseData) {
+    private void processIfSendToJudge(SscsCaseData caseData, String userAuthorisation) {
         if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), SEND_TO_JUDGE.getCode())) {
             if (caseData.isLanguagePreferenceWelsh()) {
                 caseData.setWelshInterlocNextReviewState(REVIEW_BY_JUDGE.getId());
@@ -234,12 +237,12 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
                 caseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
             }
             caseData.setInterlocReferralDate(LocalDate.now().toString());
-            addToNotesIfNoteExists(caseData);
+            addToNotesIfNoteExists(caseData, userAuthorisation);
             addProcessedActionToSelectedEvidence(caseData, SENT_TO_JUDGE);
         }
     }
 
-    private void processIfSendToAdmin(SscsCaseData caseData) {
+    private void processIfSendToAdmin(SscsCaseData caseData, String userAuthorisation) {
         if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), SEND_TO_ADMIN.getCode())) {
             if (caseData.isLanguagePreferenceWelsh()) {
                 caseData.setWelshInterlocNextReviewState(AWAITING_ADMIN_ACTION.getId());
@@ -247,7 +250,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
             } else {
                 caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
             }
-            addToNotesIfNoteExists(caseData);
+            addToNotesIfNoteExists(caseData, userAuthorisation);
             addProcessedActionToSelectedEvidence(caseData, SENT_TO_ADMIN);
         }
     }
