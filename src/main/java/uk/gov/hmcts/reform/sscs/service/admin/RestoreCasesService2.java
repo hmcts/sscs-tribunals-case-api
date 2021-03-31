@@ -113,12 +113,14 @@ public class RestoreCasesService2 {
             );
 
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("IOException from RestoreCasesService2: ", e);
         } finally {
             try {
-                reader.close();
+                if (reader != null) {
+                    reader.close();
+                }
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("IOException from RestoreCasesService2 in finally: ", e);
             }
         }
         log.info("RestoreCasesService2: Found " + allCasesToRestore.size() + " cases to restore. Processing now...");
