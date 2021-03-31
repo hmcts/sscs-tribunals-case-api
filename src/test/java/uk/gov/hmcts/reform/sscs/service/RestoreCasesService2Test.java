@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException.UnprocessableEntity;
 import java.util.Arrays;
@@ -220,6 +221,13 @@ public class RestoreCasesService2Test {
         Assert.assertFalse(status.isOk());
         Assert.assertEquals("RestoreCasesStatus{processedCount=2, successCount=1, failureCount=1, failureIds=[1234118573817544], completed=false}", status.toString());
 
+    }
+
+    @Test
+    public void testGetRestoreCaseFileNameWhenValidJsonWithRestoreCasesDate() throws JsonProcessingException {
+        String json = "{\"case_details\" : {\"case_data\" : {\"restoreCaseFileName\" : \"restore-case-.csv\"}}}";
+        String fileName = restoreCasesService2.getRestoreCaseFileName(json);
+        Assert.assertEquals("restore-case-.csv", fileName);
     }
 
 }
