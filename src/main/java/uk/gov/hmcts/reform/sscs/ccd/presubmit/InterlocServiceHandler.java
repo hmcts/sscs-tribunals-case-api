@@ -27,6 +27,7 @@ public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler
         eventTypeToSecondaryStatus.put(EventType.JUDGE_DIRECTION_ISSUED, AWAITING_INFORMATION.getId());
         eventTypeToSecondaryStatus.put(EventType.TCW_REFER_TO_JUDGE, REVIEW_BY_JUDGE.getId());
         eventTypeToSecondaryStatus.put(EventType.NON_COMPLIANT, REVIEW_BY_TCW.getId());
+        eventTypeToSecondaryStatus.put(EventType.DRAFT_TO_NON_COMPLIANT, REVIEW_BY_TCW.getId());
         eventTypeToSecondaryStatus.put(EventType.NON_COMPLIANT_SEND_TO_INTERLOC, REVIEW_BY_TCW.getId());
         eventTypeToSecondaryStatus.put(EventType.REINSTATE_APPEAL, AWAITING_ADMIN_ACTION.getId());
         eventTypeToSecondaryStatus.put(EventType.TCW_DECISION_APPEAL_TO_PROCEED, NONE.getId());
@@ -57,6 +58,7 @@ public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler
 
     private void setInterlocReferralDate(SscsCaseData newSscsCaseData, EventType eventType) {
         if (eventType.equals(EventType.NON_COMPLIANT)
+                || eventType.equals(EventType.DRAFT_TO_NON_COMPLIANT)
                 || eventType.equals(EventType.NON_COMPLIANT_SEND_TO_INTERLOC)
                 || eventType.equals(EventType.TCW_REFER_TO_JUDGE)
                 || eventType.equals(EventType.DWP_REQUEST_TIME_EXTENSION)
@@ -69,6 +71,7 @@ public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler
 
     private void clearDirectionDueDate(SscsCaseData newSscsCaseData, EventType eventType) {
         if (eventType.equals(EventType.NON_COMPLIANT)
+                || eventType.equals(EventType.DRAFT_TO_NON_COMPLIANT)
                 || eventType.equals(EventType.NON_COMPLIANT_SEND_TO_INTERLOC)
                 || eventType.equals(EventType.REINSTATE_APPEAL)) {
             log.info("Clearing direction due date for caseId {}", newSscsCaseData.getCcdCaseId());
