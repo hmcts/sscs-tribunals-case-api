@@ -494,14 +494,14 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(action.getCode()));
         final String note = "This is a note";
         final String userName = "John Lewis";
-        sscsCaseData.setAppealNote(note);
+        sscsCaseData.setTempNoteDetail(note);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verifyNoInteractions(footerService);
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getWarnings().size(), is(0));
-        assertNull(response.getData().getAppealNote());
+        assertNull(response.getData().getTempNoteDetail());
         assertThat(response.getData().getAppealNotePad().getNotesCollection().size(), is(1));
         assertThat(response.getData().getAppealNotePad().getNotesCollection().get(0), is(Note.builder().value(NoteDetails.builder().noteDate(LocalDate.now().toString()).noteDetail(note).author(userName).build()).build()));
     }
