@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Collections.emptyList;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -75,10 +76,12 @@ public class OnlineHearingService {
         ));
     }
 
-    private AppealDetails convertAppealDetails(SscsCaseDetails sscsCaseDetails) {
-        return new AppealDetails(sscsCaseDetails.getData().getCaseCreated(),
-                sscsCaseDetails.getData().getAppeal().getMrnDetails().getMrnDate(),
-                sscsCaseDetails.getData().getAppeal().getBenefitType().getCode()
+    private AppealDetails convertAppealDetails(SscsCaseDetails sscsCaseDeails) {
+        String createdDate = (sscsCaseDeails.getCreatedDate() != null) ? sscsCaseDeails.getCreatedDate().format(DateTimeFormatter.ISO_DATE) : "";
+
+        return new AppealDetails(createdDate,
+                sscsCaseDeails.getData().getAppeal().getMrnDetails().getMrnDate(),
+                sscsCaseDeails.getData().getAppeal().getBenefitType().getCode()
         );
     }
 

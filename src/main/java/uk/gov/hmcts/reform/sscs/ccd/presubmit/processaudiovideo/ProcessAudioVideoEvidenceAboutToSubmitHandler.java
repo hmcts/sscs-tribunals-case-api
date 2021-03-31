@@ -89,6 +89,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         processIfSendToAdmin(caseData, userAuthorisation);
         overrideInterlocReviewStateIfSelected(caseData);
 
+        clearEmptyAudioVideoList(caseData);
         clearTransientFields(caseData);
         caseData.updateTranslationWorkOutstandingFlag();
 
@@ -279,6 +280,12 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
                     break;
             }
 
+        }
+    }
+
+    private void clearEmptyAudioVideoList(SscsCaseData caseData) {
+        if (caseData.getAudioVideoEvidence() != null && caseData.getAudioVideoEvidence().size() == 0) {
+            caseData.setAudioVideoEvidence(null);
         }
     }
 

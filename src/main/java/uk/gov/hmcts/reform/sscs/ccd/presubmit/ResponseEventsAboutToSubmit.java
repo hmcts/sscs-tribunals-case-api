@@ -43,6 +43,7 @@ public class ResponseEventsAboutToSubmit {
         if (isNull(sscsCaseData.getDwpDocuments())) {
             sscsCaseData.setDwpDocuments(new ArrayList<>());
         }
+        sscsCaseData.getDwpDocuments().removeIf(d -> DwpDocumentType.UCB.getValue().equals(d.getValue().getDocumentType()));
         sscsCaseData.getDwpDocuments().add(dwpDocument);
     }
 
