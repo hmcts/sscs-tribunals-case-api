@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
@@ -194,7 +195,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenDwpDocs_thenClearDwpDocFields() {
+    public void givenDwpDocumentIsUpdated_thenDwpCollectionIsUpdated() {
         DwpDocument dwpResponseDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
                 .documentLink(DocumentLink.builder().documentFilename("response.pdf").documentBinaryUrl("/responsebinaryurl").documentUrl("/responseurl").build())
                 .documentType(DwpDocumentType.DWP_RESPONSE.getValue()).build()).build();
@@ -203,37 +204,65 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
         DwpDocument dwpEvidenceDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
                 .documentLink(DocumentLink.builder().documentFilename("evidence.pdf").documentBinaryUrl("/evidencebinaryurl").documentUrl("/evidenceurl").build())
                 .documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue()).build()).build();
-        DwpDocument dwpEditedResponseDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
-                .documentLink(DocumentLink.builder().documentFilename("editedresponse.pdf").documentBinaryUrl("/evidencebinaryurl").documentUrl("/evidenceurl").build())
-                .documentType(DwpDocumentType.DWP_EDITED_RESPONSE.getValue()).build()).build();
-        DwpDocument dwpEditedEvidenceDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
-                .documentLink(DocumentLink.builder().documentFilename("editedevidence.pdf").documentBinaryUrl("/evidencebinaryurl").documentUrl("/evidenceurl").build())
-                .documentType(DwpDocumentType.DWP_EDITED_EVIDENCE_BUNDLE.getValue()).build()).build();
-        DwpDocument dwpAppendix12Document = DwpDocument.builder().value(DwpDocumentDetails.builder()
-                .documentLink(DocumentLink.builder().documentFilename("appendix12.pdf").documentBinaryUrl("/evidencebinaryurl").documentUrl("/evidenceurl").build())
-                .documentType(DwpDocumentType.APPENDIX_12.getValue()).build()).build();
-        DwpDocument ucbDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
-                .documentLink(DocumentLink.builder().documentFilename("ucb.pdf").documentBinaryUrl("/evidencebinaryurl").documentUrl("/evidenceurl").build())
-                .documentType(DwpDocumentType.UCB.getValue()).build()).build();
 
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(dwpResponseDocument);
+        dwpDocuments.add(dwpAt38Document);
+        dwpDocuments.add(dwpEvidenceDocument);
+
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
+        callback.getCaseDetails().getCaseData().setDwpResponseDocument(new DwpResponseDocument(dwpResponseDocument.getValue().getDocumentLink(), dwpResponseDocument.getValue().getDocumentFileName()));
+        callback.getCaseDetails().getCaseData().setDwpAT38Document(new DwpResponseDocument(
+                DocumentLink.builder().documentUrl("/newurl").documentBinaryUrl("/newbinaryurl").documentFilename("newfilename.pdf").build(), "newfilename"));
+        callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(new DwpResponseDocument(dwpEvidenceDocument.getValue().getDocumentLink(), dwpEvidenceDocument.getValue().getDocumentFileName()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String todayDate = java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+
+        assertEquals("/newurl", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("/newbinaryurl", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentBinaryUrl());
+        assertEquals("AT38 received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentFilename());
+        assertEquals("AT38 received on " + todayDate, response.getData().getDwpDocuments().get(1).getValue().getDocumentFileName());
+        assertNull(response.getData().getDwpResponseDocument());
+        assertNull(response.getData().getDwpAT38Document());
+        assertNull(response.getData().getDwpEvidenceBundleDocument());
+    }
+
+    @Test
+    public void givenNoDwpDocument_thenDwpUploadedCollectionIsUpdated() {
+        DwpDocument dwpResponseDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("response.pdf").documentBinaryUrl("/responsebinaryurl").documentUrl("/responseurl").build())
+                .documentType(DwpDocumentType.DWP_RESPONSE.getValue()).build()).build();
+        DwpDocument dwpAt38Document = DwpDocument.builder().value(DwpDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("at38.pdf").documentBinaryUrl("/binaryurl").documentUrl("/url").build()).documentType(DwpDocumentType.AT_38.getValue()).build()).build();
+        DwpDocument dwpEvidenceDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("evidence.pdf").documentBinaryUrl("/evidencebinaryurl").documentUrl("/evidenceurl").build())
+                .documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue()).build()).build();
 
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(new DwpResponseDocument(dwpResponseDocument.getValue().getDocumentLink(), dwpResponseDocument.getValue().getDocumentFileName()));
         callback.getCaseDetails().getCaseData().setDwpAT38Document(new DwpResponseDocument(dwpAt38Document.getValue().getDocumentLink(), dwpAt38Document.getValue().getDocumentFileName()));
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(new DwpResponseDocument(dwpEvidenceDocument.getValue().getDocumentLink(), dwpEvidenceDocument.getValue().getDocumentFileName()));
-        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(new DwpResponseDocument(dwpEditedResponseDocument.getValue().getDocumentLink(), dwpEditedResponseDocument.getValue().getDocumentFileName()));
-        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(new DwpResponseDocument(dwpEditedEvidenceDocument.getValue().getDocumentLink(), dwpEditedEvidenceDocument.getValue().getDocumentFileName()));
-        callback.getCaseDetails().getCaseData().setAppendix12Doc(new DwpResponseDocument(dwpAppendix12Document.getValue().getDocumentLink(), dwpAppendix12Document.getValue().getDocumentFileName()));
-        callback.getCaseDetails().getCaseData().setDwpUcbEvidenceDocument(ucbDocument.getValue().getDocumentLink());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        String todayDate = java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+
+        assertEquals("/evidenceurl", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("/evidencebinaryurl", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentBinaryUrl());
+        assertEquals("DWP evidence received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentFilename());
+
+        assertEquals("/responseurl", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("/responsebinaryurl", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentBinaryUrl());
+        assertEquals("DWP response received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentFilename());
+
+        assertEquals("/url", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("/binaryurl", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentBinaryUrl());
+        assertEquals("AT38 received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentFilename());
+        assertEquals("AT38 received on " + todayDate, response.getData().getDwpDocuments().get(2).getValue().getDocumentFileName());
 
         assertNull(response.getData().getDwpResponseDocument());
         assertNull(response.getData().getDwpAT38Document());
         assertNull(response.getData().getDwpEvidenceBundleDocument());
-        assertNull(response.getData().getDwpEditedResponseDocument());
-        assertNull(response.getData().getDwpEditedEvidenceBundleDocument());
-        assertNull(response.getData().getAppendix12Doc());
-        assertNull(response.getData().getDwpUcbEvidenceDocument());
     }
 
 

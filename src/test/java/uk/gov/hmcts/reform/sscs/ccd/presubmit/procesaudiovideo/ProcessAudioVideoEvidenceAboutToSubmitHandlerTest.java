@@ -46,9 +46,6 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String DOCUMENT_URL = "dm-store/documents/123";
 
-
-    private static final String URL = "http://dm-store/documents/123";
-
     private ProcessAudioVideoEvidenceAboutToSubmitHandler handler;
 
     @Spy
@@ -175,7 +172,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenIncludeEvidenceFromAppellant_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToSscsDocumentsCollection() {
+    public void givenIncludeEvidenceFromAppellant_willRemoveDocFromAudioVideoEvidenceAndInterlocReviewStateAndAddToSscsDocumentsCollection() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(INCLUDE_EVIDENCE.getCode()));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -286,7 +283,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         assertNull(response.getData().getInterlocReviewState());
         assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
-        assertTrue(response.getData().getAudioVideoEvidence().isEmpty());
+        assertNull(response.getData().getAudioVideoEvidence());
         assertEquals(1, response.getData().getDwpDocuments().size());
         assertEquals(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getDwpDocuments().get(0).getValue().getDocumentLink());
         assertEquals(LocalDate.now().toString(), response.getData().getDwpDocuments().get(0).getValue().getDateApproved());
@@ -325,7 +322,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         assertNull(response.getData().getInterlocReviewState());
         assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
-        assertTrue(response.getData().getAudioVideoEvidence().isEmpty());
+        assertNull(response.getData().getAudioVideoEvidence());
         assertEquals(1, response.getData().getDwpDocuments().size());
         assertEquals(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getDwpDocuments().get(0).getValue().getDocumentLink());
         assertEquals(LocalDate.now().toString(), response.getData().getDwpDocuments().get(0).getValue().getDateApproved());
@@ -374,7 +371,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         assertNull(response.getData().getInterlocReviewState());
         assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
-        assertTrue(response.getData().getAudioVideoEvidence().isEmpty());
+        assertNull(response.getData().getAudioVideoEvidence());
         assertEquals(2, response.getData().getDwpDocuments().size());
         assertEquals(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getDwpDocuments().get(0).getValue().getDocumentLink());
         assertEquals(LocalDate.now().toString(), response.getData().getDwpDocuments().get(0).getValue().getDateApproved());
@@ -400,6 +397,25 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getInterlocReviewState());
         assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
         assertEquals(1, response.getData().getAudioVideoEvidence().size());
+    }
+
+    @Test
+    public void excludeEvidenceWithNoMoreAudioVideoEvidenceToProcess_willClearAudioVideoEvidenceCollectionAndInterlocReviewState() {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(EXCLUDE_EVIDENCE.getCode()));
+        sscsCaseData.getAudioVideoEvidence().remove(1);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertNull(response.getData().getPreviewDocument());
+        assertNull(response.getData().getSignedBy());
+        assertNull(response.getData().getSignedRole());
+        assertNull(response.getData().getGenerateNotice());
+        assertNull(response.getData().getDateAdded());
+        assertNull(response.getData().getReservedToJudge());
+
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
+        assertNull(response.getData().getInterlocReviewState());
+        assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
+        assertNull(response.getData().getAudioVideoEvidence());
     }
 
     @Test
@@ -514,7 +530,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));
         assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.WELSH_TRANSLATION.getId()));
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
-        assertTrue(response.getData().getAudioVideoEvidence().isEmpty());
+        assertNull(response.getData().getAudioVideoEvidence());
         assertEquals(1, response.getData().getDwpDocuments().size());
         assertEquals(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getDwpDocuments().get(0).getValue().getDocumentLink());
         assertEquals(LocalDate.now().toString(), response.getData().getDwpDocuments().get(0).getValue().getDateApproved());

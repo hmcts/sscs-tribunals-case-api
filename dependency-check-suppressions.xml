@@ -8,20 +8,6 @@
         ]]></notes>
         <cve>CVE-2018-1258</cve>
     </suppress>
-    <suppress>
-        <notes><![CDATA[
-         file name: sentiment-analysis-parser-0.1.jar
-        ]]></notes>
-        <packageUrl regex="true">^pkg:maven/edu\.usc\.ir/sentiment-analysis-parser@0.*$</packageUrl>
-        <cve>CVE-2018-18749</cve>
-    </suppress>
-
-    <suppress>
-        <notes><![CDATA[No fix available]]></notes>
-        <gav regex="true">^org\.apache\.sling:org\.apache\.sling\.javax\.activation:0\.1\.0$</gav>
-        <cve>CVE-2016-5394</cve>
-        <cve>CVE-2016-6798</cve>
-    </suppress>
     <suppress until="2021-04-01">
         <notes><![CDATA[
          file name: kotlin-stdlib-common-1.4.30.jar
@@ -29,16 +15,5 @@
         <gav regex="true">^org\.jetbrains\.kotlin:*:.*$</gav>
         <cve>CVE-2020-15824</cve>
         <cve>CVE-2020-29582</cve>
-    </suppress>
-    <suppress until="2021-04-01">
-        <notes><![CDATA[
-         file name: sscs-pdf-email-common-1.4.14.jar
-         Jquery included from SpringCloud. We are on latest release awaiting patch (Hoxton SR8)
-        ]]></notes>
-        <cve>CVE-2015-9251</cve>
-        <cve>CVE-2019-11358</cve>
-        <cve>CVE-2019-11358</cve>
-        <cve>CVE-2020-11022</cve>
-        <cve>CVE-2020-11023</cve>
     </suppress>
 </suppressions>
