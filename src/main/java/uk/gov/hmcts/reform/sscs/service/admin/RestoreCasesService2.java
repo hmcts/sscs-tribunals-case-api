@@ -165,7 +165,7 @@ public class RestoreCasesService2 {
             caseData.setIsScottishCase(isScotCase);
         }
 
-        caseData.setSignedBy(caseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
+        caseData.getAppeal().setSigner(caseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
 
         triggerEvent(sscsCaseDetails, idamTokens);
     }
