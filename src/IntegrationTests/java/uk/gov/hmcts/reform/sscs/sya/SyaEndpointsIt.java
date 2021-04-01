@@ -249,7 +249,7 @@ public class SyaEndpointsIt {
 
         mockMvc.perform(post("/appeals")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(getCase("json/sya_with_ccdId_mrnDateMoreThan13Months.json.json")))
+                .content(getCase("json/sya_with_ccdId_mrnDateMoreThan13Months.json")))
                 .andExpect(status().isCreated());
 
         verify(ccdClient).startEvent(any(), eq(1234567890L), eq(DRAFT_TO_NON_COMPLIANT.getCcdType()));
