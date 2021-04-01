@@ -92,7 +92,7 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
         assertThat(ccdEventResponse.getWarnings().size(), is(0));
         assertThat(ccdEventResponse.getErrors().size(), is(1));
-        assertThat(ccdEventResponse.getErrors().iterator().next(), is("Unable to extract restoreCasesDate"));
+        assertThat(ccdEventResponse.getErrors().iterator().next(), is("Unable to extract restoreCaseFileName"));
     }
 
     private CcdEventResponse getCcdEventResponse(HttpResponse httpResponse) throws IOException {
