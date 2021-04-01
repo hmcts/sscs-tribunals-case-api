@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecis
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
-import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesService;
+import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesService2;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesStatus;
 
 @RestController
@@ -34,19 +34,19 @@ public class CcdMideventCallbackController {
     private final DecisionNoticeService decisionNoticeService;
     private final AdjournCasePreviewService adjournCasePreviewService;
     private final AdjournCaseCcdService adjournCaseCcdService;
-    private final RestoreCasesService restoreCasesService;
+    private final RestoreCasesService2 restoreCasesService2;
 
     @Autowired
     public CcdMideventCallbackController(AuthorisationService authorisationService, SscsCaseCallbackDeserializer deserializer,
                                          DecisionNoticeService decisionNoticeService,
                                             AdjournCasePreviewService adjournCasePreviewService, AdjournCaseCcdService adjournCaseCcdService,
-                                            RestoreCasesService restoreCasesService) {
+                                            RestoreCasesService2 restoreCasesService2) {
         this.authorisationService = authorisationService;
         this.deserializer = deserializer;
         this.decisionNoticeService = decisionNoticeService;
         this.adjournCasePreviewService = adjournCasePreviewService;
         this.adjournCaseCcdService = adjournCaseCcdService;
-        this.restoreCasesService = restoreCasesService;
+        this.restoreCasesService2 = restoreCasesService2;
     }
 
     @PostMapping(path = "/ccdMidEventAdjournCasePopulateVenueDropdown")
@@ -126,10 +126,9 @@ public class CcdMideventCallbackController {
 
         try {
 
-            String date = restoreCasesService.getRestoreCasesDate(message);
+            String fileName = restoreCasesService2.getRestoreCaseFileName(message);
 
-            RestoreCasesStatus status =
-                restoreCasesService.restoreNextBatchOfCases(date);
+            RestoreCasesStatus status = restoreCasesService2.restoreCases("csv/" + fileName);
 
             if (!status.isCompleted()) {
                 preSubmitCallbackResponse.addError(status.toString());
