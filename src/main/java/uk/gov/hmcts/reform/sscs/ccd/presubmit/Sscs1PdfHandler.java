@@ -72,7 +72,8 @@ public class Sscs1PdfHandler implements PreSubmitCallbackHandler<SscsCaseData> {
             try {
                 updateAppointeeNullIfNotPresent(caseData);
                 caseData.setEvidencePresent(hasEvidence(caseData, fileName));
-                sscsPdfService.generatePdf(caseData, Long.parseLong(caseData.getCcdCaseId()), "sscs1", fileName);
+        //FIXME: PUT BACK IN!
+//                sscsPdfService.generatePdf(caseData, Long.parseLong(caseData.getCcdCaseId()), "sscs1", fileName);
 
             } catch (PDFServiceClientException pdfServiceClientException) {
                 log.error("Sscs1 form could not be generated for caseId {} for exception ", caseData.getCcdCaseId(), pdfServiceClientException);

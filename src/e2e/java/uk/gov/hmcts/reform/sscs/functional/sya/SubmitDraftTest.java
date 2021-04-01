@@ -2,14 +2,14 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
+import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static uk.gov.hmcts.reform.sscs.functional.sya.SubmitAppealTest.getCcdIdFromLocationHeader;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_DWP_REGIONAL_CENTRE;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_FROM_DRAFT;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
 import io.restassured.RestAssured;
@@ -181,11 +181,8 @@ public class SubmitDraftTest {
         wrapper.setCcdCaseId(draft.getCcdCaseId());
         wrapper.getMrn().setDate(mrnDate);
         wrapper.getAppellant().setNino(nino);
-        RegionalProcessingCenter rpc = getRegionalProcessingCenter();
 
-        Appeal expected = convertSyaToCcdCaseData(wrapper, rpc.getName(), rpc).getAppeal();
-
-        String body = ALL_DETAILS_FROM_DRAFT.getSerializedMessage().replaceAll("CCD_CASE_ID", draft.getCcdCaseId());
+        String body = setDraftCaseJson(mrnDate, nino).replaceAll("CCD_CASE_ID", draft.getCcdCaseId());
 
         Response response = RestAssured.given()
                 .body(body)
@@ -197,13 +194,17 @@ public class SubmitDraftTest {
         final Long id = getCcdIdFromLocationHeader(response.getHeader("Location"));
         SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, userIdamTokens);
 
-        if (expected.getAppellant().getAppointee() == null) {
-            sscsCaseDetails.getData().getAppeal().getAppellant().setAppointee(null);
-        }
-
         log.info(String.format("SYA created with CCD ID %s", id));
-        assertEquals(expected, sscsCaseDetails.getData().getAppeal());
+        assertJsonEquals(changeExpectedFields(ALL_DETAILS_FROM_DRAFT_CCD.getSerializedMessage(), nino, mrnDate), sscsCaseDetails.getData());
+
         assertEquals(expectedState, sscsCaseDetails.getState());
+    }
+
+    private String changeExpectedFields(String serializedMessage, String nino, LocalDate mrnDate) {
+        serializedMessage = serializedMessage.replace("ZRPVJDDBS", nino);
+        serializedMessage = serializedMessage.replace("2018-02-01", mrnDate.toString());
+
+        return serializedMessage;
     }
 
     @Test

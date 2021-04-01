@@ -17,6 +17,7 @@ public enum SyaJsonMessageSerializer {
     ALL_DETAILS_DWP_REGIONAL_CENTRE("allDetailsDwpRegionalCentre.json"),
     ALL_DETAILS_CCD("allDetailsCcd.json"),
     ALL_DETAILS_FROM_DRAFT("allDetailsFromDraft.json"),
+    ALL_DETAILS_FROM_DRAFT_CCD("allDetailsFromDraftCcd.json"),
     WITHOUT_NOTIFICATION("withoutNotification.json"),
     WITHOUT_NOTIFICATION_CCD("withoutNotificationCcd.json"),
     WITHOUT_EMAIL_NOTIFICATION("withoutEmailNotification.json"),

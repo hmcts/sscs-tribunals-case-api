@@ -99,6 +99,23 @@ public class SubmitAppealService {
 
         return caseDetails.getId();
     }
+//
+//    public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
+//
+//        IdamTokens idamTokens = idamService.getIdamTokens();
+//
+//        Long caseId = appeal.getCcdCaseId() != null ? Long.valueOf(appeal.getCcdCaseId()) : null;
+//
+//        log.info("Converting sya appeal data to sscs case");
+//        SscsCaseData caseData = convertAppealToSscsCaseData(appeal);
+//
+//        EventType event = findEventType(caseData, caseId != null);
+//        SscsCaseDetails caseDetails = createOrUpdateCase(caseData, event, idamTokens);
+//
+//        associateCase(idamTokens, caseDetails, userToken);
+//
+//        return caseDetails.getId();
+//    }
 
     public Optional<SaveCaseResult> submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal, Boolean forceCreate) {
         appeal.setCaseType("draft");
