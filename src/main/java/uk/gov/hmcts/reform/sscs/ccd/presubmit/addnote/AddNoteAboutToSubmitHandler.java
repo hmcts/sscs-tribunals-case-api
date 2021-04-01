@@ -35,7 +35,12 @@ public class AddNoteAboutToSubmitHandler  implements PreSubmitCallbackHandler<Ss
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
                 && (callback.getEvent() == EventType.ADD_NOTE
-                || callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED);
+                || callback.getEvent() == EventType.NON_COMPLIANT_SEND_TO_INTERLOC
+                || callback.getEvent() == EventType.ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE
+                || callback.getEvent() == EventType.INTERLOC_SEND_TO_TCW
+                || callback.getEvent() == EventType.TCW_REFER_TO_JUDGE
+                || callback.getEvent() == EventType.SEND_TO_ADMIN
+                || callback.getEvent() == EventType.ADMIN_APPEAL_WITHDRAWN);
     }
 
     @Override

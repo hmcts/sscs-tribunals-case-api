@@ -98,7 +98,8 @@ public class SubmitAppealTest {
     @Parameters({
         "ALL_DETAILS, incompleteApplication",
         "ALL_DETAILS, interlocutoryReviewState",
-        "ALL_DETAILS, validAppeal"
+        "ALL_DETAILS, validAppeal",
+        "ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS, validAppeal"
     })
     public void appealShouldBeSavedViaSya(SyaJsonMessageSerializer syaJsonMessageSerializer, String expectedState) {
 
