@@ -165,7 +165,7 @@ public class SyaEndpointsIt {
         Map<String, Object> data = new HashMap<>();
         data.put("appeal", appeal);
 
-        given(ccdClient.readForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123L).data(data).build());
+        given(ccdClient.readForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(1234567890L).data(data).build());
 
         given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
 
@@ -174,8 +174,8 @@ public class SyaEndpointsIt {
                 .content(getCase("json/sya_with_ccdId.json")))
                 .andExpect(status().isCreated());
 
-        verify(ccdClient).startEvent(any(), eq(123L), eq(DRAFT_TO_VALID_APPEAL_CREATED.getCcdType()));
-        verify(ccdClient).submitEventForCaseworker(any(), eq(123L), any());
+        verify(ccdClient).startEvent(any(), eq(1234567890L), eq(DRAFT_TO_VALID_APPEAL_CREATED.getCcdType()));
+        verify(ccdClient).submitEventForCaseworker(any(), eq(1234567890L), any());
     }
 
     @Test
@@ -204,17 +204,17 @@ public class SyaEndpointsIt {
         Map<String, Object> data = new HashMap<>();
         data.put("appeal", appeal);
 
-        given(ccdClient.readForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123L).data(data).build());
+        given(ccdClient.readForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(1234567890L).data(data).build());
 
         given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
 
         mockMvc.perform(post("/appeals")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(getCase("json/sya_with_ccdId.json")))
+                .content(getCase("json/sya_with_ccdId_noMrnDate.json")))
                 .andExpect(status().isCreated());
 
-        verify(ccdClient).startEvent(any(), eq(123L), eq(DRAFT_TO_INCOMPLETE_APPLICATION.getCcdType()));
-        verify(ccdClient).submitEventForCaseworker(any(), eq(123L), any());
+        verify(ccdClient).startEvent(any(), eq(1234567890L), eq(DRAFT_TO_INCOMPLETE_APPLICATION.getCcdType()));
+        verify(ccdClient).submitEventForCaseworker(any(), eq(1234567890L), any());
     }
 
     @Test
@@ -243,17 +243,17 @@ public class SyaEndpointsIt {
         Map<String, Object> data = new HashMap<>();
         data.put("appeal", appeal);
 
-        given(ccdClient.readForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123L).data(data).build());
+        given(ccdClient.readForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(1234567890L).data(data).build());
 
         given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
 
         mockMvc.perform(post("/appeals")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(getCase("json/sya_with_ccdId.json")))
+                .content(getCase("json/sya_with_ccdId_mrnDateMoreThan13Months.json.json")))
                 .andExpect(status().isCreated());
 
-        verify(ccdClient).startEvent(any(), eq(123L), eq(DRAFT_TO_NON_COMPLIANT.getCcdType()));
-        verify(ccdClient).submitEventForCaseworker(any(), eq(123L), any());
+        verify(ccdClient).startEvent(any(), eq(1234567890L), eq(DRAFT_TO_NON_COMPLIANT.getCcdType()));
+        verify(ccdClient).submitEventForCaseworker(any(), eq(1234567890L), any());
     }
 
     @Test

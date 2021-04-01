@@ -47,7 +47,12 @@
       },
       "isAppointee": "No",
       "isAddressSameAsAppointee": "No",
-      "appointee": null
+      "appointee": {
+        "name":null,
+        "address":null,
+        "contact":null,
+        "identity":null
+      }
     },
     "benefitType": {
       "code": "PIP",
@@ -138,7 +143,7 @@
   "subscriptions": {
     "appellantSubscription": {
       "wantSmsNotifications": "Yes",
-      "tya": "pN7jTFbzNy",
+      "tya": "${json-unit.ignore}",
       "email": "sscstest+notify@greencroftconsulting.com",
       "mobile": "+447398785050",
       "subscribeEmail": "Yes",
@@ -146,11 +151,29 @@
       "reason": null,
       "lastLoggedIntoMya": null
     },
-    "supporterSubscription": null,
-    "appointeeSubscription": null,
+    "supporterSubscription": {
+      "wantSmsNotifications": null,
+      "tya":null,
+      "email": null,
+      "mobile": null,
+      "subscribeEmail": null,
+      "subscribeSms": null,
+      "reason":null,
+      "lastLoggedIntoMya": null
+    },
+    "appointeeSubscription": {
+      "wantSmsNotifications": null,
+      "tya":null,
+      "email": null,
+      "mobile": null,
+      "subscribeEmail": null,
+      "subscribeSms": null,
+      "reason":null,
+      "lastLoggedIntoMya": null
+    },
     "representativeSubscription": {
       "wantSmsNotifications":"Yes",
-      "tya":null,
+      "tya": "${json-unit.ignore}",
       "email":"harry.potter@wizards.com",
       "mobile":"+447411999999",
       "subscribeEmail":"Yes",
@@ -158,7 +181,16 @@
       "reason":null,
       "lastLoggedIntoMya": null
     },
-    "jointPartySubscription": null
+    "jointPartySubscription": {
+      "wantSmsNotifications": null,
+      "tya":null,
+      "email": null,
+      "mobile": null,
+      "subscribeEmail": null,
+      "subscribeSms": null,
+      "reason":null,
+      "lastLoggedIntoMya": null
+    }
   },
   "evidencePresent" : "No",
   "sscsDocument":[],

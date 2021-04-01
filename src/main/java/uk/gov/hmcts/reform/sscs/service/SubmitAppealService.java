@@ -71,51 +71,17 @@ public class SubmitAppealService {
 
         Long caseId = appeal.getCcdCaseId() != null ? Long.valueOf(appeal.getCcdCaseId()) : null;
 
-        SscsCaseData caseData = null;
-        boolean saveAndReturnCase = false;
+        log.info("Converting sya appeal data to sscs case");
 
-        if (caseId != null) {
-            log.info("Finding case from draft store for case id: {}", caseId);
-            SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(caseId, idamTokens);
-            if (sscsCaseDetails != null) {
-                log.info("Found case from draft store for case id: {}", caseId);
-                caseData = sscsCaseDetails.getData();
-                saveAndReturnCase = true;
-            } else {
-                log.info("Could not find case from draft store for case id: {}", caseId);
-            }
-        }
-        if (caseData == null) {
-            log.info("Converting sya appeal data to sscs case");
-            caseData = convertAppealToSscsCaseData(appeal);
-        }
+        SscsCaseData caseData = convertAppealToSscsCaseData(appeal);
 
-        caseData.setIsSaveAndReturn(appeal.getIsSaveAndReturn());
-
-        EventType event = findEventType(caseData, saveAndReturnCase);
+        EventType event = findEventType(caseData, caseId != null);
         SscsCaseDetails caseDetails = createOrUpdateCase(caseData, event, idamTokens);
 
         associateCase(idamTokens, caseDetails, userToken);
 
         return caseDetails.getId();
     }
-//
-//    public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
-//
-//        IdamTokens idamTokens = idamService.getIdamTokens();
-//
-//        Long caseId = appeal.getCcdCaseId() != null ? Long.valueOf(appeal.getCcdCaseId()) : null;
-//
-//        log.info("Converting sya appeal data to sscs case");
-//        SscsCaseData caseData = convertAppealToSscsCaseData(appeal);
-//
-//        EventType event = findEventType(caseData, caseId != null);
-//        SscsCaseDetails caseDetails = createOrUpdateCase(caseData, event, idamTokens);
-//
-//        associateCase(idamTokens, caseDetails, userToken);
-//
-//        return caseDetails.getId();
-//    }
 
     public Optional<SaveCaseResult> submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal, Boolean forceCreate) {
         appeal.setCaseType("draft");
