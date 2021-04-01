@@ -64,7 +64,7 @@ public class GenerateCoversheetAboutToStartHandler implements PreSubmitCallbackH
             uploadResponse = evidenceManagementService.upload(singletonList(file), DM_STORE_USER_ID);
         }
 
-        if (nonNull(uploadResponse)) {
+        if (nonNull(uploadResponse) && nonNull(uploadResponse.getEmbedded()) && !uploadResponse.getEmbedded().getDocuments().isEmpty()) {
             String location = uploadResponse.getEmbedded().getDocuments().get(0).links.self.href;
             DocumentLink newDoc = DocumentLink.builder().documentFilename(FILENAME).documentUrl(location).documentBinaryUrl(location + "/binary").build();
             caseData.setPreviewDocument(newDoc);
