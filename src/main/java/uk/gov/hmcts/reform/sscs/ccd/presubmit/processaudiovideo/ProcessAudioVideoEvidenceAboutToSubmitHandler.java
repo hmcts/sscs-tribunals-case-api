@@ -86,6 +86,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         processIfSendToAdmin(caseData);
         overrideInterlocReviewStateIfSelected(caseData);
 
+        clearEmptyAudioVideoList(caseData);
         clearTransientFields(caseData);
         caseData.updateTranslationWorkOutstandingFlag();
 
@@ -209,9 +210,9 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     }
 
     private void addToNotesIfNoteExists(SscsCaseData caseData) {
-        if (StringUtils.isNoneBlank(caseData.getAppealNote())) {
+        if (StringUtils.isNoneBlank(caseData.getTempNoteDetail())) {
             ArrayList<Note> notes = new ArrayList<>(Optional.ofNullable(caseData.getAppealNotePad()).flatMap(f -> Optional.ofNullable(f.getNotesCollection())).orElse(Collections.emptyList()));
-            final NoteDetails noteDetail = NoteDetails.builder().noteDetail(caseData.getAppealNote()).noteDate(LocalDate.now().toString()).build();
+            final NoteDetails noteDetail = NoteDetails.builder().noteDetail(caseData.getTempNoteDetail()).noteDate(LocalDate.now().toString()).build();
             notes.add(Note.builder().value(noteDetail).build());
             caseData.setAppealNotePad(NotePad.builder().notesCollection(notes).build());
         }
@@ -279,6 +280,12 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         }
     }
 
+    private void clearEmptyAudioVideoList(SscsCaseData caseData) {
+        if (caseData.getAudioVideoEvidence() != null && caseData.getAudioVideoEvidence().size() == 0) {
+            caseData.setAudioVideoEvidence(null);
+        }
+    }
+
     private void clearTransientFields(SscsCaseData caseData) {
         caseData.setBodyContent(null);
         caseData.setPreviewDocument(null);
@@ -288,7 +295,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         caseData.setSignedBy(null);
         caseData.setSignedRole(null);
         caseData.setDateAdded(null);
-        caseData.setAppealNote(null);
+        caseData.setTempNoteDetail(null);
         caseData.setSelectedAudioVideoEvidenceDetails(null);
         caseData.setShowRip1DocPage(null);
         caseData.setProcessAudioVideoReviewState(null);

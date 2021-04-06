@@ -47,6 +47,7 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -232,6 +233,9 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
                     .willReturn(new UserInfo("16", "userId", "", "", "", Arrays.asList("caseworker", "citizen")));
 
         given(authTokenGenerator.generate()).willReturn("s2s token");
+
+        given(idamClient.getUserDetails(anyString())).willReturn(UserDetails.builder()
+                .forename("Chris").surname("Davis").build());
     }
 
     @Test
@@ -255,6 +259,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
 
     @Test
     public void shouldHandleInterlocEventCallback() throws Exception {
+        mockIdam();
         json = getJson("callback/interlocEventCallback.json");
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));

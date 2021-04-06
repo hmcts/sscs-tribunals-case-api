@@ -47,7 +47,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewServ
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipWriteFinalDecisionPreviewDecisionService;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
-import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesService;
+import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesService2;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesStatus;
 
 @SuppressWarnings("unchecked")
@@ -84,7 +84,7 @@ public class CcdMideventCallbackControllerTest {
     private AdjournCaseCcdService adjournCaseCcdService;
 
     @MockBean
-    private RestoreCasesService restoreCasesService;
+    private RestoreCasesService2 restoreCasesService2;
 
     private CcdMideventCallbackController controller;
 
@@ -103,7 +103,7 @@ public class CcdMideventCallbackControllerTest {
             Arrays.asList(writeFinalDecisionPreviewDecisionService));
 
         controller = new CcdMideventCallbackController(authorisationService, deserializer, decisionNoticeService,
-            adjournCasePreviewService, adjournCaseCcdService, restoreCasesService);
+            adjournCasePreviewService, adjournCaseCcdService, restoreCasesService2);
         mockMvc = standaloneSetup(controller).build();
     }
 
@@ -131,17 +131,17 @@ public class CcdMideventCallbackControllerTest {
     }
 
     @Test
-    public void handleCcdMidEventAdminRestoreCasesWhenDateIsExtractedAndFailuresReturnedUncompleted() throws Exception {
+    public void handleCcdMidEventAdminRestoreCasesWhenPathIsExtractedAndFailuresReturnedUncompleted() throws Exception {
 
         RestoreCasesStatus status = new RestoreCasesStatus(10, 6,
             Arrays.asList(1L, 2L, 3L, 4L), false);
 
-        Mockito.when(restoreCasesService.restoreNextBatchOfCases("someDate")).thenReturn(status);
+        Mockito.when(restoreCasesService2.restoreCases("csv/somePath")).thenReturn(status);
 
-        Mockito.when(restoreCasesService.getRestoreCasesDate(anyString())).thenReturn("someDate");
+        Mockito.when(restoreCasesService2.getRestoreCaseFileName(anyString())).thenReturn("somePath");
 
         // We don't care what the content is for this test, as we are defining behaviour through the
-        // restoreCasesService mock config above
+        // restoreCasesService2 mock config above
         String path = getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json").getFile();
         String content = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
@@ -160,22 +160,21 @@ public class CcdMideventCallbackControllerTest {
             .header("ServiceAuthorization", "")
             .header("Authorization", "")
             .content(content))
-            .andExpect(status().isOk())
             .andExpect(content().json(expectedJsonErrorsAndWarningsString));
     }
 
     @Test
-    public void handleCcdMidEventAdminRestoreCasesWhenDateIsExtractedAndNoFailuresReturnedUncompleted() throws Exception {
+    public void handleCcdMidEventAdminRestoreCasesWhenPathIsExtractedAndNoFailuresReturnedUncompleted() throws Exception {
 
         RestoreCasesStatus status = new RestoreCasesStatus(10, 10,
             Arrays.asList(), false);
 
-        Mockito.when(restoreCasesService.restoreNextBatchOfCases("someDate")).thenReturn(status);
+        Mockito.when(restoreCasesService2.restoreCases("csv/somePath")).thenReturn(status);
 
-        Mockito.when(restoreCasesService.getRestoreCasesDate(anyString())).thenReturn("someDate");
+        Mockito.when(restoreCasesService2.getRestoreCaseFileName(anyString())).thenReturn("somePath");
 
         // We don't care what the content is for this test, as we are defining behaviour through the
-        // restoreCasesService mock config above
+        // restoreCasesService2 mock config above
         String path = getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json").getFile();
         String content = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
@@ -194,22 +193,21 @@ public class CcdMideventCallbackControllerTest {
             .header("ServiceAuthorization", "")
             .header("Authorization", "")
             .content(content))
-            .andExpect(status().isOk())
             .andExpect(content().json(expectedJsonErrorsAndWarningsString));
     }
 
     @Test
-    public void handleCcdMidEventAdminRestoreCasesWhenDateIsExtractedAndNoFailuresReturnedCompleted() throws Exception {
+    public void handleCcdMidEventAdminRestoreCasesWhenPathIsExtractedAndNoFailuresReturnedCompleted() throws Exception {
 
         RestoreCasesStatus status = new RestoreCasesStatus(10, 10,
             Arrays.asList(), true);
 
-        Mockito.when(restoreCasesService.restoreNextBatchOfCases("someDate")).thenReturn(status);
+        Mockito.when(restoreCasesService2.restoreCases("csv/somePath")).thenReturn(status);
 
-        Mockito.when(restoreCasesService.getRestoreCasesDate(anyString())).thenReturn("someDate");
+        Mockito.when(restoreCasesService2.getRestoreCaseFileName(anyString())).thenReturn("somePath");
 
         // We don't care what the content is for this test, as we are defining behaviour through the
-        // restoreCasesService mock config above
+        // restoreCasesService2 mock config above
         String path = getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json").getFile();
         String content = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
@@ -228,19 +226,18 @@ public class CcdMideventCallbackControllerTest {
             .header("ServiceAuthorization", "")
             .header("Authorization", "")
             .content(content))
-            .andExpect(status().isOk())
             .andExpect(content().json(expectedJsonErrorsAndWarningsString));
     }
 
     @Test
-    public void handleCcdMidEventAdminRestoreCasesWhenDateIsExtractedAndRestoreNextBatchThrowsException() throws Exception {
+    public void handleCcdMidEventAdminRestoreCasesWhenPathIsExtractedAndRestoreNextBatchThrowsException() throws Exception {
 
-        Mockito.when(restoreCasesService.restoreNextBatchOfCases("someDate")).thenThrow(new RuntimeException("anything"));
+        Mockito.when(restoreCasesService2.restoreCases("csv/somePath")).thenThrow(new RuntimeException("anything"));
 
-        Mockito.when(restoreCasesService.getRestoreCasesDate(anyString())).thenReturn("someDate");
+        Mockito.when(restoreCasesService2.getRestoreCaseFileName(anyString())).thenReturn("somePath");
 
         // We don't care what the content is for this test, as we are defining behaviour through the
-        // restoreCasesService mock config above
+        // restoreCasesService2 mock config above
         String path = getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json").getFile();
         String content = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
@@ -259,17 +256,16 @@ public class CcdMideventCallbackControllerTest {
             .header("ServiceAuthorization", "")
             .header("Authorization", "")
             .content(content))
-            .andExpect(status().isOk())
             .andExpect(content().json(expectedJsonErrorsAndWarningsString));
     }
 
     @Test
-    public void handleCcdMidEventAdminRestoreCasesWhenDateExtractionThrowsException() throws Exception {
+    public void handleCcdMidEventAdminRestoreCasesWhenPathExtractionThrowsException() throws Exception {
 
-        Mockito.when(restoreCasesService.getRestoreCasesDate(anyString())).thenThrow(new RuntimeException("anything"));
+        Mockito.when(restoreCasesService2.getRestoreCaseFileName(anyString())).thenThrow(new RuntimeException("anything"));
 
         // We don't care what the content is for this test, as we are defining behaviour through the
-        // restoreCasesService mock config above
+        // restoreCasesService2 mock config above
         String path = getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json").getFile();
         String content = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
@@ -288,26 +284,26 @@ public class CcdMideventCallbackControllerTest {
             .header("ServiceAuthorization", "")
             .header("Authorization", "")
             .content(content))
-            .andExpect(status().isOk())
             .andExpect(content().json(expectedJsonErrorsAndWarningsString));
 
-        Mockito.verify(restoreCasesService, Mockito.times(1)).getRestoreCasesDate(any());
-        Mockito.verifyNoMoreInteractions(restoreCasesService);
+        Mockito.verify(restoreCasesService2, Mockito.times(1)).getRestoreCaseFileName(any());
+        Mockito.verifyNoMoreInteractions(restoreCasesService2);
 
     }
 
     @Test
-    public void handleCcdMidEventAdminRestoreCasesWhenDateIsExtractedAndFailuresReturnedCompleted() throws Exception {
+    public void handleCcdMidEventAdminRestoreCasesWhenPathIsExtractedAndFailuresReturnedCompleted() throws Exception {
 
         RestoreCasesStatus status = new RestoreCasesStatus(10, 6,
             Arrays.asList(1L, 2L, 3L, 4L), true);
 
-        Mockito.when(restoreCasesService.restoreNextBatchOfCases("someDate")).thenReturn(status);
+        Mockito.when(restoreCasesService2.restoreCases("csv/somePath")).thenReturn(status);
 
-        Mockito.when(restoreCasesService.getRestoreCasesDate(anyString())).thenReturn("someDate");
+        Mockito.when(restoreCasesService2.getRestoreCaseFileName(anyString())).thenReturn("somePath");
+
 
         // We don't care what the content is for this test, as we are defining behaviour through the
-        // restoreCasesService mock config above
+        // restoreCasesService2 mock config above
         String path = getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json").getFile();
         String content = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
@@ -326,7 +322,6 @@ public class CcdMideventCallbackControllerTest {
             .header("ServiceAuthorization", "")
             .header("Authorization", "")
             .content(content))
-            .andExpect(status().isOk())
             .andExpect(content().json(expectedJsonErrorsAndWarningsString));
     }
 
