@@ -109,6 +109,48 @@ and then using it to publish your tests:
 ```
 
 
+or to run the tests and publish in one go you can run the following:
+
+```
+./gradlew runAndPublishConsumerPactTests
+```
+
+In order to run the CCD Provider Tests to determine that the CCD Consumer contract tests published here can be verified you'll need to check out the following github repo:
+
+```
+https://github.com/hmcts/ccd-data-store-api/tree/TA-82_CcdProviderPactTest
+```
+And run the following test ensuring that the Pacts created here are published to your local Pact Broker instance and that you have an up to date CCD Docker setup running locally with up to date CCD definition deployed
+
+```
+https://github.com/hmcts/ccd-data-store-api/blob/TA-82_CcdProviderPactTest/src/contractTest/java/uk/gov/hmcts/ccd/v2/external/controller/CasesControllerProviderTest.java
+```
+Please change the version tag to point to 'Dev' and ensure the Pact Broker annotations point to your local Pact Broker instance
+
+```
+@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
+    host = "${PACT_BROKER_URL:localhost}",
+    port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
+    @VersionSelector(tag = "Dev")})
+```
+
+Also if you require the Provider verification to be published please add the following System Environment Variable before running the CasesControllerProviderTest:
+
+```
+  System.getProperties().setProperty("pact.verifier.publishResults", "true");
+```
+
+If you need to run the CCD provider test against the Preview environment for a particular branch of code then please ensure that the Pact Broker annotations are pointing to the central reform Pact Broker with the following credentials ( with the tag in the @VersionSelector pointing to your feature branch name of the PR):
+
+```
+@PactBroker(scheme = "${PACT_BROKER_SCHEME:https}",
+    host = "${PACT_BROKER_URL:pact-broker.platform.hmcts.net}",
+    port = "${PACT_BROKER_PORT:443}", consumerVersionSelectors = {
+    @VersionSelector(tag = "feature_branch_name")})
+
+```
+
+
 ## Gotchas
 
 PRs that start with _"Bump"_ won't have a preview environment. The decision was made after we realised that most the preview environments were created by Depandabot.
