@@ -266,6 +266,7 @@ public class CreateBundleAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("No");
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
+        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
         assertEquals(2, response.getData().getMultiBundleConfiguration().size());
         assertEquals("bundleEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
         assertEquals("bundleUnEditedConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
@@ -283,9 +284,28 @@ public class CreateBundleAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("Yes");
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
+        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
         assertEquals(2, response.getData().getMultiBundleConfiguration().size());
         assertEquals("bundleWelshEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
         assertEquals("bundleWelshUnEditedConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
+    }
+
+    @Test
+    public void givenCaseWithPreviouslyCreatedBundles_thenClearAllBundles() {
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("No");
+
+        List<Bundle> bundles = new ArrayList<>();
+        bundles.add(Bundle.builder().value(BundleDetails.builder().build()).build());
+        callback.getCaseDetails().getCaseData().setCaseBundles(bundles);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
+        assertNull(response.getData().getCaseBundles());
     }
 
 }

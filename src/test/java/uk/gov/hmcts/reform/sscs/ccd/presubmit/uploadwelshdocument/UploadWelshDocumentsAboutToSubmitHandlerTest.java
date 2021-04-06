@@ -72,7 +72,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
 
     @Test
     public void shouldAddAnErrorIfNoWelshDocumentSelected() {
-        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, buildSscsDocuments(false), buildInvalidSscsWelshDocuments(DocumentType.SSCS1.getValue()), State.VALID_APPEAL);
+        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, buildSscsDocuments(false), buildInvalidSscsWelshDocuments(DocumentType.SSCS1.getValue()), null, State.VALID_APPEAL);
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setState(State.VALID_APPEAL);
@@ -85,7 +85,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
 
     @Test
     public void updateCaseWhenOnlyOneDocumentAndOnlyOneSetToRequestTranslationStatusToRequestTranslation() {
-        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, buildSscsDocuments(false), buildSscsWelshDocuments(DocumentType.SSCS1.getValue()), State.VALID_APPEAL);
+        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, buildSscsDocuments(false), buildSscsWelshDocuments(DocumentType.SSCS1.getValue()), null, State.VALID_APPEAL);
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setState(State.VALID_APPEAL);
@@ -105,7 +105,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
 
     @Test
     public void updateCaseWhenOnlyOneDocumentAndMoreThanOneSetToRequestTranslationStatusToRequestTranslation() {
-        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, buildSscsDocuments(true), buildSscsWelshDocuments(DocumentType.SSCS1.getValue()), State.VALID_APPEAL);
+        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, buildSscsDocuments(true), buildSscsWelshDocuments(DocumentType.SSCS1.getValue()), null, State.VALID_APPEAL);
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setState(State.VALID_APPEAL);
@@ -125,9 +125,29 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void updateCaseWhenRip1DwpDocumentSetToRequestTranslationStatusToRequestTranslation() {
+        Callback<SscsCaseData> callback = buildCallback("rip1.pdf", UPLOAD_WELSH_DOCUMENT, null, buildSscsWelshDocuments("rip1Document"), buildDwpDocuments(), State.VALID_APPEAL);
+
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setState(State.VALID_APPEAL);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertNotNull(caseData.getOriginalDocuments());
+        assertEquals("rip1.pdf", caseData.getOriginalDocuments().getListItems().get(0).getCode());
+        assertEquals(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE.getId(),
+                caseData.getDwpDocuments().get(0).getValue().getDocumentTranslationStatus().getId());
+        assertEquals("No", caseData.getTranslationWorkOutstanding());
+        assertEquals("rip1.pdf",
+                caseData.getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
+        assertEquals("welsh",
+                caseData.getSscsWelshDocuments().get(0).getValue().getDocumentLanguage());
+        assertNull(caseData.getSscsWelshPreviewNextEvent());
+    }
+
+    @Test
     public void shouldUpdateWithDirectionIssuedWelshNextEventCorrectlyBasedOnDirectionNoticeDocumentType() {
 
-        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("filename", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.DIRECTION_NOTICE.getValue(), "A")), buildSscsWelshDocuments(DocumentType.DIRECTION_NOTICE.getValue()), State.VALID_APPEAL);
+        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("filename", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.DIRECTION_NOTICE.getValue(), "A")), buildSscsWelshDocuments(DocumentType.DIRECTION_NOTICE.getValue()), null, State.VALID_APPEAL);
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setState(State.VALID_APPEAL);
@@ -140,7 +160,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
     @Test
     public void shouldUpdateWithDecisionIssuedWelshNextEventCorrectlyBasedOnDecisionNoticeDocumentType() {
 
-        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("filename", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.DECISION_NOTICE.getValue(), "A")), buildSscsWelshDocuments(DocumentType.DECISION_NOTICE.getValue()), State.VALID_APPEAL);
+        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("filename", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.DECISION_NOTICE.getValue(), "A")), buildSscsWelshDocuments(DocumentType.DECISION_NOTICE.getValue()), null, State.VALID_APPEAL);
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setState(State.VALID_APPEAL);
@@ -153,7 +173,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
     @Test
     public void shouldUpdateWithDecisionIssuedWelshNextEventCorrectlyBasedOnReinstatementRequestDocumentType() {
 
-        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("filename", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.REINSTATEMENT_REQUEST.getValue(), "A")), buildSscsWelshDocuments(DocumentType.REINSTATEMENT_REQUEST.getValue()), State.VALID_APPEAL);
+        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("filename", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.REINSTATEMENT_REQUEST.getValue(), "A")), buildSscsWelshDocuments(DocumentType.REINSTATEMENT_REQUEST.getValue()), null, State.VALID_APPEAL);
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setState(State.VALID_APPEAL);
@@ -166,7 +186,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
     @Test
     public void shouldUpdateWithUploadWelshDocumentEventCorrectlyBasedOnAppellantEvidenceDocumentType() {
 
-        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("filename", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.APPELLANT_EVIDENCE.getValue(), null)), buildSscsWelshDocuments(DocumentType.APPELLANT_EVIDENCE.getValue()), State.VALID_APPEAL);
+        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("filename", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.APPELLANT_EVIDENCE.getValue(), null)), buildSscsWelshDocuments(DocumentType.APPELLANT_EVIDENCE.getValue()), null, State.VALID_APPEAL);
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setState(State.VALID_APPEAL);
@@ -177,9 +197,22 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void shouldUpdateWithFinalDecisionIssuedWelshNextEventCorrectlyBasedOnDecisionNoticeDocumentType() {
+
+        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("filename", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.FINAL_DECISION_NOTICE.getValue(), "A")), buildSscsWelshDocuments(DocumentType.FINAL_DECISION_NOTICE.getValue()), null, State.VALID_APPEAL);
+
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setState(State.VALID_APPEAL);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(EventType.ISSUE_FINAL_DECISION_WELSH.getCcdType(), caseData.getSscsWelshPreviewNextEvent());
+    }
+
+    @Test
     public void shouldAddBundleAdditionForAppellantEvidenceDocumentType() {
 
-        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("english.pdf", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.APPELLANT_EVIDENCE.getValue(), "A")), buildSscsWelshDocuments(DocumentType.APPELLANT_EVIDENCE.getValue()), State.VALID_APPEAL);
+        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("english.pdf", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.APPELLANT_EVIDENCE.getValue(), "A")), buildSscsWelshDocuments(DocumentType.APPELLANT_EVIDENCE.getValue()), null, State.VALID_APPEAL);
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
@@ -207,7 +240,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
     @Test
     public void givenInterlocReviewStateshouldNotSetReviewState() {
 
-        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("english.pdf", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.APPELLANT_EVIDENCE.getValue(), null)), buildSscsWelshDocuments(DocumentType.APPELLANT_EVIDENCE.getValue()), State.INTERLOCUTORY_REVIEW_STATE);
+        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("english.pdf", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.APPELLANT_EVIDENCE.getValue(), null)), buildSscsWelshDocuments(DocumentType.APPELLANT_EVIDENCE.getValue()), null, State.INTERLOCUTORY_REVIEW_STATE);
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setState(State.INTERLOCUTORY_REVIEW_STATE);
@@ -221,12 +254,12 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
 
     private Object[] generateCanHandleScenarios() {
         Callback<SscsCaseData> callbackWithValidEventOption =
-            buildCallback("callbackWithValidEventOption", UPLOAD_WELSH_DOCUMENT, buildSscsDocuments(false), buildSscsWelshDocuments(DocumentType.SSCS1.getValue()), State.VALID_APPEAL);
+            buildCallback("callbackWithValidEventOption", UPLOAD_WELSH_DOCUMENT, buildSscsDocuments(false), buildSscsWelshDocuments(DocumentType.SSCS1.getValue()), null, State.VALID_APPEAL);
         return new Object[]{new Object[]{ABOUT_TO_SUBMIT, callbackWithValidEventOption, true}};
     }
 
     private Callback<SscsCaseData> buildCallback(String dynamicListItemCode, EventType eventType,
-                                                 List<SscsDocument> sscsDocuments, List<SscsWelshDocument> welshDocuments, State state) {
+                                                 List<SscsDocument> sscsDocuments, List<SscsWelshDocument> welshDocuments, List<DwpDocument> dwpDocuments, State state) {
 
         final DynamicList dynamicList = new DynamicList(new DynamicListItem(dynamicListItemCode, "label"),
             Collections.singletonList(new DynamicListItem(dynamicListItemCode, "label")));
@@ -234,6 +267,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .originalDocuments(dynamicList)
             .sscsDocument(sscsDocuments)
+            .dwpDocuments(dwpDocuments)
             .sscsWelshPreviewDocuments(welshDocuments)
             .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
@@ -253,6 +287,15 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
             sscsDocuments.add(sscs2Doc);
         }
         return sscsDocuments;
+    }
+
+    private List<DwpDocument> buildDwpDocuments() {
+
+        DwpDocument dwpDoc1 = buildDwpDocument("english.pdf", "/anotherUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.AUDIO_DOCUMENT.getValue());
+
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(dwpDoc1);
+        return dwpDocuments;
     }
 
     private List<SscsWelshDocument> buildSscsWelshDocuments(String documentType) {
@@ -290,6 +333,24 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
                 .bundleAddition(bundleAddition)
                 .build())
             .build();
+    }
+
+    private DwpDocument buildDwpDocument(String filename, String documentUrl, SscsDocumentTranslationStatus translationRequested, String documentType) {
+        return DwpDocument.builder()
+                .value(DwpDocumentDetails.builder()
+                        .documentLink(DocumentLink.builder()
+                                .documentUrl(documentUrl)
+                                .documentFilename(filename)
+                                .build())
+                        .documentTranslationStatus(translationRequested)
+                        .documentType(documentType)
+                        .documentFileName(filename)
+                        .rip1DocumentLink(DocumentLink.builder()
+                                .documentUrl("rip1url")
+                                .documentFilename("rip1.pdf")
+                                .build())
+                        .build())
+                .build();
     }
 
 }

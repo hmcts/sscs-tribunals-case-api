@@ -69,7 +69,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .build();
     }
 
-    private static String getDwpRegionalCenterGivenDwpIssuingOffice(String benefitTypeCode, String dwpIssuingOffice) {
+    public static String getDwpRegionalCenterGivenDwpIssuingOffice(String benefitTypeCode, String dwpIssuingOffice) {
         if (dwpIssuingOffice == null) {
             return null;
         }
