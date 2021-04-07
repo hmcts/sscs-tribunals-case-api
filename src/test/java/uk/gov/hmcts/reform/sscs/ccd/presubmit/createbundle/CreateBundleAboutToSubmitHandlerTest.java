@@ -260,7 +260,7 @@ public class CreateBundleAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenEnglishCaseWithEditedAndMultiBundleFeatureSwitchedOn_thenPopulateEnglishEditedAndUneditedConfigFileName() {
+    public void givenEnglishCaseWithEditedAndMultigivenEnglishCaseWithEditedAndMultiBundleFeatureSwitchedOn_thenPopulateEnglishEditedAndUneditedConfigFileNameBundleFeatureSwitchedOn_thenPopulateEnglishEditedAndUneditedConfigFileName() {
         ReflectionTestUtils.setField(handler, "multiBundleFeature", true);
 
         List<DwpDocument> dwpDocuments = new ArrayList<>();
@@ -314,11 +314,8 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        String error = response.getErrors().stream()
-                .findFirst()
-                .orElse("");
-        assertEquals("The edited bundle cannot be created as PHME status has not been granted", error);
-        verifyNoInteractions(serviceRequestExecutor);
+        assertEquals(1, response.getData().getMultiBundleConfiguration().size());
+        assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
     }
 
     @Test

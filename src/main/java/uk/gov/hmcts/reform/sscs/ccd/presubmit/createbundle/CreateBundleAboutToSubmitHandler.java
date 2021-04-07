@@ -157,14 +157,14 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
     private void setMultiBundleConfig(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         List<MultiBundleConfig> configs = new ArrayList<>();
-
+        
         if (sscsCaseData.getDwpDocuments().stream().filter(f -> (f.getValue().getDocumentType().equals(DwpDocumentType.DWP_RESPONSE.getValue())
                 && f.getValue().getEditedDocumentLink() != null)
                 || f.getValue().getDocumentType().equals(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue())
-                && f.getValue().getEditedDocumentLink() != null).count() > 0) {
+                && f.getValue().getEditedDocumentLink() != null).count() > 0 &&  checkPhmeReviewIsGrantedOrUnderReview(sscsCaseData))  {
 
-            if (checkPhmeStatusIsNotGranted(sscsCaseData)) {
-                response.addError("The edited bundle cannot be created as PHME status has not been granted");
+            if (checkPhmeStatusIsUnderReview(sscsCaseData)) {
+                response.addError("There is a pending PHME request on this case");
                 return;
             }
 
@@ -185,7 +185,6 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         }
         sscsCaseData.setMultiBundleConfiguration(configs);
     }
-
 
     private boolean checkMandatoryFilesMissing(SscsCaseData sscsCaseData) {
         if (null != sscsCaseData.getDwpDocuments()) {
@@ -217,8 +216,12 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         }
     }
 
-    protected boolean checkPhmeStatusIsNotGranted(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getPhmeGranted() == null || sscsCaseData.getPhmeGranted().getValue().equals("No");
+    protected boolean checkPhmeStatusIsUnderReview(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getPhmeGranted() == null;
+    }
+
+    private boolean checkPhmeReviewIsGrantedOrUnderReview(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getPhmeGranted() == null || sscsCaseData.getPhmeGranted().equals(YesNo.YES);
     }
 
 }
