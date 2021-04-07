@@ -258,7 +258,7 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
         assertEquals(configFile, response.getData().getBundleConfiguration());
     }
-    
+
     @Test
     public void givenEnglishCaseWithEditedAndMultiBundleFeatureSwitchedOn_thenPopulateEnglishEditedAndUneditedConfigFileName() {
         ReflectionTestUtils.setField(handler, "multiBundleFeature", true);
@@ -316,6 +316,27 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
         assertEquals(1, response.getData().getMultiBundleConfiguration().size());
         assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
+    }
+
+    @Test
+    public void givenCaseWithEditedDwpDocsAndPhmeUnderReviewAndMultiBundleFeatureSwitchedOn_thenReturnErrorMessageAndDoNotSendRequestToBundleService() {
+        ReflectionTestUtils.setField(handler, "multiBundleFeature", true);
+
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
+
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("No");
+        callback.getCaseDetails().getCaseData().setDwpPhme("Yes");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream()
+                .findFirst()
+                .orElse("");
+        assertEquals("There is a pending PHME request on this case", error);
+        verifyNoInteractions(serviceRequestExecutor);
     }
 
     @Test
