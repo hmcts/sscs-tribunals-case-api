@@ -258,9 +258,9 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
         assertEquals(configFile, response.getData().getBundleConfiguration());
     }
-
+    
     @Test
-    public void givenEnglishCaseWithEditedAndMultigivenEnglishCaseWithEditedAndMultiBundleFeatureSwitchedOn_thenPopulateEnglishEditedAndUneditedConfigFileNameBundleFeatureSwitchedOn_thenPopulateEnglishEditedAndUneditedConfigFileName() {
+    public void givenEnglishCaseWithEditedAndMultiBundleFeatureSwitchedOn_thenPopulateEnglishEditedAndUneditedConfigFileName() {
         ReflectionTestUtils.setField(handler, "multiBundleFeature", true);
 
         List<DwpDocument> dwpDocuments = new ArrayList<>();
