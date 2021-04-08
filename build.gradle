@@ -219,8 +219,6 @@ dependencyManagement {
         dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
         dependency group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
         dependency group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.14.1'
-        // resolves: CVE-2020-9489
-        dependency group: 'org.apache.tika', name: 'tika-core', version: '1.26'
         // resolves: CVE-2020-28052
         dependency group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.68'
 
@@ -237,15 +235,6 @@ dependencyManagement {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
-        }
-
-        // CVE-2020-13954
-        dependencySet(group: 'org.apache.cxf', version: '3.4.2') {
-            entry 'cxf-core'
-            entry 'cxf-rt-frontend-jaxrs'
-            entry 'cxf-rt-rs-client'
-            entry 'cxf-rt-security'
-            entry 'cxf-rt-transports-http'
         }
 
         // CVE-2020-17521
