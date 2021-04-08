@@ -30,7 +30,7 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.exceptions.PdfPasswordException;
 
 @RunWith(JUnitParamsRunner.class)
-public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
+public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseHandlerTest {
 
     @Mock
     private FooterService footerService;
@@ -39,13 +39,13 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
     private static final String UPLOAD_DOCUMENT_FE_CALLBACK_JSON = "uploaddocument/uploadDocumentFECallback.json";
     private static final String UPLOAD_AUDIO_VIDEO_DOCUMENT_FE_CALLBACK_JSON = "uploaddocument/uploadAudioVideoDocumentFECallback.json";
 
-    UploadDocumentFurtherEvidenceHandler handler;
+    UploadDocumentFurtherEvidenceAboutToSubmitHandler handler;
 
     @Before
     public void setUp() {
 
         MockitoAnnotations.openMocks(this);
-        handler = new UploadDocumentFurtherEvidenceHandler(true, footerService);
+        handler = new UploadDocumentFurtherEvidenceAboutToSubmitHandler(true, footerService);
 
         try {
             when(footerService.isReadablePdf(any())).thenReturn(true);
@@ -128,6 +128,27 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
     }
 
     @Test
+    public void givenAudioVideoEvidenceWithNoDocumentFileName_thenDefaultToTheNameOfFile() throws IOException {
+        Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,"appealCreated",
+                DocumentType.OTHER_EVIDENCE.getId(), DocumentType.APPELLANT_EVIDENCE.getId(), UPLOAD_AUDIO_VIDEO_DOCUMENT_FE_CALLBACK_JSON);
+
+        callback.getCaseDetails().getCaseData().getDraftSscsFurtherEvidenceDocument().get(1).getValue().setDocumentFileName(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(ABOUT_TO_SUBMIT, callback,
+                USER_AUTHORISATION);
+
+        assertEquals(1, actualCaseData.getData().getScannedDocuments().size());
+        assertEquals("reps-some-name.pdf", actualCaseData.getData().getScannedDocuments().get(0).getValue().getFileName());
+        assertEquals("other", actualCaseData.getData().getScannedDocuments().get(0).getValue().getType());
+        assertEquals(1, actualCaseData.getData().getAudioVideoEvidence().size());
+        assertEquals("file-name-appellant-some-name.mp3", actualCaseData.getData().getAudioVideoEvidence().get(0).getValue().getFileName());
+        assertEquals(UploadParty.CTSC, actualCaseData.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded());
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), actualCaseData.getData().getInterlocReviewState());
+        assertEquals("feReceived", actualCaseData.getData().getDwpState());
+        assertNull(actualCaseData.getData().getDraftSscsFurtherEvidenceDocument());
+    }
+
+    @Test
     public void givenUploadDocumentFurtherEvidenceAndInterlocReviewStateAlreadyReviewByJudge_thenLeaveAsReviewByJudge() throws IOException {
         Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,"appealCreated",
                 DocumentType.OTHER_EVIDENCE.getId(), DocumentType.APPELLANT_EVIDENCE.getId(), UPLOAD_AUDIO_VIDEO_DOCUMENT_FE_CALLBACK_JSON);
@@ -190,7 +211,7 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
 
     @Test
     public void handleDocumentUploadWhereUploadedFileIsNotAPdf() throws IOException {
-        UploadDocumentFurtherEvidenceHandler handler = new UploadDocumentFurtherEvidenceHandler(false, footerService);
+        UploadDocumentFurtherEvidenceAboutToSubmitHandler handler = new UploadDocumentFurtherEvidenceAboutToSubmitHandler(false, footerService);
         Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,
                 "withDwp",
                 "representativeEvidence", "appellantEvidence",
