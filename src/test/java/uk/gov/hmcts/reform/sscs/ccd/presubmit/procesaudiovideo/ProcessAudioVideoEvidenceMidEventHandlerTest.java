@@ -83,6 +83,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
                 .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
                 .processAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.ISSUE_DIRECTIONS_NOTICE.getCode()))
                 .selectedAudioVideoEvidence(new DynamicList("test.com"))
+                .directionDueDate("2021-04-01")
                 .audioVideoEvidence(singletonList(AudioVideoEvidence.builder().value(
                         AudioVideoEvidenceDetails.builder()
                                 .documentLink(DOCUMENT_LINK)
