@@ -290,7 +290,7 @@ dependencies {
     compile group: 'com.google.guava', name: 'guava', version: '30.1.1-jre'
     compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.12.0'
 
-    compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.4'
+    compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
 
     // Added to fix CVE-2020-13934, CVE-2020-13935, CVE-2020-17527
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.43'
