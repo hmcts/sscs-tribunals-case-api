@@ -116,7 +116,8 @@ public final class PactDslBuilderForCaseDetailsList {
             .stringType("generatedEmail", "joe@bloggs.com")
             .stringType("generatedMobile", "07411222222")
             //.stringType("generatedDob", "1990-02-26")
-            .stringMatcher("evidencePresent", "Yes|No", "No");
+            .stringMatcher("evidencePresent", "Yes|No", "No")
+            .stringMatcher("evidenceHandled", "Yes|No", "No");
 
     }
 

@@ -162,6 +162,7 @@
     "generatedSurname": "Bloggs",
     "generatedEmail": "joe@bloggs.com",
     "generatedMobile": "07411222222",
-    "evidencePresent": "No"
+    "evidencePresent": "No",
+    "evidenceHandled": "No"
   }
 }
