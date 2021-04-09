@@ -104,7 +104,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
             USER_AUTHORISATION);
 
         assertThatJson(actualCaseData).isEqualTo(getExpectedResponse());
-        assertEquals("feReceived", actualCaseData.getData().getDwpState());
+        assertNull(actualCaseData.getData().getDwpState());
         assertNull(actualCaseData.getData().getDraftSscsFurtherEvidenceDocument());
     }
 
@@ -123,7 +123,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
         assertEquals("appellant-some-name.mp3", actualCaseData.getData().getAudioVideoEvidence().get(0).getValue().getFileName());
         assertEquals(UploadParty.CTSC, actualCaseData.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded());
         assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), actualCaseData.getData().getInterlocReviewState());
-        assertEquals("feReceived", actualCaseData.getData().getDwpState());
+        assertNull(actualCaseData.getData().getDwpState());
         assertNull(actualCaseData.getData().getDraftSscsFurtherEvidenceDocument());
     }
 
@@ -144,7 +144,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
         assertEquals("file-name-appellant-some-name.mp3", actualCaseData.getData().getAudioVideoEvidence().get(0).getValue().getFileName());
         assertEquals(UploadParty.CTSC, actualCaseData.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded());
         assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), actualCaseData.getData().getInterlocReviewState());
-        assertEquals("feReceived", actualCaseData.getData().getDwpState());
+        assertNull(actualCaseData.getData().getDwpState());
         assertNull(actualCaseData.getData().getDraftSscsFurtherEvidenceDocument());
     }
 
@@ -159,17 +159,6 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
                 USER_AUTHORISATION);
 
         assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), actualCaseData.getData().getInterlocReviewState());
-    }
-
-    @Test
-    public void dwpStateIsNotSetWhenStateIsWithDwp() throws IOException {
-        Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,"withDwp",
-                "representativeEvidence", "appellantEvidence", UPLOAD_DOCUMENT_FE_CALLBACK_JSON);
-
-        PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(ABOUT_TO_SUBMIT, callback,
-                USER_AUTHORISATION);
-
-        assertNull(actualCaseData.getData().getDwpState());
     }
 
     @Test
