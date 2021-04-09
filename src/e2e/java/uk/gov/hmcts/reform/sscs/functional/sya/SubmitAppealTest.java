@@ -66,8 +66,12 @@ public class SubmitAppealTest {
 
     @Test
     @Parameters({
-        "PIP,DWP PIP (1),Newcastle", "PIP,DWP PIP (2),Glasgow", "ESA,Inverness DRT,Inverness DRT",
-        "ESA,Coatbridge Benefit Centre,Coatbridge Benefit Centre", "UC,,Universal Credit"
+        "PIP,DWP PIP (1),Newcastle",
+        "PIP,DWP PIP (2),Glasgow",
+        "ESA,Inverness DRT,Inverness DRT",
+        "ESA,Coatbridge Benefit Centre,Coatbridge Benefit Centre",
+        "UC,,Universal Credit",
+        "carersAllowance,,Tyneview Park DRT"
     })
     public void givenAppealIsSubmitted_shouldSetDwpRegionalCentre(String benefitCode, String dwpIssuingOffice,
                                                                   String expectedDwpRegionalCentre) {
