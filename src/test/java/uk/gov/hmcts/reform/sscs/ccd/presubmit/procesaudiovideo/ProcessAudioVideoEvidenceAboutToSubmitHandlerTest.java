@@ -172,8 +172,8 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenIncludeEvidenceFromAppellant_willRemoveDocFromAudioVideoEvidenceAndInterlocReviewStateAndAddToSscsDocumentsCollection() {
-        sscsCaseData.setProcessAudioVideoAction(new DynamicList(INCLUDE_EVIDENCE.getCode()));
+    public void givenAdmitEvidenceFromAppellant_willRemoveDocFromAudioVideoEvidenceAndInterlocReviewStateAndAddToSscsDocumentsCollection() {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(ADMIT_EVIDENCE.getCode()));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertNull(response.getData().getPreviewDocument());
@@ -197,8 +197,8 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenIncludeEvidenceFromAppellantWithExistingSscsDocuments_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToSscsDocumentsCollection() {
-        sscsCaseData.setProcessAudioVideoAction(new DynamicList(INCLUDE_EVIDENCE.getCode()));
+    public void givenAdmitEvidenceFromAppellantWithExistingSscsDocuments_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToSscsDocumentsCollection() {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(ADMIT_EVIDENCE.getCode()));
 
         List<SscsDocument> sscsDocuments = singletonList(SscsDocument.builder().value(
                 SscsDocumentDetails.builder()
@@ -232,8 +232,8 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenIncludeEvidenceIsNotAnMp3OrMp4_thenDisplayError() {
-        sscsCaseData.setProcessAudioVideoAction(new DynamicList(INCLUDE_EVIDENCE.getCode()));
+    public void givenAdmitEvidenceIsNotAnMp3OrMp4_thenDisplayError() {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(ADMIT_EVIDENCE.getCode()));
 
         AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
                 .documentLink(DocumentLink.builder().documentFilename("nonvideo.pdf").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
@@ -256,8 +256,8 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenIncludeEvidenceFromDwp_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToDwpDocumentsCollection() {
-        sscsCaseData.setProcessAudioVideoAction(new DynamicList(INCLUDE_EVIDENCE.getCode()));
+    public void givenAdmitEvidenceFromDwp_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToDwpDocumentsCollection() {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(ADMIT_EVIDENCE.getCode()));
 
         AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
                 .documentLink(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
@@ -294,8 +294,8 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenIncludeEvidenceFromDwpWithRip1Document_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToDwpDocumentsCollection() {
-        sscsCaseData.setProcessAudioVideoAction(new DynamicList(INCLUDE_EVIDENCE.getCode()));
+    public void givenAdmitEvidenceFromDwpWithRip1Document_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToDwpDocumentsCollection() {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(ADMIT_EVIDENCE.getCode()));
 
         AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
                 .documentLink(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
@@ -334,8 +334,8 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenIncludeEvidenceFromDwpWithExistingDwpDocuments_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToDwpDocumentsCollection() {
-        sscsCaseData.setProcessAudioVideoAction(new DynamicList(INCLUDE_EVIDENCE.getCode()));
+    public void givenAdmitEvidenceFromDwpWithExistingDwpDocuments_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToDwpDocumentsCollection() {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(ADMIT_EVIDENCE.getCode()));
 
         AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
                 .documentLink(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
@@ -488,21 +488,21 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     public void shouldAddNote_whenActionIsSelected(ProcessAudioVideoActionDynamicListItems action) {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(action.getCode()));
         final String note = "This is a note";
-        sscsCaseData.setAppealNote(note);
+        sscsCaseData.setTempNoteDetail(note);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verifyNoInteractions(footerService);
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getWarnings().size(), is(0));
-        assertNull(response.getData().getAppealNote());
+        assertNull(response.getData().getTempNoteDetail());
         assertThat(response.getData().getAppealNotePad().getNotesCollection().size(), is(1));
         assertThat(response.getData().getAppealNotePad().getNotesCollection().get(0), is(Note.builder().value(NoteDetails.builder().noteDate(LocalDate.now().toString()).noteDetail(note).build()).build()));
     }
 
     @Test
-    public void givenIncludeEvidenceFromDwpWithRip1DocumentForWelshCase_willSetInterlockReviewStateAndDocumentTranslationStatus() {
-        sscsCaseData.setProcessAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.INCLUDE_EVIDENCE.getCode()));
+    public void givenAdmitEvidenceFromDwpWithRip1DocumentForWelshCase_willSetInterlockReviewStateAndDocumentTranslationStatus() {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.ADMIT_EVIDENCE.getCode()));
         sscsCaseData.setLanguagePreferenceWelsh("Yes");
 
         AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
@@ -543,9 +543,9 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"INCLUDE_EVIDENCE, AWAITING_INFORMATION, AWAITING_INFORMATION",
-            "INCLUDE_EVIDENCE, REVIEW_BY_JUDGE, REVIEW_BY_JUDGE",
-            "INCLUDE_EVIDENCE, AWAITING_ADMIN_ACTION, AWAITING_ADMIN_ACTION",
+    @Parameters({"ADMIT_EVIDENCE, AWAITING_INFORMATION, AWAITING_INFORMATION",
+            "ADMIT_EVIDENCE, REVIEW_BY_JUDGE, REVIEW_BY_JUDGE",
+            "ADMIT_EVIDENCE, AWAITING_ADMIN_ACTION, AWAITING_ADMIN_ACTION",
             "SEND_TO_ADMIN, CLEAR_INTERLOC_REVIEW_STATE, null",
             "SEND_TO_ADMIN, null, AWAITING_ADMIN_ACTION",
     })

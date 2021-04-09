@@ -39,7 +39,7 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 @Slf4j
 public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    public static final List<String> ACTIONS_THAT_REQUIRES_NOTICE = asList(ISSUE_DIRECTIONS_NOTICE.getCode(), EXCLUDE_EVIDENCE.getCode(), INCLUDE_EVIDENCE.getCode());
+    public static final List<String> ACTIONS_THAT_REQUIRES_NOTICE = asList(ISSUE_DIRECTIONS_NOTICE.getCode(), EXCLUDE_EVIDENCE.getCode(), ADMIT_EVIDENCE.getCode());
 
     private final FooterService footerService;
 
@@ -80,7 +80,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
             return response;
         }
         processIfIssueDirectionNotice(caseData);
-        processIfIncludeEvidence(caseData, response);
+        processIfAdmitEvidence(caseData, response);
         processIfExcludeEvidence(caseData);
         processIfSendToJudge(caseData);
         processIfSendToAdmin(caseData);
@@ -117,8 +117,8 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         }
     }
 
-    private void processIfIncludeEvidence(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-        if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), INCLUDE_EVIDENCE.getCode())) {
+    private void processIfAdmitEvidence(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), ADMIT_EVIDENCE.getCode())) {
             caseData.setInterlocReviewState(null);
             caseData.setDwpState(DIRECTION_ACTION_REQUIRED.getId());
 
@@ -210,9 +210,9 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     }
 
     private void addToNotesIfNoteExists(SscsCaseData caseData) {
-        if (StringUtils.isNoneBlank(caseData.getAppealNote())) {
+        if (StringUtils.isNoneBlank(caseData.getTempNoteDetail())) {
             ArrayList<Note> notes = new ArrayList<>(Optional.ofNullable(caseData.getAppealNotePad()).flatMap(f -> Optional.ofNullable(f.getNotesCollection())).orElse(Collections.emptyList()));
-            final NoteDetails noteDetail = NoteDetails.builder().noteDetail(caseData.getAppealNote()).noteDate(LocalDate.now().toString()).build();
+            final NoteDetails noteDetail = NoteDetails.builder().noteDetail(caseData.getTempNoteDetail()).noteDate(LocalDate.now().toString()).build();
             notes.add(Note.builder().value(noteDetail).build());
             caseData.setAppealNotePad(NotePad.builder().notesCollection(notes).build());
         }
@@ -295,7 +295,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         caseData.setSignedBy(null);
         caseData.setSignedRole(null);
         caseData.setDateAdded(null);
-        caseData.setAppealNote(null);
+        caseData.setTempNoteDetail(null);
         caseData.setSelectedAudioVideoEvidenceDetails(null);
         caseData.setShowRip1DocPage(null);
         caseData.setProcessAudioVideoReviewState(null);

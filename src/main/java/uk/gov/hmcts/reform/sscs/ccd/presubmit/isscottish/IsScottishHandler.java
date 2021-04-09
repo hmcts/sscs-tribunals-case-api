@@ -20,7 +20,9 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 public class IsScottishHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     List<EventType> permittedEvents = Arrays.asList(EventType.VALID_APPEAL_CREATED,
-            EventType.INCOMPLETE_APPLICATION_RECEIVED, EventType.NON_COMPLIANT);
+            EventType.INCOMPLETE_APPLICATION_RECEIVED, EventType.NON_COMPLIANT,
+            EventType.DRAFT_TO_INCOMPLETE_APPLICATION, EventType.DRAFT_TO_NON_COMPLIANT,
+            EventType.DRAFT_TO_VALID_APPEAL_CREATED);
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
