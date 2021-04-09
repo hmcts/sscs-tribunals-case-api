@@ -252,21 +252,7 @@ public class SubmitDraftTest {
             .then()
             .statusCode(HttpStatus.SC_OK);
     }
-
-    @Test
-    public void deleteDraft() {
-        draftAppeal.setCcdCaseId("123456");
-        saveDraft(draftAppeal);
-        RestAssured.given()
-                .header(new Header(AUTHORIZATION, citizenToken))
-                .delete("/drafts/123456");
-        RestAssured.given()
-                .header(new Header(AUTHORIZATION, citizenToken))
-                .get("/drafts/all")
-                .then()
-                .statusCode(HttpStatus.SC_NO_CONTENT);
-    }
-
+    
     @Test
     public void onceADraftIsArchived_itCannotBeRetrievedByTheCitizenUser() throws InterruptedException {
         saveDraft(draftAppeal);
