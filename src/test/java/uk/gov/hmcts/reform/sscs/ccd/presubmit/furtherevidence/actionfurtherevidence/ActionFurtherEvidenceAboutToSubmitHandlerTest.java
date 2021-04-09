@@ -89,7 +89,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     private SscsCaseData sscsCaseData;
 
     private List<ScannedDocument> scannedDocumentList = new ArrayList<>();
-    private BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder = new BundleAdditionFilenameBuilder();
+    private final BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder = new BundleAdditionFilenameBuilder();
 
     @Before
     public void setUp() {
@@ -449,23 +449,24 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         }
     }
 
-    private Callback<SscsCaseData> buildCallback(String dynamicListItemCode) {
+    private Callback<SscsCaseData> buildCallback(String dynamicListItemCode, State state) {
         DynamicList dynamicList = new DynamicList(new DynamicListItem(dynamicListItemCode, "label"),
             Collections.singletonList(new DynamicListItem(dynamicListItemCode, "label")));
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .originalSender(dynamicList)
             .furtherEvidenceAction(dynamicList)
+            .state(state)
             .scannedDocuments(Collections.singletonList(ScannedDocument.builder().build()))
             .appeal(Appeal.builder().appellant(Appellant.builder().address(Address.builder().line1("My Road").postcode("TS1 2BA").build()).build()).build())
             .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-                State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now());
+                state, sscsCaseData, LocalDateTime.now());
         return new Callback<>(caseDetails, Optional.empty(), EventType.ACTION_FURTHER_EVIDENCE, false);
     }
 
     @Test
     public void givenIssueFurtherEvidence_shouldUpdateDwpFurtherEvidenceStates() {
-        Callback<SscsCaseData> callback = buildCallback(ISSUE_FURTHER_EVIDENCE.getCode());
+        Callback<SscsCaseData> callback = buildCallback(ISSUE_FURTHER_EVIDENCE.getCode(), State.INTERLOCUTORY_REVIEW_STATE);
 
         PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -473,9 +474,18 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenIssueFurtherEvidenceAndStateIsWithDwp_shouldNotUpdateDwpFurtherEvidenceStates() {
+        Callback<SscsCaseData> callback = buildCallback(ISSUE_FURTHER_EVIDENCE.getCode(), State.WITH_DWP);
+
+        PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(updated.getData().getDwpFurtherEvidenceStates());
+    }
+
+    @Test
     @Parameters(method = "generateIssueFurtherEvidenceAddressEmptyScenarios")
     public void givenIssueFurtherEvidenceAndEmptyAppellantAddress_shouldReturnAnErrorToUser(Appeal appeal, String... parties) {
-        Callback<SscsCaseData> callback = buildCallback(ISSUE_FURTHER_EVIDENCE.getCode());
+        Callback<SscsCaseData> callback = buildCallback(ISSUE_FURTHER_EVIDENCE.getCode(), State.INTERLOCUTORY_REVIEW_STATE);
 
         callback.getCaseDetails().getCaseData().setAppeal(appeal);
         PreSubmitCallbackResponse<SscsCaseData> result = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -506,7 +516,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     public void givenOtherDocument_shouldNotUpdateDwpFurtherEvidenceStates() {
-        Callback<SscsCaseData> callback = buildCallback(OTHER_DOCUMENT_MANUAL.getCode());
+        Callback<SscsCaseData> callback = buildCallback(OTHER_DOCUMENT_MANUAL.getCode(), State.INTERLOCUTORY_REVIEW_STATE);
 
         PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -515,7 +525,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     public void givenNullFurtherEvidenceAction_shouldNotUpdateDwpFurtherEvidenceStates() {
-        Callback<SscsCaseData> callback = buildCallback(null);
+        Callback<SscsCaseData> callback = buildCallback(null, State.INTERLOCUTORY_REVIEW_STATE);
 
         PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
