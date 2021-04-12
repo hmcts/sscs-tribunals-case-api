@@ -13,7 +13,7 @@ plugins {
     id 'org.sonarqube' version '3.1.1'
     id 'jacoco'
     id 'org.springframework.boot' version '2.3.5.RELEASE'
-    id 'uk.gov.hmcts.java' version '0.12.6'
+    id 'uk.gov.hmcts.java' version '0.12.8'
     id 'com.gorylenko.gradle-git-properties' version '2.2.4'
     id 'com.github.ben-manes.versions' version '0.38.0'
     id 'net.ltgt.apt' version '0.21'
@@ -219,8 +219,6 @@ dependencyManagement {
         dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
         dependency group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
         dependency group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.14.1'
-        // resolves: CVE-2020-9489
-        dependency group: 'org.apache.tika', name: 'tika-core', version: '1.26'
         // resolves: CVE-2020-28052
         dependency group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.68'
 
@@ -237,15 +235,6 @@ dependencyManagement {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
-        }
-
-        // CVE-2020-13954
-        dependencySet(group: 'org.apache.cxf', version: '3.4.2') {
-            entry 'cxf-core'
-            entry 'cxf-rt-frontend-jaxrs'
-            entry 'cxf-rt-rs-client'
-            entry 'cxf-rt-security'
-            entry 'cxf-rt-transports-http'
         }
 
         // CVE-2020-17521
@@ -301,12 +290,12 @@ dependencies {
     compile group: 'com.google.guava', name: 'guava', version: '30.1.1-jre'
     compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.12.0'
 
-    compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.4'
+    compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
 
     // Added to fix CVE-2020-13934, CVE-2020-13935, CVE-2020-17527
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.43'
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.43'
-    compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.4'
+    compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.5'
 
     // Safe to remove once Spring update their dependencies - see CVE-2019-14439 and add 'com.fasterxml.jackson.core' configurations.all above
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
@@ -327,7 +316,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.07'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.2.42'
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.2.44'
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.31'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
@@ -335,9 +324,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.18'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.5.RELEASE'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.8.0'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.9.0'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.25.0'
-    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.8.0'
+    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.9.0'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.24.0'
     testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
