@@ -26,8 +26,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -54,6 +52,7 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @RunWith(JUnitParamsRunner.class)
 public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
@@ -77,10 +76,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     protected CaseDetails<SscsCaseData> caseDetails;
 
     @Mock
-    protected IdamClient idamClient;
-
-    @Mock
-    protected UserDetails userDetails;
+    protected UserDetailsService userDetailsService;
 
     @Spy
     protected DocumentConfiguration documentConfiguration;
@@ -90,7 +86,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     protected SscsCaseData sscsCaseData;
 
 
-    protected abstract WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient,
+    protected abstract WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
         DocumentConfiguration documentConfiguration);
 
     protected abstract Map<LanguagePreference, Map<EventType, String>> getBenefitSpecificDocuments();
@@ -112,15 +108,13 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
         documentConfiguration.setDocuments(getBenefitSpecificDocuments());
 
-        service = createPreviewDecisionService(generateFile, idamClient,
+        service = createPreviewDecisionService(generateFile, userDetailsService,
             documentConfiguration);
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer token")).thenReturn(userDetails);
+        when(userDetailsService.buildLoggedInUserName("Bearer token")).thenReturn("Judge Full Name");
 
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
@@ -249,7 +243,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        when(userDetails.getFullName()).thenReturn(null);
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenThrow(new IllegalStateException("Unable to obtain signed in user details"));
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -258,7 +252,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Unable to obtain signed in user name", error);
+        assertEquals("Unable to obtain signed in user details", error);
         assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
 
@@ -269,7 +263,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        when(idamClient.getUserDetails("Bearer token")).thenReturn(null);
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenThrow(new IllegalStateException("Unable to obtain signed in user details"));
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));

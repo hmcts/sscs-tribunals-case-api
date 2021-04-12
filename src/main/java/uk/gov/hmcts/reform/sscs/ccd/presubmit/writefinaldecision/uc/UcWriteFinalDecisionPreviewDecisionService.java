@@ -10,7 +10,6 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
@@ -25,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.UcDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.UcDecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @Slf4j
 @Component
@@ -33,9 +33,9 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
     private UcDecisionNoticeQuestionService ucDecisionNoticeQuestionService;
 
     @Autowired
-    public UcWriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient,
+    public UcWriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
         UcDecisionNoticeQuestionService decisionNoticeQuestionService, UcDecisionNoticeOutcomeService outcomeService, DocumentConfiguration documentConfiguration) {
-        super(generateFile, idamClient, decisionNoticeQuestionService, outcomeService, documentConfiguration);
+        super(generateFile, userDetailsService, decisionNoticeQuestionService, outcomeService, documentConfiguration);
         this.ucDecisionNoticeQuestionService = decisionNoticeQuestionService;
     }
 
@@ -107,9 +107,9 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
 
     @Override
     protected void setDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
-        
+
         builder.wcaAppeal(caseData.isWcaAppeal());
-        
+
         List<Descriptor> allSchedule6Descriptors = new ArrayList<>();
         List<String> physicalDisabilityAnswers = UcActivityType.PHYSICAL_DISABILITIES.getAnswersExtractor().apply(caseData);
         if (physicalDisabilityAnswers != null) {
