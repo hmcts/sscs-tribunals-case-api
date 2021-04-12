@@ -188,7 +188,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         assertThat(response.getData().getPreviewDocument(), is(nullValue()));
         verifyNoInteractions(generateFile);
         assertEquals(response.getData().getSelectedAudioVideoEvidenceDetails(), expectedEvidenceDetails);
-        assertTrue(sscsCaseData.getTempMediaUrl().contains(DM_GW_URL+"/2124-12/binary"));
+        assertTrue(sscsCaseData.getTempMediaUrl().contains(DM_GW_URL + "/2124-12/binary"));
     }
 
     @Test

@@ -133,9 +133,9 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
         }
     }
 
-    private void setSelectedAudioVideoEvidenceLink(SscsCaseData caseData, AudioVideoEvidenceDetails selected){
+    private void setSelectedAudioVideoEvidenceLink(SscsCaseData caseData, AudioVideoEvidenceDetails selected) {
         String binaryDocUrl = selected.getDocumentLink().getDocumentBinaryUrl().replace(documentManagementUrl, dmGatewayUrl);
-        String tempDocumentLink = "<a target=\"_blank\" href=\""+binaryDocUrl+"\">"+selected.getDocumentLink().getDocumentFilename()+"</a>";
+        String tempDocumentLink = "<a target=\"_blank\" href=\"" + binaryDocUrl + "\">" + selected.getDocumentLink().getDocumentFilename() + "</a>";
         caseData.setTempMediaUrl(tempDocumentLink);
     }
 
