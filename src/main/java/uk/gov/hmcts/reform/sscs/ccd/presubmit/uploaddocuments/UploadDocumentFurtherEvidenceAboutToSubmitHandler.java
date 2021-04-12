@@ -22,13 +22,13 @@ import uk.gov.hmcts.reform.sscs.service.exceptions.PdfPasswordException;
 import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
 
 @Service
-public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final boolean uploadAudioVideoEvidenceEnabled;
     private FooterService footerService;
 
     @Autowired
-    public UploadDocumentFurtherEvidenceHandler(@Value("${feature.upload-audio-video-evidence.enabled}") boolean uploadAudioVideoEvidenceEnabled, FooterService footerService) {
+    public UploadDocumentFurtherEvidenceAboutToSubmitHandler(@Value("${feature.upload-audio-video-evidence.enabled}") boolean uploadAudioVideoEvidenceEnabled, FooterService footerService) {
         this.uploadAudioVideoEvidenceEnabled = uploadAudioVideoEvidenceEnabled;
         this.footerService = footerService;
     }
@@ -176,12 +176,13 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
     }
 
     private void moveDraftsToAudioVideoEvidence(SscsCaseData sscsCaseData) {
+
         List<AudioVideoEvidence> newAudioVideoEvidence = sscsCaseData.getDraftSscsFurtherEvidenceDocument().stream()
                 .filter(doc -> DocumentUtil.isFileAMedia(doc.getValue().getDocumentLink()))
                 .map(doc ->
                         AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
                                 .documentLink(doc.getValue().getDocumentLink())
-                                .fileName(doc.getValue().getDocumentFileName())
+                                .fileName(doc.getValue().getDocumentFileName() != null ? doc.getValue().getDocumentFileName() : doc.getValue().getDocumentLink().getDocumentFilename())
                                 .dateAdded(LocalDate.now())
                                 .partyUploaded(UploadParty.CTSC)
                                 .build()).build()).collect(toList());
