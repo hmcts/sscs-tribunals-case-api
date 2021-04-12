@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVide
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @RunWith(JUnitParamsRunner.class)
 public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
@@ -64,6 +65,9 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     @Mock
     private FooterService footerService;
 
+    @Mock
+    private UserDetailsService userDetailsService;
+
     private SscsDocument expectedDocument;
 
     @Before
@@ -77,7 +81,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         documents.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
 
         documentConfiguration.setDocuments(documents);
-        handler = new ProcessAudioVideoEvidenceAboutToSubmitHandler(footerService);
+        handler = new ProcessAudioVideoEvidenceAboutToSubmitHandler(footerService, userDetailsService);
 
         sscsCaseData = SscsCaseData.builder()
                 .signedBy("User")
@@ -133,6 +137,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getEvent()).thenReturn(EventType.PROCESS_AUDIO_VIDEO);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn("John Lewis");
     }
 
     @Test
@@ -488,6 +493,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     public void shouldAddNote_whenActionIsSelected(ProcessAudioVideoActionDynamicListItems action) {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(action.getCode()));
         final String note = "This is a note";
+        final String userName = "John Lewis";
         sscsCaseData.setTempNoteDetail(note);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -497,7 +503,18 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertThat(response.getWarnings().size(), is(0));
         assertNull(response.getData().getTempNoteDetail());
         assertThat(response.getData().getAppealNotePad().getNotesCollection().size(), is(1));
-        assertThat(response.getData().getAppealNotePad().getNotesCollection().get(0), is(Note.builder().value(NoteDetails.builder().noteDate(LocalDate.now().toString()).noteDetail(note).build()).build()));
+        assertThat(response.getData().getAppealNotePad().getNotesCollection().get(0), is(Note.builder().value(NoteDetails.builder().noteDate(LocalDate.now().toString()).noteDetail(note).author(userName).build()).build()));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldAddNoteAndNoUserDetails_thenThrowsException() {
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenThrow(new IllegalStateException("Unable to obtain signed in user details"));
+
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(SEND_TO_ADMIN.getCode()));
+        final String note = "This is a note";
+        sscsCaseData.setTempNoteDetail(note);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 
     @Test

@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Test;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -38,6 +37,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.TemplateComponent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDecisionPreviewDecisionServiceTestBase {
 
@@ -51,9 +51,9 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     }
 
     @Override
-    protected WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient,
+    protected WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
         DocumentConfiguration documentConfiguration) {
-        return new EsaWriteFinalDecisionPreviewDecisionService(generateFile, idamClient, esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration);
+        return new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration);
     }
 
     @Override

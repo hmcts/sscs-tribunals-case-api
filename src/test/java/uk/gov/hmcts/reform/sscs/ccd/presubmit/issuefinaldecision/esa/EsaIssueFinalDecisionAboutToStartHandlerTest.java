@@ -29,8 +29,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -57,6 +55,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @RunWith(JUnitParamsRunner.class)
 public class EsaIssueFinalDecisionAboutToStartHandlerTest {
@@ -67,10 +66,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
     private static final String TEMPLATE_ID = "nuts.docx";
 
     @Mock
-    private IdamClient idamClient;
-
-    @Mock
-    private UserDetails userDetails;
+    private UserDetailsService userDetailsService;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -112,9 +108,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer token")).thenReturn(userDetails);
+        when(userDetailsService.buildLoggedInUserName("Bearer token")).thenReturn("Judge Full Name");
 
 
         capture = ArgumentCaptor.forClass(GenerateFileParams.class);
@@ -182,7 +176,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
 
         EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
 
-        final EsaWriteFinalDecisionPreviewDecisionService previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, idamClient,
+        final EsaWriteFinalDecisionPreviewDecisionService previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
             esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration);
 
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -224,7 +218,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
 
         when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("ESA");
 
-        final EsaWriteFinalDecisionPreviewDecisionService previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, idamClient,
+        final EsaWriteFinalDecisionPreviewDecisionService previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
             esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration);
 
         when(generateFile.assemble(any())).thenReturn(URL);
