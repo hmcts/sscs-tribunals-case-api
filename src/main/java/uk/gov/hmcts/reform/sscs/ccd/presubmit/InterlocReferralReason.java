@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.Arrays;
+import java.util.Optional;
 
 public enum InterlocReferralReason {
 
@@ -36,6 +37,11 @@ public enum InterlocReferralReason {
 
     @JsonCreator
     public static String findLabelById(String id) {
-        return Arrays.stream(InterlocReferralReason.values()).filter(pt -> pt.id.equals(id)).findFirst().get().getLabel();
+        Optional<InterlocReferralReason> interlocReferralReason = Arrays.stream(InterlocReferralReason.values()).filter(pt -> pt.id.equals(id)).findFirst();
+        String label = null;
+        if (interlocReferralReason.isPresent()) {
+            label = interlocReferralReason.get().getLabel();
+        }
+        return label;
     }
 }
