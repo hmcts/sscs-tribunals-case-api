@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.addnote;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.findLabelById;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -54,6 +55,11 @@ public class AddNoteAboutToSubmitHandler  implements PreSubmitCallbackHandler<Ss
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         String note = sscsCaseData.getTempNoteDetail();
+
+        if (callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED && nonNull(sscsCaseData.getInterlocReferralReason()) && StringUtils.isNoneBlank(sscsCaseData.getInterlocReferralReason())) {
+            note = findLabelById(sscsCaseData.getInterlocReferralReason()) + " - " + note;
+        }
+
         if (nonNull(note) && StringUtils.isNoneBlank(note)) {
             Note newNote = Note.builder().value(NoteDetails.builder().noteDetail(note).noteDate(LocalDate.now().toString())
                     .author(buildLoggedInUserName(userAuthorisation)).build()).build();

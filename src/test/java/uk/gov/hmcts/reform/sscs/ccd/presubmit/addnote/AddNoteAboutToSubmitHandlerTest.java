@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.HMCTS_RESPONSE_REVIEWED;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -117,10 +118,31 @@ public class AddNoteAboutToSubmitHandlerTest {
     }
 
     @Test
+    @Parameters({"timeExtension, Time extension",
+                 "phmeRequest, PHME request",
+                 "over200Pages, Over 200 pages",
+                 "over13months, Over 13 months",
+                 "other, Other",
+                 "noResponseToDirection, No response to a direction"})
+    public void ifEventIsResponseReviewed_AddInterlocReferralReasonToNote(String interlocReferralId, String interlocReferralLabel) {
+        when(callback.getEvent()).thenReturn(HMCTS_RESPONSE_REVIEWED);
+        sscsCaseData.setTempNoteDetail("Here is my note");
+        sscsCaseData.setInterlocReferralReason(interlocReferralId);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String expectedNote = interlocReferralLabel + " - Here is my note";
+
+        assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
+        assertEquals(expectedNote, response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
+        assertEquals("Chris Davis", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getAuthor());
+        assertEquals(LocalDate.now().toString(), response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDate());
+    }
+
+    @Test
     public void testTempNoteFilledIn_thenNoteAddedToEmptyCollection() {
         sscsCaseData.setTempNoteDetail("Here is my note");
-        Note oldNote = Note.builder().value(NoteDetails.builder().noteDetail("Existing note").noteDate(LocalDate.now().toString())
-                .author("A user").build()).build();
 
         sscsCaseData.setAppealNotePad(NotePad.builder().notesCollection(new ArrayList<Note>()).build());
 
@@ -154,8 +176,6 @@ public class AddNoteAboutToSubmitHandlerTest {
     @Test
     public void testTempNoteFilledIn_thenNoteAddedToNullCollection() {
         sscsCaseData.setTempNoteDetail("Here is my note");
-        Note oldNote = Note.builder().value(NoteDetails.builder().noteDetail("Existing note").noteDate(LocalDate.now().toString())
-                .author("A user").build()).build();
 
         sscsCaseData.setAppealNotePad(NotePad.builder().notesCollection(null).build());
 
@@ -173,12 +193,9 @@ public class AddNoteAboutToSubmitHandlerTest {
         when(idamClient.getUserDetails(USER_AUTHORISATION)).thenReturn(null);
 
         sscsCaseData.setTempNoteDetail("Here is my note");
-        Note oldNote = Note.builder().value(NoteDetails.builder().noteDetail("Existing note").noteDate(LocalDate.now().toString())
-                .author("A user").build()).build();
 
         sscsCaseData.setAppealNotePad(NotePad.builder().notesCollection(null).build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response =
-                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 }
