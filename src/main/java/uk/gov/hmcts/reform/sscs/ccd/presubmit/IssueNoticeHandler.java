@@ -3,8 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.WordUtils;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -12,20 +10,21 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @Slf4j
 public abstract class IssueNoticeHandler extends IssueDocumentHandler {
 
     protected final GenerateFile generateFile;
     protected final Function<LanguagePreference, String> templateId;
-    protected final IdamClient idamClient;
     protected boolean showIssueDate;
+    protected final UserDetailsService userDetailsService;
 
-    public IssueNoticeHandler(GenerateFile generateFile, IdamClient idamClient,
+    public IssueNoticeHandler(GenerateFile generateFile, UserDetailsService userDetailsService,
                               Function<LanguagePreference, String> templateId) {
         this.generateFile = generateFile;
         this.templateId = templateId;
-        this.idamClient = idamClient;
+        this.userDetailsService = userDetailsService;
     }
 
     protected abstract void setGeneratedDateIfRequired(SscsCaseData caseData, EventType eventType);
@@ -56,11 +55,7 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
     }
 
     protected String buildSignedInJudgeName(String userAuthorisation) {
-        UserDetails userDetails = idamClient.getUserDetails(userAuthorisation);
-        if (userDetails == null) {
-            throw new IllegalStateException("Unable to obtain signed in user details");
-        }
-        return userDetails.getFullName();
+        return userDetailsService.buildLoggedInUserName(userAuthorisation);
     }
 
 }

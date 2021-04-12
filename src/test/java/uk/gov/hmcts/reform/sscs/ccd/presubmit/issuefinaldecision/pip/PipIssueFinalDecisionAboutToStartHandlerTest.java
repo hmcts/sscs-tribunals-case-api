@@ -22,8 +22,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -40,6 +38,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @RunWith(JUnitParamsRunner.class)
 public class PipIssueFinalDecisionAboutToStartHandlerTest {
@@ -50,10 +49,7 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
     private static final String TEMPLATE_ID = "nuts.docx";
 
     @Mock
-    private IdamClient idamClient;
-
-    @Mock
-    private UserDetails userDetails;
+    private UserDetailsService userDetailsService;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -95,9 +91,7 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer token")).thenReturn(userDetails);
+        when(userDetailsService.buildLoggedInUserName("Bearer token")).thenReturn("Judge Full Name");
 
         capture = ArgumentCaptor.forClass(GenerateFileParams.class);
 
@@ -164,7 +158,7 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
 
         PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
 
-        final PipWriteFinalDecisionPreviewDecisionService previewDecisionService = new PipWriteFinalDecisionPreviewDecisionService(generateFile, idamClient,
+        final PipWriteFinalDecisionPreviewDecisionService previewDecisionService = new PipWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
             pipDecisionNoticeQuestionService, pipDecisionNoticeOutcomeService, documentConfiguration);
 
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -207,7 +201,7 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
 
         when(pipDecisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
 
-        final PipWriteFinalDecisionPreviewDecisionService previewDecisionService = new PipWriteFinalDecisionPreviewDecisionService(generateFile, idamClient,
+        final PipWriteFinalDecisionPreviewDecisionService previewDecisionService = new PipWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
             pipDecisionNoticeQuestionService, pipDecisionNoticeOutcomeService, documentConfiguration);
 
         when(generateFile.assemble(any())).thenReturn(URL);
