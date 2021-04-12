@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -33,14 +34,20 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
     private final GenerateFile generateFile;
     private final DocumentConfiguration documentConfiguration;
     private final IdamService idamService;
+    private String dmGatewayUrl;
+    private String documentManagementUrl;
 
     @Autowired
     public ProcessAudioVideoEvidenceMidEventHandler(GenerateFile generateFile,
-                                          DocumentConfiguration documentConfiguration,
-                                                    IdamService idamService) {
+                                                    DocumentConfiguration documentConfiguration,
+                                                    IdamService idamService,
+                                                    @Value("${dm_gateway.url}") String dmGatewayUrl,
+                                                    @Value("${document_management.url}") String documentManagementUrl) {
         this.generateFile = generateFile;
         this.documentConfiguration = documentConfiguration;
         this.idamService = idamService;
+        this.dmGatewayUrl = dmGatewayUrl;
+        this.documentManagementUrl = documentManagementUrl;
     }
 
     @Override
@@ -90,6 +97,7 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
             }
             setDocumentType(selectedAudioVideoEvidence.getValue());
             selectedAudioVideoEvidenceDetails = selectedAudioVideoEvidence.getValue();
+            setSelectedAudioVideoEvidenceLink(caseData, selectedAudioVideoEvidence.getValue());
         }
 
         caseData.setSelectedAudioVideoEvidenceDetails(selectedAudioVideoEvidenceDetails);
@@ -123,6 +131,12 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
         } else {
             ProcessAudioVideoActionHelper.setSelectedAudioVideoEvidence(caseData);
         }
+    }
+
+    private void setSelectedAudioVideoEvidenceLink(SscsCaseData caseData, AudioVideoEvidenceDetails selected){
+        String binaryDocUrl = selected.getDocumentLink().getDocumentBinaryUrl().replace(documentManagementUrl, dmGatewayUrl);
+        String tempDocumentLink = "<a target=\"_blank\" href=\""+binaryDocUrl+"\">"+selected.getDocumentLink().getDocumentFilename()+"</a>";
+        caseData.setTempMediaUrl(tempDocumentLink);
     }
 
     private void setDocumentType(AudioVideoEvidenceDetails evidence) {
