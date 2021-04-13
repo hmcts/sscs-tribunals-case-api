@@ -102,11 +102,12 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
 
     private void validateDueDateIsInFuture(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
 
-        LocalDate directionDueDate = LocalDate.parse(preSubmitCallbackResponse.getData().getDirectionDueDate());
+        if (preSubmitCallbackResponse.getData().getDirectionDueDate() != null) {
+            LocalDate directionDueDate = LocalDate.parse(preSubmitCallbackResponse.getData().getDirectionDueDate());
 
-        if (!directionDueDate.isAfter(LocalDate.now())) {
-            preSubmitCallbackResponse.addError("Directions due date must be in the future");
+            if (!directionDueDate.isAfter(LocalDate.now())) {
+                preSubmitCallbackResponse.addError("Directions due date must be in the future");
+            }
         }
-
     }
 }
