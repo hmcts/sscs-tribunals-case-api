@@ -14,11 +14,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @RunWith(JUnitParamsRunner.class)
 public class AddNoteAboutToSubmitHandlerTest {
@@ -27,7 +27,7 @@ public class AddNoteAboutToSubmitHandlerTest {
     private AddNoteAboutToSubmitHandler handler;
 
     @Mock
-    private IdamClient idamClient;
+    private UserDetailsService userDetailsService;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -40,7 +40,7 @@ public class AddNoteAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new AddNoteAboutToSubmitHandler(idamClient);
+        handler = new AddNoteAboutToSubmitHandler(userDetailsService);
 
         when(callback.getEvent()).thenReturn(EventType.ADD_NOTE);
 
@@ -53,8 +53,8 @@ public class AddNoteAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        when(idamClient.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
-                .forename("Chris").surname("Davis").build());
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+                .forename("Chris").surname("Davis").build().getFullName());
     }
 
     @Test
@@ -144,7 +144,7 @@ public class AddNoteAboutToSubmitHandlerTest {
 
     @Test(expected = IllegalStateException.class)
     public void testNoUserDetails_thenThrowsException() {
-        when(idamClient.getUserDetails(USER_AUTHORISATION)).thenReturn(null);
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenThrow(new IllegalStateException("Unable to obtain signed in user details"));
 
         sscsCaseData.setTempNoteDetail("Here is my note");
         Note oldNote = Note.builder().value(NoteDetails.builder().noteDetail("Existing note").noteDate(LocalDate.now().toString())
