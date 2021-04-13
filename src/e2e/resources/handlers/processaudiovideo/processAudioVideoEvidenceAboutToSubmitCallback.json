@@ -25,6 +25,7 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
+      "directionDueDate": "2120-06-01",
       "caseCode": "002DD",
       "subscriptions": {
         "appellantSubscription": {
