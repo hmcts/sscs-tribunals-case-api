@@ -92,7 +92,7 @@ public class MidEventValidationHandlerTest {
 
         if (eventType.equals(EventType.NOT_LISTABLE)) {
             sscsCaseData.setNotListableDueDate(LocalDate.now().toString());
-        } else {
+        } else if (eventType.equals(EventType.UPDATE_NOT_LISTABLE)) {
             sscsCaseData.setUpdateNotListableDueDate(LocalDate.now().toString());
         }
 
@@ -112,7 +112,7 @@ public class MidEventValidationHandlerTest {
         String yesterdayDate = LocalDate.now().plus(-1, ChronoUnit.DAYS).toString();
         if (eventType.equals(EventType.NOT_LISTABLE)) {
             sscsCaseData.setNotListableDueDate(yesterdayDate);
-        } else {
+        } else if (eventType.equals(EventType.UPDATE_NOT_LISTABLE)) {
             sscsCaseData.setUpdateNotListableDueDate(yesterdayDate);
         }
 
@@ -132,7 +132,7 @@ public class MidEventValidationHandlerTest {
         String tomorrowDate = LocalDate.now().plus(1, ChronoUnit.DAYS).toString();
         if (eventType.equals(EventType.NOT_LISTABLE)) {
             sscsCaseData.setNotListableDueDate(tomorrowDate);
-        } else {
+        } else if (eventType.equals(EventType.UPDATE_NOT_LISTABLE)) {
             sscsCaseData.setUpdateNotListableDueDate(tomorrowDate);
         }
 

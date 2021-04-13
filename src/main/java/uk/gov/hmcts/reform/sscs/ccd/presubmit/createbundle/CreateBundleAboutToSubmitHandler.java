@@ -88,9 +88,9 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
         moveDocsToDwpCollectionIfOldPattern(sscsCaseData);
 
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
+
         if (checkMandatoryFilesMissing(sscsCaseData)) {
-            PreSubmitCallbackResponse<SscsCaseData> response;
-            response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
             response.addError("The bundle cannot be created as mandatory DWP documents are missing");
             return response;
         } else {
@@ -115,17 +115,24 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
                 }
             }
 
+            callback.getCaseDetails().getCaseData().setCaseBundles(null);
+
             bundleAudioVideoPdfService.createAudioVideoPdf(sscsCaseData);
 
             if (multiBundleFeature) {
-                setMultiBundleConfig(sscsCaseData);
+                setMultiBundleConfig(sscsCaseData, response);
             } else {
                 setBundleConfig(sscsCaseData);
             }
 
-            log.info("Setting the bundleConfiguration on the case {} for case id {}", sscsCaseData.getBundleConfiguration(), callback.getCaseDetails().getId());
+            if (response.getErrors() != null && !response.getErrors().isEmpty()) {
+                log.info("Error found in bundle creation process for case id {}", callback.getCaseDetails().getId());
+                return response;
+            } else {
+                log.info("Setting the bundleConfiguration on the case {} for case id {}", sscsCaseData.getBundleConfiguration(), callback.getCaseDetails().getId());
 
-            return serviceRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
+                return serviceRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
+            }
         }
     }
 
@@ -148,13 +155,18 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         }
     }
 
-    private void setMultiBundleConfig(SscsCaseData sscsCaseData) {
+    private void setMultiBundleConfig(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         List<MultiBundleConfig> configs = new ArrayList<>();
-
+        
         if (sscsCaseData.getDwpDocuments().stream().filter(f -> (f.getValue().getDocumentType().equals(DwpDocumentType.DWP_RESPONSE.getValue())
                 && f.getValue().getEditedDocumentLink() != null)
                 || f.getValue().getDocumentType().equals(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue())
-                && f.getValue().getEditedDocumentLink() != null).count() > 0) {
+                && f.getValue().getEditedDocumentLink() != null).count() > 0 &&  checkPhmeReviewIsGrantedOrUnderReview(sscsCaseData))  {
+
+            if (checkPhmeStatusIsUnderReview(sscsCaseData)) {
+                response.addError("There is a pending PHME request on this case");
+                return;
+            }
 
             if (sscsCaseData.isLanguagePreferenceWelsh()) {
                 configs.add(MultiBundleConfig.builder().value(bundleWelshEditedConfig).build());
@@ -173,7 +185,6 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         }
         sscsCaseData.setMultiBundleConfiguration(configs);
     }
-
 
     private boolean checkMandatoryFilesMissing(SscsCaseData sscsCaseData) {
         if (null != sscsCaseData.getDwpDocuments()) {
@@ -205,5 +216,12 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         }
     }
 
+    protected boolean checkPhmeStatusIsUnderReview(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getPhmeGranted() == null;
+    }
+
+    private boolean checkPhmeReviewIsGrantedOrUnderReview(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getPhmeGranted() == null || sscsCaseData.getPhmeGranted().equals(YesNo.YES);
+    }
 
 }

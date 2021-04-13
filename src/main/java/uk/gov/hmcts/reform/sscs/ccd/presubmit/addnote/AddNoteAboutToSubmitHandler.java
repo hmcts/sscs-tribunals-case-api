@@ -9,23 +9,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @Component
 @Slf4j
 public class AddNoteAboutToSubmitHandler  implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    protected final IdamClient idamClient;
+    protected final UserDetailsService userDetailsService;
 
     @Autowired
-    public AddNoteAboutToSubmitHandler(IdamClient idamClient) {
-        this.idamClient = idamClient;
+    public AddNoteAboutToSubmitHandler(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -55,24 +54,15 @@ public class AddNoteAboutToSubmitHandler  implements PreSubmitCallbackHandler<Ss
         String note = sscsCaseData.getTempNoteDetail();
         if (nonNull(note) && StringUtils.isNoneBlank(note)) {
             Note newNote = Note.builder().value(NoteDetails.builder().noteDetail(note).noteDate(LocalDate.now().toString())
-                    .author(buildLoggedInUserName(userAuthorisation)).build()).build();
+                    .author(userDetailsService.buildLoggedInUserName(userAuthorisation)).build()).build();
             if (sscsCaseData.getAppealNotePad() == null || sscsCaseData.getAppealNotePad().getNotesCollection() == null) {
                 sscsCaseData.setAppealNotePad(NotePad.builder().notesCollection(new ArrayList<Note>()).build());
             }
             sscsCaseData.getAppealNotePad().getNotesCollection().add(newNote);
-
             sscsCaseData.setTempNoteDetail(null);
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-
-    protected String buildLoggedInUserName(String userAuthorisation) {
-        UserDetails userDetails = idamClient.getUserDetails(userAuthorisation);
-        if (userDetails == null) {
-            throw new IllegalStateException("Unable to obtain signed in user details");
-        }
-        return userDetails.getFullName();
-    }
 }
