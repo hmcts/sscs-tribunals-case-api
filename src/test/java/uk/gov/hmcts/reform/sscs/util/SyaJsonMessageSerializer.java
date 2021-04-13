@@ -18,6 +18,7 @@ public enum SyaJsonMessageSerializer {
     ALL_DETAILS_CCD("allDetailsCcd.json"),
     ALL_DETAILS_FROM_DRAFT("allDetailsFromDraft.json"),
     ALL_DETAILS_FROM_DRAFT_CCD("allDetailsFromDraftCcd.json"),
+    ALL_DETAILS_FROM_DRAFT_CCD_WITH_INTERLOC("allDetailsFromDraftCcd.json"),
     WITHOUT_NOTIFICATION("withoutNotification.json"),
     WITHOUT_NOTIFICATION_CCD("withoutNotificationCcd.json"),
     WITHOUT_EMAIL_NOTIFICATION("withoutEmailNotification.json"),

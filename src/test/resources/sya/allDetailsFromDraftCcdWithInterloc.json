@@ -210,5 +210,7 @@
   "languagePreferenceWelsh": "No",
   "createdInGapsFrom": "readyToList",
   "processingVenue": "Ashford",
+  "interlocReferralDate" : "2021-04-13",
+  "interlocReviewState" : "reviewByTcw",
   "isScottishCase" : "No"
 }

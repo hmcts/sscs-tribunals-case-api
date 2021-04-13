@@ -147,20 +147,20 @@ public class SubmitDraftTest {
 
     @Test
     public void givenValidDraftAppealIsSubmittedFromSaveAndReturn_thenCreateValidAppeal() throws InterruptedException {
-        assertDraftCaseToSscsCaseResults("validAppeal");
+        assertDraftCaseToSscsCaseResults("validAppeal", false);
     }
 
     @Test
     public void givenIncompleteDraftAppealIsSubmittedFromSaveAndReturn_thenCreateIncompleteAppeal() throws InterruptedException {
-        assertDraftCaseToSscsCaseResults("incompleteApplication");
+        assertDraftCaseToSscsCaseResults("incompleteApplication", true);
     }
 
     @Test
     public void givenNonCompliantDraftAppealIsSubmittedFromSaveAndReturn_thenCreateNonCompliantAppeal() throws InterruptedException {
-        assertDraftCaseToSscsCaseResults("interlocutoryReviewState");
+        assertDraftCaseToSscsCaseResults("interlocutoryReviewState", true);
     }
 
-    private void assertDraftCaseToSscsCaseResults(String expectedState) throws InterruptedException {
+    private void assertDraftCaseToSscsCaseResults(String expectedState, Boolean withInterloc) throws InterruptedException {
         LocalDate now = LocalDate.now();
         LocalDate interlocutoryReviewDate = now.minusMonths(13).minusDays(1);
         LocalDate mrnDate = expectedState.equals("interlocutoryReviewState") ? interlocutoryReviewDate :
@@ -194,7 +194,10 @@ public class SubmitDraftTest {
         SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, userIdamTokens);
 
         log.info(String.format("SYA created with CCD ID %s", id));
-        assertJsonEquals(changeExpectedFields(ALL_DETAILS_FROM_DRAFT_CCD.getSerializedMessage(), nino, mrnDate), sscsCaseDetails.getData());
+
+        String expectedResponse = withInterloc ? ALL_DETAILS_FROM_DRAFT_CCD_WITH_INTERLOC.getSerializedMessage() : ALL_DETAILS_FROM_DRAFT_CCD.getSerializedMessage();
+
+        assertJsonEquals(changeExpectedFields(expectedResponse, nino, mrnDate), sscsCaseDetails.getData());
 
         assertEquals(expectedState, sscsCaseDetails.getState());
     }
