@@ -40,9 +40,9 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 @Component
 @Slf4j
 public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-    private static final String FURTHER_EVIDENCE_RECEIVED = "furtherEvidenceReceived";
-    private static final String COVERSHEET = "coversheet";
     public static final String YES = YesNo.YES.getValue();
+    public static final String FURTHER_EVIDENCE_RECEIVED = "furtherEvidenceReceived";
+    private static final String COVERSHEET = "coversheet";
 
     private final FooterService footerService;
     private final BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder;
@@ -89,6 +89,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
             if (!State.WITH_DWP.equals(callback.getCaseDetails().getState())) {
                 sscsCaseData.setDwpFurtherEvidenceStates(FURTHER_EVIDENCE_RECEIVED);
+                sscsCaseData.setDwpState(DwpState.FE_RECEIVED.getId());
             }
 
         }
