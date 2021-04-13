@@ -28,8 +28,7 @@ public class MidEventValidationHandler implements PreSubmitCallbackHandler<SscsC
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.MID_EVENT
             && (callback.getEvent() == EventType.NOT_LISTABLE
-                || callback.getEvent() == EventType.UPDATE_NOT_LISTABLE
-                || callback.getEvent() == EventType.PROCESS_AUDIO_VIDEO)
+                || callback.getEvent() == EventType.UPDATE_NOT_LISTABLE)
             && Objects.nonNull(callback.getCaseDetails())
             && Objects.nonNull(callback.getCaseDetails().getCaseData());
     }

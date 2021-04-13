@@ -88,6 +88,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
                 .processAudioVideoAction(new DynamicList(ISSUE_DIRECTIONS_NOTICE.getCode()))
                 .signedRole("Judge")
                 .dateAdded(LocalDate.now().minusDays(1))
+                .directionDueDate(LocalDate.now().plusDays(1).toString())
                 .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
                 .previewDocument(DocumentLink.builder()
                         .documentUrl(DOCUMENT_URL)
@@ -594,5 +595,4 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
             assertThat(response.getData().getInterlocReviewState(), is(finalState.getId()));
         }
     }
-
 }
