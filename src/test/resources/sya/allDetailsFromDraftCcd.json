@@ -48,10 +48,21 @@
       "isAppointee": "No",
       "isAddressSameAsAppointee": "No",
       "appointee": {
-        "name":null,
-        "address":null,
-        "contact":null,
-        "identity":null
+        "name": {
+          "title": null,
+          "firstName": null,
+          "lastName": null
+        },
+        "address": {},
+        "contact": {
+          "email": null,
+          "phone": null,
+          "mobile": null
+        },
+        "identity": {
+          "dob": null,
+          "nino": null
+        }
       }
     },
     "benefitType": {
