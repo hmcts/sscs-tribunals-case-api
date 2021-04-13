@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 import junitparams.NamedParameters;
 import org.junit.Test;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -27,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.GenDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.GenDecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDecisionPreviewDecisionServiceTestBase {
 
@@ -40,9 +40,9 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     }
 
     @Override
-    protected WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient,
+    protected WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
         DocumentConfiguration documentConfiguration) {
-        return new GenWriteFinalDecisionPreviewDecisionService(generateFile, idamClient, genDecisionNoticeQuestionService,
+        return new GenWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, genDecisionNoticeQuestionService,
             genDecisionNoticeOutcomeService, documentConfiguration);
     }
 

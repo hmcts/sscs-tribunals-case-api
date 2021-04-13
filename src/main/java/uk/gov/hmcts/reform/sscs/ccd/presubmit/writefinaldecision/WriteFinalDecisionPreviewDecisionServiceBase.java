@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -28,6 +27,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody.WriteFinalDecisionTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 @Slf4j
@@ -36,9 +36,9 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
     protected final DecisionNoticeQuestionService decisionNoticeQuestionService;
     protected final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
 
-    protected WriteFinalDecisionPreviewDecisionServiceBase(GenerateFile generateFile, IdamClient idamClient,
+    protected WriteFinalDecisionPreviewDecisionServiceBase(GenerateFile generateFile, UserDetailsService userDetailsService,
         DecisionNoticeQuestionService decisionNoticeQuestionService,  DecisionNoticeOutcomeService decisionNoticeOutcomeService, DocumentConfiguration documentConfiguration) {
-        super(generateFile, idamClient, languagePreference -> getTemplateId(documentConfiguration, languagePreference));
+        super(generateFile, userDetailsService, languagePreference -> getTemplateId(documentConfiguration, languagePreference));
         this.decisionNoticeQuestionService = decisionNoticeQuestionService;
         this.decisionNoticeOutcomeService = decisionNoticeOutcomeService;
     }
