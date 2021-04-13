@@ -72,6 +72,8 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
             return response;
         }
 
+        validateDueDateIsInFuture(response);
+
         if (ACTIONS_THAT_REQUIRES_NOTICE.contains(caseData.getProcessAudioVideoAction().getValue().getCode())) {
             if (isNull(caseData.getPreviewDocument())) {
                 response.addError("There is no document notice");
@@ -281,6 +283,16 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
             }
 
         }
+    }
+
+    private void validateDueDateIsInFuture(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+
+        LocalDate directionDueDate = LocalDate.parse(preSubmitCallbackResponse.getData().getDirectionDueDate());
+
+        if (!directionDueDate.isAfter(LocalDate.now())) {
+            preSubmitCallbackResponse.addError("Directions due date must be in the future");
+        }
+
     }
 
     private void clearEmptyAudioVideoList(SscsCaseData caseData) {
