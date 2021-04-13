@@ -157,7 +157,7 @@ public class SubmitDraftTest {
 
     @Test
     public void givenNonCompliantDraftAppealIsSubmittedFromSaveAndReturn_thenCreateNonCompliantAppeal() throws InterruptedException {
-        assertDraftCaseToSscsCaseResults("interlocutoryReviewState", true);
+        assertDraftCaseToSscsCaseResults("interlocutoryReviewState", false);
     }
 
     private void assertDraftCaseToSscsCaseResults(String expectedState, Boolean withInterloc) throws InterruptedException {
