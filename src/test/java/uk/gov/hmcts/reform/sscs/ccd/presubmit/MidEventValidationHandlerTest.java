@@ -67,7 +67,7 @@ public class MidEventValidationHandlerTest {
     }
 
     @Test
-    @Parameters({"NOT_LISTABLE", "UPDATE_NOT_LISTABLE", "PROCESS_AUDIO_VIDEO"})
+    @Parameters({"NOT_LISTABLE", "UPDATE_NOT_LISTABLE"})
     public void givenAValidMidEventValidationCaseEvent_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
         assertTrue(handler.canHandle(MID_EVENT, callback));
@@ -86,7 +86,7 @@ public class MidEventValidationHandlerTest {
     }
 
     @Test
-    @Parameters({"NOT_LISTABLE", "UPDATE_NOT_LISTABLE", "PROCESS_AUDIO_VIDEO"})
+    @Parameters({"NOT_LISTABLE", "UPDATE_NOT_LISTABLE"})
     public void givenDirectionsDueDateIsToday_ThenDisplayAnError(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
 
@@ -94,8 +94,6 @@ public class MidEventValidationHandlerTest {
             sscsCaseData.setNotListableDueDate(LocalDate.now().toString());
         } else if (eventType.equals(EventType.UPDATE_NOT_LISTABLE)) {
             sscsCaseData.setUpdateNotListableDueDate(LocalDate.now().toString());
-        } else if (eventType.equals(EventType.PROCESS_AUDIO_VIDEO)) {
-            sscsCaseData.setDirectionDueDate(LocalDate.now().toString());
         }
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -107,7 +105,7 @@ public class MidEventValidationHandlerTest {
     }
 
     @Test
-    @Parameters({"NOT_LISTABLE", "UPDATE_NOT_LISTABLE", "PROCESS_AUDIO_VIDEO"})
+    @Parameters({"NOT_LISTABLE", "UPDATE_NOT_LISTABLE"})
     public void givenDirectionsDueDateIsBeforeToday_ThenDisplayAnError(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
 
@@ -116,8 +114,6 @@ public class MidEventValidationHandlerTest {
             sscsCaseData.setNotListableDueDate(yesterdayDate);
         } else if (eventType.equals(EventType.UPDATE_NOT_LISTABLE)) {
             sscsCaseData.setUpdateNotListableDueDate(yesterdayDate);
-        } else if (eventType.equals(EventType.PROCESS_AUDIO_VIDEO)) {
-            sscsCaseData.setDirectionDueDate(yesterdayDate);
         }
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -129,7 +125,7 @@ public class MidEventValidationHandlerTest {
     }
 
     @Test
-    @Parameters({"NOT_LISTABLE", "UPDATE_NOT_LISTABLE", "PROCESS_AUDIO_VIDEO"})
+    @Parameters({"NOT_LISTABLE", "UPDATE_NOT_LISTABLE"})
     public void givenDirectionsDueDateIsAfterToday_ThenDoNotDisplayAnError(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
 
@@ -138,8 +134,6 @@ public class MidEventValidationHandlerTest {
             sscsCaseData.setNotListableDueDate(tomorrowDate);
         } else if (eventType.equals(EventType.UPDATE_NOT_LISTABLE)) {
             sscsCaseData.setUpdateNotListableDueDate(tomorrowDate);
-        } else if (eventType.equals(EventType.PROCESS_AUDIO_VIDEO)) {
-            sscsCaseData.setDirectionDueDate(tomorrowDate);
         }
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
