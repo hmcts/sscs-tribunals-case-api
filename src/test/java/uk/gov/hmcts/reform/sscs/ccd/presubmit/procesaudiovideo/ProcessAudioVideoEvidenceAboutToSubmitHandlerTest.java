@@ -15,7 +15,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.DIRECTION_ACTION_REQU
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.*;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -596,31 +595,4 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
             assertThat(response.getData().getInterlocReviewState(), is(finalState.getId()));
         }
     }
-
-    public void givenDirectionsDueDateIsToday_ThenDisplayAnError(EventType eventType) {
-        when(callback.getEvent()).thenReturn(eventType);
-
-        sscsCaseData.setDirectionDueDate(LocalDate.now().toString());
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Directions due date must be in the future", error);
-    }
-
-    @Test
-    public void givenDirectionsDueDateIsBeforeToday_ThenDisplayAnError() {
-        String yesterdayDate = LocalDate.now().plus(-1, ChronoUnit.DAYS).toString();
-        sscsCaseData.setDirectionDueDate(yesterdayDate);
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Directions due date must be in the future", error);
-    }
-
 }
