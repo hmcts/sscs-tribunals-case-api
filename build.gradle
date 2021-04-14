@@ -327,7 +327,7 @@ dependencies {
 
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
-    compile 'org.projectlombok:lombok:1.18.18'
+    compile 'org.projectlombok:lombok:1.18.20'
     annotationProcessor 'org.projectlombok:lombok:1.18.18'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.5.RELEASE'
@@ -345,8 +345,8 @@ dependencies {
 
     testCompile 'pl.pragmatists:JUnitParams:1.1.1'
 
-    testCompileOnly 'org.projectlombok:lombok:1.18.16'
-    testAnnotationProcessor "org.projectlombok:lombok:1.18.14"
+    testCompileOnly 'org.projectlombok:lombok:1.18.20'
+    testAnnotationProcessor "org.projectlombok:lombok:1.18.20"
     e2eCompile 'org.projectlombok:lombok:1.18.16'
     e2eAnnotationProcessor "org.projectlombok:lombok:1.18.18"
 

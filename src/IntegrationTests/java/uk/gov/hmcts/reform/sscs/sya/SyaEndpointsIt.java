@@ -13,6 +13,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.time.LocalDate;
 import java.util.*;
 import javax.mail.Session;
 import junitparams.JUnitParamsRunner;
@@ -140,7 +141,7 @@ public class SyaEndpointsIt {
     }
 
     @Test
-    public void givenAValidAppeal_createAppealCreatedCase() throws Exception {
+    public void givenAValidAppeal_createValidAppealCreatedCase() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
         given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
@@ -155,7 +156,30 @@ public class SyaEndpointsIt {
     }
 
     @Test
-    public void givenAValidAppealWithNoMrnDate_createIncompleteAppealCase() throws Exception {
+    public void givenAValidAppealFromDraft_updateDraftToValidAppealCreatedCase() throws Exception {
+        Map<String, Object> appeal = new HashMap<>();
+        appeal.put("mrnDetails", Collections.singletonMap("mrnDate", LocalDate.now().toString()));
+        appeal.put("appellant", Collections.singletonMap("identity",  Collections.singletonMap("nino", "BB000000B")));
+        appeal.put("benefitType", Collections.singletonMap("code", "PIP"));
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("appeal", appeal);
+
+        given(ccdClient.readForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(1234567890L).data(data).build());
+
+        given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
+
+        mockMvc.perform(post("/appeals")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(getCase("json/sya_with_ccdId.json")))
+                .andExpect(status().isCreated());
+
+        verify(ccdClient).startEvent(any(), eq(1234567890L), eq(DRAFT_TO_VALID_APPEAL_CREATED.getCcdType()));
+        verify(ccdClient).submitEventForCaseworker(any(), eq(1234567890L), any());
+    }
+
+    @Test
+    public void givenAValidAppealWithNoMrnDate_createIncompleteCase() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
         given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
@@ -171,7 +195,30 @@ public class SyaEndpointsIt {
     }
 
     @Test
-    public void givenAValidAppealWithMrnDateMoreThan13MonthsAgo_createNonCompliantAppealCase() throws Exception {
+    public void givenAValidAppealWithNoMrnDateFromDraft_updateDraftToIncompleteCase() throws Exception {
+        Map<String, Object> appeal = new HashMap<>();
+        appeal.put("mrnDetails", Collections.singletonMap("mrnDate", null));
+        appeal.put("appellant", Collections.singletonMap("identity",  Collections.singletonMap("nino", "BB000000B")));
+        appeal.put("benefitType", Collections.singletonMap("code", "PIP"));
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("appeal", appeal);
+
+        given(ccdClient.readForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(1234567890L).data(data).build());
+
+        given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
+
+        mockMvc.perform(post("/appeals")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(getCase("json/sya_with_ccdId_noMrnDate.json")))
+                .andExpect(status().isCreated());
+
+        verify(ccdClient).startEvent(any(), eq(1234567890L), eq(DRAFT_TO_INCOMPLETE_APPLICATION.getCcdType()));
+        verify(ccdClient).submitEventForCaseworker(any(), eq(1234567890L), any());
+    }
+
+    @Test
+    public void givenAValidAppealWithMrnDateMoreThan13MonthsAgo_createNonCompliantCase() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
         given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
@@ -184,6 +231,29 @@ public class SyaEndpointsIt {
         verify(ccdClient).startCaseForCaseworker(any(), eq(NON_COMPLIANT.getCcdType()));
         verify(ccdClient).submitForCaseworker(any(), any());
         verify(ccdClient, times(0)).startEvent(any(), any(), eq(SEND_TO_DWP.getCcdType()));
+    }
+
+    @Test
+    public void givenAValidAppealWithMrnDateMoreThan13MonthsAgoFromDraft_updateDraftToNonCompliantCase() throws Exception {
+        Map<String, Object> appeal = new HashMap<>();
+        appeal.put("mrnDetails", Collections.singletonMap("mrnDate", LocalDate.now().minusMonths(13).minusDays(1).toString()));
+        appeal.put("appellant", Collections.singletonMap("identity",  Collections.singletonMap("nino", "BB000000B")));
+        appeal.put("benefitType", Collections.singletonMap("code", "PIP"));
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("appeal", appeal);
+
+        given(ccdClient.readForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(1234567890L).data(data).build());
+
+        given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
+
+        mockMvc.perform(post("/appeals")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(getCase("json/sya_with_ccdId_mrnDateMoreThan13Months.json")))
+                .andExpect(status().isCreated());
+
+        verify(ccdClient).startEvent(any(), eq(1234567890L), eq(DRAFT_TO_NON_COMPLIANT.getCcdType()));
+        verify(ccdClient).submitEventForCaseworker(any(), eq(1234567890L), any());
     }
 
     @Test
