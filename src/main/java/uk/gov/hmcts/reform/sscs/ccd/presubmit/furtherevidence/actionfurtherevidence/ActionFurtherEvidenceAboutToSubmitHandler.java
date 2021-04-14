@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
+import static java.util.Arrays.stream;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -325,7 +327,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             log.info("adding footer appendix document link: {} and caseId {}", url, sscsCaseData.getCcdCaseId());
 
             String originalSenderCode = sscsCaseData.getOriginalSender().getValue().getCode();
-            String documentFooterText = OriginalSenderItemList.APPELLANT.getCode().equals(originalSenderCode) ? "Appellant evidence" : "Representative evidence";
+            String documentFooterText = stream(OriginalSenderItemList.values())
+                    .filter(f -> f.getCode().equals(originalSenderCode))
+                    .findFirst()
+                    .map(OriginalSenderItemList::getDocumentFooter).orElse(EMPTY);
 
             bundleAddition = footerService.getNextBundleAddition(sscsCaseData.getSscsDocument());
 
