@@ -55,8 +55,14 @@ public class AddNoteAboutToSubmitHandler  implements PreSubmitCallbackHandler<Ss
 
         String note = sscsCaseData.getTempNoteDetail();
 
-        if (callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED && nonNull(sscsCaseData.getInterlocReferralReason()) && StringUtils.isNoneBlank(sscsCaseData.getInterlocReferralReason())) {
-            note = findLabelById(sscsCaseData.getInterlocReferralReason()) + " - " + note;
+        if (callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED && nonNull(sscsCaseData.getInterlocReferralReason())
+                && StringUtils.isNoneBlank(sscsCaseData.getInterlocReferralReason()) && nonNull(sscsCaseData.getSelectWhoReviewsCase())) {
+            String reasonLabel = findLabelById(sscsCaseData.getInterlocReferralReason());
+            if (nonNull(note) && StringUtils.isNoneBlank(note)) {
+                note = "Referred to interloc for " + sscsCaseData.getSelectWhoReviewsCase().getValue().getLabel().toLowerCase() + " - " + reasonLabel + " - " + note;
+            } else {
+                note = "Referred to interloc for " + sscsCaseData.getSelectWhoReviewsCase().getValue().getLabel().toLowerCase() + " - " + reasonLabel;
+            }
         }
 
         if (nonNull(note) && StringUtils.isNoneBlank(note)) {

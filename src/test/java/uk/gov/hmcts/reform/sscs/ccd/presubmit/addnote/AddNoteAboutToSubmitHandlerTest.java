@@ -70,6 +70,20 @@ public class AddNoteAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void testTempNoteFilledIsNullAndResponseReviewedEvent_thenNoteIsAdded() {
+        when(callback.getEvent()).thenReturn(HMCTS_RESPONSE_REVIEWED);
+        sscsCaseData.setTempNoteDetail(null);
+        sscsCaseData.setInterlocReferralReason("over200Pages");
+        sscsCaseData.setSelectWhoReviewsCase(new DynamicList("Review by Judge"));
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
+        assertEquals("Referred to interloc for review by judge - Over 200 pages", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
+    }
+
+    @Test
     public void testTempNoteFilledIsNull_thenNoNoteAddedToCollection() {
         sscsCaseData.setTempNoteDetail(null);
 
@@ -128,11 +142,12 @@ public class AddNoteAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(HMCTS_RESPONSE_REVIEWED);
         sscsCaseData.setTempNoteDetail("Here is my note");
         sscsCaseData.setInterlocReferralReason(interlocReferralId);
+        sscsCaseData.setSelectWhoReviewsCase(new DynamicList("Review by Judge"));
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        String expectedNote = interlocReferralLabel + " - Here is my note";
+        String expectedNote = "Referred to interloc for review by judge - " + interlocReferralLabel + " - Here is my note";
 
         assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
         assertEquals(expectedNote, response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
