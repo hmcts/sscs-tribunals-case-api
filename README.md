@@ -134,7 +134,7 @@ Please change the version tag to point to 'Dev' and ensure the Pact Broker annot
     @VersionSelector(tag = "Dev")})
 ```
 
-Also if you require the Provider verification to be published please add the following System Environment Variable before running the CasesControllerProviderTest:
+Also if you require the Provider verification to be published uncomment the following line before running the CasesControllerProviderTest:
 
 ```
   System.getProperties().setProperty("pact.verifier.publishResults", "true");

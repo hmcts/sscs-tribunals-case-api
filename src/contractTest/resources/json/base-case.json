@@ -162,5 +162,6 @@
   "generatedEmail": "joe@bloggs.com",
   "generatedMobile": "07411222222",
   "evidencePresent": "No",
-  "evidenceHandled": "No"
+  "evidenceHandled": "No",
+  "isAppellantDeceased": "No"
 }
