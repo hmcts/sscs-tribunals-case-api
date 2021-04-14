@@ -23,4 +23,11 @@
         <packageUrl regex="true">^pkg:maven/org\.gagravarr/vorbis\-java\-tika@.*$</packageUrl>
         <cve>CVE-2017-6888</cve>
     </suppress>
+    <suppress until="2021-05-01">
+        <notes><![CDATA[
+        https://nvd.nist.gov/vuln/detail/CVE-2021-20291
+         Looks like false positive references github.com/containers/storage which we don't use
+        ]]></notes>
+        <cve>CVE-2021-20291</cve>
+    </suppress>
 </suppressions>

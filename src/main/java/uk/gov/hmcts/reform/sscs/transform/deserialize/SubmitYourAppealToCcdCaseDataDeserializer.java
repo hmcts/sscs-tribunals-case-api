@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CARERS_ALLOWANCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.*;
 import static uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator.generateAppealNumber;
 import static uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil.cleanPhoneNumber;
@@ -69,11 +71,12 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .build();
     }
 
-    public static String getDwpRegionalCenterGivenDwpIssuingOffice(String benefitTypeCode, String dwpIssuingOffice) {
-        if (dwpIssuingOffice == null) {
+    private static String getDwpRegionalCenterGivenDwpIssuingOffice(String benefitTypeCode, String dwpIssuingOffice) {
+        DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
+
+        if (dwpIssuingOffice == null && ! (CARERS_ALLOWANCE == Benefit.getBenefitByCode(benefitTypeCode))) {
             return null;
         }
-        DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
         return dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(benefitTypeCode, dwpIssuingOffice);
     }
 
@@ -181,22 +184,25 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static String getDwpIssuingOffice(SyaCaseWrapper syaCaseWrapper) {
+        DwpAddressLookupService dwpLookup = new DwpAddressLookupService();
         String benefitType = syaCaseWrapper.getBenefitType().getCode();
-        if (benefitType.equalsIgnoreCase("uc")
-                && (syaCaseWrapper.getMrn() == null
-                || syaCaseWrapper.getMrn().getDwpIssuingOffice() == null)) {
-            return "Universal Credit";
-        } else {
-            if (!mrnIsNotProvided(syaCaseWrapper)) {
-                String dwpIssuingOffice = syaCaseWrapper.getMrn().getDwpIssuingOffice();
-                if (dwpIssuingOffice != null) {
-                    return new DwpAddressLookupService().getDwpMappingByOffice(benefitType, dwpIssuingOffice)
-                            .map(office -> office.getMapping().getCcd())
-                            .orElse(null);
+        String result = null;
+        switch (Benefit.getBenefitByCode(benefitType)) {
+            case UC:
+            case CARERS_ALLOWANCE:
+                result = dwpLookup.getDefaultDwpRegionalCenterByBenefitTypeAndOffice(benefitType);
+                break;
+            default:
+                if (!mrnIsNotProvided(syaCaseWrapper)) {
+                    String dwpIssuingOffice = syaCaseWrapper.getMrn().getDwpIssuingOffice();
+                    if (dwpIssuingOffice != null) {
+                        result = dwpLookup.getDwpMappingByOffice(benefitType, dwpIssuingOffice)
+                                .map(office -> office.getMapping().getCcd())
+                                .orElse(null);
+                    }
                 }
-            }
-            return null;
         }
+        return result;
     }
 
     private static String getMrnDate(SyaCaseWrapper syaCaseWrapper) {

@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
@@ -80,6 +81,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
 
         sscsCaseData = SscsCaseData.builder()
                 .generateNotice("Yes")
+                .directionDueDate(LocalDate.now().plusDays(1).toString())
                 .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
                 .processAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.ISSUE_DIRECTIONS_NOTICE.getCode()))
                 .selectedAudioVideoEvidence(new DynamicList("test.com"))
@@ -164,6 +166,31 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         assertThat(response.getData().getPreviewDocument(), is(nullValue()));
         verifyNoInteractions(generateFile);
         assertEquals(response.getData().getSelectedAudioVideoEvidenceDetails(), expectedEvidenceDetails);
+    }
+
+    @Test
+    public void givenDirectionsDueDateIsToday_ThenDisplayAnError() {
+        sscsCaseData.setDirectionDueDate(LocalDate.now().toString());
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Directions due date must be in the future", error);
+    }
+
+    @Test
+    public void givenDirectionsDueDateIsBeforeToday_ThenDisplayAnError() {
+        String yesterdayDate = LocalDate.now().plus(-1, ChronoUnit.DAYS).toString();
+        sscsCaseData.setDirectionDueDate(yesterdayDate);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Directions due date must be in the future", error);
     }
 
     private void verifyTemplateBody(String templateId) {

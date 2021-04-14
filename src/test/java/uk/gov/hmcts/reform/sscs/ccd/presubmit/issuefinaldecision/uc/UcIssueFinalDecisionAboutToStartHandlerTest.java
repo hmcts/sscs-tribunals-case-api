@@ -29,8 +29,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -57,6 +55,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.UcDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.UcDecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @RunWith(JUnitParamsRunner.class)
 public class UcIssueFinalDecisionAboutToStartHandlerTest {
@@ -68,10 +67,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
     private static final String UC_TEMPLATE_ID = "esanuts.docx";
 
     @Mock
-    private IdamClient idamClient;
-
-    @Mock
-    private UserDetails userDetails;
+    private UserDetailsService userDetailsService;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -113,9 +109,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer token")).thenReturn(userDetails);
+        when(userDetailsService.buildLoggedInUserName("Bearer token")).thenReturn("Judge Full Name");
 
 
         capture = ArgumentCaptor.forClass(GenerateFileParams.class);
@@ -183,7 +177,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
 
         UcDecisionNoticeQuestionService esaDecisionNoticeQuestionService = new UcDecisionNoticeQuestionService();
 
-        final UcWriteFinalDecisionPreviewDecisionService previewDecisionService = new UcWriteFinalDecisionPreviewDecisionService(generateFile, idamClient,
+        final UcWriteFinalDecisionPreviewDecisionService previewDecisionService = new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
             esaDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration);
 
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -225,7 +219,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
 
         when(ucDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
 
-        final UcWriteFinalDecisionPreviewDecisionService previewDecisionService = new UcWriteFinalDecisionPreviewDecisionService(generateFile, idamClient,
+        final UcWriteFinalDecisionPreviewDecisionService previewDecisionService = new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
             esaDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration);
 
         when(generateFile.assemble(any())).thenReturn(URL);

@@ -35,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Evidence;
@@ -262,9 +263,10 @@ public class EvidenceUploadServiceTest {
         assertThat(submittedEvidence, is(true));
 
         verify(ccdService).updateCase(
-                and(and(hasSscsScannedDocumentAndSscsDocuments(expectedEvidenceUploadFilename),
+                and(and(and(hasSscsScannedDocumentAndSscsDocuments(expectedEvidenceUploadFilename),
                     doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo()),
                     argThat(argument -> argument.getInterlocReviewState().equals(expectedInterlocReviewState.getId()))),
+                        argThat(argument ->  argument.getInterlocReferralReason().equals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE.getId()))),
                 eq(someCcdCaseId),
                 eq(ATTACH_SCANNED_DOCS.getCcdType()),
                 eq("SSCS - upload evidence from MYA"),

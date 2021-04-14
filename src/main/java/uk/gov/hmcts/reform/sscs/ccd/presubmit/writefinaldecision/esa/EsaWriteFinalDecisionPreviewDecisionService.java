@@ -10,7 +10,6 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
@@ -25,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @Slf4j
 @Component
@@ -33,9 +33,9 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
     private EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService;
 
     @Autowired
-    public EsaWriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient,
+    public EsaWriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
         EsaDecisionNoticeQuestionService decisionNoticeQuestionService, EsaDecisionNoticeOutcomeService outcomeService, DocumentConfiguration documentConfiguration) {
-        super(generateFile, idamClient, decisionNoticeQuestionService, outcomeService, documentConfiguration);
+        super(generateFile, userDetailsService, decisionNoticeQuestionService, outcomeService, documentConfiguration);
         this.esaDecisionNoticeQuestionService = decisionNoticeQuestionService;
     }
 

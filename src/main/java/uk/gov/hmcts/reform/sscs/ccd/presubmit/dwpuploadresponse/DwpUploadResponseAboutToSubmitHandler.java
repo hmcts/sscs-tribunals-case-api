@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
 import static java.util.Collections.*;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
 
@@ -101,8 +102,11 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         if (StringUtils.equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "phme")) {
             sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
-        } else if (!REVIEW_BY_JUDGE.getId().equals(sscsCaseData.getInterlocReviewState())) {
-            sscsCaseData.setInterlocReviewState(REVIEW_BY_TCW.getId());
+        } else {
+            if (!REVIEW_BY_JUDGE.getId().equals(sscsCaseData.getInterlocReviewState())) {
+                sscsCaseData.setInterlocReviewState(REVIEW_BY_TCW.getId());
+            }
+            sscsCaseData.setInterlocReferralReason(REVIEW_AUDIO_VIDEO_EVIDENCE.getId());
         }
     }
 

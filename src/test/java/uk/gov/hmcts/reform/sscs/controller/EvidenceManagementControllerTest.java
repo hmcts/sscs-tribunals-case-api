@@ -2,7 +2,10 @@ package uk.gov.hmcts.reform.sscs.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.service.SubmitAppealService.DM_STORE_USER_ID;
 
@@ -14,6 +17,7 @@ import org.mockito.Mock;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.exception.EvidenceDocumentsMissingException;
+import uk.gov.hmcts.reform.sscs.exception.FileToPdfConversionException;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
 
@@ -62,5 +66,17 @@ public class EvidenceManagementControllerTest {
         verify(evidenceManagementService, times(1)).upload(files, DM_STORE_USER_ID);
         assertThat(actualUploadResponseEmbedded, equalTo(uploadResponseEmbedded));
 
+    }
+
+    @Test(expected = FileToPdfConversionException.class)
+    public void shouldUploadEvidenceDocumentListLogsParseException() {
+
+        MultipartFile file = mock(MultipartFile.class);
+        List<MultipartFile> files = Collections.singletonList(file);
+
+        when(fileToPdfConversionService.convert(files)).thenThrow(
+            new FileToPdfConversionException("Conversion to PDF error", new RuntimeException()));
+
+        controller.upload(files);
     }
 }
