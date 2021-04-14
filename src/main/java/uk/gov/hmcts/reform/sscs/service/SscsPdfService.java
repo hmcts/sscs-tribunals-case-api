@@ -11,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.pdf.PdfWrapper;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
@@ -24,26 +21,23 @@ import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.ResourceManager;
 @Slf4j
 public class SscsPdfService {
 
-    private String appellantTemplatePath;
-    private String appellantWelshTemplatePath;
-    private PDFServiceClient pdfServiceClient;
-    private CcdPdfService ccdPdfService;
-    private ResourceManager resourceManager;
-    private WelshBenefitTypeTranslator welshBenefitTypeTranslator;
+    private final String appellantTemplatePath;
+    private final String appellantWelshTemplatePath;
+    private final PDFServiceClient pdfServiceClient;
+    private final CcdPdfService ccdPdfService;
+    private final ResourceManager resourceManager;
 
     @Autowired
     public SscsPdfService(@Value("${appellant.appeal.html.template.path}") String appellantTemplatePath,
                           @Value("${appellant.appeal.html.welsh.template.path}") String appellantWelshTemplatePath,
                           PDFServiceClient pdfServiceClient,
                           CcdPdfService ccdPdfService,
-                          ResourceManager resourceManager,
-                          WelshBenefitTypeTranslator welshBenefitTypeTranslator) {
+                          ResourceManager resourceManager) {
         this.pdfServiceClient = pdfServiceClient;
         this.appellantTemplatePath = appellantTemplatePath;
         this.appellantWelshTemplatePath = appellantWelshTemplatePath;
         this.ccdPdfService = ccdPdfService;
         this.resourceManager = resourceManager;
-        this.welshBenefitTypeTranslator = welshBenefitTypeTranslator;
     }
 
     public SscsCaseData generatePdf(SscsCaseData sscsCaseData, Long caseDetailsId, String documentType, String fileName) {
@@ -92,8 +86,7 @@ public class SscsPdfService {
                 placeholders.put("welsh_exclude_dates", welshExcludesDates);
             }
             placeholders.put("welshCurrentDate", LocalDateToWelshStringConverter.convert(sscsCaseData.getCaseCreated()));
-            String benefitType;
-            benefitType = welshBenefitTypeTranslator.translate(sscsCaseData);
+            String benefitType = Benefit.getLongBenefitNameDescriptionWithOptionalAcronym(sscsCaseData.getAppeal().getBenefitType().getCode(), false);
             placeholders.put("welshBenefitType", benefitType);
             placeholders.put("welshEvidencePresent",
                     sscsCaseData.getEvidencePresent() != null && sscsCaseData.getEvidencePresent().equalsIgnoreCase(
