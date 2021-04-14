@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
+import static net.javacrumbs.jsonunit.JsonAssert.whenIgnoringPaths;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -147,20 +148,20 @@ public class SubmitDraftTest {
 
     @Test
     public void givenValidDraftAppealIsSubmittedFromSaveAndReturn_thenCreateValidAppeal() throws InterruptedException {
-        assertDraftCaseToSscsCaseResults("validAppeal", false);
+        assertDraftCaseToSscsCaseResults("validAppeal", ALL_DETAILS_FROM_DRAFT_CCD.getSerializedMessage());
     }
 
     @Test
     public void givenIncompleteDraftAppealIsSubmittedFromSaveAndReturn_thenCreateIncompleteAppeal() throws InterruptedException {
-        assertDraftCaseToSscsCaseResults("incompleteApplication", true);
+        assertDraftCaseToSscsCaseResults("incompleteApplication", ALL_DETAILS_FROM_DRAFT_NO_MRN_DATE_CCD.getSerializedMessage());
     }
 
     @Test
     public void givenNonCompliantDraftAppealIsSubmittedFromSaveAndReturn_thenCreateNonCompliantAppeal() throws InterruptedException {
-        assertDraftCaseToSscsCaseResults("interlocutoryReviewState", false);
+        assertDraftCaseToSscsCaseResults("interlocutoryReviewState", ALL_DETAILS_FROM_DRAFT_WITH_INTERLOC_CCD.getSerializedMessage());
     }
 
-    private void assertDraftCaseToSscsCaseResults(String expectedState, Boolean withInterloc) throws InterruptedException {
+    private void assertDraftCaseToSscsCaseResults(String expectedState, String expectedResponse) throws InterruptedException {
         LocalDate now = LocalDate.now();
         LocalDate interlocutoryReviewDate = now.minusMonths(13).minusDays(1);
         LocalDate mrnDate = expectedState.equals("interlocutoryReviewState") ? interlocutoryReviewDate :
@@ -195,16 +196,19 @@ public class SubmitDraftTest {
 
         log.info(String.format("SYA created with CCD ID %s", id));
 
-        String expectedResponse = withInterloc ? ALL_DETAILS_FROM_DRAFT_CCD_WITH_INTERLOC.getSerializedMessage() : ALL_DETAILS_FROM_DRAFT_CCD.getSerializedMessage();
-
-        assertJsonEquals(changeExpectedFields(expectedResponse, nino, mrnDate), sscsCaseDetails.getData());
+        assertJsonEquals(changeExpectedFields(expectedResponse, nino, mrnDate), sscsCaseDetails.getData(), whenIgnoringPaths("sscsDocument"));
 
         assertEquals(expectedState, sscsCaseDetails.getState());
     }
 
     private String changeExpectedFields(String serializedMessage, String nino, LocalDate mrnDate) {
         serializedMessage = serializedMessage.replace("ZRPVJDDBS", nino);
-        serializedMessage = serializedMessage.replace("2018-02-01", mrnDate.toString());
+        serializedMessage = serializedMessage.replace("2021-04-13", LocalDate.now().toString());
+
+        if (mrnDate != null) {
+            serializedMessage = serializedMessage.replace("2018-02-01", mrnDate.toString());
+        }
+
 
         return serializedMessage;
     }

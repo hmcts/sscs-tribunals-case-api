@@ -19,7 +19,7 @@
   "appeal": {
     "mrnDetails": {
       "dwpIssuingOffice": "DWP PIP (1)",
-      "mrnDate": "2018-02-01",
+      "mrnDate": null,
       "mrnLateReason": null,
       "mrnMissingReason": null
     },
@@ -48,21 +48,10 @@
       "isAppointee": "No",
       "isAddressSameAsAppointee": "No",
       "appointee": {
-        "name": {
-          "title": null,
-          "firstName": null,
-          "lastName": null
-        },
-        "address": {},
-        "contact": {
-          "email": null,
-          "phone": null,
-          "mobile": null
-        },
-        "identity": {
-          "dob": null,
-          "nino": null
-        }
+        "name": null,
+        "address": null,
+        "contact": null,
+        "identity": null
       }
     },
     "benefitType": {
@@ -210,7 +199,5 @@
   "languagePreferenceWelsh": "No",
   "createdInGapsFrom": "readyToList",
   "processingVenue": "Ashford",
-  "interlocReferralDate" : "2021-04-13",
-  "interlocReviewState" : "reviewByTcw",
   "isScottishCase" : "No"
 }

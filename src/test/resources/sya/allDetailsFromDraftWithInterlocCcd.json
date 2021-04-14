@@ -193,25 +193,13 @@
     }
   },
   "evidencePresent" : "No",
-  "sscsDocument":[
-    {
-      "id":"e0a86d4b-f0ab-4373-8b44-de6a670ac0b7",
-      "value":{
-        "documentLink":{
-          "document_url":"http://dm-store:5005/documents/deed8cc2-9d9e-4f5e-8c26-941010f4f9f6",
-          "document_filename":"Bloggs_8Q6.pdf",
-          "document_binary_url":"http://dm-store:5005/documents/deed8cc2-9d9e-4f5e-8c26-941010f4f9f6/binary"
-        },
-        "documentType":"sscs1",
-        "documentFileName":"Bloggs_8Q6.pdf",
-        "documentDateAdded":"2020-11-05"
-      }
-    }
-  ],
+  "sscsDocument":[],
   "dwpRegionalCentre": "Newcastle",
   "pcqId": "12345678",
   "languagePreferenceWelsh": "No",
   "createdInGapsFrom": "readyToList",
   "processingVenue": "Ashford",
+  "interlocReferralDate" : "2021-04-13",
+  "interlocReviewState" : "reviewByTcw",
   "isScottishCase" : "No"
 }
