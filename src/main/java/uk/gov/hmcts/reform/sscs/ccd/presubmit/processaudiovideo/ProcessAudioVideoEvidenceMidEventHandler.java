@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAu
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.getDocumentType;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.isSelectedEvidence;
 
+import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -56,6 +57,14 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
         final DynamicList processAudioVideoAction = caseData.getProcessAudioVideoAction();
         AudioVideoEvidenceDetails selectedAudioVideoEvidenceDetails = caseData.getSelectedAudioVideoEvidenceDetails();
 
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+
+        validateDueDateIsInFuture(response);
+
+        if (!response.getErrors().isEmpty()) {
+            return response;
+        }
+
         if (nonNull(selectedAudioVideoEvidenceDetails) && nonNull(processAudioVideoAction) && ACTIONS_THAT_REQUIRES_NOTICE.contains(processAudioVideoAction.getValue().getCode())) {
             String templateId = documentConfiguration.getDocuments().get(caseData.getLanguagePreference()).get(EventType.DIRECTION_ISSUED);
             return issueDocument(callback, DocumentType.DIRECTION_NOTICE, templateId, generateFile, userAuthorisation);
@@ -76,7 +85,7 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
 
         caseData.setSelectedAudioVideoEvidenceDetails(selectedAudioVideoEvidenceDetails);
 
-        return new PreSubmitCallbackResponse<>(caseData);
+        return response;
     }
 
     private void setDocumentType(AudioVideoEvidenceDetails evidence) {
@@ -89,5 +98,16 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
         }
 
         evidence.setDocumentType(documentTypeLabel);
+    }
+
+    private void validateDueDateIsInFuture(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+
+        if (preSubmitCallbackResponse.getData().getDirectionDueDate() != null) {
+            LocalDate directionDueDate = LocalDate.parse(preSubmitCallbackResponse.getData().getDirectionDueDate());
+
+            if (!directionDueDate.isAfter(LocalDate.now())) {
+                preSubmitCallbackResponse.addError("Directions due date must be in the future");
+            }
+        }
     }
 }

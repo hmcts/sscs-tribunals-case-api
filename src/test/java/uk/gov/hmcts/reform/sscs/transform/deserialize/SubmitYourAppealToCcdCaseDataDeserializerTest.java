@@ -69,13 +69,18 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         assertJsonEquals(APPELLANT_NO_CONTACT_DETAILS_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
+    @Parameters({"DWP PIP ( 9),PIP,DWP PIP (9)", "null,carersAllowance,Tyneview Park DRT"})
     @Test
-    public void syaDwpIssuingOfficeTest() {
+    public void syaDwpIssuingOfficeTest(String issuingOffice, String beneiftCode, String expectedIssuing) {
+
+        String actIssuingOffice = "null".equals(issuingOffice) ? null : issuingOffice;
+
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
-        syaCaseWrapper.getMrn().setDwpIssuingOffice("DWP PIP ( 9)");
+        syaCaseWrapper.getBenefitType().setCode(beneiftCode);
+        syaCaseWrapper.getMrn().setDwpIssuingOffice(actIssuingOffice);
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
             regionalProcessingCenter.getName(), regionalProcessingCenter);
-        assertEquals("DWP PIP (9)", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+        assertEquals(expectedIssuing, caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
     }
 
     @Test
@@ -106,7 +111,8 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         "DWP PIP (1),PIP,Newcastle", "DWP PIP (2),PIP,Glasgow", "DWP PIP (3),PIP,Bellevale", "DWP PIP (4),PIP,Glasgow",
         "DWP PIP (5),PIP,Springburn", "DWP PIP (6),PIP,Blackpool", "DWP PIP (7),PIP,Blackpool", "DWP PIP (8),PIP,Blackpool",
         "DWP PIP (9),PIP,Blackpool", "Inverness DRT,ESA,Inverness DRT","DWP PIP (),PIP,null",
-        "DWP PIP (11),PIP,null", "null,UC,Universal Credit", ",UC,Universal Credit", "null,PIP,null"
+        "DWP PIP (11),PIP,null", "null,UC,Universal Credit", ",UC,Universal Credit", "null,PIP,null",
+        "null,carersAllowance,Tyneview Park DRT", "DWP PIP (5),carersAllowance,Tyneview Park DRT"
     })
     @Test
     public void givenADwpIssuingOffice_shouldMapToTheDwpRegionalCenter(@Nullable String dwpIssuingOffice,
