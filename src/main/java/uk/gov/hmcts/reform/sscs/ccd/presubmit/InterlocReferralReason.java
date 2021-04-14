@@ -7,6 +7,7 @@ import java.util.Optional;
 public enum InterlocReferralReason {
 
     TIME_EXTENSION("timeExtension","Time extension"),
+    REVIEW_AUDIO_VIDEO_EVIDENCE("reviewAudioVideoEvidence", "Review Audio Video Evidence"),
     PHME_REQUEST("phmeRequest", "PHME request"),
     OVER_200_PAGES("over200Pages", "Over 200 pages"),
     OVER_13_MONTHS("over13months", "Over 13 months"),
