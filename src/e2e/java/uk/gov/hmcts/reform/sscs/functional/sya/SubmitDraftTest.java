@@ -175,6 +175,8 @@ public class SubmitDraftTest {
                 .body(setDraftCaseJson(mrnDate, nino))
                 .put("/drafts");
 
+        Thread.sleep(5000L);
+
         SscsCaseData draft = findCase(citizenIdamTokens).get(0);
 
         SyaCaseWrapper wrapper = ALL_DETAILS_FROM_DRAFT.getDeserializeMessage();
