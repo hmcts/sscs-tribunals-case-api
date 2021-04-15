@@ -37,9 +37,9 @@
         "postcode": "TN32 6PL"
       },
       "contact": {
-        "email": "sscstest+notify@greencroftconsulting.com",
+        "email": null,
         "phone": null,
-        "mobile": "07411222222"
+        "mobile": null
       },
       "identity": {
         "dob": "1990-02-26",
@@ -49,18 +49,23 @@
       "isAddressSameAsAppointee": "No",
       "appointee": {
         "name": {
-          "title": null,
-          "lastName": null,
-          "firstName": null
+          "title": "Mrs",
+          "firstName": "Mary",
+          "lastName": "Bloggs"
         },
-        "address": {},
+        "address": {
+          "line1": "999 Another Street",
+          "town": "Another Town",
+          "county": "Newcastle",
+          "postcode": "NE1 1AW"
+        },
         "contact": {
-          "email": null,
+          "email": "sscsappointee@greencroftconsulting.com",
           "phone": null,
-          "mobile": null
+          "mobile": "01234567810"
         },
         "identity": {
-          "dob": null,
+          "dob": "1991-03-31",
           "nino": null
         }
       }

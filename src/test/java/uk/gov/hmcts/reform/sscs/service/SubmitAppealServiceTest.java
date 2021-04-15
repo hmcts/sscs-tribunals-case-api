@@ -91,9 +91,6 @@ public class SubmitAppealServiceTest {
     @Mock
     private ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
 
-    @Mock
-    private WelshBenefitTypeTranslator welshBenefitTypeTranslator;
-
     private static final RegionalProcessingCenterService regionalProcessingCenterService;
 
     private static AirLookupService airLookupService;
