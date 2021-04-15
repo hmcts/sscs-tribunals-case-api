@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
 public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final boolean uploadAudioVideoEvidenceEnabled;
-    private FooterService footerService;
+    private final FooterService footerService;
 
     @Autowired
     public UploadDocumentFurtherEvidenceAboutToSubmitHandler(@Value("${feature.upload-audio-video-evidence.enabled}") boolean uploadAudioVideoEvidenceEnabled, FooterService footerService) {
@@ -78,10 +78,6 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
         moveDraftsToSscsDocs(caseData);
         moveDraftsToAudioVideoEvidence(caseData);
         caseData.setEvidenceHandled("No");
-
-        if (!State.WITH_DWP.equals(callback.getCaseDetails().getState())) {
-            caseData.setDwpState(DwpState.FE_RECEIVED.getId());
-        }
 
         initDraftSscsFurtherEvidenceDocument(caseData);
         return response;

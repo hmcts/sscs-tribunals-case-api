@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.JOINT_PARTY_EVI
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.ActionFurtherEvidenceAboutToSubmitHandler.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE;
@@ -41,26 +42,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.ScannedDocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -89,7 +71,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     private SscsCaseData sscsCaseData;
 
     private List<ScannedDocument> scannedDocumentList = new ArrayList<>();
-    private BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder = new BundleAdditionFilenameBuilder();
+    private final BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder = new BundleAdditionFilenameBuilder();
 
     @Before
     public void setUp() {
@@ -449,33 +431,44 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         }
     }
 
-    private Callback<SscsCaseData> buildCallback(String dynamicListItemCode) {
+    private Callback<SscsCaseData> buildCallback(String dynamicListItemCode, State state) {
         DynamicList dynamicList = new DynamicList(new DynamicListItem(dynamicListItemCode, "label"),
             Collections.singletonList(new DynamicListItem(dynamicListItemCode, "label")));
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .originalSender(dynamicList)
             .furtherEvidenceAction(dynamicList)
+            .state(state)
             .scannedDocuments(Collections.singletonList(ScannedDocument.builder().build()))
             .appeal(Appeal.builder().appellant(Appellant.builder().address(Address.builder().line1("My Road").postcode("TS1 2BA").build()).build()).build())
             .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-                State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now());
+                state, sscsCaseData, LocalDateTime.now());
         return new Callback<>(caseDetails, Optional.empty(), EventType.ACTION_FURTHER_EVIDENCE, false);
     }
 
     @Test
-    public void givenIssueFurtherEvidence_shouldUpdateDwpFurtherEvidenceStates() {
-        Callback<SscsCaseData> callback = buildCallback(ISSUE_FURTHER_EVIDENCE.getCode());
+    public void givenIssueFurtherEvidenceWhenStateNotWithDwp_shouldUpdateDwpFurtherEvidenceStates() {
+        Callback<SscsCaseData> callback = buildCallback(ISSUE_FURTHER_EVIDENCE.getCode(), State.INTERLOCUTORY_REVIEW_STATE);
 
         PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("furtherEvidenceReceived", updated.getData().getDwpFurtherEvidenceStates());
+        assertEquals(FURTHER_EVIDENCE_RECEIVED, updated.getData().getDwpFurtherEvidenceStates());
+        assertEquals(DwpState.FE_RECEIVED.getId(), updated.getData().getDwpState());
+    }
+
+    @Test
+    public void givenIssueFurtherEvidenceAndStateIsWithDwp_shouldNotUpdateDwpFurtherEvidenceStates() {
+        Callback<SscsCaseData> callback = buildCallback(ISSUE_FURTHER_EVIDENCE.getCode(), State.WITH_DWP);
+
+        PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(updated.getData().getDwpFurtherEvidenceStates());
     }
 
     @Test
     @Parameters(method = "generateIssueFurtherEvidenceAddressEmptyScenarios")
     public void givenIssueFurtherEvidenceAndEmptyAppellantAddress_shouldReturnAnErrorToUser(Appeal appeal, String... parties) {
-        Callback<SscsCaseData> callback = buildCallback(ISSUE_FURTHER_EVIDENCE.getCode());
+        Callback<SscsCaseData> callback = buildCallback(ISSUE_FURTHER_EVIDENCE.getCode(), State.INTERLOCUTORY_REVIEW_STATE);
 
         callback.getCaseDetails().getCaseData().setAppeal(appeal);
         PreSubmitCallbackResponse<SscsCaseData> result = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -506,7 +499,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     public void givenOtherDocument_shouldNotUpdateDwpFurtherEvidenceStates() {
-        Callback<SscsCaseData> callback = buildCallback(OTHER_DOCUMENT_MANUAL.getCode());
+        Callback<SscsCaseData> callback = buildCallback(OTHER_DOCUMENT_MANUAL.getCode(), State.INTERLOCUTORY_REVIEW_STATE);
 
         PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -515,7 +508,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     public void givenNullFurtherEvidenceAction_shouldNotUpdateDwpFurtherEvidenceStates() {
-        Callback<SscsCaseData> callback = buildCallback(null);
+        Callback<SscsCaseData> callback = buildCallback(null, State.INTERLOCUTORY_REVIEW_STATE);
 
         PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -989,6 +982,27 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         for (String error : response.getErrors()) {
             assertEquals("Further evidence action must be 'Send to Interloc - Review by Judge' or 'Information received for Interloc - send to Judge' for a confidential document", error);
         }
+    }
+
+    @Test
+    @Parameters({"APPELLANT", "REPRESENTATIVE", "DWP", "JOINT_PARTY"})
+    public void shouldIssueToAllParties_willAddFooterTextToDocument(OriginalSenderItemList sender) {
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(ISSUE_FURTHER_EVIDENCE.code, ISSUE_FURTHER_EVIDENCE.label));
+        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(sender.getCode(), sender.getLabel()));
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CHERISHED.getValue())
+                        .includeInBundle(YES)
+                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+        List<ScannedDocument> docs = new ArrayList<>();
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+        
+        when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        verify(footerService).addFooter(eq(scannedDocument.getValue().getUrl()), eq(sender.getDocumentFooter()), eq(null));
+        assertEquals(0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size());
     }
 
     private DatedRequestOutcome createDatedRequestOutcome(RequestOutcome requestOutcome) {

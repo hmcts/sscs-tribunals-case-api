@@ -192,6 +192,7 @@ public class SubmitDraftTest {
         response.then().statusCode(HttpStatus.SC_CREATED);
 
         final Long id = getCcdIdFromLocationHeader(response.getHeader("Location"));
+
         SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, userIdamTokens);
 
         log.info(String.format("SYA created with CCD ID %s", id));
