@@ -73,14 +73,14 @@ public class AddNoteAboutToSubmitHandlerTest {
     public void testTempNoteFilledIsNullAndResponseReviewedEvent_thenNoteIsAdded() {
         when(callback.getEvent()).thenReturn(HMCTS_RESPONSE_REVIEWED);
         sscsCaseData.setTempNoteDetail(null);
-        sscsCaseData.setInterlocReferralReason("over200Pages");
+        sscsCaseData.setInterlocReferralReason("over300Pages");
         sscsCaseData.setSelectWhoReviewsCase(new DynamicList("Review by Judge"));
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
-        assertEquals("Referred to interloc for review by judge - Over 200 pages", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
+        assertEquals("Referred to interloc for review by judge - Over 300 pages", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
     }
 
     @Test
@@ -134,7 +134,7 @@ public class AddNoteAboutToSubmitHandlerTest {
     @Test
     @Parameters({"timeExtension, Time extension",
                  "phmeRequest, PHME request",
-                 "over200Pages, Over 200 pages",
+                 "over300Pages, Over 300 pages",
                  "over13months, Over 13 months",
                  "other, Other",
                  "noResponseToDirection, No response to a direction"})
