@@ -10,14 +10,18 @@ import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 
 import java.util.List;
 import java.util.Map;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.ResourceManager;
 
+@RunWith(JUnitParamsRunner.class)
 public class SscsPdfServiceTest {
 
     private SscsPdfService service;
@@ -37,6 +41,7 @@ public class SscsPdfServiceTest {
 
     SscsCaseData caseData = buildCaseData();
 
+    ArgumentCaptor<Map> argumentCaptor = ArgumentCaptor.forClass(Map.class);
 
     @Before
     public void setup() {
@@ -45,15 +50,21 @@ public class SscsPdfServiceTest {
     }
 
     @Test
-    public void createValidWelshPdfAndSendEmailAndStoreInDocumentStore() {
+    @Parameters({
+            "PIP, Taliad Annibyniaeth Personol (PIP), Personal Independence Payment (PIP)",
+            "ESA, Lwfans Cyflogaeth a Chymorth (ESA), Employment and Support Allowance (ESA)",
+            "UC, Credyd Cynhwysol (UC), Universal Credit (UC)",
+            "carersAllowance, Lwfans Gofalwr, Carer's Allowance"
+    })
+    public void createValidWelshPdfAndSendEmailAndStoreInDocumentStore(String benefitCode, String expectedWelshBenefitName, String expectedEnglishBenefitName) {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
         caseData.setLanguagePreferenceWelsh("Yes");
         caseData.getAppeal().getAppellant().getIdentity().setDob("2000-12-31");
         caseData.setCaseCreated("2020-12-31");
+        caseData.getAppeal().getBenefitType().setCode(benefitCode);
         service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");
 
-        ArgumentCaptor<Map> argumentCaptor = ArgumentCaptor.forClass(Map.class);
         verify(pdfServiceClient).generateFromHtml(any(), argumentCaptor.capture());
         verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence"),
                 eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));
@@ -73,15 +84,26 @@ public class SscsPdfServiceTest {
 
 
     @Test
-    public void createValidPdfAndSendEmailAndStoreInDocumentStore() {
+    @Parameters({
+            "PIP, Personal Independence Payment (PIP)",
+            "ESA, Employment and Support Allowance (ESA)",
+            "UC, Universal Credit (UC)",
+            "carersAllowance, Carer's Allowance"
+    })
+    public void createValidPdfAndSendEmailAndStoreInDocumentStore(String benefitCode, String expectedEnglishBenefitName) {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+        caseData.getAppeal().getBenefitType().setCode(benefitCode);
 
         service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");
 
-        verify(pdfServiceClient).generateFromHtml(any(), any());
+        verify(pdfServiceClient).generateFromHtml(any(), argumentCaptor.capture());
         verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence"),
                 eq(null));
+
+        assertEquals(expectedEnglishBenefitName, ((PdfWrapper) argumentCaptor.getValue().get("PdfWrapper")).getEnglishBenefitName());
+        assertEquals(caseData, ((PdfWrapper) argumentCaptor.getValue().get("PdfWrapper")).getSscsCaseData());
+
     }
 
     @Test

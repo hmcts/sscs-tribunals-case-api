@@ -325,6 +325,8 @@ dependencies {
     compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.1-RC-SSCS-9050'
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.32'
 
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.0'
+    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.33'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
     compile 'org.projectlombok:lombok:1.18.20'
