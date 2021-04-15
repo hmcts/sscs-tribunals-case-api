@@ -4,16 +4,18 @@ import lombok.Getter;
 
 @Getter
 public enum OriginalSenderItemList {
-    APPELLANT("appellant", "Appellant (or Appointee)"),
-    REPRESENTATIVE("representative", "Representative"),
-    DWP("dwp", "DWP"),
-    JOINT_PARTY("jointParty", "Joint party");
+    APPELLANT("appellant", "Appellant (or Appointee)", "Appellant evidence"),
+    REPRESENTATIVE("representative", "Representative", "Representative evidence"),
+    DWP("dwp", "DWP", "DWP evidence"),
+    JOINT_PARTY("jointParty", "Joint party", "Joint party evidence");
 
-    private String code;
-    private String label;
+    private final String documentFooter;
+    private final String code;
+    private final String label;
 
-    OriginalSenderItemList(String code, String label) {
+    OriginalSenderItemList(String code, String label, String documentFooter) {
         this.code = code;
         this.label = label;
+        this.documentFooter = documentFooter;
     }
 }
