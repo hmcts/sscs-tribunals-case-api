@@ -18,7 +18,12 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
+import uk.gov.hmcts.reform.sscs.domain.pdf.PdfWrapper;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.ResourceManager;
 
 @RunWith(JUnitParamsRunner.class)
