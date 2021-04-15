@@ -42,9 +42,9 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 @Component
 @Slf4j
 public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-    private static final String FURTHER_EVIDENCE_RECEIVED = "furtherEvidenceReceived";
-    private static final String COVERSHEET = "coversheet";
     public static final String YES = YesNo.YES.getValue();
+    public static final String FURTHER_EVIDENCE_RECEIVED = "furtherEvidenceReceived";
+    private static final String COVERSHEET = "coversheet";
 
     private final FooterService footerService;
     private final BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder;
@@ -85,11 +85,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         if (isIssueFurtherEvidenceToAllParties(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction())) {
             checkAddressesValidToIssueEvidenceToAllParties(sscsCaseData, preSubmitCallbackResponse);
 
-            if (preSubmitCallbackResponse.getErrors().size() > 0) {
+            if (!preSubmitCallbackResponse.getErrors().isEmpty()) {
                 return preSubmitCallbackResponse;
             }
 
-            sscsCaseData.setDwpFurtherEvidenceStates(FURTHER_EVIDENCE_RECEIVED);
+            if (!State.WITH_DWP.equals(callback.getCaseDetails().getState())) {
+                sscsCaseData.setDwpFurtherEvidenceStates(FURTHER_EVIDENCE_RECEIVED);
+                sscsCaseData.setDwpState(DwpState.FE_RECEIVED.getId());
+            }
 
         }
 
@@ -128,7 +131,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     public void checkAddressesValidToIssueEvidenceToAllParties(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (isAppellantOrAppointeeAddressInvalid(sscsCaseData)) {
-            String party = null != sscsCaseData.getAppeal().getAppellant() && "yes".equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee()) ? "Appointee" : "Appellant";
+            String party = null != sscsCaseData.getAppeal().getAppellant() && YES.equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee()) ? "Appointee" : "Appellant";
             preSubmitCallbackResponse.addError(buildErrorMessage(party, sscsCaseData.getCcdCaseId()));
         }
         if (isRepAddressInvalid(sscsCaseData)) {
@@ -218,7 +221,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             documents.addAll(sscsCaseData.getSscsDocument());
         }
 
-        if (documents.size() > 0) {
+        if (!documents.isEmpty()) {
             sscsCaseData.setSscsDocument(documents);
         }
 
@@ -246,7 +249,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 sscsCaseData.setPreviousState(State.INTERLOCUTORY_REVIEW_STATE);
             }
         } else {
-            log.info("{} supressing reinstatement request fields for welsh case", sscsCaseData.getCcdCaseId());
+            log.info("{} suppressing reinstatement request fields for welsh case", sscsCaseData.getCcdCaseId());
         }
     }
 
@@ -318,8 +321,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         if (caseState != null
             && (isIssueFurtherEvidenceToAllParties(sscsCaseData.getFurtherEvidenceAction())
-                || (isOtherDocumentTypeActionManually(sscsCaseData.getFurtherEvidenceAction()) && "Yes".equalsIgnoreCase(scannedDocument.getValue().getIncludeInBundle())))
-            && isCaseStateAddtitionValid(caseState)) {
+                || (isOtherDocumentTypeActionManually(sscsCaseData.getFurtherEvidenceAction()) && YES.equalsIgnoreCase(scannedDocument.getValue().getIncludeInBundle())))
+            && isCaseStateAdditionValid(caseState)) {
 
             log.info("adding footer appendix document link: {} and caseId {}", url, sscsCaseData.getCcdCaseId());
 
@@ -349,16 +352,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             .build()).build();
     }
 
-    private Boolean isCaseStateAddtitionValid(State caseState) {
-        if (caseState.equals(State.DORMANT_APPEAL_STATE)
+    private Boolean isCaseStateAdditionValid(State caseState) {
+        return caseState.equals(State.DORMANT_APPEAL_STATE)
                 || caseState.equals(State.RESPONSE_RECEIVED)
                 || caseState.equals(State.READY_TO_LIST)
                 || caseState.equals(State.HEARING)
-                || caseState.equals(State.WITH_DWP)) {
-            return true;
-        } else {
-            return false;
-        }
+                || caseState.equals(State.WITH_DWP);
     }
 
     private DocumentType getSubtype(String furtherEvidenceActionItemCode, String originalSenderCode, ScannedDocument scannedDocument) {

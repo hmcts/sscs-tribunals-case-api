@@ -26,6 +26,20 @@
     },
     "isAddressSameAsAppointee": false
   },
+  "appointee": {
+    "title": "Mrs",
+    "firstName": "Mary",
+    "lastName": "Bloggs",
+    "dob": "31-03-1991",
+    "contactDetails": {
+      "addressLine1": "999 Another Street",
+      "townCity": "Another Town",
+      "county": "Newcastle",
+      "postCode": "NE1 1AW",
+      "phoneNumber": "01234567810",
+      "emailAddress": "sscsappointee@greencroftconsulting.com"
+    }
+  },
   "smsNotify": {
     "wantsSMSNotifications": true,
     "smsNumber": "07398785050",
