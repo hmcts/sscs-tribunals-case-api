@@ -175,8 +175,6 @@ public class SubmitDraftTest {
                 .body(setDraftCaseJson(mrnDate, nino))
                 .put("/drafts");
 
-        Thread.sleep(5000L);
-
         SscsCaseData draft = findCase(citizenIdamTokens).get(0);
 
         SyaCaseWrapper wrapper = ALL_DETAILS_FROM_DRAFT.getDeserializeMessage();
@@ -194,8 +192,6 @@ public class SubmitDraftTest {
         response.then().statusCode(HttpStatus.SC_CREATED);
 
         final Long id = getCcdIdFromLocationHeader(response.getHeader("Location"));
-
-        Thread.sleep(5000L);
 
         SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, userIdamTokens);
 

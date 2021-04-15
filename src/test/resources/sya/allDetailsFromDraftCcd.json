@@ -48,10 +48,26 @@
       "isAppointee": "No",
       "isAddressSameAsAppointee": "No",
       "appointee": {
-        "name": null,
-        "address": null,
-        "contact": null,
-        "identity": null
+        "name": {
+          "title": "Mrs",
+          "firstName": "Mary",
+          "lastName": "Bloggs"
+        },
+        "address": {
+          "line1": "999 Another Street",
+          "town": "Another Town",
+          "county": "Newcastle",
+          "postcode": "NE1 1AW"
+        },
+        "contact": {
+          "email": "sscsappointee@greencroftconsulting.com",
+          "phone": null,
+          "mobile": "01234567810"
+        },
+        "identity": {
+          "dob": "1991-03-31",
+          "nino": null
+        }
       }
     },
     "benefitType": {
