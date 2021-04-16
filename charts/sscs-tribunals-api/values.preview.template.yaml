@@ -66,8 +66,8 @@ ccd:
       enabled: false
     apiGatewayWeb:
       enabled: true
-    definitionImporter:
-      enabled: false
+#    definitionImporter:
+#      enabled: false
     managementWeb:
       enabled: false
     s2s:
