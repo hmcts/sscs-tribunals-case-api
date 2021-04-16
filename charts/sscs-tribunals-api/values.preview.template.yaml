@@ -63,7 +63,7 @@ xui-webapp:
 ccd:
   ccd:
     adminWeb:
-      enabled: false
+      enabled: true
     apiGatewayWeb:
       enabled: true
     definitionImporter:
