@@ -67,7 +67,7 @@ ccd:
     apiGatewayWeb:
       enabled: true
     definitionImporter:
-      enabled: false
+      enabled: true
     managementWeb:
       enabled: false
     s2s:
@@ -86,6 +86,15 @@ ccd:
     idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
     s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
 
+  ccd-admin-web:
+    nodejs:
+      image: hmctspublic.azurecr.io/ccd/admin-web:latest
+      ingressHost: ccd-admin-web-${SERVICE_FQDN}
+      keyVaults: [ ]
+      environment:
+        IDAM_OAUTH2_AW_CLIENT_SECRET: ${ADMIN_WEB_IDAM_SECRET}
+    idam-pr:
+      enabled: true
   ccd-api-gateway-web:
     nodejs:
       imagePullPolicy: Always
@@ -151,6 +160,7 @@ ccd:
   ccd-definition-importer:
     image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.7.69
     definitionFilename: sscs-ccd.xlsx
+    keyVaults: []
     userRoles:
       - citizen
       - caseworker
