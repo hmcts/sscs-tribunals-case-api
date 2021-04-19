@@ -160,7 +160,13 @@ ccd:
   ccd-definition-importer:
     image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.7.69
     definitionFilename: sscs-ccd.xlsx
-    keyVaults: []
+    keyVaults:
+      ccd:
+        resourceGroup: ccd
+        secrets:
+          - ccd-importer-autotest-email
+          - ccd-importer-autotest-password
+          - ccd-admin-web-oauth2-client-secret
     userRoles:
       - citizen
       - caseworker
