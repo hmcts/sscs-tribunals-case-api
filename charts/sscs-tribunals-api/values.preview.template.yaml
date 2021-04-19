@@ -67,7 +67,9 @@ ccd:
     apiGatewayWeb:
       enabled: true
     definitionImporter:
-      enabled: false
+      enabled: true
+    userProfileImporter:
+      enabled: true
     managementWeb:
       enabled: false
     s2s:
@@ -157,8 +159,9 @@ ccd:
     image: hmctspublic.azurecr.io/ccd/user-profile-importer:db2r9a
     users:
       - system.update@hmcts.net|SSCS|Benefit|appealCreated
+      - sscs.superuser@mailinator.com|SSCS|Benefit|appealCreated
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.7.69
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.7.81
     definitionFilename: sscs-ccd.xlsx
     keyVaults:
       ccd:
