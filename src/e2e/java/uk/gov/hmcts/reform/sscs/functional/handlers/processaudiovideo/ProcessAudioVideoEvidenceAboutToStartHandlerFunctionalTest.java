@@ -48,10 +48,6 @@ public class ProcessAudioVideoEvidenceAboutToStartHandlerFunctionalTest extends 
                 .log().all(true)
                 .assertThat().body("data.selectedAudioVideoEvidence.value.label", equalTo("file.mp3"))
                 .assertThat().body("data.selectedAudioVideoEvidence.list_items", hasItem(hasEntry("code", "url")))
-                .assertThat().body("data.selectedAudioVideoEvidence.list_items", hasSize(1))
-                .assertThat().body("data.processAudioVideoAction.value.code", equalTo("issueDirectionsNotice"))
-                .assertThat().body("data.processAudioVideoAction.list_items", hasItem(hasEntry("code", "sendToJudge")))
-                .assertThat().body("data.processAudioVideoAction.list_items", hasItem(hasEntry("code", "issueDirectionsNotice")))
-                .assertThat().body("data.processAudioVideoAction.list_items", hasSize(2));
+                .assertThat().body("data.selectedAudioVideoEvidence.list_items", hasSize(1));
     }
 }
