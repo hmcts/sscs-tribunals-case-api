@@ -56,13 +56,13 @@ public class RemoveLinkForCaseAboutToSubmitHandlerTest {
 
         sscsCaseDataBefore = SscsCaseData.builder()
                 .ccdCaseId("1234")
-                .linkedCase(buildCaseLink("1", "2", "3", "4"))
+                .associatedCase(buildCaseLink("1", "2", "3", "4"))
                 .appeal(Appeal.builder().build())
                 .build();
 
         sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("1234")
-                .linkedCase(buildCaseLink("1", "2", "4"))
+                .associatedCase(buildCaseLink("1", "2", "4"))
                 .appeal(Appeal.builder().build())
                 .build();
 
@@ -96,33 +96,33 @@ public class RemoveLinkForCaseAboutToSubmitHandlerTest {
 
     @Test
     public void shouldReturnAnErrorWhenThereWereNoCasesLinks() {
-        sscsCaseDataBefore.setLinkedCase(null);
-        sscsCaseData.setLinkedCase(null);
+        sscsCaseDataBefore.setAssociatedCase(null);
+        sscsCaseData.setAssociatedCase(null);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("There are no case links to remove."));
+        assertThat(response.getErrors().iterator().next(), is("There are no associated case to remove."));
     }
 
     @Test
     public void shouldReturnAnErrorWhenCaseLinksAreUnchanged() {
-        sscsCaseData.setLinkedCase(sscsCaseDataBefore.getLinkedCase());
+        sscsCaseData.setAssociatedCase(sscsCaseDataBefore.getAssociatedCase());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("No case links have been selected to remove from the case."));
+        assertThat(response.getErrors().iterator().next(), is("No associated case have been selected to remove from the case."));
     }
 
     @Test
     public void shouldReturnAnErrorWhenCaseLinksAreAdded() {
-        sscsCaseData.setLinkedCase(buildCaseLink("1", "5"));
+        sscsCaseData.setAssociatedCase(buildCaseLink("1", "5"));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("Cannot add a case link."));
+        assertThat(response.getErrors().iterator().next(), is("Cannot add a associated case."));
     }
 
     @Test
     public void shouldRemoveACaseLink() {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(0));
-        assertThat(response.getData().getLinkedCase().stream().map(f -> f.getValue().getCaseReference()).collect(joining()), is("124"));
+        assertThat(response.getData().getAssociatedCase().stream().map(f -> f.getValue().getCaseReference()).collect(joining()), is("124"));
     }
 }

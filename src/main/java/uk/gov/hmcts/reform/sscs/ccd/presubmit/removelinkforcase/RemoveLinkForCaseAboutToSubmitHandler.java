@@ -4,7 +4,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -38,7 +37,7 @@ public class RemoveLinkForCaseAboutToSubmitHandler implements PreSubmitCallbackH
         final PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if (associatedCasesBefore.size() == 0) {
-            preSubmitCallbackResponse.addError("There are no associated cases to remove.");
+            preSubmitCallbackResponse.addError("There are no associated case to remove.");
         } else if (associatedCasesAfter.containsAll(associatedCasesBefore)) {
             preSubmitCallbackResponse.addError("No associated case have been selected to remove from the case.");
         }
