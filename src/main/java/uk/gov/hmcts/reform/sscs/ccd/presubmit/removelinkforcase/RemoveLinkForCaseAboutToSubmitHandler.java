@@ -47,7 +47,6 @@ public class RemoveLinkForCaseAboutToSubmitHandler implements PreSubmitCallbackH
         if (preSubmitCallbackResponse.getErrors().isEmpty()) {
             sscsCaseData.setAssociatedCase(associatedCasesAfter);
             if (!associatedCasesAfter.isEmpty()) {
-                sscsCaseData.setAssociatedCase(associatedCasesAfter);
                 sscsCaseData.setLinkedCasesBoolean("Yes");
             } else {
                 sscsCaseData.setLinkedCasesBoolean("No");
