@@ -37,6 +37,10 @@ def secrets = [
     ]
 ]
 
+def vaultOverrides = [
+        'preview': 'aat'
+    ]
+
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
   [ $class: 'AzureKeyVaultSecret',
     secretType: 'Secret',
@@ -51,6 +55,7 @@ withPipeline(type, product, component) {
         // Vars needed for AKS testing
         env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
     }
+    overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
     enableAksStagingDeployment()
