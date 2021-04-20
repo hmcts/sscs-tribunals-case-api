@@ -169,6 +169,7 @@ ccd:
     keyVaults:
       ccd:
         resourceGroup: ccd
+        secretRef: "kvcreds"
         secrets:
           - ccd-importer-autotest-email
           - ccd-importer-autotest-password
