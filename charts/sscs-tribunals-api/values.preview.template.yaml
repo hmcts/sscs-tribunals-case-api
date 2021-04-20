@@ -166,14 +166,7 @@ ccd:
     definitionFilename: sscs-ccd.xlsx
     idamApiUrl: https://idam-api.aat.platform.hmcts.net
     definitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
-    keyVaults:
-      ccd:
-        resourceGroup: ccd
-        secretRef: "kvcreds"
-        secrets:
-          - ccd-importer-autotest-email
-          - ccd-importer-autotest-password
-          - ccd-admin-web-oauth2-client-secret
+    keyVaults: []
     userRoles:
       - citizen
       - caseworker
