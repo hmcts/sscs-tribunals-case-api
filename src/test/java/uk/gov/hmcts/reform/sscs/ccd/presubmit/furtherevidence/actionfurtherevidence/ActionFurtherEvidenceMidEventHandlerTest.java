@@ -1,11 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -19,31 +23,42 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.service.exceptions.PdfPasswordException;
 
 @RunWith(JUnitParamsRunner.class)
 public class ActionFurtherEvidenceMidEventHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-
+    private final List<ScannedDocument> scannedDocumentList = new ArrayList<>();
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
-
     private ActionFurtherEvidenceMidEventHandler handler;
-
     @Mock
     private Callback<SscsCaseData> callback;
-
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
-
+    @Mock
+    private FooterService footerService;
     private SscsCaseData sscsCaseData;
-
-    private final List<ScannedDocument> scannedDocumentList = new ArrayList<>();
 
     @Before
     public void setUp() {
-        handler = new ActionFurtherEvidenceMidEventHandler();
+        handler = new ActionFurtherEvidenceMidEventHandler(footerService);
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_FURTHER_EVIDENCE);
 
@@ -69,7 +84,9 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
             .scannedDocuments(scannedDocumentList)
             .furtherEvidenceAction(furtherEvidenceActionList)
             .originalSender(originalSender)
-            .appeal(Appeal.builder().appellant(Appellant.builder().address(Address.builder().line1("My Road").postcode("TS1 2BA").build()).build()).build())
+            .appeal(Appeal.builder().appellant(
+                Appellant.builder().address(Address.builder().line1("My Road").postcode("TS1 2BA").build()).build())
+                .build())
             .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -79,7 +96,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     private DynamicList buildFurtherEvidenceActionItemListForGivenOption(String code, String label) {
         DynamicListItem selectedOption = new DynamicListItem(code, label);
         return new DynamicList(selectedOption,
-                Collections.singletonList(selectedOption));
+            Collections.singletonList(selectedOption));
     }
 
     @Test
@@ -136,10 +153,10 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     @Test
     public void givenACaseWithScannedDocumentWithNoDocumentType_showAWarning() {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder()
-                        .fileName("type.pdf")
-                        .url(DocumentLink.builder().documentUrl("www.test.com").build())
-                        .build()).build();
+            ScannedDocumentDetails.builder()
+                .fileName("type.pdf")
+                .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                .build()).build();
 
         scannedDocumentList.add(scannedDocument);
 
@@ -184,8 +201,9 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("Testing.jpg").url(DocumentLink.builder().documentUrl("test.com").build())
-                        .editedUrl(DocumentLink.builder().documentUrl("test").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName("Testing.jpg")
+                .url(DocumentLink.builder().documentUrl("test.com").build())
+                .editedUrl(DocumentLink.builder().documentUrl("test").build()).build()).build();
 
         docs.add(scannedDocument);
 
@@ -196,7 +214,8 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
 
         assertEquals(1, response.getErrors().size());
 
-        assertEquals("Case is not marked as confidential so cannot upload an edited document", response.getErrors().iterator().next());
+        assertEquals("Case is not marked as confidential so cannot upload an edited document",
+            response.getErrors().iterator().next());
     }
 
     @Test
@@ -205,7 +224,8 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-            ScannedDocumentDetails.builder().fileName(filename).url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName(filename)
+                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
 
         docs.add(scannedDocument);
 
@@ -216,6 +236,50 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
         assertEquals(1, response.getErrors().size());
 
         assertEquals("No document file name so could not process", response.getErrors().iterator().next());
+    }
+
+    @Test
+    public void givenACaseWithUnreadableScannedDocument_showAnError() throws Exception {
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+            ScannedDocumentDetails.builder()
+                .fileName("Testing.jpg")
+                .type("type")
+                .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                .build()).build();
+
+        scannedDocumentList.add(scannedDocument);
+        when(footerService.isReadablePdf(any())).thenThrow(new Exception("Cannot load the file"));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getWarnings().isEmpty());
+        assertEquals(3, response.getErrors().size());
+        Iterator<String> iterator = response.getErrors().iterator();
+        assertEquals("The below PDF document(s) are not readable, please correct this", iterator.next());
+        assertEquals("bla.pdf", iterator.next());
+        assertEquals("Testing.jpg", iterator.next());
+    }
+
+    @Test
+    public void givenACaseWithPasswordEncryptedScannedDocument_showAnError() throws Exception {
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+            ScannedDocumentDetails.builder()
+                .fileName("Testing.jpg")
+                .type("type")
+                .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                .build()).build();
+
+        scannedDocumentList.add(scannedDocument);
+        when(footerService.isReadablePdf(any())).thenThrow(new PdfPasswordException("Cannot open the file"));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getWarnings().isEmpty());
+        assertEquals(3, response.getErrors().size());
+        Iterator<String> iterator = response.getErrors().iterator();
+        assertEquals("The below PDF document(s) cannot be password protected, please correct this", iterator.next());
+        assertEquals("bla.pdf", iterator.next());
+        assertEquals("Testing.jpg", iterator.next());
     }
 
 
