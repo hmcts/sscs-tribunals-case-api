@@ -33,10 +33,7 @@ def secrets = [
     'ccd-${env}'      : [
         secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_IDAM_CLIENT_SECRET'),
         secret('postcode-info-address-lookup-token', 'ADDRESS_LOOKUP_TOKEN'),
-        secret('ccd-admin-web-oauth2-client-secret', 'ADMIN_WEB_IDAM_SECRET'),
-        secret('ccd-importer-autotest-email', 'IMPORTER_USERNAME'),
-        secret('ccd-importer-autotest-password', 'IMPORTER_PASSWORD'),
-        secret('ccd-admin-web-oauth2-client-secret', 'CLIENT_SECRET')
+        secret('ccd-admin-web-oauth2-client-secret', 'ADMIN_WEB_IDAM_SECRET')
     ]
 ]
 
