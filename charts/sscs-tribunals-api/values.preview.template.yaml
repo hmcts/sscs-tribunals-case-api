@@ -87,7 +87,6 @@ ccd:
     idamApiUrl: https://idam-api.aat.platform.hmcts.net
     idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
     s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-    enableKeyVaults: true
 
   ccd-admin-web:
     nodejs:
@@ -166,13 +165,6 @@ ccd:
     definitionFilename: sscs-ccd.xlsx
     idamApiUrl: https://idam-api.aat.platform.hmcts.net
     definitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
-    keyVaults:
-      "ccd":
-        excludeEnvironmentSuffix: false
-        secrets:
-          - ccd-importer-autotest-email
-          - ccd-importer-autotest-password
-          - ccd-admin-web-oauth2-client-secret
     userRoles:
       - citizen
       - caseworker
