@@ -2,16 +2,20 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static java.util.Objects.*;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX;
+import static uk.gov.hmcts.reform.sscs.util.ConfidentialityRequestUtil.isAtLeastOneRequestInProgress;
 
 import java.util.List;
-import java.util.Objects;
-
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -94,14 +98,18 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
             setMultiBundleConfig(sscsCaseData, response);
 
-            if (response.getErrors() != null && !response.getErrors().isEmpty()) {
+            if (isNotEmpty(response.getErrors())) {
                 log.info("Error found in bundle creation process for case id {}", callback.getCaseDetails().getId());
                 return response;
             }
 
             log.info("Setting the bundleConfiguration on the case {} for case id {}", sscsCaseData.getBundleConfiguration(), callback.getCaseDetails().getId());
-            return serviceRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
+            return sendToBundleService(callback);
         }
+    }
+
+    private PreSubmitCallbackResponse<SscsCaseData> sendToBundleService(Callback<SscsCaseData> callback) {
+        return serviceRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
     }
 
     private void createPdfsForAnyAudioVideoEvidence(SscsCaseData sscsCaseData) {
@@ -121,48 +129,83 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     private void setDocumentFileNameOnDwpResponseDocument(SscsCaseData sscsCaseData) {
         emptyIfNull(sscsCaseData.getDwpDocuments())
                 .stream()
-                .filter(f -> DwpDocumentType.DWP_RESPONSE.getValue().equals(f.getValue().getDocumentType()))
-                .filter(f -> isNull(f.getValue().getDocumentFileName()))
-                .forEach(f-> f.getValue().setDocumentFileName(DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX));
+                .filter(dwpDocument -> DwpDocumentType.DWP_RESPONSE.getValue().equals(dwpDocument.getValue().getDocumentType()))
+                .filter(dwpDocument -> isNull(dwpDocument.getValue().getDocumentFileName()))
+                .forEach(dwpDocument -> dwpDocument.getValue().setDocumentFileName(DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX));
     }
 
     private void setDocumentFileNameOnDwpEvidenceDocument(SscsCaseData sscsCaseData) {
         emptyIfNull(sscsCaseData.getDwpDocuments())
                 .stream()
-                .filter(f -> DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue().equals(f.getValue().getDocumentType()))
-                .filter(f -> isNull(f.getValue().getDocumentFileName()))
-                .forEach( f-> f.getValue().setDocumentFileName(DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX));
+                .filter(dwpDocument -> DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue().equals(dwpDocument.getValue().getDocumentType()))
+                .filter(dwpDocument -> isNull(dwpDocument.getValue().getDocumentFileName()))
+                .forEach(dwpDocument -> dwpDocument.getValue().setDocumentFileName(DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX));
     }
 
     private void setDocumentFileNameOnSscsDocuments(SscsCaseData sscsCaseData) {
         emptyIfNull(sscsCaseData.getSscsDocument())
                 .stream()
-                .filter(s-> s.getValue() != null)
-                .filter(s -> isNull(s.getValue().getDocumentFileName()))
-                .forEach(s -> s.getValue().setDocumentFileName(s.getValue().getDocumentLink().getDocumentFilename()));
+                .filter(sscsDocument -> sscsDocument.getValue() != null)
+                .filter(sscsDocument -> isNull(sscsDocument.getValue().getDocumentFileName()))
+                .forEach(sscsDocument -> sscsDocument.getValue().setDocumentFileName(sscsDocument.getValue().getDocumentLink().getDocumentFilename()));
     }
 
     private void setMultiBundleConfig(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
 
-        boolean hasEditedDwpResponseDocument = emptyIfNull(sscsCaseData.getDwpDocuments()).stream()
-                .filter(f -> DwpDocumentType.DWP_RESPONSE.getValue().equals(f.getValue().getDocumentType()))
-                .anyMatch(f -> nonNull(f.getValue().getEditedDocumentLink()));
+        boolean hasEditedDwpResponseDocument = isHasEditedDwpResponseDocument(sscsCaseData);
 
-        boolean hasEditedDwpEvidenceBundleDocument = emptyIfNull(sscsCaseData.getDwpDocuments()).stream()
-                .filter(f -> DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue().equals(f.getValue().getDocumentType()))
-                .anyMatch(f -> nonNull(f.getValue().getEditedDocumentLink()));
+        boolean hasEditedDwpEvidenceBundleDocument = isHasEditedDwpEvidenceBundleDocument(sscsCaseData);
 
-        if ((hasEditedDwpResponseDocument || hasEditedDwpEvidenceBundleDocument) && checkPhmeStatusIsUnderReview(sscsCaseData)) {
+        if (!hasPhmeRequestOrConfidentialityUnderReview(sscsCaseData, response, hasEditedDwpResponseDocument, hasEditedDwpEvidenceBundleDocument)) {
+
+            sscsCaseData.setMultiBundleConfiguration(getMultiBundleConfigs(sscsCaseData));
+        }
+    }
+
+    private boolean hasPhmeRequestOrConfidentialityUnderReview(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response, boolean hasEditedDwpResponseDocument, boolean hasEditedDwpEvidenceBundleDocument) {
+        if (isPhmeStatusUnderReview(sscsCaseData) && (hasEditedDwpResponseDocument || hasEditedDwpEvidenceBundleDocument)) {
             response.addError("There is a pending PHME request on this case");
-            return;
+            log.info("There is a pending PHME request on this case");
+            return true;
         }
-        final List<MultiBundleConfig> configs;
-        if ((hasEditedDwpResponseDocument || hasEditedDwpEvidenceBundleDocument) && checkPhmeReviewIsGranted(sscsCaseData))  {
-            configs = getEditedAndUneditedConfigs(sscsCaseData);
-        } else {
-            configs = getUneditedConfigs(sscsCaseData);
+
+        if (isAtLeastOneRequestInProgress(sscsCaseData)) {
+            response.addError("There is a pending enhanced confidentiality request on this case");
+            log.info("There is a pending enhanced confidentiality request on this case");
+            return true;
         }
-        sscsCaseData.setMultiBundleConfiguration(configs);
+        return false;
+    }
+
+    private boolean isHasEditedDwpEvidenceBundleDocument(SscsCaseData sscsCaseData) {
+        return emptyIfNull(sscsCaseData.getDwpDocuments()).stream()
+                .filter(dwpDocument -> DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue().equals(dwpDocument.getValue().getDocumentType()))
+                .anyMatch(dwpDocument -> nonNull(dwpDocument.getValue().getEditedDocumentLink()));
+    }
+
+    private boolean isHasEditedDwpResponseDocument(SscsCaseData sscsCaseData) {
+        return emptyIfNull(sscsCaseData.getDwpDocuments()).stream()
+                .filter(dwpDocument -> DwpDocumentType.DWP_RESPONSE.getValue().equals(dwpDocument.getValue().getDocumentType()))
+                .anyMatch(dwpDocument -> nonNull(dwpDocument.getValue().getEditedDocumentLink()));
+    }
+
+    private boolean hasEditedSscsDocuments(SscsCaseData sscsCaseData) {
+        return emptyIfNull(sscsCaseData.getSscsDocument()).stream()
+                .anyMatch(doc -> nonNull(doc.getValue().getEditedDocumentLink()));
+    }
+
+    private List<MultiBundleConfig> getMultiBundleConfigs(SscsCaseData sscsCaseData) {
+        boolean requiresMultiBundleForPhme = isPhmeReviewGranted(sscsCaseData) && (isHasEditedDwpResponseDocument(sscsCaseData) || isHasEditedDwpEvidenceBundleDocument(sscsCaseData));
+        boolean requiresMultiBundleForConfidentiality = isConfidentialCase(sscsCaseData) && hasEditedSscsDocuments(sscsCaseData);
+
+        if (requiresMultiBundleForPhme || requiresMultiBundleForConfidentiality)  {
+            return getEditedAndUneditedConfigs(sscsCaseData);
+        }
+        return getUneditedConfigs(sscsCaseData);
+    }
+
+    private boolean isConfidentialCase(SscsCaseData sscsCaseData) {
+        return isYes(sscsCaseData.getIsConfidentialCase());
     }
 
     private List<MultiBundleConfig> getUneditedConfigs(SscsCaseData sscsCaseData) {
@@ -200,19 +243,35 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     }
 
     private boolean checkMandatoryFilesMissing(SscsCaseData sscsCaseData) {
-        List<DwpDocument> dwpResponseDocs = emptyIfNull(sscsCaseData.getDwpDocuments()).stream()
-                .filter(e -> DwpDocumentType.DWP_RESPONSE.getValue().equals(e.getValue().getDocumentType()))
-                .collect(toList());
-
-        if (dwpResponseDocs.isEmpty() || hasMandatoryDocumentMissingForLegacyAppeals(dwpResponseDocs)) {
-            return true;
+        boolean depResponseDocsMissing = isDwpResponseDocsMissing(sscsCaseData);
+        if (!depResponseDocsMissing) {
+            return isDwpEvidenceBundleDocsMissing(sscsCaseData);
         }
+        return true;
+    }
 
-        List<DwpDocument> dwpEvidenceBundleDocs = emptyIfNull(sscsCaseData.getDwpDocuments()).stream()
+    private boolean isDwpEvidenceBundleDocsMissing(SscsCaseData sscsCaseData) {
+        List<DwpDocument> dwpEvidenceBundleDocs = getDwpEvidenceBundleDocs(sscsCaseData);
+        return dwpEvidenceBundleDocs.isEmpty() || hasMandatoryDocumentMissingForLegacyAppeals(dwpEvidenceBundleDocs);
+    }
+
+    private boolean isDwpResponseDocsMissing(SscsCaseData sscsCaseData) {
+        List<DwpDocument> dwpResponseDocs = getDwpResponseDocs(sscsCaseData);
+        return dwpResponseDocs.isEmpty() || hasMandatoryDocumentMissingForLegacyAppeals(dwpResponseDocs);
+    }
+
+    @NotNull
+    private List<DwpDocument> getDwpEvidenceBundleDocs(SscsCaseData sscsCaseData) {
+        return emptyIfNull(sscsCaseData.getDwpDocuments()).stream()
                 .filter(e -> DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue().equals(e.getValue().getDocumentType()))
                 .collect(toList());
+    }
 
-        return dwpEvidenceBundleDocs.isEmpty() || hasMandatoryDocumentMissingForLegacyAppeals(dwpEvidenceBundleDocs);
+    @NotNull
+    private List<DwpDocument> getDwpResponseDocs(SscsCaseData sscsCaseData) {
+        return emptyIfNull(sscsCaseData.getDwpDocuments()).stream()
+                .filter(e -> DwpDocumentType.DWP_RESPONSE.getValue().equals(e.getValue().getDocumentType()))
+                .collect(toList());
     }
 
     private boolean hasMandatoryDocumentMissingForLegacyAppeals(List<DwpDocument> dwpResponseDocs) {
@@ -230,12 +289,12 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         }
     }
 
-    protected boolean checkPhmeStatusIsUnderReview(SscsCaseData sscsCaseData) {
+    protected boolean isPhmeStatusUnderReview(SscsCaseData sscsCaseData) {
         return isNull(sscsCaseData.getPhmeGranted());
     }
 
-    private boolean checkPhmeReviewIsGranted(SscsCaseData sscsCaseData) {
-        return YesNo.YES.equals(sscsCaseData.getPhmeGranted());
+    private boolean isPhmeReviewGranted(SscsCaseData sscsCaseData) {
+        return isYes(sscsCaseData.getPhmeGranted());
     }
 
 }
