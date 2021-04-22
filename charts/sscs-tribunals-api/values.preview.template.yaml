@@ -165,7 +165,31 @@ ccd:
     image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.7.81
     definitionFilename: sscs-ccd.xlsx
     idamApiUrl: https://idam-api.aat.platform.hmcts.net
+    redirectUri: REDIRECT_URI
+    idamClientId: ccd_gateway
+    s2sUrl: AUTH_PROVIDER_BASE_URL
+    microservice: MICROSERVICE
     definitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
+    environment:
+      CCD_ENVIRONMENT: 'PREVIEW'
+      CCD_DEF_EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-ccd-definition-store
+      CCD_DEF_SSCS_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-ccd-definition-store
+      CCD_DEF_TRIBUNALS_API_URL: http://${SERVICE_NAME}-ccd-definition-store
+      CCD_DEF_TYA_NOTIFICATIONS_API_URL: http://${SERVICE_NAME}-ccd-definition-store
+      CCD_DEF_BULK_SCAN_API_URL: http://${SERVICE_NAME}-ccd-definition-store
+      CCD_DEF_BULK_SCAN_ORCHESTRATOR_URL: http://${SERVICE_NAME}-ccd-definition-store
+      CCD_DEF_COR_BACKEND_URL: http://${SERVICE_NAME}-ccd-definition-store
+      CCD_DEF_FIXED_LIST_USERS: ''
+      CCD_DEF_PIP_DECISION_NOTICE_QUESTIONS: ''
+      CCD_DEF_ESA_DECISION_NOTICE_QUESTIONS: ''
+      CCD_DEF_UC_DECISION_NOTICE_QUESTIONS: ''
+      CCD_DEF_LANGUAGES: ''
+      CCD_DEF_TYA_LINK: http://${SERVICE_NAME}-ccd-definition-store
+      CCD_DEF_TYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
+      CCD_DEF_MYA_LINK: http://${SERVICE_NAME}-ccd-definition-store
+      CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
+      CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
+      CCD_DEF_E: 'PREVIEW'
     secrets: []
     userRoles:
       - citizen
