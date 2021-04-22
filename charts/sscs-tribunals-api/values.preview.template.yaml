@@ -166,6 +166,7 @@ ccd:
     definitionFilename: sscs-ccd.xlsx
     idamApiUrl: https://idam-api.aat.platform.hmcts.net
     definitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
+    secrets: null
     userRoles:
       - citizen
       - caseworker
