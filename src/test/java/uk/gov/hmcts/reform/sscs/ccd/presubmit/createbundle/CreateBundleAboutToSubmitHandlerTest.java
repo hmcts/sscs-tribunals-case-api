@@ -1,13 +1,21 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle;
 
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_EVIDENCE_BUNDLE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_RESPONSE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -97,9 +105,9 @@ public class CreateBundleAboutToSubmitHandlerTest {
     public void givenEnglishCaseWithEdited_thenPopulateEnglishEditedAndUneditedConfigFileName() {
         addMandatoryDwpDocuments();
 
-        callback.getCaseDetails().getCaseData().setDwpPhme("Yes");
-        callback.getCaseDetails().getCaseData().setPhmeGranted(YesNo.YES);
-        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("No");
+        callback.getCaseDetails().getCaseData().setDwpPhme(YES.getValue());
+        callback.getCaseDetails().getCaseData().setPhmeGranted(YES);
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(NO.getValue());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
@@ -112,9 +120,9 @@ public class CreateBundleAboutToSubmitHandlerTest {
     public void givenWelshCaseWithEdited_thenPopulateWelshEditedAndUneditedConfigFileName() {
         addMandatoryDwpDocuments();
 
-        callback.getCaseDetails().getCaseData().setDwpPhme("Yes");
-        callback.getCaseDetails().getCaseData().setPhmeGranted(YesNo.YES);
-        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("Yes");
+        callback.getCaseDetails().getCaseData().setDwpPhme(YES.getValue());
+        callback.getCaseDetails().getCaseData().setPhmeGranted(YES);
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(YES.getValue());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
@@ -127,10 +135,12 @@ public class CreateBundleAboutToSubmitHandlerTest {
     @Parameters({"Yes, bundleWelshConfig", " No, bundleEnglishConfig"})
     public void givenCaseWithEditedDwpDocsAndPhmeNotGranted_thenReturnErrorMessageAndDoNotSendRequestToBundleService(String languagePreference, String expectedConfigFile) {
         addMandatoryDwpDocuments();
+        addNonEditedSscsDocuments();
+        sscsCaseData.setIsConfidentialCase(NO);
 
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(languagePreference);
-        callback.getCaseDetails().getCaseData().setDwpPhme("Yes");
-        callback.getCaseDetails().getCaseData().setPhmeGranted(YesNo.NO);
+        callback.getCaseDetails().getCaseData().setDwpPhme(YES.getValue());
+        callback.getCaseDetails().getCaseData().setPhmeGranted(NO);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -262,13 +272,10 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
     @Test
     public void givenCaseWithEditedDwpDocsAndPhmeUnderReview_thenReturnErrorMessageAndDoNotSendRequestToBundleService() {
-        List<DwpDocument> dwpDocuments = new ArrayList<>();
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
-        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
+        addMandatoryDwpDocuments();
 
-        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("No");
-        callback.getCaseDetails().getCaseData().setDwpPhme("Yes");
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(NO.getValue());
+        callback.getCaseDetails().getCaseData().setDwpPhme(YES.getValue());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -280,20 +287,48 @@ public class CreateBundleAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"appellant", "jointParty"})
-    public void givenCaseWithPendingEnhancedConfidentiality_thenReturnErrorMessage(String party) {
-        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("No");
+    @Parameters({"appellant, YES", "appellant, NO", "jointParty, YES", "jointParty, NO"})
+    public void givenCaseWithPendingEnhancedConfidentiality_thenReturnErrorMessage(String party, YesNo phmeGranted) {
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(NO.getValue());
         if (party.equals("appellant")) {
             callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeAppellant(getDatedRequestOutcome(RequestOutcome.IN_PROGRESS));
         } else {
             callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeJointParty(getDatedRequestOutcome(RequestOutcome.IN_PROGRESS));
         }
 
-        addMandatoryNonEditedDwpDocuments();
+        if (isYes(phmeGranted)) {
+            sscsCaseData.setDwpPhme(phmeGranted.getValue());
+            sscsCaseData.setPhmeGranted(phmeGranted);
+            addMandatoryDwpDocuments();
+        } else {
+            addMandatoryNonEditedDwpDocuments();
+        }
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
+        assertThat(response.getErrors().size(), is(1));
         assertEquals("There is a pending enhanced confidentiality request on this case", response.getErrors().iterator().next());
+        verifyNoInteractions(serviceRequestExecutor);
+    }
+
+    @Test
+    @Parameters({"appellant", "jointParty"})
+    public void givenCaseWithPendingEnhancedConfidentialityAndPendingPhmeRequest_thenReturnTwoErrorMessages(String party) {
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(NO.getValue());
+        if (party.equals("appellant")) {
+            sscsCaseData.setConfidentialityRequestOutcomeAppellant(getDatedRequestOutcome(RequestOutcome.IN_PROGRESS));
+        } else {
+            sscsCaseData.setConfidentialityRequestOutcomeJointParty(getDatedRequestOutcome(RequestOutcome.IN_PROGRESS));
+        }
+        callback.getCaseDetails().getCaseData().setDwpPhme(YES.getValue());
+
+        addMandatoryDwpDocuments();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(2));
+        assertEquals("There is a pending PHME request on this case", response.getErrors().toArray()[0]);
+        assertEquals("There is a pending enhanced confidentiality request on this case", response.getErrors().toArray()[1]);
         verifyNoInteractions(serviceRequestExecutor);
     }
 
@@ -307,7 +342,7 @@ public class CreateBundleAboutToSubmitHandlerTest {
         addMandatoryNonEditedDwpDocuments();
         addEditedSscsDocuments();
 
-        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YesNo.YES);
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(langPreference);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -318,11 +353,42 @@ public class CreateBundleAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenPhmeGrantedAndEnhancedConfidentiality_thenPopulateEditedAndUneditedConfigFilename() {
+        addMandatoryDwpDocuments();
+        addEditedSscsDocuments();
+        sscsCaseData.setDwpPhme(YES.getValue());
+        sscsCaseData.setPhmeGranted(YES);
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
+        assertEquals(2, response.getData().getMultiBundleConfiguration().size());
+        assertEquals("bundleEnglishEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
+        assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
+    }
+
+    @Test
     @Parameters({"Yes, bundleWelshConfig", "No, bundleEnglishConfig"})
     public void givenEnhancedConfidentialityCaseWithNoEditedDocs_thenPopulateUneditedConfigFileName(String langPreference, String expectedBundleName) {
         addMandatoryNonEditedDwpDocuments();
 
-        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YesNo.YES);
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(langPreference);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
+        assertEquals(1, response.getData().getMultiBundleConfiguration().size());
+        assertEquals(expectedBundleName, response.getData().getMultiBundleConfiguration().get(0).getValue());
+    }
+
+    @Test
+    @Parameters({"Yes, bundleWelshConfig", "No, bundleEnglishConfig"})
+    public void givenEnhancedConfidentialityCaseAndPhmeGrantedWithNoEditedDocs_thenPopulateUneditedConfigFileName(String langPreference, String expectedBundleName) {
+        addMandatoryNonEditedDwpDocuments();
+        addNonEditedSscsDocuments();
+        callback.getCaseDetails().getCaseData().setPhmeGranted(YES);
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(langPreference);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -336,11 +402,16 @@ public class CreateBundleAboutToSubmitHandlerTest {
         sscsCaseData.setSscsDocument(Collections.singletonList(sscsDocument));
     }
 
+    private void addNonEditedSscsDocuments() {
+        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("test.pdf").build()).build();
+        sscsCaseData.setSscsDocument(Collections.singletonList(sscsDocument));
+    }
+
     @Test
     public void givenCaseWithPreviouslyCreatedBundles_thenClearAllBundles() {
         addMandatoryDwpDocuments();
-        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("No");
-        callback.getCaseDetails().getCaseData().setPhmeGranted(YesNo.YES);
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(NO.getValue());
+        callback.getCaseDetails().getCaseData().setPhmeGranted(YES);
 
         List<Bundle> bundles = new ArrayList<>();
         bundles.add(Bundle.builder().value(BundleDetails.builder().build()).build());

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle;
 
+import static java.lang.String.join;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
@@ -88,24 +89,23 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         if (checkMandatoryFilesMissing(sscsCaseData)) {
             response.addError("The bundle cannot be created as mandatory DWP documents are missing");
             return response;
-        } else {
-
-            setDocumentFileNameIfNotSet(sscsCaseData);
-
-            clearExistingBundles(callback);
-
-            createPdfsForAnyAudioVideoEvidence(sscsCaseData);
-
-            setMultiBundleConfig(sscsCaseData, response);
-
-            if (isNotEmpty(response.getErrors())) {
-                log.info("Error found in bundle creation process for case id {}", callback.getCaseDetails().getId());
-                return response;
-            }
-
-            log.info("Setting the bundleConfiguration on the case {} for case id {}", sscsCaseData.getBundleConfiguration(), callback.getCaseDetails().getId());
-            return sendToBundleService(callback);
         }
+
+        setDocumentFileNameIfNotSet(sscsCaseData);
+
+        clearExistingBundles(callback);
+
+        createPdfsForAnyAudioVideoEvidence(sscsCaseData);
+
+        setMultiBundleConfig(sscsCaseData, response);
+
+        if (isNotEmpty(response.getErrors())) {
+            log.info("Error found in bundle creation process with message \"{}\" for case id {} ", join("\", \"", response.getErrors()), callback.getCaseDetails().getId());
+            return response;
+        }
+
+        log.info("Setting the bundleConfiguration on the case {} for case id {}", sscsCaseData.getBundleConfiguration(), callback.getCaseDetails().getId());
+        return sendToBundleService(callback);
     }
 
     private PreSubmitCallbackResponse<SscsCaseData> sendToBundleService(Callback<SscsCaseData> callback) {
@@ -165,16 +165,12 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     private boolean hasPhmeRequestOrConfidentialityUnderReview(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response, boolean hasEditedDwpResponseDocument, boolean hasEditedDwpEvidenceBundleDocument) {
         if (isPhmeStatusUnderReview(sscsCaseData) && (hasEditedDwpResponseDocument || hasEditedDwpEvidenceBundleDocument)) {
             response.addError("There is a pending PHME request on this case");
-            log.info("There is a pending PHME request on this case");
-            return true;
         }
 
         if (isAtLeastOneRequestInProgress(sscsCaseData)) {
             response.addError("There is a pending enhanced confidentiality request on this case");
-            log.info("There is a pending enhanced confidentiality request on this case");
-            return true;
         }
-        return false;
+        return !response.getErrors().isEmpty();
     }
 
     private boolean isHasEditedDwpEvidenceBundleDocument(SscsCaseData sscsCaseData) {
