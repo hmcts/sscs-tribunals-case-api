@@ -102,9 +102,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
                 .directionDueDate(LocalDate.now().plusDays(1).toString())
                 .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
                 .processAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.ISSUE_DIRECTIONS_NOTICE.getCode()))
-                .selectedAudioVideoEvidence(new DynamicList("test.com"))
                 .selectedAudioVideoEvidence(new DynamicList(DOCUMENT_MANAGEMENT_URL + "/2124-12"))
-                .directionDueDate("2021-04-01")
                 .audioVideoEvidence(singletonList(AudioVideoEvidence.builder().value(
                         AudioVideoEvidenceDetails.builder()
                                 .documentLink(DOCUMENT_LINK)
@@ -289,7 +287,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         sscsCaseData.setSelectedAudioVideoEvidence(null);
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        DynamicListItem item = new DynamicListItem("test.com", "music.mp3");
+        DynamicListItem item = new DynamicListItem(DOCUMENT_MANAGEMENT_URL + "/2124-12", "music.mp3");
         List<DynamicListItem> items = List.of(item);
 
         DynamicList expectedEvidences = new DynamicList(item, items);
@@ -304,7 +302,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         sscsCaseData.setSelectedAudioVideoEvidence(selectedEv);
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        DynamicListItem item = new DynamicListItem("test.com", "music.mp3");
+        DynamicListItem item = new DynamicListItem(DOCUMENT_MANAGEMENT_URL + "/2124-12", "music.mp3");
         List<DynamicListItem> items = List.of(item);
 
         DynamicList expectedEvidences = new DynamicList(selectedEv.getValue(), items);
