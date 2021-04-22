@@ -18,8 +18,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
-import uk.gov.hmcts.reform.sscs.service.exceptions.PdfPasswordException;
 
 @Component
 @Slf4j
@@ -70,12 +70,18 @@ public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHa
                 if (scannedDocument != null && scannedDocument.getValue() != null) {
                     if (scannedDocument.getValue().getUrl() != null
                         && scannedDocument.getValue().getUrl().getDocumentUrl() != null) {
-                        try {
+                        PdfState pdfState =
                             footerService.isReadablePdf(scannedDocument.getValue().getUrl().getDocumentUrl());
-                        } catch (PdfPasswordException e) {
-                            encryptedPdfLinks.add(scannedDocument.getValue().getFileName());
-                        } catch (Exception ioE) {
-                            unreadablePdfLinks.add(scannedDocument.getValue().getFileName());
+                        switch (pdfState) {
+                            case UNREADABLE:
+                                unreadablePdfLinks.add(scannedDocument.getValue().getFileName());
+                                break;
+                            case PASSWORD_ENCRYPTED:
+                                encryptedPdfLinks.add(scannedDocument.getValue().getFileName());
+                                break;
+                            case OK:
+                            default:
+                                break;
                         }
                     }
                     if (isEmpty(unreadablePdfLinks) && isEmpty(encryptedPdfLinks)) {

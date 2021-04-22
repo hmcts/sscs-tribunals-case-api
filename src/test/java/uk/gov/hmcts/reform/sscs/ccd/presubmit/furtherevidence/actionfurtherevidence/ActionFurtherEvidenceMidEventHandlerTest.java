@@ -37,8 +37,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
-import uk.gov.hmcts.reform.sscs.service.exceptions.PdfPasswordException;
 
 @RunWith(JUnitParamsRunner.class)
 public class ActionFurtherEvidenceMidEventHandlerTest {
@@ -61,6 +61,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
         handler = new ActionFurtherEvidenceMidEventHandler(footerService);
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_FURTHER_EVIDENCE);
+        when(footerService.isReadablePdf(any())).thenReturn(PdfState.OK);
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder()
@@ -239,7 +240,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenACaseWithUnreadableScannedDocument_showAnError() throws Exception {
+    public void givenACaseWithUnreadableScannedDocument_showAnError() {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder()
                 .fileName("Testing.jpg")
@@ -248,7 +249,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
                 .build()).build();
 
         scannedDocumentList.add(scannedDocument);
-        when(footerService.isReadablePdf(any())).thenThrow(new Exception("Cannot load the file"));
+        when(footerService.isReadablePdf(any())).thenReturn(PdfState.UNREADABLE);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -261,7 +262,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenACaseWithPasswordEncryptedScannedDocument_showAnError() throws Exception {
+    public void givenACaseWithPasswordEncryptedScannedDocument_showAnError() {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder()
                 .fileName("Testing.jpg")
@@ -270,7 +271,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
                 .build()).build();
 
         scannedDocumentList.add(scannedDocument);
-        when(footerService.isReadablePdf(any())).thenThrow(new PdfPasswordException("Cannot open the file"));
+        when(footerService.isReadablePdf(any())).thenReturn(PdfState.PASSWORD_ENCRYPTED);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
