@@ -211,7 +211,7 @@ ext["rest-assured.version"] = '4.2.0'
 ext['spring-security.version']='5.3.8.RELEASE'
 
 ext {
-    springCloudVersion = 'Hoxton.SR10'
+    springCloudVersion = 'Hoxton.SR11'
 }
 
 dependencyManagement {
