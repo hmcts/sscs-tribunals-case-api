@@ -37,6 +37,7 @@ xui-webapp:
       HEALTH_TERMS_AND_CONDITIONS_API: http://xui-terms-and-conditions-${SERVICE_FQDN}.service.core-compute-preview.internal/health
       SERVICES_CCD_COMPONENT_API: http://gateway-${SERVICE_FQDN}
       SERVICES_CCD_DATA_STORE_API: http://${SERVICE_NAME}-ccd-data-store-api
+      SERVICES_CCD_CASE_ASSIGNMENT_API: http://aac-${SERVICE_FQDN}
       SERVICES_TERMS_AND_CONDITIONS: http://xui-terms-and-conditions-${SERVICE_FQDN}.service.core-compute-preview.internal
       JURISDICTIONS: SSCS
       LAUNCH_DARKLY_CLIENT_ID: 5de6610b23ce5408280f2268
@@ -63,7 +64,7 @@ xui-webapp:
 ccd:
   ccd:
     adminWeb:
-      enabled: true
+      enabled: false
     apiGatewayWeb:
       enabled: true
     definitionImporter:
@@ -103,7 +104,7 @@ ccd:
       imagePullPolicy: Always
       environment:
         ADDRESS_LOOKUP_TOKEN: ${ADDRESS_LOOKUP_TOKEN}
-#        IDAM_SERVICE_KEY: ${IDAM_S2S_AUTH_TOTP_SECRET}
+        IDAM_SERVICE_KEY: ${CCD_API_GATEWAY_S2S_SECRET}
         IDAM_OAUTH2_CLIENT_SECRET: ${CCD_API_GATEWAY_IDAM_CLIENT_SECRET}
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
       ingressHost: gateway-${SERVICE_FQDN}
@@ -250,22 +251,22 @@ logstash:
     initialDelaySeconds: 90
 
 evidenceshare:
-  enabled: true
+  enabled: false
 
-sscs-evidence-share:
-  image: hmctspublic.azurecr.io/sscs/evidence-share:latest
-  ingressHost: ${SERVICE_FQDN}
-  environment:
-    SEND_LETTER_SERVICE_ENABLED: "true"
-    SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
-    IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
-    DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
-    CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-    SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
-    TOPIC_NAME: "sscs-evidenceshare-topic-aat"
-    AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
-    AMQP_USERNAME: "SendAndListenSharedAccessKey"
-    ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
-    ROBOTICS_EMAIL_TO: "fake"
-    ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
-    ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
+#sscs-evidence-share:
+#  image: hmctspublic.azurecr.io/sscs/evidence-share:latest
+#  ingressHost: ${SERVICE_FQDN}
+#  environment:
+#    SEND_LETTER_SERVICE_ENABLED: "true"
+#    SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
+#    IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+#    DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
+#    CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+#    SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
+#    TOPIC_NAME: "sscs-evidenceshare-topic-aat"
+#    AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
+#    AMQP_USERNAME: "SendAndListenSharedAccessKey"
+#    ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
+#    ROBOTICS_EMAIL_TO: "fake"
+#    ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
+#    ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
