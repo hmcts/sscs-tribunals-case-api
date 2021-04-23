@@ -165,19 +165,19 @@ ccd:
     image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.7.81
     definitionFilename: sscs-ccd.xlsx
     idamApiUrl: https://idam-api.aat.platform.hmcts.net
-    redirectUri: REDIRECT_URI
+    redirectUri: http://case-management-web-${SERVICE_FQDN}/oauth2redirect
     idamClientId: ccd_gateway
-    s2sUrl: AUTH_PROVIDER_BASE_URL
-    microservice: MICROSERVICE
+    s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+    microservice: ccd_gw
     definitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
     environment:
       CCD_ENVIRONMENT: 'PREVIEW'
-      CCD_DEF_EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-ccd-definition-store
-      CCD_DEF_SSCS_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-ccd-definition-store
-      CCD_DEF_TRIBUNALS_API_URL: http://${SERVICE_NAME}-ccd-definition-store
-      CCD_DEF_TYA_NOTIFICATIONS_API_URL: http://${SERVICE_NAME}-ccd-definition-store
-      CCD_DEF_BULK_SCAN_API_URL: http://${SERVICE_NAME}-ccd-definition-store
-      CCD_DEF_BULK_SCAN_ORCHESTRATOR_URL: http://${SERVICE_NAME}-ccd-definition-store
+      CCD_DEF_EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-em-ccd-orchestrator
+      CCD_DEF_SSCS_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-sscs-ccd-orchestrator
+      CCD_DEF_TRIBUNALS_API_URL: http://${SERVICE_NAME}-java
+      CCD_DEF_TYA_NOTIFICATIONS_API_URL: http://${SERVICE_NAME}-tya-notification
+      CCD_DEF_BULK_SCAN_API_URL: http://${SERVICE_NAME}-bulk-scan-api
+      CCD_DEF_BULK_SCAN_ORCHESTRATOR_URL: http://${SERVICE_NAME}-bulk-scan-orchestrator
       CCD_DEF_COR_BACKEND_URL: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_FIXED_LIST_USERS: '{"LiveFrom": "01/01/2018", "ID": "FL_AssignToJudge", "ListElementCode": "unassigned", "ListElement": "Unassigned"}'
       CCD_DEF_PIP_DECISION_NOTICE_QUESTIONS: '{"LiveFrom": "01/01/2018", "ID": "FL_mobilityActivities", "DisplayOrder": "2", "ListElementCode": "movingAround", "ListElement": "Moving around"}'
@@ -249,37 +249,23 @@ logstash:
   livenessProbe:
     initialDelaySeconds: 90
 
-#importer:
-#  userprofile:
-#    enabled: true
-#    jurisdictions:
-#      - SSCS
-#    users:
-#      - system.update@hmcts.net|SSCS|Benefit|appealCreated
-#    userProfileDatabaseHost: ${SERVICE_NAME}-postgresql
-#    userProfileDatabasePort: 5432
-#    userProfileDatabaseUser: hmcts
-#    userProfileDatabasePassword: hmcts
-#    userProfileDatabaseName: user-profile
-#  definition:
-#    enabled: true
-#    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.7.69
-#    kvSecretRef: kvcreds
-#    gitSecretRef: kvcreds
-#    redirectUri: https://case-management-web-${SERVICE_FQDN}/oauth2redirect
-#    definitionFilename: sscs-ccd.xlsx
-#    userRoles:
-#      - citizen
-#      - caseworker
-#      - caseworker-sscs
-#      - caseworker-sscs-systemupdate
-#      - caseworker-sscs-anonymouscitizen
-#      - caseworker-sscs-callagent
-#      - caseworker-sscs-judge
-#      - caseworker-sscs-clerk
-#      - caseworker-sscs-dwpresponsewriter
-#      - caseworker-sscs-registrar
-#      - caseworker-sscs-superuser
-#      - caseworker-sscs-teamleader
-#      - caseworker-sscs-panelmember
-#      - caseworker-sscs-bulkscan
+evidenceshare:
+  enabled: true
+
+sscs-evidence-share
+  image: ${IMAGE_NAME}
+  ingressHost: ${SERVICE_FQDN}
+  environment:
+    SEND_LETTER_SERVICE_ENABLED: "true"
+    SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
+    IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+    DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
+    CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+    SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
+    TOPIC_NAME: "sscs-evidenceshare-topic-aat"
+    AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
+    AMQP_USERNAME: "SendAndListenSharedAccessKey"
+    ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
+    ROBOTICS_EMAIL_TO: "fake"
+    ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
+    ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
