@@ -253,7 +253,7 @@ evidenceshare:
   enabled: true
 
 sscs-evidence-share
-  image: ${IMAGE_NAME}
+  image: hmctspublic.azurecr.io/sscs/evidence-share:latest
   ingressHost: ${SERVICE_FQDN}
   environment:
     SEND_LETTER_SERVICE_ENABLED: "true"
