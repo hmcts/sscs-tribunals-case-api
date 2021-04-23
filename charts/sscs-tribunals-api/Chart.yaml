@@ -10,7 +10,7 @@ dependencies:
     version: 3.4.7
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
   - name: ccd
-    version: 5.0.1
+    version: 5.0.2
     repository: '@hmctspublic'
     tags:
       - sscs-ccd-idam-pr
@@ -30,3 +30,7 @@ dependencies:
     version: 2.4.1
     repository: '@hmctspublic'
     condition: elastic.enabled
+  - name: sscs-evidence-share
+    version: 0.0.34
+    repository: '@hmctspublic'
+    condition: evidenceshare.enabled
