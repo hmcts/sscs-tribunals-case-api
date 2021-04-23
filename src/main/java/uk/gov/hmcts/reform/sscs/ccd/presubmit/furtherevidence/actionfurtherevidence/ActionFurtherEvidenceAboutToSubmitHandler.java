@@ -79,7 +79,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             checkForWarnings(preSubmitCallbackResponse);
         }
 
-        if (isIssueFurtherEvidenceToAllParties(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction())) {
+        if (isFurtherEvidenceActionType(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction(), ISSUE_FURTHER_EVIDENCE)) {
             checkAddressesValidToIssueEvidenceToAllParties(sscsCaseData, preSubmitCallbackResponse);
 
             if (!preSubmitCallbackResponse.getErrors().isEmpty()) {
@@ -110,18 +110,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
     }
 
-    private boolean isIssueFurtherEvidenceToAllParties(DynamicList furtherEvidenceActionList) {
+    private boolean isFurtherEvidenceActionType(DynamicList furtherEvidenceActionList, FurtherEvidenceActionDynamicListItems item) {
         if (furtherEvidenceActionList != null && furtherEvidenceActionList.getValue() != null
-            && isNotBlank(furtherEvidenceActionList.getValue().getCode())) {
-            return furtherEvidenceActionList.getValue().getCode().equals(ISSUE_FURTHER_EVIDENCE.getCode());
-        }
-        return false;
-    }
-
-    private boolean isOtherDocumentTypeActionManually(DynamicList furtherEvidenceActionList) {
-        if (furtherEvidenceActionList != null && furtherEvidenceActionList.getValue() != null
-            && isNotBlank(furtherEvidenceActionList.getValue().getCode())) {
-            return furtherEvidenceActionList.getValue().getCode().equals(OTHER_DOCUMENT_MANUAL.getCode());
+                && isNotBlank(furtherEvidenceActionList.getValue().getCode())) {
+            return furtherEvidenceActionList.getValue().getCode().equals(item.getCode());
         }
         return false;
     }
@@ -202,7 +194,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             SscsDocument sscsDocument = buildSscsDocument(sscsCaseData, scannedDocument, caseState);
 
             if (REINSTATEMENT_REQUEST.getValue().equals(sscsDocument.getValue().getDocumentType())) {
-                if (isOtherDocumentTypeActionManually(sscsCaseData.getFurtherEvidenceAction())) {
+                if (isFurtherEvidenceActionType(sscsCaseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL)) {
                     setReinstateCaseFields(sscsCaseData);
                 }
             }
@@ -317,8 +309,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         String bundleAddition = null;
 
         if (caseState != null
-            && (isIssueFurtherEvidenceToAllParties(sscsCaseData.getFurtherEvidenceAction())
-                || (isOtherDocumentTypeActionManually(sscsCaseData.getFurtherEvidenceAction()) && YES.equalsIgnoreCase(scannedDocument.getValue().getIncludeInBundle())))
+            && isCorrectActionTypeForBundleAddition(sscsCaseData, scannedDocument)
             && isCaseStateAdditionValid(caseState)) {
 
             log.info("adding footer appendix document link: {} and caseId {}", url, sscsCaseData.getCcdCaseId());
@@ -347,6 +338,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             .evidenceIssued("No")
             .documentTranslationStatus(sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null)
             .build()).build();
+    }
+
+    private boolean isCorrectActionTypeForBundleAddition(SscsCaseData sscsCaseData, ScannedDocument scannedDocument) {
+        return (isFurtherEvidenceActionType(sscsCaseData.getFurtherEvidenceAction(), ISSUE_FURTHER_EVIDENCE)
+                || ((isFurtherEvidenceActionType(sscsCaseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL)
+                        || isFurtherEvidenceActionType(sscsCaseData.getFurtherEvidenceAction(), SEND_TO_INTERLOC_REVIEW_BY_JUDGE))
+                    && YES.equalsIgnoreCase(scannedDocument.getValue().getIncludeInBundle()))
+        );
     }
 
     private Boolean isCaseStateAdditionValid(State caseState) {
