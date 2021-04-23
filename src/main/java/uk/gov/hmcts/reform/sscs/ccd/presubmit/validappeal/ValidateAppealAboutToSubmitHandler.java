@@ -1,5 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.validappeal;
 
+import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.trimToEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -11,13 +17,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
-
-import static java.util.Objects.nonNull;
-import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.StringUtils.trimToEmpty;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
-import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
 
 @Component
 @Slf4j
@@ -54,7 +53,7 @@ public class ValidateAppealAboutToSubmitHandler extends ResponseEventsAboutToSub
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         //Set digital flag on legacy cases
-        if (( sscsCaseData.getCreatedInGapsFrom() == null
+        if ((sscsCaseData.getCreatedInGapsFrom() == null
                 || VALID_APPEAL.getId().equalsIgnoreCase(sscsCaseData.getCreatedInGapsFrom()))) {
             sscsCaseData.setCreatedInGapsFrom(READY_TO_LIST.getId());
         }
