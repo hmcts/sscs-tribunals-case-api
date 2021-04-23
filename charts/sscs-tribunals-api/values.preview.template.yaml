@@ -252,7 +252,7 @@ logstash:
 evidenceshare:
   enabled: true
 
-sscs-evidence-share
+sscs-evidence-share:
   image: hmctspublic.azurecr.io/sscs/evidence-share:latest
   ingressHost: ${SERVICE_FQDN}
   environment:
