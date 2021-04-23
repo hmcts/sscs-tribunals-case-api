@@ -6,13 +6,9 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CONFIDENTIALITY_REQUEST;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DWP_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.JOINT_PARTY_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REINSTATEMENT_REQUEST;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome.GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE;
@@ -25,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -373,17 +370,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         if (OTHER_DOCUMENT_MANUAL.getCode().equals(furtherEvidenceActionItemCode)) {
             return OTHER_DOCUMENT;
         }
-        if (OriginalSenderItemList.APPELLANT.getCode().equals(originalSenderCode)) {
-            return APPELLANT_EVIDENCE;
-        }
-        if (OriginalSenderItemList.REPRESENTATIVE.getCode().equals(originalSenderCode)) {
-            return REPRESENTATIVE_EVIDENCE;
-        }
-        if (OriginalSenderItemList.DWP.getCode().equals(originalSenderCode)) {
-            return DWP_EVIDENCE;
-        }
-        if (OriginalSenderItemList.JOINT_PARTY.getCode().equals(originalSenderCode)) {
-            return JOINT_PARTY_EVIDENCE;
+
+        final Optional<DocumentType> optionalDocumentType = stream(OriginalSenderItemList.values())
+                .filter(f -> f.getCode().equals(originalSenderCode))
+                .findFirst()
+                .map(OriginalSenderItemList::getDocumentType);
+        if (optionalDocumentType.isPresent()) {
+            return optionalDocumentType.get();
         }
         throw new IllegalStateException("document Type could not be worked out");
     }
