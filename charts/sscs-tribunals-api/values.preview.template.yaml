@@ -165,12 +165,12 @@ ccd:
   ccd-definition-importer:
     image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.7.81
     definitionFilename: sscs-ccd.xlsx
-    idamApiUrl: https://idam-api.aat.platform.hmcts.net
-    redirectUri: http://case-management-web-${SERVICE_FQDN}/oauth2redirect
-    idamClientId: ccd_gateway
-    s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-    microservice: ccd_gw
-    definitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
+#    idamApiUrl: https://idam-api.aat.platform.hmcts.net
+#    redirectUri: http://case-management-web-${SERVICE_FQDN}/oauth2redirect
+#    idamClientId: ccd_gateway
+#    s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+#    microservice: ccd_gw
+#    definitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
     environment:
       CCD_ENVIRONMENT: 'PREVIEW'
       CCD_DEF_EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-em-ccd-orchestrator
