@@ -96,10 +96,11 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals(3, response.getData().getOriginalSender().getListItems().size());
+        assertEquals(4, response.getData().getOriginalSender().getListItems().size());
         assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
         assertEquals("dwp", response.getData().getOriginalSender().getListItems().get(1).getCode());
         assertEquals("representative", response.getData().getOriginalSender().getListItems().get(2).getCode());
+        assertEquals("hmcts", response.getData().getOriginalSender().getListItems().get(3).getCode());
     }
 
     @Test
@@ -109,9 +110,10 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
+        assertEquals(3, response.getData().getOriginalSender().getListItems().size());
         assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
         assertEquals("dwp", response.getData().getOriginalSender().getListItems().get(1).getCode());
-        assertEquals(2, response.getData().getOriginalSender().getListItems().size());
+        assertEquals("hmcts", response.getData().getOriginalSender().getListItems().get(2).getCode());
     }
 
     @Test
@@ -121,10 +123,11 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
+        assertEquals(4, response.getData().getOriginalSender().getListItems().size());
         assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
         assertEquals("dwp", response.getData().getOriginalSender().getListItems().get(1).getCode());
         assertEquals("jointParty", response.getData().getOriginalSender().getListItems().get(2).getCode());
-        assertEquals(3, response.getData().getOriginalSender().getListItems().size());
+        assertEquals("hmcts", response.getData().getOriginalSender().getListItems().get(3).getCode());
     }
 
     @Test
@@ -134,10 +137,11 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals(4, response.getData().getOriginalSender().getListItems().size());
+        assertEquals(5, response.getData().getOriginalSender().getListItems().size());
         assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
         assertEquals("dwp", response.getData().getOriginalSender().getListItems().get(1).getCode());
         assertEquals("jointParty", response.getData().getOriginalSender().getListItems().get(2).getCode());
         assertEquals("representative", response.getData().getOriginalSender().getListItems().get(3).getCode());
+        assertEquals("hmcts", response.getData().getOriginalSender().getListItems().get(4).getCode());
     }
 }
