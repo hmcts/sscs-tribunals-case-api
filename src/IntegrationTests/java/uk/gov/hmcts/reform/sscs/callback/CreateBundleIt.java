@@ -150,7 +150,7 @@ public class CreateBundleIt extends AbstractEventIt {
 
         assertEquals(2,  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().size());
         assertEquals("sscs-bundle-edited-config.yaml",  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().get(0).getValue());
-        assertEquals("sscs-bundle-unedited-config.yaml",  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().get(1).getValue());
+        assertEquals("sscs-bundle-config.yaml",  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().get(1).getValue());
     }
 
     @Test
@@ -174,7 +174,7 @@ public class CreateBundleIt extends AbstractEventIt {
 
         assertEquals(2,  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().size());
         assertEquals("sscs-bundle-welsh-edited-config.yaml",  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().get(0).getValue());
-        assertEquals("sscs-bundle-welsh-unedited-config.yaml",  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().get(1).getValue());
+        assertEquals("sscs-bundle-welsh-config.yaml",  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().get(1).getValue());
     }
 
     @Test
@@ -205,7 +205,7 @@ public class CreateBundleIt extends AbstractEventIt {
 
         assertEquals(2,  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().size());
         assertEquals("sscs-bundle-edited-config.yaml",  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().get(0).getValue());
-        assertEquals("sscs-bundle-unedited-config.yaml",  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().get(1).getValue());
+        assertEquals("sscs-bundle-config.yaml",  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().get(1).getValue());
         assertEquals("Audio/video document",  captor.getValue().getBody().getCaseDetails().getCaseData().getAudioVideoEvidenceBundleDocument().getDocumentFileName());
 
     }
