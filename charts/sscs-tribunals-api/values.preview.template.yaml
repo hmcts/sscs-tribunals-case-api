@@ -68,7 +68,7 @@ xui-webapp:
 ccd:
   ccd:
     adminWeb:
-      enabled: false
+      enabled: true
     apiGatewayWeb:
       enabled: true
     definitionImporter:
@@ -76,7 +76,7 @@ ccd:
     userProfileImporter:
       enabled: true
     managementWeb:
-      enabled: false
+      enabled: true
     s2s:
       enabled: false
     elastic:
