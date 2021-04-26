@@ -16,7 +16,7 @@ java:
     MANAGE_CASE_UI_BASE_URL: https://xui-${SERVICE_FQDN}
 
 idam-pr:
-  releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
+  releaseNameOverride: ${SERVICE_NAME}-idam-pr
   enabled: true
   redirect_uris:
     XUI:
@@ -170,7 +170,7 @@ ccd:
     image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.7.81
     definitionFilename: sscs-ccd.xlsx
 #    idamApiUrl: https://idam-api.aat.platform.hmcts.net
-    redirectUri: http://case-management-web-${SERVICE_FQDN}/oauth2redirect
+#    redirectUri: http://case-management-web-${SERVICE_FQDN}/oauth2redirect
 #    idamClientId: ccd_gateway
 #    s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
 #    microservice: ccd_gw
