@@ -292,7 +292,6 @@ public class SubmitAppealService {
                             caseDetails.getId(),
                             caseData.getAppeal().getBenefitType().getCode(),
                             eventType);
-                    throw new Exception();
                 }
                 return caseDetails;
             }
