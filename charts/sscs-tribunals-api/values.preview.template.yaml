@@ -16,15 +16,11 @@ java:
     MANAGE_CASE_UI_BASE_URL: https://xui-${SERVICE_FQDN}
 
 idam-pr:
-  releaseNameOverride: ${SERVICE_NAME}-idam-pr
+  releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
   enabled: true
   redirect_uris:
     XUI:
       - http://xui-${SERVICE_FQDN}/oauth2/callback
-    CCD:
-      - https://case-management-web-${SERVICE_FQDN}/oauth2redirect
-    CCD Admin:
-      - https://admin-web-${SERVICE_FQDN}/oauth2redirect
 
 xui-webapp:
   enabled: true
@@ -70,21 +66,24 @@ ccd:
     adminWeb:
       enabled: true
     apiGatewayWeb:
-      enabled: true
+      enabled: false
     definitionImporter:
       enabled: true
     userProfileImporter:
       enabled: true
     managementWeb:
-      enabled: true
+      enabled: false
     s2s:
       enabled: false
     elastic:
+      enabled: false
+    postgresql:
       enabled: false
 
   global:
     ccdApiGatewayIngress: gateway-${SERVICE_FQDN}
     ccdCaseManagementWebIngress: case-management-web-${SERVICE_FQDN}
+    ccdAdminWebIngress: ccd-admin-web-${SERVICE_FQDN}
     ccdDataStoreUrl: http://${SERVICE_NAME}-ccd-data-store-api
     ccdDefinitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
     ccdUserProfileUrl: http://${SERVICE_NAME}-ccd-user-profile-api
@@ -102,7 +101,17 @@ ccd:
       environment:
         IDAM_OAUTH2_AW_CLIENT_SECRET: ${ADMIN_WEB_IDAM_SECRET}
     idam-pr:
+      releaseNameOverride: ${SERVICE_NAME}-ccd-admin-idam-pr
       enabled: true
+
+  ccd-case-management-web:
+    nodejs:
+      image: hmctspublic.azurecr.io/ccd/case-management-web:latest
+      ingressHost: ccd-case-mgmt-web-${SERVICE_FQDN}
+    idam-pr:
+      releaseNameOverride: ${SERVICE_NAME}-ccd-mgmt-idam-pr
+      enabled: true
+
   ccd-api-gateway-web:
     nodejs:
       imagePullPolicy: Always
@@ -114,6 +123,7 @@ ccd:
       ingressHost: gateway-${SERVICE_FQDN}
       ingressIP: ${INGRESS_IP}
       keyVaults: []
+
   ccd-data-store-api:
     java:
       imagePullPolicy: Always
@@ -136,6 +146,7 @@ ccd:
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
       autoscaling:
         enabled: false
+
   ccd-definition-store-api:
     java:
       autoscaling:
@@ -145,10 +156,12 @@ ccd:
         DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
-        ELASTIC_SEARCH_ENABLED: true
+        OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/hmcts
+        ELASTIC_SEARCH_ENABLED: false
         ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
       keyVaults: []
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
+
   ccd-user-profile-api:
     java:
       imagePullPolicy: Always
@@ -161,16 +174,18 @@ ccd:
         enabled: false
       postgresConfig:
         maxConnections: "300"
+
   ccd-user-profile-importer:
     image: hmctspublic.azurecr.io/ccd/user-profile-importer:db2r9a
     users:
       - system.update@hmcts.net|SSCS|Benefit|appealCreated
       - sscs.superuser@mailinator.com|SSCS|Benefit|appealCreated
+      -
   ccd-definition-importer:
     image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.7.81
     definitionFilename: sscs-ccd.xlsx
 #    idamApiUrl: https://idam-api.aat.platform.hmcts.net
-#    redirectUri: http://case-management-web-${SERVICE_FQDN}/oauth2redirect
+    redirectUri: https://ccd-admin-web-${SERVICE_FQDN}/oauth2redirect
 #    idamClientId: ccd_gateway
 #    s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
 #    microservice: ccd_gw
@@ -231,6 +246,7 @@ elasticsearch:
     path: /
     hosts:
       - es-${SERVICE_FQDN}
+      -
 logstash:
   image:
     repository: hmctspublic.azurecr.io/ccd/logstash
