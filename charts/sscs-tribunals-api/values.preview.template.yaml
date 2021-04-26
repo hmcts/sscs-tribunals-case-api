@@ -80,7 +80,7 @@ ccd:
     s2s:
       enabled: false
     elastic:
-      enabled: true
+      enabled: false
 
   global:
     ccdApiGatewayIngress: gateway-${SERVICE_FQDN}
@@ -213,7 +213,7 @@ ccd:
       - caseworker-sscs-bulkscan
 
 elastic:
-  enabled: true
+  enabled: false
 
 elasticsearch:
   clusterName: "es"
