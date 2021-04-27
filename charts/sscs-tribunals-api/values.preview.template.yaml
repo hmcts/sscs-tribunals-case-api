@@ -110,7 +110,7 @@ ccd:
         USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
         USER_PROFILE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_definition,ccd_admin
       keyVaults: [ ]
-#      ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
+      ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
     postgresql:
       persistence:
         enabled: false
@@ -129,7 +129,7 @@ ccd:
         ELASTIC_SEARCH_ENABLED: false
         ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
       keyVaults: [ ]
-#      ingressHost: ccd-definition-store-${SERVICE_FQDN}
+      ingressHost: ccd-definition-store-${SERVICE_FQDN}
 
   ccd-data-store-api:
     java:
@@ -151,7 +151,7 @@ ccd:
         DATA_STORE_DB_MAX_POOL_SIZE: 80
         DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
       keyVaults: [ ]
-#      ingressHost: ccd-data-store-api-${SERVICE_FQDN}
+      ingressHost: ccd-data-store-api-${SERVICE_FQDN}
       autoscaling:
         enabled: false
 
