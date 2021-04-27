@@ -78,7 +78,7 @@ ccd:
     elastic:
       enabled: false
     postgresql:
-      enabled: false
+      enabled: true
 
   global:
     ccdApiGatewayIngress: gateway-${SERVICE_FQDN}
