@@ -31,21 +31,34 @@ public class RemoveLinkForCaseAboutToSubmitHandler implements PreSubmitCallbackH
         }
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
+        final List<CaseLink> associatedCasesBefore = ofNullable(callback.getCaseDetailsBefore().orElse(caseDetails).getCaseData().getAssociatedCase()).orElse(emptyList());
+        final List<CaseLink> associatedCasesAfter = ofNullable(sscsCaseData.getAssociatedCase()).orElse(emptyList());
         final List<CaseLink> linkedCaseBefore = ofNullable(callback.getCaseDetailsBefore().orElse(caseDetails).getCaseData().getLinkedCase()).orElse(emptyList());
         final List<CaseLink> linkedCasesAfter = ofNullable(sscsCaseData.getLinkedCase()).orElse(emptyList());
 
         final PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (linkedCaseBefore.size() == 0) {
-            preSubmitCallbackResponse.addError("There are no case links to remove.");
-        } else if (linkedCasesAfter.containsAll(linkedCaseBefore)) {
-            preSubmitCallbackResponse.addError("No case links have been selected to remove from the case.");
+        if (linkedCaseBefore.size() == 0 && associatedCasesBefore.size() == 0) {
+            preSubmitCallbackResponse.addError("There are no case links and associated case to remove.");
+        } else if (linkedCasesAfter.containsAll(linkedCaseBefore) && associatedCasesAfter.containsAll(associatedCasesBefore)) {
+            preSubmitCallbackResponse.addError("No case links or associated case have been selected to remove from the case.");
         }
         if (linkedCasesAfter.stream().filter(f -> !linkedCaseBefore.contains(f)).toArray().length > 0) {
             preSubmitCallbackResponse.addError("Cannot add a case link.");
         }
+        if (associatedCasesAfter.stream().filter(f -> !associatedCasesBefore.contains(f)).toArray().length > 0) {
+            preSubmitCallbackResponse.addError("Cannot add a associated case.");
+        }
         if (preSubmitCallbackResponse.getErrors().isEmpty()) {
             sscsCaseData.setLinkedCase(linkedCasesAfter);
+        }
+        if (preSubmitCallbackResponse.getErrors().isEmpty()) {
+            sscsCaseData.setAssociatedCase(associatedCasesAfter);
+            if (!associatedCasesAfter.isEmpty()) {
+                sscsCaseData.setLinkedCasesBoolean("Yes");
+            } else {
+                sscsCaseData.setLinkedCasesBoolean("No");
+            }
         }
 
         return preSubmitCallbackResponse;
