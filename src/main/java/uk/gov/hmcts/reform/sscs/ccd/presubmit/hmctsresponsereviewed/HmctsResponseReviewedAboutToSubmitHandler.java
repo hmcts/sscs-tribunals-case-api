@@ -80,9 +80,9 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
 
     private void updateDocument(DwpDocument dwpDocument, DwpResponseDocument dwpResponseDocument, String documentTypePrefix) {
         String todayDate = java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        String fileExtension = dwpResponseDocument.getDocumentLink().getDocumentFilename()
-                .substring(dwpResponseDocument.getDocumentLink().getDocumentFilename().lastIndexOf("."));
-        if (dwpResponseDocument != null) {
+        if (dwpResponseDocument != null && dwpResponseDocument.getDocumentLink() != null) {
+            String fileExtension = dwpResponseDocument.getDocumentLink().getDocumentFilename()
+                    .substring(dwpResponseDocument.getDocumentLink().getDocumentFilename().lastIndexOf("."));
             if (!dwpDocument.getValue().getDocumentLink().getDocumentUrl()
                     .equals(dwpResponseDocument.getDocumentLink().getDocumentUrl())) {
                 dwpDocument.getValue().setDocumentLink(DocumentLink.builder()
