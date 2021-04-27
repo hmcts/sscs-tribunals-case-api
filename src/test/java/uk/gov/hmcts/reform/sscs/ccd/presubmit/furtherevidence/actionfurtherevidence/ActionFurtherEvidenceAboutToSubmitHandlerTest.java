@@ -985,7 +985,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"APPELLANT", "REPRESENTATIVE", "DWP", "JOINT_PARTY"})
+    @Parameters({"APPELLANT", "REPRESENTATIVE", "DWP", "JOINT_PARTY", "HMCTS"})
     public void shouldIssueToAllParties_willAddFooterTextToDocument(OriginalSenderItemList sender) {
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(ISSUE_FURTHER_EVIDENCE.code, ISSUE_FURTHER_EVIDENCE.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(sender.getCode(), sender.getLabel()));
@@ -1003,6 +1003,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         verify(footerService).addFooter(eq(scannedDocument.getValue().getUrl()), eq(sender.getDocumentFooter()), eq(null));
         assertEquals(0, response.getErrors().size());
         assertEquals(0, response.getWarnings().size());
+        assertEquals(sender.getDocumentType().getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
     }
 
     private DatedRequestOutcome createDatedRequestOutcome(RequestOutcome requestOutcome) {
