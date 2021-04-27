@@ -4,11 +4,13 @@ import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidenceDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
+@Slf4j
 public class AudioVideoEvidenceUtil {
 
     private AudioVideoEvidenceUtil() {
@@ -31,8 +33,10 @@ public class AudioVideoEvidenceUtil {
     public static void setHasUnprocessedAudioVideoEvidenceFlag(SscsCaseData caseData) {
         if (isNull(caseData.getAudioVideoEvidence()) || caseData.getAudioVideoEvidence().isEmpty()) {
             caseData.setHasUnprocessedAudioVideoEvidence(NO);
+            log.info("HasUnprocessedAudioVideoEvidence flag has been set to NO");
         } else {
             caseData.setHasUnprocessedAudioVideoEvidence(YES);
+            log.info("HasUnprocessedAudioVideoEvidence flag has been set to YES");
         }
     }
 }
