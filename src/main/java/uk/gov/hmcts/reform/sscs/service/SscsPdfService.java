@@ -18,11 +18,11 @@ import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.ResourceManager;
 @Slf4j
 public class SscsPdfService {
 
-    private String appellantTemplatePath;
-    private String appellantWelshTemplatePath;
-    private PDFServiceClient pdfServiceClient;
-    private CcdPdfService ccdPdfService;
-    private ResourceManager resourceManager;
+    private final String appellantTemplatePath;
+    private final String appellantWelshTemplatePath;
+    private final PDFServiceClient pdfServiceClient;
+    private final CcdPdfService ccdPdfService;
+    private final ResourceManager resourceManager;
 
     @Autowired
     public SscsPdfService(@Value("${appellant.appeal.html.template.path}") String appellantTemplatePath,

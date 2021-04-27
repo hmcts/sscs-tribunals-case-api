@@ -18,7 +18,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -53,8 +52,8 @@ public class CreateBundleAboutToSubmitHandlerTest {
     public void setUp() {
         openMocks(this);
         dwpDocumentService = new DwpDocumentService();
-        handler = new CreateBundleAboutToSubmitHandler(serviceRequestExecutor, dwpDocumentService, bundleAudioVideoPdfService,false, "bundleUrl.com", "bundleEnglishConfig", "bundleWelshConfig",
-                "bundleEditedConfig", "bundleWelshEditedConfig", "bundleUnEditedConfig", "bundleWelshUnEditedConfig");
+        handler = new CreateBundleAboutToSubmitHandler(serviceRequestExecutor, dwpDocumentService, bundleAudioVideoPdfService, "bundleUrl.com", "bundleEnglishConfig", "bundleWelshConfig",
+                "bundleEnglishEditedConfig", "bundleWelshEditedConfig");
 
         when(callback.getEvent()).thenReturn(EventType.CREATE_BUNDLE);
 
@@ -78,6 +77,77 @@ public class CreateBundleAboutToSubmitHandlerTest {
     }
 
     @Test
+    @Parameters({"Yes, bundleWelshConfig", " No, bundleEnglishConfig"})
+    public void givenCaseWithLanguagePreference_thenPopulateConfigFileName(String languagePreference, String expectedConfigFile) {
+
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().build()).build()).build());
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
+        caseData.setDwpDocuments(dwpDocuments);
+
+        caseData.setLanguagePreferenceWelsh(languagePreference);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(expectedConfigFile, response.getData().getMultiBundleConfiguration().get(0).getValue());
+    }
+
+    @Test
+    public void givenEnglishCaseWithEdited_thenPopulateEnglishEditedAndUneditedConfigFileName() {
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
+
+        callback.getCaseDetails().getCaseData().setDwpPhme("Yes");
+        callback.getCaseDetails().getCaseData().setPhmeGranted(YesNo.YES);
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("No");
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
+        assertEquals(2, response.getData().getMultiBundleConfiguration().size());
+        assertEquals("bundleEnglishEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
+        assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
+    }
+
+    @Test
+    public void givenWelshCaseWithEdited_thenPopulateWelshEditedAndUneditedConfigFileName() {
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
+
+        callback.getCaseDetails().getCaseData().setDwpPhme("Yes");
+        callback.getCaseDetails().getCaseData().setPhmeGranted(YesNo.YES);
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("Yes");
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
+        assertEquals(2, response.getData().getMultiBundleConfiguration().size());
+        assertEquals("bundleWelshEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
+        assertEquals("bundleWelshConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
+    }
+
+    @Test
+    @Parameters({"Yes, bundleWelshConfig", " No, bundleEnglishConfig"})
+    public void givenCaseWithEditedDwpDocsAndPhmeNotGranted_thenReturnErrorMessageAndDoNotSendRequestToBundleService(String languagePreference, String expectedConfigFile) {
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
+
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(languagePreference);
+        callback.getCaseDetails().getCaseData().setDwpPhme("Yes");
+        callback.getCaseDetails().getCaseData().setPhmeGranted(YesNo.NO);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
+        assertEquals(1, response.getData().getMultiBundleConfiguration().size());
+        assertEquals(expectedConfigFile, response.getData().getMultiBundleConfiguration().get(0).getValue());
+    }
+
+    @Test
     public void givenDwpResponseDocumentHasEmptyFileName_thenPopulateFileName() {
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().build()).build());
@@ -94,39 +164,6 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
         assertEquals(DWP_EVIDENCE_BUNDLE.getLabel(), response.getData().getDwpDocuments().stream().filter(e -> e.getValue().getDocumentType().equals(DWP_EVIDENCE_BUNDLE.getValue())).collect(toList()).get(0).getValue().getDocumentFileName());
     }
-
-    @Test
-    @Parameters({"Yes, bundleWelshConfig", " No, bundleEnglishConfig"})
-    public void givenWelshCase_thenPopulateWelshConfigFileName(String languagePreference, String configFile) {
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        List<DwpDocument> dwpDocuments = new ArrayList<>();
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().build()).build()).build());
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
-        caseData.setDwpDocuments(dwpDocuments);
-
-        caseData.setLanguagePreferenceWelsh(languagePreference);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(configFile, response.getData().getBundleConfiguration());
-    }
-
-    @Test
-    @Parameters({"Yes, bundleWelshConfig", " No, bundleEnglishConfig"})
-    public void givenWelshCaseWithMultiBundleFeatureOn_thenPopulateWelshConfigFileName(String languagePreference, String configFile) {
-        ReflectionTestUtils.setField(handler, "multiBundleFeature", true);
-
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        List<DwpDocument> dwpDocuments = new ArrayList<>();
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().build()).build()).build());
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
-        caseData.setDwpDocuments(dwpDocuments);
-
-        caseData.setLanguagePreferenceWelsh(languagePreference);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(configFile, response.getData().getMultiBundleConfiguration().get(0).getValue());
-    }
-
 
     @Test
     public void givenSscsDocumentHasEmptyFileName_thenPopulateFileName() {
@@ -147,19 +184,6 @@ public class CreateBundleAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("test.com", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
-    }
-
-    @Test
-    public void givenCreateBundleEvent_thenTriggerTheExternalCreateBundleEvent() {
-        List<DwpDocument> dwpDocuments = new ArrayList<>();
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
-        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
-
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        verify(bundleAudioVideoPdfService).createAudioVideoPdf(sscsCaseData);
-        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
     }
 
     @Test
@@ -245,83 +269,7 @@ public class CreateBundleAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"Yes, bundleWelshUnEditedConfig", " No, bundleUnEditedConfig"})
-    public void givenCaseWithEdited_thenPopulateUneditedConfigFileName(String languagePreference, String configFile) {
-
-        List<DwpDocument> dwpDocuments = new ArrayList<>();
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
-        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
-
-        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(languagePreference);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(configFile, response.getData().getBundleConfiguration());
-    }
-
-    @Test
-    public void givenEnglishCaseWithEditedAndMultiBundleFeatureSwitchedOn_thenPopulateEnglishEditedAndUneditedConfigFileName() {
-        ReflectionTestUtils.setField(handler, "multiBundleFeature", true);
-
-        List<DwpDocument> dwpDocuments = new ArrayList<>();
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
-        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
-
-        callback.getCaseDetails().getCaseData().setDwpPhme("Yes");
-        callback.getCaseDetails().getCaseData().setPhmeGranted(YesNo.YES);
-        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("No");
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
-        assertEquals(2, response.getData().getMultiBundleConfiguration().size());
-        assertEquals("bundleEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
-        assertEquals("bundleUnEditedConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
-    }
-
-    @Test
-    public void givenWelshCaseWithEditedAndMultiBundleFeatureSwitchedOn_thenPopulateWelshEditedAndUneditedConfigFileName() {
-        ReflectionTestUtils.setField(handler, "multiBundleFeature", true);
-
-        List<DwpDocument> dwpDocuments = new ArrayList<>();
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
-        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
-
-        callback.getCaseDetails().getCaseData().setDwpPhme("Yes");
-        callback.getCaseDetails().getCaseData().setPhmeGranted(YesNo.YES);
-        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("Yes");
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
-        assertEquals(2, response.getData().getMultiBundleConfiguration().size());
-        assertEquals("bundleWelshEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
-        assertEquals("bundleWelshUnEditedConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
-    }
-
-    @Test
-    public void givenCaseWithEditedDwpDocsAndPhmeNotGrantedAndMultiBundleFeatureSwitchedOn_thenReturnErrorMessageAndDoNotSendRequestToBundleService() {
-        ReflectionTestUtils.setField(handler, "multiBundleFeature", true);
-
-        List<DwpDocument> dwpDocuments = new ArrayList<>();
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
-        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
-
-        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("No");
-        callback.getCaseDetails().getCaseData().setDwpPhme("Yes");
-        callback.getCaseDetails().getCaseData().setPhmeGranted(YesNo.NO);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(1, response.getData().getMultiBundleConfiguration().size());
-        assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
-    }
-
-    @Test
-    public void givenCaseWithEditedDwpDocsAndPhmeUnderReviewAndMultiBundleFeatureSwitchedOn_thenReturnErrorMessageAndDoNotSendRequestToBundleService() {
-        ReflectionTestUtils.setField(handler, "multiBundleFeature", true);
-
+    public void givenCaseWithEditedDwpDocsAndPhmeUnderReview_thenReturnErrorMessageAndDoNotSendRequestToBundleService() {
         List<DwpDocument> dwpDocuments = new ArrayList<>();
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
@@ -346,6 +294,7 @@ public class CreateBundleAboutToSubmitHandlerTest {
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
         callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("No");
+        callback.getCaseDetails().getCaseData().setPhmeGranted(YesNo.YES);
 
         List<Bundle> bundles = new ArrayList<>();
         bundles.add(Bundle.builder().value(BundleDetails.builder().build()).build());

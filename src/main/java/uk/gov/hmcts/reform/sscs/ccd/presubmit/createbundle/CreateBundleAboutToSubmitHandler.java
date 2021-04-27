@@ -29,13 +29,10 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
     private String bundleUrl;
 
-    private boolean multiBundleFeature;
     private String bundleEnglishConfig;
     private String bundleWelshConfig;
-    private String bundleEditedConfig;
+    private String bundleEnglishEditedConfig;
     private String bundleWelshEditedConfig;
-    private String bundleUnEditedConfig;
-    private String bundleWelshUnEditedConfig;
 
     private static String CREATE_BUNDLE_ENDPOINT = "/api/new-bundle";
 
@@ -47,25 +44,19 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     public CreateBundleAboutToSubmitHandler(ServiceRequestExecutor serviceRequestExecutor,
                                             DwpDocumentService dwpDocumentService,
                                             BundleAudioVideoPdfService bundleAudioVideoPdfService,
-                                            @Value("${feature.multi-bundle-feature.enabled}") boolean multiBundleFeature,
                                             @Value("${bundle.url}") String bundleUrl,
                                             @Value("${bundle.english.config}") String bundleEnglishConfig,
                                             @Value("${bundle.welsh.config}") String bundleWelshConfig,
-                                            @Value("${bundle.edited.config}") String bundleEditedConfig,
-                                            @Value("${bundle.welsh.edited.config}") String bundleWelshEditedConfig,
-                                            @Value("${bundle.unedited.config}") String bundleUnEditedConfig,
-                                            @Value("${bundle.welsh.unedited.config}") String bundleWelshUnEditedConfig) {
+                                            @Value("${bundle.english.edited.config}") String bundleEnglishEditedConfig,
+                                            @Value("${bundle.welsh.edited.config}") String bundleWelshEditedConfig) {
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.dwpDocumentService = dwpDocumentService;
         this.bundleAudioVideoPdfService = bundleAudioVideoPdfService;
-        this.multiBundleFeature = multiBundleFeature;
         this.bundleUrl = bundleUrl;
         this.bundleEnglishConfig = bundleEnglishConfig;
         this.bundleWelshConfig = bundleWelshConfig;
-        this.bundleEditedConfig = bundleEditedConfig;
+        this.bundleEnglishEditedConfig = bundleEnglishEditedConfig;
         this.bundleWelshEditedConfig = bundleWelshEditedConfig;
-        this.bundleUnEditedConfig = bundleUnEditedConfig;
-        this.bundleWelshUnEditedConfig = bundleWelshUnEditedConfig;
     }
 
     @Override
@@ -119,11 +110,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
             bundleAudioVideoPdfService.createAudioVideoPdf(sscsCaseData);
 
-            if (multiBundleFeature) {
-                setMultiBundleConfig(sscsCaseData, response);
-            } else {
-                setBundleConfig(sscsCaseData);
-            }
+            setMultiBundleConfig(sscsCaseData, response);
 
             if (response.getErrors() != null && !response.getErrors().isEmpty()) {
                 log.info("Error found in bundle creation process for case id {}", callback.getCaseDetails().getId());
@@ -132,25 +119,6 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
                 log.info("Setting the bundleConfiguration on the case {} for case id {}", sscsCaseData.getBundleConfiguration(), callback.getCaseDetails().getId());
 
                 return serviceRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
-            }
-        }
-    }
-
-    private void setBundleConfig(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getDwpDocuments().stream().filter(f -> (f.getValue().getDocumentType().equals(DwpDocumentType.DWP_RESPONSE.getValue())
-                && f.getValue().getEditedDocumentLink() != null)
-                || f.getValue().getDocumentType().equals(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue())
-                && f.getValue().getEditedDocumentLink() != null).count() > 0) {
-            if (sscsCaseData.isLanguagePreferenceWelsh()) {
-                sscsCaseData.setBundleConfiguration(bundleWelshUnEditedConfig);
-            } else {
-                sscsCaseData.setBundleConfiguration(bundleUnEditedConfig);
-            }
-        } else {
-            if (sscsCaseData.isLanguagePreferenceWelsh()) {
-                sscsCaseData.setBundleConfiguration(bundleWelshConfig);
-            } else {
-                sscsCaseData.setBundleConfiguration(bundleEnglishConfig);
             }
         }
     }
@@ -170,10 +138,10 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
             if (sscsCaseData.isLanguagePreferenceWelsh()) {
                 configs.add(MultiBundleConfig.builder().value(bundleWelshEditedConfig).build());
-                configs.add(MultiBundleConfig.builder().value(bundleWelshUnEditedConfig).build());
+                configs.add(MultiBundleConfig.builder().value(bundleWelshConfig).build());
             } else {
-                configs.add(MultiBundleConfig.builder().value(bundleEditedConfig).build());
-                configs.add(MultiBundleConfig.builder().value(bundleUnEditedConfig).build());
+                configs.add(MultiBundleConfig.builder().value(bundleEnglishEditedConfig).build());
+                configs.add(MultiBundleConfig.builder().value(bundleEnglishConfig).build());
             }
 
         } else {

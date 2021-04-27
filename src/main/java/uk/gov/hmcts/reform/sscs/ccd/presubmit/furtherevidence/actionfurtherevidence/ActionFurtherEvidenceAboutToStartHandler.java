@@ -71,6 +71,7 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
             && equalsIgnoreCase(sscsCaseData.getAppeal().getRep().getHasRepresentative(), "yes")) {
             listOptions.add(new DynamicListItem(REPRESENTATIVE.getCode(), REPRESENTATIVE.getLabel()));
         }
+        listOptions.add(new DynamicListItem(HMCTS.getCode(), HMCTS.getLabel()));
 
         sscsCaseData.setOriginalSender(new DynamicList(listOptions.get(0), listOptions));
 
