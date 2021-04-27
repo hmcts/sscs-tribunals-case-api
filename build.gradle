@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath("net.serenity-bdd:serenity-gradle-plugin:2.3.31")
+        classpath("net.serenity-bdd:serenity-gradle-plugin:2.4.4")
     }
 }
 
@@ -211,7 +211,7 @@ ext["rest-assured.version"] = '4.2.0'
 ext['spring-security.version']='5.3.8.RELEASE'
 
 ext {
-    springCloudVersion = 'Hoxton.SR10'
+    springCloudVersion = 'Hoxton.SR11'
 }
 
 dependencyManagement {
@@ -238,7 +238,7 @@ dependencyManagement {
         }
 
         // CVE-2020-17521
-        dependencySet(group: 'org.codehaus.groovy', version: '3.0.7') {
+        dependencySet(group: 'org.codehaus.groovy', version: '3.0.8') {
             entry 'groovy'
             entry 'groovy-json'
             entry 'groovy-xml'
@@ -260,6 +260,13 @@ dependencyManagement {
 
         dependencySet(group: 'org.apache.xmlgraphics', version: '1.14') {
             entry 'batik-all'
+        }
+
+        //CVE-2021-27807
+        dependencySet(group: 'org.apache.pdfbox', version: '2.0.23') {
+            entry 'pdfbox'
+            entry 'pdfbox-tools'
+            entry 'preflight'
         }
 
         imports {
@@ -317,10 +324,10 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
     compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.2.48-RC-SSCS-8966'
-    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.32'
+    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.33'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
-    compile 'org.projectlombok:lombok:1.18.18'
+    compile 'org.projectlombok:lombok:1.18.20'
     annotationProcessor 'org.projectlombok:lombok:1.18.18'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.5.RELEASE'
@@ -338,8 +345,8 @@ dependencies {
 
     testCompile 'pl.pragmatists:JUnitParams:1.1.1'
 
-    testCompileOnly 'org.projectlombok:lombok:1.18.16'
-    testAnnotationProcessor "org.projectlombok:lombok:1.18.14"
+    testCompileOnly 'org.projectlombok:lombok:1.18.20'
+    testAnnotationProcessor "org.projectlombok:lombok:1.18.20"
     e2eCompile 'org.projectlombok:lombok:1.18.16'
     e2eAnnotationProcessor "org.projectlombok:lombok:1.18.18"
 

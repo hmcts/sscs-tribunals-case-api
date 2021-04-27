@@ -80,10 +80,9 @@ public class CreateCaseController {
     }
 
     private SscsCaseData createSscsCase(String email, String mobile, String hearingType) {
-        InputStream caseStream = getClass().getClassLoader().getResourceAsStream("json/ccd_case.json");
-        String caseAsString = new BufferedReader(new InputStreamReader(caseStream)).lines().collect(joining("\n"));
         SscsCaseData sscsCaseData;
-        try {
+        try (InputStream caseStream = getClass().getClassLoader().getResourceAsStream("json/ccd_case.json")) {
+            String caseAsString = new BufferedReader(new InputStreamReader(caseStream)).lines().collect(joining("\n"));
             sscsCaseData = new ObjectMapper().readValue(caseAsString, SscsCaseData.class);
 
             Event events = Event.builder()

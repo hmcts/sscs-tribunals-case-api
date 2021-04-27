@@ -4,7 +4,6 @@ import static java.util.stream.Stream.of;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_ARCHIVED;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -88,22 +87,6 @@ public class CitizenCcdService {
                 .caseDetailsId(caseDetails.getId())
                 .saveCaseOperation(SaveCaseOperation.CREATE)
                 .build();
-    }
-
-    public Optional<SscsCaseDetails> draftArchivedFirst(SscsCaseData caseData,
-                                                        IdamTokens citizenIdamTokens,
-                                                        IdamTokens userIdamTokens) {
-        List<CaseDetails> caseDetailsList = citizenCcdClient.searchForCitizen(citizenIdamTokens);
-
-        if (!caseDetailsList.isEmpty()) {
-            Long caseId = caseDetailsList.get(0).getId();
-
-            SscsCaseDetails sscsCaseDetails = ccdService.updateCase(caseData, caseId, DRAFT_ARCHIVED.getCcdType(),
-                    "SSCS - draft archived", "SSCS - draft archived", userIdamTokens);
-
-            return Optional.of(sscsCaseDetails);
-        }
-        return Optional.empty();
     }
 
     public CaseDetails archiveDraft(SscsCaseData caseData, IdamTokens userIdamTokens, Long caseId) {
