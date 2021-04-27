@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -31,7 +32,7 @@ public class AudioVideoEvidenceUtil {
     }
 
     public static void setHasUnprocessedAudioVideoEvidenceFlag(SscsCaseData caseData) {
-        if (isNull(caseData.getAudioVideoEvidence()) || caseData.getAudioVideoEvidence().isEmpty()) {
+        if (isNull(caseData.getAudioVideoEvidence()) || isEmpty(caseData.getAudioVideoEvidence())) {
             caseData.setHasUnprocessedAudioVideoEvidence(NO);
             log.info("HasUnprocessedAudioVideoEvidence flag has been set to NO");
         } else {
