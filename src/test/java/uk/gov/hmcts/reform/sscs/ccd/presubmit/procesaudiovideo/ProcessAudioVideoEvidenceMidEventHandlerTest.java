@@ -7,6 +7,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
@@ -52,9 +53,13 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
 
     private static final String URL = "http://dm-store/documents/123";
 
+    private static final String DM_GW_URL = "http://gateway-ccd/documents";
+
+    private static final String DOCUMENT_MANAGEMENT_URL = "http://dm-store/documents";
+
     private static final LocalDate DATE = LocalDate.of(2021, 1,1);
 
-    private static final DocumentLink DOCUMENT_LINK = DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build();
+    private static final DocumentLink DOCUMENT_LINK = DocumentLink.builder().documentFilename("music.mp3").documentUrl(DOCUMENT_MANAGEMENT_URL + "/2124-12").documentBinaryUrl(DOCUMENT_MANAGEMENT_URL + "/2124-12/binary").build();
 
     private final UserDetails userDetails = UserDetails.builder().roles(new ArrayList<>(asList("caseworker-sscs", UserRole.CTSC_CLERK.getValue()))).build();
 
@@ -90,14 +95,14 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         documents.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
 
         documentConfiguration.setDocuments(documents);
-        handler = new ProcessAudioVideoEvidenceMidEventHandler(generateFile, documentConfiguration, idamService);
+        handler = new ProcessAudioVideoEvidenceMidEventHandler(generateFile, documentConfiguration, idamService, DM_GW_URL, DOCUMENT_MANAGEMENT_URL);
 
         sscsCaseData = SscsCaseData.builder()
                 .generateNotice("Yes")
                 .directionDueDate(LocalDate.now().plusDays(1).toString())
                 .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
                 .processAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.ISSUE_DIRECTIONS_NOTICE.getCode()))
-                .selectedAudioVideoEvidence(new DynamicList("test.com"))
+                .selectedAudioVideoEvidence(new DynamicList(DOCUMENT_MANAGEMENT_URL + "/2124-12"))
                 .audioVideoEvidence(singletonList(AudioVideoEvidence.builder().value(
                         AudioVideoEvidenceDetails.builder()
                                 .documentLink(DOCUMENT_LINK)
@@ -181,6 +186,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         assertThat(response.getData().getPreviewDocument(), is(nullValue()));
         verifyNoInteractions(generateFile);
         assertEquals(response.getData().getSelectedAudioVideoEvidenceDetails(), expectedEvidenceDetails);
+        assertTrue(sscsCaseData.getTempMediaUrl().contains(DM_GW_URL + "/2124-12/binary"));
     }
 
     @Test
@@ -281,7 +287,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         sscsCaseData.setSelectedAudioVideoEvidence(null);
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        DynamicListItem item = new DynamicListItem("test.com", "music.mp3");
+        DynamicListItem item = new DynamicListItem(DOCUMENT_MANAGEMENT_URL + "/2124-12", "music.mp3");
         List<DynamicListItem> items = List.of(item);
 
         DynamicList expectedEvidences = new DynamicList(item, items);
@@ -296,7 +302,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         sscsCaseData.setSelectedAudioVideoEvidence(selectedEv);
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        DynamicListItem item = new DynamicListItem("test.com", "music.mp3");
+        DynamicListItem item = new DynamicListItem(DOCUMENT_MANAGEMENT_URL + "/2124-12", "music.mp3");
         List<DynamicListItem> items = List.of(item);
 
         DynamicList expectedEvidences = new DynamicList(selectedEv.getValue(), items);
