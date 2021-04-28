@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.addnote;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.findLabelById;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -39,7 +40,8 @@ public class AddNoteAboutToSubmitHandler  implements PreSubmitCallbackHandler<Ss
                 || callback.getEvent() == EventType.INTERLOC_SEND_TO_TCW
                 || callback.getEvent() == EventType.TCW_REFER_TO_JUDGE
                 || callback.getEvent() == EventType.SEND_TO_ADMIN
-                || callback.getEvent() == EventType.ADMIN_APPEAL_WITHDRAWN);
+                || callback.getEvent() == EventType.ADMIN_APPEAL_WITHDRAWN
+                || callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED);
     }
 
     @Override
@@ -52,6 +54,17 @@ public class AddNoteAboutToSubmitHandler  implements PreSubmitCallbackHandler<Ss
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         String note = sscsCaseData.getTempNoteDetail();
+
+        if (callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED && nonNull(sscsCaseData.getInterlocReferralReason())
+                && StringUtils.isNoneBlank(sscsCaseData.getInterlocReferralReason()) && nonNull(sscsCaseData.getSelectWhoReviewsCase())) {
+            String reasonLabel = findLabelById(sscsCaseData.getInterlocReferralReason());
+            if (nonNull(note) && StringUtils.isNoneBlank(note)) {
+                note = "Referred to interloc for " + sscsCaseData.getSelectWhoReviewsCase().getValue().getLabel().toLowerCase() + " - " + reasonLabel + " - " + note;
+            } else {
+                note = "Referred to interloc for " + sscsCaseData.getSelectWhoReviewsCase().getValue().getLabel().toLowerCase() + " - " + reasonLabel;
+            }
+        }
+
         if (nonNull(note) && StringUtils.isNoneBlank(note)) {
             Note newNote = Note.builder().value(NoteDetails.builder().noteDetail(note).noteDate(LocalDate.now().toString())
                     .author(userDetailsService.buildLoggedInUserName(userAuthorisation)).build()).build();
