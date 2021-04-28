@@ -14,7 +14,7 @@ plugins {
     id 'jacoco'
     id 'org.springframework.boot' version '2.3.5.RELEASE'
     id 'uk.gov.hmcts.java' version '0.12.8'
-    id 'com.gorylenko.gradle-git-properties' version '2.2.4'
+    id 'com.gorylenko.gradle-git-properties' version '2.3.0'
     id 'com.github.ben-manes.versions' version '0.38.0'
     id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.6.0'
