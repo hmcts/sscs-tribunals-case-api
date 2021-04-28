@@ -174,7 +174,7 @@ ccd:
     users:
       - system.update@hmcts.net|SSCS|Benefit|appealCreated
       - sscs.superuser@mailinator.com|SSCS|Benefit|appealCreated
-      -
+
   ccd-definition-importer:
     image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.7.87-5235
     definitionFilename: sscs-ccd.xlsx
@@ -2191,6 +2191,7 @@ ccd:
       - caseworker-sscs-teamleader
       - caseworker-sscs-panelmember
       - caseworker-sscs-bulkscan
+      - caseworker-sscs-pcqextractor
 
 elastic:
   enabled: false
