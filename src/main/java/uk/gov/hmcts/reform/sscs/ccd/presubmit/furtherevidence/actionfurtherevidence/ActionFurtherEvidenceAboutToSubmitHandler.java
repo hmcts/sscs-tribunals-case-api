@@ -345,7 +345,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 || ((isFurtherEvidenceActionType(sscsCaseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL)
                         || isFurtherEvidenceActionType(sscsCaseData.getFurtherEvidenceAction(), SEND_TO_INTERLOC_REVIEW_BY_JUDGE))
                     && YES.equalsIgnoreCase(scannedDocument.getValue().getIncludeInBundle()))
-        );
+            );
     }
 
     private Boolean isCaseStateAdditionValid(State caseState) {
