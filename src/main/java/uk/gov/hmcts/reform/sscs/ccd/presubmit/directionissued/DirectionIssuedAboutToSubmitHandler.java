@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
+import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 
 @Service
 @Slf4j
@@ -123,6 +124,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private SscsCaseData updateCaseAfterExtensionRefused(SscsCaseData caseData, String interlocReviewState, State state) {
         caseData.setHmctsDwpState("sentToDwp");
         caseData.setDateSentToDwp(LocalDate.now().toString());
+        caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate());
         caseData.setInterlocReviewState(interlocReviewState);
         caseData.setState(state);
 
@@ -139,6 +141,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         } else if (getPreValidStates().contains(caseDetails.getState())
                 && DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setDateSentToDwp(LocalDate.now().toString());
+            caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate());
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
             updateDwpRegionalCentre(caseData);
 
@@ -266,6 +269,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
             } else if (getPreValidStates().contains(caseDetails.getState()) && DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
                 caseData.setDateSentToDwp(LocalDate.now().toString());
+                caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate());
                 caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
 
             } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
