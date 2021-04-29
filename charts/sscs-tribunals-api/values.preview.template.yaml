@@ -20,6 +20,7 @@ java:
     IDAM_S2S-AUTH_MICROSERVICE: ${IDAM_S2S_AUTH_MICROSERVICE}
     CORE_CASE_DATA_JURISDICTION_ID: SSCS
     CORE_CASE_DATA_CASE_TYPE_ID: Benefit
+    TEST_URL: http://sscs-tribunals-api-${SERVICE_FQDN}
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
@@ -2243,22 +2244,23 @@ logstash:
     initialDelaySeconds: 90
 
 evidenceshare:
-  enabled: false
+  enabled: true
 
-#sscs-evidence-share:
-#  image: hmctspublic.azurecr.io/sscs/evidence-share:latest
-#  ingressHost: ${SERVICE_FQDN}
-#  environment:
-#    SEND_LETTER_SERVICE_ENABLED: "true"
-#    SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
-#    IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
-#    DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
-#    CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-#    SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
-#    TOPIC_NAME: "sscs-evidenceshare-topic-aat"
-#    AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
-#    AMQP_USERNAME: "SendAndListenSharedAccessKey"
-#    ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
-#    ROBOTICS_EMAIL_TO: "fake"
-#    ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
-#    ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
+sscs-evidence-share:
+  image: hmctspublic.azurecr.io/sscs/evidence-share:latest
+  releaseNameOverride: ${SERVICE_NAME}-sscs-evidence-share
+  ingressHost: sscs-evidence-share-${SERVICE_FQDN}
+  environment:
+    SEND_LETTER_SERVICE_ENABLED: "true"
+    SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
+    IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+    DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
+    CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-${SERVICE_FQDN}"
+    SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
+    TOPIC_NAME: "sscs-evidenceshare-topic-aat"
+    AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
+    AMQP_USERNAME: "SendAndListenSharedAccessKey"
+    ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
+    ROBOTICS_EMAIL_TO: "fake"
+    ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
+    ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
