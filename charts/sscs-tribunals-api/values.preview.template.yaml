@@ -7,13 +7,19 @@ java:
   readinessDelay: 45
   environment:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
-    CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-data-store-api"
+    CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-${SERVICE_FQDN}"
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
     CCD_UI_BASE_URL: https://case-management-web-${SERVICE_FQDN}
     IDAM_S2S_AUTH: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
     IDAM_API_JWK_URL: https://idam-api.aat.platform.hmcts.net/jwks
     MANAGE_CASE_UI_BASE_URL: https://xui-${SERVICE_FQDN}
+    IDAM_OAUTH2_CLIENT_ID: ${IDAM_OAUTH2_CLIENT_ID}
+    IDAM_OAUTH2_CLIENT_SECRET: ${IDAM_OAUTH2_CLIENT_SECRET}
+    IDAM_S2S-AUTH_TOTP_SECRET: ${IDAM_S2S_AUTH_TOTP_SECRET}
+    IDAM_S2S-AUTH_MICROSERVICE: ${IDAM_S2S_AUTH_MICROSERVICE}
+    CORE_CASE_DATA_JURISDICTION_ID: SSCS
+    CORE_CASE_DATA_CASE_TYPE_ID: Benefit
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
@@ -33,12 +39,12 @@ xui-webapp:
     cpuLimits: 1900m
     environment:
       HEALTH_CCD_COMPONENT_API: http://gateway-${SERVICE_FQDN}/health
-      HEALTH_CCD_DATA_API: http://${SERVICE_NAME}-ccd-data-store-api/health
-      HEALTH_TERMS_AND_CONDITIONS_API: http://xui-terms-and-conditions-${SERVICE_FQDN}.service.core-compute-preview.internal/health
+      HEALTH_CCD_DATA_API: http://ccd-data-store-api-${SERVICE_FQDN}/health
+      HEALTH_TERMS_AND_CONDITIONS_API: http://xui-terms-and-conditions-${SERVICE_FQDN}/health
       SERVICES_CCD_COMPONENT_API: http://gateway-${SERVICE_FQDN}
-      SERVICES_CCD_DATA_STORE_API: http://${SERVICE_NAME}-ccd-data-store-api
+      SERVICES_CCD_DATA_STORE_API: http://ccd-data-store-api-${SERVICE_FQDN}
       SERVICES_CCD_CASE_ASSIGNMENT_API: http://aac-${SERVICE_FQDN}
-      SERVICES_TERMS_AND_CONDITIONS: http://xui-terms-and-conditions-${SERVICE_FQDN}.service.core-compute-preview.internal
+      SERVICES_TERMS_AND_CONDITIONS: http://xui-terms-and-conditions-${SERVICE_FQDN}
       JURISDICTIONS: SSCS
       LAUNCH_DARKLY_CLIENT_ID: 5de6610b23ce5408280f2268
       FEATURE_REDIS_ENABLED: false
