@@ -2244,7 +2244,7 @@ logstash:
     initialDelaySeconds: 90
 
 evidenceshare:
-  enabled: true
+  enabled: false
 
 sscs-evidence-share:
   image: hmctspublic.azurecr.io/sscs/evidence-share:latest
