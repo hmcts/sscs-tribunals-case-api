@@ -41,8 +41,8 @@ public final class DateTimeUtils {
 
     }
 
-    public static LocalDate generateDwpResponseDueDate() {
-        return LocalDate.now().plusDays(DWP_RESPONSE_DUE_IN_DAYS);
+    public static String generateDwpResponseDueDate() {
+        return LocalDate.now().plusDays(DWP_RESPONSE_DUE_IN_DAYS).toString();
     }
 
     private static String formatUtc(ZonedDateTime zonedDateTime) {
