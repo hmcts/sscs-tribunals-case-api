@@ -23,11 +23,14 @@ java:
     TEST_URL: http://sscs-tribunals-api-${SERVICE_FQDN}
 
 idam-pr:
-  releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
+  releaseNameOverride: ${SERVICE_NAME}-idam-pr
   enabled: true
   redirect_uris:
     XUI:
       - http://xui-${SERVICE_FQDN}/oauth2/callback
+    CCD-ADMIN:
+      - http://ccd-admin-web-${SERVICE_FQDN}/oauth2redirect
+
 
 xui-webapp:
   enabled: true
@@ -46,6 +49,9 @@ xui-webapp:
       SERVICES_CCD_DATA_STORE_API: http://ccd-data-store-api-${SERVICE_FQDN}
       SERVICES_CCD_CASE_ASSIGNMENT_API: http://aac-${SERVICE_FQDN}
       SERVICES_TERMS_AND_CONDITIONS: http://xui-terms-and-conditions-${SERVICE_FQDN}
+      SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+      SERVICES_IDAM_CLIENT_ID: xui_webapp
+      SERVICES_S2S: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       JURISDICTIONS: SSCS
       LAUNCH_DARKLY_CLIENT_ID: 5de6610b23ce5408280f2268
       FEATURE_REDIS_ENABLED: false
@@ -183,7 +189,7 @@ ccd:
       - sscs.superuser@mailinator.com|SSCS|Benefit|appealCreated
 
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.7.87-5235
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.7.87-8870
     definitionFilename: sscs-ccd.xlsx
     redirectUri: https://ccd-admin-web-${SERVICE_FQDN}/oauth2redirect
     environment:
