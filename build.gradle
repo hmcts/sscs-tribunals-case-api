@@ -305,7 +305,7 @@ dependencies {
     compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.5'
 
     // Safe to remove once Spring update their dependencies - see CVE-2019-14439 and add 'com.fasterxml.jackson.core' configurations.all above
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.3'
 
     compile group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.2'
 
