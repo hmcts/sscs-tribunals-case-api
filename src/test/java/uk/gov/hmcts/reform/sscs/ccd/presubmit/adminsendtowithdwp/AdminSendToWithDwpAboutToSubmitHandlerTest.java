@@ -73,7 +73,7 @@ public class AdminSendToWithDwpAboutToSubmitHandlerTest {
         assertEquals(Collections.EMPTY_SET, response.getErrors());
 
         assertThat(response.getData().getDateSentToDwp(), is(LocalDate.now().toString()));
-        assertThat(response.getData().getDwpDueDate(), is(LocalDate.now().plusDays(35)));
+        assertThat(response.getData().getDwpDueDate(), is(LocalDate.now().plusDays(35).toString()));
     }
 
     @Test

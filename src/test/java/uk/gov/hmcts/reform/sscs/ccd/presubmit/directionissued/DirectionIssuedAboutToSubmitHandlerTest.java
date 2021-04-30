@@ -273,7 +273,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertNotNull(response.getData().getDateSentToDwp());
-        assertThat(response.getData().getDwpDueDate(), is(LocalDate.now().plusDays(35)));
+        assertThat(response.getData().getDwpDueDate(), is(LocalDate.now().plusDays(35).toString()));
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
         assertEquals(DUMMY_REGIONAL_CENTER, response.getData().getDwpRegionalCentre());
     }
@@ -311,7 +311,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertNotNull(response.getData().getDateSentToDwp());
-        assertThat(response.getData().getDwpDueDate(), is(LocalDate.now().plusDays(35)));
+        assertThat(response.getData().getDwpDueDate(), is(LocalDate.now().plusDays(35).toString()));
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
         assertEquals(DUMMY_REGIONAL_CENTER, response.getData().getDwpRegionalCentre());
     }
@@ -645,6 +645,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertThat(response.getData().getState(), is(state));
         assertThat(response.getData().getHmctsDwpState(), is("sentToDwp"));
         assertThat(response.getData().getDateSentToDwp(), is(LocalDate.now().toString()));
-        assertThat(response.getData().getDwpDueDate(), is(LocalDate.now().plusDays(35)));
+        assertThat(response.getData().getDwpDueDate(), is(LocalDate.now().plusDays(35).toString()));
     }
 }
