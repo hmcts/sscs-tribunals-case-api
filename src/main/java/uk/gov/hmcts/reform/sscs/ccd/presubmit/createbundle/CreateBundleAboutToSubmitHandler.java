@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX;
 
@@ -17,6 +18,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 import uk.gov.hmcts.reform.sscs.service.bundle.BundleAudioVideoPdfService;
@@ -33,6 +36,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     private String bundleWelshConfig;
     private String bundleEnglishEditedConfig;
     private String bundleWelshEditedConfig;
+    private IdamService idamService;
 
     private static String CREATE_BUNDLE_ENDPOINT = "/api/new-bundle";
 
@@ -45,6 +49,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
                                             DwpDocumentService dwpDocumentService,
                                             BundleAudioVideoPdfService bundleAudioVideoPdfService,
                                             @Value("${bundle.url}") String bundleUrl,
+                                            IdamService idamService,
                                             @Value("${bundle.english.config}") String bundleEnglishConfig,
                                             @Value("${bundle.welsh.config}") String bundleWelshConfig,
                                             @Value("${bundle.english.edited.config}") String bundleEnglishEditedConfig,
@@ -57,6 +62,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         this.bundleWelshConfig = bundleWelshConfig;
         this.bundleEnglishEditedConfig = bundleEnglishEditedConfig;
         this.bundleWelshEditedConfig = bundleWelshEditedConfig;
+        this.idamService = idamService;
     }
 
     @Override
@@ -81,8 +87,17 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
 
-        if (checkMandatoryFilesMissing(sscsCaseData)) {
-            response.addError("The bundle cannot be created as mandatory DWP documents are missing");
+        if (hasMandatoryFilesMissing(sscsCaseData)) {
+
+            final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
+            final boolean hasSuperUserRole = userDetails.hasRole(SUPER_USER);
+
+            if (!hasSuperUserRole) {
+                response.addError("The bundle cannot be created as mandatory DWP documents are missing");
+            } else {
+                response.addWarning("The bundle cannot be created as mandatory DWP documents are missing, do you want to proceed?");
+            }
+
             return response;
         } else {
 
@@ -125,7 +140,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
     private void setMultiBundleConfig(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         List<MultiBundleConfig> configs = new ArrayList<>();
-        
+
         if (sscsCaseData.getDwpDocuments().stream().filter(f -> (f.getValue().getDocumentType().equals(DwpDocumentType.DWP_RESPONSE.getValue())
                 && f.getValue().getEditedDocumentLink() != null)
                 || f.getValue().getDocumentType().equals(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue())
@@ -154,7 +169,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         sscsCaseData.setMultiBundleConfiguration(configs);
     }
 
-    private boolean checkMandatoryFilesMissing(SscsCaseData sscsCaseData) {
+    private boolean hasMandatoryFilesMissing(SscsCaseData sscsCaseData) {
         if (null != sscsCaseData.getDwpDocuments()) {
 
             List<DwpDocument> dwpResponseDocs = sscsCaseData.getDwpDocuments().stream().filter(e -> DwpDocumentType.DWP_RESPONSE.getValue().equals(e.getValue().getDocumentType())).collect(toList());
