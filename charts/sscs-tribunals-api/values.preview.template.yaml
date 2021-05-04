@@ -45,6 +45,7 @@ xui-webapp:
       HEALTH_CCD_COMPONENT_API: http://gateway-${SERVICE_FQDN}/health
       HEALTH_CCD_DATA_API: http://ccd-data-store-api-${SERVICE_FQDN}/health
       HEALTH_TERMS_AND_CONDITIONS_API: http://xui-terms-and-conditions-${SERVICE_FQDN}/health
+      SERVICES_EM_ANNO_API: http://gateway-${SERVICE_FQDN}
       SERVICES_CCD_COMPONENT_API: http://gateway-${SERVICE_FQDN}
       SERVICES_CCD_DATA_STORE_API: http://ccd-data-store-api-${SERVICE_FQDN}
       SERVICES_CCD_CASE_ASSIGNMENT_API: http://aac-${SERVICE_FQDN}
