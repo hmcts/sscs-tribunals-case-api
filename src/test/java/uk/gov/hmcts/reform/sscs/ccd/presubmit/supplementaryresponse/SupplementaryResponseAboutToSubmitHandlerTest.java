@@ -176,6 +176,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         assertEquals("No", response.getData().getEvidenceHandled());
         assertNull(response.getData().getDwpOtherDoc());
         assertNull(response.getData().getShowRip1DocPage());
+        assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
     }
 
     @Test
