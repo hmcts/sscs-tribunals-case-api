@@ -4,6 +4,8 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.NONE;
@@ -140,6 +142,10 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
             updateDwpRegionalCentre(caseData);
 
+            //Set digital flag on legacy cases
+            if (caseData.getCreatedInGapsFrom() == null || VALID_APPEAL.getId().equalsIgnoreCase(caseData.getCreatedInGapsFrom())) {
+                caseData.setCreatedInGapsFrom(READY_TO_LIST.getId());
+            }
         } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
                 && ExtensionNextEvent.SEND_TO_LISTING.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
             caseData = updateCaseAfterExtensionRefused(caseData, AWAITING_ADMIN_ACTION.getId(), State.RESPONSE_RECEIVED);
