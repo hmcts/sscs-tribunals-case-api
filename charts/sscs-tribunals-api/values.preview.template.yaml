@@ -2211,7 +2211,7 @@ ccd:
       - caseworker-sscs-pcqextractor
 
 elastic:
-  enabled: true
+  enabled: false
 
 elasticsearch:
   clusterName: "es"
@@ -2299,4 +2299,4 @@ sscs-tribunals-frontend:
           - pcq-token-key
 
 redis:
-  enabled: true
+  enabled: false
