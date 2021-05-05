@@ -67,6 +67,7 @@ xui-webapp:
       PROTOCOL: http
       SYSTEM_USER_NAME: "dummy"
       SYSTEM_USER_PASSWORD: "dummy"
+      XUI_ENV: prod
     keyVaults:
       rpx:
         resourceGroup: rpx
@@ -2275,7 +2276,6 @@ sscs-evidence-share:
 sscs-tribunals-frontend:
   enabled: true
   nodejs:
-    releaseNameOverride: ${SERVICE_NAME}-sya
     image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
     environment:
