@@ -16,6 +16,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.WELSH_T
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.*;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.getDocumentType;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.isSelectedEvidence;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -93,6 +94,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         clearEmptyAudioVideoList(caseData);
         clearTransientFields(caseData);
         caseData.updateTranslationWorkOutstandingFlag();
+        setHasUnprocessedAudioVideoEvidenceFlag(caseData);
 
         return response;
     }

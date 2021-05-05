@@ -11,6 +11,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.DIRECTION_ACTION_REQUIRED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.NONE;
@@ -611,6 +613,28 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertValues(response, null, DIRECTION_ACTION_REQUIRED.getId(), State.WITH_DWP);
+    }
+
+    @Test
+    public void givenIssueDirectionNoticeForAppealToProceedForPreValidCase_thenSetNonDigitalToDigitalCase() {
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()));
+        when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
+        sscsCaseData.setCreatedInGapsFrom(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getCreatedInGapsFrom(), is(READY_TO_LIST.getId()));
+    }
+
+    @Test
+    public void givenIssueDirectionNoticeForAppealToProceedForPreValidCase_thenSetNoDigitalToDigitalCase() {
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()));
+        when(caseDetails.getState()).thenReturn(State.INCOMPLETE_APPLICATION);
+        sscsCaseData.setCreatedInGapsFrom(VALID_APPEAL.getId());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getCreatedInGapsFrom(), is(READY_TO_LIST.getId()));
     }
 
     private void assertValues(PreSubmitCallbackResponse<SscsCaseData> response, String intterlocReviewState, String dwpState, State state) {
