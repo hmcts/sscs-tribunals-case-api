@@ -65,6 +65,8 @@ xui-webapp:
       REDISCLOUD_URL: http://dummyrediscloudurl
       UV_THREADPOOL_SIZE: 128
       PROTOCOL: http
+      SYSTEM_USER_NAME: "dummy"
+      SYSTEM_USER_PASSWORD: "dummy"
     keyVaults:
       rpx:
         resourceGroup: rpx
@@ -2272,27 +2274,29 @@ sscs-evidence-share:
 
 sscs-tribunals-frontend:
   enabled: true
-  image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
-  ingressHost: sya-${SERVICE_FQDN}
-  environment:
-    REDIS_URL: redis://${SERVICE_NAME}-redis-master
-    APPINSIGHTS_ROLE_NAME: ${SERVICE_NAME}
-    PCQ_URL: "https://pcq.aat.platform.hmcts.net"
-    FT_ANTENNA_WEBCHAT: false
-    FT_WELSH: true
-    PCQ_ENABLED: true
-    MULTIPLE_DRAFTS_ENABLED: true
-    TRIBUNALS_CASE_API_URL: http://${SERVICE_FQDN}
-    UPLOAD_EVIDENCE_URL: http://${SERVICE_FQDN}/evidence/upload
-    SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
-    SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
-  keyVaults:
-    sscs:
-      secrets:
-        - idam-sscs-oauth2-client-secret
-        - postcode-lookup-token
-        - AppInsightsInstrumentationKey
-        - pcq-token-key
+  nodejs:
+    releaseNameOverride: ${SERVICE_NAME}-sya
+    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
+    ingressHost: sya-${SERVICE_FQDN}
+    environment:
+      REDIS_URL: redis://${SERVICE_NAME}-redis-master
+      APPINSIGHTS_ROLE_NAME: ${SERVICE_NAME}
+      PCQ_URL: "https://pcq.aat.platform.hmcts.net"
+      FT_ANTENNA_WEBCHAT: false
+      FT_WELSH: true
+      PCQ_ENABLED: true
+      MULTIPLE_DRAFTS_ENABLED: true
+      TRIBUNALS_CASE_API_URL: http://${SERVICE_FQDN}
+      UPLOAD_EVIDENCE_URL: http://${SERVICE_FQDN}/evidence/upload
+      SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
+      SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+    keyVaults:
+      sscs:
+        secrets:
+          - idam-sscs-oauth2-client-secret
+          - postcode-lookup-token
+          - AppInsightsInstrumentationKey
+          - pcq-token-key
 
 redis:
   enabled: true
