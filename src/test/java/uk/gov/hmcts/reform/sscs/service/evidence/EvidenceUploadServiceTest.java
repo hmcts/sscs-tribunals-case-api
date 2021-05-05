@@ -263,10 +263,11 @@ public class EvidenceUploadServiceTest {
         assertThat(submittedEvidence, is(true));
 
         verify(ccdService).updateCase(
-                and(and(and(hasSscsScannedDocumentAndSscsDocuments(expectedEvidenceUploadFilename),
+                and(and(and(and(hasSscsScannedDocumentAndSscsDocuments(expectedEvidenceUploadFilename),
                     doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo()),
                     argThat(argument -> argument.getInterlocReviewState().equals(expectedInterlocReviewState.getId()))),
                         argThat(argument ->  argument.getInterlocReferralReason().equals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE.getId()))),
+                        argThat(argument ->  argument.getHasUnprocessedAudioVideoEvidence().equals(YesNo.YES))),
                 eq(someCcdCaseId),
                 eq(ATTACH_SCANNED_DOCS.getCcdType()),
                 eq("SSCS - upload evidence from MYA"),

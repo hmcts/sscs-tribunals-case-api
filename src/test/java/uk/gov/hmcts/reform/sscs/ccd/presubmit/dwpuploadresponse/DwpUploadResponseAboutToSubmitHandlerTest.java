@@ -152,6 +152,14 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
+        assertEquals(NO, response.getData().getHasUnprocessedAudioVideoEvidence());
+    }
+
+    @Test
+    public void givenADwpUploadResponseEventWithExistingAudioVideoEvidence_assertFlagIsSet() {
+        callback.getCaseDetails().getCaseData().setAudioVideoEvidence(List.of(AudioVideoEvidence.builder().build()));
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(YES, response.getData().getHasUnprocessedAudioVideoEvidence());
     }
 
     @Test

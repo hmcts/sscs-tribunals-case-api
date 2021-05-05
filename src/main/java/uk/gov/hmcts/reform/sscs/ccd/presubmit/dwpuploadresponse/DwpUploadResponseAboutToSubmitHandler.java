@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -72,6 +73,8 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         moveDocsToCorrectCollection(sscsCaseData, todayDate);
 
         checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
+
+        setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
 
         return preSubmitCallbackResponse;
     }
