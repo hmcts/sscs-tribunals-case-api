@@ -11,7 +11,6 @@ public final class DateTimeUtils {
     private static final String EUROPE_LONDON = "Europe/London";
     private static final String UTC = "UTC";
     private static final String UTC_STRING_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-    public static final int DWP_RESPONSE_DUE_IN_DAYS = 35;
     public static final DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern(UTC_STRING_FORMAT);
 
     private DateTimeUtils() {
@@ -41,8 +40,8 @@ public final class DateTimeUtils {
 
     }
 
-    public static String generateDwpResponseDueDate() {
-        return LocalDate.now().plusDays(DWP_RESPONSE_DUE_IN_DAYS).toString();
+    public static String generateDwpResponseDueDate(int numberOfDays) {
+        return LocalDate.now().plusDays(numberOfDays).toString();
     }
 
     private static String formatUtc(ZonedDateTime zonedDateTime) {
