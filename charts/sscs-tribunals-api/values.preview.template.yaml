@@ -2211,7 +2211,7 @@ ccd:
       - caseworker-sscs-pcqextractor
 
 elastic:
-  enabled: true
+  enabled: false
 
 elasticsearch:
   clusterName: "es"
@@ -2274,7 +2274,7 @@ sscs-evidence-share:
     ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
 
 sscs-tribunals-frontend:
-  enabled: true
+  enabled: false
   nodejs:
     image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
@@ -2299,4 +2299,4 @@ sscs-tribunals-frontend:
           - pcq-token-key
 
 redis:
-  enabled: true
+  enabled: false
