@@ -42,7 +42,7 @@ public class AdminSendToWithDwpAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new AdminSendToWithDwpAboutToSubmitHandler();
+        handler = new AdminSendToWithDwpAboutToSubmitHandler(35);
 
         when(callback.getEvent()).thenReturn(EventType.ADMIN_SEND_TO_WITH_DWP);
         when(callback.getCaseDetails()).thenReturn(caseDetails);

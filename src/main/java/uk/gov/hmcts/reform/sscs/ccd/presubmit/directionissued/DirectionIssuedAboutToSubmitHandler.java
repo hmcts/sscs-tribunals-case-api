@@ -43,16 +43,19 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private final ServiceRequestExecutor serviceRequestExecutor;
     private final String bulkScanEndpoint;
     private final DwpAddressLookupService dwpAddressLookupService;
+    private final int dwpResponseDueDays;
 
     @Autowired
     public DirectionIssuedAboutToSubmitHandler(FooterService footerService, ServiceRequestExecutor serviceRequestExecutor,
                                                @Value("${bulk_scan.url}") String bulkScanUrl,
                                                @Value("${bulk_scan.validateEndpoint}") String validateEndpoint,
-                                               DwpAddressLookupService dwpAddressLookupService) {
+                                               DwpAddressLookupService dwpAddressLookupService,
+                                               @Value("${dwp.response.due.days}") int dwpResponseDueDays) {
         this.footerService = footerService;
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bulkScanEndpoint = String.format("%s%s", trimToEmpty(bulkScanUrl), trimToEmpty(validateEndpoint));
         this.dwpAddressLookupService = dwpAddressLookupService;
+        this.dwpResponseDueDays = dwpResponseDueDays;
     }
 
     @Override
@@ -124,7 +127,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private SscsCaseData updateCaseAfterExtensionRefused(SscsCaseData caseData, String interlocReviewState, State state) {
         caseData.setHmctsDwpState("sentToDwp");
         caseData.setDateSentToDwp(LocalDate.now().toString());
-        caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate());
+        caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate(dwpResponseDueDays));
         caseData.setInterlocReviewState(interlocReviewState);
         caseData.setState(state);
 
@@ -141,7 +144,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         } else if (getPreValidStates().contains(caseDetails.getState())
                 && DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setDateSentToDwp(LocalDate.now().toString());
-            caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate());
+            caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate(dwpResponseDueDays));
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
             updateDwpRegionalCentre(caseData);
 
@@ -269,7 +272,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
             } else if (getPreValidStates().contains(caseDetails.getState()) && DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
                 caseData.setDateSentToDwp(LocalDate.now().toString());
-                caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate());
+                caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate(dwpResponseDueDays));
                 caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
 
             } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
