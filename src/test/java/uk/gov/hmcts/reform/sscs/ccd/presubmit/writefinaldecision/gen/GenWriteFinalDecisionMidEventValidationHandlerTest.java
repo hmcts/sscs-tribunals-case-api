@@ -1,8 +1,13 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen;
 
+import static org.junit.Assert.assertNull;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+
 import javax.validation.Validator;
 import junitparams.JUnitParamsRunner;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerBase;
@@ -61,6 +66,13 @@ public class GenWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     @Override
     protected void shouldExhibitBenefitSpecificBehaviourWhenAnAnAwardIsGivenAndNoActivitiesSelected(AwardType dailyLiving, AwardType mobility) {
         // N/A for GEN
+    }
+
+    @Test
+    public void givenGenerateNoticeValueAndCaseIsGen_thenDoNotSetShowWorkCapabilityAssessment() {
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getShowWorkCapabilityAssessmentPage());
     }
 
 }
