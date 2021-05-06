@@ -103,7 +103,7 @@ public class PipWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setShowWorkCapabilityAssessmentPage(SscsCaseData sscsCaseData) {
-        // N/A for UC
+        // N/A for PIP
     }
 
     @Override
