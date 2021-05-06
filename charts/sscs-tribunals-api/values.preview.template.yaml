@@ -33,7 +33,7 @@ idam-pr:
 
 
 xui-webapp:
-  enabled: true
+  enabled: false
   nodejs:
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
