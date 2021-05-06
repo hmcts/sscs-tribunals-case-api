@@ -28,8 +28,8 @@ idam-pr:
   redirect_uris:
     XUI:
       - http://xui-${SERVICE_FQDN}/oauth2/callback
-    CCD-ADMIN:
-      - http://ccd-admin-web-${SERVICE_FQDN}/oauth2redirect
+#    CCD-ADMIN:
+#      - http://ccd-admin-web-${SERVICE_FQDN}/oauth2redirect
 
 
 xui-webapp:
@@ -62,13 +62,13 @@ xui-webapp:
       FEATURE_HELMET_ENABLED: false
       FEATURE_OIDC_ENABLED: false
       NOW: false
+        resourceGroup: rpx
       REDISCLOUD_URL: http://dummyrediscloudurl
       UV_THREADPOOL_SIZE: 128
       PROTOCOL: http
       XUI_ENV: PROD
     keyVaults:
       rpx:
-        resourceGroup: rpx
         secrets:
           - mc-s2s-client-secret
           - mc-idam-client-secret
