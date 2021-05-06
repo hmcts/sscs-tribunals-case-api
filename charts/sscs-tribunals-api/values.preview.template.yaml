@@ -2297,4 +2297,4 @@ sscs-tribunals-frontend:
           - pcq-token-key
 
 redis:
-  enabled: true
+  enabled: false
