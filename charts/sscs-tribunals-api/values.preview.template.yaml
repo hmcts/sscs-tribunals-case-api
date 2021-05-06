@@ -33,7 +33,7 @@ idam-pr:
 
 
 xui-webapp:
-  enabled: false
+  enabled: true
   nodejs:
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
@@ -65,8 +65,6 @@ xui-webapp:
       REDISCLOUD_URL: http://dummyrediscloudurl
       UV_THREADPOOL_SIZE: 128
       PROTOCOL: http
-      SYSTEM_USER_NAME: "dummy"
-      SYSTEM_USER_PASSWORD: "dummy"
       XUI_ENV: PROD
     keyVaults:
       rpx:
@@ -2233,7 +2231,7 @@ elasticsearch:
 logstash:
   image:
     repository: hmctspublic.azurecr.io/ccd/logstash
-    tag: latest
+    tag: ccd-sscs-logstash-latest
     pullPolicy: Always
   logstashJavaOpts: -Xmx1g -Xms512M
   persistence:
@@ -2274,10 +2272,11 @@ sscs-evidence-share:
     ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
 
 sscs-tribunals-frontend:
-  enabled: false
+  enabled: true
   nodejs:
     image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
+    releaseNameOverride: ${SERVICE_NAME}-sya
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master
       APPINSIGHTS_ROLE_NAME: ${SERVICE_NAME}
@@ -2299,4 +2298,4 @@ sscs-tribunals-frontend:
           - pcq-token-key
 
 redis:
-  enabled: false
+  enabled: true
