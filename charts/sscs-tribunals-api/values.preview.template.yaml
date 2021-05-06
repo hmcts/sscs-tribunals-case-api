@@ -2211,7 +2211,7 @@ ccd:
       - caseworker-sscs-pcqextractor
 
 elastic:
-  enabled: false
+  enabled: true
 
 elasticsearch:
   clusterName: "es"
