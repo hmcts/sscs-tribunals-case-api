@@ -2276,7 +2276,6 @@ sscs-tribunals-frontend:
   nodejs:
     image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
-    releaseNameOverride: ${SERVICE_NAME}-sya
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master
       APPINSIGHTS_ROLE_NAME: ${SERVICE_NAME}
