@@ -27,8 +27,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
-import uk.gov.hmcts.reform.sscs.service.exceptions.PdfPasswordException;
 
 @RunWith(JUnitParamsRunner.class)
 public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseHandlerTest {
@@ -48,11 +48,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
         MockitoAnnotations.openMocks(this);
         handler = new UploadDocumentFurtherEvidenceAboutToSubmitHandler(true, footerService);
 
-        try {
-            when(footerService.isReadablePdf(any())).thenReturn(true);
-        } catch (Exception e) {
-            // continue
-        }
+        when(footerService.isReadablePdf(any())).thenReturn(PdfState.OK);
 
         super.setUp();
     }
@@ -127,6 +123,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
         assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), actualCaseData.getData().getInterlocReferralReason());
         assertNull(actualCaseData.getData().getDwpState());
         assertNull(actualCaseData.getData().getDraftSscsFurtherEvidenceDocument());
+        assertEquals(YesNo.YES, actualCaseData.getData().getHasUnprocessedAudioVideoEvidence());
     }
 
     @Test
@@ -272,7 +269,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
                         .build())
                 .build());
 
-        when(footerService.isReadablePdf(any())).thenThrow(new Exception());
+        when(footerService.isReadablePdf(any())).thenReturn(PdfState.UNREADABLE);
 
         callback.getCaseDetails().getCaseData().setDraftSscsFurtherEvidenceDocument(draftDocuments);
         PreSubmitCallbackResponse<SscsCaseData> actualResponse = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -304,7 +301,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
                         .build())
                 .build());
 
-        when(footerService.isReadablePdf(any())).thenThrow(new PdfPasswordException("not allowed bro"));
+        when(footerService.isReadablePdf(any())).thenReturn(PdfState.PASSWORD_ENCRYPTED);
 
         callback.getCaseDetails().getCaseData().setDraftSscsFurtherEvidenceDocument(draftDocuments);
         PreSubmitCallbackResponse<SscsCaseData> actualResponse = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

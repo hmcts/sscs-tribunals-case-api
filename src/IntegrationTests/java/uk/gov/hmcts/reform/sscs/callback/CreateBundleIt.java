@@ -10,9 +10,7 @@ import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWi
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -36,7 +34,6 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -87,20 +84,8 @@ public class CreateBundleIt extends AbstractEventIt {
 
     @Test
     public void callToAboutToSubmitHandler_willCallExternalCreateBundleService() throws Exception {
-        List<DwpDocument> dwpDocumentList = new ArrayList<>();
-        dwpDocumentList.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DwpDocumentType.DWP_RESPONSE.getValue()).build()).build());
-        dwpDocumentList.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue()).build()).build());
 
-        SscsCaseData caseData = SscsCaseData.builder().dwpDocuments(dwpDocumentList).build();
-        when(restTemplate.exchange(eq("/api/new-bundle"), eq(HttpMethod.POST), any(), any(ParameterizedTypeReference.class))).thenReturn(responseEntity);
-
-        when(responseEntity.getBody()).thenReturn(new PreSubmitCallbackResponse<CaseData>(caseData));
-
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
-
-        assertHttpStatus(response, HttpStatus.OK);
-
-        verify(restTemplate).exchange(eq("/api/new-bundle"), eq(HttpMethod.POST), captor.capture(), any(ParameterizedTypeReference.class));
+        verifyBundlingServiceIsCalled();
 
         assertEquals(1,  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().size());
         assertEquals("sscs-bundle-config.yaml",  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().get(0).getValue());
@@ -110,20 +95,7 @@ public class CreateBundleIt extends AbstractEventIt {
     public void callToAboutToSubmitHandlerWithWelshCase_willCallExternalCreateBundleService() throws Exception {
         json = getJson("callback/createWelshBundleCallback.json");
 
-        List<DwpDocument> dwpDocumentList = new ArrayList<>();
-        dwpDocumentList.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DwpDocumentType.DWP_RESPONSE.getValue()).build()).build());
-        dwpDocumentList.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue()).build()).build());
-
-        SscsCaseData caseData = SscsCaseData.builder().dwpDocuments(dwpDocumentList).build();
-        when(restTemplate.exchange(eq("/api/new-bundle"), eq(HttpMethod.POST), any(), any(ParameterizedTypeReference.class))).thenReturn(responseEntity);
-
-        when(responseEntity.getBody()).thenReturn(new PreSubmitCallbackResponse<CaseData>(caseData));
-
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
-
-        assertHttpStatus(response, HttpStatus.OK);
-
-        verify(restTemplate).exchange(eq("/api/new-bundle"), eq(HttpMethod.POST), captor.capture(), any(ParameterizedTypeReference.class));
+        verifyBundlingServiceIsCalled();
 
         assertEquals(1,  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().size());
         assertEquals("sscs-bundle-welsh-config.yaml",  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().get(0).getValue());
@@ -133,20 +105,7 @@ public class CreateBundleIt extends AbstractEventIt {
     public void callToAboutToSubmitHandlerWithEditedDocuments_willCallExternalCreateBundleServiceWithMultiBundleConfig() throws Exception {
         json = getJson("callback/createBundleCallbackWithEditedDocuments.json");
 
-        List<DwpDocument> dwpDocumentList = new ArrayList<>();
-        dwpDocumentList.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DwpDocumentType.DWP_RESPONSE.getValue()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
-        dwpDocumentList.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
-
-        SscsCaseData caseData = SscsCaseData.builder().dwpDocuments(dwpDocumentList).build();
-        when(restTemplate.exchange(eq("/api/new-bundle"), eq(HttpMethod.POST), any(), any(ParameterizedTypeReference.class))).thenReturn(responseEntity);
-
-        when(responseEntity.getBody()).thenReturn(new PreSubmitCallbackResponse<CaseData>(caseData));
-
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
-
-        assertHttpStatus(response, HttpStatus.OK);
-
-        verify(restTemplate).exchange(eq("/api/new-bundle"), eq(HttpMethod.POST), captor.capture(), any(ParameterizedTypeReference.class));
+        verifyBundlingServiceIsCalled();
 
         assertEquals(2,  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().size());
         assertEquals("sscs-bundle-edited-config.yaml",  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().get(0).getValue());
@@ -157,20 +116,7 @@ public class CreateBundleIt extends AbstractEventIt {
     public void callToAboutToSubmitHandlerWithWelshCaseAndEditedDocuments_willCallExternalCreateBundleServiceWithMultiBundleConfig() throws Exception {
         json = getJson("callback/createWelshBundleCallbackWithEditedDocuments.json");
 
-        List<DwpDocument> dwpDocumentList = new ArrayList<>();
-        dwpDocumentList.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DwpDocumentType.DWP_RESPONSE.getValue()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
-        dwpDocumentList.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
-
-        SscsCaseData caseData = SscsCaseData.builder().dwpDocuments(dwpDocumentList).build();
-        when(restTemplate.exchange(eq("/api/new-bundle"), eq(HttpMethod.POST), any(), any(ParameterizedTypeReference.class))).thenReturn(responseEntity);
-
-        when(responseEntity.getBody()).thenReturn(new PreSubmitCallbackResponse<CaseData>(caseData));
-
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
-
-        assertHttpStatus(response, HttpStatus.OK);
-
-        verify(restTemplate).exchange(eq("/api/new-bundle"), eq(HttpMethod.POST), captor.capture(), any(ParameterizedTypeReference.class));
+        verifyBundlingServiceIsCalled();
 
         assertEquals(2,  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().size());
         assertEquals("sscs-bundle-welsh-edited-config.yaml",  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().get(0).getValue());
@@ -188,26 +134,37 @@ public class CreateBundleIt extends AbstractEventIt {
 
         json = getJson("callback/createBundleCallbackWithAudioVideoEvidence.json");
 
-        List<DwpDocument> dwpDocumentList = new ArrayList<>();
-        dwpDocumentList.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DwpDocumentType.DWP_RESPONSE.getValue()).build()).build());
-        dwpDocumentList.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue()).build()).build());
-
-        SscsCaseData caseData = SscsCaseData.builder().dwpDocuments(dwpDocumentList).build();
-        when(restTemplate.exchange(eq("/api/new-bundle"), eq(HttpMethod.POST), any(), any(ParameterizedTypeReference.class))).thenReturn(responseEntity);
-
-        when(responseEntity.getBody()).thenReturn(new PreSubmitCallbackResponse<CaseData>(caseData));
-
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
-
-        assertHttpStatus(response, HttpStatus.OK);
-
-        verify(restTemplate).exchange(eq("/api/new-bundle"), eq(HttpMethod.POST), captor.capture(), any(ParameterizedTypeReference.class));
+        verifyBundlingServiceIsCalled();
 
         assertEquals(2,  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().size());
         assertEquals("sscs-bundle-edited-config.yaml",  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().get(0).getValue());
         assertEquals("sscs-bundle-config.yaml",  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().get(1).getValue());
         assertEquals("Audio/video document",  captor.getValue().getBody().getCaseDetails().getCaseData().getAudioVideoEvidenceBundleDocument().getDocumentFileName());
 
+    }
+
+    @Test
+    public void callToAboutToSubmitHandlerWithEnhancedConfidentialityEditedDocuments_willCallExternalCreateBundleServiceWithMultiBundleConfig() throws Exception {
+        json = getJson("callback/createBundleCallbackWithEnhancedConfidentialityEditedDocuments.json");
+
+        verifyBundlingServiceIsCalled();
+
+        assertEquals(2,  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().size());
+        assertEquals("sscs-bundle-edited-config.yaml",  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().get(0).getValue());
+        assertEquals("sscs-bundle-config.yaml",  captor.getValue().getBody().getCaseDetails().getCaseData().getMultiBundleConfiguration().get(1).getValue());
+    }
+
+    private void verifyBundlingServiceIsCalled() throws Exception {
+        when(restTemplate.exchange(eq("/api/new-bundle"), eq(HttpMethod.POST), any(), any(ParameterizedTypeReference.class))).thenReturn(responseEntity);
+
+        SscsCaseData ingoreReturnedCaseData = SscsCaseData.builder().build();
+        when(responseEntity.getBody()).thenReturn(new PreSubmitCallbackResponse<CaseData>(ingoreReturnedCaseData));
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+
+        assertHttpStatus(response, HttpStatus.OK);
+
+        verify(restTemplate).exchange(eq("/api/new-bundle"), eq(HttpMethod.POST), captor.capture(), any(ParameterizedTypeReference.class));
     }
 
     private UploadResponse createUploadResponse() {

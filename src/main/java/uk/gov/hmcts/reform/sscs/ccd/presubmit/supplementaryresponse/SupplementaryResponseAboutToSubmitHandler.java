@@ -5,6 +5,7 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.collections4.ListUtils.union;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -76,6 +77,7 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
             sscsCaseData.setDwpState("supplementaryResponse");
         }
 
+        setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
         return callbackResponse;
     }
 
