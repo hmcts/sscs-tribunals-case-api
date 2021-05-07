@@ -29,7 +29,9 @@ idam-pr:
     XUI:
       - http://xui-${SERVICE_FQDN}/oauth2/callback
     CCD-ADMIN:
-      - http://ccd-admin-web-${SERVICE_FQDN}/oauth2redirect
+      - https://ccd-admin-web-${SERVICE_FQDN}/oauth2redirect
+    CCD:
+      - https://ccd-web-${SERVICE_FQDN}/oauth2redirect
 
 
 xui-webapp:
@@ -78,6 +80,8 @@ ccd:
   ccd:
     adminWeb:
       enabled: true
+    managementWeb:
+      enabled: true
     definitionImporter:
       enabled: true
     userProfileImporter:
@@ -96,6 +100,7 @@ ccd:
   global:
     ccdApiGatewayIngress: gateway-${SERVICE_FQDN}
     ccdAdminWebIngress: ccd-admin-web-${SERVICE_FQDN}
+    ccdCaseManagementWebIngress: ccd-web-${SERVICE_FQDN}
     ccdDataStoreUrl: http://ccd-data-store-api-${SERVICE_FQDN}
     ccdDefinitionStoreUrl: http://ccd-definition-store-${SERVICE_FQDN}
     ccdUserProfileUrl: http://ccd-user-profile-api-${SERVICE_FQDN}
@@ -115,6 +120,14 @@ ccd:
         IDAM_OAUTH2_AW_CLIENT_SECRET: ${ADMIN_WEB_IDAM_SECRET}
     idam-pr:
       releaseNameOverride: ${SERVICE_NAME}-ccd-admin-idam-pr
+      enabled: true
+
+  ccd-case-management-web:
+    nodejs:
+      image: hmctspublic.azurecr.io/ccd/case-management-web:latest
+      ingressHost: ccd-web-${SERVICE_FQDN}
+    idam-pr:
+      releaseNameOverride: ${SERVICE_NAME}-ccd-web-idam-pr
       enabled: true
 
   ccd-user-profile-api:
