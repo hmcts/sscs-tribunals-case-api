@@ -19,9 +19,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState;
 import uk.gov.hmcts.reform.sscs.pdf.PdfACompliance;
 import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
-import uk.gov.hmcts.reform.sscs.service.exceptions.PdfPasswordException;
 
 @Component
 @Slf4j
@@ -124,17 +124,19 @@ public abstract class AbstractFooterService<D extends AbstractDocument> {
         );
     }
 
-    public boolean isReadablePdf(String documentUrl) throws Exception {
+    public PdfState isReadablePdf(String documentUrl) {
         try (PDDocument document = PDDocument.load(toBytes(documentUrl))) {
 
             PdfACompliance p1a = new PdfACompliance();
             p1a.makeCompliant(document);
-            return true;
+            return PdfState.OK;
 
         } catch (InvalidPasswordException ipe) {
-            throw new PdfPasswordException(ipe.getMessage());
+            log.error("Error while reading the encrypted PDF with URL:{}, Exception:{}", documentUrl, ipe.getMessage());
+            return PdfState.PASSWORD_ENCRYPTED;
         } catch (Exception e) {
-            throw e;
+            log.error("Error while reading the PDF with URL:{}, Exception:{}", documentUrl, e.getMessage());
+            return PdfState.UNREADABLE;
         }
     }
 }

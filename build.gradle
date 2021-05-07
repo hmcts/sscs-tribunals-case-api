@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath("net.serenity-bdd:serenity-gradle-plugin:2.4.4")
+        classpath("net.serenity-bdd:serenity-gradle-plugin:2.4.24")
     }
 }
 
@@ -13,7 +13,7 @@ plugins {
     id 'org.sonarqube' version '3.2.0'
     id 'jacoco'
     id 'org.springframework.boot' version '2.3.5.RELEASE'
-    id 'uk.gov.hmcts.java' version '0.12.8'
+    id 'uk.gov.hmcts.java' version '0.12.9'
     id 'com.gorylenko.gradle-git-properties' version '2.2.4'
     id 'com.github.ben-manes.versions' version '0.38.0'
     id 'net.ltgt.apt' version '0.21'
@@ -323,7 +323,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.07'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.11-RC-SSCS-9124'
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.10'
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.33'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
