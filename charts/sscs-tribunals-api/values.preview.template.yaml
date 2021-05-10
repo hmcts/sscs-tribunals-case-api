@@ -2243,7 +2243,7 @@ logstash:
     port: 9200
   configTpl:
     xpack.monitoring.enabled: "false"
-    db.url: jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/ccd_data?stringtype=unspecified&ssl=false
+    db.url: jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?stringtype=unspecified&ssl=false
     db.user: hmcts
     db.pwd: hmcts
     es.data.nodes.url: http://${SERVICE_NAME}-es-master:9200
