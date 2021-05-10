@@ -22,4 +22,11 @@
         ]]></notes>
         <cve>CVE-2021-20291</cve>
     </suppress>
+    <suppress until="2021-06-01">
+        <notes><![CDATA[
+   file name: batik-i18n-1.14.jar : CVE-2020-7791 is false positive, it's actually a C# CVE.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.xmlgraphics/batik\-i18n@.*$</packageUrl>
+        <cve>CVE-2020-7791</cve>
+    </suppress>
 </suppressions>
