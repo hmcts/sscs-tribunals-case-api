@@ -637,4 +637,16 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), callback.getCaseDetails().getCaseData().getInterlocReferralReason());
     }
 
+    @Test
+    public void givenADwpUploadResponseEventWithRemovedDwpDocumentsThenHandle() {
+
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(new DwpResponseDocument(null, null));
+        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(new DwpResponseDocument(null, null));
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().isEmpty());
+    }
+
 }
