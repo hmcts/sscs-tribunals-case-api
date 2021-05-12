@@ -48,7 +48,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
-
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
@@ -65,9 +64,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
 
         String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-
         handleEditedDocuments(sscsCaseData, todayDate, preSubmitCallbackResponse);
-
         handleAudioVideoDocuments(sscsCaseData);
 
         moveDocsToCorrectCollection(sscsCaseData, todayDate);
@@ -175,7 +172,10 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     }
 
     private PreSubmitCallbackResponse<SscsCaseData> handleEditedDocuments(SscsCaseData sscsCaseData, String todayDate, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (sscsCaseData.getDwpEditedEvidenceBundleDocument() != null && sscsCaseData.getDwpEditedResponseDocument() != null) {
+
+        if (sscsCaseData.getDwpEditedEvidenceBundleDocument() != null
+                && sscsCaseData.getDwpEditedResponseDocument() != null
+                && sscsCaseData.getDwpEditedResponseDocument().getDocumentLink() != null) {
 
             sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
 
