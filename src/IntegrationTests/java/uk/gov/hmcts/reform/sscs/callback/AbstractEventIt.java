@@ -48,7 +48,7 @@ public abstract class AbstractEventIt {
     @Autowired
     protected WebApplicationContext context;
 
-    String json;
+    public String json;
 
     void setup() throws IOException {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
