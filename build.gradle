@@ -19,7 +19,7 @@ plugins {
     id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.6.0'
     id 'org.owasp.dependencycheck' version '6.1.6'
-    id 'au.com.dius.pact' version '4.2.2'
+    id 'au.com.dius.pact' version '4.2.5'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -330,7 +330,7 @@ dependencies {
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.25.0'
     testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.9.0'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
-    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.24.0'
+    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.25.0'
     testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
     // Added to fix CVE-2020-13934, CVE-2020-13935, CVE-2020-17527
