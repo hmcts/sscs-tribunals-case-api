@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -47,7 +48,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
-
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
@@ -64,14 +64,14 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
 
         String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-
         handleEditedDocuments(sscsCaseData, todayDate, preSubmitCallbackResponse);
-
         handleAudioVideoDocuments(sscsCaseData);
 
         moveDocsToCorrectCollection(sscsCaseData, todayDate);
 
         checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
+
+        setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
 
         return preSubmitCallbackResponse;
     }
@@ -172,7 +172,10 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     }
 
     private PreSubmitCallbackResponse<SscsCaseData> handleEditedDocuments(SscsCaseData sscsCaseData, String todayDate, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (sscsCaseData.getDwpEditedEvidenceBundleDocument() != null && sscsCaseData.getDwpEditedResponseDocument() != null) {
+
+        if (sscsCaseData.getDwpEditedEvidenceBundleDocument() != null
+                && sscsCaseData.getDwpEditedResponseDocument() != null
+                && sscsCaseData.getDwpEditedResponseDocument().getDocumentLink() != null) {
 
             sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
 

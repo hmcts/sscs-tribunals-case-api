@@ -202,6 +202,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertEquals("music.mp3", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("audioDocument", response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("Appellant", response.getData().getSscsDocument().get(0).getValue().getPartyUploaded().getLabel());
+        assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
     }
 
     @Test
@@ -300,6 +301,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertEquals("video.mp4", response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
         assertEquals("videoDocument", response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
         assertEquals("DWP", response.getData().getDwpDocuments().get(0).getValue().getPartyUploaded().getLabel());
+        assertEquals(YesNo.NO, response.getData().getHasUnprocessedAudioVideoEvidence());
     }
 
     @Test

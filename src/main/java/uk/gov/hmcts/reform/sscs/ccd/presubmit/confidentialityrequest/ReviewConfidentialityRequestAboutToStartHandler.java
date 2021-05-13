@@ -1,14 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.confidentialityrequest;
 
+import static uk.gov.hmcts.reform.sscs.util.ConfidentialityRequestUtil.isAtLeastOneRequestInProgress;
+
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
@@ -22,25 +22,6 @@ public class ReviewConfidentialityRequestAboutToStartHandler implements PreSubmi
             && callback.getEvent() == EventType.REVIEW_CONFIDENTIALITY_REQUEST
             && Objects.nonNull(callback.getCaseDetails())
             && Objects.nonNull(callback.getCaseDetails().getCaseData());
-    }
-
-    private boolean isAtLeastOneRequestInProgress(SscsCaseData sscsCaseData) {
-        return isAppellantRequestInProgress(sscsCaseData)
-            || isJointPartyRequestInProgress(sscsCaseData);
-    }
-
-    private boolean isAppellantRequestInProgress(SscsCaseData sscsCaseData) {
-        return RequestOutcome.IN_PROGRESS
-            .equals(getRequestOutcome(sscsCaseData.getConfidentialityRequestOutcomeAppellant()));
-    }
-
-    private boolean isJointPartyRequestInProgress(SscsCaseData sscsCaseData) {
-        return RequestOutcome.IN_PROGRESS
-            .equals(getRequestOutcome(sscsCaseData.getConfidentialityRequestOutcomeJointParty()));
-    }
-
-    private RequestOutcome getRequestOutcome(DatedRequestOutcome datedRequestOutcome) {
-        return datedRequestOutcome == null ? null : datedRequestOutcome.getRequestOutcome();
     }
 
     @Override

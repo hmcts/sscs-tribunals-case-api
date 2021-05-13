@@ -143,11 +143,13 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
         if (fileType.equalsIgnoreCase("pdf")) {
             assertThat(response.getData().getSscsDocument().size(), is(1));
             assertThat(response.getData().getAudioVideoEvidence(), is(nullValue()));
+            assertEquals(YesNo.NO, response.getData().getHasUnprocessedAudioVideoEvidence());
         } else {
             assertThat(response.getData().getSscsDocument(), is(nullValue()));
             assertThat(response.getData().getAudioVideoEvidence().size(), is(1));
             assertThat(response.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded(), is(UploadParty.CTSC));
             assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), response.getData().getInterlocReferralReason());
+            assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
         }
     }
 

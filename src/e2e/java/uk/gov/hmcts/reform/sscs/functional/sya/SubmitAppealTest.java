@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.sscs.functional.sya;
 
 import static io.restassured.RestAssured.baseURI;
+import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
+import static net.javacrumbs.jsonunit.JsonAssert.whenIgnoringPaths;
 import static org.junit.Assert.assertEquals;
-import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_DWP_REGIONAL_CENTRE;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
 import io.restassured.RestAssured;
@@ -11,7 +12,6 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import java.time.LocalDate;
 import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
@@ -25,7 +25,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
@@ -63,91 +62,78 @@ public class SubmitAppealTest {
         RestAssured.useRelaxedHTTPSValidation();
     }
 
-
-    @Test
-    @Parameters({
-        "PIP,DWP PIP (1),Newcastle",
-        "PIP,DWP PIP (2),Glasgow",
-        "ESA,Inverness DRT,Inverness DRT",
-        "ESA,Coatbridge Benefit Centre,Coatbridge Benefit Centre",
-        "UC,,Universal Credit",
-        "carersAllowance,,Tyneview Park DRT"
-    })
-    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentre(String benefitCode, String dwpIssuingOffice,
-                                                                  String expectedDwpRegionalCentre) {
-        String body = ALL_DETAILS_DWP_REGIONAL_CENTRE.getSerializedMessage();
-        String nino = submitHelper.getRandomNino();
-        body = submitHelper.setNino(body, nino);
-        body = submitHelper.setLatestMrnDate(body, LocalDate.now());
-        body = submitHelper.setDwpIssuingOffice(body, dwpIssuingOffice);
-        body = submitHelper.setBenefitCode(body, benefitCode);
-
-        Response response = RestAssured.given()
-            .body(body)
-            .header("Content-Type", "application/json")
-            .post("/appeals");
-
-        response.then().statusCode(HttpStatus.SC_CREATED);
-        long ccdId = getCcdIdFromLocationHeader(response.getHeader("Location"));
-        SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(ccdId, idamTokens);
-
-        assertEquals(expectedDwpRegionalCentre, sscsCaseDetails.getData().getDwpRegionalCentre());
-    }
-
     public static long getCcdIdFromLocationHeader(String location) {
         return Long.parseLong(location.substring(location.lastIndexOf("/") + 1));
     }
 
     @Test
-    @Parameters({
-        "ALL_DETAILS, incompleteApplication",
-        "ALL_DETAILS, interlocutoryReviewState",
-        "ALL_DETAILS, validAppeal"
-    })
-    public void appealShouldBeSavedViaSya(SyaJsonMessageSerializer syaJsonMessageSerializer, String expectedState) {
+    public void givenValidDraftAppealIsSubmittedFromSaveAndReturn_thenCreateValidAppeal() throws InterruptedException {
+        assertCaseToSscsCaseResults("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD.getSerializedMessage());
+    }
 
-        String body = syaJsonMessageSerializer.getSerializedMessage();
-        String nino = submitHelper.getRandomNino();
-        body = submitHelper.setNino(body, nino);
+    @Test
+    public void givenIncompleteDraftAppealIsSubmittedFromSaveAndReturn_thenCreateIncompleteAppeal() throws InterruptedException {
+        assertCaseToSscsCaseResults("incompleteApplication", ALL_DETAILS_NON_SAVE_AND_RETURN_NO_MRN_DATE_CCD.getSerializedMessage());
+    }
 
+    @Test
+    public void givenNonCompliantDraftAppealIsSubmittedFromSaveAndReturn_thenCreateNonCompliantAppeal() throws InterruptedException {
+        assertCaseToSscsCaseResults("interlocutoryReviewState", ALL_DETAILS_NON_SAVE_AND_RETURN_WITH_INTERLOC_CCD.getSerializedMessage());
+    }
+
+    private void assertCaseToSscsCaseResults(String expectedState, String expectedResponse) throws InterruptedException {
         LocalDate now = LocalDate.now();
         LocalDate interlocutoryReviewDate = now.minusMonths(13).minusDays(1);
         LocalDate mrnDate = expectedState.equals("interlocutoryReviewState") ? interlocutoryReviewDate :
-            expectedState.equals("incompleteApplication") ? null : now;
+                expectedState.equals("incompleteApplication") ? null : now;
+        String nino = submitHelper.getRandomNino();
 
-        body = submitHelper.setLatestMrnDate(body, mrnDate);
-
-        SyaCaseWrapper wrapper = syaJsonMessageSerializer.getDeserializeMessage();
-
-        wrapper.getAppellant().setNino(nino);
+        SyaCaseWrapper wrapper = ALL_DETAILS_NON_SAVE_AND_RETURN.getDeserializeMessage();
         wrapper.getMrn().setDate(mrnDate);
+        wrapper.getAppellant().setNino(nino);
 
-        RegionalProcessingCenter rpc = getRegionalProcessingCenter();
-
-        Appeal expected = convertSyaToCcdCaseData(wrapper, rpc.getName(), rpc).getAppeal();
+        String body = setDraftCaseJson(mrnDate, nino);
 
         Response response = RestAssured.given()
-            .body(body)
-            .header("Content-Type", "application/json")
-            .post("/appeals");
+                .body(body)
+                .header("Content-Type", "application/json")
+                .post("/appeals");
 
         response.then().statusCode(HttpStatus.SC_CREATED);
 
         final Long id = getCcdIdFromLocationHeader(response.getHeader("Location"));
+
         SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, idamTokens);
 
-        if (expected.getAppellant().getAppointee() == null) {
-            sscsCaseDetails.getData().getAppeal().getAppellant().setAppointee(null);
-        }
-
         log.info(String.format("SYA created with CCD ID %s", id));
-        assertEquals(expected, sscsCaseDetails.getData().getAppeal());
+
+        assertJsonEquals(changeExpectedFields(expectedResponse, nino, mrnDate), sscsCaseDetails.getData(), whenIgnoringPaths("sscsDocument"));
+
         assertEquals(expectedState, sscsCaseDetails.getState());
     }
 
+    private String setDraftCaseJson(LocalDate mrnDate, String nino) {
+        String body = ALL_DETAILS_NON_SAVE_AND_RETURN.getSerializedMessage();
+        body = submitHelper.setNino(body, nino);
+        body = submitHelper.setLatestMrnDate(body, mrnDate);
+        return body;
+    }
+
+    private String changeExpectedFields(String serializedMessage, String nino, LocalDate mrnDate) {
+        serializedMessage = serializedMessage.replace("AB877533C", nino);
+        serializedMessage = serializedMessage.replace("2021-04-13", LocalDate.now().toString());
+
+        if (mrnDate != null) {
+            serializedMessage = serializedMessage.replace("2018-02-01", mrnDate.toString());
+        }
+
+
+        return serializedMessage;
+    }
+
     @Test
-    @Parameters({"ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS, validAppeal"})
-    public void appealShouldCreateDuplicateAndLinked(SyaJsonMessageSerializer syaJsonMessageSerializer, String expectedState) throws InterruptedException {
+    public void appealShouldCreateDuplicateAndLinked() throws InterruptedException {
+        SyaJsonMessageSerializer syaJsonMessageSerializer = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
         String body = syaJsonMessageSerializer.getSerializedMessage();
         String nino = submitHelper.getRandomNino();
 
@@ -173,7 +159,7 @@ public class SubmitAppealTest {
         SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, idamTokens);
 
         log.info(String.format("SYA created with CCD ID %s", id));
-        assertEquals(expectedState, sscsCaseDetails.getState());
+        assertEquals("validAppeal", sscsCaseDetails.getState());
 
         //create a case with different mrn date
         body = syaJsonMessageSerializer.getSerializedMessage();

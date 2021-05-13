@@ -152,6 +152,14 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
+        assertEquals(NO, response.getData().getHasUnprocessedAudioVideoEvidence());
+    }
+
+    @Test
+    public void givenADwpUploadResponseEventWithExistingAudioVideoEvidence_assertFlagIsSet() {
+        callback.getCaseDetails().getCaseData().setAudioVideoEvidence(List.of(AudioVideoEvidence.builder().build()));
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(YES, response.getData().getHasUnprocessedAudioVideoEvidence());
     }
 
     @Test
@@ -627,6 +635,18 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(2, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
         assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
         assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), callback.getCaseDetails().getCaseData().getInterlocReferralReason());
+    }
+
+    @Test
+    public void givenADwpUploadResponseEventWithRemovedDwpDocumentsThenHandle() {
+
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(new DwpResponseDocument(null, null));
+        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(new DwpResponseDocument(null, null));
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().isEmpty());
     }
 
 }
