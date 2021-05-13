@@ -10,6 +10,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX;
 import static uk.gov.hmcts.reform.sscs.util.ConfidentialityRequestUtil.isAtLeastOneRequestInProgress;
@@ -26,6 +27,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 import uk.gov.hmcts.reform.sscs.service.bundle.BundleAudioVideoPdfService;
@@ -44,6 +47,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     private final String bundleWelshEditedConfig;
     private final DwpDocumentService dwpDocumentService;
     private final BundleAudioVideoPdfService bundleAudioVideoPdfService;
+    private IdamService idamService;
 
     @Autowired
     public CreateBundleAboutToSubmitHandler(ServiceRequestExecutor serviceRequestExecutor,
@@ -53,7 +57,8 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
                                             @Value("${bundle.english.config}") String bundleEnglishConfig,
                                             @Value("${bundle.welsh.config}") String bundleWelshConfig,
                                             @Value("${bundle.english.edited.config}") String bundleEnglishEditedConfig,
-                                            @Value("${bundle.welsh.edited.config}") String bundleWelshEditedConfig) {
+                                            @Value("${bundle.welsh.edited.config}") String bundleWelshEditedConfig,
+                                            IdamService idamService) {
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.dwpDocumentService = dwpDocumentService;
         this.bundleAudioVideoPdfService = bundleAudioVideoPdfService;
@@ -62,6 +67,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         this.bundleWelshConfig = bundleWelshConfig;
         this.bundleEnglishEditedConfig = bundleEnglishEditedConfig;
         this.bundleWelshEditedConfig = bundleWelshEditedConfig;
+        this.idamService = idamService;
     }
 
     @Override
@@ -86,8 +92,16 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
 
-        if (checkMandatoryFilesMissing(sscsCaseData)) {
-            response.addError("The bundle cannot be created as mandatory DWP documents are missing");
+        if (hasMandatoryFilesMissing(sscsCaseData)) {
+
+            final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
+            final boolean hasSuperUserRole = userDetails.hasRole(SUPER_USER);
+
+            if (!hasSuperUserRole) {
+                response.addError("The bundle cannot be created as mandatory DWP documents are missing");
+            } else {
+                response.addWarning("The bundle cannot be created as mandatory DWP documents are missing, do you want to proceed?");
+            }
             return response;
         }
 
@@ -238,7 +252,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         return MultiBundleConfig.builder().value(config).build();
     }
 
-    private boolean checkMandatoryFilesMissing(SscsCaseData sscsCaseData) {
+    private boolean hasMandatoryFilesMissing(SscsCaseData sscsCaseData) {
         boolean depResponseDocsMissing = isDwpResponseDocsMissing(sscsCaseData);
         if (!depResponseDocsMissing) {
             return isDwpEvidenceBundleDocsMissing(sscsCaseData);

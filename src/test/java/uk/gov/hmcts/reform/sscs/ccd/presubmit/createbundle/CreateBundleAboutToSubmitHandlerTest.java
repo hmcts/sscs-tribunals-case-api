@@ -19,6 +19,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
@@ -30,6 +31,8 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 import uk.gov.hmcts.reform.sscs.service.bundle.BundleAudioVideoPdfService;
@@ -56,13 +59,15 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
     private DwpDocumentService dwpDocumentService;
 
+    @Mock
+    private IdamService idamService;
 
     @Before
     public void setUp() {
         openMocks(this);
         dwpDocumentService = new DwpDocumentService();
         handler = new CreateBundleAboutToSubmitHandler(serviceRequestExecutor, dwpDocumentService, bundleAudioVideoPdfService, "bundleUrl.com", "bundleEnglishConfig", "bundleWelshConfig",
-                "bundleEnglishEditedConfig", "bundleWelshEditedConfig");
+                "bundleEnglishEditedConfig", "bundleWelshEditedConfig", idamService);
 
         when(callback.getEvent()).thenReturn(EventType.CREATE_BUNDLE);
 
@@ -71,6 +76,8 @@ public class CreateBundleAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(serviceRequestExecutor.post(any(), any())).thenReturn(new PreSubmitCallbackResponse<>(sscsCaseData));
+
+        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first", "last", Arrays.asList("caseworker-sscs-clerk")));
     }
 
     @Test
@@ -421,6 +428,78 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
         verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
         assertNull(response.getData().getCaseBundles());
+    }
+
+    @Test
+    public void givenEmptyDwpEvidenceBundleDocumentLinkWithDwpDocumentsPatternForSuperUser_thenReturnWarning() {
+
+        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first", "last", Arrays.asList("caseworker-sscs-superuser")));
+
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).build()).build());
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String warning = response.getWarnings().stream()
+                .findFirst()
+                .orElse("");
+
+        assertEquals("The bundle cannot be created as mandatory DWP documents are missing, do you want to proceed?", warning);
+        verifyNoInteractions(serviceRequestExecutor);
+
+    }
+
+    @Test
+    public void givenEmptyDwpEvidenceBundleDocumentLinkWithOldPatternForSuperUser_thenReturnWarning() {
+        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first", "last", Arrays.asList("caseworker-sscs-superuser")));
+
+        callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().build());
+        callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String warning = response.getWarnings().stream()
+                .findFirst()
+                .orElse("");
+
+        assertEquals("The bundle cannot be created as mandatory DWP documents are missing, do you want to proceed?", warning);
+        verifyNoInteractions(serviceRequestExecutor);
+    }
+
+    @Test
+    public void givenEmptyDwpResponseDocumentLinkWithDwpDocumentsPatternForSuperUser_thenReturnWarning() {
+        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first", "last", Arrays.asList("caseworker-sscs-superuser")));
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).build()).build());
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String warning = response.getWarnings().stream()
+                .findFirst()
+                .orElse("");
+
+        assertEquals("The bundle cannot be created as mandatory DWP documents are missing, do you want to proceed?", warning);
+        verifyNoInteractions(serviceRequestExecutor);
+    }
+
+    @Test
+    public void givenEmptyDwpResponseDocumentLinkWithOldPatternForSuperUser_thenReturnWarning() {
+        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first", "last", Arrays.asList("caseworker-sscs-superuser")));
+        callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+        callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String warning = response.getWarnings().stream()
+                .findFirst()
+                .orElse("");
+
+        assertEquals("The bundle cannot be created as mandatory DWP documents are missing, do you want to proceed?", warning);
+        verifyNoInteractions(serviceRequestExecutor);
     }
 
     private void addMandatoryDwpDocuments() {
