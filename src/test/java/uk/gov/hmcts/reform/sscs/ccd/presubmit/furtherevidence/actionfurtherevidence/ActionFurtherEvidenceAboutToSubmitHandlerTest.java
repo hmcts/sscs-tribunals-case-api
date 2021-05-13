@@ -1034,6 +1034,38 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals(sender.getDocumentType().getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
     }
 
+    @Test
+    @Parameters({
+        "ISSUE_FURTHER_EVIDENCE,Yes,1",
+        "ISSUE_FURTHER_EVIDENCE,No,1",
+        "OTHER_DOCUMENT_MANUAL,Yes,1",
+        "OTHER_DOCUMENT_MANUAL,No,0",
+        "SEND_TO_INTERLOC_REVIEW_BY_TCW,Yes,1",
+        "SEND_TO_INTERLOC_REVIEW_BY_TCW,No,0"
+    })
+    public void shouldAddDocumentToBundleBasedOnFurtherEvidenceActionType(FurtherEvidenceActionDynamicListItems actionType, String includeInBundle, int occurs) {
+
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder);
+
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(actionType.code, actionType.label));
+
+        when(caseDetails.getState()).thenReturn(READY_TO_LIST);
+        when(footerService.getNextBundleAddition(any())).thenReturn("A");
+
+        ScannedDocument scannedDocument = ScannedDocument
+            .builder()
+            .value(
+                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                    .url(DocumentLink.builder().documentUrl("test.com").build()).includeInBundle(includeInBundle).build()).build();
+        List<ScannedDocument> docs = new ArrayList<>();
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(occurs, response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count());
+    }
+
     private DatedRequestOutcome createDatedRequestOutcome(RequestOutcome requestOutcome) {
         return DatedRequestOutcome.builder().date(LocalDate.now().minusDays(1))
             .requestOutcome(requestOutcome).build();
