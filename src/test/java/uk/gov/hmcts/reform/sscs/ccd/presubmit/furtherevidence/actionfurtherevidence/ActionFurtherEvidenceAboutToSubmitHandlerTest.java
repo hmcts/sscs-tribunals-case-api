@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.JOINT_PARTY_EVI
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.ActionFurtherEvidenceAboutToSubmitHandler.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
@@ -716,6 +717,33 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    @Parameters({"ISSUE_FURTHER_EVIDENCE,No,1", "OTHER_DOCUMENT_MANUAL,Yes,1", "OTHER_DOCUMENT_MANUAL,No,0", "SEND_TO_INTERLOC_REVIEW_BY_JUDGE,Yes,1",
+            "SEND_TO_INTERLOC_REVIEW_BY_JUDGE,No,0", "INFORMATION_RECEIVED_FOR_INTERLOC_TCW,Yes,0"})
+    public void shouldSetBundleAdditionBasedOnFurtherEvidenceActionType(FurtherEvidenceActionDynamicListItems actionType, String includeInBundle, int occurs) {
+
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder);
+
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(actionType.code, actionType.label));
+
+        when(caseDetails.getState()).thenReturn(READY_TO_LIST);
+        when(footerService.getNextBundleAddition(any())).thenReturn("A");
+
+        ScannedDocument scannedDocument = ScannedDocument
+                .builder()
+                .value(
+                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.URGENT_HEARING_REQUEST.getValue())
+                        .url(DocumentLink.builder().documentUrl("test.com").build()).includeInBundle(includeInBundle).build()).build();
+        List<ScannedDocument> docs = new ArrayList<>();
+
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(occurs, response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count());
+    }
+
+    @Test
     public void shouldNotUpdateInterlocReviewStateWhenActionManuallyAndHasNoReinstatementRequestDocument() {
         sscsCaseData.setPreviousState(null);
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
@@ -806,7 +834,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
         assertEquals(0, response.getWarnings().size());
-        
+
         assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant().getRequestOutcome());
         assertEquals(createDatedRequestOutcome(RequestOutcome.GRANTED), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
         assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestOutcomeAppellant().getDate());
@@ -996,8 +1024,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
-        
-        when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
+
+        when(caseDetails.getState()).thenReturn(READY_TO_LIST);
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         verify(footerService).addFooter(eq(scannedDocument.getValue().getUrl()), eq(sender.getDocumentFooter()), eq(null));
