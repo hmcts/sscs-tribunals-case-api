@@ -67,32 +67,28 @@ public class SubmitAppealTest {
     }
 
     @Test
-    public void givenValidDraftAppealIsSubmittedFromSaveAndReturn_thenCreateValidAppeal() throws InterruptedException {
-        assertCaseToSscsCaseResults("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD.getSerializedMessage());
+    public void givenValidAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateValidAppeal() throws InterruptedException {
+        assertSscsCaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD.getSerializedMessage());
     }
 
     @Test
-    public void givenIncompleteDraftAppealIsSubmittedFromSaveAndReturn_thenCreateIncompleteAppeal() throws InterruptedException {
-        assertCaseToSscsCaseResults("incompleteApplication", ALL_DETAILS_NON_SAVE_AND_RETURN_NO_MRN_DATE_CCD.getSerializedMessage());
+    public void givenIncompleteAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateIncompleteAppeal() throws InterruptedException {
+        assertSscsCaseIsExpectedResult("incompleteApplication", ALL_DETAILS_NON_SAVE_AND_RETURN_NO_MRN_DATE_CCD.getSerializedMessage());
     }
 
     @Test
-    public void givenNonCompliantDraftAppealIsSubmittedFromSaveAndReturn_thenCreateNonCompliantAppeal() throws InterruptedException {
-        assertCaseToSscsCaseResults("interlocutoryReviewState", ALL_DETAILS_NON_SAVE_AND_RETURN_WITH_INTERLOC_CCD.getSerializedMessage());
+    public void givenNonCompliantAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateNonCompliantAppeal() throws InterruptedException {
+        assertSscsCaseIsExpectedResult("interlocutoryReviewState", ALL_DETAILS_NON_SAVE_AND_RETURN_WITH_INTERLOC_CCD.getSerializedMessage());
     }
 
-    private void assertCaseToSscsCaseResults(String expectedState, String expectedResponse) throws InterruptedException {
+    private void assertSscsCaseIsExpectedResult(String expectedState, String expectedResponse) {
         LocalDate now = LocalDate.now();
         LocalDate interlocutoryReviewDate = now.minusMonths(13).minusDays(1);
         LocalDate mrnDate = expectedState.equals("interlocutoryReviewState") ? interlocutoryReviewDate :
                 expectedState.equals("incompleteApplication") ? null : now;
         String nino = submitHelper.getRandomNino();
 
-        SyaCaseWrapper wrapper = ALL_DETAILS_NON_SAVE_AND_RETURN.getDeserializeMessage();
-        wrapper.getMrn().setDate(mrnDate);
-        wrapper.getAppellant().setNino(nino);
-
-        String body = setDraftCaseJson(mrnDate, nino);
+        String body = updateCaseJsonWithMrnDateAndNino(mrnDate, nino);
 
         Response response = RestAssured.given()
                 .body(body)
@@ -112,7 +108,7 @@ public class SubmitAppealTest {
         assertEquals(expectedState, sscsCaseDetails.getState());
     }
 
-    private String setDraftCaseJson(LocalDate mrnDate, String nino) {
+    private String updateCaseJsonWithMrnDateAndNino(LocalDate mrnDate, String nino) {
         String body = ALL_DETAILS_NON_SAVE_AND_RETURN.getSerializedMessage();
         body = submitHelper.setNino(body, nino);
         body = submitHelper.setLatestMrnDate(body, mrnDate);
