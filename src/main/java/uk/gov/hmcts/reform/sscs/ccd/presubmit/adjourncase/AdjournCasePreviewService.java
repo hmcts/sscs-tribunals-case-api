@@ -32,7 +32,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
     private final VenueDataLoader venueDataLoader;
     private final LanguageService languageService;
-    private static final String DOCUMENT_DATE_PATTERN = "dd/MM/YYYY";
+    private static final String DOCUMENT_DATE_PATTERN = "dd/MM/yyyy";
     public static final String IN_CHAMBERS = "In chambers";
 
     @Autowired

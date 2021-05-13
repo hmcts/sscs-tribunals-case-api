@@ -304,7 +304,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         if (callback.getEvent() == EventType.DIRECTION_ISSUED) {
             footerService.createFooterAndAddDocToCase(url, caseData, DocumentType.DIRECTION_NOTICE,
                     Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now())
-                            .format(DateTimeFormatter.ofPattern("dd-MM-YYYY")),
+                            .format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
                     caseData.getDateAdded(), null, documentTranslationStatus);
         }
 
