@@ -67,17 +67,17 @@ public class SubmitAppealTest {
     }
 
     @Test
-    public void givenValidDraftAppealIsSubmittedFromSaveAndReturn_thenCreateValidAppeal() throws InterruptedException {
+    public void givenValidAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateValidAppeal() throws InterruptedException {
         assertCaseToSscsCaseResults("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD.getSerializedMessage());
     }
 
     @Test
-    public void givenIncompleteDraftAppealIsSubmittedFromSaveAndReturn_thenCreateIncompleteAppeal() throws InterruptedException {
+    public void givenIncompleteDraftAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateIncompleteAppeal() throws InterruptedException {
         assertCaseToSscsCaseResults("incompleteApplication", ALL_DETAILS_NON_SAVE_AND_RETURN_NO_MRN_DATE_CCD.getSerializedMessage());
     }
 
     @Test
-    public void givenNonCompliantDraftAppealIsSubmittedFromSaveAndReturn_thenCreateNonCompliantAppeal() throws InterruptedException {
+    public void givenNonCompliantDraftAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateNonCompliantAppeal() throws InterruptedException {
         assertCaseToSscsCaseResults("interlocutoryReviewState", ALL_DETAILS_NON_SAVE_AND_RETURN_WITH_INTERLOC_CCD.getSerializedMessage());
     }
 
