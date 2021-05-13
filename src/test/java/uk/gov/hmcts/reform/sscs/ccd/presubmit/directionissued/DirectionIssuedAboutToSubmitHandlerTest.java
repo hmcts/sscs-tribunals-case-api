@@ -84,7 +84,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService, 35);
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
@@ -273,6 +273,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertNotNull(response.getData().getDateSentToDwp());
+        assertThat(response.getData().getDwpDueDate(), is(LocalDate.now().plusDays(35).toString()));
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
         assertEquals(DUMMY_REGIONAL_CENTER, response.getData().getDwpRegionalCentre());
     }
@@ -310,6 +311,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertNotNull(response.getData().getDateSentToDwp());
+        assertThat(response.getData().getDwpDueDate(), is(LocalDate.now().plusDays(35).toString()));
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
         assertEquals(DUMMY_REGIONAL_CENTER, response.getData().getDwpRegionalCentre());
     }
@@ -349,7 +351,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     public void givenDirectionTypeOfGrantReinstatementAndNotInterlocReview_setState() {
 
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService, 35);
 
         callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
         callback.getCaseDetails().getCaseData().setPreviousState(State.APPEAL_CREATED);
@@ -370,7 +372,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     public void givenDirectionTypeOfGrantReinstatementAndInterlocReview_setState() {
 
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService, 35);
 
         callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
         callback.getCaseDetails().getCaseData().setPreviousState(State.INTERLOCUTORY_REVIEW_STATE);
@@ -390,7 +392,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     public void givenDirectionTypeOfRefuseReinstatementkeepState() {
 
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService, 35);
 
         callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
         callback.getCaseDetails().getCaseData().setPreviousState(State.APPEAL_CREATED);
@@ -410,7 +412,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     public void givenDirectionTypeOfGrantReinstatementForWelshCaseDont_setStates() {
 
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService, 35);
 
         callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
         callback.getCaseDetails().getCaseData().setPreviousState(State.APPEAL_CREATED);
@@ -433,7 +435,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     public void givenDirectionTypeOfRefuseReinstatementForWelshCaseDont_setStates() {
 
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService, 35);
 
         callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
         callback.getCaseDetails().getCaseData().setPreviousState(State.APPEAL_CREATED);
@@ -456,7 +458,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     public void givenDirectionTypeOfGrantUrgentHearingAndInterlocReview_setState() {
 
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService, 35);
 
         callback.getCaseDetails().getCaseData().setState(State.INTERLOCUTORY_REVIEW_STATE);
         callback.getCaseDetails().getCaseData().setPreviousState(State.DORMANT_APPEAL_STATE);
@@ -476,7 +478,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     public void givenDirectionTypeOfRefuseUrgentHearingkeepState() {
 
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService, 35);
 
         callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
         callback.getCaseDetails().getCaseData().setPreviousState(State.APPEAL_CREATED);
@@ -643,5 +645,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertThat(response.getData().getState(), is(state));
         assertThat(response.getData().getHmctsDwpState(), is("sentToDwp"));
         assertThat(response.getData().getDateSentToDwp(), is(LocalDate.now().toString()));
+        assertThat(response.getData().getDwpDueDate(), is(LocalDate.now().plusDays(35).toString()));
     }
 }
