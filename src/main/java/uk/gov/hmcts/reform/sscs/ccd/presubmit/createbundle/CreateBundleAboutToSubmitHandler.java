@@ -6,18 +6,15 @@ import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX;
 import static uk.gov.hmcts.reform.sscs.util.ConfidentialityRequestUtil.isAtLeastOneRequestInProgress;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -27,8 +24,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 import uk.gov.hmcts.reform.sscs.service.bundle.BundleAudioVideoPdfService;
@@ -47,7 +42,6 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     private final String bundleWelshEditedConfig;
     private final DwpDocumentService dwpDocumentService;
     private final BundleAudioVideoPdfService bundleAudioVideoPdfService;
-    private IdamService idamService;
 
     @Autowired
     public CreateBundleAboutToSubmitHandler(ServiceRequestExecutor serviceRequestExecutor,
@@ -57,8 +51,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
                                             @Value("${bundle.english.config}") String bundleEnglishConfig,
                                             @Value("${bundle.welsh.config}") String bundleWelshConfig,
                                             @Value("${bundle.english.edited.config}") String bundleEnglishEditedConfig,
-                                            @Value("${bundle.welsh.edited.config}") String bundleWelshEditedConfig,
-                                            IdamService idamService) {
+                                            @Value("${bundle.welsh.edited.config}") String bundleWelshEditedConfig) {
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.dwpDocumentService = dwpDocumentService;
         this.bundleAudioVideoPdfService = bundleAudioVideoPdfService;
@@ -67,7 +60,6 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         this.bundleWelshConfig = bundleWelshConfig;
         this.bundleEnglishEditedConfig = bundleEnglishEditedConfig;
         this.bundleWelshEditedConfig = bundleWelshEditedConfig;
-        this.idamService = idamService;
     }
 
     @Override
@@ -90,27 +82,13 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
         moveDocsToDwpCollectionIfOldPattern(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
-
-        if (hasMandatoryFilesMissing(sscsCaseData)) {
-
-            final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
-            final boolean hasSuperUserRole = userDetails.hasRole(SUPER_USER);
-
-            if (!hasSuperUserRole) {
-                response.addError("The bundle cannot be created as mandatory DWP documents are missing");
-            } else {
-                response.addWarning("The bundle cannot be created as mandatory DWP documents are missing, do you want to proceed?");
-            }
-            return response;
-        }
-
         setDocumentFileNameIfNotSet(sscsCaseData);
 
         clearExistingBundles(callback);
 
         createPdfsForAnyAudioVideoEvidence(sscsCaseData);
 
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
         setMultiBundleConfig(sscsCaseData, response);
 
         if (isNotEmpty(response.getErrors())) {
@@ -250,42 +228,6 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
     private MultiBundleConfig getMultiBundleConfig(String config) {
         return MultiBundleConfig.builder().value(config).build();
-    }
-
-    private boolean hasMandatoryFilesMissing(SscsCaseData sscsCaseData) {
-        boolean depResponseDocsMissing = isDwpResponseDocsMissing(sscsCaseData);
-        if (!depResponseDocsMissing) {
-            return isDwpEvidenceBundleDocsMissing(sscsCaseData);
-        }
-        return true;
-    }
-
-    private boolean isDwpEvidenceBundleDocsMissing(SscsCaseData sscsCaseData) {
-        List<DwpDocument> dwpEvidenceBundleDocs = getDwpEvidenceBundleDocs(sscsCaseData);
-        return dwpEvidenceBundleDocs.isEmpty() || hasMandatoryDocumentMissingForLegacyAppeals(dwpEvidenceBundleDocs);
-    }
-
-    private boolean isDwpResponseDocsMissing(SscsCaseData sscsCaseData) {
-        List<DwpDocument> dwpResponseDocs = getDwpResponseDocs(sscsCaseData);
-        return dwpResponseDocs.isEmpty() || hasMandatoryDocumentMissingForLegacyAppeals(dwpResponseDocs);
-    }
-
-    @NotNull
-    private List<DwpDocument> getDwpEvidenceBundleDocs(SscsCaseData sscsCaseData) {
-        return emptyIfNull(sscsCaseData.getDwpDocuments()).stream()
-                .filter(e -> DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue().equals(e.getValue().getDocumentType()))
-                .collect(toList());
-    }
-
-    @NotNull
-    private List<DwpDocument> getDwpResponseDocs(SscsCaseData sscsCaseData) {
-        return emptyIfNull(sscsCaseData.getDwpDocuments()).stream()
-                .filter(e -> DwpDocumentType.DWP_RESPONSE.getValue().equals(e.getValue().getDocumentType()))
-                .collect(toList());
-    }
-
-    private boolean hasMandatoryDocumentMissingForLegacyAppeals(List<DwpDocument> dwpResponseDocs) {
-        return dwpResponseDocs.stream().anyMatch(e -> isNull(e.getValue().getDocumentLink()));
     }
 
     private void moveDocsToDwpCollectionIfOldPattern(SscsCaseData sscsCaseData) {
