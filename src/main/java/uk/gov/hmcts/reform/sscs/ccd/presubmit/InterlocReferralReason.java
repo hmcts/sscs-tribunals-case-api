@@ -16,7 +16,7 @@ public enum InterlocReferralReason {
     NO_MRN("noMrn", "No MRN"),
     NONE("none", "N/A"),
     LISTING_DIRECTIONS("listingDirections", "Listing directions"),
-    OVER_13_MONTHS_AND_GROUNDS_MISSING("groundsForAppealMissing", "Grounds for appeal missing"),
+    OVER_13_MONTHS_AND_GROUNDS_MISSING("over13MonthsAndGroundsMissing", "Grounds for appeal missing"),
     COMPLEX_CASE("complexCase", "Complex Case"),
     ADVICE_ON_HOW_TO_PROCEED("adviceOnHowToProceed", "Advice on how to proceed");
 
