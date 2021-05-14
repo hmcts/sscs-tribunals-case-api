@@ -16,7 +16,7 @@ public final class DateTimeUtils {
     private DateTimeUtils() {
         //
     }
-    
+
     public static String convertLocalDateLocalTimetoUtc(String localDateStr, String localTimeStr) {
 
         LocalDate localDate = LocalDate.parse(localDateStr);
@@ -38,6 +38,10 @@ public final class DateTimeUtils {
         ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, ZoneId.of(EUROPE_LONDON));
         return formatUtc(zonedDateTime);
 
+    }
+
+    public static String generateDwpResponseDueDate(int numberOfDays) {
+        return LocalDate.now().plusDays(numberOfDays).toString();
     }
 
     private static String formatUtc(ZonedDateTime zonedDateTime) {
