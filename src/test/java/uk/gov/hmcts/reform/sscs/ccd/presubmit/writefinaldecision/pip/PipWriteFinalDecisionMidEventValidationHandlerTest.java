@@ -853,7 +853,13 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         assertEquals("End date is not applicable for this decision - please specify 'N/A - No Award'.", response.getErrors().iterator().next());
 
         assertEquals("indefinite", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+    }
 
+    @Test
+    public void givenGenerateNoticeValueAndCaseIsPip_thenDoNotSetShowWorkCapabilityAssessment() {
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getShowWorkCapabilityAssessmentPage());
     }
 
     @Override

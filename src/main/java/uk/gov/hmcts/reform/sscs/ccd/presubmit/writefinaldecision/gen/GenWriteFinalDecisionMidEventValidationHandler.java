@@ -47,6 +47,11 @@ public class GenWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     }
 
     @Override
+    protected void setShowWorkCapabilityAssessmentPage(SscsCaseData sscsCaseData) {
+        // N/A for GEN
+    }
+
+    @Override
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData) {
         sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
     }
