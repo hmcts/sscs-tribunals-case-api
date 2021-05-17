@@ -347,7 +347,7 @@ dependencies {
     e2eCompile 'org.projectlombok:lombok:1.18.16'
     e2eAnnotationProcessor "org.projectlombok:lombok:1.18.18"
 
-    testCompile "org.junit.jupiter:junit-jupiter-api:5.7.1"
+    testCompile "org.junit.jupiter:junit-jupiter-api:5.7.2"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:5.6.2"
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.7.1"
 
@@ -355,9 +355,9 @@ dependencies {
     contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
     contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
 
-    contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.7.0")
+    contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.7.2")
     contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.6.1")
-    contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.6.2')
+    contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.7.2')
 
     contractTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.28') {
         force = true
