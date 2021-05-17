@@ -45,7 +45,7 @@ public class UcDecisionNoticeQuestionService extends DecisionNoticeQuestionServi
 
         if (answerText != null) {
             @SuppressWarnings(value = "java:S4784")
-            Pattern p = Pattern.compile("(\\d+)\\. (.*)");
+            Pattern p = Pattern.compile("^(\\d+)\\. ");
             Matcher m = p.matcher(answerText);
             if (m.find()) {
                 ActivityAnswer answer = ActivityAnswer.builder()
@@ -60,7 +60,7 @@ public class UcDecisionNoticeQuestionService extends DecisionNoticeQuestionServi
         String questionText = findSelectedAnswerOrQuestionInJson(key.getKey());
         if (questionText != null) {
             @SuppressWarnings(value = "java:S4784")
-            Pattern p = Pattern.compile("(\\d+)([a-z])\\. (.*)\\((\\d+)(?!.*\\d)");
+            Pattern p = Pattern.compile("(\\d+)([a-z])\\. (.*)\\((\\d+) (points|point)\\)");
             Matcher m = p.matcher(questionText);
             if (!m.find()) {
                 return new UcActivityQuestion(key, questionText);
