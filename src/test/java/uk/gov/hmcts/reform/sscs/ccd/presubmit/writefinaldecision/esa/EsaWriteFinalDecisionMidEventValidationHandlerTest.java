@@ -248,4 +248,14 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     }
 
+    @Test
+    @Parameters({"Yes, YES", "NO, null"})
+    public void givenGenerateNoticeValueAndCaseIsEsa_thenShouldSetShowWorkCapabilityAssessment(String isGenerateNotice, @Nullable YesNo showWorkCapabilityPage) {
+        sscsCaseData.setWriteFinalDecisionGenerateNotice(isGenerateNotice);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(showWorkCapabilityPage, response.getData().getShowWorkCapabilityAssessmentPage());
+    }
+
 }

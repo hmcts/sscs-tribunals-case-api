@@ -102,7 +102,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
         if (uploadResponse != null) {
             String location = uploadResponse.getEmbedded().getDocuments().get(0).links.self.href;
             newDocLink = DocumentLink.builder().documentFilename(filename).documentUrl(location).documentBinaryUrl(location + "/binary").build();
-            final FooterDetails footerDetails = welshFooterService.addFooterToExistingToContentAndCreateNewUrl(newDocLink, caseData.getSscsWelshDocuments(), fromValue(caseData.getDocumentTypes().getValue().getCode()), null, LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
+            final FooterDetails footerDetails = welshFooterService.addFooterToExistingToContentAndCreateNewUrl(newDocLink, caseData.getSscsWelshDocuments(), fromValue(caseData.getDocumentTypes().getValue().getCode()), null, LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
             SscsWelshDocumentDetails sscsWelshDocumentDetails = SscsWelshDocumentDetails.builder()
                     .documentType(caseData.getDocumentTypes().getValue().getCode())
