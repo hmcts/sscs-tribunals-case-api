@@ -83,9 +83,9 @@ public class AdjournCaseMidEventValidationHandler implements PreSubmitCallbackHa
 
     private void validateSscsCaseDataConstraints(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         Set<ConstraintViolation<SscsCaseData>> violations = validator.validate(sscsCaseData);
-        for (ConstraintViolation<SscsCaseData> violation : violations) {
-            preSubmitCallbackResponse.addError(violation.getMessage());
-        }
+        violations.stream()
+                .map(ConstraintViolation::getMessage)
+                .forEach(preSubmitCallbackResponse::addError);
     }
 
     private void validateAdjournCaseDirectionsDueDateIsInFuture(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {

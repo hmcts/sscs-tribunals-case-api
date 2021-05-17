@@ -6,6 +6,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import junitparams.JUnitParamsRunner;
@@ -18,10 +19,12 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.MidEventValidationHandler;
 
 @RunWith(JUnitParamsRunner.class)
 public class MidEventValidationHandlerTest {
@@ -79,6 +82,64 @@ public class MidEventValidationHandlerTest {
     @Parameters({"ABOUT_TO_START", "ABOUT_TO_SUBMIT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
+    }
+
+    @Test
+    @Parameters({"NOT_LISTABLE", "UPDATE_NOT_LISTABLE"})
+    public void givenDirectionsDueDateIsToday_ThenDisplayAnError(EventType eventType) {
+        when(callback.getEvent()).thenReturn(eventType);
+
+        if (eventType.equals(EventType.NOT_LISTABLE)) {
+            sscsCaseData.setNotListableDueDate(LocalDate.now().toString());
+        } else if (eventType.equals(EventType.UPDATE_NOT_LISTABLE)) {
+            sscsCaseData.setUpdateNotListableDueDate(LocalDate.now().toString());
+        }
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Directions due date must be in the future", error);
+    }
+
+    @Test
+    @Parameters({"NOT_LISTABLE", "UPDATE_NOT_LISTABLE"})
+    public void givenDirectionsDueDateIsBeforeToday_ThenDisplayAnError(EventType eventType) {
+        when(callback.getEvent()).thenReturn(eventType);
+
+        String yesterdayDate = LocalDate.now().plusDays(-1).toString();
+        if (eventType.equals(EventType.NOT_LISTABLE)) {
+            sscsCaseData.setNotListableDueDate(yesterdayDate);
+        } else if (eventType.equals(EventType.UPDATE_NOT_LISTABLE)) {
+            sscsCaseData.setUpdateNotListableDueDate(yesterdayDate);
+        }
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Directions due date must be in the future", error);
+    }
+
+    @Test
+    @Parameters({"NOT_LISTABLE", "UPDATE_NOT_LISTABLE"})
+    public void givenDirectionsDueDateIsAfterToday_ThenDoNotDisplayAnError(EventType eventType) {
+        when(callback.getEvent()).thenReturn(eventType);
+
+        String tomorrowDate = LocalDate.now().plusDays(1).toString();
+        if (eventType.equals(EventType.NOT_LISTABLE)) {
+            sscsCaseData.setNotListableDueDate(tomorrowDate);
+        } else if (eventType.equals(EventType.UPDATE_NOT_LISTABLE)) {
+            sscsCaseData.setUpdateNotListableDueDate(tomorrowDate);
+        }
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
     }
 
     @Test(expected = IllegalStateException.class)
