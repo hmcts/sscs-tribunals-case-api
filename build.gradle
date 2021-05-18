@@ -320,7 +320,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.07'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.17'
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.20'
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.35'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
@@ -328,7 +328,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.18'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.5.RELEASE'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.9.0'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.10.0'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.25.0'
     testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.10.0'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
@@ -347,7 +347,7 @@ dependencies {
     e2eCompile 'org.projectlombok:lombok:1.18.16'
     e2eAnnotationProcessor "org.projectlombok:lombok:1.18.18"
 
-    testCompile "org.junit.jupiter:junit-jupiter-api:5.7.1"
+    testCompile "org.junit.jupiter:junit-jupiter-api:5.7.2"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:5.6.2"
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.7.1"
 
@@ -355,9 +355,9 @@ dependencies {
     contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
     contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
 
-    contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.7.0")
+    contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.7.2")
     contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.6.1")
-    contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.6.2')
+    contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.7.2')
 
     contractTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.28') {
         force = true
