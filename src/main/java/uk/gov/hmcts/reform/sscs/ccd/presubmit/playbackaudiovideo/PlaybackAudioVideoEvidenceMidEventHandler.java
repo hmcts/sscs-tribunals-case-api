@@ -3,10 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.playbackaudiovideo;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.playbackaudiovideo.PlaybackAudioVideoActionHelper.*;
-import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +52,7 @@ public class PlaybackAudioVideoEvidenceMidEventHandler implements PreSubmitCallb
         List<? extends AbstractDocument> sscsAvDocuments = getApprovedAudioVideoDocuments(sscsCaseData.getSscsDocument());
         List<? extends AbstractDocument> dwpAvDocuments = getApprovedAudioVideoDocuments(sscsCaseData.getDwpDocuments());
 
-        List<AbstractDocument> combinedAvDocuments = new ArrayList<>(sscsAvDocuments);
-        combinedAvDocuments.addAll(dwpAvDocuments);
+        List<AbstractDocument> combinedAvDocuments = combineAvLists(sscsAvDocuments, dwpAvDocuments);
 
         setSelectedDropdown(sscsCaseData, combinedAvDocuments);
 

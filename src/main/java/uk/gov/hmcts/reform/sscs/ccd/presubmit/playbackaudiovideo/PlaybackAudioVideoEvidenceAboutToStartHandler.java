@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.playbackaudiovideo;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.playbackaudiovideo.PlaybackAudioVideoActionHelper.getApprovedAudioVideoDocuments;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.playbackaudiovideo.PlaybackAudioVideoActionHelper.setSelectedAudioVideoEvidence;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.playbackaudiovideo.PlaybackAudioVideoActionHelper.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -49,8 +47,7 @@ public class PlaybackAudioVideoEvidenceAboutToStartHandler implements PreSubmitC
             return errorResponse;
         }
 
-        List<AbstractDocument> combinedAvDocuments = new ArrayList<>(sscsAvDocuments);
-        combinedAvDocuments.addAll(dwpAvDocuments);
+        List<AbstractDocument> combinedAvDocuments = combineAvLists(sscsAvDocuments, dwpAvDocuments);
 
         setSelectedAudioVideoEvidence(sscsCaseData, combinedAvDocuments);
 

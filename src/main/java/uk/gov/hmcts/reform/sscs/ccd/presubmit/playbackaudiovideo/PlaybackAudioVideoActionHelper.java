@@ -17,6 +17,12 @@ public final class PlaybackAudioVideoActionHelper {
         //not called
     }
 
+    static List<AbstractDocument> combineAvLists(List<? extends AbstractDocument> sscsAvDocuments, List<? extends AbstractDocument> dwpAvDocuments) {
+        List<AbstractDocument> combinedAvDocuments = new ArrayList<>(sscsAvDocuments);
+        combinedAvDocuments.addAll(dwpAvDocuments);
+        return combinedAvDocuments;
+    }
+
     static void setSelectedAudioVideoEvidence(SscsCaseData sscsCaseData, List<? extends AbstractDocument> avDocuments) {
         List<DynamicListItem> listOptionsSscs = populateEvidenceListWithItems(avDocuments);
 
