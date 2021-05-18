@@ -28,7 +28,6 @@ public abstract class IssueNoticeHandlerTestBase {
     @Mock
     public Function<LanguagePreference, String> templateId;
 
-
     public IssueNoticeHandlerTestBase(String benefitType) {
         this.benefitType = benefitType;
     }
