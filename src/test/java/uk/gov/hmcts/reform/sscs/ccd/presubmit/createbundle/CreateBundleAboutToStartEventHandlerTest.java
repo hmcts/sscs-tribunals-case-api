@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_EVIDENCE_BUNDLE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_RESPONSE;
 
@@ -27,10 +27,10 @@ import uk.gov.hmcts.reform.sscs.service.bundle.BundleAudioVideoPdfService;
 
 
 @RunWith(JUnitParamsRunner.class)
-public class CreateBundleMidEventHandlerTest {
+public class CreateBundleAboutToStartEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private CreateBundleMidEventHandler handler;
+    private CreateBundleAboutToStartEventHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -55,7 +55,7 @@ public class CreateBundleMidEventHandlerTest {
     public void setUp() {
         openMocks(this);
         dwpDocumentService = new DwpDocumentService();
-        handler = new CreateBundleMidEventHandler(serviceRequestExecutor, dwpDocumentService, bundleAudioVideoPdfService, "bundleUrl.com", "bundleEnglishConfig", "bundleWelshConfig",
+        handler = new CreateBundleAboutToStartEventHandler(serviceRequestExecutor, dwpDocumentService, bundleAudioVideoPdfService, "bundleUrl.com", "bundleEnglishConfig", "bundleWelshConfig",
                 "bundleEnglishEditedConfig", "bundleWelshEditedConfig", idamService);
 
         when(callback.getEvent()).thenReturn(EventType.CREATE_BUNDLE);
@@ -68,14 +68,14 @@ public class CreateBundleMidEventHandlerTest {
 
     @Test
     public void givenAValidEvent_thenReturnTrue() {
-        assertTrue(handler.canHandle(MID_EVENT, callback));
+        assertTrue(handler.canHandle(ABOUT_TO_START, callback));
     }
 
     @Test
     public void givenANonCreateBundleEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
-        assertFalse(handler.canHandle(MID_EVENT, callback));
+        assertFalse(handler.canHandle(ABOUT_TO_START, callback));
     }
 
     @Test
@@ -85,7 +85,7 @@ public class CreateBundleMidEventHandlerTest {
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
         callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         String error = response.getErrors().stream()
                 .findFirst()
@@ -100,7 +100,7 @@ public class CreateBundleMidEventHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().build());
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         String error = response.getErrors().stream()
                 .findFirst()
@@ -116,7 +116,7 @@ public class CreateBundleMidEventHandlerTest {
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
         callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         String error = response.getErrors().stream()
                 .findFirst()
@@ -130,7 +130,7 @@ public class CreateBundleMidEventHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         String error = response.getErrors().stream()
                 .findFirst()
@@ -149,7 +149,7 @@ public class CreateBundleMidEventHandlerTest {
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
         callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         String warning = response.getWarnings().stream()
                 .findFirst()
@@ -167,7 +167,7 @@ public class CreateBundleMidEventHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().build());
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         String warning = response.getWarnings().stream()
                 .findFirst()
@@ -185,7 +185,7 @@ public class CreateBundleMidEventHandlerTest {
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
         callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         String warning = response.getWarnings().stream()
                 .findFirst()
@@ -201,7 +201,7 @@ public class CreateBundleMidEventHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         String warning = response.getWarnings().stream()
                 .findFirst()

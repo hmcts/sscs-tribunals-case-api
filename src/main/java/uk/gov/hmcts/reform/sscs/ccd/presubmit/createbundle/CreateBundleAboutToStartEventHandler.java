@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.sscs.service.bundle.BundleAudioVideoPdfService;
 
 @Service
 @Slf4j
-public class CreateBundleMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class CreateBundleAboutToStartEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private static final String CREATE_BUNDLE_ENDPOINT = "/api/new-bundle";
 
@@ -40,15 +40,15 @@ public class CreateBundleMidEventHandler implements PreSubmitCallbackHandler<Ssc
     private IdamService idamService;
 
     @Autowired
-    public CreateBundleMidEventHandler(ServiceRequestExecutor serviceRequestExecutor,
-                                       DwpDocumentService dwpDocumentService,
-                                       BundleAudioVideoPdfService bundleAudioVideoPdfService,
-                                       @Value("${bundle.url}") String bundleUrl,
-                                       @Value("${bundle.english.config}") String bundleEnglishConfig,
-                                       @Value("${bundle.welsh.config}") String bundleWelshConfig,
-                                       @Value("${bundle.english.edited.config}") String bundleEnglishEditedConfig,
-                                       @Value("${bundle.welsh.edited.config}") String bundleWelshEditedConfig,
-                                       IdamService idamService) {
+    public CreateBundleAboutToStartEventHandler(ServiceRequestExecutor serviceRequestExecutor,
+                                                DwpDocumentService dwpDocumentService,
+                                                BundleAudioVideoPdfService bundleAudioVideoPdfService,
+                                                @Value("${bundle.url}") String bundleUrl,
+                                                @Value("${bundle.english.config}") String bundleEnglishConfig,
+                                                @Value("${bundle.welsh.config}") String bundleWelshConfig,
+                                                @Value("${bundle.english.edited.config}") String bundleEnglishEditedConfig,
+                                                @Value("${bundle.welsh.edited.config}") String bundleWelshEditedConfig,
+                                                IdamService idamService) {
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.dwpDocumentService = dwpDocumentService;
         this.bundleAudioVideoPdfService = bundleAudioVideoPdfService;
@@ -65,7 +65,7 @@ public class CreateBundleMidEventHandler implements PreSubmitCallbackHandler<Ssc
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        return callbackType.equals(CallbackType.MID_EVENT)
+        return callbackType.equals(CallbackType.ABOUT_TO_START)
                 && callback.getEvent() == EventType.CREATE_BUNDLE;
     }
 
