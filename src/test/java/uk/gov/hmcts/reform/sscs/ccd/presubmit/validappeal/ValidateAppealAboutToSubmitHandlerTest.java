@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.validappeal;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -41,6 +42,9 @@ public class ValidateAppealAboutToSubmitHandlerTest {
     @Mock
     private PreSubmitCallbackResponse<SscsCaseData> response;
 
+    @Mock
+    private SscsCaseData bulkScanResponseData;
+
     private SscsCaseData sscsCaseData;
 
     @Before
@@ -79,6 +83,8 @@ public class ValidateAppealAboutToSubmitHandlerTest {
     public void givenValidateAppealForPreValidCase_thenSetNonDigitalToDigitalCase() {
         when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
         sscsCaseData.setCreatedInGapsFrom(null);
+        when(response.getData()).thenReturn(bulkScanResponseData);
+        when(bulkScanResponseData.getCreatedInGapsFrom()).thenReturn(READY_TO_LIST.getId());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -90,10 +96,24 @@ public class ValidateAppealAboutToSubmitHandlerTest {
     public void givenValidateAppealForPreValidCase_thenSetNoDigitalToDigitalCase() {
         when(caseDetails.getState()).thenReturn(State.INCOMPLETE_APPLICATION);
         sscsCaseData.setCreatedInGapsFrom(VALID_APPEAL.getId());
+        when(response.getData()).thenReturn(bulkScanResponseData);
+        when(bulkScanResponseData.getCreatedInGapsFrom()).thenReturn(READY_TO_LIST.getId());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getCreatedInGapsFrom(), is(READY_TO_LIST.getId()));
+        verify(serviceRequestExecutor).post(callback, "https://sscs-bulk-scan.net/validate");
+    }
+
+    @Test
+    public void givenValidateAppealForPreValidCase_thenSetDwpRegionalCenterToCase() {
+        when(caseDetails.getState()).thenReturn(State.INCOMPLETE_APPLICATION);
+        when(response.getData()).thenReturn(bulkScanResponseData);
+        when(bulkScanResponseData.getDwpRegionalCentre()).thenReturn("PIP Newcastle");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("PIP Newcastle", response.getData().getDwpRegionalCentre());
         verify(serviceRequestExecutor).post(callback, "https://sscs-bulk-scan.net/validate");
     }
 }
