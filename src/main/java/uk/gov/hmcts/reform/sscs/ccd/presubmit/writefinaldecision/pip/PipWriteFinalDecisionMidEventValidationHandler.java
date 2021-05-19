@@ -102,6 +102,11 @@ public class PipWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     }
 
     @Override
+    protected void setShowWorkCapabilityAssessmentPage(SscsCaseData sscsCaseData) {
+        // N/A for PIP
+    }
+
+    @Override
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData) {
         sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
     }
