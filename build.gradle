@@ -301,7 +301,7 @@ dependencies {
     // Added to fix CVE-2020-13934, CVE-2020-13935, CVE-2020-17527
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.43'
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.43'
-    compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.5'
+    compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.6'
 
     // Safe to remove once Spring update their dependencies - see CVE-2019-14439 and add 'com.fasterxml.jackson.core' configurations.all above
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
@@ -320,7 +320,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.07'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.20'
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.21'
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.35'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
@@ -338,7 +338,7 @@ dependencies {
     // Added to fix CVE-2020-13934, CVE-2020-13935, CVE-2020-17527
     testCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.40'
     testCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.40'
-    testCompile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.4'
+    testCompile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.6'
 
     testCompile 'pl.pragmatists:JUnitParams:1.1.1'
 

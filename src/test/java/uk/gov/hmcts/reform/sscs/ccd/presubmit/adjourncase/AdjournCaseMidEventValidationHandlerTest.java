@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -90,7 +91,7 @@ public class AdjournCaseMidEventValidationHandlerTest {
     @Test
     public void givenDirectionsDueDateIsToday_ThenDisplayAnError() {
 
-        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties("yes");
+        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties(YES.getValue());
 
         sscsCaseData.setAdjournCaseDirectionsDueDate(LocalDate.now().toString());
 
@@ -105,7 +106,7 @@ public class AdjournCaseMidEventValidationHandlerTest {
     @Test
     public void givenDirectionsDueDateIsBeforeToday_ThenDisplayAnError() {
 
-        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties("yes");
+        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties(YES.getValue());
 
         sscsCaseData.setAdjournCaseDirectionsDueDate(LocalDate.now().plus(-1, ChronoUnit.DAYS).toString());
 
@@ -120,7 +121,7 @@ public class AdjournCaseMidEventValidationHandlerTest {
     @Test
     public void givenDirectionsDueDateIsAfterTodayAndDaysOffsetSpecified_ThenDisplayAnError() {
 
-        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties("yes");
+        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties(YES.getValue());
 
         sscsCaseData.setAdjournCaseDirectionsDueDate(LocalDate.now().plus(1, ChronoUnit.DAYS).toString());
         sscsCaseData.setAdjournCaseDirectionsDueDateDaysOffset("7");
@@ -135,7 +136,7 @@ public class AdjournCaseMidEventValidationHandlerTest {
     @Test
     public void givenDirectionsDueDateIsAfterTodayAndDaysOffsetSpecifiedButZero_ThenDoNotDisplayAnError() {
 
-        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties("yes");
+        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties(YES.getValue());
 
         sscsCaseData.setAdjournCaseDirectionsDueDate(LocalDate.now().plus(1, ChronoUnit.DAYS).toString());
         sscsCaseData.setAdjournCaseDirectionsDueDateDaysOffset("0");
@@ -149,7 +150,7 @@ public class AdjournCaseMidEventValidationHandlerTest {
     @Test
     public void givenDirectionsDueDateIsNotSpecifiedAndDaysOffsetSpecified_ThenDoNotDisplayAnError() {
 
-        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties("yes");
+        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties(YES.getValue());
 
         sscsCaseData.setAdjournCaseDirectionsDueDateDaysOffset("7");
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -162,7 +163,7 @@ public class AdjournCaseMidEventValidationHandlerTest {
     @Test
     public void givenNeitherDirectionsDueDateOrOffsetSpecified_ThenDisplayAnError() {
 
-        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties("yes");
+        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties(YES.getValue());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
