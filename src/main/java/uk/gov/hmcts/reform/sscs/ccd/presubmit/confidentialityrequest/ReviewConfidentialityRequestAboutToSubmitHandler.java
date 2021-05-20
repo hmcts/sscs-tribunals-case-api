@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.confidentialityrequest;
 
-import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.CONFIDENTIALITY_ACTION_REQUIRED;
-
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -52,19 +50,14 @@ public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubm
                 boolean jointPartyGrantedNow = processJointPartyAndReturnWhetherGrantedNow(sscsCaseData);
 
                 if (appellantGrantedNow || jointPartyGrantedNow) {
-                    if (!State.RESPONSE_RECEIVED.equals(callback.getCaseDetails().getState())) {
-                        sscsCaseData.setDwpState(CONFIDENTIALITY_ACTION_REQUIRED.getId());
-                        sscsCaseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION.getId());
-                        sscsCaseData.setState(State.NOT_LISTABLE);
-                    } else {
-                        sscsCaseData.setDwpState(null);
-                        sscsCaseData.setInterlocReviewState(null);
-                    }
+                    String interlocReviewState = !State.RESPONSE_RECEIVED.equals(callback.getCaseDetails().getState())
+                        ? InterlocReviewState.AWAITING_ADMIN_ACTION.getId() : null;
+
+                    sscsCaseData.setInterlocReviewState(interlocReviewState);
                     sscsCaseData.setIsConfidentialCase(YesNo.YES);
-                    sscsCaseData.setIsProgressingViaGaps(YesNo.YES.getValue());
-                    log.info("'Confidentiality - Action Required' set on case id " + sscsCaseData.getCcdCaseId());
+                    log.info("'Confidentiality granted - appellant: {}, jointParty: {}, for case id {}", appellantGrantedNow, jointPartyGrantedNow, sscsCaseData.getCcdCaseId());
                 } else {
-                    sscsCaseData.setInterlocReviewState(InterlocReviewState.NONE.getId());
+                    sscsCaseData.setInterlocReviewState(null);
                 }
 
                 clearTransientFields(preSubmitCallbackResponse);

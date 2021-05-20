@@ -301,7 +301,7 @@ dependencies {
     // Added to fix CVE-2020-13934, CVE-2020-13935, CVE-2020-17527
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.43'
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.43'
-    compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.5'
+    compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.6'
 
     // Safe to remove once Spring update their dependencies - see CVE-2019-14439 and add 'com.fasterxml.jackson.core' configurations.all above
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
@@ -320,7 +320,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.07'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.18'
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.21'
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.35'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
@@ -328,7 +328,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.18'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.5.RELEASE'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.9.0'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.10.0'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.25.0'
     testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.10.0'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
@@ -338,7 +338,7 @@ dependencies {
     // Added to fix CVE-2020-13934, CVE-2020-13935, CVE-2020-17527
     testCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.40'
     testCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.40'
-    testCompile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.4'
+    testCompile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.6'
 
     testCompile 'pl.pragmatists:JUnitParams:1.1.1'
 
@@ -347,7 +347,7 @@ dependencies {
     e2eCompile 'org.projectlombok:lombok:1.18.16'
     e2eAnnotationProcessor "org.projectlombok:lombok:1.18.18"
 
-    testCompile "org.junit.jupiter:junit-jupiter-api:5.7.1"
+    testCompile "org.junit.jupiter:junit-jupiter-api:5.7.2"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:5.6.2"
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.7.1"
 
@@ -355,9 +355,9 @@ dependencies {
     contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
     contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
 
-    contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.7.0")
+    contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.7.2")
     contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.6.1")
-    contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.6.2')
+    contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.7.2')
 
     contractTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.28') {
         force = true

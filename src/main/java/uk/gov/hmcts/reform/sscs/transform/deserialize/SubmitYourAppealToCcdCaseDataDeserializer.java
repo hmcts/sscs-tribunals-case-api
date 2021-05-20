@@ -190,7 +190,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         switch (Benefit.getBenefitByCode(benefitType)) {
             case UC:
             case CARERS_ALLOWANCE:
-                result = dwpLookup.getDefaultDwpRegionalCenterByBenefitTypeAndOffice(benefitType);
+                result = dwpLookup.getDefaultDwpMappingByBenefitType(benefitType)
+                        .map(office -> office.getMapping().getCcd())
+                        .orElse(null);
                 break;
             default:
                 if (!mrnIsNotProvided(syaCaseWrapper)) {
