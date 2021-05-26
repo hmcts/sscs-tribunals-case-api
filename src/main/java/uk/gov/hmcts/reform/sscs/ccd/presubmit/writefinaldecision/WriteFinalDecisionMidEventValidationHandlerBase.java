@@ -73,6 +73,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
         }
 
         setShowSummaryOfOutcomePage(sscsCaseData);
+        setShowWorkCapabilityAssessmentPage(sscsCaseData);
         setDwpReassessAwardPage(sscsCaseData);
 
         validateAwardTypes(sscsCaseData, preSubmitCallbackResponse);
@@ -89,6 +90,8 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
     protected abstract void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse);
 
     protected abstract void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData);
+
+    protected abstract void setShowWorkCapabilityAssessmentPage(SscsCaseData sscsCaseData);
 
     protected abstract void setDwpReassessAwardPage(SscsCaseData sscsCaseData);
 

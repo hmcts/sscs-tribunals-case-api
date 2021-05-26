@@ -69,7 +69,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         assertJsonEquals(APPELLANT_NO_CONTACT_DETAILS_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
-    @Parameters({"DWP PIP ( 9),PIP,DWP PIP (9)", "null,carersAllowance,Tyneview Park DRT"})
+    @Parameters({"DWP PIP ( 9),PIP,DWP PIP (9)", "null,carersAllowance,Carer’s Allowance Dispute Resolution Team","null,bereavementBenefit,Pensions Dispute Resolution Team"})
     @Test
     public void syaDwpIssuingOfficeTest(String issuingOffice, String beneiftCode, String expectedIssuing) {
 
@@ -112,7 +112,8 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         "DWP PIP (5),PIP,Springburn", "DWP PIP (6),PIP,Blackpool", "DWP PIP (7),PIP,Blackpool", "DWP PIP (8),PIP,Blackpool",
         "DWP PIP (9),PIP,Blackpool", "Inverness DRT,ESA,Inverness DRT","DWP PIP (),PIP,null",
         "DWP PIP (11),PIP,null", "null,UC,Universal Credit", ",UC,Universal Credit", "null,PIP,null",
-        "null,carersAllowance,Tyneview Park DRT", "DWP PIP (5),carersAllowance,Tyneview Park DRT"
+        "null,carersAllowance,Carers Allowance", "DWP PIP (5),carersAllowance,Carers Allowance",
+        "null,bereavementBenefit,Bereavement Benefit", ",bereavementBenefit,Bereavement Benefit"
     })
     @Test
     public void givenADwpIssuingOffice_shouldMapToTheDwpRegionalCenter(@Nullable String dwpIssuingOffice,

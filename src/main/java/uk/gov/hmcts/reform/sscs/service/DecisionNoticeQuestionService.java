@@ -66,7 +66,7 @@ public abstract class DecisionNoticeQuestionService {
 
         if (answerText != null) {
             @SuppressWarnings(value = "java:S4784")
-            Pattern p = Pattern.compile("(\\d+)([a-z])\\. (.*)\\((\\d+)(?!.*\\d)");
+            Pattern p = Pattern.compile("(\\d+)([a-z])\\. (.*)\\((\\d+) (points|point)\\)");
             Matcher m = p.matcher(answerText);
             if (m.find()) {
                 ActivityAnswer answer = ActivityAnswer.builder()
@@ -95,6 +95,6 @@ public abstract class DecisionNoticeQuestionService {
         return answerKeys.stream().map(answerText -> getAnswerForActivityQuestionKey(sscsCaseData,
             answerText)).filter(Optional::isPresent).map(Optional::get).mapToInt(ActivityAnswer::getActivityAnswerPoints).sum();
     }
-    
-    
+
+
 }

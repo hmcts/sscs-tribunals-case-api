@@ -172,17 +172,12 @@ public class SubmitDraftTest {
                 .log().method().log().headers().log().uri().log().body(true)
                 .contentType(ContentType.JSON)
                 .header(new Header(AUTHORIZATION, citizenToken))
-                .body(setDraftCaseJson(mrnDate, nino))
+                .body(updateDraftCaseJsonWithMrnDateAndNino(mrnDate, nino))
                 .put("/drafts");
 
         SscsCaseData draft = findCase(citizenIdamTokens).get(0);
 
-        SyaCaseWrapper wrapper = ALL_DETAILS_FROM_DRAFT.getDeserializeMessage();
-        wrapper.setCcdCaseId(draft.getCcdCaseId());
-        wrapper.getMrn().setDate(mrnDate);
-        wrapper.getAppellant().setNino(nino);
-
-        String body = setDraftCaseJson(mrnDate, nino).replaceAll("CCD_CASE_ID", draft.getCcdCaseId());
+        String body = updateDraftCaseJsonWithMrnDateAndNino(mrnDate, nino).replaceAll("CCD_CASE_ID", draft.getCcdCaseId());
 
         Response response = RestAssured.given()
                 .body(body)
@@ -273,7 +268,7 @@ public class SubmitDraftTest {
         return savedDrafts;
     }
 
-    private String setDraftCaseJson(LocalDate mrnDate, String nino) {
+    private String updateDraftCaseJsonWithMrnDateAndNino(LocalDate mrnDate, String nino) {
         String body = ALL_DETAILS_FROM_DRAFT.getSerializedMessage();
         body = submitHelper.setNino(body, nino);
         body = submitHelper.setLatestMrnDate(body, mrnDate);

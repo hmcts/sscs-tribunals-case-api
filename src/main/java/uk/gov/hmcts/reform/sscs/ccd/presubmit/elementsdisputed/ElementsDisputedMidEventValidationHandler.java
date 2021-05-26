@@ -68,7 +68,7 @@ public class ElementsDisputedMidEventValidationHandler implements PreSubmitCallb
 
         return preSubmitCallbackResponse;
     }
-    
+
     private void checkAt38DocIsPresent(SscsCaseData sscsCaseData) {
         if ((!"uc".equalsIgnoreCase(sscsCaseData.getAppeal().getBenefitType().getCode())
                 && sscsCaseData.getDwpAT38Document() == null)
@@ -90,6 +90,7 @@ public class ElementsDisputedMidEventValidationHandler implements PreSubmitCallb
         validateElementDisputedList(sscsCaseData.getElementsDisputedCare(), CARE);
         validateElementDisputedList(sscsCaseData.getElementsDisputedChildElement(), CHILD_ELEMENT);
         validateElementDisputedList(sscsCaseData.getElementsDisputedChildDisabled(), CHILD_DISABLED);
+        validateElementDisputedList(sscsCaseData.getElementsDisputedLimitedWork(), LIMITED_CAPABILITY_FOR_WORK);
 
     }
 

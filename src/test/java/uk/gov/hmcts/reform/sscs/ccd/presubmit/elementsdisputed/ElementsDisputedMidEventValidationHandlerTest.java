@@ -199,6 +199,21 @@ public class ElementsDisputedMidEventValidationHandlerTest {
     }
 
     @Test
+    public void givenElementsDisputedLimitedWorkPopulatedWithDuplicateIssues_thenDisplayError() {
+
+        sscsCaseData.setElementsDisputedLimitedWork((List.of(
+                ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("AA").build()).build(),
+                ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("AA").build()).build())));
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Limited Capability for Work (WCA) element contains duplicate issue codes", error);
+    }
+
+    @Test
     public void givenElementsDisputedSelectedWithNoDuplicates_thenDoNotDisplayError() {
 
         sscsCaseData.setElementsDisputedChildDisabled(List.of(
@@ -320,7 +335,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
         sscsCaseData.setJointPartyIdentity(Identity.builder().nino("blah").build());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         String error = response.getErrors().stream().findFirst().orElse("");

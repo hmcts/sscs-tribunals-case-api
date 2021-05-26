@@ -8,8 +8,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAu
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.getDocumentType;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.isSelectedEvidence;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
 
-import java.time.LocalDate;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +34,8 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
     private final GenerateFile generateFile;
     private final DocumentConfiguration documentConfiguration;
     private final IdamService idamService;
-    private String dmGatewayUrl;
-    private String documentManagementUrl;
+    private final String dmGatewayUrl;
+    private final String documentManagementUrl;
 
     @Autowired
     public ProcessAudioVideoEvidenceMidEventHandler(GenerateFile generateFile,
@@ -152,13 +152,8 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
     }
 
     private void validateDueDateIsInFuture(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-
-        if (preSubmitCallbackResponse.getData().getDirectionDueDate() != null) {
-            LocalDate directionDueDate = LocalDate.parse(preSubmitCallbackResponse.getData().getDirectionDueDate());
-
-            if (!directionDueDate.isAfter(LocalDate.now())) {
-                preSubmitCallbackResponse.addError("Directions due date must be in the future");
-            }
+        if (nonNull(preSubmitCallbackResponse.getData().getDirectionDueDate()) && !isDateInTheFuture(preSubmitCallbackResponse.getData().getDirectionDueDate())) {
+            preSubmitCallbackResponse.addError("Directions due date must be in the future");
         }
     }
 }

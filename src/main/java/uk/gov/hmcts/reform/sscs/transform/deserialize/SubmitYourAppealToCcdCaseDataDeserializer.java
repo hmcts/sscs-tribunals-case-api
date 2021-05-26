@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CARERS_ALLOWANCE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.*;
 import static uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator.generateAppealNumber;
 import static uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil.cleanPhoneNumber;
@@ -190,7 +189,10 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         switch (Benefit.getBenefitByCode(benefitType)) {
             case UC:
             case CARERS_ALLOWANCE:
-                result = dwpLookup.getDefaultDwpRegionalCenterByBenefitTypeAndOffice(benefitType);
+            case BEREAVEMENT_BENEFIT:
+                result = dwpLookup.getDefaultDwpMappingByBenefitType(benefitType)
+                        .map(office -> office.getMapping().getCcd())
+                        .orElse(null);
                 break;
             default:
                 if (!mrnIsNotProvided(syaCaseWrapper)) {

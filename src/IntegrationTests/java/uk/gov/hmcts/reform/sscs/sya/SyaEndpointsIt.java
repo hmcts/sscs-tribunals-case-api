@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.sya;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 import java.util.*;
 import javax.mail.Session;
 import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -37,6 +39,7 @@ import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
@@ -46,16 +49,17 @@ import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
+import uk.gov.hmcts.reform.sscs.callback.AbstractEventIt;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
-import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.idam.Authorize;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
-@RunWith(JUnitParamsRunner.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_it.properties")
 @AutoConfigureMockMvc
-public class SyaEndpointsIt {
+@RunWith(JUnitParamsRunner.class)
+public class SyaEndpointsIt extends AbstractEventIt {
 
     // being: it needed to run springRunner and junitParamsRunner
     @ClassRule
@@ -101,13 +105,12 @@ public class SyaEndpointsIt {
     @Value("${appellant.appeal.html.template.path}")
     private String templateName;
 
-    private SyaCaseWrapper caseWrapper;
+    @Captor
+    private ArgumentCaptor<CaseDataContent> caseDataCaptor;
 
     @Before
     public void setup() throws IOException {
         mapper = new ObjectMapper().registerModule(new JavaTimeModule());
-
-        caseWrapper = getCaseWrapper();
 
         given(pdfServiceClient.generateFromHtml(eq(getTemplate()), captor.capture()))
             .willReturn(PDF.getBytes());
@@ -270,6 +273,34 @@ public class SyaEndpointsIt {
         verify(ccdClient, never()).submitForCaseworker(any(), any());
     }
 
+    @Test
+    @Parameters({"PIP, DWP PIP (1), Newcastle",
+            "ESA, Inverness DRT, Inverness DRT",
+            "UC,, Universal Credit",
+            "ESA, Coatbridge Benefit Centre,Coatbridge Benefit Centre",
+            "DLA, Disability Benefit Centre 4, DLA Child/Adult",
+            "carersAllowance,, Carers Allowance",
+            "attendanceAllowance, The Pension Service 11, Attendance Allowance",
+            "bereavementBenefit,, Bereavement Benefit"})
+    public void givenAValidAppealForBenefitType_createValidAppealCreatedCaseWithDwpRegionalCentre(String benefitTypeCode, String dwpIssuingOffice, String expectedDwpRegionalCentre) throws Exception {
+        given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
+
+        given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
+
+        setJsonAndReplace("json/sya_with_benefit_type.json", Arrays.asList("BENEFIT_TYPE", "ISSUING_OFFICE"), Arrays.asList(benefitTypeCode, dwpIssuingOffice));
+
+        mockMvc.perform(post("/appeals")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isCreated());
+
+        verify(ccdClient).startCaseForCaseworker(any(), eq(VALID_APPEAL_CREATED.getCcdType()));
+        verify(ccdClient).submitForCaseworker(any(), caseDataCaptor.capture());
+
+        assertEquals(benefitTypeCode, ((SscsCaseData) caseDataCaptor.getValue().getData()).getAppeal().getBenefitType().getCode());
+        assertEquals(expectedDwpRegionalCentre, ((SscsCaseData) caseDataCaptor.getValue().getData()).getDwpRegionalCentre());
+    }
+
     private byte[] getTemplate() throws IOException {
         URL resource = getClass().getResource(templateName);
         return IOUtils.toByteArray(resource);
@@ -283,12 +314,6 @@ public class SyaEndpointsIt {
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
-    }
-
-    private SyaCaseWrapper getCaseWrapper() throws IOException {
-        String syaCaseJson = "json/sya.json";
-        URL resource = getClass().getClassLoader().getResource(syaCaseJson);
-        return mapper.readValue(resource, SyaCaseWrapper.class);
     }
 
 }
