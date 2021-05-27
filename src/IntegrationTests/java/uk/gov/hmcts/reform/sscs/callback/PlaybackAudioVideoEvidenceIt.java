@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
@@ -13,7 +11,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Collections;
 import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,10 +20,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidenceDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -35,7 +34,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 @SpringBootTest
 @AutoConfigureMockMvc
 @RunWith(JUnitParamsRunner.class)
-public class HmctsResponseReviewedIt extends AbstractEventIt {
+public class PlaybackAudioVideoEvidenceIt extends AbstractEventIt {
 
     @MockBean
     private CcdService ccdService;
@@ -48,7 +47,7 @@ public class HmctsResponseReviewedIt extends AbstractEventIt {
         CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         mapper.registerModule(new JavaTimeModule());
-        json = getJson("callback/hmctsResponseReviewedCallback.json");
+        json = getJson("callback/playbackAudioVideoEvidenceCallback.json");
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
     }
@@ -59,43 +58,36 @@ public class HmctsResponseReviewedIt extends AbstractEventIt {
 
         assertHttpStatus(response, HttpStatus.OK);
 
-        DynamicListItem listItem = new DynamicListItem("DWP PIP (2)", "DWP PIP (2)");
+        DynamicListItem listItem = new DynamicListItem("http://www.myAudio.mp3", "myAudio.mp3");
 
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
-        assertEquals(10, result.getData().getDwpPresentingOffice().getListItems().size());
-        assertEquals(listItem, result.getData().getDwpPresentingOffice().getValue());
-        assertEquals(10, result.getData().getDwpOriginatingOffice().getListItems().size());
-        assertEquals(listItem, result.getData().getDwpOriginatingOffice().getValue());
+        assertEquals(2, result.getData().getSelectedAudioVideoEvidence().getListItems().size());
+        assertEquals(listItem, result.getData().getSelectedAudioVideoEvidence().getValue());
+
     }
 
     @Test
-    public void callToAboutToSubmitHandler_willSetCaseCode() throws Exception {
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+    public void callMidEventHandler_willPopulateSelectedOption() throws Exception {
+        json = getJson("callback/playbackAudioVideoEvidenceMideventCallback.json");
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEvent"));
 
         assertHttpStatus(response, HttpStatus.OK);
 
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
-        assertEquals("002CC", result.getData().getCaseCode());
-        assertEquals(LocalDate.now().toString(), result.getData().getDwpResponseDate());
+
+        AudioVideoEvidenceDetails expectedAudioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder()
+                .partyUploaded(UploadParty.DWP)
+                .documentType(DocumentType.VIDEO_DOCUMENT.getLabel())
+                .dateAdded(LocalDate.of(2021, 5, 10))
+                .build();
+
+        assertEquals(expectedAudioVideoEvidenceDetails, result.getData().getSelectedAudioVideoEvidenceDetails());
+        assertTrue(result.getData().getTempMediaUrl().contains("myVideo.mp4"));
     }
 
-
-    @Test
-    @Parameters({"Yes,VALID_SEND_TO_INTERLOC", "No,READY_TO_LIST"})
-    public void callToSubmittedHandler_willTriggerValidSendToInterlocEvent(String yesOrNo, EventType eventType) throws Exception {
-        json = json.replaceAll("IS_INTERLOC_REQUIRED_VALUE", yesOrNo);
-
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdSubmittedEvent"));
-
-        assertHttpStatus(response, HttpStatus.OK);
-
-        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-
-        assertEquals(Collections.EMPTY_SET, result.getErrors());
-        verify(ccdService).updateCase(any(SscsCaseData.class), eq(12345656789L), eq(eventType.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
-    }
 }

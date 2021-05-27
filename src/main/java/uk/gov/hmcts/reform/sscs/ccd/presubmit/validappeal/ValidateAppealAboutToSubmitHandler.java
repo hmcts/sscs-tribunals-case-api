@@ -50,7 +50,6 @@ public class ValidateAppealAboutToSubmitHandler extends ResponseEventsAboutToSub
         }
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         //Set digital flag on legacy cases
         if ((sscsCaseData.getCreatedInGapsFrom() == null
@@ -58,10 +57,7 @@ public class ValidateAppealAboutToSubmitHandler extends ResponseEventsAboutToSub
             sscsCaseData.setCreatedInGapsFrom(READY_TO_LIST.getId());
         }
 
-        PreSubmitCallbackResponse<SscsCaseData> response = serviceRequestExecutor.post(callback, bulkScanEndpoint);
-        sscsCaseDataPreSubmitCallbackResponse.addErrors(response.getErrors());
-
-        return sscsCaseDataPreSubmitCallbackResponse;
+        return serviceRequestExecutor.post(callback, bulkScanEndpoint);
     }
 
 }
