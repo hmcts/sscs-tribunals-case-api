@@ -34,6 +34,7 @@ public abstract class IssueNoticeHandlerTestBase {
 
     protected abstract IssueNoticeHandler createIssueNoticeHandler(GenerateFile generateFile, UserDetailsService userDetailsService,
                                                                    Function<LanguagePreference, String> templateId);
+
     @Before
     public void setUp() throws IOException {
         openMocks(this);
