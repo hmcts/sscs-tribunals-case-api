@@ -7,7 +7,6 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CONFIDENTIALITY_REQUEST;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REINSTATEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome.GRANTED;
@@ -363,9 +362,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         DocumentLink url = scannedDocument.getValue().getUrl();
 
-        DocumentType documentType = getSubtype(
-            sscsCaseData.getFurtherEvidenceAction().getValue().getCode(),
-            sscsCaseData.getOriginalSender().getValue().getCode(), scannedDocument);
+        DocumentType documentType = getSubtype(sscsCaseData.getOriginalSender().getValue().getCode(), scannedDocument);
 
         String bundleAddition = null;
         if (caseState != null
@@ -401,7 +398,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null)
             .build()).build();
     }
-    
+
     private boolean isCorrectActionTypeForBundleAddition(SscsCaseData sscsCaseData, ScannedDocument scannedDocument) {
         return (isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), ISSUE_FURTHER_EVIDENCE.getCode())
                 || ((isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL.getCode())
@@ -419,8 +416,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             || caseState.equals(State.WITH_DWP);
     }
 
-    private DocumentType getSubtype(String furtherEvidenceActionItemCode, String originalSenderCode,
-                                    ScannedDocument scannedDocument) {
+    private DocumentType getSubtype(String originalSenderCode, ScannedDocument scannedDocument) {
         if (ScannedDocumentType.REINSTATEMENT_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
             return REINSTATEMENT_REQUEST;
         }
@@ -429,9 +425,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
         if (ScannedDocumentType.URGENT_HEARING_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
             return URGENT_HEARING_REQUEST;
-        }
-        if (OTHER_DOCUMENT_MANUAL.getCode().equals(furtherEvidenceActionItemCode)) {
-            return OTHER_DOCUMENT;
         }
 
         final Optional<DocumentType> optionalDocumentType = stream(OriginalSenderItemList.values())

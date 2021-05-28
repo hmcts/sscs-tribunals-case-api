@@ -8,7 +8,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DWP_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.JOINT_PARTY_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
@@ -170,8 +169,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(0).getValue();
-        assertEquals("Other document received on 13-06-2020", sscsDocumentDetail.getDocumentFileName());
-        assertEquals("Other document", sscsDocumentDetail.getDocumentType());
+        assertEquals("Appellant evidence received on 13-06-2020", sscsDocumentDetail.getDocumentFileName());
+        assertEquals("appellantEvidence", sscsDocumentDetail.getDocumentType());
         assertEquals("www.test.com", sscsDocumentDetail.getDocumentLink().getDocumentUrl());
         assertEquals("www.edited.com", sscsDocumentDetail.getEditedDocumentLink().getDocumentUrl());
         assertEquals("2020-06-13", sscsDocumentDetail.getDocumentDateAdded());
@@ -293,15 +292,15 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         return new Object[]{
             //other options scenarios
-            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, null, OTHER_DOCUMENT},
-            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, NO, OTHER_DOCUMENT},
-            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, YES, OTHER_DOCUMENT},
-            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, NO, OTHER_DOCUMENT},
-            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, null, OTHER_DOCUMENT},
-            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, YES, OTHER_DOCUMENT},
-            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, NO, OTHER_DOCUMENT},
-            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, null, OTHER_DOCUMENT},
-            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, YES, OTHER_DOCUMENT},
+            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, null, APPELLANT_EVIDENCE},
+            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, NO, APPELLANT_EVIDENCE},
+            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, YES, APPELLANT_EVIDENCE},
+            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, NO, REPRESENTATIVE_EVIDENCE},
+            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, null, REPRESENTATIVE_EVIDENCE},
+            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, YES, REPRESENTATIVE_EVIDENCE},
+            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, NO, DWP_EVIDENCE},
+            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, null, DWP_EVIDENCE},
+            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, YES, DWP_EVIDENCE},
             //issue parties scenarios
             new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, null, APPELLANT_EVIDENCE},
             new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, NO, APPELLANT_EVIDENCE},
@@ -361,9 +360,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("Other document received on 12-06-2019", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("Appellant evidence received on 12-06-2019", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("2019-06-12", response.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
-        assertEquals("Other document received on 13-06-2019", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
+        assertEquals("Appellant evidence received on 13-06-2019", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
         assertEquals("2019-06-13", response.getData().getSscsDocument().get(1).getValue().getDocumentDateAdded());
         assertEquals("exist.pdf", response.getData().getSscsDocument().get(2).getValue().getDocumentFileName());
         assertNotNull(response.getData().getSscsDocument().get(0).getValue().getControlNumber());
@@ -387,11 +386,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("Other document received on 12-06-2019", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("Appellant evidence received on 12-06-2019", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("2019-06-12", response.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
         assertEquals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED, response.getData().getSscsDocument().get(0).getValue().getDocumentTranslationStatus());
 
-        assertEquals("Other document received on 13-06-2019", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
+        assertEquals("Appellant evidence received on 13-06-2019", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
         assertEquals("2019-06-13", response.getData().getSscsDocument().get(1).getValue().getDocumentDateAdded());
         assertEquals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED, response.getData().getSscsDocument().get(1).getValue().getDocumentTranslationStatus());
 
