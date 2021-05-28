@@ -49,9 +49,14 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
     }
 
 
-    protected String buildName(SscsCaseData caseData) {
+    protected String buildName(SscsCaseData caseData, boolean displayAppointeeName) {
+        if (displayAppointeeName && "yes".equalsIgnoreCase(caseData.getAppeal().getAppellant().getIsAppointee())
+            && null != caseData.getAppeal().getAppellant().getAppointee()) {
+            return WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getAppointee().getName()
+                    .getFullNameNoTitle(), ' ', '.');
+        }
         return WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getName()
-            .getFullNameNoTitle(), ' ', '.');
+                .getFullNameNoTitle(), ' ', '.');
     }
 
     protected String buildSignedInJudgeName(String userAuthorisation) {
