@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.functional.mya;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.util.List;
@@ -64,13 +65,14 @@ public class EvidenceUploadTest extends BaseFunctionTest {
 
         SscsCaseDetails caseDetails = getCaseDetails(createdCcdCase.getCaseId());
 
-        List<ScannedDocument> scannedDocument = caseDetails.getData().getScannedDocuments();
-        assertThat(scannedDocument.size(), is(1));
+        assertNull(caseDetails.getData().getScannedDocuments());
         List<AudioVideoEvidence> audioVideoEvidences = caseDetails.getData().getAudioVideoEvidence();
         assertThat(audioVideoEvidences.size(), is(1));
-        String expectedEvidenceUploadFilename = String.format("Appellant upload 1 - %s.pdf", caseDetails.getId());
-        assertThat(scannedDocument.get(0).getValue().getFileName(), is(expectedEvidenceUploadFilename));
         assertThat(audioVideoEvidences.get(0).getValue().getFileName(), is("evidence.mp3"));
+
+        // FIXME: Put these lines in once definition uploaded to AAT with new field
+        // String expectedEvidenceUploadFilename = String.format("Appellant upload 1 - %s.pdf", caseDetails.getId());
+        // assertThat(audioVideoEvidences.get(0).getValue().getStatementOfEvidencePdf().getDocumentFilename(), is(expectedEvidenceUploadFilename));
     }
 
     @Test
