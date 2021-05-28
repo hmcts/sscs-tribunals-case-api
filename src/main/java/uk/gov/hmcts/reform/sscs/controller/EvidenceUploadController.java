@@ -58,6 +58,7 @@ public class EvidenceUploadController {
             @ApiParam(value = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx") @PathVariable("identifier") String identifier,
             @RequestParam("file") MultipartFile file
     ) {
+        log.info("In PUT");
         return uploadEvidence(() -> evidenceUploadService.uploadDraftHearingEvidence(identifier, file));
     }
 
@@ -125,11 +126,21 @@ public class EvidenceUploadController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity submitEvidence(
-            @PathVariable("identifier") String identifier,
+            @ApiParam(value = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx") @PathVariable("identifier") String identifier,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("body") String body,
+            @RequestParam("idamEmail") String idamEmail
+    ) {
+        log.info("In POST 1");
+        boolean evidenceSubmitted = evidenceUploadService.submitHearingEvidence(identifier, new EvidenceDescription(body, idamEmail), file);
+        return evidenceSubmitted ? ResponseEntity.noContent().build() : notFound().build();
+    }
+
+    public ResponseEntity submitEvidence(
+            @ApiParam(value = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx") @PathVariable("identifier") String identifier,
             @RequestBody EvidenceDescription description
     ) {
-        boolean evidenceSubmitted = evidenceUploadService.submitHearingEvidence(identifier, description);
-        return evidenceSubmitted ? ResponseEntity.noContent().build() : notFound().build();
+        return null;
     }
 
     @ApiOperation(value = "Get evidence cover sheet",
