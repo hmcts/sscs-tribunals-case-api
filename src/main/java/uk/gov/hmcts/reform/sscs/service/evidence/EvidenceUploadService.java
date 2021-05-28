@@ -234,7 +234,7 @@ public class EvidenceUploadService {
         byte[] combinedContent = appendEvidenceUploadsToStatement(statementContent.getByteArray(), contentUploads,
                 sscsCaseData.getCcdCaseId());
         SscsDocument combinedPdfEvidence = pdfStoreService.store(combinedContent, filename, "Other evidence").get(0);
-        buildScannedDocumentByGivenSscsDoc(sscsCaseData, combinedPdfEvidence, audioVideoMedia, idamEmail);
+        buildUploadedDocumentByGivenSscsDoc(sscsCaseData, combinedPdfEvidence, audioVideoMedia, idamEmail);
     }
 
     private ByteArrayResource getContentFromTheStatement(MyaEventActionContext storePdfContext) {
@@ -366,40 +366,52 @@ public class EvidenceUploadService {
     }
 
 
-    protected void buildScannedDocumentByGivenSscsDoc(SscsCaseData sscsCaseData, SscsDocument draftSscsDocument,
-                                                      List<SscsDocument> audioVideoMedia, String idamEmail) {
+    protected void buildUploadedDocumentByGivenSscsDoc(SscsCaseData sscsCaseData, SscsDocument draftSscsDocument,
+                                                       List<SscsDocument> audioVideoMedia, String idamEmail) {
         LocalDate ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(),
             DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
+
+        if (audioVideoMedia != null && !audioVideoMedia.isEmpty()) {
+            updateCaseDataWithNewAudioVideoUpload(audioVideoMedia, sscsCaseData, idamEmail, ldt, draftSscsDocument);
+        } else {
+            updateCaseDataWithNewPdfUpload(sscsCaseData, ldt, draftSscsDocument);
+        }
+    }
+
+    private void updateCaseDataWithNewPdfUpload(SscsCaseData sscsCaseData, LocalDateTime ldt, SscsDocument draftSscsDocument) {
         ScannedDocument scannedDocument = ScannedDocument.builder()
-            .value(ScannedDocumentDetails.builder()
-                .type("other")
-                .url(draftSscsDocument.getValue().getDocumentLink())
-                .fileName(draftSscsDocument.getValue().getDocumentFileName())
-                .scannedDate(ldt.toString())
-                .build())
-            .build();
+                .value(ScannedDocumentDetails.builder()
+                        .type("other")
+                        .url(draftSscsDocument.getValue().getDocumentLink())
+                        .fileName(draftSscsDocument.getValue().getDocumentFileName())
+                        .scannedDate(ldt.toString())
+                        .build())
+                .build();
 
         List<ScannedDocument> scannedDocuments = new ArrayList<>();
         scannedDocuments.add(scannedDocument);
+        List<ScannedDocument> newScannedDocumentsList = union(emptyIfNull(sscsCaseData.getScannedDocuments()),
+                emptyIfNull(scannedDocuments));
+        sscsCaseData.setScannedDocuments(newScannedDocumentsList);
+    }
 
+    private void updateCaseDataWithNewAudioVideoUpload(List<SscsDocument> audioVideoMedia, SscsCaseData sscsCaseData, String idamEmail, LocalDateTime ldt, SscsDocument draftSscsDocument) {
         List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>();
         UploadParty uploader = workOutAudioVideoUploadParty(sscsCaseData, idamEmail);
 
-        for (SscsDocument audioVideoDocument: audioVideoMedia) {
+        for (SscsDocument audioVideoDocument : audioVideoMedia) {
+
             audioVideoEvidence.add(AudioVideoEvidence.builder()
                     .value(AudioVideoEvidenceDetails.builder()
                             .documentLink(audioVideoDocument.getValue().getDocumentLink())
                             .dateAdded(ldt.toLocalDate())
                             .fileName(audioVideoDocument.getValue().getDocumentFileName())
                             .partyUploaded(uploader)
+                            .statementOfEvidencePdf(draftSscsDocument.getValue().getDocumentLink())
                             .build())
                     .build());
         }
-        List<ScannedDocument> newScannedDocumentsList = union(emptyIfNull(sscsCaseData.getScannedDocuments()),
-                emptyIfNull(scannedDocuments));
-        sscsCaseData.setScannedDocuments(newScannedDocumentsList);
-
         if (!audioVideoEvidence.isEmpty()) {
             List<AudioVideoEvidence> newAudioVideoEvidenceList = union(emptyIfNull(sscsCaseData.getAudioVideoEvidence()),
                     emptyIfNull(audioVideoEvidence));
