@@ -102,6 +102,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
                         .fileName("music.mp3")
                         .partyUploaded(UploadParty.APPELLANT)
                         .dateAdded(LocalDate.now())
+                        .statementOfEvidencePdf(DocumentLink.builder().documentFilename("statement1.pdf").build())
                         .build())
                 .audioVideoEvidence(new ArrayList<>(Arrays.asList(AudioVideoEvidence.builder().value(
                         AudioVideoEvidenceDetails.builder()
@@ -109,6 +110,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
                                 .fileName("music.mp3")
                                 .partyUploaded(UploadParty.APPELLANT)
                                 .dateAdded(LocalDate.now())
+                                .statementOfEvidencePdf(DocumentLink.builder().documentFilename("statement1.pdf").build())
                             .build())
                         .build(),
                         AudioVideoEvidence.builder().value(
@@ -202,6 +204,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertEquals("music.mp3", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("audioDocument", response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("Appellant", response.getData().getSscsDocument().get(0).getValue().getPartyUploaded().getLabel());
+        assertEquals("statement1.pdf", response.getData().getSscsDocument().get(0).getValue().getStatementOfEvidencePdf().getDocumentFilename());
         assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
     }
 
@@ -238,6 +241,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertEquals("music.mp3", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("audioDocument", response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("Appellant", response.getData().getSscsDocument().get(0).getValue().getPartyUploaded().getLabel());
+        assertEquals("statement1.pdf", response.getData().getSscsDocument().get(0).getValue().getStatementOfEvidencePdf().getDocumentFilename());
     }
 
     @Test
