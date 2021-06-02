@@ -190,7 +190,7 @@ ccd:
       - sscs.superuser@mailinator.com|SSCS|Benefit|appealCreated
 
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.8.3-RC-SSCS-5235
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.8.14-RC-SSCS-5235
     definitionFilename: sscs-ccd.xlsx
     redirectUri: https://ccd-admin-web-${SERVICE_FQDN}/oauth2redirect
     environment:
