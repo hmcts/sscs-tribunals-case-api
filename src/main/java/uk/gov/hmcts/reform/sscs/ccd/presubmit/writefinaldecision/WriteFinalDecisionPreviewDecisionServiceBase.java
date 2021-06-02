@@ -98,7 +98,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
             writeFinalDecisionBuilder.dateOfDecision(null);
         }
 
-        writeFinalDecisionBuilder.appellantName(buildName(caseData));
+        writeFinalDecisionBuilder.appellantName(buildName(caseData, true));
         if ("na".equals(caseData.getWriteFinalDecisionEndDateType())) {
             caseData.setWriteFinalDecisionEndDateType(null);
         }

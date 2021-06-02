@@ -279,8 +279,9 @@ public class SyaEndpointsIt extends AbstractEventIt {
             "UC,, Universal Credit",
             "ESA, Coatbridge Benefit Centre,Coatbridge Benefit Centre",
             "DLA, Disability Benefit Centre 4, DLA Child/Adult",
-            "carersAllowance,, Tyneview Park DRT",
-            "attendanceAllowance, The Pension Service 11, Attendance Allowance"})
+            "carersAllowance,, Carers Allowance",
+            "attendanceAllowance, The Pension Service 11, Attendance Allowance",
+            "bereavementBenefit,, Bereavement Benefit"})
     public void givenAValidAppealForBenefitType_createValidAppealCreatedCaseWithDwpRegionalCentre(String benefitTypeCode, String dwpIssuingOffice, String expectedDwpRegionalCentre) throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 

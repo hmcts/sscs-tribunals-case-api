@@ -14,12 +14,12 @@ plugins {
     id 'jacoco'
     id 'org.springframework.boot' version '2.3.5.RELEASE'
     id 'uk.gov.hmcts.java' version '0.12.9'
-    id 'com.gorylenko.gradle-git-properties' version '2.2.4'
+    id 'com.gorylenko.gradle-git-properties' version '2.3.1'
     id 'com.github.ben-manes.versions' version '0.38.0'
     id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.6.0'
     id 'org.owasp.dependencycheck' version '6.1.6'
-    id 'au.com.dius.pact' version '4.2.5'
+    id 'au.com.dius.pact' version '4.2.6'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -179,7 +179,9 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/StorePdfService.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/coversheet/PdfCoverSheet.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/controllers/CreateCaseController.java," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/PdfData.java"
+                "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/PdfData.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/esa/EsaWriteFinalDecisionMidEventValidationHandler.java,"
+                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/uc/UcWriteFinalDecisionMidEventValidationHandler.java"
         property "sonar.pitest.mode", "reuseReport"
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
     }
@@ -292,14 +294,14 @@ dependencies {
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
     compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.1'
     compile group: 'com.google.guava', name: 'guava', version: '30.1.1-jre'
-    compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.12.1'
+    compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.13.0'
 
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
 
     // Added to fix CVE-2020-13934, CVE-2020-13935, CVE-2020-17527
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.43'
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.43'
-    compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.5'
+    compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.6'
 
     // Safe to remove once Spring update their dependencies - see CVE-2019-14439 and add 'com.fasterxml.jackson.core' configurations.all above
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
@@ -309,7 +311,7 @@ dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
-    compile group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.1'
+    compile group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.2'
     compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.1'
 
     compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.4'
@@ -318,7 +320,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.07'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.14'
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.24'
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.35'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
@@ -326,9 +328,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.18'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.5.RELEASE'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.9.0'
-    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.25.0'
-    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.9.0'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.10.0'
+    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.26.0'
+    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.10.0'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.25.0'
     testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
@@ -336,7 +338,7 @@ dependencies {
     // Added to fix CVE-2020-13934, CVE-2020-13935, CVE-2020-17527
     testCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.40'
     testCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.40'
-    testCompile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.4'
+    testCompile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.6'
 
     testCompile 'pl.pragmatists:JUnitParams:1.1.1'
 
@@ -345,7 +347,7 @@ dependencies {
     e2eCompile 'org.projectlombok:lombok:1.18.16'
     e2eAnnotationProcessor "org.projectlombok:lombok:1.18.18"
 
-    testCompile "org.junit.jupiter:junit-jupiter-api:5.7.1"
+    testCompile "org.junit.jupiter:junit-jupiter-api:5.7.2"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:5.6.2"
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.7.1"
 
@@ -353,9 +355,9 @@ dependencies {
     contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
     contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
 
-    contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.7.0")
+    contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.7.2")
     contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.6.1")
-    contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.6.2')
+    contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.7.2')
 
     contractTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.28') {
         force = true

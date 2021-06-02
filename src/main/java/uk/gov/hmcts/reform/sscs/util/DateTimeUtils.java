@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 
 public final class DateTimeUtils {
@@ -38,6 +40,26 @@ public final class DateTimeUtils {
         ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, ZoneId.of(EUROPE_LONDON));
         return formatUtc(zonedDateTime);
 
+    }
+
+    public static boolean isDateInTheFuture(LocalDate date) {
+        return Optional.ofNullable(date).filter(d -> d.isAfter(LocalDate.now())).isPresent();
+    }
+
+    public static boolean isDateInTheFuture(String dateString) {
+        return isDateInTheFuture(getLocalDate(dateString).orElse(null));
+    }
+
+    public static boolean isDateInThePast(LocalDate date) {
+        return Optional.ofNullable(date).filter(d -> d.isBefore(LocalDate.now())).isPresent();
+    }
+
+    public static boolean isDateInThePast(String dateString) {
+        return isDateInThePast(getLocalDate(dateString).orElse(null));
+    }
+
+    public static Optional<LocalDate> getLocalDate(String dateString) {
+        return Optional.ofNullable(stripToNull(dateString)).map(LocalDate::parse);
     }
 
     public static String generateDwpResponseDueDate(int numberOfDays) {

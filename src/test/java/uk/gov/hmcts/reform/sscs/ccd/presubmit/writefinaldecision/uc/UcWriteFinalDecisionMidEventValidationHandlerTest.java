@@ -235,4 +235,14 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
 
     }
 
+    @Test
+    @Parameters({"Yes, YES", "NO, null"})
+    public void givenGenerateNoticeValueAndCaseIsUc_thenShouldSetShowWorkCapabilityAssessment(String isGenerateNotice, @Nullable YesNo showWorkCapabilityPage) {
+        sscsCaseData.setWriteFinalDecisionGenerateNotice(isGenerateNotice);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(showWorkCapabilityPage, response.getData().getShowWorkCapabilityAssessmentPage());
+    }
+
 }
