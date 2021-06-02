@@ -6,7 +6,6 @@ import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
@@ -16,7 +15,6 @@ import static uk.gov.hmcts.reform.sscs.util.ConfidentialityRequestUtil.isAtLeast
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -84,19 +82,13 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
         moveDocsToDwpCollectionIfOldPattern(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
-
-        if (checkMandatoryFilesMissing(sscsCaseData)) {
-            response.addError("The bundle cannot be created as mandatory DWP documents are missing");
-            return response;
-        }
-
         setDocumentFileNameIfNotSet(sscsCaseData);
 
         clearExistingBundles(callback);
 
         createPdfsForAnyAudioVideoEvidence(sscsCaseData);
 
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
         setMultiBundleConfig(sscsCaseData, response);
 
         if (isNotEmpty(response.getErrors())) {
@@ -236,42 +228,6 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
     private MultiBundleConfig getMultiBundleConfig(String config) {
         return MultiBundleConfig.builder().value(config).build();
-    }
-
-    private boolean checkMandatoryFilesMissing(SscsCaseData sscsCaseData) {
-        boolean depResponseDocsMissing = isDwpResponseDocsMissing(sscsCaseData);
-        if (!depResponseDocsMissing) {
-            return isDwpEvidenceBundleDocsMissing(sscsCaseData);
-        }
-        return true;
-    }
-
-    private boolean isDwpEvidenceBundleDocsMissing(SscsCaseData sscsCaseData) {
-        List<DwpDocument> dwpEvidenceBundleDocs = getDwpEvidenceBundleDocs(sscsCaseData);
-        return dwpEvidenceBundleDocs.isEmpty() || hasMandatoryDocumentMissingForLegacyAppeals(dwpEvidenceBundleDocs);
-    }
-
-    private boolean isDwpResponseDocsMissing(SscsCaseData sscsCaseData) {
-        List<DwpDocument> dwpResponseDocs = getDwpResponseDocs(sscsCaseData);
-        return dwpResponseDocs.isEmpty() || hasMandatoryDocumentMissingForLegacyAppeals(dwpResponseDocs);
-    }
-
-    @NotNull
-    private List<DwpDocument> getDwpEvidenceBundleDocs(SscsCaseData sscsCaseData) {
-        return emptyIfNull(sscsCaseData.getDwpDocuments()).stream()
-                .filter(e -> DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue().equals(e.getValue().getDocumentType()))
-                .collect(toList());
-    }
-
-    @NotNull
-    private List<DwpDocument> getDwpResponseDocs(SscsCaseData sscsCaseData) {
-        return emptyIfNull(sscsCaseData.getDwpDocuments()).stream()
-                .filter(e -> DwpDocumentType.DWP_RESPONSE.getValue().equals(e.getValue().getDocumentType()))
-                .collect(toList());
-    }
-
-    private boolean hasMandatoryDocumentMissingForLegacyAppeals(List<DwpDocument> dwpResponseDocs) {
-        return dwpResponseDocs.stream().anyMatch(e -> isNull(e.getValue().getDocumentLink()));
     }
 
     private void moveDocsToDwpCollectionIfOldPattern(SscsCaseData sscsCaseData) {
