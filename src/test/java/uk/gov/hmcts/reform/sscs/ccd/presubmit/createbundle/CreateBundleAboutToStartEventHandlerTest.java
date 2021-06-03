@@ -110,6 +110,18 @@ public class CreateBundleAboutToStartEventHandlerTest {
     }
 
     @Test
+    public void givenOldPattern_thenNoError() {
+        callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+        callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size());
+        verifyNoInteractions(serviceRequestExecutor);
+    }
+
+    @Test
     public void givenEmptyDwpResponseDocumentLinkWithDwpDocumentsPattern_thenReturnError() {
         List<DwpDocument> dwpDocuments = new ArrayList<>();
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).build()).build());
