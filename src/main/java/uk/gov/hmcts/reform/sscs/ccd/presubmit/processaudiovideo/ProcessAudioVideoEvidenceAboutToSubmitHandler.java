@@ -202,6 +202,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
                         .documentDateAdded(audioVideoEvidence.getDateAdded().toString())
                         .partyUploaded(audioVideoEvidence.getPartyUploaded())
                         .dateApproved(LocalDate.now().toString())
+                        .statementOfEvidencePdf(audioVideoEvidence.getStatementOfEvidencePdf())
                         .build())
                 .build();
     }

@@ -228,7 +228,6 @@ public class EvidenceUploadServiceTest {
         initCommonParams("someFileName" + fileExtension);
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName,
                 documentUrl, evidenceCreatedOn);
-        sscsCaseDetails.getData().setScannedDocuments(getScannedDocuments());
         sscsCaseDetails.getData().setSscsDocument(buildSscsDocumentList());
         sscsCaseDetails.getData().setAppeal(Appeal.builder().hearingType("sya").build());
 
@@ -238,7 +237,8 @@ public class EvidenceUploadServiceTest {
 
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
         List files = new ArrayList<String>();
-        files.add("someFileName" + fileExtension);
+        String avFileName = "someFileName" + fileExtension;
+        files.add(avFileName);
 
         UploadedEvidence evidenceDescriptionPdf = mock(UploadedEvidence.class);
         when(storeEvidenceDescriptionService.storePdf(
@@ -263,7 +263,7 @@ public class EvidenceUploadServiceTest {
         assertThat(submittedEvidence, is(true));
 
         verify(ccdService).updateCase(
-                and(and(and(and(hasSscsScannedDocumentAndSscsDocuments(expectedEvidenceUploadFilename),
+                and(and(and(and(hasAudioVideoDocumentAndSscsDocuments(avFileName, "http://dm-store/112"),
                     doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo()),
                     argThat(argument -> argument.getInterlocReviewState().equals(expectedInterlocReviewState.getId()))),
                         argThat(argument ->  argument.getInterlocReferralReason().equals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE.getId()))),
@@ -378,6 +378,19 @@ public class EvidenceUploadServiceTest {
     @Test
     public void testBuildScannedDocumentByGivenSscsDoc() {
         SscsCaseData sscsCaseData = createSscsCaseDetailsDraftDocsJustDescription("EvidenceDescription.pdf").getData();
+
+        SscsDocument evidenceDescriptionDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentDateAdded("2021-01-30")
+                .documentLink(DocumentLink.builder().documentBinaryUrl("url/binary").documentFilename("description.pdf").documentUrl("url").build()).build()).build();
+
+        evidenceUploadService.buildUploadedDocumentByGivenSscsDoc(sscsCaseData, evidenceDescriptionDocument, null, null);
+        assertEquals(1, sscsCaseData.getScannedDocuments().size());
+        assertNull(sscsCaseData.getAudioVideoEvidence());
+    }
+
+    @Test
+    public void testBuildScannedDocumentByGivenSscsDocWithAvEvidenceAndPdf() {
+        //This should never happen - but just in case should treat as just an AV evidence upload and ignore the pdf
+        SscsCaseData sscsCaseData = createSscsCaseDetailsDraftDocsJustDescription("EvidenceDescription.pdf").getData();
         List<SscsDocument> audioVideoDocuments = new ArrayList<>();
 
         SscsDocument evidenceDescriptionDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentDateAdded("2021-01-30")
@@ -391,8 +404,8 @@ public class EvidenceUploadServiceTest {
         audioVideoDocuments.add(draftSscsAudioDocument);
         audioVideoDocuments.add(draftSscsVideoDocument);
 
-        evidenceUploadService.buildScannedDocumentByGivenSscsDoc(sscsCaseData, evidenceDescriptionDocument, audioVideoDocuments, null);
-        assertEquals(1, sscsCaseData.getScannedDocuments().size());
+        evidenceUploadService.buildUploadedDocumentByGivenSscsDoc(sscsCaseData, evidenceDescriptionDocument, audioVideoDocuments, null);
+        assertNull(sscsCaseData.getScannedDocuments());
         assertEquals(2, sscsCaseData.getAudioVideoEvidence().size());
     }
 
@@ -437,26 +450,9 @@ public class EvidenceUploadServiceTest {
         SscsDocument evidenceDescriptionDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentDateAdded("2021-01-30")
                 .documentLink(DocumentLink.builder().documentBinaryUrl("url/binary").documentFilename("description.pdf").documentUrl("url").build()).build()).build();
 
-        evidenceUploadService.buildScannedDocumentByGivenSscsDoc(sscsCaseData, evidenceDescriptionDocument, audioVideoDocuments, null);
+        evidenceUploadService.buildUploadedDocumentByGivenSscsDoc(sscsCaseData, evidenceDescriptionDocument, audioVideoDocuments, null);
         assertEquals(1, sscsCaseData.getScannedDocuments().size());
         assertNull(sscsCaseData.getAudioVideoEvidence());
-    }
-
-    @Test
-    public void testBuildScannedDocumentByGivenSscsDocAndAudio() {
-        List<SscsDocument> audioVideoDocuments = new ArrayList<>();
-        audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("word1.docx").build()).build());
-        audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("audio2.mp3").build()).build());
-        audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("word2.docx").build()).build());
-
-        SscsDocument draftSscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentDateAdded("2021-01-30")
-                .documentLink(DocumentLink.builder().documentBinaryUrl("url/binary").documentFilename("coversheet").documentUrl("url").build()).build()).build();
-
-        SscsCaseData sscsCaseData = createSscsCaseDetailsDraftDocsJustDescription("EvidenceDescription.pdf").getData();
-
-        evidenceUploadService.buildScannedDocumentByGivenSscsDoc(sscsCaseData, draftSscsDocument, audioVideoDocuments, null);
-        assertEquals(3, sscsCaseData.getAudioVideoEvidence().size());
-        assertEquals(1, sscsCaseData.getScannedDocuments().size());
     }
 
     @Test
@@ -468,7 +464,7 @@ public class EvidenceUploadServiceTest {
         SscsDocument draftSscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentDateAdded("2021-01-30")
                 .documentLink(DocumentLink.builder().documentBinaryUrl("url/binary").documentFilename("coversheet").documentUrl("url").build()).build()).build();
 
-        evidenceUploadService.buildScannedDocumentByGivenSscsDoc(sscsCaseDetails.getData(), draftSscsDocument, audioVideoDocuments, idamEmail);
+        evidenceUploadService.buildUploadedDocumentByGivenSscsDoc(sscsCaseDetails.getData(), draftSscsDocument, audioVideoDocuments, idamEmail);
         assertEquals(1, sscsCaseDetails.getData().getAudioVideoEvidence().size());
         assertEquals(uploader, sscsCaseDetails.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded());
     }
@@ -624,16 +620,6 @@ public class EvidenceUploadServiceTest {
         return uploadResponse;
     }
 
-    private SscsCaseData hasDraftCorDocument(int originalNumberOfCorDocuments, String someQuestionId, String documentUrl, String fileName) {
-        return argThat(argument -> {
-            List<CorDocument> corDocument = argument.getDraftCorDocument();
-            return corDocument.size() == originalNumberOfCorDocuments + 1
-                    && corDocument.get(originalNumberOfCorDocuments).getValue().getQuestionId().equals(someQuestionId)
-                    && corDocument.get(originalNumberOfCorDocuments).getValue().getDocument().getDocumentLink().getDocumentUrl().equals(documentUrl)
-                    && corDocument.get(originalNumberOfCorDocuments).getValue().getDocument().getDocumentFileName().equals(fileName);
-        });
-    }
-
     private SscsCaseData hasSscsDocument(String documentUrl, String fileName, int expectedNumberOfDocs) {
         return argThat(argument -> {
             List<SscsDocument> sscsDocument = argument.getSscsDocument();
@@ -657,6 +643,11 @@ public class EvidenceUploadServiceTest {
             argument.getScannedDocuments()) && checkSscsDocuments(argument.getSscsDocument()));
     }
 
+    private SscsCaseData hasAudioVideoDocumentAndSscsDocuments(String expectedFileName, String expectedStatementPrefix) {
+        return argThat(argument -> checkSscsAudioVideoDocument(expectedFileName, expectedStatementPrefix,
+                argument.getAudioVideoEvidence()) && checkSscsDocuments(argument.getSscsDocument()));
+    }
+
     private boolean checkSscsDocuments(List<SscsDocument> sscsDocument) {
         boolean isExpectedNumberOfDocs = sscsDocument.size() == 1;
         return isExpectedNumberOfDocs && sscsDocument.get(0).getValue().getDocumentFileName().equals("form1");
@@ -671,29 +662,22 @@ public class EvidenceUploadServiceTest {
         return  isExpectedNumberOfAppellantStatements && isExpectedNumberOfScannedDocs;
     }
 
+    private boolean checkSscsAudioVideoDocument(String expectedFileName, String expectedStatementPrefix,
+                                             List<AudioVideoEvidence> audioVideoEvidences) {
+        boolean isExpectedNumberOfAvDocs = audioVideoEvidences.size() == 1;
+        boolean isExpectedAvFileName = audioVideoEvidences.get(0).getValue().getFileName().equals(expectedFileName);
+        boolean isExpectedNumberOfAppellantStatements = audioVideoEvidences.stream()
+                .filter(avDoc -> avDoc.getValue().getStatementOfEvidencePdf().getDocumentUrl().startsWith(expectedStatementPrefix))
+                .count() == 1;
+        return  isExpectedNumberOfAppellantStatements && isExpectedAvFileName && isExpectedNumberOfAvDocs;
+    }
+
     private SscsCaseData hasDraftSscsDocument(int originalNumberOfDocuments, String documentUrl, String fileName) {
         return argThat(argument -> {
             List<SscsDocument> sscsDocument = argument.getDraftSscsDocument();
             return sscsDocument.size() == originalNumberOfDocuments + 1
                     && sscsDocument.get(originalNumberOfDocuments).getValue().getDocumentLink().getDocumentUrl().equals(documentUrl)
                     && sscsDocument.get(originalNumberOfDocuments).getValue().getDocumentFileName().equals(fileName);
-        });
-    }
-
-    private SscsCaseData hasCorDocument(int originalNumberOfDocuments, String questionId, String documentUrl, String fileName) {
-        return argThat(argument -> {
-            List<CorDocument> sscsDocument = argument.getCorDocument();
-            return sscsDocument.size() == originalNumberOfDocuments + 1
-                    && sscsDocument.get(originalNumberOfDocuments).getValue().getQuestionId().equals(questionId)
-                    && sscsDocument.get(originalNumberOfDocuments).getValue().getDocument().getDocumentLink().getDocumentUrl().equals(documentUrl)
-                    && sscsDocument.get(originalNumberOfDocuments).getValue().getDocument().getDocumentFileName().equals(fileName);
-        });
-    }
-
-    private SscsCaseData doesNotHaveDraftCorDocuments() {
-        return argThat(argument -> {
-            List<CorDocument> corDocument = argument.getDraftCorDocument();
-            return corDocument.isEmpty();
         });
     }
 
