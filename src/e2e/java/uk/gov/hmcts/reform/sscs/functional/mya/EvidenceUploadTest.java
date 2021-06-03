@@ -70,9 +70,8 @@ public class EvidenceUploadTest extends BaseFunctionTest {
         assertThat(audioVideoEvidences.size(), is(1));
         assertThat(audioVideoEvidences.get(0).getValue().getFileName(), is("evidence.mp3"));
 
-        // FIXME: Put these lines in once definition uploaded to AAT with new field
-        // String expectedEvidenceUploadFilename = String.format("Appellant upload 1 - %s.pdf", caseDetails.getId());
-        // assertThat(audioVideoEvidences.get(0).getValue().getStatementOfEvidencePdf().getDocumentFilename(), is(expectedEvidenceUploadFilename));
+        String expectedEvidenceUploadFilename = String.format("Appellant upload 1 - %s.pdf", caseDetails.getId());
+        assertThat(audioVideoEvidences.get(0).getValue().getStatementOfEvidencePdf().getDocumentFilename(), is(expectedEvidenceUploadFilename));
     }
 
     @Test
