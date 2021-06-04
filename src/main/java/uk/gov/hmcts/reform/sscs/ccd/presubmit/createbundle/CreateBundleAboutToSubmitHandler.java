@@ -80,8 +80,6 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        moveDocsToDwpCollectionIfOldPattern(sscsCaseData);
-
         setDocumentFileNameIfNotSet(sscsCaseData);
 
         clearExistingBundles(callback);
@@ -228,17 +226,6 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
     private MultiBundleConfig getMultiBundleConfig(String config) {
         return MultiBundleConfig.builder().value(config).build();
-    }
-
-    private void moveDocsToDwpCollectionIfOldPattern(SscsCaseData sscsCaseData) {
-        //Before we moved to the new DWP document collection, we stored DWP documents within their own fields. This would break bundling with the new config that
-        //looks at the new DWP document collection. Therefore, if the DWP fields are populated, then assume old pattern and move to the DWP document collection.
-        if (sscsCaseData.getDwpResponseDocument() != null) {
-            dwpDocumentService.moveDwpResponseDocumentToDwpDocumentCollection(sscsCaseData);
-        }
-        if (sscsCaseData.getDwpEvidenceBundleDocument() != null) {
-            dwpDocumentService.moveDwpEvidenceBundleToDwpDocumentCollection(sscsCaseData);
-        }
     }
 
     protected boolean isPhmeStatusUnderReview(SscsCaseData sscsCaseData) {
