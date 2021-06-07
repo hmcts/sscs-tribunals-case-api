@@ -196,13 +196,14 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     private SscsDocument buildAudioVideoSscsDocument(AudioVideoEvidenceDetails audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response) {
         return SscsDocument.builder().value(
                 SscsDocumentDetails.builder()
-                        .documentLink(audioVideoEvidence.getDocumentLink())
+                        .avEvidenceDocumentLink(audioVideoEvidence.getDocumentLink())
                         .documentFileName(audioVideoEvidence.getFileName())
                         .documentType(findAudioVideoDocumentType(audioVideoEvidence, response))
                         .documentDateAdded(audioVideoEvidence.getDateAdded().toString())
                         .partyUploaded(audioVideoEvidence.getPartyUploaded())
                         .dateApproved(LocalDate.now().toString())
-                        .statementOfEvidencePdf(audioVideoEvidence.getStatementOfEvidencePdf())
+                        .documentLink(audioVideoEvidence.getStatementOfEvidencePdf())
+                        .isAvEvidenceDocumentLinkPresent(YesNo.YES)
                         .build())
                 .build();
     }

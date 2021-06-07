@@ -31,6 +31,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
@@ -102,7 +103,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
                         .fileName("music.mp3")
                         .partyUploaded(UploadParty.APPELLANT)
                         .dateAdded(LocalDate.now())
-                        .statementOfEvidencePdf(DocumentLink.builder().documentFilename("statement1.pdf").build())
+                        .statementOfEvidencePdf(DocumentLink.builder().documentFilename("statement1.pdf").documentUrl("statement1.url").documentBinaryUrl("statement1.url/binary").build())
                         .build())
                 .audioVideoEvidence(new ArrayList<>(Arrays.asList(AudioVideoEvidence.builder().value(
                         AudioVideoEvidenceDetails.builder()
@@ -198,13 +199,14 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
         assertEquals(1, response.getData().getAudioVideoEvidence().size());
         assertEquals(1, response.getData().getSscsDocument().size());
-        assertEquals(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getSscsDocument().get(0).getValue().getDocumentLink());
+        assertEquals(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getSscsDocument().get(0).getValue().getAvEvidenceDocumentLink());
+        assertEquals(YesNo.YES, response.getData().getSscsDocument().get(0).getValue().getIsAvEvidenceDocumentLinkPresent());
         assertEquals(LocalDate.now().toString(), response.getData().getSscsDocument().get(0).getValue().getDateApproved());
         assertEquals(LocalDate.now().toString(), response.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
         assertEquals("music.mp3", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
-        assertEquals("audioDocument", response.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals(DocumentType.AUDIO_DOCUMENT.getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("Appellant", response.getData().getSscsDocument().get(0).getValue().getPartyUploaded().getLabel());
-        assertEquals("statement1.pdf", response.getData().getSscsDocument().get(0).getValue().getStatementOfEvidencePdf().getDocumentFilename());
+        assertEquals(DocumentLink.builder().documentFilename("statement1.pdf").documentUrl("statement1.url").documentBinaryUrl("statement1.url/binary").build(), response.getData().getSscsDocument().get(0).getValue().getDocumentLink());
         assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
     }
 
@@ -235,13 +237,14 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
         assertEquals(1, response.getData().getAudioVideoEvidence().size());
         assertEquals(2, response.getData().getSscsDocument().size());
-        assertEquals(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getSscsDocument().get(0).getValue().getDocumentLink());
+        assertEquals(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getSscsDocument().get(0).getValue().getAvEvidenceDocumentLink());
+        assertEquals(YesNo.YES, response.getData().getSscsDocument().get(0).getValue().getIsAvEvidenceDocumentLinkPresent());
         assertEquals(LocalDate.now().toString(), response.getData().getSscsDocument().get(0).getValue().getDateApproved());
         assertEquals(LocalDate.now().toString(), response.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
         assertEquals("music.mp3", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
-        assertEquals("audioDocument", response.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals(DocumentType.AUDIO_DOCUMENT.getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("Appellant", response.getData().getSscsDocument().get(0).getValue().getPartyUploaded().getLabel());
-        assertEquals("statement1.pdf", response.getData().getSscsDocument().get(0).getValue().getStatementOfEvidencePdf().getDocumentFilename());
+        assertEquals(DocumentLink.builder().documentFilename("statement1.pdf").documentUrl("statement1.url").documentBinaryUrl("statement1.url/binary").build(), response.getData().getSscsDocument().get(0).getValue().getDocumentLink());
     }
 
     @Test
