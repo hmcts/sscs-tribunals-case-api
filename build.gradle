@@ -222,7 +222,7 @@ dependencyManagement {
         dependency group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.68'
 
         // resolves: CVE-2019-10101, CVE-2019-10102, CVE-2019-10103, CVE-2020-15824
-        dependencySet(group: 'org.jetbrains.kotlin', version: '1.5.0') {
+        dependencySet(group: 'org.jetbrains.kotlin', version: '1.5.10') {
             entry 'kotlin-stdlib'
             entry 'kotlin-stdlib-common'
             entry 'kotlin-stdlib-jdk8'
@@ -328,7 +328,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.18'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.5.RELEASE'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.10.0'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.11.0'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.26.0'
     testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.10.0'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
