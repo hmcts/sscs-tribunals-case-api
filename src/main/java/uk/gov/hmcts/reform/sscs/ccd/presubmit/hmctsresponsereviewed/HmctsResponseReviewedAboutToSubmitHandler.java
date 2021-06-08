@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 @Component
 @Slf4j
 public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
-    private DwpDocumentService dwpDocumentService;
+    private final DwpDocumentService dwpDocumentService;
 
     @Autowired
     public HmctsResponseReviewedAboutToSubmitHandler(DwpDocumentService dwpDocumentService) {
@@ -73,8 +73,7 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
         }
 
         if (sscsCaseData.getDwpAT38Document() != null || sscsCaseData.getDwpEvidenceBundleDocument() != null || sscsCaseData.getDwpResponseDocument() != null) {
-            String todayDate = java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-            dwpDocumentService.moveDocsToCorrectCollection(sscsCaseData, todayDate);
+            dwpDocumentService.moveDocsToCorrectCollection(sscsCaseData);
         }
     }
 
