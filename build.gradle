@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath("net.serenity-bdd:serenity-gradle-plugin:2.4.24")
+        classpath("net.serenity-bdd:serenity-gradle-plugin:2.4.34")
     }
 }
 
@@ -222,7 +222,7 @@ dependencyManagement {
         dependency group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.68'
 
         // resolves: CVE-2019-10101, CVE-2019-10102, CVE-2019-10103, CVE-2020-15824
-        dependencySet(group: 'org.jetbrains.kotlin', version: '1.5.0') {
+        dependencySet(group: 'org.jetbrains.kotlin', version: '1.5.10') {
             entry 'kotlin-stdlib'
             entry 'kotlin-stdlib-common'
             entry 'kotlin-stdlib-jdk8'
@@ -306,7 +306,7 @@ dependencies {
     // Safe to remove once Spring update their dependencies - see CVE-2019-14439 and add 'com.fasterxml.jackson.core' configurations.all above
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
 
-    compile group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.2'
+    compile group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.4'
 
     compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
@@ -320,7 +320,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.07'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.24'
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.31'
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.35'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
@@ -328,11 +328,11 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.18'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.5.RELEASE'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.10.0'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.11.0'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.26.0'
-    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.10.0'
+    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.11.0'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
-    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.25.0'
+    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.26.0'
     testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
     // Added to fix CVE-2020-13934, CVE-2020-13935, CVE-2020-17527
