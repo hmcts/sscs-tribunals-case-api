@@ -80,6 +80,8 @@ public class CreateBundleAboutToStartEventHandler implements PreSubmitCallbackHa
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
 
+        moveDocsToDwpCollectionIfOldPattern(sscsCaseData);
+
         if (hasMandatoryFilesMissing(sscsCaseData)) {
 
             final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
@@ -129,5 +131,16 @@ public class CreateBundleAboutToStartEventHandler implements PreSubmitCallbackHa
 
     private boolean hasMandatoryDocumentMissingForLegacyAppeals(List<DwpDocument> dwpResponseDocs) {
         return dwpResponseDocs.stream().anyMatch(e -> isNull(e.getValue().getDocumentLink()));
+    }
+
+    private void moveDocsToDwpCollectionIfOldPattern(SscsCaseData sscsCaseData) {
+        //Before we moved to the new DWP document collection, we stored DWP documents within their own fields. This would break bundling with the new config that
+        //looks at the new DWP document collection. Therefore, if the DWP fields are populated, then assume old pattern and move to the DWP document collection.
+        if (sscsCaseData.getDwpResponseDocument() != null) {
+            dwpDocumentService.moveDwpResponseDocumentToDwpDocumentCollection(sscsCaseData);
+        }
+        if (sscsCaseData.getDwpEvidenceBundleDocument() != null) {
+            dwpDocumentService.moveDwpEvidenceBundleToDwpDocumentCollection(sscsCaseData);
+        }
     }
 }
