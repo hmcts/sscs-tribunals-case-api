@@ -115,6 +115,24 @@ public class TrackYourAppealJsonBuilderTest {
         Assert.assertEquals("6d3b7351-168e-42f6-90b7-d263000e1864", trackYourAppealJsonBuilder.stripUrl("http://dm-store:5005/documents/6d3b7351-168e-42f6-90b7-d263000e1864/binary"));
     }
 
+    @Test
+    public void shouldReturnSameUrlIfNotInRightFormatMissingDocument() {
+        String url = "http://dm-store:5005/6d3b7351-168e-42f6-90b7-d263000e1864/binary";
+        Assert.assertEquals(url, trackYourAppealJsonBuilder.stripUrl(url));
+    }
+
+    @Test
+    public void shouldReturnSameUrlIfNotInRightFormatMissingBinary() {
+        String url = "http://dm-store:5005/documents/6d3b7351-168e-42f6-90b7-d263000e1864";
+        Assert.assertEquals(url, trackYourAppealJsonBuilder.stripUrl(url));
+    }
+
+    @Test
+    public void shouldReturnSameUrlIfNotInRightFormatMissingBoth() {
+        String url = "http://dm-store:5005";
+        Assert.assertEquals(url, trackYourAppealJsonBuilder.stripUrl(url));
+    }
+
     private RegionalProcessingCenter populateRegionalProcessingCenter() {
         return RegionalProcessingCenter.builder()
             .name("LIVERPOOL")

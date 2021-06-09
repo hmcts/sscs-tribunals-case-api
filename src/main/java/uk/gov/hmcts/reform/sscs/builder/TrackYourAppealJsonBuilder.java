@@ -235,7 +235,7 @@ public class TrackYourAppealJsonBuilder {
         if (documentBinaryUrl != null) {
             int frontIndex = documentBinaryUrl.indexOf("documents") + 10;
             int backIndex = documentBinaryUrl.indexOf("/binary");
-            if (frontIndex > 0 && backIndex > 0) {
+            if (frontIndex >= 10 && backIndex > 0) {
                 return documentBinaryUrl.substring(frontIndex, backIndex);
             }
         }

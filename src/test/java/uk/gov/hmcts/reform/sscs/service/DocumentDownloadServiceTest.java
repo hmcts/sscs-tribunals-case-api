@@ -44,7 +44,7 @@ public class DocumentDownloadServiceTest {
     @Before
     public void setUp() {
         documentDownloadService = new DocumentDownloadService(documentDownloadClientApi,
-            authTokenGenerator, "http://dm-store:4506");
+            authTokenGenerator);
     }
 
     @Test
