@@ -23,7 +23,7 @@ public class AppellantStatementService {
 
     public Optional<MyaEventActionContext> handleAppellantStatement(String identifier, Statement statement) {
         return onlineHearingService.getCcdCaseByIdentifier(identifier).map(caseDetails ->
-                storeAppellantStatementService.storePdf(
+                storeAppellantStatementService.storePdfAndUpdate(
                 caseDetails.getId(),
                 identifier,
                 new AppellantStatementPdfData(caseDetails, statement)

@@ -82,12 +82,6 @@ public class EvidenceUploadService {
         this.pdfStoreService = pdfStoreService;
     }
 
-    public Optional<Evidence> uploadDraftHearingEvidence(String identifier, MultipartFile file) {
-        return uploadEvidence(identifier, file, draftHearingDocumentExtractor,
-            document -> new SscsDocument(createNewDocumentDetails(document)), UPLOAD_DRAFT_DOCUMENT,
-            "SSCS - upload document from MYA");
-    }
-
     private SscsDocumentDetails createNewDocumentDetails(Document document) {
         String createdOn = getCreatedDate(document);
         DocumentLink documentLink = DocumentLink.builder()
@@ -107,45 +101,6 @@ public class EvidenceUploadService {
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate()
                 .format(DateTimeFormatter.ISO_DATE);
-    }
-
-    private <E> Optional<Evidence> uploadEvidence(String identifier, MultipartFile file,
-                                                  DocumentExtract<E> documentExtract,
-                                                  Function<Document, E> createNewDocument, EventType eventType,
-                                                  String summary) {
-        return onlineHearingService.getCcdCaseByIdentifier(identifier)
-                .map(caseDetails -> {
-
-                    List<MultipartFile> convertedFiles = fileToPdfConversionService.convert(singletonList(file));
-
-                    Document document = evidenceManagementService.upload(convertedFiles, DM_STORE_USER_ID).getEmbedded().getDocuments().get(0);
-
-                    List<E> currentDocuments = documentExtract.getDocuments().apply(caseDetails.getData());
-                    ArrayList<E> newDocuments = (currentDocuments == null) ? new ArrayList<>() : new ArrayList<>(currentDocuments);
-                    newDocuments.add(createNewDocument.apply(document));
-
-                    documentExtract.setDocuments().accept(caseDetails.getData(), newDocuments);
-
-                    ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), eventType.getCcdType(), summary, UPDATED_SSCS, idamService.getIdamTokens());
-                    String md5Checksum = "";
-                    String filename = "";
-
-                    try {
-                        md5Checksum = DigestUtils.md5DigestAsHex(file.getBytes()).toUpperCase();
-                        filename = file.getOriginalFilename();
-                        log.info("uploadEvidence: for case ID Case({}): User has uploaded the file ({}) with a checksum of ({})", caseDetails.getId(), filename, md5Checksum);
-                    } catch (IOException ioException) {
-                        log.error(ioException.getMessage()
-                                + ". Something has gone wrong for caseId: ", caseDetails.getId()
-                                + " when logging uploadEvidence for file (" + filename
-                                + ") with a checksum of (" + md5Checksum + ")");
-                    }
-                    return new Evidence(document.links.self.href, document.originalDocumentName, getCreatedDate(document));
-                });
-    }
-
-    public boolean submitHearingEvidence(String identifier, EvidenceDescription description) {
-        return false;
     }
 
     public boolean submitHearingEvidence(String identifier, EvidenceDescription description, MultipartFile file) {
@@ -190,29 +145,6 @@ public class EvidenceUploadService {
                 .orElse(false);
     }
 
-    public boolean deleteDraftHearingEvidence(String identifier, String evidenceId) {
-        return deleteEvidence(identifier, evidenceId, draftHearingDocumentExtractor);
-    }
-
-    private <E> boolean deleteEvidence(String identifier, String evidenceId, DocumentExtract<E> documentExtract) {
-        return onlineHearingService.getCcdCaseByIdentifier(identifier)
-                .map(caseDetails -> {
-                    List<E> documents = documentExtract.getDocuments().apply(caseDetails.getData());
-
-                    if (documents != null) {
-                        List<E> newDocuments = documents.stream()
-                                .filter(corDocument -> !documentExtract.findDocument().apply(corDocument).getDocumentLink().getDocumentUrl().endsWith(evidenceId))
-                                .collect(toList());
-                        documentExtract.setDocuments().accept(caseDetails.getData(), newDocuments);
-
-                        ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), UPLOAD_DRAFT_DOCUMENT.getCcdType(), "SSCS - evidence deleted", UPDATED_SSCS, idamService.getIdamTokens());
-
-                        documentManagementService.delete(evidenceId);
-                    }
-                    return true;
-                }).orElse(false);
-    }
-
     private void submitHearingWhenNoCoreCase(SscsCaseDetails caseDetails, SscsCaseData sscsCaseData, Long ccdCaseId,
                                              MyaEventActionContext storePdfContext, String idamEmail) {
 
@@ -234,14 +166,6 @@ public class EvidenceUploadService {
         SscsCaseData data = storePdfContext.getDocument().getData();
         long uploadCounter = getCountOfNextUploadDoc(data.getScannedDocuments(), data.getSscsDocument());
         return String.format("%s upload %s - %s.pdf", appellantOrRepsFileNamePrefix, uploadCounter, ccdCaseId);
-    }
-
-    private void mergeNewUnprocessedCorrespondenceToTheExistingInTheCase(SscsCaseDetails caseDetails,
-                                                                         SscsCaseData sscsCaseData,
-                                                                         List<ScannedDocument> scannedDocs) {
-        List<ScannedDocument> newScannedDocumentsList = union(emptyIfNull(caseDetails.getData().getScannedDocuments()),
-                emptyIfNull(scannedDocs));
-        sscsCaseData.setScannedDocuments(newScannedDocumentsList);
     }
 
     private void appendEvidenceUploadsToStatementAndStoreIt(SscsCaseData sscsCaseData,
@@ -490,17 +414,6 @@ public class EvidenceUploadService {
                 .collect(toList());
     }
 
-    public List<Evidence> listDraftHearingEvidence(String identifier) {
-        return loadEvidence(identifier)
-                .map(LoadedEvidence::getDraftHearingEvidence)
-                .orElse(emptyList());
-    }
-
-    private Optional<LoadedEvidence> loadEvidence(String identifier) {
-        return onlineHearingService.getCcdCaseByIdentifier(identifier)
-                .map(LoadedEvidence::new);
-    }
-
     private interface DocumentExtract<E> {
         Function<SscsCaseData, List<E>> getDocuments();
 
@@ -523,44 +436,6 @@ public class EvidenceUploadService {
         @Override
         public Function<SscsDocument, SscsDocumentDetails> findDocument() {
             return SscsDocument::getValue;
-        }
-    }
-
-    private static class LoadedEvidence {
-        private final SscsCaseDetails caseDetails;
-        private final List<Evidence> draftHearingEvidence;
-
-        LoadedEvidence(SscsCaseDetails caseDetails) {
-            this.caseDetails = caseDetails;
-            draftHearingEvidence = extractHearingEvidences(caseDetails.getData().getDraftSscsDocument());
-        }
-
-        public SscsCaseDetails getCaseDetails() {
-            return caseDetails;
-        }
-
-        public List<Evidence> getDraftHearingEvidence() {
-            return draftHearingEvidence;
-        }
-
-        private List<Evidence> extractHearingEvidences(List<SscsDocument> sscsDocuments) {
-            List<SscsDocument> hearingDocuments = emptyIfNull(sscsDocuments);
-            return hearingDocuments.stream().map(sscsDocumentToEvidence()).collect(toList());
-        }
-
-        private Function<SscsDocument, Evidence> sscsDocumentToEvidence() {
-            return sscsDocument -> {
-                SscsDocumentDetails sscsDocumentDetails = sscsDocument.getValue();
-                return extractEvidence(sscsDocumentDetails);
-            };
-        }
-
-        private Evidence extractEvidence(SscsDocumentDetails sscsDocumentDetails) {
-            DocumentLink documentLink = sscsDocumentDetails.getDocumentLink();
-            return new Evidence(
-                    documentLink != null ? documentLink.getDocumentUrl() : null,
-                    sscsDocumentDetails.getDocumentFileName(),
-                    sscsDocumentDetails.getDocumentDateAdded());
         }
     }
 }
