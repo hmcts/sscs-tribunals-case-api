@@ -71,40 +71,33 @@ public class BundleAudioVideoPdfService {
         List<PdfTableDescriptor> pdfTableDescriptorList = new ArrayList<>();
 
         if (caseData.getSscsDocument() != null) {
-            pdfTableDescriptorList.addAll(buildDescriptorsUsingSscsDocuments(caseData.getSscsDocument()));
+            pdfTableDescriptorList.addAll(buildDescriptorsUsingDocuments(caseData.getSscsDocument()));
         }
 
         if (caseData.getDwpDocuments() != null) {
-            pdfTableDescriptorList.addAll(buildDescriptorsUsingDwpDocuments(caseData.getDwpDocuments()));
+            pdfTableDescriptorList.addAll(buildDescriptorsUsingDocuments(caseData.getDwpDocuments()));
         }
 
         return pdfTableDescriptorList;
     }
 
-    public List<PdfTableDescriptor> buildDescriptorsUsingSscsDocuments(List<SscsDocument> sscsDocument) {
+    public List<PdfTableDescriptor> buildDescriptorsUsingDocuments(List<? extends AbstractDocument> abstractDocument) {
 
-        return sscsDocument.stream()
-                .filter(e -> e.getValue().getAvEvidenceDocumentLink() != null && (e.getValue().getAvEvidenceDocumentLink().getDocumentFilename().endsWith(".mp3") || e.getValue().getAvEvidenceDocumentLink().getDocumentFilename().endsWith(".mp4")))
-                .map(audioVideoDocument -> buildDescriptorsFromAudioVideoEvidence(audioVideoDocument, audioVideoDocument.getValue().getAvEvidenceDocumentLink()))
+        return abstractDocument.stream()
+                .filter(e -> e.getValue().getAvDocumentLink() != null && (e.getValue().getAvDocumentLink().getDocumentFilename().endsWith(".mp3") || e.getValue().getAvDocumentLink().getDocumentFilename().endsWith(".mp4")))
+                .map(audioVideoDocument -> buildDescriptorsFromAudioVideoEvidence(audioVideoDocument))
                 .collect(Collectors.toList());
+
     }
 
-    public List<PdfTableDescriptor> buildDescriptorsUsingDwpDocuments(List<DwpDocument> dwpDocument) {
-
-        return dwpDocument.stream()
-                .filter(e -> e.getValue().getDocumentLink() != null && (e.getValue().getDocumentLink().getDocumentFilename().endsWith(".mp3") || e.getValue().getDocumentLink().getDocumentFilename().endsWith(".mp4")))
-                .map(audioVideoDocument -> buildDescriptorsFromAudioVideoEvidence(audioVideoDocument, audioVideoDocument.getValue().getDocumentLink()))
-                .collect(Collectors.toList());
-    }
-
-    private PdfTableDescriptor buildDescriptorsFromAudioVideoEvidence(AbstractDocument document,  DocumentLink docLink) {
+    private PdfTableDescriptor buildDescriptorsFromAudioVideoEvidence(AbstractDocument document) {
 
         if (document != null) {
 
-            String docUrl = docLink.getDocumentBinaryUrl().replace(documentManagementUrl, dmGatewayUrl);
+            String docUrl = document.getValue().getAvDocumentLink().getDocumentBinaryUrl().replace(documentManagementUrl, dmGatewayUrl);
 
             return PdfTableDescriptor.builder().documentType(DocumentType.fromValue(document.getValue().getDocumentType()).getLabel())
-                    .documentUrl(docLink.getDocumentFilename() + "|" + docUrl)
+                    .documentUrl(document.getValue().getAvDocumentLink().getDocumentFilename() + "|" + docUrl)
                     .dateAdded(DATEFORMATTER.format(LocalDate.parse(document.getValue().getDocumentDateAdded())))
                     .dateApproved(DATEFORMATTER.format(LocalDate.parse(document.getValue().getDateApproved())))
                     .uploadParty(document.getValue().getPartyUploaded().getLabel())

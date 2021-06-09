@@ -119,7 +119,7 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         if (caseData.getSscsDocument() != null) {
             for (SscsDocument sscsDocument : caseData.getSscsDocument()) {
                 if (SscsDocumentTranslationStatus.TRANSLATION_REQUESTED.equals(sscsDocument.getValue().getDocumentTranslationStatus())) {
-                    if (sscsDocument.getValue().getDocumentLink().getDocumentFilename().equals(caseData.getOriginalDocuments().getValue().getCode())) {
+                    if (sscsDocument.getValue().getDocumentLink() != null && sscsDocument.getValue().getDocumentLink().getDocumentFilename().equals(caseData.getOriginalDocuments().getValue().getCode())) {
                         sscsDocument.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE);
                     }
                 }
@@ -131,7 +131,7 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         if (caseData.getDwpDocuments() != null) {
             for (DwpDocument dwpDocument : caseData.getDwpDocuments()) {
                 if (SscsDocumentTranslationStatus.TRANSLATION_REQUESTED.equals(dwpDocument.getValue().getDocumentTranslationStatus())) {
-                    if (dwpDocument.getValue().getRip1DocumentLink().getDocumentFilename().equals(caseData.getOriginalDocuments().getValue().getCode())) {
+                    if (dwpDocument.getValue().getDocumentLink() != null && dwpDocument.getValue().getDocumentLink().getDocumentFilename().equals(caseData.getOriginalDocuments().getValue().getCode())) {
                         dwpDocument.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE);
                     }
                 }
