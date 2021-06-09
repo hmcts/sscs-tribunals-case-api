@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -98,10 +97,6 @@ public class DocumentDownloadService {
     }
 
     private String getDownloadUrl(String urlString) throws UnsupportedEncodingException {
-        String path = urlString.replace(documentManagementUrl, "");
-        if (path.startsWith("/")) {
-            return path;
-        }
-        return "/" + URLDecoder.decode(path, "UTF-8");
+        return "/documents/" + urlString + "/binary";
     }
 }
