@@ -382,7 +382,7 @@ dependencies {
     contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.6.1")
     contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.7.2')
 
-    contractTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.28') {
+    contractTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.29') {
         force = true
     }
 
