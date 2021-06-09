@@ -116,7 +116,7 @@ public class EvidenceUploadService {
 
                     draftHearingDocumentExtractor.setDocuments().accept(caseDetails.getData(), newDocuments);
 
-                    ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), UPLOAD_DRAFT_DOCUMENT.getCcdType(), "SSCS - upload document from MYA", UPDATED_SSCS, idamService.getIdamTokens());
+//                    ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), UPLOAD_DRAFT_DOCUMENT.getCcdType(), "SSCS - upload document from MYA", UPDATED_SSCS, idamService.getIdamTokens());
                     String md5Checksum = "";
                     String filename = "";
 
@@ -155,7 +155,7 @@ public class EvidenceUploadService {
 
         sscsCaseData.setDraftSscsDocument(Collections.emptyList());
         sscsCaseData.setEvidenceHandled("No");
-        ccdService.updateCase(sscsCaseData, ccdCaseId, ATTACH_SCANNED_DOCS.getCcdType(),
+        ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_DOCUMENT.getCcdType(),
             "SSCS - upload evidence from MYA",
             "Uploaded a further evidence document", idamService.getIdamTokens());
     }
