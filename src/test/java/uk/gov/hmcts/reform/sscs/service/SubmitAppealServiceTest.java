@@ -19,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -437,6 +438,35 @@ public class SubmitAppealServiceTest {
 
         verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
         assertFalse(result.isPresent());
+    }
+
+    @Test
+    public void shouldhandleScConfilctWithNullNinoForSubmitDraftAppeal() {
+        FeignException feignException = mock(FeignException.class);
+        given(feignException.status()).willReturn(HttpStatus.SC_CONFLICT);
+        given(citizenCcdService.saveCase(any(SscsCaseData.class), any(IdamTokens.class)))
+                .willThrow(feignException);
+        appealData.getAppellant().setNino(null);
+
+
+        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData, false);
+
+        verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
+        assertEquals(result, Optional.empty());
+    }
+
+    @Test
+    public void shouldhandleScConfilctWithNullNinoForUpdateDraftAppeal() {
+        FeignException feignException = mock(FeignException.class);
+        given(feignException.status()).willReturn(409);
+        given(citizenCcdService.updateCase(any(SscsCaseData.class), any(), any(), any(), any(), any()))
+                .willThrow(feignException);
+        appealData.getAppellant().setNino(null);
+
+        Optional<SaveCaseResult> result = submitAppealService.updateDraftAppeal("authorisation", appealData);
+
+        verify(citizenCcdService).updateCase(any(SscsCaseData.class), any(), any(), any(), any(), any());
+        assertEquals(result, Optional.empty());
     }
 
     @Test(expected = ApplicationErrorException.class)
