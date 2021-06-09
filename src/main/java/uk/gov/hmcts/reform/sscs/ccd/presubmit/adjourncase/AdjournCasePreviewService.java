@@ -61,7 +61,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         adjournCaseBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
         String venueName = setHearings(adjournCaseBuilder, caseData);
-        adjournCaseBuilder.appellantName(buildName(caseData));
+        adjournCaseBuilder.appellantName(buildName(caseData, false));
 
         if (caseData.getAdjournCaseReasons() != null && !caseData.getAdjournCaseReasons().isEmpty()) {
             adjournCaseBuilder.reasonsForDecision(

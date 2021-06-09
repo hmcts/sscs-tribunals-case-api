@@ -345,7 +345,9 @@ public class SubmitAppealService {
 
 
     private Predicate<SscsCaseDetails> createNinoAndBenefitTypeAndMrnDatePredicate(SscsCaseData caseData) {
-        return c -> c.getData(). getAppeal().getAppellant().getIdentity().getNino().equalsIgnoreCase(caseData.getAppeal().getAppellant().getIdentity().getNino())
+        return c -> c.getData().getAppeal().getAppellant().getIdentity() != null
+                && c.getData().getAppeal().getAppellant().getIdentity().getNino().equalsIgnoreCase(caseData.getAppeal().getAppellant().getIdentity().getNino())
+                && c.getData().getAppeal().getBenefitType() != null
                 && c.getData().getAppeal().getBenefitType().getCode().equals(caseData.getAppeal().getBenefitType().getCode())
                 && c.getData().getAppeal().getMrnDetails().getMrnDate() != null
                 && c.getData().getAppeal().getMrnDetails().getMrnDate().equalsIgnoreCase(caseData.getAppeal().getMrnDetails().getMrnDate());
