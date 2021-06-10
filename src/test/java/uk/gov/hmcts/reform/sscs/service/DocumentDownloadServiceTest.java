@@ -44,7 +44,7 @@ public class DocumentDownloadServiceTest {
     @Before
     public void setUp() {
         documentDownloadService = new DocumentDownloadService(documentDownloadClientApi,
-            authTokenGenerator, "http://dm-store:4506");
+            authTokenGenerator);
     }
 
     @Test
@@ -53,7 +53,7 @@ public class DocumentDownloadServiceTest {
         given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
                 .willReturn(response);
         long size = documentDownloadService
-            .getFileSize("http://dm-store:4506/documents/19cd94a8-4280-406b-92c7-090b735159ca");
+            .getFileSize("19cd94a8-4280-406b-92c7-090b735159ca");
         assertEquals(4L, size);
     }
 
@@ -63,11 +63,11 @@ public class DocumentDownloadServiceTest {
         given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
                 .willReturn(response);
         documentDownloadService
-            .getFileSize("http://dm-store:4506/documents/19cd94a8-4280-406b-92c7-090b735159ca");
+            .getFileSize("19cd94a8-4280-406b-92c7-090b735159ca");
 
         then(documentDownloadClientApi).should().downloadBinary(
             "oauth2Token", null, "caseworker", "sscs",
-            "/documents/19cd94a8-4280-406b-92c7-090b735159ca");
+            "/documents/19cd94a8-4280-406b-92c7-090b735159ca/binary");
     }
 
     @Test
@@ -75,7 +75,7 @@ public class DocumentDownloadServiceTest {
         given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
             .willThrow(RuntimeException.class);
         long size = documentDownloadService
-            .getFileSize("http://dm-store:4506/documents/19cd94a8-4280-406b-92c7-090b735159ca");
+            .getFileSize("19cd94a8-4280-406b-92c7-090b735159ca");
         assertEquals(0L, size);
     }
 
@@ -86,7 +86,7 @@ public class DocumentDownloadServiceTest {
         given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
             .willReturn(response);
         long size = documentDownloadService
-            .getFileSize("http://dm-store:4506/documents/19cd94a8-4280-406b-92c7-090b735159ca");
+            .getFileSize("19cd94a8-4280-406b-92c7-090b735159ca");
         assertEquals(0L, size);
     }
 
