@@ -160,8 +160,13 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     private DwpDocument buildAudioVideoDwpDocument(AudioVideoEvidenceDetails audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response, boolean isWelshCase) {
         DocumentLink rip1Doc = null;
         SscsDocumentTranslationStatus status = null;
+
+        String fileName = audioVideoEvidence.getFileName();
+
         if (audioVideoEvidence.getRip1Document() != null) {
             rip1Doc = buildRip1Doc(audioVideoEvidence);
+            fileName = "RIP 1 document for A/V file: " + fileName;
+
             if (isWelshCase) {
                 response.getData().setInterlocReviewState(WELSH_TRANSLATION.getId());
                 status = SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
@@ -170,13 +175,14 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
 
         return DwpDocument.builder().value(
                 DwpDocumentDetails.builder()
-                        .documentLink(audioVideoEvidence.getDocumentLink())
-                        .documentFileName(audioVideoEvidence.getFileName())
+                        .avDocumentLink(audioVideoEvidence.getDocumentLink())
+                        .documentFileName(fileName)
                         .documentType(findAudioVideoDocumentType(audioVideoEvidence, response))
                         .documentDateAdded(audioVideoEvidence.getDateAdded().toString())
                         .partyUploaded(audioVideoEvidence.getPartyUploaded())
                         .dateApproved(LocalDate.now().toString())
-                        .rip1DocumentLink(rip1Doc)
+                        .documentLink(rip1Doc)
+                        .isAvDocumentLinkPresent(YesNo.YES)
                         .documentTranslationStatus(status)
                         .build())
                 .build();
@@ -194,15 +200,22 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     }
 
     private SscsDocument buildAudioVideoSscsDocument(AudioVideoEvidenceDetails audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response) {
+        String fileName = audioVideoEvidence.getFileName();
+
+        if (audioVideoEvidence.getStatementOfEvidencePdf() != null) {
+            fileName = "Statement for A/V file: " + fileName;
+        }
+
         return SscsDocument.builder().value(
                 SscsDocumentDetails.builder()
-                        .documentLink(audioVideoEvidence.getDocumentLink())
-                        .documentFileName(audioVideoEvidence.getFileName())
+                        .avDocumentLink(audioVideoEvidence.getDocumentLink())
+                        .documentFileName(fileName)
                         .documentType(findAudioVideoDocumentType(audioVideoEvidence, response))
                         .documentDateAdded(audioVideoEvidence.getDateAdded().toString())
                         .partyUploaded(audioVideoEvidence.getPartyUploaded())
                         .dateApproved(LocalDate.now().toString())
-                        .statementOfEvidencePdf(audioVideoEvidence.getStatementOfEvidencePdf())
+                        .documentLink(audioVideoEvidence.getStatementOfEvidencePdf())
+                        .isAvDocumentLinkPresent(YesNo.YES)
                         .build())
                 .build();
     }
