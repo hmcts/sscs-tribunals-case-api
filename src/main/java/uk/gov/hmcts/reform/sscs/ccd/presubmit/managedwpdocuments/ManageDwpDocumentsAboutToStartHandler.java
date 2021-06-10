@@ -1,16 +1,24 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.managedwpdocuments;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.collections4.CollectionUtils.union;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_EVIDENCE_BUNDLE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_RESPONSE;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
@@ -45,9 +53,42 @@ public class ManageDwpDocumentsAboutToStartHandler extends ResponseEventsAboutTo
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        dwpDocumentService.moveDocsToCorrectCollection(sscsCaseData);
+        migrateDwpDocumentsToTheDwpDocumentCollection(sscsCaseData);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
+    }
+
+    private void migrateDwpDocumentsToTheDwpDocumentCollection(SscsCaseData sscsCaseData) {
+        final Collection<DwpDocument> dwpDocumentsToKeepAfterMigration = getDwpDocumentsToKeepAfterMigration(sscsCaseData);
+
+        migrateToDwpDocumentsIfTheyExistInTheOldLocations(sscsCaseData);
+
+        addBackDwpDocumentsIfTheyWereRemovedFromTheMigration(sscsCaseData, dwpDocumentsToKeepAfterMigration);
+    }
+
+    private void migrateToDwpDocumentsIfTheyExistInTheOldLocations(SscsCaseData sscsCaseData) {
+        dwpDocumentService.moveDocsToCorrectCollection(sscsCaseData);
+    }
+
+    private Collection<DwpDocument> getDwpDocumentsToKeepAfterMigration(SscsCaseData sscsCaseData) {
+        final List<DwpDocument> dwpResponseDocument = keepDwpDocumentIfRemovedFromTheMigrationToTheDwpDocumentsCollection(DWP_RESPONSE, sscsCaseData.getDwpResponseDocument(), sscsCaseData.getDwpDocuments());
+        final List<DwpDocument> dwpEvidenceBundle = keepDwpDocumentIfRemovedFromTheMigrationToTheDwpDocumentsCollection(DWP_EVIDENCE_BUNDLE, sscsCaseData.getDwpEvidenceBundleDocument(), sscsCaseData.getDwpDocuments());
+        return union(dwpResponseDocument, dwpEvidenceBundle);
+    }
+
+    private void addBackDwpDocumentsIfTheyWereRemovedFromTheMigration(SscsCaseData sscsCaseData, Collection<DwpDocument> dwpDocumentsToKeepAfterMigration) {
+        if (isNotEmpty(dwpDocumentsToKeepAfterMigration)) {
+            sscsCaseData.getDwpDocuments().addAll(dwpDocumentsToKeepAfterMigration);
+        }
+    }
+
+    @NotNull
+    private List<DwpDocument> keepDwpDocumentIfRemovedFromTheMigrationToTheDwpDocumentsCollection(DwpDocumentType dwpDocumentType, DwpResponseDocument dwpResponseDocument, List<DwpDocument> dwpDocuments) {
+        return emptyIfNull(dwpDocuments).stream()
+                .filter(doc -> doc.getValue().getDocumentType().equals(dwpDocumentType.getValue()))
+                .filter(doc -> dwpResponseDocument != null)
+                .filter(doc -> dwpResponseDocument.getDocumentLink() != null)
+                .collect(Collectors.toList());
     }
 
 }
