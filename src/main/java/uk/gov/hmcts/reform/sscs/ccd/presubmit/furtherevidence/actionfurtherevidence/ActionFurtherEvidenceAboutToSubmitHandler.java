@@ -15,6 +15,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurth
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -48,6 +49,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
@@ -119,9 +121,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     "Further evidence action must be 'Send to Interloc - Review by Judge' or 'Information received for Interloc - send to Judge' for a confidential document");
             }
 
-            if (!OriginalSenderItemList.APPELLANT.getCode()
+            if (!APPELLANT.getCode()
                 .equals(sscsCaseData.getOriginalSender().getValue().getCode())
-                && !OriginalSenderItemList.JOINT_PARTY.getCode()
+                && !JOINT_PARTY.getCode()
                 .equals(sscsCaseData.getOriginalSender().getValue().getCode())) {
                 preSubmitCallbackResponse
                     .addError("Original sender must be appellant or joint party for a confidential document");
@@ -191,12 +193,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         if ((null != preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeAppellant()
             && GRANTED
             .equals(preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeAppellant().getRequestOutcome())
-            && OriginalSenderItemList.APPELLANT.getCode()
+            && APPELLANT.getCode()
             .equals(preSubmitCallbackResponse.getData().getOriginalSender().getValue().getCode()))
             || (null != preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeJointParty()
             && GRANTED.equals(
             preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeJointParty().getRequestOutcome())
-            && OriginalSenderItemList.JOINT_PARTY.getCode()
+            && JOINT_PARTY.getCode()
             .equals(preSubmitCallbackResponse.getData().getOriginalSender().getValue().getCode()))) {
             preSubmitCallbackResponse.addWarning("This case has a confidentiality flag, ensure any evidence from the "
                 + preSubmitCallbackResponse.getData().getOriginalSender().getValue().getLabel().toLowerCase()
@@ -324,10 +326,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private void setConfidentialCaseFields(SscsCaseData sscsCaseData) {
-        if (OriginalSenderItemList.APPELLANT.getCode().equals(sscsCaseData.getOriginalSender().getValue().getCode())) {
+        if (APPELLANT.getCode().equals(sscsCaseData.getOriginalSender().getValue().getCode())) {
             sscsCaseData.setConfidentialityRequestOutcomeAppellant(DatedRequestOutcome.builder()
                 .requestOutcome(RequestOutcome.IN_PROGRESS).date(LocalDate.now()).build());
-        } else if (OriginalSenderItemList.JOINT_PARTY.getCode()
+        } else if (JOINT_PARTY.getCode()
             .equals(sscsCaseData.getOriginalSender().getValue().getCode())) {
             sscsCaseData.setConfidentialityRequestOutcomeJointParty(DatedRequestOutcome.builder()
                 .requestOutcome(RequestOutcome.IN_PROGRESS).date(LocalDate.now()).build());
@@ -372,10 +374,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             log.info("adding footer appendix document link: {} and caseId {}", url, sscsCaseData.getCcdCaseId());
 
             String originalSenderCode = sscsCaseData.getOriginalSender().getValue().getCode();
-            String documentFooterText = stream(OriginalSenderItemList.values())
+            String documentFooterText = stream(values())
                 .filter(f -> f.getCode().equals(originalSenderCode))
                 .findFirst()
-                .map(OriginalSenderItemList::getDocumentFooter).orElse(EMPTY);
+                .map(PartyItemList::getDocumentFooter).orElse(EMPTY);
 
             bundleAddition = footerService.getNextBundleAddition(sscsCaseData.getSscsDocument());
 
@@ -427,10 +429,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             return URGENT_HEARING_REQUEST;
         }
 
-        final Optional<DocumentType> optionalDocumentType = stream(OriginalSenderItemList.values())
+        final Optional<DocumentType> optionalDocumentType = stream(PartyItemList.values())
             .filter(f -> f.getCode().equals(originalSenderCode))
             .findFirst()
-            .map(OriginalSenderItemList::getDocumentType);
+            .map(PartyItemList::getDocumentType);
         if (optionalDocumentType.isPresent()) {
             return optionalDocumentType.get();
         }

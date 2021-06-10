@@ -56,7 +56,6 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
     private DwpDocumentService dwpDocumentService;
 
-
     @Before
     public void setUp() {
         openMocks(this);
@@ -207,67 +206,6 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
         verify(bundleAudioVideoPdfService).createAudioVideoPdf(sscsCaseData);
         verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
-    }
-
-    @Test
-    public void givenEmptyDwpEvidenceBundleDocumentLinkWithDwpDocumentsPattern_thenReturnError() {
-        List<DwpDocument> dwpDocuments = new ArrayList<>();
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).build()).build());
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
-        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        String error = response.getErrors().stream()
-                .findFirst()
-                .orElse("");
-        assertEquals("The bundle cannot be created as mandatory DWP documents are missing", error);
-        verifyNoInteractions(serviceRequestExecutor);
-
-    }
-
-    @Test
-    public void givenEmptyDwpEvidenceBundleDocumentLinkWithOldPattern_thenReturnError() {
-        callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().build());
-        callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        String error = response.getErrors().stream()
-                .findFirst()
-                .orElse("");
-        assertEquals("The bundle cannot be created as mandatory DWP documents are missing", error);
-        verifyNoInteractions(serviceRequestExecutor);
-    }
-
-    @Test
-    public void givenEmptyDwpResponseDocumentLinkWithDwpDocumentsPattern_thenReturnError() {
-        List<DwpDocument> dwpDocuments = new ArrayList<>();
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).build()).build());
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
-        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        String error = response.getErrors().stream()
-                .findFirst()
-                .orElse("");
-        assertEquals("The bundle cannot be created as mandatory DWP documents are missing", error);
-        verifyNoInteractions(serviceRequestExecutor);
-    }
-
-    @Test
-    public void givenEmptyDwpResponseDocumentLinkWithOldPattern_thenReturnError() {
-        callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
-        callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        String error = response.getErrors().stream()
-                .findFirst()
-                .orElse("");
-        assertEquals("The bundle cannot be created as mandatory DWP documents are missing", error);
-        verifyNoInteractions(serviceRequestExecutor);
     }
 
     @Test
@@ -422,6 +360,7 @@ public class CreateBundleAboutToSubmitHandlerTest {
         verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
         assertNull(response.getData().getCaseBundles());
     }
+
 
     private void addMandatoryDwpDocuments() {
         List<DwpDocument> dwpDocuments = new ArrayList<>();

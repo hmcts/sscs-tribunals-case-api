@@ -53,7 +53,7 @@ public class RequestInfoIncompleteApplicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenANonHandleEvidenceEvent_thenReturnFalse() {
+    public void givenANonRequestInfoIncompleteEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
         assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }

@@ -6,8 +6,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.OriginalSenderItemList.APPELLANT;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.OriginalSenderItemList.DWP;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,7 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.OriginalSenderItemList;
+import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 
 @RunWith(JUnitParamsRunner.class)
 public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
@@ -109,7 +108,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"url1, file1.pdf - representativeEvidence, APPELLANT", "url2, file2.pdf - appellantEvidence, DWP", "welshUrl1, welshFile1.pdf - appellantEvidence, APPELLANT", "welshUrl2, welshFile2.pdf - representativeEvidence, APPELLANT"})
-    public void setsEvidenceHandledFlagToNoForDocumentSelected(String selectedUrl, String selectedLabel, OriginalSenderItemList newSender) {
+    public void setsEvidenceHandledFlagToNoForDocumentSelected(String selectedUrl, String selectedLabel, PartyItemList newSender) {
 
         sscsCaseData = sscsCaseData.toBuilder()
                 .originalSender(new DynamicList(
