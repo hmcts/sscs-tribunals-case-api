@@ -396,12 +396,28 @@ project.ext {
 
 pact {
     publish {
-        pactDirectory = 'target/pacts'
+        pactDirectory = 'pacts'
         pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
         tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
         version = project.pactVersion
     }
 }
+
+task contractTest(type: Test) {
+    description = "Runs the consumer Pact tests"
+    useJUnitPlatform()
+    testClassesDirs = sourceSets.contractTest.output.classesDirs
+    classpath = sourceSets.contractTest.runtimeClasspath
+}
+
+task runAndPublishConsumerPactTests(type: Test) {
+    logger.lifecycle("Runs pact Tests")
+    testClassesDirs = sourceSets.contractTest.output.classesDirs
+    classpath = sourceSets.contractTest.runtimeClasspath
+}
+
+runAndPublishConsumerPactTests.dependsOn contractTest
+runAndPublishConsumerPactTests.finalizedBy pactPublish
 
 static def getCheckedOutGitCommitHash() {
     'git rev-parse --verify --short HEAD'.execute().text.trim()
@@ -443,13 +459,6 @@ task smoke(type: Test) {
     setClasspath(sourceSets.e2e.runtimeClasspath)
     include "uk/gov/hmcts/reform/sscs/smoke/**"
     exclude "uk/gov/hmcts/reform/sscs/functional/**"
-}
-
-task contract(type: Test, description: 'Runs the pact contract tests.', group: 'Verification') {
-    description = "Runs the consumer Pact tests"
-    useJUnitPlatform()
-    testClassesDirs = sourceSets.contractTest.output.classesDirs
-    classpath = sourceSets.contractTest.runtimeClasspath
 }
 
 run {
