@@ -54,9 +54,12 @@ public class UploadWelshDocumentsAboutToStartHandler implements PreSubmitCallbac
         List<DwpDocument> dwpDocuments = buildDwpDocumentsForTranslation(sscsCaseData);
 
         dwpDocuments.forEach(dwpDocument -> {
-            if (dwpDocument.getValue().getRip1DocumentLink() != null) {
-                listOptions.add(new DynamicListItem(dwpDocument.getValue().getRip1DocumentLink().getDocumentFilename(),
-                        dwpDocument.getValue().getRip1DocumentLink().getDocumentFilename()));
+            if (dwpDocument.getValue().getIsAvDocumentLinkPresent() != null
+                    && YesNo.YES.getValue().equals(dwpDocument.getValue().getIsAvDocumentLinkPresent().getValue())
+                    && dwpDocument.getValue().getDocumentLink() != null) {
+                // RIP 1 doc is stored in this field when AV document is present
+                listOptions.add(new DynamicListItem(dwpDocument.getValue().getDocumentLink().getDocumentFilename(),
+                        dwpDocument.getValue().getDocumentLink().getDocumentFilename()));
             }
         });
 
