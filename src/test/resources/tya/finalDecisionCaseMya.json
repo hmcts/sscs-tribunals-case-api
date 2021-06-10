@@ -43,17 +43,17 @@
       {
         "name": "Adjournment Notice issued on 20-11-2019.pdf",
         "date": "2019-11-20",
-        "url": "http://dm-store:5005/documents/dbed7988-4ed5-4965-b1b4-50e5582770f3/binary"
+        "url": "dbed7988-4ed5-4965-b1b4-50e5582770f3"
       },
       {
         "name": "Adjournment Notice issued on 21-11-2019.pdf",
         "date": "2019-11-21",
-        "url": "http://dm-store:5005/documents/dac800d4-1cf2-47c1-a1ef-db91c6ab3412/binary"
+        "url": "dac800d4-1cf2-47c1-a1ef-db91c6ab3412"
       },
       {
         "name": "Final Decision issued on 29-11-2019.pdf",
         "date": "2019-11-29",
-        "url": "http://dm-store:5005/documents/b502f219-ef46-4778-9aef-4e47d3176e32/binary"
+        "url": "b502f219-ef46-4778-9aef-4e47d3176e32"
       }
     ],
     "regionalProcessingCenter": {
