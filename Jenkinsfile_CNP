@@ -1,4 +1,6 @@
 #!groovy
+import uk.gov.hmcts.contino.AppPipelineDsl
+
 properties([
         [$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/hmcts/tribunals-case-api'],
         pipelineTriggers([[$class: 'GitHubPushTrigger']])
