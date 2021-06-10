@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 public class TyaEndpointsIt {
 
     private static final long CASE_ID = 123456789L;
+    private static final String DOC_ID = "6819915a-52fa-4ee2-abb1-7880985806e7";
     private static final String URL = "/documents/6819915a-52fa-4ee2-abb1-7880985806e7/binary";
     private static final String AUTH_TOKEN = "GHAS78232JKAS888";
     private static final String PDF = "PDF";
@@ -89,7 +90,7 @@ public class TyaEndpointsIt {
         when(documentDownloadClientApi.downloadBinary("oauth2Token", AUTH_TOKEN,"caseworker,citizen","sscs", URL))
                 .thenReturn(ResponseEntity.of(Optional.of(new ByteArrayResource(PDF.getBytes()))));
 
-        MvcResult mvcResult = mockMvc.perform(get("/document?url=" + URL))
+        MvcResult mvcResult = mockMvc.perform(get("/document?url=" + DOC_ID))
                 .andExpect(status().isOk())
                 .andReturn();
 
