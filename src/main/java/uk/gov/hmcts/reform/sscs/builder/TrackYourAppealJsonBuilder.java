@@ -197,7 +197,7 @@ public class TrackYourAppealJsonBuilder {
             ObjectNode documentNode = JsonNodeFactory.instance.objectNode();
             documentNode.put("name", d.getValue().getDocumentFileName());
             documentNode.put("type", d.getValue().getDocumentType());
-            documentNode.put("url", d.getValue().getDocumentLink().getDocumentBinaryUrl());
+            documentNode.put("url", stripUrl(d.getValue().getDocumentLink().getDocumentBinaryUrl()));
             avEvidenceNode.add(documentNode);
         };
     }
@@ -224,11 +224,22 @@ public class TrackYourAppealJsonBuilder {
             ObjectNode documentNode = JsonNodeFactory.instance.objectNode();
             documentNode.put("name", detail.getDocumentLink().getDocumentFilename());
             documentNode.put("date", detail.getDocumentDateAdded());
-            documentNode.put("url", detail.getDocumentLink().getDocumentBinaryUrl());
+            documentNode.put("url", stripUrl(detail.getDocumentLink().getDocumentBinaryUrl()));
             outcomeNode.add(documentNode);
         }
 
         return outcomeNode;
+    }
+
+    protected String stripUrl(String documentBinaryUrl) {
+        if (documentBinaryUrl != null) {
+            int frontIndex = documentBinaryUrl.indexOf("documents") + 10;
+            int backIndex = documentBinaryUrl.indexOf("/binary");
+            if (frontIndex >= 10 && backIndex > 0) {
+                return documentBinaryUrl.substring(frontIndex, backIndex);
+            }
+        }
+        return documentBinaryUrl;
     }
 
     private Comparator<? super SscsDocumentDetails> createDateAddedComparator() {
