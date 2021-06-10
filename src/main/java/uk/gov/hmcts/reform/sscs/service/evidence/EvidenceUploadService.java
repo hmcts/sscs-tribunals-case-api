@@ -35,7 +35,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.domain.wrapper.Evidence;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.EvidenceDescription;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
@@ -46,12 +45,10 @@ import uk.gov.hmcts.reform.sscs.service.exceptions.EvidenceUploadException;
 import uk.gov.hmcts.reform.sscs.service.pdf.MyaEventActionContext;
 import uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.EvidenceDescriptionPdfData;
-import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.DocumentManagementService;
 
 @Slf4j
 @Service
 public class EvidenceUploadService {
-    private final DocumentManagementService documentManagementService;
     private final CcdService ccdService;
     private final IdamService idamService;
     private final OnlineHearingService onlineHearingService;
@@ -66,13 +63,11 @@ public class EvidenceUploadService {
     private static final DraftHearingDocumentExtractor draftHearingDocumentExtractor = new DraftHearingDocumentExtractor();
 
     @Autowired
-    public EvidenceUploadService(DocumentManagementService documentManagementService,
-                                 CcdService ccdService,
+    public EvidenceUploadService(CcdService ccdService,
                                  IdamService idamService, OnlineHearingService onlineHearingService,
                                  StoreEvidenceDescriptionService storeEvidenceDescriptionService,
                                  FileToPdfConversionService fileToPdfConversionService,
                                  EvidenceManagementService evidenceManagementService, PdfStoreService pdfStoreService) {
-        this.documentManagementService = documentManagementService;
         this.ccdService = ccdService;
         this.idamService = idamService;
         this.onlineHearingService = onlineHearingService;
@@ -116,10 +111,8 @@ public class EvidenceUploadService {
 
                     draftHearingDocumentExtractor.setDocuments().accept(caseDetails.getData(), newDocuments);
 
-//                    ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), UPLOAD_DRAFT_DOCUMENT.getCcdType(), "SSCS - upload document from MYA", UPDATED_SSCS, idamService.getIdamTokens());
                     String md5Checksum = "";
                     String filename = "";
-
                     try {
                         md5Checksum = DigestUtils.md5DigestAsHex(file.getBytes()).toUpperCase();
                         filename = file.getOriginalFilename();
@@ -129,6 +122,7 @@ public class EvidenceUploadService {
                                 + ". Something has gone wrong for caseId: ", caseDetails.getId()
                                 + " when logging uploadEvidence for file (" + filename
                                 + ") with a checksum of (" + md5Checksum + ")");
+                        return false;
                     }
 
                     SscsCaseData sscsCaseData = caseDetails.getData();

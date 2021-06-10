@@ -46,7 +46,7 @@ public class AppellantStatementServiceTest {
     public void findsOnlineHearing() {
         long id = 1234L;
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearing)).thenReturn(Optional.of(SscsCaseDetails.builder().id(id).build()));
-        when(storeAppellantStatementService.storePdf(eq(id), eq(someOnlineHearing), any(AppellantStatementPdfData.class)))
+        when(storeAppellantStatementService.storePdfAndUpdate(eq(id), eq(someOnlineHearing), any(AppellantStatementPdfData.class)))
                 .thenReturn(mock(MyaEventActionContext.class));
         Optional handled = appellantStatementService.handleAppellantStatement(someOnlineHearing, someStatement());
 
@@ -58,7 +58,7 @@ public class AppellantStatementServiceTest {
         long id = 1234L;
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearing)).thenReturn(Optional.of(SscsCaseDetails.builder().id(id).build()));
         MyaEventActionContext myaEventActionContext = mock(MyaEventActionContext.class);
-        when(storeAppellantStatementService.storePdf(eq(id), eq(someOnlineHearing), any(AppellantStatementPdfData.class)))
+        when(storeAppellantStatementService.storePdfAndUpdate(eq(id), eq(someOnlineHearing), any(AppellantStatementPdfData.class)))
                 .thenReturn(myaEventActionContext);
         Optional handled = appellantStatementService.handleAppellantStatement(someOnlineHearing, someStatement());
 
