@@ -30,9 +30,6 @@ def secrets = [
     ]
 ]
 
-// Vars for Kubernetes
-env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
-
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
   [ $class: 'AzureKeyVaultSecret',
     secretType: 'Secret',
@@ -41,6 +38,9 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
     envVariable: envVar
   ]
 }
+
+// Vars for Kubernetes
+env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
 
 withPipeline(type, product, component) {
     after('akschartsinstall'){
