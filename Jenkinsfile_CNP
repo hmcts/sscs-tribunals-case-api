@@ -28,6 +28,9 @@ def secrets = [
     ]
 ]
 
+// Vars for Kubernetes
+env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
+
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
   [ $class: 'AzureKeyVaultSecret',
     secretType: 'Secret',
@@ -48,3 +51,10 @@ withPipeline(type, product, component) {
     disableLegacyDeployment()
 }
 
+onPR() {
+    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
+}
+
+onMaster() {
+    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
+}
