@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.managedwpdocuments;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -22,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 
 @RunWith(JUnitParamsRunner.class)
 public class ManageDwpDocumentsAboutToSubmitHandlerTest {
@@ -34,11 +37,13 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
     private SscsCaseData sscsCaseData;
+    @Mock
+    private DwpDocumentService dwpDocumentService;
 
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new ManageDwpDocumentsAboutToSubmitHandler();
+        handler = new ManageDwpDocumentsAboutToSubmitHandler(dwpDocumentService);
 
         when(callback.getEvent()).thenReturn(EventType.MANAGE_DWP_DOCUMENTS);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -75,6 +80,7 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().isEmpty(), is(true));
+        verify(dwpDocumentService).removeOldDwpDocuments(eq(sscsCaseData));
     }
 
     @Test
@@ -120,8 +126,10 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({
-            "DWP_EDITED_EVIDENCE_BUNDLE, Only one DWP evidence bundle should be seen against each case\\, please correct",
-            "DWP_EDITED_RESPONSE, Only one DWP response should be seen against each case\\, please correct"
+            "DWP_EDITED_EVIDENCE_BUNDLE, Only one edited DWP evidence bundle should be seen against each case\\, please correct",
+            "DWP_EVIDENCE_BUNDLE, Only one DWP evidence bundle should be seen against each case\\, please correct",
+            "DWP_RESPONSE, Only one DWP response should be seen against each case\\, please correct",
+            "DWP_EDITED_RESPONSE, Only one edited DWP response should be seen against each case\\, please correct"
     })
     public void shouldHaveErrorWhenMoreThanOneEditedDwpResponseDocumentsAreUploaded(DwpDocumentType documentType, String expectedErrorMessage) {
         addMandatoryDwpDocuments();

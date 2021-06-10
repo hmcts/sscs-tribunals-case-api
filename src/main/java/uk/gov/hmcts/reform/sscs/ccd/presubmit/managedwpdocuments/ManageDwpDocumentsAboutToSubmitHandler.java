@@ -6,6 +6,7 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -17,10 +18,18 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
+import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 
 @Component
 @Slf4j
 public class ManageDwpDocumentsAboutToSubmitHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private final DwpDocumentService dwpDocumentService;
+
+    @Autowired
+    public ManageDwpDocumentsAboutToSubmitHandler(DwpDocumentService dwpDocumentService) {
+        this.dwpDocumentService = dwpDocumentService;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -39,14 +48,22 @@ public class ManageDwpDocumentsAboutToSubmitHandler extends ResponseEventsAboutT
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
+        removeDwpDocumentsStoredInTheOldLocationTheyDoNotGetRemoveFromTheAboutToStartHandler(sscsCaseData);
+
         return validateDwpDocuments(sscsCaseData);
+    }
+
+    private void removeDwpDocumentsStoredInTheOldLocationTheyDoNotGetRemoveFromTheAboutToStartHandler(SscsCaseData sscsCaseData) {
+        dwpDocumentService.removeOldDwpDocuments(sscsCaseData);
     }
 
     private PreSubmitCallbackResponse<SscsCaseData> validateDwpDocuments(SscsCaseData sscsCaseData) {
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         validateDwpResponseDocument(sscsCaseData, preSubmitCallbackResponse);
+        validateOneDwpResponseDocument(sscsCaseData, preSubmitCallbackResponse);
         validateDwpEvidenceBundle(sscsCaseData, preSubmitCallbackResponse);
+        validateOneDwpEvidenceBundle(sscsCaseData, preSubmitCallbackResponse);
 
         if (sscsCaseData.getDwpEditedEvidenceReason() != null) {
             validateEditedResponseAndBundle(sscsCaseData, preSubmitCallbackResponse);
@@ -61,10 +78,25 @@ public class ManageDwpDocumentsAboutToSubmitHandler extends ResponseEventsAboutT
         }
     }
 
+    private void validateOneDwpResponseDocument(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        final long numberOfDwpResponses = countDwpDocument(sscsCaseData, DwpDocumentType.DWP_RESPONSE);
+        if (numberOfDwpResponses > 1) {
+            preSubmitCallbackResponse.addError("Only one DWP response should be seen against each case, please correct");
+        }
+    }
+
     private void validateDwpEvidenceBundle(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         Optional<DwpDocument> dwpEvidenceBundleDocument = getDwpDocument(sscsCaseData, DwpDocumentType.DWP_EVIDENCE_BUNDLE);
         if (isDocumentEmptyOrInvalid(dwpEvidenceBundleDocument)) {
             preSubmitCallbackResponse.addError("DWP evidence bundle cannot be empty");
+        }
+    }
+
+
+    private void validateOneDwpEvidenceBundle(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        final long numberOfDwpEvidenceBundleDocument = countDwpDocument(sscsCaseData, DwpDocumentType.DWP_EVIDENCE_BUNDLE);
+        if (numberOfDwpEvidenceBundleDocument > 1) {
+            preSubmitCallbackResponse.addError("Only one DWP evidence bundle should be seen against each case, please correct");
         }
     }
 
@@ -87,7 +119,7 @@ public class ManageDwpDocumentsAboutToSubmitHandler extends ResponseEventsAboutT
     private void validateOneDwpEditedResponse(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         final long numberOfDwpEditedResponses = countDwpDocument(sscsCaseData, DwpDocumentType.DWP_EDITED_RESPONSE);
         if (numberOfDwpEditedResponses > 1) {
-            preSubmitCallbackResponse.addError("Only one DWP response should be seen against each case, please correct");
+            preSubmitCallbackResponse.addError("Only one edited DWP response should be seen against each case, please correct");
         }
     }
 
@@ -102,7 +134,7 @@ public class ManageDwpDocumentsAboutToSubmitHandler extends ResponseEventsAboutT
     private void validateOneDwpEditedEvidenceBundle(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         final long numberOfDwpEditedEvidenceBundleDocument = countDwpDocument(sscsCaseData, DwpDocumentType.DWP_EDITED_EVIDENCE_BUNDLE);
         if (numberOfDwpEditedEvidenceBundleDocument > 1) {
-            preSubmitCallbackResponse.addError("Only one DWP evidence bundle should be seen against each case, please correct");
+            preSubmitCallbackResponse.addError("Only one edited DWP evidence bundle should be seen against each case, please correct");
         }
     }
 

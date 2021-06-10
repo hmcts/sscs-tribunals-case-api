@@ -126,4 +126,13 @@ public class DwpDocumentService {
                                 .build()
                 ).build());
     }
+
+    public void removeOldDwpDocuments(SscsCaseData sscsCaseData) {
+        sscsCaseData.setDwpAT38Document(null);
+        sscsCaseData.setDwpResponseDocument(null);
+        sscsCaseData.setDwpEditedResponseDocument(null);
+        sscsCaseData.setDwpEvidenceBundleDocument(null);
+        sscsCaseData.setDwpEditedEvidenceBundleDocument(null);
+        sscsCaseData.setAppendix12Doc(null);
+    }
 }
