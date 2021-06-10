@@ -568,7 +568,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                 .rip1Document(DocumentLink.builder()
                         .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("surveillance").build()).build();
 
-        List audioVideoList = new ArrayList<>();
+        List<AudioVideoEvidence> audioVideoList = new ArrayList<>();
         audioVideoList.add(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build());
 
         sscsCaseData.setAudioVideoEvidence(new ArrayList<>(
@@ -647,6 +647,59 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertTrue(response.getErrors().isEmpty());
+    }
+
+    @Test
+    public void givenADwpUploadResponseEventWithRip1DocumentAndNoAvFile_displayAnError() {
+        AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(null)
+                .rip1Document(DocumentLink.builder().documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("surveillance").build()).build();
+
+        List<AudioVideoEvidence> audioVideoList = new ArrayList<>();
+        audioVideoList.add(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build());
+
+        sscsCaseData.setDwpUploadAudioVideoEvidence(audioVideoList);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+
+        for (String error : response.getErrors()) {
+            assertEquals("You must upload an audio/video document when submitting a RIP 1 document", error);
+        }
+    }
+
+    @Test
+    public void givenADwpUploadResponseEventWithRip1DocumentAndAvFile_thenDoNotDisplayAnError() {
+        AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
+                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
+                .rip1Document(DocumentLink.builder()
+                        .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("surveillance").build()).build();
+
+        List<AudioVideoEvidence> audioVideoList = new ArrayList<>();
+        audioVideoList.add(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build());
+
+        sscsCaseData.setDwpUploadAudioVideoEvidence(audioVideoList);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void givenADwpUploadResponseEventWithAvFileAndNoRip1Document_thenDoNotDisplayAnError() {
+        AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
+                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
+                .rip1Document(null).build();
+
+        List<AudioVideoEvidence> audioVideoList = new ArrayList<>();
+        audioVideoList.add(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build());
+
+        sscsCaseData.setDwpUploadAudioVideoEvidence(audioVideoList);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+
     }
 
 }
