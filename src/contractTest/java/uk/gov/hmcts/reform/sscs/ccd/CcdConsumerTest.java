@@ -54,7 +54,7 @@ public class CcdConsumerTest {
         RestAssured.config().encoderConfig(new EncoderConfig("UTF-8", "UTF-8"));
     }
 
-    @Pact(provider = "ccd_api", consumer = "sscs_tribunals_case_api")
+    @Pact(provider = "ccd", consumer = "sscs_tribunals_case_api")
     public RequestResponsePact executeStartCaseForCaseworkerAndGet200(PactDslWithProvider builder) {
 
         Map<String, String> headers = Maps.newHashMap();
