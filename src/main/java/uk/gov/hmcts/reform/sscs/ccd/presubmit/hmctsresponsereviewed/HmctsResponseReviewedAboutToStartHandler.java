@@ -8,9 +8,10 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_EVIDENCE
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_RESPONSE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.UCB;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -92,24 +93,17 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
     }
 
     public void setOfficeDropdowns(SscsCaseData sscsCaseData) {
-        List<DynamicListItem> listOptions = new ArrayList<>();
 
         Optional<OfficeMapping> selectedOfficeMapping = sscsCaseData.getAppeal().getMrnDetails() != null && sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice() != null && sscsCaseData.getAppeal().getBenefitType() != null
                 ? service.getDwpMappingByOffice(sscsCaseData.getAppeal().getBenefitType().getCode(), sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice()) : Optional.empty();
 
-        OfficeMapping[] offices = service.allDwpBenefitOffices();
-        int defaultSelectedIndex = -1;
+        OfficeMapping[] offices = service.getDwpOfficeMappings(sscsCaseData.getAppeal().getBenefitType().getCode());
+        List<DynamicListItem> listOptions = Arrays.stream(offices)
+                .map(office -> new DynamicListItem(office.getMapping().getCcd(), office.getMapping().getCcd()))
+                .collect(Collectors.toUnmodifiableList());
 
-        for (int i = 0; i < offices.length; i++) {
-            OfficeMapping office = offices[i];
-            listOptions.add(new DynamicListItem(office.getMapping().getCcd(), office.getMapping().getCcd()));
-
-            if (selectedOfficeMapping.isPresent() && selectedOfficeMapping.get() == office) {
-                defaultSelectedIndex = i;
-            }
-        }
-
-        DynamicListItem selectedDynamicListItem = defaultSelectedIndex == -1 ? new DynamicListItem(null, null) : listOptions.get(defaultSelectedIndex);
+        DynamicListItem selectedDynamicListItem = selectedOfficeMapping
+                .flatMap(selectedOffice -> listOptions.stream().filter(office -> office.getCode().equals(selectedOffice.getMapping().getCcd())).findFirst()).orElse(new DynamicListItem(null, null));
 
         if (sscsCaseData.getDwpOriginatingOffice() == null) {
             sscsCaseData.setDwpOriginatingOffice(new DynamicList(selectedDynamicListItem, listOptions));

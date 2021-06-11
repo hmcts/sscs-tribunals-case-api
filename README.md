@@ -11,7 +11,7 @@ For versions and complete list of dependencies see build.gradle
 * Java 8
 * Spring Boot
 * Gradle
- 
+
 ## Building and deploying the application 
   
 ### Building the application

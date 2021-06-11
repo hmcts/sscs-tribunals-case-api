@@ -5,10 +5,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.*;
-import static uk.gov.hmcts.reform.sscs.idam.UserRole.JUDGE;
-import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
-import static uk.gov.hmcts.reform.sscs.idam.UserRole.TCW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +20,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidenceDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -89,64 +83,10 @@ public class ProcessAudioVideoEvidenceAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenAudioEvidenceListIsNotEmpty_ProcessAudioVideoActionListIsCreated() {
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        SscsCaseData responseData = response.getData();
-        assertEquals(2, responseData.getProcessAudioVideoAction().getListItems().size());
-        assertEquals(ISSUE_DIRECTIONS_NOTICE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), ISSUE_DIRECTIONS_NOTICE.getCode()));
-        assertEquals(SEND_TO_JUDGE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), SEND_TO_JUDGE.getCode()));
-    }
-
-    @Test
     public void givenAudioEvidenceListIsNotEmpty_SelectedAudioVideoEvidenceListIsCreated() {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         SscsCaseData responseData = response.getData();
         assertEquals(responseData.getSelectedAudioVideoEvidence().getValue().getCode(), "url/1234");
         assertEquals(responseData.getSelectedAudioVideoEvidence().getValue().getLabel(), "filename.mp4");
-    }
-
-    @Test
-    public void givenJudgeRole_thenUserCanProcessMoreAudioVideoActions() {
-        userDetails.getRoles().add(JUDGE.getValue());
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        SscsCaseData responseData = response.getData();
-        assertEquals(4, responseData.getProcessAudioVideoAction().getListItems().size());
-        assertEquals(ISSUE_DIRECTIONS_NOTICE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), ISSUE_DIRECTIONS_NOTICE.getCode()));
-        assertEquals(INCLUDE_EVIDENCE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), INCLUDE_EVIDENCE.getCode()));
-        assertEquals(EXCLUDE_EVIDENCE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), EXCLUDE_EVIDENCE.getCode()));
-        assertEquals(SEND_TO_ADMIN.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), SEND_TO_ADMIN.getCode()));
-    }
-
-    @Test
-    public void superUser_willGetAllActions() {
-        userDetails.getRoles().add(SUPER_USER.getValue());
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        SscsCaseData responseData = response.getData();
-        assertEquals(5, responseData.getProcessAudioVideoAction().getListItems().size());
-        assertEquals(ISSUE_DIRECTIONS_NOTICE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), ISSUE_DIRECTIONS_NOTICE.getCode()));
-        assertEquals(INCLUDE_EVIDENCE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), INCLUDE_EVIDENCE.getCode()));
-        assertEquals(EXCLUDE_EVIDENCE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), EXCLUDE_EVIDENCE.getCode()));
-        assertEquals(SEND_TO_JUDGE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), SEND_TO_JUDGE.getCode()));
-        assertEquals(SEND_TO_ADMIN.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), SEND_TO_ADMIN.getCode()));
-    }
-
-    @Test
-    public void givenTcwRole_verifyUserActions() {
-        userDetails.getRoles().add(TCW.getValue());
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        SscsCaseData responseData = response.getData();
-        assertEquals(3, responseData.getProcessAudioVideoAction().getListItems().size());
-        assertEquals(ISSUE_DIRECTIONS_NOTICE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), ISSUE_DIRECTIONS_NOTICE.getCode()));
-        assertEquals(SEND_TO_JUDGE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), SEND_TO_JUDGE.getCode()));
-        assertEquals(SEND_TO_ADMIN.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), SEND_TO_ADMIN.getCode()));
-    }
-
-
-    private String getItemCodeInList(DynamicList dynamicList, String item) {
-        return dynamicList.getListItems().stream()
-                .filter(o -> item.equals(o.getCode()))
-                .findFirst()
-                .map(DynamicListItem::getCode)
-                .orElse(null);
     }
 }

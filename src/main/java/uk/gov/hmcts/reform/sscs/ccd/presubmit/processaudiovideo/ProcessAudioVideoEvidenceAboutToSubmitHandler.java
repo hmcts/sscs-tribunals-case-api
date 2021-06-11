@@ -16,6 +16,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.WELSH_T
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.*;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.getDocumentType;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.isSelectedEvidence;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -32,20 +33,24 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @Service
 @Slf4j
 public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    public static final List<String> ACTIONS_THAT_REQUIRES_NOTICE = asList(ISSUE_DIRECTIONS_NOTICE.getCode(), EXCLUDE_EVIDENCE.getCode(), INCLUDE_EVIDENCE.getCode());
+    public static final List<String> ACTIONS_THAT_REQUIRES_NOTICE = asList(ISSUE_DIRECTIONS_NOTICE.getCode(), EXCLUDE_EVIDENCE.getCode(), ADMIT_EVIDENCE.getCode());
 
     private final FooterService footerService;
+    protected final UserDetailsService userDetailsService;
 
     @Autowired
-    public ProcessAudioVideoEvidenceAboutToSubmitHandler(FooterService footerService) {
+    public ProcessAudioVideoEvidenceAboutToSubmitHandler(FooterService footerService, UserDetailsService userDetailsService) {
         this.footerService = footerService;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -80,15 +85,16 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
             return response;
         }
         processIfIssueDirectionNotice(caseData);
-        processIfIncludeEvidence(caseData, response);
+        processIfAdmitEvidence(caseData, response);
         processIfExcludeEvidence(caseData);
-        processIfSendToJudge(caseData);
-        processIfSendToAdmin(caseData);
+        processIfSendToJudge(caseData, userAuthorisation);
+        processIfSendToAdmin(caseData, userAuthorisation);
         overrideInterlocReviewStateIfSelected(caseData);
 
         clearEmptyAudioVideoList(caseData);
         clearTransientFields(caseData);
         caseData.updateTranslationWorkOutstandingFlag();
+        setHasUnprocessedAudioVideoEvidenceFlag(caseData);
 
         return response;
     }
@@ -112,14 +118,16 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
             } else {
                 caseData.setInterlocReviewState(AWAITING_INFORMATION.getId());
             }
+            caseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE.getId());
             caseData.setInterlocReferralDate(LocalDate.now().toString());
             addProcessedActionToSelectedEvidence(caseData, DIRECTION_ISSUED);
         }
     }
 
-    private void processIfIncludeEvidence(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-        if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), INCLUDE_EVIDENCE.getCode())) {
+    private void processIfAdmitEvidence(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), ADMIT_EVIDENCE.getCode())) {
             caseData.setInterlocReviewState(null);
+            caseData.setInterlocReferralReason(InterlocReferralReason.NONE.getId());
             caseData.setDwpState(DIRECTION_ACTION_REQUIRED.getId());
 
             List<SscsDocument> sscsDocuments = new ArrayList<>();
@@ -152,8 +160,13 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     private DwpDocument buildAudioVideoDwpDocument(AudioVideoEvidenceDetails audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response, boolean isWelshCase) {
         DocumentLink rip1Doc = null;
         SscsDocumentTranslationStatus status = null;
+
+        String fileName = audioVideoEvidence.getFileName();
+
         if (audioVideoEvidence.getRip1Document() != null) {
             rip1Doc = buildRip1Doc(audioVideoEvidence);
+            fileName = "RIP 1 document for A/V file: " + fileName;
+
             if (isWelshCase) {
                 response.getData().setInterlocReviewState(WELSH_TRANSLATION.getId());
                 status = SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
@@ -162,13 +175,14 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
 
         return DwpDocument.builder().value(
                 DwpDocumentDetails.builder()
-                        .documentLink(audioVideoEvidence.getDocumentLink())
-                        .documentFileName(audioVideoEvidence.getFileName())
+                        .avDocumentLink(audioVideoEvidence.getDocumentLink())
+                        .documentFileName(fileName)
                         .documentType(findAudioVideoDocumentType(audioVideoEvidence, response))
                         .documentDateAdded(audioVideoEvidence.getDateAdded().toString())
                         .partyUploaded(audioVideoEvidence.getPartyUploaded())
                         .dateApproved(LocalDate.now().toString())
-                        .rip1DocumentLink(rip1Doc)
+                        .documentLink(rip1Doc)
+                        .isAvDocumentLinkPresent(YesNo.YES)
                         .documentTranslationStatus(status)
                         .build())
                 .build();
@@ -186,14 +200,22 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     }
 
     private SscsDocument buildAudioVideoSscsDocument(AudioVideoEvidenceDetails audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response) {
+        String fileName = audioVideoEvidence.getFileName();
+
+        if (audioVideoEvidence.getStatementOfEvidencePdf() != null) {
+            fileName = "Statement for A/V file: " + fileName;
+        }
+
         return SscsDocument.builder().value(
                 SscsDocumentDetails.builder()
-                        .documentLink(audioVideoEvidence.getDocumentLink())
-                        .documentFileName(audioVideoEvidence.getFileName())
+                        .avDocumentLink(audioVideoEvidence.getDocumentLink())
+                        .documentFileName(fileName)
                         .documentType(findAudioVideoDocumentType(audioVideoEvidence, response))
                         .documentDateAdded(audioVideoEvidence.getDateAdded().toString())
                         .partyUploaded(audioVideoEvidence.getPartyUploaded())
                         .dateApproved(LocalDate.now().toString())
+                        .documentLink(audioVideoEvidence.getStatementOfEvidencePdf())
+                        .isAvDocumentLinkPresent(YesNo.YES)
                         .build())
                 .build();
     }
@@ -209,10 +231,10 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         }
     }
 
-    private void addToNotesIfNoteExists(SscsCaseData caseData) {
+    private void addToNotesIfNoteExists(SscsCaseData caseData, String userAuthorisation) {
         if (StringUtils.isNoneBlank(caseData.getTempNoteDetail())) {
             ArrayList<Note> notes = new ArrayList<>(Optional.ofNullable(caseData.getAppealNotePad()).flatMap(f -> Optional.ofNullable(f.getNotesCollection())).orElse(Collections.emptyList()));
-            final NoteDetails noteDetail = NoteDetails.builder().noteDetail(caseData.getTempNoteDetail()).noteDate(LocalDate.now().toString()).build();
+            final NoteDetails noteDetail = NoteDetails.builder().noteDetail(caseData.getTempNoteDetail()).noteDate(LocalDate.now().toString()).author(userDetailsService.buildLoggedInUserName(userAuthorisation)).build();
             notes.add(Note.builder().value(noteDetail).build());
             caseData.setAppealNotePad(NotePad.builder().notesCollection(notes).build());
         }
@@ -221,12 +243,13 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     private void processIfExcludeEvidence(SscsCaseData caseData) {
         if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), EXCLUDE_EVIDENCE.getCode())) {
             caseData.setInterlocReviewState(null);
+            caseData.setInterlocReferralReason(InterlocReferralReason.NONE.getId());
             caseData.setDwpState(DIRECTION_ACTION_REQUIRED.getId());
             caseData.getAudioVideoEvidence().removeIf(evidence -> isSelectedEvidence(evidence, caseData));
         }
     }
 
-    private void processIfSendToJudge(SscsCaseData caseData) {
+    private void processIfSendToJudge(SscsCaseData caseData, String userAuthorisation) {
         if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), SEND_TO_JUDGE.getCode())) {
             if (caseData.isLanguagePreferenceWelsh()) {
                 caseData.setWelshInterlocNextReviewState(REVIEW_BY_JUDGE.getId());
@@ -234,13 +257,14 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
             } else {
                 caseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
             }
+            caseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE.getId());
             caseData.setInterlocReferralDate(LocalDate.now().toString());
-            addToNotesIfNoteExists(caseData);
+            addToNotesIfNoteExists(caseData, userAuthorisation);
             addProcessedActionToSelectedEvidence(caseData, SENT_TO_JUDGE);
         }
     }
 
-    private void processIfSendToAdmin(SscsCaseData caseData) {
+    private void processIfSendToAdmin(SscsCaseData caseData, String userAuthorisation) {
         if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), SEND_TO_ADMIN.getCode())) {
             if (caseData.isLanguagePreferenceWelsh()) {
                 caseData.setWelshInterlocNextReviewState(AWAITING_ADMIN_ACTION.getId());
@@ -248,7 +272,8 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
             } else {
                 caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
             }
-            addToNotesIfNoteExists(caseData);
+            caseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE.getId());
+            addToNotesIfNoteExists(caseData, userAuthorisation);
             addProcessedActionToSelectedEvidence(caseData, SENT_TO_ADMIN);
         }
     }

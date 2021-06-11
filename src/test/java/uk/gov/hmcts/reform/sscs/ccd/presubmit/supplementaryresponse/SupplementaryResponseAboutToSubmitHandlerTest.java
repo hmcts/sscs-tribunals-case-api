@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -171,9 +172,11 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
 
         assertEquals("supplementaryResponse", response.getData().getDwpState());
         assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), response.getData().getInterlocReviewState());
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), response.getData().getInterlocReferralReason());
         assertEquals("No", response.getData().getEvidenceHandled());
         assertNull(response.getData().getDwpOtherDoc());
         assertNull(response.getData().getShowRip1DocPage());
+        assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
     }
 
     @Test
@@ -196,6 +199,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
 
         assertEquals("supplementaryResponse", response.getData().getDwpState());
         assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), response.getData().getInterlocReviewState());
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), response.getData().getInterlocReferralReason());
         assertEquals("No", response.getData().getEvidenceHandled());
         assertNull(response.getData().getDwpOtherDoc());
         assertNull(response.getData().getRip1Doc());
@@ -212,5 +216,6 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
 
         assertEquals("supplementaryResponse", response.getData().getDwpState());
         assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), response.getData().getInterlocReferralReason());
     }
 }

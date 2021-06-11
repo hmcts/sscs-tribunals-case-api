@@ -7,6 +7,7 @@ import static org.apache.commons.collections4.ListUtils.union;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService.TEMP_UNIQUE_ID;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,6 +32,7 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Evidence;
@@ -220,8 +222,11 @@ public class EvidenceUploadService {
         removeStatementDocFromDocumentTab(sscsCaseData, storePdfContext.getDocument().getData().getSscsDocument());
         List<SscsDocument> audioVideoMedia = pullAudioVideoFilesFromDraft(storePdfContext.getDocument().getData().getDraftSscsDocument());
 
-        if (audioVideoMedia.size() > 0 && !REVIEW_BY_JUDGE.getId().equals(sscsCaseData.getInterlocReviewState())) {
-            sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId());
+        if (audioVideoMedia.size() > 0) {
+            sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE.getId());
+            if (!REVIEW_BY_JUDGE.getId().equals(sscsCaseData.getInterlocReviewState())) {
+                sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId());
+            }
         }
 
         List<byte[]> contentUploads = getContentListFromTheEvidenceUploads(storePdfContext);
@@ -229,7 +234,7 @@ public class EvidenceUploadService {
         byte[] combinedContent = appendEvidenceUploadsToStatement(statementContent.getByteArray(), contentUploads,
                 sscsCaseData.getCcdCaseId());
         SscsDocument combinedPdfEvidence = pdfStoreService.store(combinedContent, filename, "Other evidence").get(0);
-        buildScannedDocumentByGivenSscsDoc(sscsCaseData, combinedPdfEvidence, audioVideoMedia, idamEmail);
+        buildUploadedDocumentByGivenSscsDoc(sscsCaseData, combinedPdfEvidence, audioVideoMedia, idamEmail);
     }
 
     private ByteArrayResource getContentFromTheStatement(MyaEventActionContext storePdfContext) {
@@ -361,45 +366,58 @@ public class EvidenceUploadService {
     }
 
 
-    protected void buildScannedDocumentByGivenSscsDoc(SscsCaseData sscsCaseData, SscsDocument draftSscsDocument,
-                                                      List<SscsDocument> audioVideoMedia, String idamEmail) {
+    protected void buildUploadedDocumentByGivenSscsDoc(SscsCaseData sscsCaseData, SscsDocument draftSscsDocument,
+                                                       List<SscsDocument> audioVideoMedia, String idamEmail) {
         LocalDate ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(),
             DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
+
+        if (audioVideoMedia != null && !audioVideoMedia.isEmpty()) {
+            updateCaseDataWithNewAudioVideoUpload(audioVideoMedia, sscsCaseData, idamEmail, ldt, draftSscsDocument);
+        } else {
+            updateCaseDataWithNewPdfUpload(sscsCaseData, ldt, draftSscsDocument);
+        }
+    }
+
+    private void updateCaseDataWithNewPdfUpload(SscsCaseData sscsCaseData, LocalDateTime ldt, SscsDocument draftSscsDocument) {
         ScannedDocument scannedDocument = ScannedDocument.builder()
-            .value(ScannedDocumentDetails.builder()
-                .type("other")
-                .url(draftSscsDocument.getValue().getDocumentLink())
-                .fileName(draftSscsDocument.getValue().getDocumentFileName())
-                .scannedDate(ldt.toString())
-                .build())
-            .build();
+                .value(ScannedDocumentDetails.builder()
+                        .type("other")
+                        .url(draftSscsDocument.getValue().getDocumentLink())
+                        .fileName(draftSscsDocument.getValue().getDocumentFileName())
+                        .scannedDate(ldt.toString())
+                        .build())
+                .build();
 
         List<ScannedDocument> scannedDocuments = new ArrayList<>();
         scannedDocuments.add(scannedDocument);
+        List<ScannedDocument> newScannedDocumentsList = union(emptyIfNull(sscsCaseData.getScannedDocuments()),
+                emptyIfNull(scannedDocuments));
+        sscsCaseData.setScannedDocuments(newScannedDocumentsList);
+    }
 
+    private void updateCaseDataWithNewAudioVideoUpload(List<SscsDocument> audioVideoMedia, SscsCaseData sscsCaseData, String idamEmail, LocalDateTime ldt, SscsDocument draftSscsDocument) {
         List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>();
         UploadParty uploader = workOutAudioVideoUploadParty(sscsCaseData, idamEmail);
 
-        for (SscsDocument audioVideoDocument: audioVideoMedia) {
+        for (SscsDocument audioVideoDocument : audioVideoMedia) {
+
             audioVideoEvidence.add(AudioVideoEvidence.builder()
                     .value(AudioVideoEvidenceDetails.builder()
                             .documentLink(audioVideoDocument.getValue().getDocumentLink())
                             .dateAdded(ldt.toLocalDate())
                             .fileName(audioVideoDocument.getValue().getDocumentFileName())
                             .partyUploaded(uploader)
+                            .statementOfEvidencePdf(draftSscsDocument.getValue().getDocumentLink())
                             .build())
                     .build());
         }
-        List<ScannedDocument> newScannedDocumentsList = union(emptyIfNull(sscsCaseData.getScannedDocuments()),
-                emptyIfNull(scannedDocuments));
-        sscsCaseData.setScannedDocuments(newScannedDocumentsList);
-
         if (!audioVideoEvidence.isEmpty()) {
             List<AudioVideoEvidence> newAudioVideoEvidenceList = union(emptyIfNull(sscsCaseData.getAudioVideoEvidence()),
                     emptyIfNull(audioVideoEvidence));
             sscsCaseData.setAudioVideoEvidence(newAudioVideoEvidenceList);
         }
+        setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
     }
 
     @NotNull

@@ -229,8 +229,8 @@
     "evidencePresent": "No",
     "dateSentToDwp": "2019-09-06",
     "hmctsDwpState": "sentToDwp",
-    "dwpState": "feReceived",
-    "evidenceHandled": "No"
+    "evidenceHandled": "No",
+    "hasUnprocessedAudioVideoEvidence": "No"
   },
   "errors": [],
   "warnings": []

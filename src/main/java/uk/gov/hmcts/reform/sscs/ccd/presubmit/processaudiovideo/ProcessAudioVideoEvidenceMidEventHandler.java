@@ -5,36 +5,49 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoEvidenceAboutToSubmitHandler.ACTIONS_THAT_REQUIRES_NOTICE;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.getDocumentType;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.isSelectedEvidence;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
 
+import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidenceDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
 @Component
+@Slf4j
 public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final GenerateFile generateFile;
     private final DocumentConfiguration documentConfiguration;
+    private final IdamService idamService;
+    private final String dmGatewayUrl;
+    private final String documentManagementUrl;
 
     @Autowired
     public ProcessAudioVideoEvidenceMidEventHandler(GenerateFile generateFile,
-                                          DocumentConfiguration documentConfiguration) {
+                                                    DocumentConfiguration documentConfiguration,
+                                                    IdamService idamService,
+                                                    @Value("${dm_gateway.url}") String dmGatewayUrl,
+                                                    @Value("${document_management.url}") String documentManagementUrl) {
         this.generateFile = generateFile;
         this.documentConfiguration = documentConfiguration;
+        this.idamService = idamService;
+        this.dmGatewayUrl = dmGatewayUrl;
+        this.documentManagementUrl = documentManagementUrl;
     }
 
     @Override
@@ -53,8 +66,20 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
         }
 
         final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        final DynamicList processAudioVideoAction = caseData.getProcessAudioVideoAction();
+        DynamicList processAudioVideoAction = caseData.getProcessAudioVideoAction();
+
+        setActionDropDown(processAudioVideoAction, caseData, userAuthorisation);
+        setEvidenceDropdown(caseData);
+
         AudioVideoEvidenceDetails selectedAudioVideoEvidenceDetails = caseData.getSelectedAudioVideoEvidenceDetails();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+
+        validateDueDateIsInFuture(response);
+
+        if (!response.getErrors().isEmpty()) {
+            return response;
+        }
 
         if (nonNull(selectedAudioVideoEvidenceDetails) && nonNull(processAudioVideoAction) && ACTIONS_THAT_REQUIRES_NOTICE.contains(processAudioVideoAction.getValue().getCode())) {
             String templateId = documentConfiguration.getDocuments().get(caseData.getLanguagePreference()).get(EventType.DIRECTION_ISSUED);
@@ -72,11 +97,46 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
             }
             setDocumentType(selectedAudioVideoEvidence.getValue());
             selectedAudioVideoEvidenceDetails = selectedAudioVideoEvidence.getValue();
+            setSelectedAudioVideoEvidenceLink(caseData, selectedAudioVideoEvidence.getValue());
         }
 
         caseData.setSelectedAudioVideoEvidenceDetails(selectedAudioVideoEvidenceDetails);
 
-        return new PreSubmitCallbackResponse<>(caseData);
+        return response;
+    }
+
+    private void setActionDropDown(DynamicList processAudioVideoAction, SscsCaseData caseData, String userAuthorisation) {
+
+        final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
+        final boolean hasJudgeRole = userDetails.hasRole(JUDGE);
+        final boolean hasTcwRole = userDetails.hasRole(TCW);
+        final boolean hasSuperUserRole = userDetails.hasRole(SUPER_USER);
+
+        if (nonNull(processAudioVideoAction) && nonNull(processAudioVideoAction.getValue())) {
+            List<DynamicListItem> actionList = ProcessAudioVideoActionHelper.populateListItems(hasJudgeRole, hasTcwRole, hasSuperUserRole);
+            DynamicList updatedActions = new DynamicList(processAudioVideoAction.getValue(), actionList);
+            caseData.setProcessAudioVideoAction(updatedActions);
+        } else {
+            ProcessAudioVideoActionHelper.setProcessAudioVideoActionDropdown(caseData, hasJudgeRole, hasTcwRole, hasSuperUserRole);
+        }
+    }
+
+    private void setEvidenceDropdown(SscsCaseData caseData) {
+        final DynamicList evidenceDL = caseData.getSelectedAudioVideoEvidence();
+
+        if (nonNull(evidenceDL) && nonNull(evidenceDL.getValue())) {
+            List<DynamicListItem> evidenceList = ProcessAudioVideoActionHelper.populateEvidenceListWithItems(caseData);
+            DynamicList updatedEvidences = new DynamicList(evidenceDL.getValue(), evidenceList);
+            caseData.setSelectedAudioVideoEvidence(updatedEvidences);
+        } else {
+            ProcessAudioVideoActionHelper.setSelectedAudioVideoEvidence(caseData);
+        }
+    }
+
+    private void setSelectedAudioVideoEvidenceLink(SscsCaseData caseData, AudioVideoEvidenceDetails selected) {
+        String binaryDocUrl = selected.getDocumentLink().getDocumentBinaryUrl().replace(documentManagementUrl, dmGatewayUrl);
+        String tempDocumentLink = "<a target=\"_blank\" href=\"" + binaryDocUrl + "\">" + selected.getDocumentLink().getDocumentFilename() + "</a>";
+        caseData.setTempMediaUrl(tempDocumentLink);
     }
 
     private void setDocumentType(AudioVideoEvidenceDetails evidence) {
@@ -89,5 +149,11 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
         }
 
         evidence.setDocumentType(documentTypeLabel);
+    }
+
+    private void validateDueDateIsInFuture(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (nonNull(preSubmitCallbackResponse.getData().getDirectionDueDate()) && !isDateInTheFuture(preSubmitCallbackResponse.getData().getDirectionDueDate())) {
+            preSubmitCallbackResponse.addError("Directions due date must be in the future");
+        }
     }
 }

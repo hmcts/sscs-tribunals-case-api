@@ -1,26 +1,21 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.*;
-import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
 @Service
+@Slf4j
 public class ProcessAudioVideoEvidenceAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final IdamService idamService;
@@ -53,53 +48,9 @@ public class ProcessAudioVideoEvidenceAboutToStartHandler implements PreSubmitCa
             errorResponse.addError("Before running this event audio and video evidence must be uploaded");
             return errorResponse;
         }
-        final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
-        final boolean hasJudgeRole = userDetails.hasRole(JUDGE);
-        final boolean hasTcwRole = userDetails.hasRole(TCW);
-        final boolean hasSuperUserRole = userDetails.hasRole(SUPER_USER);
-        setSelectedAudioVideoEvidence(sscsCaseData);
-        setProcessAudioVideoActionDropdown(sscsCaseData, hasJudgeRole, hasTcwRole, hasSuperUserRole);
+        ProcessAudioVideoActionHelper.setSelectedAudioVideoEvidence(sscsCaseData);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    private void setProcessAudioVideoActionDropdown(SscsCaseData sscsCaseData, boolean hasJudgeRole, boolean hasTcwRole, boolean hasSuperUserRole) {
-        List<DynamicListItem> listOptions = new ArrayList<>();
-
-        populateListWithItems(listOptions, ISSUE_DIRECTIONS_NOTICE);
-
-        if (hasJudgeRole || hasSuperUserRole) {
-            populateListWithItems(listOptions, INCLUDE_EVIDENCE);
-            populateListWithItems(listOptions, EXCLUDE_EVIDENCE);
-        }
-
-        if (!hasJudgeRole || hasSuperUserRole) {
-            populateListWithItems(listOptions, SEND_TO_JUDGE);
-        }
-
-        if (hasTcwRole || hasJudgeRole || hasSuperUserRole) {
-            populateListWithItems(listOptions, SEND_TO_ADMIN);
-        }
-
-
-        sscsCaseData.setProcessAudioVideoAction(new DynamicList(listOptions.get(0), listOptions));
-    }
-
-    private void populateListWithItems(List<DynamicListItem> listOptions,
-                                       ProcessAudioVideoActionDynamicListItems... items) {
-
-        for (ProcessAudioVideoActionDynamicListItems item : items) {
-            listOptions.add(new DynamicListItem(item.getCode(), item.getLabel()));
-        }
-    }
-
-    private void setSelectedAudioVideoEvidence(SscsCaseData sscsCaseData) {
-        List<DynamicListItem> listOptions = new ArrayList<>();
-
-        sscsCaseData.getAudioVideoEvidence().forEach(audioVideoEvidence ->
-                  listOptions.add(new DynamicListItem(audioVideoEvidence.getValue().getDocumentLink().getDocumentUrl(),
-                          audioVideoEvidence.getValue().getFileName())));
-
-        sscsCaseData.setSelectedAudioVideoEvidence(new DynamicList(listOptions.get(0), listOptions));
-    }
 }

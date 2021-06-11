@@ -19,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -91,9 +92,6 @@ public class SubmitAppealServiceTest {
     @Mock
     private ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
 
-    @Mock
-    private WelshBenefitTypeTranslator welshBenefitTypeTranslator;
-
     private static final RegionalProcessingCenterService regionalProcessingCenterService;
 
     private static AirLookupService airLookupService;
@@ -159,6 +157,9 @@ public class SubmitAppealServiceTest {
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
 
+        given(ccdService.updateCase(any(SscsCaseData.class), any(), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
+                .willReturn(SscsCaseDetails.builder().id(123L).build());
+
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().roles(Arrays.asList("citizen")).build());
@@ -168,10 +169,6 @@ public class SubmitAppealServiceTest {
 
     @Test
     public void givenCaseDoesNotExistInCcd_shouldCreateCaseWithAppealDetailsWithValidAppealCreatedEvent() {
-        submitAppealService = new SubmitAppealService(
-                ccdService, citizenCcdService, regionalProcessingCenterService,
-                idamService, convertAIntoBService, airLookupService);
-
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
 
@@ -179,7 +176,78 @@ public class SubmitAppealServiceTest {
 
         submitAppealService.submitAppeal(appealData, userToken);
 
-        verify(ccdService).createCase(any(SscsCaseData.class), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(ccdService).createCase(capture.capture(), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals("No", capture.getValue().getIsSaveAndReturn());
+    }
+
+    @Test
+    public void givenDraftCaseDoesExistAndCaseSubmitted_shouldUpdateCaseWithAppealDetailsWithDraftToValidAppealCreatedEvent() {
+        byte[] expected = {};
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
+        given(ccdService.getByCaseId(eq(123L), any())).willReturn(SscsCaseDetails.builder().build());
+
+        appealData.setCcdCaseId("123");
+        appealData.setIsSaveAndReturn("Yes");
+        submitAppealService.submitAppeal(appealData, userToken);
+
+        verify(ccdService).updateCase(capture.capture(), eq(123L), eq(DRAFT_TO_VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals("Yes", capture.getValue().getIsSaveAndReturn());
+
+    }
+
+    @Test
+    public void givenDraftCaseDoesExistAndCaseSubmittedHasNullBenefitType_shouldUpdateCaseWithAppealDetailsWithDraftToValidAppealCreatedEvent() {
+        byte[] expected = {};
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+
+        given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq(appealData.getAppellant().getNino()), any()))
+                .willReturn(Collections.singletonList(
+                        SscsCaseDetails.builder()
+                                .id(12345678L)
+                                .data(SscsCaseData.builder()
+                                        .appeal(Appeal.builder()
+                                                .appellant(Appellant.builder().identity(Identity.builder().nino(appealData.getAppellant().getNino()).build()).build())
+                                                .mrnDetails(MrnDetails.builder().mrnDate(appealData.getMrn().getDate().plusDays(5).format(DateTimeFormatter.ISO_LOCAL_DATE))
+                                                        .build()).build()).build()).build()));
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
+        given(ccdService.getByCaseId(eq(123L), any())).willReturn(SscsCaseDetails.builder().build());
+
+        appealData.setCcdCaseId("123");
+        appealData.setIsSaveAndReturn("Yes");
+        submitAppealService.submitAppeal(appealData, userToken);
+
+        verify(ccdService).updateCase(capture.capture(), eq(123L), eq(DRAFT_TO_VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals("Yes", capture.getValue().getIsSaveAndReturn());
+
+    }
+
+    @Test
+    public void givenDraftCaseDoesExistAndCaseSubmittedHasNullNino_shouldUpdateCaseWithAppealDetailsWithDraftToValidAppealCreatedEvent() {
+        byte[] expected = {};
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+
+        given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq(appealData.getAppellant().getNino()), any()))
+                .willReturn(Collections.singletonList(
+                        SscsCaseDetails.builder()
+                                .id(12345678L)
+                                .data(SscsCaseData.builder()
+                                        .appeal(Appeal.builder()
+                                                .appellant(Appellant.builder().build())
+                                                .benefitType(BenefitType.builder().code(appealData.getBenefitType().getCode()).build())
+                                                .mrnDetails(MrnDetails.builder().mrnDate(appealData.getMrn().getDate().plusDays(5).format(DateTimeFormatter.ISO_LOCAL_DATE))
+                                                        .build()).build()).build()).build()));
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
+        given(ccdService.getByCaseId(eq(123L), any())).willReturn(SscsCaseDetails.builder().build());
+
+        appealData.setCcdCaseId("123");
+        appealData.setIsSaveAndReturn("Yes");
+        submitAppealService.submitAppeal(appealData, userToken);
+
+        verify(ccdService).updateCase(capture.capture(), eq(123L), eq(DRAFT_TO_VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals("Yes", capture.getValue().getIsSaveAndReturn());
+
     }
 
     @Test
@@ -241,8 +309,29 @@ public class SubmitAppealServiceTest {
 
         submitAppealService.submitAppeal(appealData, userToken);
 
-        verify(ccdService).createCase(any(SscsCaseData.class), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(ccdService).createCase(capture.capture(), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         verify(ccdService, times(0)).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals("No", capture.getValue().getIsSaveAndReturn());
+    }
+
+    @Test
+    public void givenDraftCaseDoesExistAndMrnDateIsMissingAndCaseSubmitted_shouldUpdateCaseWithAppealDetailsWithDraftToIncompleteApplicationEvent() {
+        byte[] expected = {};
+        appealData.getMrn().setDate(null);
+
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
+
+        given(ccdService.getByCaseId(eq(123L), any())).willReturn(SscsCaseDetails.builder().build());
+
+        appealData.setCcdCaseId("123");
+        appealData.setIsSaveAndReturn("Yes");
+        submitAppealService.submitAppeal(appealData, userToken);
+
+        verify(ccdService).updateCase(capture.capture(), eq(123L), eq(DRAFT_TO_INCOMPLETE_APPLICATION.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals("Yes", capture.getValue().getIsSaveAndReturn());
+
     }
 
     @Test
@@ -256,7 +345,27 @@ public class SubmitAppealServiceTest {
 
         submitAppealService.submitAppeal(appealData, userToken);
 
-        verify(ccdService).createCase(any(SscsCaseData.class), eq(NON_COMPLIANT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(ccdService).createCase(capture.capture(), eq(NON_COMPLIANT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals("No", capture.getValue().getIsSaveAndReturn());
+    }
+
+    @Test
+    public void givenDraftCaseDoesExistAndMrnDateIsGreaterThan13MonthsAndCaseSubmitted_shouldUpdateCaseWithAppealDetailsWithDraftToNonCompliantEvent() {
+        byte[] expected = {};
+        appealData.getMrn().setDate(LocalDate.now().minusMonths(13).minusDays(1));
+
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
+
+        given(ccdService.getByCaseId(eq(123L), any())).willReturn(SscsCaseDetails.builder().build());
+
+        appealData.setCcdCaseId("123");
+        appealData.setIsSaveAndReturn("Yes");
+        submitAppealService.submitAppeal(appealData, userToken);
+
+        verify(ccdService).updateCase(capture.capture(), eq(123L), eq(DRAFT_TO_NON_COMPLIANT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals("Yes", capture.getValue().getIsSaveAndReturn());
     }
 
     @Test
@@ -382,6 +491,35 @@ public class SubmitAppealServiceTest {
 
         verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
         assertFalse(result.isPresent());
+    }
+
+    @Test
+    public void shouldhandleScConfilctWithNullNinoForSubmitDraftAppeal() {
+        FeignException feignException = mock(FeignException.class);
+        given(feignException.status()).willReturn(HttpStatus.SC_CONFLICT);
+        given(citizenCcdService.saveCase(any(SscsCaseData.class), any(IdamTokens.class)))
+                .willThrow(feignException);
+        appealData.getAppellant().setNino(null);
+
+
+        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData, false);
+
+        verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
+        assertEquals(result, Optional.empty());
+    }
+
+    @Test
+    public void shouldhandleScConfilctWithNullNinoForUpdateDraftAppeal() {
+        FeignException feignException = mock(FeignException.class);
+        given(feignException.status()).willReturn(409);
+        given(citizenCcdService.updateCase(any(SscsCaseData.class), any(), any(), any(), any(), any()))
+                .willThrow(feignException);
+        appealData.getAppellant().setNino(null);
+
+        Optional<SaveCaseResult> result = submitAppealService.updateDraftAppeal("authorisation", appealData);
+
+        verify(citizenCcdService).updateCase(any(SscsCaseData.class), any(), any(), any(), any(), any());
+        assertEquals(result, Optional.empty());
     }
 
     @Test(expected = ApplicationErrorException.class)
@@ -577,49 +715,6 @@ public class SubmitAppealServiceTest {
         submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService, never()).createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class));
-    }
-
-    @Test
-    public void willArchiveFirstDraftOnceAppealIsSubmitted() {
-        String userToken = "MyCitizenToken";
-        byte[] expected = {};
-        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
-
-        submitAppealService.submitAppeal(appealData, userToken);
-
-
-        verify(ccdService).createCase(any(SscsCaseData.class), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
-        verify(citizenCcdService).draftArchivedFirst(any(SscsCaseData.class), any(IdamTokens.class), any(IdamTokens.class));
-    }
-
-    @Test
-    public void willArchiveASpecifcDraftOnceAppealIsSubmittedWithValidCaseId() {
-
-        byte[] expected = {};
-        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
-
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
-        String userToken = "MyCitizenToken";
-        appealData.setCcdCaseId("576890");
-        submitAppealService.submitAppeal(appealData, userToken);
-
-        verify(ccdService).createCase(any(SscsCaseData.class), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
-        verify(citizenCcdService).archiveDraft(any(SscsCaseData.class), any(IdamTokens.class), any());
-    }
-
-    @Test
-    public void willArchiveFirstcDraftOnceAppealIsSubmittedWithInvalidCaseId() {
-
-        byte[] expected = {};
-        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
-
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
-        String userToken = "MyCitizenToken";
-        appealData.setCcdCaseId("lkj3242&*^");
-        submitAppealService.submitAppeal(appealData, userToken);
-
-        verify(ccdService).createCase(any(SscsCaseData.class), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
-        verify(citizenCcdService).draftArchivedFirst(any(SscsCaseData.class), any(IdamTokens.class), any(IdamTokens.class));
     }
 
     @Test

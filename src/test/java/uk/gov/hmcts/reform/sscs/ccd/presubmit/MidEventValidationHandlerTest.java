@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import junitparams.JUnitParamsRunner;
@@ -92,7 +91,7 @@ public class MidEventValidationHandlerTest {
 
         if (eventType.equals(EventType.NOT_LISTABLE)) {
             sscsCaseData.setNotListableDueDate(LocalDate.now().toString());
-        } else {
+        } else if (eventType.equals(EventType.UPDATE_NOT_LISTABLE)) {
             sscsCaseData.setUpdateNotListableDueDate(LocalDate.now().toString());
         }
 
@@ -109,10 +108,10 @@ public class MidEventValidationHandlerTest {
     public void givenDirectionsDueDateIsBeforeToday_ThenDisplayAnError(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
 
-        String yesterdayDate = LocalDate.now().plus(-1, ChronoUnit.DAYS).toString();
+        String yesterdayDate = LocalDate.now().plusDays(-1).toString();
         if (eventType.equals(EventType.NOT_LISTABLE)) {
             sscsCaseData.setNotListableDueDate(yesterdayDate);
-        } else {
+        } else if (eventType.equals(EventType.UPDATE_NOT_LISTABLE)) {
             sscsCaseData.setUpdateNotListableDueDate(yesterdayDate);
         }
 
@@ -129,10 +128,10 @@ public class MidEventValidationHandlerTest {
     public void givenDirectionsDueDateIsAfterToday_ThenDoNotDisplayAnError(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
 
-        String tomorrowDate = LocalDate.now().plus(1, ChronoUnit.DAYS).toString();
+        String tomorrowDate = LocalDate.now().plusDays(1).toString();
         if (eventType.equals(EventType.NOT_LISTABLE)) {
             sscsCaseData.setNotListableDueDate(tomorrowDate);
-        } else {
+        } else if (eventType.equals(EventType.UPDATE_NOT_LISTABLE)) {
             sscsCaseData.setUpdateNotListableDueDate(tomorrowDate);
         }
 

@@ -6,11 +6,11 @@ import static java.util.Collections.unmodifiableList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -143,10 +143,13 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
         if (fileType.equalsIgnoreCase("pdf")) {
             assertThat(response.getData().getSscsDocument().size(), is(1));
             assertThat(response.getData().getAudioVideoEvidence(), is(nullValue()));
+            assertEquals(YesNo.NO, response.getData().getHasUnprocessedAudioVideoEvidence());
         } else {
             assertThat(response.getData().getSscsDocument(), is(nullValue()));
             assertThat(response.getData().getAudioVideoEvidence().size(), is(1));
             assertThat(response.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded(), is(UploadParty.CTSC));
+            assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), response.getData().getInterlocReferralReason());
+            assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
         }
     }
 
@@ -204,6 +207,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_JUDGE.getId()));
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), response.getData().getInterlocReferralReason());
     }
 
     @Test

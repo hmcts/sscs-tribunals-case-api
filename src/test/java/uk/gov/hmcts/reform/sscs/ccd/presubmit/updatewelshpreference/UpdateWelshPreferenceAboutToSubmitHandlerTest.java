@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_WELSH_PREFERENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.WELSH_TRANSLATION;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -28,6 +30,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.addnote.AddNoteAboutToSubmitHandler;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @RunWith(JUnitParamsRunner.class)
 public class UpdateWelshPreferenceAboutToSubmitHandlerTest {
@@ -39,10 +43,19 @@ public class UpdateWelshPreferenceAboutToSubmitHandlerTest {
     @Mock
     private Callback<SscsCaseData> callback;
 
+    @Mock
+    private UserDetailsService userDetailsService;
+
+    @Mock
+    private AddNoteAboutToSubmitHandler addNote;
+
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        handler = new UpdateWelshPreferenceAboutToSubmitHandler();
+        addNote = new AddNoteAboutToSubmitHandler(userDetailsService);
+        handler = new UpdateWelshPreferenceAboutToSubmitHandler(addNote);
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+                .forename("Chris").surname("Davis").build().getFullName());
         when(callback.getEvent()).thenReturn(UPDATE_WELSH_PREFERENCE);
     }
 
@@ -67,6 +80,19 @@ public class UpdateWelshPreferenceAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals("Yes",result.getData().getLanguagePreferenceWelsh());
         assertEquals("Yes",result.getData().getTranslationWorkOutstanding());
+    }
+
+    @Test
+    public void givenWelshTransaltionsInterlocStateAddNote() {
+        Callback<SscsCaseData> callback = buildCallback();
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("No");
+        callback.getCaseDetails().getCaseData().setInterlocReviewState(WELSH_TRANSLATION.getId());
+        PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals("No",result.getData().getLanguagePreferenceWelsh());
+        assertEquals("No",result.getData().getTranslationWorkOutstanding());
+        assertEquals(1,result.getData().getAppealNotePad().getNotesCollection().size());
+        assertEquals("Assigned to admin - Case no longer Welsh. Please cancel any Welsh translations",
+                result.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
     }
 
     @Test

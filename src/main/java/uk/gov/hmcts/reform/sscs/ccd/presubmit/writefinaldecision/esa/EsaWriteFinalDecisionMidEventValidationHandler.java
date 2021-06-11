@@ -72,6 +72,13 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     }
 
     @Override
+    protected void setShowWorkCapabilityAssessmentPage(SscsCaseData sscsCaseData) {
+        if (YES.getValue().equals(sscsCaseData.getWriteFinalDecisionGenerateNotice())) {
+            sscsCaseData.setShowWorkCapabilityAssessmentPage(YES);
+        }
+    }
+
+    @Override
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData) {
 
         if (YesNo.YES.getValue().equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionGenerateNotice())

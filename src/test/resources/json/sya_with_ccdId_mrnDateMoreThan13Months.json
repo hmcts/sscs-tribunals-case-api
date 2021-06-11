@@ -1,0 +1,90 @@
+{
+  "benefitType": {
+    "description": "Personal Independence Payment",
+    "code": "PIP"
+  },
+  "mrn": {
+    "dwpIssuingOffice": "DWP PIP (1)",
+    "date": "01-12-2017",
+    "reasonForBeingLate": "Lost my paperwork"
+  },
+  "isAppointee": false,
+  "evidenceProvide": "false",
+  "appellant": {
+    "title": "Mr",
+    "firstName": "Joe",
+    "lastName": "Bloggs",
+    "dob": "26-02-1990",
+    "nino": "AB877533C",
+    "contactDetails": {
+      "addressLine1": "123 Hairy Lane",
+      "addressLine2": "Off Hairy Park",
+      "townCity": "Hairyfield",
+      "county": "Kent",
+      "postCode": "TN32 6PL",
+      "phoneNumber": "07411222222",
+      "emailAddress": "joe@bloggs.com"
+    }
+  },
+  "smsNotify": {
+    "wantsSMSNotifications": true,
+    "smsNumber": "07411333333"
+  },
+  "hasRepresentative": true,
+  "representative": {
+    "title": "Mr",
+    "firstName": "Harry",
+    "lastName": "Potter",
+    "organisation": "HP Ltd",
+    "contactDetails": {
+      "addressLine1": "123 Hairy Lane",
+      "addressLine2": "Off Hairy Park",
+      "townCity": "Town",
+      "county": "County",
+      "postCode": "CM14 4LQ",
+      "phoneNumber": "07411999999",
+      "emailAddress": "harry.potter@wizards.com"
+    }
+  },
+  "reasonsForAppealing": {
+    "reasons": [
+      {
+        "whatYouDisagreeWith": "aaaaaaaaaa",
+        "reasonForAppealing": "aaaaaaaaaa"
+      },
+      {
+        "whatYouDisagreeWith": "bbbbbbbbbb",
+        "reasonForAppealing": "bbbbbbbbbb"
+      },
+      {
+        "whatYouDisagreeWith": "cccccccccc",
+        "reasonForAppealing": "cccccccccc"
+      }
+    ],
+    "otherReasons": "Another reason"
+  },
+  "hearing": {
+    "wantsToAttend": true,
+    "wantsSupport": true,
+    "anythingElse": "Yes, this...",
+    "interpreterLanguageType": "An interpreter language",
+    "signLanguageType": "A sign language",
+    "arrangements": {
+      "languageInterpreter": true,
+      "signLanguageInterpreter": true,
+      "hearingLoop": true,
+      "accessibleHearingRoom": false,
+      "other": true
+    },
+    "scheduleHearing": true,
+    "datesCantAttend": [
+      "04-04-2020",
+      "05-04-2020",
+      "06-04-2020"
+    ]
+  },
+  "signAndSubmit": {
+    "signer": "Joe Bloggs"
+  },
+  "ccdCaseId": "1234567890"
+}
