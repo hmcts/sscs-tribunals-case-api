@@ -34,10 +34,9 @@ public class AudioVideoEvidenceUtil {
     public static void setHasUnprocessedAudioVideoEvidenceFlag(SscsCaseData caseData) {
         if (isNull(caseData.getAudioVideoEvidence()) || isEmpty(caseData.getAudioVideoEvidence())) {
             caseData.setHasUnprocessedAudioVideoEvidence(NO);
-            log.info("HasUnprocessedAudioVideoEvidence flag has been set to NO");
         } else {
             caseData.setHasUnprocessedAudioVideoEvidence(YES);
-            log.info("HasUnprocessedAudioVideoEvidence flag has been set to YES");
         }
+        log.info("HasUnprocessedAudioVideoEvidence flag has been set to {} for case id: {}", caseData.getHasUnprocessedAudioVideoEvidence(), caseData.getCcdCaseId());
     }
 }

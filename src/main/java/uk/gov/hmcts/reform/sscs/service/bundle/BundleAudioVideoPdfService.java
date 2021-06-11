@@ -84,7 +84,7 @@ public class BundleAudioVideoPdfService {
     public List<PdfTableDescriptor> buildDescriptorsUsingDocuments(List<? extends AbstractDocument> abstractDocument) {
 
         return abstractDocument.stream()
-                .filter(e -> e.getValue().getDocumentLink().getDocumentFilename().endsWith(".mp3") || e.getValue().getDocumentLink().getDocumentFilename().endsWith(".mp4"))
+                .filter(e -> e.getValue().getAvDocumentLink() != null && (e.getValue().getAvDocumentLink().getDocumentFilename().endsWith(".mp3") || e.getValue().getAvDocumentLink().getDocumentFilename().endsWith(".mp4")))
                 .map(audioVideoDocument -> buildDescriptorsFromAudioVideoEvidence(audioVideoDocument))
                 .collect(Collectors.toList());
 
@@ -94,10 +94,10 @@ public class BundleAudioVideoPdfService {
 
         if (document != null) {
 
-            String docUrl = document.getValue().getDocumentLink().getDocumentBinaryUrl().replace(documentManagementUrl, dmGatewayUrl);
+            String docUrl = document.getValue().getAvDocumentLink().getDocumentBinaryUrl().replace(documentManagementUrl, dmGatewayUrl);
 
             return PdfTableDescriptor.builder().documentType(DocumentType.fromValue(document.getValue().getDocumentType()).getLabel())
-                    .documentUrl(document.getValue().getDocumentLink().getDocumentFilename() + "|" + docUrl)
+                    .documentUrl(document.getValue().getAvDocumentLink().getDocumentFilename() + "|" + docUrl)
                     .dateAdded(DATEFORMATTER.format(LocalDate.parse(document.getValue().getDocumentDateAdded())))
                     .dateApproved(DATEFORMATTER.format(LocalDate.parse(document.getValue().getDateApproved())))
                     .uploadParty(document.getValue().getPartyUploaded().getLabel())

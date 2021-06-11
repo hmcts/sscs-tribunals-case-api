@@ -291,7 +291,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
 
     private List<DwpDocument> buildDwpDocuments() {
 
-        DwpDocument dwpDoc1 = buildDwpDocument("english.pdf", "/anotherUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.AUDIO_DOCUMENT.getValue());
+        DwpDocument dwpDoc1 = buildDwpDocument("english.mp3", "/anotherUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.AUDIO_DOCUMENT.getValue());
 
         List<DwpDocument> dwpDocuments = new ArrayList<>();
         dwpDocuments.add(dwpDoc1);
@@ -338,14 +338,14 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
     private DwpDocument buildDwpDocument(String filename, String documentUrl, SscsDocumentTranslationStatus translationRequested, String documentType) {
         return DwpDocument.builder()
                 .value(DwpDocumentDetails.builder()
-                        .documentLink(DocumentLink.builder()
+                        .avDocumentLink(DocumentLink.builder()
                                 .documentUrl(documentUrl)
                                 .documentFilename(filename)
                                 .build())
                         .documentTranslationStatus(translationRequested)
                         .documentType(documentType)
                         .documentFileName(filename)
-                        .rip1DocumentLink(DocumentLink.builder()
+                        .documentLink(DocumentLink.builder()
                                 .documentUrl("rip1url")
                                 .documentFilename("rip1.pdf")
                                 .build())
