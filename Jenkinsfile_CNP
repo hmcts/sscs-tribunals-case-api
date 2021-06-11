@@ -52,6 +52,10 @@ withPipeline(type, product, component) {
     enableAksStagingDeployment()
     disableLegacyDeployment()
 
+    onPR() {
+        enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
+    }
+
     onMaster() {
         enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
     }
