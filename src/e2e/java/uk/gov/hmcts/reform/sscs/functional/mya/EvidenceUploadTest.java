@@ -21,19 +21,7 @@ public class EvidenceUploadTest extends BaseFunctionTest {
 
         Thread.sleep(5000L);
 
-        JSONArray draftHearingEvidence = sscsMyaBackendRequests.getDraftHearingEvidence(createdCcdCase.getCaseId());
-        assertThat(draftHearingEvidence.length(), is(0));
-
-        sscsMyaBackendRequests.uploadHearingEvidence(createdCcdCase.getCaseId(), "evidence.png");
-
-        draftHearingEvidence = sscsMyaBackendRequests.getDraftHearingEvidence(createdCcdCase.getCaseId());
-        assertThat(draftHearingEvidence.length(), is(1));
-        assertThat(draftHearingEvidence.getJSONObject(0).getString("file_name"), is("evidence.pdf"));
-
-        sscsMyaBackendRequests.submitHearingEvidence(createdCcdCase.getCaseId(), "some description");
-
-        draftHearingEvidence = sscsMyaBackendRequests.getDraftHearingEvidence(createdCcdCase.getCaseId());
-        assertThat(draftHearingEvidence.length(), is(0));
+        sscsMyaBackendRequests.submitHearingEvidence(createdCcdCase.getCaseId(), "some description", "evidence.png");
 
         SscsCaseDetails caseDetails = getCaseDetails(createdCcdCase.getCaseId());
 
@@ -49,19 +37,7 @@ public class EvidenceUploadTest extends BaseFunctionTest {
 
         Thread.sleep(5000L);
 
-        JSONArray draftHearingEvidence = sscsMyaBackendRequests.getDraftHearingEvidence(createdCcdCase.getCaseId());
-        assertThat(draftHearingEvidence.length(), is(0));
-
-        sscsMyaBackendRequests.uploadHearingEvidence(createdCcdCase.getCaseId(), "evidence.mp3");
-        
-        draftHearingEvidence = sscsMyaBackendRequests.getDraftHearingEvidence(createdCcdCase.getCaseId());
-        assertThat(draftHearingEvidence.length(), is(1));
-        assertThat(draftHearingEvidence.getJSONObject(0).getString("file_name"), is("evidence.mp3"));
-
-        sscsMyaBackendRequests.submitHearingEvidence(createdCcdCase.getCaseId(), "some description");
-
-        draftHearingEvidence = sscsMyaBackendRequests.getDraftHearingEvidence(createdCcdCase.getCaseId());
-        assertThat(draftHearingEvidence.length(), is(0));
+        sscsMyaBackendRequests.submitHearingEvidence(createdCcdCase.getCaseId(), "some description", "evidence.mp3");
 
         SscsCaseDetails caseDetails = getCaseDetails(createdCcdCase.getCaseId());
 
@@ -80,15 +56,5 @@ public class EvidenceUploadTest extends BaseFunctionTest {
 
         String coversheet = sscsMyaBackendRequests.getCoversheet(createdCcdCase.getCaseId());
         assertThat(coversheet, is("evidence_cover_sheet.pdf"));
-    }
-
-    @Test
-    public void shouldDeleteUploadEvidenceForAnAppeal() throws IOException {
-        CreatedCcdCase createdCcdCase = createCase();
-        sscsMyaBackendRequests.uploadHearingEvidence(createdCcdCase.getCaseId(), "evidence.png");
-        SscsCaseDetails caseDetails = getCaseDetails(createdCcdCase.getCaseId());
-        JSONArray draftHearingEvidence = sscsMyaBackendRequests.getDraftHearingEvidence(createdCcdCase.getCaseId());
-        assertThat(draftHearingEvidence.length(), is(1));
-        sscsMyaBackendRequests.deleteUploadEvidence(caseDetails.getId(), draftHearingEvidence.getJSONObject(0).getString("id"));
     }
 }
