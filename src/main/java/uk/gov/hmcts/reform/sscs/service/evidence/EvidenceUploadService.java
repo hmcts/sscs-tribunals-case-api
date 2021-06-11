@@ -101,16 +101,6 @@ public class EvidenceUploadService {
     public boolean submitHearingEvidence(String identifier, EvidenceDescription description, MultipartFile file) {
         return onlineHearingService.getCcdCaseByIdentifier(identifier)
                 .map(caseDetails -> {
-                    List<MultipartFile> convertedFiles = fileToPdfConversionService.convert(singletonList(file));
-
-                    Document document = evidenceManagementService.upload(convertedFiles, DM_STORE_USER_ID).getEmbedded().getDocuments().get(0);
-
-                    List<SscsDocument> currentDocuments = draftHearingDocumentExtractor.getDocuments().apply(caseDetails.getData());
-                    ArrayList<SscsDocument> newDocuments = (currentDocuments == null) ? new ArrayList<>() : new ArrayList<>(currentDocuments);
-                    newDocuments.add(new SscsDocument(createNewDocumentDetails(document)));
-
-                    draftHearingDocumentExtractor.setDocuments().accept(caseDetails.getData(), newDocuments);
-
                     String md5Checksum = "";
                     String filename = "";
                     try {
@@ -124,6 +114,17 @@ public class EvidenceUploadService {
                                 + ") with a checksum of (" + md5Checksum + ")");
                         return false;
                     }
+
+
+                    List<MultipartFile> convertedFiles = fileToPdfConversionService.convert(singletonList(file));
+
+                    Document document = evidenceManagementService.upload(convertedFiles, DM_STORE_USER_ID).getEmbedded().getDocuments().get(0);
+
+                    List<SscsDocument> currentDocuments = draftHearingDocumentExtractor.getDocuments().apply(caseDetails.getData());
+                    ArrayList<SscsDocument> newDocuments = (currentDocuments == null) ? new ArrayList<>() : new ArrayList<>(currentDocuments);
+                    newDocuments.add(new SscsDocument(createNewDocumentDetails(document)));
+
+                    draftHearingDocumentExtractor.setDocuments().accept(caseDetails.getData(), newDocuments);
 
                     SscsCaseData sscsCaseData = caseDetails.getData();
                     Long ccdCaseId = caseDetails.getId();
