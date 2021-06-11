@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.util.List;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
