@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
@@ -95,9 +96,7 @@ public class SubmitAppealService {
             return Optional.of(saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal), idamTokens, forceCreate));
         } catch (FeignException e) {
             if (e.status() == HttpStatus.SC_CONFLICT) {
-                log.error("The case data has been altered outside of this transaction for case with nino {} and idam id {}",
-                        appeal.getAppellant().getNino(),
-                        idamTokens.getUserId());
+                logError(appeal, idamTokens);
                 return Optional.empty();
             } else {
                 throw e;
@@ -128,13 +127,22 @@ public class SubmitAppealService {
         } catch (FeignException e) {
 
             if (e.status() == HttpStatus.SC_CONFLICT) {
-                log.error("The case data has been altered outside of this transaction for case with nino {} and idam id {}",
-                        appeal.getAppellant().getNino(),
-                        idamTokens.getUserId());
+                logError(appeal, idamTokens);
                 return Optional.empty();
             } else {
                 throw e;
             }
+        }
+    }
+
+    private void logError(SyaCaseWrapper appeal, IdamTokens idamTokens) {
+        if (nonNull(appeal.getAppellant().getNino())) {
+            log.error("The case data has been altered outside of this transaction for case with nino {} and idam id {}",
+                    appeal.getAppellant().getNino(),
+                    idamTokens.getUserId());
+        } else {
+            log.error("The case data has been altered outside of this transaction for idam id {}",
+                    idamTokens.getUserId());
         }
     }
 
