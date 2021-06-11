@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.AT_38;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_EVIDENCE_BUNDLE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_RESPONSE;
 
@@ -102,6 +103,23 @@ public class ManageDwpDocumentsAboutToStartTest {
         assertThat(response.getData().getDwpDocuments().size(), is(2));
         assertThat(response.getData().getDwpDocuments().stream()
                 .filter(doc -> doc.getValue().getDocumentType().equals(DWP_EVIDENCE_BUNDLE.getValue())).count(), is(2L));
+    }
+
+    @Test
+    public void willMoveAllDocsFromOldLocationsToDwpCollections() {
+        sscsCaseData.setDwpEvidenceBundleDocument(newDwpResponseDocument(DWP_EVIDENCE_BUNDLE));
+        sscsCaseData.setDwpResponseDocument(newDwpResponseDocument(DWP_RESPONSE));
+        sscsCaseData.setDwpAT38Document(newDwpResponseDocument(AT_38));
+        sscsCaseData.setDwpDocuments(Lists.newArrayList(newDwpDocument(DWP_EVIDENCE_BUNDLE), newDwpDocument(DWP_RESPONSE), newDwpDocument(AT_38)));
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getDwpResponseDocument(), is(nullValue()));
+        assertThat(response.getData().getDwpDocuments().size(), is(6));
+        assertThat(response.getData().getDwpDocuments().stream()
+                .filter(doc -> doc.getValue().getDocumentType().equals(DWP_EVIDENCE_BUNDLE.getValue())).count(), is(2L));
+        assertThat(response.getData().getDwpDocuments().stream()
+                .filter(doc -> doc.getValue().getDocumentType().equals(DWP_RESPONSE.getValue())).count(), is(2L));
+        assertThat(response.getData().getDwpDocuments().stream()
+                .filter(doc -> doc.getValue().getDocumentType().equals(AT_38.getValue())).count(), is(2L));
     }
 
     private DwpDocument newDwpDocument(DwpDocumentType dwpDocumentType) {

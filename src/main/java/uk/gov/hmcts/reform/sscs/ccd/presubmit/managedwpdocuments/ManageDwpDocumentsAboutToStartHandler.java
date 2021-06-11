@@ -3,13 +3,13 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.managedwpdocuments;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-import static org.apache.commons.collections4.CollectionUtils.union;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_EVIDENCE_BUNDLE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_RESPONSE;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +59,7 @@ public class ManageDwpDocumentsAboutToStartHandler extends ResponseEventsAboutTo
     }
 
     private void migrateDwpDocumentsToTheDwpDocumentCollection(SscsCaseData sscsCaseData) {
-        final Collection<DwpDocument> dwpDocumentsToKeepAfterMigration = getDwpDocumentsToKeepAfterMigration(sscsCaseData);
+        final List<DwpDocument> dwpDocumentsToKeepAfterMigration = getDwpDocumentsToKeepAfterMigration(sscsCaseData);
 
         migrateToDwpDocumentsIfTheyExistInTheOldLocations(sscsCaseData);
 
@@ -70,10 +70,10 @@ public class ManageDwpDocumentsAboutToStartHandler extends ResponseEventsAboutTo
         dwpDocumentService.moveDocsToCorrectCollection(sscsCaseData);
     }
 
-    private Collection<DwpDocument> getDwpDocumentsToKeepAfterMigration(SscsCaseData sscsCaseData) {
+    private List<DwpDocument> getDwpDocumentsToKeepAfterMigration(SscsCaseData sscsCaseData) {
         final List<DwpDocument> dwpResponseDocument = keepDwpDocumentIfRemovedFromTheMigrationToTheDwpDocumentsCollection(DWP_RESPONSE, sscsCaseData.getDwpResponseDocument(), sscsCaseData.getDwpDocuments());
         final List<DwpDocument> dwpEvidenceBundle = keepDwpDocumentIfRemovedFromTheMigrationToTheDwpDocumentsCollection(DWP_EVIDENCE_BUNDLE, sscsCaseData.getDwpEvidenceBundleDocument(), sscsCaseData.getDwpDocuments());
-        return union(dwpResponseDocument, dwpEvidenceBundle);
+        return Stream.of(dwpEvidenceBundle, dwpResponseDocument).flatMap(Collection::stream).collect(Collectors.toList());
     }
 
     private void addBackDwpDocumentsIfTheyWereRemovedFromTheMigration(SscsCaseData sscsCaseData, Collection<DwpDocument> dwpDocumentsToKeepAfterMigration) {
