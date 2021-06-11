@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -13,6 +15,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -130,7 +133,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
     @Test
     @Parameters({
-        "informationReceivedForInterlocJudge, awaitingAdminAction, interlocInformationReceivedActionFurtherEvidence",
+        "informationReceivedForInterlocJudge, reviewByJudge, interlocInformationReceivedActionFurtherEvidence",
         "informationReceivedForInterlocTcw, reviewByTcw, interlocInformationReceivedActionFurtherEvidence",
         "sendToInterlocReviewByJudge, reviewByJudge, validSendToInterloc",
         "sendToInterlocReviewByTcw, reviewByTcw, validSendToInterloc"
@@ -151,6 +154,10 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertEquals(interlocReviewState, captor.getValue().getInterlocReviewState());
+
+        if (furtherEvidenceActionSelectedOption.equals("informationReceivedForInterlocJudge")) {
+            assertThat(captor.getValue().getInterlocReferralDate(), is(LocalDate.now().toString()));
+        }
 
         then(ccdService).should(times(1))
             .updateCase(eq(callback.getCaseDetails().getCaseData()), eq(123L), eq(eventType), anyString(),
