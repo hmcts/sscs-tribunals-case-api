@@ -71,7 +71,7 @@ public class IdamConsumerTest {
 
     }
 
-    @Pact(provider = "idam_api", consumer = "sscs_tribunals_case_api")
+    @Pact(provider = "Idam_api", consumer = "sscs_tribunals_case_api")
     public RequestResponsePact executeGetIdamAuthTokenAndGet200(PactDslWithProvider builder) {
 
         Map<String, String> headers = Maps.newHashMap();
@@ -94,7 +94,7 @@ public class IdamConsumerTest {
 
     }
 
-    @Pact(provider = "idam_api", consumer = "sscs_tribunals_case_api")
+    @Pact(provider = "Idam_api", consumer = "sscs_tribunals_case_api")
     public RequestResponsePact executeGetUserDetailsAndGet200(PactDslWithProvider builder) {
 
         Map<String, String> headers = Maps.newHashMap();
