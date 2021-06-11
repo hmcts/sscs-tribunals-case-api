@@ -397,7 +397,7 @@ project.ext {
 pact {
     publish {
         pactDirectory = 'target/pacts'
-        pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://dm-store-aat.service.core-compute-aat.internal'
+        pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
         tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
         version = project.pactVersion
     }
