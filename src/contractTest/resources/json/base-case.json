@@ -1,0 +1,167 @@
+{
+  "caseReference": "SC123/11/11111",
+  "caseCreated": "2005-06-07",
+  "appeal": {
+    "rep": {
+      "name": {
+        "title": "Kimberley Matthews",
+        "lastName": "Doyle",
+        "firstName": "Brian",
+        "middleName": "Madeline Cardenas"
+      },
+      "contact": {
+        "email": "tanesis@gmail.com",
+        "phone": "07982989348",
+        "mobile": "07982989348"
+      },
+      "organisation": "org"
+    },
+    "mrnDetails": {
+      "mrnDate": "2010-05-01"
+    },
+    "appellant": {
+      "name": {
+        "title": "Justine May",
+        "lastName": "Strickland",
+        "firstName": "Leah",
+        "middleName": "Patricia Riggs"
+      },
+      "address": {
+        "line1": "123 Hairy Lane",
+        "line2": "Off Hairy Park",
+        "town": "Hairyfield",
+        "county": "Kent",
+        "postcode": "TN32 6PL"
+      },
+      "identity": {
+        "dob": "1990-02-26",
+        "nino": "AB877533C"
+      },
+      "appointee": {
+        "name": {
+          "title": "Mr",
+          "lastName": "Test",
+          "firstName": "Appointee"
+        },
+        "address": {
+          "line1": "124 Hairy Lane",
+          "line2": "Off Hairy Park",
+          "town": "Hairyfield",
+          "county": "Kent",
+          "postcode": "TS1 1ST"
+        },
+        "contact": {
+          "email": "appointee@test.com",
+          "mobile": "07411222223"
+        },
+        "identity": {
+          "dob": "1995-02-26",
+          "nino": "AB877533B"
+        }
+      },
+      "isAppointee": "Yes",
+      "isAddressSameAsAppointee": "Yes"
+    },
+    "benefitType": {
+      "code": "PIP"
+    },
+    "hearingType": "oral",
+    "hearingOptions": {
+      "wantsToAttend": "Yes",
+      "wantsSupport": "Yes",
+      "languageInterpreter": "Yes",
+      "languages": "Arabic",
+      "arrangements": [
+        "signLanguageInterpreter",
+        "hearingLoop"
+      ],
+      "scheduleHearing": "Yes",
+      "excludeDates": [
+        {
+          "value": {
+            "start": "2018-04-04",
+            "end": "2018-04-04"
+          }
+        },
+        {
+          "value": {
+            "start": "2018-04-05",
+            "end": "2018-04-05"
+          }
+        },
+        {
+          "value": {
+            "start": "2018-04-06",
+            "end": "2018-04-06"
+          }
+        }
+      ],
+      "other": "Yes, this..."
+    },
+    "appealReasons": {
+      "reasons": [
+        {
+          "value": {
+            "reason": "aaaaaaaaaa",
+            "description": "aaaaaaaaaa"
+          }
+        },
+        {
+          "value": {
+            "reason": "bbbbbbbbbb",
+            "description": "bbbbbbbbbb"
+          }
+        },
+        {
+          "value": {
+            "reason": "cccccccccc",
+            "description": "cccccccccc"
+          }
+        }
+      ],
+      "otherReasons": "Another reason"
+    },
+    "signer": "Joe Bloggs"
+  },
+  "subscriptions": {
+    "appellantSubscription": {
+      "wantSmsNotifications": "Yes",
+      "tya": "ew2OCHXOL5",
+      "email": "joe@bloggs.com",
+      "mobile": "07411333333",
+      "subscribeEmail": "Yes",
+      "subscribeSms": "Yes"
+    },
+    "appointeeSubscription": {
+      "wantSmsNotifications": "Yes",
+      "tya": "ew2OCHXOL7",
+      "email": "appointee@test.com",
+      "mobile": "07411333333",
+      "subscribeEmail": "Yes",
+      "subscribeSms": "Yes"
+    },
+    "representativeSubscription": {
+      "wantSmsNotifications": "Yes",
+      "tya": "ew2OCHXOL8",
+      "email": "rep@test.com",
+      "mobile": "07411333333",
+      "subscribeEmail": "Yes",
+      "subscribeSms": "Yes"
+    },
+    "jointPartySubscription": {
+      "wantSmsNotifications": "Yes",
+      "tya": "ew2OCHXOL6",
+      "email": "joint@bloggs.com",
+      "mobile": "07411333333",
+      "subscribeEmail": "Yes",
+      "subscribeSms": "Yes"
+    }
+  },
+  "generatedNino": "AB877533C",
+  "generatedSurname": "Bloggs",
+  "generatedEmail": "joe@bloggs.com",
+  "generatedMobile": "07411222222",
+  "evidencePresent": "No",
+  "evidenceHandled": "No",
+  "isAppellantDeceased": "No"
+}
