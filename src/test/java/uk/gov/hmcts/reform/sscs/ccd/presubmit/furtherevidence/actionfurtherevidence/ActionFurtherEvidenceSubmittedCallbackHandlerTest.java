@@ -155,7 +155,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         assertEquals(interlocReviewState, captor.getValue().getInterlocReviewState());
 
-        if (furtherEvidenceActionSelectedOption.equals("informationReceivedForInterlocJudge")) {
+        if (furtherEvidenceActionSelectedOption.equals("informationReceivedForInterlocJudge")
+                || furtherEvidenceActionSelectedOption.equals("informationReceivedForInterlocTcw")) {
             assertThat(captor.getValue().getInterlocReferralDate(), is(LocalDate.now().toString()));
         }
 

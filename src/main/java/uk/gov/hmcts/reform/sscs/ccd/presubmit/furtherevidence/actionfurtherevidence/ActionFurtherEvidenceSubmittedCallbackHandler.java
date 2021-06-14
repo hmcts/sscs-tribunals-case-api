@@ -80,6 +80,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         }
         if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(),
             INFORMATION_RECEIVED_FOR_INTERLOC_TCW)) {
+            caseData.setInterlocReferralDate(LocalDate.now().toString());
             return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
                 REVIEW_BY_TCW.getId(), INFORMATION_RECEIVED_FOR_INTERLOC_TCW,
                 EventType.INTERLOC_INFORMATION_RECEIVED_ACTION_FURTHER_EVIDENCE, "Interloc information received event");
