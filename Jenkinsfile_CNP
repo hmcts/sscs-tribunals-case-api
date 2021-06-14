@@ -6,6 +6,8 @@ properties([
 
 @Library("Infrastructure")
 
+import uk.gov.hmcts.contino.AppPipelineDsl
+
 def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
@@ -56,5 +58,14 @@ withPipeline(type, product, component) {
     enableSlackNotifications('#sscs-tech')
     enableAksStagingDeployment()
     disableLegacyDeployment()
+
+    env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
+    onMaster() {
+        enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
+    }
+    onPR() {
+        enablePactAs([AppPipelineDsl.PactRoles.CONSUMER,
+                      AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK])
+    }
 }
 
