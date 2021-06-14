@@ -8,9 +8,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_EVIDENCE_BUNDLE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_RESPONSE;
 
 import com.google.common.collect.Lists;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import junitparams.JUnitParamsRunner;
@@ -85,19 +87,25 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({
-            "DWP_EDITED_EVIDENCE_BUNDLE, You must upload an edited DWP evidence bundle",
-            "DWP_EDITED_RESPONSE, You must upload an edited DWP response document",
-            "DWP_RESPONSE, DWP response document cannot be empty",
-            "DWP_EVIDENCE_BUNDLE, DWP evidence bundle cannot be empty"
+            "DWP_EVIDENCE_BUNDLE, true, You must upload an edited DWP evidence bundle",
+            "DWP_RESPONSE, true, You must upload an edited DWP response document",
+            "DWP_RESPONSE, false, DWP response document cannot be empty",
+            "DWP_EVIDENCE_BUNDLE, false, DWP evidence bundle cannot be empty"
     })
-    public void shouldHaveErrorWhenDwpDocumentIsNotUploaded(DwpDocumentType documentType, String expectedErrorMessage) {
+    public void shouldHaveErrorWhenDwpDocumentIsNotUploaded(DwpDocumentType documentType, boolean isEdited, String expectedErrorMessage) {
         addMandatoryDwpDocuments();
-        sscsCaseData.setDwpEditedEvidenceReason("phme");
-        addEditedDwpDocuments();
-        sscsCaseData.setDwpDocuments(sscsCaseData.getDwpDocuments().stream()
-                .filter(dwpDocument -> !dwpDocument.getValue().getDocumentType().equals(documentType.getValue()))
-                .collect(Collectors.toList()));
-
+        if (isEdited) {
+            sscsCaseData.setDwpEditedEvidenceReason("phme");
+            addEditedDwpDocuments();
+            Optional<DwpDocument> documentOptional = sscsCaseData.getDwpDocuments().stream()
+                    .filter(dwpDocument -> dwpDocument.getValue().getDocumentType().equals(documentType.getValue()))
+                    .findFirst();
+            documentOptional.ifPresent(document -> document.getValue().setEditedDocumentLink(null));
+        } else {
+            sscsCaseData.setDwpDocuments(sscsCaseData.getDwpDocuments().stream()
+                    .filter(dwpDocument -> !dwpDocument.getValue().getDocumentType().equals(documentType.getValue()))
+                    .collect(Collectors.toList()));
+        }
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
         assertThat(response.getErrors().iterator().next(), is(expectedErrorMessage));
@@ -105,19 +113,23 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({
-            "DWP_EDITED_EVIDENCE_BUNDLE, You must upload an edited DWP evidence bundle",
-            "DWP_EDITED_RESPONSE, You must upload an edited DWP response document",
-            "DWP_RESPONSE, DWP response document cannot be empty",
-            "DWP_EVIDENCE_BUNDLE, DWP evidence bundle cannot be empty"
+            "DWP_EVIDENCE_BUNDLE, true, You must upload an edited DWP evidence bundle",
+            "DWP_RESPONSE, true, You must upload an edited DWP response document",
+            "DWP_RESPONSE, false, DWP response document cannot be empty",
+            "DWP_EVIDENCE_BUNDLE, false, DWP evidence bundle cannot be empty"
     })
-    public void shouldHaveErrorWhenDwpDocumentHasNoDocumentLink(DwpDocumentType documentType, String expectedErrorMessage) {
+    public void shouldHaveErrorWhenDwpDocumentHasNoDocumentLink(DwpDocumentType documentType, boolean isEdited, String expectedErrorMessage) {
         addMandatoryDwpDocuments();
         sscsCaseData.setDwpEditedEvidenceReason("phme");
         addEditedDwpDocuments();
         Optional<DwpDocument> documentOptional = sscsCaseData.getDwpDocuments().stream()
                 .filter(dwpDocument -> dwpDocument.getValue().getDocumentType().equals(documentType.getValue()))
                 .findFirst();
-        documentOptional.ifPresent(document -> document.getValue().setDocumentLink(null));
+        if (isEdited) {
+            documentOptional.ifPresent(document -> document.getValue().setEditedDocumentLink(null));
+        } else {
+            documentOptional.ifPresent(document -> document.getValue().setDocumentLink(null));
+        }
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
@@ -126,20 +138,24 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({
-            "DWP_EDITED_EVIDENCE_BUNDLE, Only one edited DWP evidence bundle should be seen against each case\\, please correct",
-            "DWP_EVIDENCE_BUNDLE, Only one DWP evidence bundle should be seen against each case\\, please correct",
-            "DWP_RESPONSE, Only one DWP response should be seen against each case\\, please correct",
-            "DWP_EDITED_RESPONSE, Only one edited DWP response should be seen against each case\\, please correct"
+            "DWP_EVIDENCE_BUNDLE, true, Only one edited DWP evidence bundle should be seen against each case\\, please correct",
+            "DWP_EVIDENCE_BUNDLE, false, Only one DWP evidence bundle should be seen against each case\\, please correct",
+            "DWP_RESPONSE, false, Only one DWP response should be seen against each case\\, please correct",
+            "DWP_RESPONSE, true, Only one edited DWP response should be seen against each case\\, please correct"
     })
-    public void shouldHaveErrorWhenMoreThanOneEditedDwpResponseDocumentsAreUploaded(DwpDocumentType documentType, String expectedErrorMessage) {
+    public void shouldHaveErrorWhenMoreThanOneEditedDwpResponseDocumentsAreUploaded(DwpDocumentType documentType, boolean isEdited, String expectedErrorMessage) {
         addMandatoryDwpDocuments();
         sscsCaseData.setDwpEditedEvidenceReason("phme");
         addEditedDwpDocuments();
-        sscsCaseData.getDwpDocuments().add(newDwpDocument(documentType));
+        if (isEdited) {
+            sscsCaseData.getDwpDocuments().add(newEditedDwpDocument(documentType));
+        } else {
+            sscsCaseData.getDwpDocuments().add(newDwpDocument(documentType));
+        }
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is(expectedErrorMessage));
+        assertThat(response.getErrors().size(), is(isEdited ? 2 : 1));
+        assertThat(response.getErrors().contains(expectedErrorMessage), is(true));
     }
 
     @Test
@@ -161,8 +177,15 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
     }
 
     private void addEditedDwpDocuments() {
-        sscsCaseData.getDwpDocuments().add(newDwpDocument(DWP_EDITED_RESPONSE));
-        sscsCaseData.getDwpDocuments().add(newDwpDocument(DWP_EDITED_EVIDENCE_BUNDLE));
+        editedDwpDocuments(sscsCaseData.getDwpDocuments(), DWP_RESPONSE);
+        editedDwpDocuments(sscsCaseData.getDwpDocuments(), DWP_EVIDENCE_BUNDLE);
+    }
+
+    private void editedDwpDocuments(List<DwpDocument> dwpDocuments, DwpDocumentType documentType) {
+        dwpDocuments.stream()
+                .filter(doc -> doc.getValue().getDocumentType().equals(documentType.getValue()))
+                .findFirst()
+                .ifPresent(doc -> doc.getValue().setEditedDocumentLink(DocumentLink.builder().documentUrl("docUrl").build()));
     }
 
     private void addMandatoryDwpDocuments() {
@@ -179,5 +202,12 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
                 .build();
     }
 
+    private DwpDocument newEditedDwpDocument(DwpDocumentType dwpDocumentType) {
+        return DwpDocument.builder().value(DwpDocumentDetails.builder()
+                .documentType(dwpDocumentType.getValue())
+                .editedDocumentLink(DocumentLink.builder().documentUrl("docUrl").build())
+                .build())
+                .build();
+    }
 
 }

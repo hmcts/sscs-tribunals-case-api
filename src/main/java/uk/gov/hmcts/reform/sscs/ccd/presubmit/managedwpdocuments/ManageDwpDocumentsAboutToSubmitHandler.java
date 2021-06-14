@@ -109,37 +109,41 @@ public class ManageDwpDocumentsAboutToSubmitHandler extends ResponseEventsAboutT
     }
 
     private void validateDwpEditedResponse(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        Optional<DwpDocument> dwpEditedResponseDocument = getDwpDocument(sscsCaseData, DwpDocumentType.DWP_EDITED_RESPONSE);
+        Optional<DwpDocument> dwpEditedResponseDocument = getEditedDwpDocument(sscsCaseData, DwpDocumentType.DWP_RESPONSE);
 
-        if (isDocumentEmptyOrInvalid(dwpEditedResponseDocument)) {
+        if (isDocumentEmpty(dwpEditedResponseDocument)) {
             preSubmitCallbackResponse.addError("You must upload an edited DWP response document");
         }
     }
 
     private void validateOneDwpEditedResponse(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        final long numberOfDwpEditedResponses = countDwpDocument(sscsCaseData, DwpDocumentType.DWP_EDITED_RESPONSE);
+        final long numberOfDwpEditedResponses = countEditedDwpDocument(sscsCaseData, DwpDocumentType.DWP_RESPONSE);
         if (numberOfDwpEditedResponses > 1) {
             preSubmitCallbackResponse.addError("Only one edited DWP response should be seen against each case, please correct");
         }
     }
 
     private void validateDwpEditedEvidenceBundle(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        Optional<DwpDocument> dwpEditedEvidenceBundleDocument = getDwpDocument(sscsCaseData, DwpDocumentType.DWP_EDITED_EVIDENCE_BUNDLE);
+        Optional<DwpDocument> dwpEditedEvidenceBundleDocument = getEditedDwpDocument(sscsCaseData, DwpDocumentType.DWP_EVIDENCE_BUNDLE);
 
-        if (isDocumentEmptyOrInvalid(dwpEditedEvidenceBundleDocument)) {
+        if (isDocumentEmpty(dwpEditedEvidenceBundleDocument)) {
             preSubmitCallbackResponse.addError("You must upload an edited DWP evidence bundle");
         }
     }
 
     private void validateOneDwpEditedEvidenceBundle(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        final long numberOfDwpEditedEvidenceBundleDocument = countDwpDocument(sscsCaseData, DwpDocumentType.DWP_EDITED_EVIDENCE_BUNDLE);
+        final long numberOfDwpEditedEvidenceBundleDocument = countEditedDwpDocument(sscsCaseData, DwpDocumentType.DWP_EVIDENCE_BUNDLE);
         if (numberOfDwpEditedEvidenceBundleDocument > 1) {
             preSubmitCallbackResponse.addError("Only one edited DWP evidence bundle should be seen against each case, please correct");
         }
     }
 
     private boolean isDocumentEmptyOrInvalid(Optional<DwpDocument> dwpEvidenceBundleDocument) {
-        return dwpEvidenceBundleDocument.isEmpty() || documentHasNoDocumentLink(dwpEvidenceBundleDocument);
+        return isDocumentEmpty(dwpEvidenceBundleDocument) || documentHasNoDocumentLink(dwpEvidenceBundleDocument);
+    }
+
+    private boolean isDocumentEmpty(Optional<DwpDocument> dwpEvidenceBundleDocument) {
+        return dwpEvidenceBundleDocument.isEmpty();
     }
 
     private boolean documentHasNoDocumentLink(Optional<DwpDocument> dwpEditedResponseDocument) {
@@ -161,5 +165,21 @@ public class ManageDwpDocumentsAboutToSubmitHandler extends ResponseEventsAboutT
                 .count();
     }
 
+    @NotNull
+    private Optional<DwpDocument> getEditedDwpDocument(SscsCaseData sscsCaseData, DwpDocumentType dwpDocumentType) {
+        return emptyIfNull(sscsCaseData.getDwpDocuments()).stream()
+                .filter(dwpDocument -> dwpDocument.getValue().getDocumentType() != null)
+                .filter(dwpDocument -> dwpDocument.getValue().getEditedDocumentLink() != null)
+                .filter(dwpDocument -> dwpDocument.getValue().getDocumentType().equals(dwpDocumentType.getValue()))
+                .findFirst();
+    }
+
+    private long countEditedDwpDocument(SscsCaseData sscsCaseData, DwpDocumentType dwpDocumentType) {
+        return emptyIfNull(sscsCaseData.getDwpDocuments()).stream()
+                .filter(dwpDocument -> dwpDocument.getValue().getDocumentType() != null)
+                .filter(dwpDocument -> dwpDocument.getValue().getEditedDocumentLink() != null)
+                .filter(dwpDocument -> dwpDocument.getValue().getDocumentType().equals(dwpDocumentType.getValue()))
+                .count();
+    }
 
 }
