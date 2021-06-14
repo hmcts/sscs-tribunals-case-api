@@ -1,0 +1,340 @@
+{
+  "id": 1516964708848587,
+  "jurisdiction": "SSCS",
+  "state": "appealCreated",
+  "case_type_id": "Benefit",
+  "created_date": "2018-01-26T11:05:08.866",
+  "last_modified": "2018-01-26T11:05:08.87",
+  "security_classification": "PUBLIC",
+  "case_data": {
+    "caseReference": "SC123/11/11111",
+    "caseCreated": "2005-06-07",
+    "appeal": {
+      "rep": {
+        "name": {
+          "title": "Kimberley Matthews",
+          "lastName": "Doyle",
+          "firstName": "Brian",
+          "middleName": "Madeline Cardenas"
+        },
+        "contact": {
+          "email": "tanesis@gmail.com",
+          "phone": "07982989348",
+          "mobile": "07982989348"
+        },
+        "organisation": "org"
+      },
+      "mrnDate": "2010-05-01",
+      "appellant": {
+        "name": {
+          "title": "Justine May",
+          "lastName": "Strickland",
+          "firstName": "Leah",
+          "middleName": "Patricia Riggs"
+        },
+        "address": {
+          "town": "Tempor est exercitationem aliquid sed dolorem eu labore pariatur",
+          "line1": "Sint iusto repudiandae odit duis ea labore mollit lorem quos eligendi",
+          "line2": "Adipisicing aut quaerat earum excepturi nobis in modi dolor minima explicabo Tempore repellendus",
+          "line3": "Id culpa sed mollitia proident praesentium iure beatae sunt dolores nulla neque consequat",
+          "county": "Tenetur atque ut magni sunt perferendis magni voluptate necessitatibus numquam",
+          "country": "Laboriosam nisi sed proident illo accusamus dolor aliqua Exercitationem eum",
+          "postcode": "CM12 0HN"
+        },
+        "contact": {
+          "email": "pyfiho@yahoo.com",
+          "phone": "07982989348",
+          "mobile": "07982989348"
+        },
+        "identity": {
+          "dob": "1992-02-18",
+          "nino": "Aliqua Consequatur Eu autem corrupti id aute non dolore nihil"
+        }
+      },
+      "supporter": {
+        "name": {
+          "title": "Coby Emerson",
+          "lastName": "Browning",
+          "firstName": "Grace",
+          "middleName": "Ulysses Avery"
+        },
+        "contact": {
+          "email": "bujagy@gmail.com",
+          "phone": "07982989348",
+          "mobile": "07982989348"
+        }
+      },
+      "benefitType": {
+        "code": "Adipisicing accusantium quo voluptatem Hic aute laboris aut similique sit atque Nam ex qui eligendi veritatis voluptatem officia",
+        "description": "Et adipisci laudantium explicabo Inventore qui eu dolore velit voluptatem id incidunt sit natus cupiditate commodo"
+      },
+      "hearingType": "paper",
+      "appealReasons": [],
+      "mrnLateReason": "Sit dolores consequatur deleniti doloribus aperiam eu quo expedita",
+      "hearingOptions": {
+        "other": "Et cupiditate necessitatibus cum in laborum Cupiditate maxime Nam voluptas laborum Aspernatur iusto nemo non",
+        "languages": "",
+        "arrangements": [
+          "signLanguageInterpreter",
+          "hearingLoop",
+          "disabledAccess"
+        ],
+        "excludeDates": [],
+        "languageInterpreter": ""
+      },
+      "mrnMissingReason": "Id libero voluptate quidem omnis ut"
+    },
+    "region": "Glasgow"
+  },
+  "data_classification": {
+    "caseReference": "PUBLIC",
+    "caseCreated": "PUBLIC",
+    "appeal": {
+      "value": {
+        "rep": {
+          "value": {
+            "name": {
+              "value": {
+                "title": "PUBLIC",
+                "lastName": "PUBLIC",
+                "firstName": "PUBLIC",
+                "middleName": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            },
+            "contact": {
+              "value": {
+                "email": "PUBLIC",
+                "phone": "PUBLIC",
+                "mobile": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            },
+            "organisation": "PUBLIC"
+          },
+          "classification": "PUBLIC"
+        },
+        "mrnDate": "PUBLIC",
+        "appellant": {
+          "value": {
+            "name": {
+              "value": {
+                "title": "PUBLIC",
+                "lastName": "PUBLIC",
+                "firstName": "PUBLIC",
+                "middleName": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            },
+            "address": {
+              "value": {
+                "town": "PUBLIC",
+                "line1": "PUBLIC",
+                "line2": "PUBLIC",
+                "line3": "PUBLIC",
+                "county": "PUBLIC",
+                "country": "PUBLIC",
+                "postcode": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            },
+            "contact": {
+              "value": {
+                "email": "PUBLIC",
+                "phone": "PUBLIC",
+                "mobile": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            },
+            "identity": {
+              "value": {
+                "dob": "PUBLIC",
+                "nino": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            }
+          },
+          "classification": "PUBLIC"
+        },
+        "supporter": {
+          "value": {
+            "name": {
+              "value": {
+                "title": "PUBLIC",
+                "lastName": "PUBLIC",
+                "firstName": "PUBLIC",
+                "middleName": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            },
+            "contact": {
+              "value": {
+                "email": "PUBLIC",
+                "phone": "PUBLIC",
+                "mobile": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            }
+          },
+          "classification": "PUBLIC"
+        },
+        "benefitType": {
+          "value": {
+            "code": "PUBLIC",
+            "description": "PUBLIC"
+          },
+          "classification": "PUBLIC"
+        },
+        "hearingType": "PUBLIC",
+        "appealReasons": {
+          "value": [],
+          "classification": "PUBLIC"
+        },
+        "mrnLateReason": "PUBLIC",
+        "hearingOptions": {
+          "value": {
+            "other": "PUBLIC",
+            "languages": "PUBLIC",
+            "arrangements": "PUBLIC",
+            "excludeDates": {
+              "value": [],
+              "classification": "PUBLIC"
+            },
+            "languageInterpreter": "PUBLIC"
+          },
+          "classification": "PUBLIC"
+        },
+        "mrnMissingReason": "PUBLIC"
+      },
+      "classification": "PUBLIC"
+    },
+    "region": "PUBLIC"
+  },
+  "after_submit_callback_response": null,
+  "callback_response_status_code": null,
+  "callback_response_status": null,
+  "security_classifications": {
+    "caseReference": "PUBLIC",
+    "caseCreated": "PUBLIC",
+    "appeal": {
+      "value": {
+        "rep": {
+          "value": {
+            "name": {
+              "value": {
+                "title": "PUBLIC",
+                "lastName": "PUBLIC",
+                "firstName": "PUBLIC",
+                "middleName": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            },
+            "contact": {
+              "value": {
+                "email": "PUBLIC",
+                "phone": "PUBLIC",
+                "mobile": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            },
+            "organisation": "PUBLIC"
+          },
+          "classification": "PUBLIC"
+        },
+        "mrnDate": "PUBLIC",
+        "appellant": {
+          "value": {
+            "name": {
+              "value": {
+                "title": "PUBLIC",
+                "lastName": "PUBLIC",
+                "firstName": "PUBLIC",
+                "middleName": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            },
+            "address": {
+              "value": {
+                "town": "PUBLIC",
+                "line1": "PUBLIC",
+                "line2": "PUBLIC",
+                "line3": "PUBLIC",
+                "county": "PUBLIC",
+                "country": "PUBLIC",
+                "postcode": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            },
+            "contact": {
+              "value": {
+                "email": "PUBLIC",
+                "phone": "PUBLIC",
+                "mobile": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            },
+            "identity": {
+              "value": {
+                "dob": "PUBLIC",
+                "nino": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            }
+          },
+          "classification": "PUBLIC"
+        },
+        "supporter": {
+          "value": {
+            "name": {
+              "value": {
+                "title": "PUBLIC",
+                "lastName": "PUBLIC",
+                "firstName": "PUBLIC",
+                "middleName": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            },
+            "contact": {
+              "value": {
+                "email": "PUBLIC",
+                "phone": "PUBLIC",
+                "mobile": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            }
+          },
+          "classification": "PUBLIC"
+        },
+        "benefitType": {
+          "value": {
+            "code": "PUBLIC",
+            "description": "PUBLIC"
+          },
+          "classification": "PUBLIC"
+        },
+        "hearingType": "PUBLIC",
+        "appealReasons": {
+          "value": [],
+          "classification": "PUBLIC"
+        },
+        "mrnLateReason": "PUBLIC",
+        "hearingOptions": {
+          "value": {
+            "other": "PUBLIC",
+            "languages": "PUBLIC",
+            "arrangements": "PUBLIC",
+            "excludeDates": {
+              "value": [],
+              "classification": "PUBLIC"
+            },
+            "languageInterpreter": "PUBLIC"
+          },
+          "classification": "PUBLIC"
+        },
+        "mrnMissingReason": "PUBLIC"
+      },
+      "classification": "PUBLIC"
+    },
+    "region": "PUBLIC"
+  }
+}
