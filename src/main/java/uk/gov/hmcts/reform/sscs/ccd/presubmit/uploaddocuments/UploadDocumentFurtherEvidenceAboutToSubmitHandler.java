@@ -73,7 +73,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
             response.addError("You need to upload PDF documents only");
         } else if (uploadAudioVideoEvidenceEnabled
             && !isFileUploadedAValid(caseData.getDraftSscsFurtherEvidenceDocument())) {
-            response.addError("You need to upload PDF,MP3 or MP4 file only");
+            response.addError("You need to upload PDF, MP3 or MP4 file only");
         }
 
         PdfState pdfState = isPdfReadable(caseData.getDraftSscsFurtherEvidenceDocument());
@@ -132,6 +132,8 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
                     if (!PdfState.OK.equals(pdfState)) {
                         return pdfState;
                     }
+                } else if (DocumentUtil.isFileAMedia(doc.getValue().getDocumentLink())) {
+                    pdfState = PdfState.OK;
                 }
             }
         }
