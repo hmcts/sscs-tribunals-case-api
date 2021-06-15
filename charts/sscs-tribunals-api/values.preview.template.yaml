@@ -2271,7 +2271,7 @@ sscs-evidence-share:
     ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
 
 sscs-tribunals-frontend:
-  enabled: false
+  enabled: true
   nodejs:
     image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
