@@ -77,7 +77,8 @@ public class BundleAudioVideoPdfServiceTest {
                 .documentDateAdded(now.toString())
                 .dateApproved(now.toString())
                 .partyUploaded(UploadParty.APPELLANT)
-                .documentLink(DocumentLink.builder().documentFilename("Myfilename.mp3").documentUrl("dm-store-url/123").documentBinaryUrl("dm-store-url/123/binary").build()).build())
+                .documentLink(DocumentLink.builder().documentFilename("statement.pdf").documentUrl("dm-store-url/123").documentBinaryUrl("dm-store-url/123/binary").build())
+                .avDocumentLink(DocumentLink.builder().documentFilename("Myfilename.mp3").documentUrl("dm-store-url/123").documentBinaryUrl("dm-store-url/123/binary").build()).build())
                 .build());
         caseDetails.getCaseData().setSscsDocument(audioVideoDocuments);
 
@@ -101,7 +102,7 @@ public class BundleAudioVideoPdfServiceTest {
                 .documentDateAdded(now.toString())
                 .dateApproved(now.toString())
                 .partyUploaded(UploadParty.DWP)
-                .documentLink(DocumentLink.builder().documentFilename("Myfilename.mp3").documentUrl("dm-store-url/123").documentBinaryUrl("dm-store-url/123/binary").build()).build())
+                .avDocumentLink(DocumentLink.builder().documentFilename("Myfilename.mp3").documentUrl("dm-store-url/123").documentBinaryUrl("dm-store-url/123/binary").build()).build())
                 .build());
         caseDetails.getCaseData().setDwpDocuments(audioVideoDocuments);
 
@@ -158,24 +159,29 @@ public class BundleAudioVideoPdfServiceTest {
 
     @Test
     public void givenMultipleAudioVideoEvidence_thenOnlyCreateAudioVideoPdfFromMp3OrMp4() {
-        List<SscsDocument> audioVideoDocuments = new ArrayList<>();
-        audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
+        List<SscsDocument> audioVideoSscsDocuments = new ArrayList<>();
+        List<DwpDocument> audioVideoDwpDocuments = new ArrayList<>();
+
+        audioVideoSscsDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentType("videoDocument")
                 .documentDateAdded(now.minusDays(1).toString())
-                .documentLink(DocumentLink.builder().documentFilename("Myfilename1.mp4").documentUrl("dm-store-url/123").documentBinaryUrl("dm-store-url/123/binary").build())
+                .isAvDocumentLinkPresent(YesNo.YES)
+                .documentLink(DocumentLink.builder().documentFilename("statement.pdf").documentUrl("dm-store-url/123").documentBinaryUrl("dm-store-url/123/binary").build())
+                .avDocumentLink(DocumentLink.builder().documentFilename("Myfilename1.mp4").documentUrl("dm-store-url/123").documentBinaryUrl("dm-store-url/123/binary").build())
                 .dateApproved(now.toString())
                 .partyUploaded(UploadParty.APPELLANT).build())
             .build());
 
-        audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
+        audioVideoDwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder()
                 .documentType("audioDocument")
                 .documentDateAdded(now.toString())
-                .documentLink(DocumentLink.builder().documentFilename("Myfilename2.mp3").documentUrl("dm-store-url/456").documentBinaryUrl("dm-store-url/456/binary").build())
+                .isAvDocumentLinkPresent(YesNo.YES)
+                .avDocumentLink(DocumentLink.builder().documentFilename("Myfilename2.mp3").documentUrl("dm-store-url/456").documentBinaryUrl("dm-store-url/456/binary").build())
                 .dateApproved(now.toString())
                 .partyUploaded(UploadParty.DWP).build())
             .build());
 
-        audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
+        audioVideoSscsDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentType("appellantEvidence")
                 .documentDateAdded(now.toString())
                 .documentLink(DocumentLink.builder().documentFilename("I-am-pdf.pdf").documentUrl("dm-store-url/356").documentBinaryUrl("dm-store-url/356/binary").build())
@@ -183,15 +189,18 @@ public class BundleAudioVideoPdfServiceTest {
                 .partyUploaded(UploadParty.APPELLANT).build())
             .build());
 
-        audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
+        audioVideoSscsDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentType("audioDocument")
                 .documentDateAdded(now.toString())
-                .documentLink(DocumentLink.builder().documentFilename("Myfilename4.mp3").documentUrl("dm-store-url/789").documentBinaryUrl("dm-store-url/789/binary").build())
+                .documentLink(DocumentLink.builder().documentFilename("statement.pdf").documentUrl("dm-store-url/123").documentBinaryUrl("dm-store-url/123/binary").build())
+                .isAvDocumentLinkPresent(YesNo.YES)
+                .avDocumentLink(DocumentLink.builder().documentFilename("Myfilename4.mp3").documentUrl("dm-store-url/789").documentBinaryUrl("dm-store-url/789/binary").build())
                 .dateApproved(now.toString())
                 .partyUploaded(UploadParty.REP).build())
             .build());
 
-        caseDetails.getCaseData().setSscsDocument(audioVideoDocuments);
+        caseDetails.getCaseData().setSscsDocument(audioVideoSscsDocuments);
+        caseDetails.getCaseData().setDwpDocuments(audioVideoDwpDocuments);
 
         service.createAudioVideoPdf(caseDetails.getCaseData());
 
@@ -203,16 +212,16 @@ public class BundleAudioVideoPdfServiceTest {
         assertEquals("Myfilename1.mp4|gateway-link/123/binary", capture.getValue().getContent().get(0).getDocumentUrl());
 
         assertEquals("Audio document", capture.getValue().getContent().get(1).getDocumentType());
-        assertEquals("DWP", capture.getValue().getContent().get(1).getUploadParty());
+        assertEquals("Representative", capture.getValue().getContent().get(1).getUploadParty());
         assertEquals(nowFormatted, capture.getValue().getContent().get(1).getDateApproved());
         assertEquals(nowFormatted, capture.getValue().getContent().get(1).getDateAdded());
-        assertEquals("Myfilename2.mp3|gateway-link/456/binary", capture.getValue().getContent().get(1).getDocumentUrl());
+        assertEquals("Myfilename4.mp3|gateway-link/789/binary", capture.getValue().getContent().get(1).getDocumentUrl());
 
         assertEquals("Audio document", capture.getValue().getContent().get(2).getDocumentType());
-        assertEquals("Representative", capture.getValue().getContent().get(2).getUploadParty());
+        assertEquals("DWP", capture.getValue().getContent().get(2).getUploadParty());
         assertEquals(nowFormatted, capture.getValue().getContent().get(2).getDateApproved());
         assertEquals(nowFormatted, capture.getValue().getContent().get(2).getDateAdded());
-        assertEquals("Myfilename4.mp3|gateway-link/789/binary", capture.getValue().getContent().get(2).getDocumentUrl());
+        assertEquals("Myfilename2.mp3|gateway-link/456/binary", capture.getValue().getContent().get(2).getDocumentUrl());
 
         assertEquals("Audio-video-bundle-document.pdf", caseDetails.getCaseData().getAudioVideoEvidenceBundleDocument().getDocumentLink().getDocumentFilename());
 

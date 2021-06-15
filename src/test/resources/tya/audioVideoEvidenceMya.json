@@ -41,12 +41,12 @@
       {
         "name": "appellant 2019-11-03 at 18.49.24.mp3",
         "type": "audioDocument",
-        "url": "http://dm-store:5005/documents/6d3b7351-168e-42f6-90b7-d263000e1864/binary"
+        "url": "6d3b7351-168e-42f6-90b7-d263000e1864"
       },
       {
         "name": "appointee.mp4",
         "type": "videoDocument",
-        "url": "http://dm-store:5005/documents/4efb3e1d-e78a-4f9f-8734-5c0501a6f8e4/binary"
+        "url": "4efb3e1d-e78a-4f9f-8734-5c0501a6f8e4"
       }
     ]
   },
