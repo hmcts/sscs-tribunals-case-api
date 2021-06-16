@@ -2287,6 +2287,7 @@ sscs-tribunals-frontend:
       UPLOAD_EVIDENCE_URL: http://${SERVICE_FQDN}/evidence/upload
       SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+      UV_THREADPOOL_SIZE: 64
     keyVaults:
       sscs:
         secrets:
@@ -2294,6 +2295,15 @@ sscs-tribunals-frontend:
           - postcode-lookup-token
           - AppInsightsInstrumentationKey
           - pcq-token-key
+          - sscs-redis-access-key
+          - sscs-redis-connection-string
 
 redis:
   enabled: true
+  cluster:
+    enabled: false
+    slaveCount: 0
+    usePassword: false
+    master:
+      persistence:
+        enabled: false
