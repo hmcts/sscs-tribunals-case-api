@@ -9,7 +9,8 @@ public enum ElementsDisputed {
     CHILDCARE("childcare", "Childcare"),
     CARE("carerElement", "Carer"),
     CHILD_ELEMENT("childElement", "Child"),
-    CHILD_DISABLED("disabledChildren", "Disabled child addition");
+    CHILD_DISABLED("disabledChildren", "Disabled child addition"),
+    LIMITED_CAPABILITY_FOR_WORK("limitedCapabilityWork", "Limited Capability for Work (WCA)");
 
     private final String key;
     private final String value;

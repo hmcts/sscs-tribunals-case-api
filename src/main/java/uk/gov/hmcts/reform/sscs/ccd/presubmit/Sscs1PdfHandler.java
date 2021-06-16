@@ -30,8 +30,11 @@ public class Sscs1PdfHandler implements PreSubmitCallbackHandler<SscsCaseData> {
         boolean canHandle = callbackType == CallbackType.ABOUT_TO_SUBMIT
                 && (!"Paper".equalsIgnoreCase(callback.getCaseDetails().getCaseData().getAppeal().getReceivedVia())
                 && (callback.getEvent() == EventType.VALID_APPEAL_CREATED
+                || callback.getEvent() == EventType.DRAFT_TO_VALID_APPEAL_CREATED
                 || callback.getEvent() == EventType.NON_COMPLIANT
-                || callback.getEvent() == EventType.INCOMPLETE_APPLICATION_RECEIVED)
+                || callback.getEvent() == EventType.DRAFT_TO_NON_COMPLIANT
+                || callback.getEvent() == EventType.INCOMPLETE_APPLICATION_RECEIVED
+                || callback.getEvent() == EventType.DRAFT_TO_INCOMPLETE_APPLICATION)
                 || callback.getEvent() == EventType.CREATE_APPEAL_PDF);
         return canHandle;
     }
@@ -48,7 +51,11 @@ public class Sscs1PdfHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
-        createAppealPdf(caseData);
+        if (caseData.getCaseCreated() == null) {
+            sscsCaseDataPreSubmitCallbackResponse.addError("The Case Created Date must be set to generate the SSCS1");
+        } else {
+            createAppealPdf(caseData);
+        }
 
         return sscsCaseDataPreSubmitCallbackResponse;
     }

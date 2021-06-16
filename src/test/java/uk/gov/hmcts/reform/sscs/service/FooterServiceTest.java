@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.service.SubmitAppealService.DM_STORE_USER_ID;
 
 import java.io.IOException;
@@ -26,7 +28,18 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState;
 import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
 
 @RunWith(JUnitParamsRunner.class)
@@ -46,9 +59,12 @@ public class FooterServiceTest {
     @Captor
     private ArgumentCaptor<String> stringCaptor;
 
-    @Mock private UploadResponse uploadResponse;
-    @Mock private UploadResponse.Embedded uploadResponseEmbedded;
-    @Mock private List<uk.gov.hmcts.reform.document.domain.Document> uploadedDocuments;
+    @Mock
+    private UploadResponse uploadResponse;
+    @Mock
+    private UploadResponse.Embedded uploadResponseEmbedded;
+    @Mock
+    private List<uk.gov.hmcts.reform.document.domain.Document> uploadedDocuments;
     private uk.gov.hmcts.reform.document.domain.Document uploadedDocument = new uk.gov.hmcts.reform.document.domain.Document();
 
     private SscsCaseData sscsCaseData;
@@ -108,7 +124,7 @@ public class FooterServiceTest {
         String now = LocalDate.now().toString();
 
         footerService.createFooterAndAddDocToCase(DocumentLink.builder().documentUrl("MyUrl").build(),
-                sscsCaseData, DocumentType.DIRECTION_NOTICE, now, null, null);
+                sscsCaseData, DocumentType.DIRECTION_NOTICE, now, null, null, null);
 
         assertEquals(2, sscsCaseData.getSscsDocument().size());
         SscsDocumentDetails footerDoc = sscsCaseData.getSscsDocument().get(0).getValue();
@@ -131,13 +147,40 @@ public class FooterServiceTest {
         when(pdfWatermarker.shrinkAndWatermarkPdf(any(), stringCaptor.capture(), stringCaptor.capture())).thenReturn(new byte[]{});
 
         footerService.createFooterAndAddDocToCase(DocumentLink.builder().documentUrl("MyUrl").build(),
-                sscsCaseData, DocumentType.DIRECTION_NOTICE, LocalDate.now().toString(), LocalDate.now().minusDays(1), "overriden.pdf");
+                sscsCaseData, DocumentType.DIRECTION_NOTICE, LocalDate.now().toString(), LocalDate.now().minusDays(1), "overriden.pdf", null);
 
         assertEquals(2, sscsCaseData.getSscsDocument().size());
         SscsDocumentDetails footerDoc = sscsCaseData.getSscsDocument().get(0).getValue();
         assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), footerDoc.getDocumentType());
         assertEquals("overriden.pdf", footerDoc.getDocumentFileName());
         assertEquals(LocalDate.now().minusDays(1).toString(), footerDoc.getDocumentDateAdded());
+        assertEquals(expectedDocumentUrl, footerDoc.getDocumentLink().getDocumentUrl());
+        verify(evidenceManagementService).upload(any(), eq(DM_STORE_USER_ID));
+        assertEquals("Directions Notice", stringCaptor.getAllValues().get(0));
+        assertEquals("Addition A", stringCaptor.getAllValues().get(1));
+    }
+
+
+    @Test
+    public void givenADocumentWithTranslationStatus_thenAddTranslationStatusToDocumentDetails() throws Exception {
+        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
+        when(evidenceManagementService.download(any(), anyString())).thenReturn(pdfBytes);
+
+        when(evidenceManagementService.upload(any(), eq(DM_STORE_USER_ID))).thenReturn(uploadResponse);
+
+        when(pdfWatermarker.shrinkAndWatermarkPdf(any(), stringCaptor.capture(), stringCaptor.capture())).thenReturn(new byte[]{});
+
+        String now = LocalDate.now().toString();
+
+        footerService.createFooterAndAddDocToCase(DocumentLink.builder().documentUrl("MyUrl").build(),
+                sscsCaseData, DocumentType.DIRECTION_NOTICE, now, null, null, SscsDocumentTranslationStatus.TRANSLATION_REQUIRED);
+
+        assertEquals(2, sscsCaseData.getSscsDocument().size());
+        SscsDocumentDetails footerDoc = sscsCaseData.getSscsDocument().get(0).getValue();
+        assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), footerDoc.getDocumentType());
+        assertEquals("Addition A - Directions Notice issued on " + now + ".pdf", footerDoc.getDocumentFileName());
+        assertEquals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED, footerDoc.getDocumentTranslationStatus());
+        assertEquals(now, footerDoc.getDocumentDateAdded());
         assertEquals(expectedDocumentUrl, footerDoc.getDocumentLink().getDocumentUrl());
         verify(evidenceManagementService).upload(any(), eq(DM_STORE_USER_ID));
         assertEquals("Directions Notice", stringCaptor.getAllValues().get(0));
@@ -180,9 +223,10 @@ public class FooterServiceTest {
 
         String actual = footerService.getNextBundleAddition(sscsDocuments);
 
-        String expected = currentAppendix.equals("") ? "A" : String.valueOf((char)(currentAppendix.charAt(0) +  1));
+        String expected = currentAppendix.equals("") ? "A" : String.valueOf((char) (currentAppendix.charAt(0) + 1));
         assertEquals(expected, actual);
     }
+
 
     @Test
     @Parameters({"Z", "Z1", "Z9", "Z85", "Z100"})
@@ -230,5 +274,32 @@ public class FooterServiceTest {
         String result = footerService.buildBundleAdditionFileName("A", "I am the right text");
 
         assertEquals("Addition A - I am the right text.pdf", result);
+    }
+
+    @Test
+    public void isReadablePdfReturnTrueForReadablePdf() throws Exception {
+        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
+        when(evidenceManagementService.download(any(), anyString())).thenReturn(pdfBytes);
+
+        PdfState result = footerService.isReadablePdf("url.pdf");
+        assertEquals(PdfState.OK, result);
+    }
+
+    @Test
+    public void isReadablePdfReturnFalseForGarbledBytes() {
+        byte[] pdfBytes = new byte[0];
+        when(evidenceManagementService.download(any(), anyString())).thenReturn(pdfBytes);
+
+        PdfState result = footerService.isReadablePdf("url.pdf");
+        assertEquals(PdfState.UNREADABLE, result);
+    }
+
+    @Test
+    public void isReadablePdfReturnFalseForPasswordProtectedPdf() throws Exception {
+        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/test-protected.pdf"));
+        when(evidenceManagementService.download(any(), anyString())).thenReturn(pdfBytes);
+
+        PdfState result = footerService.isReadablePdf("url.pdf");
+        assertEquals(PdfState.PASSWORD_ENCRYPTED, result);
     }
 }

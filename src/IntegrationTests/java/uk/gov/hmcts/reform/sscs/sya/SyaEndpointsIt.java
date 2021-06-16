@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.sya;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -13,9 +14,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.time.LocalDate;
 import java.util.*;
 import javax.mail.Session;
 import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -36,7 +39,9 @@ import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.Classification;
@@ -44,16 +49,17 @@ import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
+import uk.gov.hmcts.reform.sscs.callback.AbstractEventIt;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
-import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.idam.Authorize;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
-@RunWith(JUnitParamsRunner.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_it.properties")
 @AutoConfigureMockMvc
-public class SyaEndpointsIt {
+@RunWith(JUnitParamsRunner.class)
+public class SyaEndpointsIt extends AbstractEventIt {
 
     // being: it needed to run springRunner and junitParamsRunner
     @ClassRule
@@ -99,13 +105,12 @@ public class SyaEndpointsIt {
     @Value("${appellant.appeal.html.template.path}")
     private String templateName;
 
-    private SyaCaseWrapper caseWrapper;
+    @Captor
+    private ArgumentCaptor<CaseDataContent> caseDataCaptor;
 
     @Before
     public void setup() throws IOException {
         mapper = new ObjectMapper().registerModule(new JavaTimeModule());
-
-        caseWrapper = getCaseWrapper();
 
         given(pdfServiceClient.generateFromHtml(eq(getTemplate()), captor.capture()))
             .willReturn(PDF.getBytes());
@@ -139,10 +144,10 @@ public class SyaEndpointsIt {
     }
 
     @Test
-    public void givenAValidAppeal_createAppealCreatedCase() throws Exception {
+    public void givenAValidAppeal_createValidAppealCreatedCase() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
-        given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.emptyList());
+        given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
 
         mockMvc.perform(post("/appeals")
             .contentType(MediaType.APPLICATION_JSON)
@@ -154,10 +159,33 @@ public class SyaEndpointsIt {
     }
 
     @Test
-    public void givenAValidAppealWithNoMrnDate_createIncompleteAppealCase() throws Exception {
+    public void givenAValidAppealFromDraft_updateDraftToValidAppealCreatedCase() throws Exception {
+        Map<String, Object> appeal = new HashMap<>();
+        appeal.put("mrnDetails", Collections.singletonMap("mrnDate", LocalDate.now().toString()));
+        appeal.put("appellant", Collections.singletonMap("identity",  Collections.singletonMap("nino", "BB000000B")));
+        appeal.put("benefitType", Collections.singletonMap("code", "PIP"));
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("appeal", appeal);
+
+        given(ccdClient.readForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(1234567890L).data(data).build());
+
+        given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
+
+        mockMvc.perform(post("/appeals")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(getCase("json/sya_with_ccdId.json")))
+                .andExpect(status().isCreated());
+
+        verify(ccdClient).startEvent(any(), eq(1234567890L), eq(DRAFT_TO_VALID_APPEAL_CREATED.getCcdType()));
+        verify(ccdClient).submitEventForCaseworker(any(), eq(1234567890L), any());
+    }
+
+    @Test
+    public void givenAValidAppealWithNoMrnDate_createIncompleteCase() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
-        given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.emptyList());
+        given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
 
         mockMvc.perform(post("/appeals")
             .contentType(MediaType.APPLICATION_JSON)
@@ -170,10 +198,33 @@ public class SyaEndpointsIt {
     }
 
     @Test
-    public void givenAValidAppealWithMrnDateMoreThan13MonthsAgo_createNonCompliantAppealCase() throws Exception {
+    public void givenAValidAppealWithNoMrnDateFromDraft_updateDraftToIncompleteCase() throws Exception {
+        Map<String, Object> appeal = new HashMap<>();
+        appeal.put("mrnDetails", Collections.singletonMap("mrnDate", null));
+        appeal.put("appellant", Collections.singletonMap("identity",  Collections.singletonMap("nino", "BB000000B")));
+        appeal.put("benefitType", Collections.singletonMap("code", "PIP"));
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("appeal", appeal);
+
+        given(ccdClient.readForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(1234567890L).data(data).build());
+
+        given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
+
+        mockMvc.perform(post("/appeals")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(getCase("json/sya_with_ccdId_noMrnDate.json")))
+                .andExpect(status().isCreated());
+
+        verify(ccdClient).startEvent(any(), eq(1234567890L), eq(DRAFT_TO_INCOMPLETE_APPLICATION.getCcdType()));
+        verify(ccdClient).submitEventForCaseworker(any(), eq(1234567890L), any());
+    }
+
+    @Test
+    public void givenAValidAppealWithMrnDateMoreThan13MonthsAgo_createNonCompliantCase() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
-        given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.emptyList());
+        given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
 
         mockMvc.perform(post("/appeals")
             .contentType(MediaType.APPLICATION_JSON)
@@ -186,10 +237,33 @@ public class SyaEndpointsIt {
     }
 
     @Test
+    public void givenAValidAppealWithMrnDateMoreThan13MonthsAgoFromDraft_updateDraftToNonCompliantCase() throws Exception {
+        Map<String, Object> appeal = new HashMap<>();
+        appeal.put("mrnDetails", Collections.singletonMap("mrnDate", LocalDate.now().minusMonths(13).minusDays(1).toString()));
+        appeal.put("appellant", Collections.singletonMap("identity",  Collections.singletonMap("nino", "BB000000B")));
+        appeal.put("benefitType", Collections.singletonMap("code", "PIP"));
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("appeal", appeal);
+
+        given(ccdClient.readForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(1234567890L).data(data).build());
+
+        given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
+
+        mockMvc.perform(post("/appeals")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(getCase("json/sya_with_ccdId_mrnDateMoreThan13Months.json")))
+                .andExpect(status().isCreated());
+
+        verify(ccdClient).startEvent(any(), eq(1234567890L), eq(DRAFT_TO_NON_COMPLIANT.getCcdType()));
+        verify(ccdClient).submitEventForCaseworker(any(), eq(1234567890L), any());
+    }
+
+    @Test
     public void shouldNotAddDuplicateCaseToCcdAndShouldNotGeneratePdf() throws Exception {
         CaseDetails caseDetails = CaseDetails.builder().id(1L).data(new HashMap<>()).build();
 
-        given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.singletonList(caseDetails));
+        given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.singletonList(caseDetails)).build());
 
         mockMvc.perform(post("/appeals")
             .contentType(MediaType.APPLICATION_JSON))
@@ -197,6 +271,34 @@ public class SyaEndpointsIt {
 
         verify(pdfServiceClient, never()).generateFromHtml(eq(getTemplate()), anyMap());
         verify(ccdClient, never()).submitForCaseworker(any(), any());
+    }
+
+    @Test
+    @Parameters({"PIP, DWP PIP (1), Newcastle",
+            "ESA, Inverness DRT, Inverness DRT",
+            "UC,, Universal Credit",
+            "ESA, Coatbridge Benefit Centre,Coatbridge Benefit Centre",
+            "DLA, Disability Benefit Centre 4, DLA Child/Adult",
+            "carersAllowance,, Carers Allowance",
+            "attendanceAllowance, The Pension Service 11, Attendance Allowance",
+            "bereavementBenefit,, Bereavement Benefit"})
+    public void givenAValidAppealForBenefitType_createValidAppealCreatedCaseWithDwpRegionalCentre(String benefitTypeCode, String dwpIssuingOffice, String expectedDwpRegionalCentre) throws Exception {
+        given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
+
+        given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
+
+        setJsonAndReplace("json/sya_with_benefit_type.json", Arrays.asList("BENEFIT_TYPE", "ISSUING_OFFICE"), Arrays.asList(benefitTypeCode, dwpIssuingOffice));
+
+        mockMvc.perform(post("/appeals")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isCreated());
+
+        verify(ccdClient).startCaseForCaseworker(any(), eq(VALID_APPEAL_CREATED.getCcdType()));
+        verify(ccdClient).submitForCaseworker(any(), caseDataCaptor.capture());
+
+        assertEquals(benefitTypeCode, ((SscsCaseData) caseDataCaptor.getValue().getData()).getAppeal().getBenefitType().getCode());
+        assertEquals(expectedDwpRegionalCentre, ((SscsCaseData) caseDataCaptor.getValue().getData()).getDwpRegionalCentre());
     }
 
     private byte[] getTemplate() throws IOException {
@@ -212,12 +314,6 @@ public class SyaEndpointsIt {
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
-    }
-
-    private SyaCaseWrapper getCaseWrapper() throws IOException {
-        String syaCaseJson = "json/sya.json";
-        URL resource = getClass().getClassLoader().getResource(syaCaseJson);
-        return mapper.readValue(resource, SyaCaseWrapper.class);
     }
 
 }

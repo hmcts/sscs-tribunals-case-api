@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish.IsScottishHandler;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 @Component
@@ -22,12 +24,15 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final AssociatedCaseLinkHelper associatedCaseLinkHelper;
+    private final AirLookupService airLookupService;
 
     @Autowired
     CaseUpdatedAboutToSubmitHandler(RegionalProcessingCenterService regionalProcessingCenterService,
-                                    AssociatedCaseLinkHelper associatedCaseLinkHelper) {
+                                    AssociatedCaseLinkHelper associatedCaseLinkHelper,
+                                    AirLookupService airLookupService) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
+        this.airLookupService = airLookupService;
     }
 
     @Override
@@ -49,11 +54,11 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         final Optional<CaseDetails<SscsCaseData>> caseDetailsBefore = callback.getCaseDetailsBefore();
         final SscsCaseData sscsCaseData = associatedCaseLinkHelper.linkCaseByNino(caseDetails.getCaseData(), caseDetailsBefore);
 
-        setCaseCode(sscsCaseData);
+        setCaseCode(sscsCaseData, callback.getEvent());
 
         if (sscsCaseData.getAppeal().getAppellant() != null
                 && sscsCaseData.getAppeal().getAppellant().getAddress() != null
-                && sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode() != null) {
+                && isNotBlank(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode())) {
 
             RegionalProcessingCenter newRpc =
                     regionalProcessingCenterService.getByPostcode(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
@@ -66,11 +71,11 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                 sscsCaseData.setRegion(newRpc.getName());
             }
 
+            updateProcessingVenueIfRequired(caseDetails);
+
         }
 
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-
-        return preSubmitCallbackResponse;
+        return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
     public void maybeChangeIsScottish(RegionalProcessingCenter oldRpc, RegionalProcessingCenter newRpc, SscsCaseData caseData) {
@@ -79,4 +84,26 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             caseData.setIsScottishCase(isScottishCase);
         }
     }
+
+    private void updateProcessingVenueIfRequired(CaseDetails<SscsCaseData> caseDetails) {
+
+        SscsCaseData sscsCaseData = caseDetails.getCaseData();
+
+        String postCode = "yes".equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())
+            && null != sscsCaseData.getAppeal().getAppellant().getAppointee()
+            && null != sscsCaseData.getAppeal().getAppellant().getAppointee().getAddress()
+            && null != sscsCaseData.getAppeal().getAppellant().getAppointee().getAddress().getPostcode()
+                ? sscsCaseData.getAppeal().getAppellant().getAppointee().getAddress().getPostcode()
+                : sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
+
+        String venue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
+
+        if (venue != null && !venue.equalsIgnoreCase(sscsCaseData.getProcessingVenue())) {
+            log.info("Case id: {} - setting venue name to {} from {}", caseDetails.getId(), venue, sscsCaseData.getProcessingVenue());
+
+            sscsCaseData.setProcessingVenue(venue);
+        }
+
+    }
+
 }

@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
-import java.util.Objects;
+import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
+
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -17,7 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 @Slf4j
 public class MidEventValidationHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private Validator validator;
+    private final Validator validator;
 
     @Autowired
     public MidEventValidationHandler(Validator validator) {
@@ -27,9 +29,10 @@ public class MidEventValidationHandler implements PreSubmitCallbackHandler<SscsC
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.MID_EVENT
-            && (callback.getEvent() == EventType.NOT_LISTABLE || callback.getEvent() == EventType.UPDATE_NOT_LISTABLE)
-            && Objects.nonNull(callback.getCaseDetails())
-            && Objects.nonNull(callback.getCaseDetails().getCaseData());
+            && (callback.getEvent() == EventType.NOT_LISTABLE
+                || callback.getEvent() == EventType.UPDATE_NOT_LISTABLE)
+            && nonNull(callback.getCaseDetails())
+            && nonNull(callback.getCaseDetails().getCaseData());
     }
 
     @Override
@@ -42,12 +45,28 @@ public class MidEventValidationHandler implements PreSubmitCallbackHandler<SscsC
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        Set<ConstraintViolation<SscsCaseData>> violations = validator.validate(sscsCaseData);
-        for (ConstraintViolation<SscsCaseData> violation : violations) {
-            preSubmitCallbackResponse.addError(violation.getMessage());
-        }
+        validateSscsCaseDataConstraints(sscsCaseData, preSubmitCallbackResponse);
 
+        validateDirectionDueDateIsInTheFuture(sscsCaseData, preSubmitCallbackResponse);
         return preSubmitCallbackResponse;
+    }
+
+    private void validateSscsCaseDataConstraints(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        Set<ConstraintViolation<SscsCaseData>> violations = validator.validate(sscsCaseData);
+        violations.stream()
+                .map(ConstraintViolation::getMessage)
+                .forEach(preSubmitCallbackResponse::addError);
+    }
+
+    private void validateDirectionDueDateIsInTheFuture(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        validateDirectionDueDateMustBeInTheFuture(preSubmitCallbackResponse, sscsCaseData.getUpdateNotListableDueDate());
+        validateDirectionDueDateMustBeInTheFuture(preSubmitCallbackResponse, sscsCaseData.getNotListableDueDate());
+    }
+
+    private void validateDirectionDueDateMustBeInTheFuture(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, String directionsDueDate) {
+        if (nonNull(directionsDueDate) && !isDateInTheFuture(directionsDueDate)) {
+            preSubmitCallbackResponse.addError("Directions due date must be in the future");
+        }
     }
 
 }

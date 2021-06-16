@@ -4,7 +4,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import java.time.LocalDate;
@@ -38,7 +38,7 @@ public class InterlocServiceHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         handler = new InterlocServiceHandler();
 
         sscsCaseData = SscsCaseData.builder().directionDueDate("01/02/2020").build();
@@ -126,6 +126,27 @@ public class InterlocServiceHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getInterlocReviewState(), is(expectedInterlocReviewState));
+        assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now().toString()));
+        assertNull(response.getData().getDirectionDueDate());
+    }
+
+    @Test
+    @Parameters({
+            "NON_COMPLIANT, reviewByTcw",
+            "NON_COMPLIANT_SEND_TO_INTERLOC, reviewByTcw",
+            "REINSTATE_APPEAL, awaitingAdminAction"
+    })
+    public void givenWelshCaseEvent_thenSetInterlocReviewStateAndSetInterlocReferralDateToExpectedAndClearDirectionDueDate(
+            EventType eventType,
+            String expectedInterlocReviewState) {
+
+        sscsCaseData.setLanguagePreferenceWelsh("Yes");
+        when(callback.getEvent()).thenReturn(eventType);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.WELSH_TRANSLATION.getId()));
+        assertThat(response.getData().getWelshInterlocNextReviewState(), is(expectedInterlocReviewState));
         assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now().toString()));
         assertNull(response.getData().getDirectionDueDate());
     }

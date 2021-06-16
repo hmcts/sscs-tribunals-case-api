@@ -1,0 +1,104 @@
+{
+  "caseId" : "1",
+  "caseReference": "SC123/45/00001",
+  "appeal": {
+    "appellant": {
+      "name": {
+        "title": "Mr",
+        "lastName": "Mock",
+        "firstName": "Jason"
+      }
+    },
+    "benefitType": {
+      "code": "ESA"
+    },
+    "hearingOptions": {
+      "wantsToAttend": "Yes"
+    }
+  },
+  "evidence": {
+    "documents": [
+      {
+        "value": {
+          "dateReceived": "2017-03-10",
+          "description": "1",
+          "evidenceType": "EvidenceType1",
+          "evidenceProvidedBy": "Appellant1"
+        }
+      },
+      {
+        "value": {
+          "dateReceived": "2017-04-12",
+          "description": "1",
+          "evidenceType": "EvidenceType2",
+          "evidenceProvidedBy": "Appellant2"
+        }
+      }
+    ]
+  },
+  "sscsDocument": [
+    {
+      "id": "da136874-a982-4400-b30a-516a771b32b3",
+      "value": {
+        "documentLink": {
+          "document_url": "http://dm-store:5005/documents/dac800d4-1cf2-47c1-a1ef-db91c6ab3412",
+          "document_filename": "Adjournment Notice issued on 21-11-2019.pdf",
+          "document_binary_url": "http://dm-store:5005/documents/dac800d4-1cf2-47c1-a1ef-db91c6ab3412/binary"
+        },
+        "documentType": "adjournmentNotice",
+        "bundleAddition": "C",
+        "documentFileName": "Addition C - Adjournment Notice issued on 21-11-2019.pdf",
+        "documentDateAdded": "2019-11-21"
+      }
+    },
+    {
+      "id": "9d287290-f8a3-45ce-afdc-0bc51f930e61",
+      "value": {
+        "documentLink": {
+          "document_url": "http://dm-store:5005/documents/b502f219-ef46-4778-9aef-4e47d3176e32",
+          "document_filename": "Final Decision issued on 29-11-2019.pdf",
+          "document_binary_url": "http://dm-store:5005/documents/b502f219-ef46-4778-9aef-4e47d3176e32/binary"
+        },
+        "documentType": "finalDecisionNotice",
+        "bundleAddition": "A",
+        "documentFileName": "Addition A - Final Decision Notice issued on 19-11-2019",
+        "documentDateAdded": "2019-11-29"
+      }
+    },
+    {
+      "id": "d2ba0acc-d604-4d22-a382-34ad36e5454d",
+      "value": {
+        "documentLink": {
+          "document_url": "http://dm-store:5005/documents/dbed7988-4ed5-4965-b1b4-50e5582770f3",
+          "document_filename": "Adjournment Notice issued on 20-11-2019.pdf",
+          "document_binary_url": "http://dm-store:5005/documents/dbed7988-4ed5-4965-b1b4-50e5582770f3/binary"
+        },
+        "documentType": "adjournmentNotice",
+        "bundleAddition": "B",
+        "documentFileName": "Addition B - Adjournment Notice issued on 20-11-2019.pdf",
+        "documentDateAdded": "2019-11-20"
+      }
+    }
+  ],
+  "events": [
+    {
+      "value": {
+        "date": "2017-04-10T12:01:47.620",
+        "type": "responseReceived",
+        "description": "Dwp respond"
+      }
+    },
+    {
+      "value": {
+        "date": "2017-03-08T12:01:47.620",
+        "type": "appealReceived",
+        "description": "Appeal received"
+      }
+    }
+  ],
+  "subscriptions": {
+    "appellantSubscription": {
+      "tya": "abcde12345"
+    }
+  }
+}

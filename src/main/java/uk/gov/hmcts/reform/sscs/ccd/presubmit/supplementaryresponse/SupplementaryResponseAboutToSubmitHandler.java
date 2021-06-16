@@ -3,7 +3,11 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.supplementaryresponse;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.collections4.ListUtils.union;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +18,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
 
 @Service
 @Slf4j
@@ -50,9 +56,20 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
         }
 
         if (sscsCaseData.getDwpOtherDoc() != null && sscsCaseData.getDwpOtherDoc().getDocumentLink() != null) {
-            responseDocuments.add(sscsCaseData.getDwpOtherDoc());
+            if (DocumentUtil.isFileAMedia(sscsCaseData.getDwpOtherDoc().getDocumentLink())) {
+                addAudioVideoEvidence(sscsCaseData);
+                if (!REVIEW_BY_JUDGE.getId().equals(sscsCaseData.getInterlocReviewState())) {
+                    sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId());
+                }
+                sscsCaseData.setInterlocReferralReason(REVIEW_AUDIO_VIDEO_EVIDENCE.getId());
+            } else {
+                responseDocuments.add(sscsCaseData.getDwpOtherDoc());
+            }
             sscsCaseData.setDwpOtherDoc(null);
+            sscsCaseData.setRip1Doc(null);
         }
+
+        sscsCaseData.setShowRip1DocPage(null);
 
         if (responseDocuments.size() > 0) {
             sscsCaseData.setScannedDocuments(buildScannedDocsList(sscsCaseData, responseDocuments));
@@ -60,7 +77,25 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
             sscsCaseData.setDwpState("supplementaryResponse");
         }
 
+        setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
         return callbackResponse;
+    }
+
+    private void addAudioVideoEvidence(SscsCaseData sscsCaseData) {
+        AudioVideoEvidence audioVideoEvidence = AudioVideoEvidence.builder()
+                .value(AudioVideoEvidenceDetails.builder()
+                        .documentLink(sscsCaseData.getDwpOtherDoc().getDocumentLink())
+                        .fileName(sscsCaseData.getDwpOtherDoc().getDocumentLink().getDocumentFilename())
+                        .rip1Document(sscsCaseData.getRip1Doc())
+                        .dateAdded(LocalDate.now())
+                        .partyUploaded(UploadParty.DWP)
+                        .build())
+                .build();
+
+        if (sscsCaseData.getAudioVideoEvidence() == null) {
+            sscsCaseData.setAudioVideoEvidence(new ArrayList<>());
+        }
+        sscsCaseData.getAudioVideoEvidence().add(audioVideoEvidence);
     }
 
     private List<ScannedDocument> buildScannedDocsList(SscsCaseData sscsCaseData, List<DwpResponseDocument> responseDocuments) {

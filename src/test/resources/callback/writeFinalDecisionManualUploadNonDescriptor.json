@@ -43,7 +43,7 @@
           }
         },
         "benefitType": {
-          "code": "1325",
+          "code": "BENEFIT_TYPE",
           "description": null
         },
         "hearingOptions": {
@@ -753,7 +753,7 @@
           }
         },
         "benefitType": {
-          "code": "1325",
+          "code": "BENEFIT_TYPE",
           "description": null
         },
         "hearingOptions": {

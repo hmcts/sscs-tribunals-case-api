@@ -23,28 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReason;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReasonDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReasons;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
-import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveContactedDwp;
@@ -337,6 +316,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             )
             .sscsDocument(Collections.emptyList())
             .evidencePresent("no")
+            .ccdCaseId("123456")
             .build();
 
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
@@ -370,6 +350,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("Underpayment", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getWhatYouDisagreeWith());
         assertEquals("I can't think of anything else", actual.getOtherReasonForAppealing().getOtherReasonForAppealing());
         assertEquals("no", actual.getEvidenceProvide().getEvidenceProvide());
+        assertEquals("123456", actual.getCcdCaseId());
         assertNull(actual.getRepresentativeDetails());
     }
 
@@ -1176,6 +1157,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .wantsSupport("No")
                         .build()
                 )
+                .hearingSubtype(new HearingSubtype("yes", "999", null, null, null))
                 .build()
             )
             .evidencePresent("no")
@@ -1185,6 +1167,8 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("yes", actual.getTheHearing().getAttendHearing());
         assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
         assertEquals("no", actual.getHearingSupport().getArrangements());
+        assertEquals("yes", actual.getHearingOptions().getSelectOptions().getTelephone().getRequested());
+        assertEquals("999", actual.getHearingOptions().getSelectOptions().getTelephone().getPhoneNumber());
     }
 
     @Test

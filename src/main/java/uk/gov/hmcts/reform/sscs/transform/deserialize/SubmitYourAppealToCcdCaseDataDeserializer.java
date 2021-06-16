@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CARERS_ALLOWANCE;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.*;
 import static uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator.generateAppealNumber;
 import static uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil.cleanPhoneNumber;
@@ -11,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
@@ -44,9 +46,12 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         String issueCode = isDraft ? null : generateIssueCode();
         String caseCode = isDraft ? null : generateCaseCode(benefitCode, issueCode);
 
+        String ccdCaseId = StringUtils.isEmpty(syaCaseWrapper.getCcdCaseId()) ? null : syaCaseWrapper.getCcdCaseId();
+
         List<SscsDocument> sscsDocuments = getEvidenceDocumentDetails(syaCaseWrapper);
         return SscsCaseData.builder()
                 .caseCreated(LocalDate.now().toString())
+                .isSaveAndReturn(syaCaseWrapper.getIsSaveAndReturn())
                 .appeal(appeal)
                 .subscriptions(getSubscriptions(syaCaseWrapper))
                 .sscsDocument(sscsDocuments.isEmpty() ? Collections.emptyList() : sscsDocuments)
@@ -58,14 +63,19 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                         appeal.getMrnDetails().getDwpIssuingOffice()))
                 .pcqId(syaCaseWrapper.getPcqId())
                 .languagePreferenceWelsh(booleanToYesNo(syaCaseWrapper.getLanguagePreferenceWelsh()))
+                .translationWorkOutstanding(booleanToYesNull(!sscsDocuments.isEmpty()
+                        && syaCaseWrapper.getLanguagePreferenceWelsh() != null
+                        && syaCaseWrapper.getLanguagePreferenceWelsh()))
+                .ccdCaseId(ccdCaseId)
                 .build();
     }
 
     private static String getDwpRegionalCenterGivenDwpIssuingOffice(String benefitTypeCode, String dwpIssuingOffice) {
-        if (dwpIssuingOffice == null) {
+        DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
+
+        if (dwpIssuingOffice == null && ! (CARERS_ALLOWANCE == Benefit.getBenefitByCode(benefitTypeCode))) {
             return null;
         }
-        DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
         return dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(benefitTypeCode, dwpIssuingOffice);
     }
 
@@ -81,6 +91,13 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             return null;
         }
         return flag ? "Yes" : "No";
+    }
+
+    private static String booleanToYesNull(Boolean flag) {
+        if (flag == null) {
+            return null;
+        }
+        return flag ? "Yes" : null;
     }
 
     private static Subscriptions getSubscriptions(SyaCaseWrapper syaCaseWrapper) {
@@ -105,6 +122,8 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
         Representative representative = getRepresentative(syaCaseWrapper);
 
+        HearingSubtype hearingSubtype = getHearingSubType(syaCaseWrapper.getSyaHearingOptions());
+
         return Appeal.builder()
                 .mrnDetails(mrnDetails)
                 .appellant(appellant)
@@ -114,6 +133,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .rep(representative)
                 .signer(syaCaseWrapper.getSignAndSubmit() != null ? syaCaseWrapper.getSignAndSubmit().getSigner() : null)
                 .hearingType(getHearingType(hearingOptions))
+                .hearingSubtype(hearingSubtype)
                 .receivedVia("Online")
                 .build();
     }
@@ -163,22 +183,28 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static String getDwpIssuingOffice(SyaCaseWrapper syaCaseWrapper) {
+        DwpAddressLookupService dwpLookup = new DwpAddressLookupService();
         String benefitType = syaCaseWrapper.getBenefitType().getCode();
-        if (benefitType.equalsIgnoreCase("uc")
-                && (syaCaseWrapper.getMrn() == null
-                || syaCaseWrapper.getMrn().getDwpIssuingOffice() == null)) {
-            return "Universal Credit";
-        } else {
-            if (!mrnIsNotProvided(syaCaseWrapper)) {
-                String dwpIssuingOffice = syaCaseWrapper.getMrn().getDwpIssuingOffice();
-                if (dwpIssuingOffice != null) {
-                    return new DwpAddressLookupService().getDwpMappingByOffice(benefitType, dwpIssuingOffice)
-                            .map(office -> office.getMapping().getCcd())
-                            .orElse(null);
+        String result = null;
+        switch (Benefit.getBenefitByCode(benefitType)) {
+            case UC:
+            case CARERS_ALLOWANCE:
+            case BEREAVEMENT_BENEFIT:
+                result = dwpLookup.getDefaultDwpMappingByBenefitType(benefitType)
+                        .map(office -> office.getMapping().getCcd())
+                        .orElse(null);
+                break;
+            default:
+                if (!mrnIsNotProvided(syaCaseWrapper)) {
+                    String dwpIssuingOffice = syaCaseWrapper.getMrn().getDwpIssuingOffice();
+                    if (dwpIssuingOffice != null) {
+                        result = dwpLookup.getDwpMappingByOffice(benefitType, dwpIssuingOffice)
+                                .map(office -> office.getMapping().getCcd())
+                                .orElse(null);
+                    }
                 }
-            }
-            return null;
         }
+        return result;
     }
 
     private static String getMrnDate(SyaCaseWrapper syaCaseWrapper) {
@@ -355,6 +381,22 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .reasons(appealReasons)
                 .otherReasons(syaReasonsForAppealing.getOtherReasons())
                 .build();
+    }
+
+
+    private static HearingSubtype getHearingSubType(SyaHearingOptions syaHearingOptions) {
+        HearingSubtype.HearingSubtypeBuilder builder = HearingSubtype.builder();
+        if (syaHearingOptions != null && syaHearingOptions.getOptions() != null) {
+            SyaOptions options = syaHearingOptions.getOptions();
+            return HearingSubtype.builder()
+                    .wantsHearingTypeTelephone(options.getHearingTypeTelephone() ? YES : NO)
+                    .hearingTelephoneNumber(getPhoneNumberWithOutSpaces(options.getTelephone()))
+                    .wantsHearingTypeVideo(options.getHearingTypeVideo() ? YES : NO)
+                    .hearingVideoEmail(options.getEmail())
+                    .wantsHearingTypeFaceToFace(options.getHearingTypeFaceToFace() ? YES : NO)
+                    .build();
+        }
+        return builder.build();
     }
 
     private static HearingOptions getHearingOptions(SyaHearingOptions syaHearingOptions) {
@@ -656,12 +698,18 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                                 .documentDateAdded(syaEvidence.getUploadedDate().format(DateTimeFormatter.ISO_DATE))
                                 .documentLink(documentLink)
                                 .documentType("appellantEvidence")
+                                .documentTranslationStatus(getDocumentTranslationStatus(syaCaseWrapper))
                                 .documentComment(syaCaseWrapper.getReasonsForAppealing().getEvidenceDescription())
                                 .build();
                         return SscsDocument.builder().value(sscsDocumentDetails).build();
                     }).collect(Collectors.toList());
         }
         return Collections.emptyList();
+    }
+
+    @Nullable
+    private static SscsDocumentTranslationStatus getDocumentTranslationStatus(SyaCaseWrapper syaCaseWrapper) {
+        return syaCaseWrapper.getLanguagePreferenceWelsh() != null && syaCaseWrapper.getLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
     }
 
     private static String getPhoneNumberWithOutSpaces(String phoneNumber) {

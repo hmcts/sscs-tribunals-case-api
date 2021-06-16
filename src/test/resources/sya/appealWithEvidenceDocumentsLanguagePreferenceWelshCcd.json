@@ -1,0 +1,191 @@
+{
+  "caseCreated" : "${json-unit.ignore}",
+  "benefitCode" : "002",
+  "issueCode" : "DD",
+  "caseCode" : "002DD",
+  "region": "CARDIFF",
+  "regionalProcessingCenter": {
+    "name" : "CARDIFF",
+    "address1" : "HM Courts & Tribunals Service",
+    "address2" : "Social Security & Child Support Appeals",
+    "address3" : "Eastgate House",
+    "address4" : "Newport Road",
+    "city" : "CARDIFF",
+    "postcode" : "CF24 0AB",
+    "phoneNumber" : "0300 123 1142",
+    "faxNumber" : "0870 739 4438",
+    "email": "Cardiff_SYA_Respon@justice.gov.uk"
+  },
+  "appeal": {
+    "mrnDetails": {
+      "dwpIssuingOffice": "DWP PIP (1)",
+      "mrnDate": "2018-02-01",
+      "mrnLateReason": null,
+      "mrnMissingReason": null
+    },
+    "appellant": {
+      "name": {
+        "title": "Mr",
+        "firstName": "Joe",
+        "lastName": "Bloggs"
+      },
+      "address": {
+        "line1": "123 Hairy Lane",
+        "line2": "Off Hairy Park",
+        "town": "Hairyfield",
+        "county": "Kent",
+        "postcode": "TN32 6PL"
+      },
+      "contact": {
+        "email": "joe@bloggs.com",
+        "phone": null,
+        "mobile": "07411222222"
+      },
+      "identity": {
+        "dob": "1990-02-26",
+        "nino": "AB877533C"
+      },
+      "isAppointee": "No",
+      "isAddressSameAsAppointee": "No",
+      "appointee": null
+    },
+    "benefitType": {
+      "code": "PIP",
+      "description": "Personal Independence Payment"
+    },
+    "hearingOptions": {
+      "wantsToAttend": "Yes",
+      "wantsSupport": "Yes",
+      "languageInterpreter": "Yes",
+      "languages": "Telugu",
+      "signLanguageType": "Sign language",
+      "arrangements": [
+        "signLanguageInterpreter",
+        "hearingLoop"
+      ],
+      "scheduleHearing": "Yes",
+      "excludeDates": [
+        {
+          "value": {
+            "start": "2018-04-04",
+            "end": "2018-04-04"
+          }
+        },
+        {
+          "value": {
+            "start": "2018-04-05",
+            "end": "2018-04-05"
+          }
+        },
+        {
+          "value": {
+            "start": "2018-04-06",
+            "end": "2018-04-06"
+          }
+        }
+      ],
+      "other": "Yes, this..."
+    },
+    "appealReasons": {
+      "reasons": [
+        {
+          "value": {
+            "reason": "aaaaaaaaaa",
+            "description": "aaaaaaaaaa"
+          }
+        },
+        {
+          "value": {
+            "reason": "bbbbbbbbbb",
+            "description": "bbbbbbbbbb"
+          }
+        },
+        {
+          "value": {
+            "reason": "cccccccccc",
+            "description": "cccccccccc"
+          }
+        }
+      ],
+      "otherReasons": "Another reason"
+    },
+    "rep": {
+      "hasRepresentative": "Yes",
+      "name": {
+        "title": "Mr",
+        "firstName": "Harry",
+        "lastName": "Potter"
+      },
+      "address": {
+        "line1": "123 Hairy Lane",
+        "line2": "Off Hairy Park",
+        "town": "Town",
+        "county": "County",
+        "postcode": "CM14 4LQ"
+      },
+      "contact": {
+        "email": "harry.potter@wizards.com",
+        "phone": null,
+        "mobile": "07411999999"
+      },
+      "organisation": "HP Ltd"
+    },
+    "signer": "Joe Bloggs",
+    "hearingSubtype": {},
+    "hearingType": "oral",
+    "receivedVia": "Online"
+  },
+  "subscriptions": {
+    "appellantSubscription": {
+      "wantSmsNotifications": "Yes",
+      "tya": null,
+      "email": "joe@bloggs.com",
+      "mobile": "+447411333333",
+      "subscribeEmail": "Yes",
+      "subscribeSms": "Yes",
+      "reason": null,
+      "lastLoggedIntoMya": null
+    },
+    "supporterSubscription": null,
+    "appointeeSubscription": null,
+    "representativeSubscription": {
+      "wantSmsNotifications":"Yes",
+      "tya":null,
+      "email":"harry.potter@wizards.com",
+      "mobile":"+447411999999",
+      "subscribeEmail":"Yes",
+      "subscribeSms":"Yes",
+      "reason":null,
+      "lastLoggedIntoMya": null
+    },
+    "jointPartySubscription": null
+  },
+  "sscsDocument" : [
+    {
+      "value" : {
+        "documentLink" : {
+          "document_url": "http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49"
+        },
+        "documentDateAdded" : "2010-10-25",
+        "documentFileName" : "filename1",
+        "documentType" : "appellantEvidence",
+        "documentTranslationStatus":"translationRequired"
+      }
+    },
+    {
+      "value" : {
+        "documentLink" : {
+          "document_url": "http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49"
+        },
+        "documentDateAdded" : "2010-10-25",
+        "documentFileName" : "filename2",
+        "documentType" : "appellantEvidence",
+        "documentTranslationStatus":"translationRequired"
+      }
+    }
+  ],
+  "evidencePresent" : "Yes",
+  "dwpRegionalCentre": "Newcastle",
+  "languagePreferenceWelsh": "Yes",
+  "translationWorkOutstanding": "Yes"
+}

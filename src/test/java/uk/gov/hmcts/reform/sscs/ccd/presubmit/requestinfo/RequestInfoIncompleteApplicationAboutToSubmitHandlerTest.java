@@ -4,7 +4,7 @@ import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION_INFORMATION_REQUESTED;
@@ -37,7 +37,7 @@ public class RequestInfoIncompleteApplicationAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         handler = new RequestInfoIncompleteApplicationAboutToSubmitHandler();
 
         when(callback.getEvent()).thenReturn(EventType.REQUEST_INFO_INCOMPLETE);
@@ -53,7 +53,7 @@ public class RequestInfoIncompleteApplicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenANonHandleEvidenceEvent_thenReturnFalse() {
+    public void givenANonRequestInfoIncompleteEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
         assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }

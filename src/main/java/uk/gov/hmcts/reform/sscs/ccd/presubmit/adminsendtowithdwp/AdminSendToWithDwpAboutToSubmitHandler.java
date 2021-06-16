@@ -4,17 +4,27 @@ import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 
 @Service
 @Slf4j
 public class AdminSendToWithDwpAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private final int dwpResponseDueDays;
+
+    public AdminSendToWithDwpAboutToSubmitHandler(@Value("${dwp.response.due.days}") int dwpResponseDueDays) {
+        this.dwpResponseDueDays = dwpResponseDueDays;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -35,6 +45,12 @@ public class AdminSendToWithDwpAboutToSubmitHandler implements PreSubmitCallback
 
         log.info("Setting date sent to dwp for case id {} for AdminSendToWithDwpHandler" + callback.getCaseDetails().getId());
         caseData.setDateSentToDwp(LocalDate.now().toString());
+        caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate(dwpResponseDueDays));
+
+        if (InterlocReferralReason.PHME_REQUEST.getId().equals(caseData.getInterlocReferralReason())) {
+            caseData.setInterlocReviewState(InterlocReviewState.NONE.getId());
+            caseData.setInterlocReferralReason(InterlocReferralReason.NONE.getId());
+        }
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 

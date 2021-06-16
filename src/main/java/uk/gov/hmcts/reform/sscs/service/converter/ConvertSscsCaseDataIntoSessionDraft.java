@@ -20,49 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantNino;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionAppointee;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionBenefitType;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionCheckMrn;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionContactDetails;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionCreateAccount;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionDate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionDatesCantAttend;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionDob;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionDwpIssuingOffice;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionDwpIssuingOfficeEsa;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionEnterMobile;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionEvidence;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionEvidenceDescription;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionEvidenceProvide;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionEvidenceUpload;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveContactedDwp;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingArrangement;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingArrangements;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingArrangementsSelection;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingAvailability;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingSupport;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionLanguagePreferenceWelsh;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverOneMonthLate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverThirteenMonthsLate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionName;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionNoMrn;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionOtherReasonForAppealing;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionPcqId;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionPostcodeChecker;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionReasonForAppealing;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionReasonForAppealingItem;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionRepName;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionRepresentative;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionRepresentativeDetails;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionSameAddress;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionSendToNumber;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionSmsConfirmation;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionTextReminders;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionTheHearing;
+import uk.gov.hmcts.reform.sscs.model.draft.*;
 import uk.gov.hmcts.reform.sscs.service.DocumentDownloadService;
 import uk.gov.hmcts.reform.sscs.transform.deserialize.HearingOptionArrangements;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
@@ -80,6 +38,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
         Preconditions.checkNotNull(caseData.getAppeal());
 
         Appeal appeal = caseData.getAppeal();
+
         return SessionDraft.builder()
             .benefitType(buildSessionBenefitType(appeal.getBenefitType()))
             .postcode(buildSessionPostcode())
@@ -114,12 +73,14 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
             .evidenceUpload(buildSscsDocument(caseData))
             .evidenceDescription(buildEvidenceDescription(caseData))
             .theHearing(buildTheHearing(appeal))
+            .hearingOptions(buildHearingOptions(appeal))
             .hearingSupport(buildHearingSupport(appeal))
             .hearingArrangements(buildHearingArrangements(appeal))
             .hearingAvailability(buildHearingAvailability(appeal))
             .datesCantAttend(buildDatesCantAttend(appeal))
             .pcqId(new SessionPcqId(caseData.getPcqId()))
             .languagePreferenceWelsh(buildLanuagePreferenceWelsh(caseData))
+            .ccdCaseId(caseData.getCcdCaseId())
             .build();
     }
 
@@ -185,6 +146,21 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
         }
     }
 
+    private SessionHearingOptions buildHearingOptions(Appeal appeal) {
+        if (appeal.getHearingSubtype() == null) {
+            return null;
+        } else {
+
+            SessionHearingOptionsTelephone telephone = new SessionHearingOptionsTelephone(appeal.getHearingSubtype().getWantsHearingTypeTelephone(), appeal.getHearingSubtype().getHearingTelephoneNumber());
+            SessionHearingOptionsVideo video = new SessionHearingOptionsVideo(appeal.getHearingSubtype().getWantsHearingTypeVideo(), appeal.getHearingSubtype().getHearingVideoEmail());
+            SessionHearingOptionsFaceToFace faceToFace = new SessionHearingOptionsFaceToFace(appeal.getHearingSubtype().getWantsHearingTypeFaceToFace());
+
+            SessionHearingSelectOptions hearingSelectOptions = new SessionHearingSelectOptions(telephone, video, faceToFace);
+            SessionHearingOptions options =  new SessionHearingOptions(hearingSelectOptions);
+            return options;
+        }
+    }
+
     private SessionHearingSupport buildHearingSupport(Appeal appeal) {
         if (!hasHearingOptions(appeal) || appeal.getHearingOptions().getWantsSupport() == null) {
             return null;
@@ -224,6 +200,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
     }
 
     private SessionHearingArrangements buildHearingArrangements(Appeal appeal) {
+
         if (!hasHearingOptions(appeal) || hasNoArrangements(appeal)) {
             return null;
         }
@@ -252,7 +229,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
             appeal.getHearingOptions().getOther(),
             appeal.getHearingOptions().getOther());
 
-        return new SessionHearingArrangements(
+        SessionHearingArrangements arrangements =  new SessionHearingArrangements(
             new SessionHearingArrangementsSelection(
                 languageInterpreter,
                 signLanguage,
@@ -261,6 +238,8 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
                 anythingElse
             )
         );
+
+        return arrangements;
     }
 
     private boolean hasNoArrangements(Appeal appeal) {
@@ -285,7 +264,6 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
         if (!hasHearingOptions(appeal) || StringUtils.isBlank(appeal.getHearingOptions().getScheduleHearing())) {
             return null;
         }
-
         return new SessionHearingAvailability(appeal.getHearingOptions().getScheduleHearing().toLowerCase());
     }
 
@@ -300,6 +278,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
             .stream()
             .map(f -> new SessionDate(f.getValue()))
             .collect(Collectors.toList());
+
         return new SessionDatesCantAttend(dates);
     }
 

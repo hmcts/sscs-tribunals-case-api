@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
 import static org.junit.Assert.assertEquals;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.OriginalSenderItemList.*;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 

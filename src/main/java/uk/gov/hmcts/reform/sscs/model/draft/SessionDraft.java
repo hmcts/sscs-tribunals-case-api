@@ -108,6 +108,9 @@ public class SessionDraft {
     @JsonProperty("TheHearing")
     SessionTheHearing theHearing;
 
+    @JsonProperty("HearingOptions")
+    SessionHearingOptions hearingOptions;
+
     @JsonProperty("HearingSupport")
     SessionHearingSupport hearingSupport;
 
@@ -125,4 +128,7 @@ public class SessionDraft {
 
     @JsonProperty("LanguagePreference")
     SessionLanguagePreferenceWelsh languagePreferenceWelsh;
+
+    @JsonProperty("ccdCaseId")
+    String ccdCaseId;
 }

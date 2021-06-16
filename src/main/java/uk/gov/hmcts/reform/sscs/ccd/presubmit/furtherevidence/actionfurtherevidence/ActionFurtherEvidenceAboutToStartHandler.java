@@ -3,11 +3,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevid
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.OriginalSenderItemList.*;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -45,16 +44,9 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
     private void setFurtherEvidenceActionDropdown(SscsCaseData sscsCaseData) {
         List<DynamicListItem> listOptions = new ArrayList<>();
 
-        populateListWithItems(listOptions, ISSUE_FURTHER_EVIDENCE);
-        populateListWithItems(listOptions, OTHER_DOCUMENT_MANUAL);
-
-        if (StringUtils.isNotBlank(sscsCaseData.getInterlocReviewState())) {
-            populateListWithItems(listOptions, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,
-                INFORMATION_RECEIVED_FOR_INTERLOC_TCW);
-        } else {
-            populateListWithItems(listOptions, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
-                SEND_TO_INTERLOC_REVIEW_BY_TCW);
-        }
+        populateListWithItems(listOptions, ISSUE_FURTHER_EVIDENCE, OTHER_DOCUMENT_MANUAL,
+                INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, INFORMATION_RECEIVED_FOR_INTERLOC_TCW,
+                SEND_TO_INTERLOC_REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_TCW);
 
         sscsCaseData.setFurtherEvidenceAction(new DynamicList(listOptions.get(0), listOptions));
     }
@@ -71,11 +63,15 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
 
         listOptions.add(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
         listOptions.add(new DynamicListItem(DWP.getCode(), DWP.getLabel()));
+        if (sscsCaseData.isThereAJointParty()) {
+            listOptions.add(new DynamicListItem(JOINT_PARTY.getCode(), JOINT_PARTY.getLabel()));
+        }
 
         if (sscsCaseData.getAppeal().getRep() != null
             && equalsIgnoreCase(sscsCaseData.getAppeal().getRep().getHasRepresentative(), "yes")) {
             listOptions.add(new DynamicListItem(REPRESENTATIVE.getCode(), REPRESENTATIVE.getLabel()));
         }
+        listOptions.add(new DynamicListItem(HMCTS.getCode(), HMCTS.getLabel()));
 
         sscsCaseData.setOriginalSender(new DynamicList(listOptions.get(0), listOptions));
 

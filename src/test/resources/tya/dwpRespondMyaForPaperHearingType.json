@@ -1,0 +1,53 @@
+{
+  "appeal": {
+    "caseId" : "1",
+    "caseReference": "SC123/45/00001",
+    "name": "Mr Jason Mock",
+    "surname": "Mock",
+    "appealNumber": "abcde12345",
+    "benefitType": "esa",
+    "hearingType": "paper",
+    "status": "DWP_RESPOND",
+    "hideHearing": true,
+    "latestEvents": [
+      {
+        "evidenceType": "EvidenceType2",
+        "evidenceProvidedBy": "Appellant2",
+        "date": "2017-04-12T01:00:00.000Z",
+        "type": "EVIDENCE_RECEIVED",
+        "contentKey": "status.evidenceReceived"
+      },
+      {
+        "date": "2017-04-10T12:01:47.620Z",
+        "type": "DWP_RESPOND",
+        "contentKey": "status.dwpRespond",
+        "hearingContactDate": "2017-06-05T11:01:47.620Z"
+      }
+    ],
+    "historicalEvents": [
+      {
+        "evidenceType": "EvidenceType1",
+        "evidenceProvidedBy": "Appellant1",
+        "date": "2017-03-10T01:00:00.000Z",
+        "type": "EVIDENCE_RECEIVED",
+        "contentKey": "status.evidenceReceived"
+      },
+      {
+        "date": "2017-03-08T12:01:47.620Z",
+        "type": "APPEAL_RECEIVED",
+        "dwpResponseDate": "2017-04-12T11:01:47.620Z",
+        "contentKey": "status.appealReceived"
+      }
+    ],
+    "regionalProcessingCenter": {
+      "name":"LIVERPOOL",
+      "addressLines":["HM Courts & Tribunals Service","Social Security & Child Support Appeals",
+        "Prudential Buildings","36 Dale Street"],
+      "city":"LIVERPOOL",
+      "postcode":"L2 5UZ",
+      "phoneNumber":"0300 123 1142",
+      "faxNumber":"0870 324 0109"
+    }
+  },
+  "subscriptions":{}
+}

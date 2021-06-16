@@ -8,46 +8,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_DIFFERENT_ADDRESS;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_DIFFERENT_ADDRESS_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.APPELLANT_NO_CONTACT_DETAILS;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.APPELLANT_NO_CONTACT_DETAILS_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.APPELLANT_PHONE_WITHOUT_SPACES_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.APPELLANT_PHONE_WITH_SPACES;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.EVIDENCE_DOCUMENT;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.EVIDENCE_DOCUMENT_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITHOUT_SUPPORT_AND_SCHEDULE_HEARING;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITHOUT_SUPPORT_AND_SCHEDULE_HEARING_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITHOUT_SUPPORT_WITH_SCHEDULE_HEARING;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITHOUT_SUPPORT_WITH_SCHEDULE_HEARING_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITH_SUPPORT_EMPTY;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITH_SUPPORT_EMPTY_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITH_SUPPORT_WITHOUT_SCHEDULE_HEARING;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITH_SUPPORT_WITHOUT_SCHEDULE_HEARING_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.NINO_WITHOUT_SPACES_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.NINO_WITH_SPACES;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WANTS_SUPPORT_WITHOUT_ARRANGEMENTS;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WANTS_SUPPORT_WITHOUT_ARRANGEMENTS_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WANTS_SUPPORT_WITHOUT_SCHEDULE;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WANTS_SUPPORT_WITHOUT_SCHEDULE_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_EMAIL_NOTIFICATION;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_EMAIL_NOTIFICATION_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_HEARING;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_HEARING_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_NOTIFICATION;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_NOTIFICATION_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_REGIONAL_PROCESSING_CENTER;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_REPRESENTATIVE;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_SMS_NOTIFICATION;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_SMS_NOTIFICATION_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_WANTS_SUPPORT;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_WANTS_SUPPORT_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
 import java.util.Collections;
@@ -58,10 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Reason;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
@@ -92,7 +50,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         final Subscription rep = removeTyaNumber(caseData.getSubscriptions().getRepresentativeSubscription());
         final Subscription appellant = removeTyaNumber(caseData.getSubscriptions().getAppellantSubscription());
         final Subscription appointee = removeTyaNumber(caseData.getSubscriptions().getAppointeeSubscription());
-        return caseData.toBuilder().subscriptions(new Subscriptions(appellant, null, rep, appointee)).build();
+        return caseData.toBuilder().subscriptions(new Subscriptions(appellant, null, rep, appointee, null)).build();
     }
 
     @Test
@@ -111,13 +69,18 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         assertJsonEquals(APPELLANT_NO_CONTACT_DETAILS_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
+    @Parameters({"DWP PIP ( 9),PIP,DWP PIP (9)", "null,carersAllowance,Carer’s Allowance Dispute Resolution Team","null,bereavementBenefit,Pensions Dispute Resolution Team"})
     @Test
-    public void syaDwpIssuingOfficeTest() {
+    public void syaDwpIssuingOfficeTest(String issuingOffice, String beneiftCode, String expectedIssuing) {
+
+        String actIssuingOffice = "null".equals(issuingOffice) ? null : issuingOffice;
+
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
-        syaCaseWrapper.getMrn().setDwpIssuingOffice("DWP PIP ( 9)");
+        syaCaseWrapper.getBenefitType().setCode(beneiftCode);
+        syaCaseWrapper.getMrn().setDwpIssuingOffice(actIssuingOffice);
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
             regionalProcessingCenter.getName(), regionalProcessingCenter);
-        assertEquals("DWP PIP (9)", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+        assertEquals(expectedIssuing, caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
     }
 
     @Test
@@ -148,7 +111,9 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         "DWP PIP (1),PIP,Newcastle", "DWP PIP (2),PIP,Glasgow", "DWP PIP (3),PIP,Bellevale", "DWP PIP (4),PIP,Glasgow",
         "DWP PIP (5),PIP,Springburn", "DWP PIP (6),PIP,Blackpool", "DWP PIP (7),PIP,Blackpool", "DWP PIP (8),PIP,Blackpool",
         "DWP PIP (9),PIP,Blackpool", "Inverness DRT,ESA,Inverness DRT","DWP PIP (),PIP,null",
-        "DWP PIP (11),PIP,null", "null,UC,Universal Credit", ",UC,Universal Credit", "null,PIP,null"
+        "DWP PIP (11),PIP,null", "null,UC,Universal Credit", ",UC,Universal Credit", "null,PIP,null",
+        "null,carersAllowance,Carers Allowance", "DWP PIP (5),carersAllowance,Carers Allowance",
+        "null,bereavementBenefit,Bereavement Benefit", ",bereavementBenefit,Bereavement Benefit"
     })
     @Test
     public void givenADwpIssuingOffice_shouldMapToTheDwpRegionalCenter(@Nullable String dwpIssuingOffice,
@@ -299,6 +264,14 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     }
 
     @Test
+    public void syaWithHearingOptions() {
+        SyaCaseWrapper syaCaseWrapper = HEARING_WITH_OPTIONS.getDeserializeMessage();
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
+                regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertJsonEquals(HEARING_WITH_OPTIONS_CCD.getSerializedMessage(), removeTyaNumber(caseData));
+    }
+
+    @Test
     public void syaWithEmptyHearing() {
         SyaCaseWrapper syaCaseWrapper = HEARING_WITH_SUPPORT_EMPTY.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
@@ -312,6 +285,14 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
             regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertJsonEquals(EVIDENCE_DOCUMENT_CCD.getSerializedMessage(), removeTyaNumber(caseData));
+    }
+
+    @Test
+    public void shouldAddEvidenceDocumentDetailsIfPresentLanguagePreferenceWelsh() {
+        SyaCaseWrapper syaCaseWrapper = EVIDENCE_DOCUMENT_LANGUAGE_PREFERENCE_WELSH.getDeserializeMessage();
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
+                regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertJsonEquals(EVIDENCE_DOCUMENT_LANGUAGE_PREFERENCE_WELSH_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
     @Test

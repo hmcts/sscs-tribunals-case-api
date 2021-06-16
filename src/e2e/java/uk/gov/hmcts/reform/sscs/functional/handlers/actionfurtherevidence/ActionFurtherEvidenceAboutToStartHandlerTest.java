@@ -9,7 +9,6 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import org.apache.http.HttpStatus;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -33,16 +32,10 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest extends BaseHandler {
     public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
     @Test
-    @Parameters({
-        ", sendToInterlocReviewByJudge, sendToInterlocReviewByTcw",
-        "anyValue, informationReceivedForInterlocJudge, informationReceivedForInterlocTcw"
-    })
-    public void givenAboutToStartCallback_shouldSetItemsInFurtherActionDropdownMenu(
-        String interlocReviewState, String expectedItem1, String expectedItem2) throws Exception {
+    public void givenAboutToStartCallback_shouldSetItemsInFurtherActionDropdownMenu() throws Exception {
 
         String jsonCallbackForTest = BaseHandler.getJsonCallbackForTest(
             "handlers/actionfurtherevidence/actionFurtherEvidenceAboutToStartCallback.json");
-        jsonCallbackForTest = jsonCallbackForTest.replace("INTERLOC_REVIEW_STATE", interlocReviewState);
 
         RestAssured.given()
             .contentType(ContentType.JSON)
@@ -56,9 +49,11 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest extends BaseHandler {
             .assertThat().body("data.furtherEvidenceAction.value.code", equalTo("issueFurtherEvidence"))
             .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "issueFurtherEvidence")))
             .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "otherDocumentManual")))
-            .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", expectedItem1)))
-            .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", expectedItem2)))
-            .assertThat().body("data.furtherEvidenceAction.list_items", hasSize(4));
+            .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "informationReceivedForInterlocJudge")))
+            .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "informationReceivedForInterlocTcw")))
+            .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "sendToInterlocReviewByJudge")))
+            .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "sendToInterlocReviewByTcw")))
+            .assertThat().body("data.furtherEvidenceAction.list_items", hasSize(6));
 
     }
 }

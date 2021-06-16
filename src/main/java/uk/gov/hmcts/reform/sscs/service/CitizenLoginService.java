@@ -85,18 +85,23 @@ public class CitizenLoginService {
 
         if (caseByAppealNumber != null) {
             log.info(format("Associate case: Found case to assign id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
-            if (postcodeUtil.hasAppellantPostcode(caseByAppealNumber, postcode)) {
-                log.info(format("Associate case: Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] matches postcode", caseByAppealNumber.getId(), tya, email, postcode));
-                if (caseHasSubscriptionWithTyaAndEmail(caseByAppealNumber, tya, email)) {
-                    log.info(format("Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] has subscription", caseByAppealNumber.getId(), tya, email, postcode));
-                    citizenCcdService.addUserToCase(idamService.getIdamTokens(), citizenIdamTokens.getUserId(), caseByAppealNumber.getId());
-                    updateCaseWithLastLoggedIntoMya(email, caseByAppealNumber);
-                    return onlineHearingService.loadHearing(caseByAppealNumber);
+            String appealPostcode = caseByAppealNumber.getData().getAppeal().getAppellant().getAddress().getPostcode();
+            if (appealPostcode != null && !appealPostcode.isEmpty()) {
+                if (postcodeUtil.hasAppellantPostcode(caseByAppealNumber, postcode)) {
+                    log.info(format("Associate case: Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] matches postcode", caseByAppealNumber.getId(), tya, email, postcode));
+                    if (caseHasSubscriptionWithTyaAndEmail(caseByAppealNumber, tya, email)) {
+                        log.info(format("Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] has subscription", caseByAppealNumber.getId(), tya, email, postcode));
+                        citizenCcdService.addUserToCase(idamService.getIdamTokens(), citizenIdamTokens.getUserId(), caseByAppealNumber.getId());
+                        updateCaseWithLastLoggedIntoMya(email, caseByAppealNumber);
+                        return onlineHearingService.loadHearing(caseByAppealNumber);
+                    } else {
+                        log.info(format("Associate case: Subscription does not match id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
+                    }
                 } else {
-                    log.info(format("Associate case: Subscription does not match id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
+                    log.info(format("Associate case: Postcode does not match id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
                 }
             } else {
-                log.info(format("Associate case: Postcode does not match id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
+                log.info(format("Associate case: Found case to assign id [%s], however no appellant post code exists", caseByAppealNumber.getId()));
             }
         } else {
             log.info(format("Associate case: No case found for tya [%s] email [%s] postcode [%s]", tya, email, postcode));
@@ -132,7 +137,8 @@ public class CitizenLoginService {
     private boolean caseHasSubscriptionWithTyaAndEmail(SscsCaseDetails sscsCaseDetails, String tya, String email) {
         Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
 
-        return of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription())
+        return of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription(),
+                subscriptions.getJointPartySubscription())
                 .anyMatch(subscription -> subscription != null && tya.equals(subscription.getTya()) && email.equalsIgnoreCase(subscription.getEmail()));
     }
 

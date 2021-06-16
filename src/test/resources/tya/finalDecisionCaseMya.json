@@ -1,0 +1,70 @@
+{
+  "appeal": {
+    "caseId" : "1",
+    "caseReference": "SC123/45/00001",
+    "name": "Mr Jason Mock",
+    "surname": "Mock",
+    "appealNumber": "abcde12345",
+    "benefitType": "esa",
+    "hearingType": "oral",
+    "hideHearing": false,
+    "status": "DWP_RESPOND",
+    "latestEvents": [
+      {
+        "evidenceType": "EvidenceType2",
+        "evidenceProvidedBy": "Appellant2",
+        "date": "2017-04-12T01:00:00.000Z",
+        "type": "EVIDENCE_RECEIVED",
+        "contentKey": "status.evidenceReceived"
+      },
+      {
+        "date": "2017-04-10T12:01:47.620Z",
+        "type": "DWP_RESPOND",
+        "contentKey": "status.dwpRespond",
+        "hearingContactDate": "2017-06-05T11:01:47.620Z"
+      }
+    ],
+    "historicalEvents": [
+      {
+        "evidenceType": "EvidenceType1",
+        "evidenceProvidedBy": "Appellant1",
+        "date": "2017-03-10T01:00:00.000Z",
+        "type": "EVIDENCE_RECEIVED",
+        "contentKey": "status.evidenceReceived"
+      },
+      {
+        "date": "2017-03-08T12:01:47.620Z",
+        "type": "APPEAL_RECEIVED",
+        "dwpResponseDate": "2017-04-12T11:01:47.620Z",
+        "contentKey": "status.appealReceived"
+      }
+    ],
+    "hearingOutcome": [
+      {
+        "name": "Adjournment Notice issued on 20-11-2019.pdf",
+        "date": "2019-11-20",
+        "url": "dbed7988-4ed5-4965-b1b4-50e5582770f3"
+      },
+      {
+        "name": "Adjournment Notice issued on 21-11-2019.pdf",
+        "date": "2019-11-21",
+        "url": "dac800d4-1cf2-47c1-a1ef-db91c6ab3412"
+      },
+      {
+        "name": "Final Decision issued on 29-11-2019.pdf",
+        "date": "2019-11-29",
+        "url": "b502f219-ef46-4778-9aef-4e47d3176e32"
+      }
+    ],
+    "regionalProcessingCenter": {
+      "name":"LIVERPOOL",
+      "addressLines":["HM Courts & Tribunals Service","Social Security & Child Support Appeals",
+        "Prudential Buildings","36 Dale Street"],
+      "city":"LIVERPOOL",
+      "postcode":"L2 5UZ",
+      "phoneNumber":"0300 123 1142",
+      "faxNumber":"0870 324 0109"
+    }
+  },
+  "subscriptions":{}
+}

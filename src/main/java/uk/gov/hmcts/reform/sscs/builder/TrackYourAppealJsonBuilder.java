@@ -28,19 +28,24 @@ import static uk.gov.hmcts.reform.sscs.model.AppConstants.PAST_HEARING_BOOKED_IN
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.POSTCODE;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.TYPE;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.VENUE_NAME;
-import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.convertLocalDateLocalTimetoUtc;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.DATEFORMATTER;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDateTime;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.service.event.PaperCaseEventFilterUtil;
@@ -52,11 +57,8 @@ public class TrackYourAppealJsonBuilder {
     public static final String ORAL = "oral";
     public static final String YES = "Yes";
     public static final String PAPER = "paper";
-
-    public ObjectNode build(SscsCaseData caseData,
-                            RegionalProcessingCenter regionalProcessingCenter, Long caseId) {
-        return build(caseData, regionalProcessingCenter,caseId, false, null);
-    }
+    public static final String NOT_LISTABLE = "notListable";
+    public static final String DOCUMENT_DATE_FORMAT = "yyyy-MM-dd";
 
     public ObjectNode build(SscsCaseData caseData,
                             RegionalProcessingCenter regionalProcessingCenter, Long caseId, boolean mya, String state) {
@@ -84,7 +86,7 @@ public class TrackYourAppealJsonBuilder {
             PaperCaseEventFilterUtil.removeNonPaperCaseEvents(eventList);
         }
 
-        
+
 
         ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
         caseNode.put("caseId", String.valueOf(caseId));
@@ -93,25 +95,33 @@ public class TrackYourAppealJsonBuilder {
         if (appellantSubscription != null) {
             caseNode.put("appealNumber", appellantSubscription.getTya());
         }
+
+        Map<Event, Hearing> eventHearingMap = buildEventHearingMap(caseData);
+
         if (mya) {
-            log.info("Is MYA case with state {}", state);
+            log.info("Is MYA case {} with state {}", caseId, state);
             List<String> appealReceivedStates = Arrays.asList("incompleteApplication",
                     "incompleteApplicationInformationReqsted", "interlocutoryReviewState", "pendingAppeal");
 
             List<String> withDwpStates = Arrays.asList("appealCreated", "validAppeal", "withDwp");
 
-            List<String> dwpRespondStates = Arrays.asList("readyToList", "responseReceived");
+            List<String> dwpRespondStates = new ArrayList<>(List.of("readyToList", "responseReceived", NOT_LISTABLE));
+            if (getHearingType(caseData).equals(PAPER)) {
+                dwpRespondStates.addAll(List.of("hearing", "outcome"));
+            }
 
             List<String> hearingStates = Arrays.asList("hearing", "outcome");
 
             List<String> closedStates = Arrays.asList("closed",
                     "voidState", "dormantAppealState");
 
+            boolean hearingAdjourned = isHearingAdjourned(eventHearingMap);
+
             if (appealReceivedStates.contains(state)) {
                 caseNode.put("status", "APPEAL_RECEIVED");
             } else if (withDwpStates.contains(state)) {
                 caseNode.put("status", "WITH_DWP");
-            } else if (dwpRespondStates.contains(state)) {
+            } else if (dwpRespondStates.contains(state) || hearingAdjourned) {
                 caseNode.put("status", "DWP_RESPOND");
             } else if (hearingStates.contains(state)) {
                 caseNode.put("status", "HEARING_BOOKED");
@@ -119,6 +129,19 @@ public class TrackYourAppealJsonBuilder {
                 caseNode.put("status", "CLOSED");
             }
 
+            caseNode.put("hideHearing", hearingAdjourned
+                    || NOT_LISTABLE.equalsIgnoreCase(state)
+                    || HearingType.PAPER.getValue().equalsIgnoreCase(caseData.getAppeal().getHearingType()));
+
+            ArrayNode outcomeNode = getHearingOutcome(caseData.getSscsDocument());
+            if (!outcomeNode.isEmpty()) {
+                caseNode.putArray("hearingOutcome").addAll(outcomeNode);
+            }
+
+            ArrayNode avEvidence = buildEvidenceLinks(caseData.getSscsDocument(), caseData.getDwpDocuments());
+            if (!avEvidence.isEmpty()) {
+                caseNode.putArray("audioVideoEvidence").addAll(avEvidence);
+            }
         } else {
             caseNode.put("status", getAppealStatus(caseData.getEvents()));
         }
@@ -137,13 +160,9 @@ public class TrackYourAppealJsonBuilder {
         }
 
         boolean isDigitalCase = isCaseStateReadyToList(caseData);
-
-
         List<Event> latestEvents = buildLatestEvents(caseData.getEvents());
-
-
         Map<Event, Document> eventDocumentMap = buildEventDocumentMap(caseData);
-        Map<Event, Hearing> eventHearingMap = buildEventHearingMap(caseData);
+
         caseNode.set("latestEvents", buildEventArray(latestEvents, eventDocumentMap, eventHearingMap));
         List<Event> historicalEvents = buildHistoricalEvents(caseData.getEvents(), latestEvents);
         if (!historicalEvents.isEmpty()) {
@@ -157,6 +176,85 @@ public class TrackYourAppealJsonBuilder {
         root.set("subscriptions", buildSubscriptions(caseData.getSubscriptions()));
 
         return root;
+    }
+
+    private ArrayNode buildEvidenceLinks(List<SscsDocument> sscsDocuments, List<DwpDocument> dwpDocuments) {
+        ArrayNode avEvidenceNode = JsonNodeFactory.instance.arrayNode();
+
+        if (sscsDocuments != null) {
+            sscsDocuments.stream().filter(filterEvidence()).forEach(createDocumentNode(avEvidenceNode));
+        }
+
+        if (dwpDocuments != null) {
+            dwpDocuments.stream().filter(filterEvidence()).forEach(createDocumentNode(avEvidenceNode));
+        }
+
+        return avEvidenceNode;
+    }
+
+    private Consumer<? super AbstractDocument> createDocumentNode(ArrayNode avEvidenceNode) {
+        return (d) -> {
+            ObjectNode documentNode = JsonNodeFactory.instance.objectNode();
+            documentNode.put("name", d.getValue().getDocumentFileName());
+            documentNode.put("type", d.getValue().getDocumentType());
+            documentNode.put("url", stripUrl(d.getValue().getDocumentLink().getDocumentBinaryUrl()));
+            avEvidenceNode.add(documentNode);
+        };
+    }
+
+    private Predicate<? super AbstractDocument> filterEvidence() {
+        return (d) -> (DocumentType.AUDIO_DOCUMENT.getValue().equalsIgnoreCase(d.getValue().getDocumentType())
+                || DocumentType.VIDEO_DOCUMENT.getValue().equalsIgnoreCase(d.getValue().getDocumentType()));
+    }
+
+    private ArrayNode getHearingOutcome(List<SscsDocument> sscsDocument) {
+        ArrayNode outcomeNode = JsonNodeFactory.instance.arrayNode();
+        if (sscsDocument == null) {
+            return outcomeNode;
+        }
+
+        List<SscsDocumentDetails> outcomeDocs = sscsDocument.stream()
+                .filter(d -> DocumentType.ADJOURNMENT_NOTICE.getValue().equals(d.getValue().getDocumentType())
+                        || DocumentType.FINAL_DECISION_NOTICE.getValue().equals(d.getValue().getDocumentType()))
+                .map(AbstractDocument::getValue)
+                .sorted(createDateAddedComparator())
+                .collect(toList());
+
+        for (SscsDocumentDetails detail : outcomeDocs) {
+            ObjectNode documentNode = JsonNodeFactory.instance.objectNode();
+            documentNode.put("name", detail.getDocumentLink().getDocumentFilename());
+            documentNode.put("date", detail.getDocumentDateAdded());
+            documentNode.put("url", stripUrl(detail.getDocumentLink().getDocumentBinaryUrl()));
+            outcomeNode.add(documentNode);
+        }
+
+        return outcomeNode;
+    }
+
+    protected String stripUrl(String documentBinaryUrl) {
+        if (documentBinaryUrl != null) {
+            int frontIndex = documentBinaryUrl.indexOf("documents") + 10;
+            int backIndex = documentBinaryUrl.indexOf("/binary");
+            if (frontIndex >= 10 && backIndex > 0) {
+                return documentBinaryUrl.substring(frontIndex, backIndex);
+            }
+        }
+        return documentBinaryUrl;
+    }
+
+    private Comparator<? super SscsDocumentDetails> createDateAddedComparator() {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern(DOCUMENT_DATE_FORMAT);
+        return (Comparator<SscsDocumentDetails>) (details1, details2) -> {
+            LocalDate d1 = LocalDate.parse(details1.getDocumentDateAdded(), df);
+            LocalDate d2 = LocalDate.parse(details2.getDocumentDateAdded(), df);
+            return d1.compareTo(d2);
+        };
+    }
+
+    private boolean isHearingAdjourned(Map<Event, Hearing> eventHearingMap) {
+        List<Hearing> hearing = new ArrayList<>(eventHearingMap.values());
+        hearing.sort(Comparator.reverseOrder());
+        return !hearing.isEmpty() && YES.equalsIgnoreCase(hearing.get(0).getValue().getAdjourned());
     }
 
     private ObjectNode getContactNode(SscsCaseData caseData) {
@@ -276,7 +374,7 @@ public class TrackYourAppealJsonBuilder {
         for (Event event : events) {
             ObjectNode eventNode = JsonNodeFactory.instance.objectNode();
 
-            eventNode.put(DATE, getUtcDate((event)));
+            eventNode.put(DATE, getLocalDate((event)));
             eventNode.put(TYPE, getEventType(event).toString());
             eventNode.put(CONTENT_KEY, "status." + getEventType(event).getType());
 
@@ -353,7 +451,7 @@ public class TrackYourAppealJsonBuilder {
                 if (hearing != null) {
                     eventNode.put(POSTCODE, hearing.getValue().getVenue().getAddress().getPostcode());
                     eventNode.put(HEARING_DATETIME,
-                        convertLocalDateLocalTimetoUtc(hearing.getValue().getHearingDate(), hearing.getValue().getTime()));
+                            DATEFORMATTER.format(getLocalDateTime(hearing.getValue().getHearingDate(), hearing.getValue().getTime())));
                     eventNode.put(VENUE_NAME, hearing.getValue().getVenue().getName());
                     eventNode.put(ADDRESS_LINE_1, hearing.getValue().getVenue().getAddress().getLine1());
                     eventNode.put(ADDRESS_LINE_2, hearing.getValue().getVenue().getAddress().getLine2());
@@ -386,6 +484,10 @@ public class TrackYourAppealJsonBuilder {
 
     private String getUtcDate(Event event) {
         return formatDateTime(parse(event.getValue().getDate()));
+    }
+
+    private String getLocalDate(Event event) {
+        return DATEFORMATTER.format(parse(event.getValue().getDate()));
     }
 
     private String getCalculatedDate(Event event, int days, boolean isDays) {

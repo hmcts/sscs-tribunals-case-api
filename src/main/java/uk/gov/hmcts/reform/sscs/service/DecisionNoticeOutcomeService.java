@@ -3,86 +3,47 @@ package uk.gov.hmcts.reform.sscs.service;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.DECISION_IN_FAVOUR_OF_APPELLANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.DECISION_UPHELD;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
-import uk.gov.hmcts.reform.sscs.domain.wrapper.ComparedRate;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition;
 
 @Slf4j
-@Service
-public class DecisionNoticeOutcomeService {
+public abstract class DecisionNoticeOutcomeService {
 
-    public Outcome determineOutcome(SscsCaseData sscsCaseData) {
+    private String benefitType;
+    protected DecisionNoticeQuestionService questionService;
 
-        if (sscsCaseData.getWriteFinalDecisionIsDescriptorFlow() == null) {
-            // We need at least this flag to be set in order to determine outcome
-            return null;
-        } else {
-            if (sscsCaseData.isDailyLivingAndOrMobilityDecision()) {
-                if ("yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionGenerateNotice())) {
-                    // If we are generating the notice we use the daily living/mobility descriptors
-                    // to determine outcome
-                    return determineGenerateNoticeDailyLivingOrMobilityFlowOutcome(sscsCaseData);
-                } else {
-                    // If we are not generating the notice we use an explicitly set outcome
-                    return useExplicitySetOutcome(sscsCaseData);
-                }
-            } else {
-                // If we are in the non-descriptor flow we use an explicitly set outcome.
-                return useExplicitySetOutcome(sscsCaseData);
-            }
-        }
+    protected DecisionNoticeOutcomeService(String benefitType, DecisionNoticeQuestionService questionService) {
+        this.benefitType = benefitType;
+        this.questionService = questionService;
     }
 
-    private Outcome determineGenerateNoticeDailyLivingOrMobilityFlowOutcome(SscsCaseData sscsCaseData) {
-
-        // Daily living and or/mobility
-
-        if ((!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion())
-            && sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion() == null)
-            || (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion())
-            && sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion() == null)) {
-            return null;
-        } else {
-
-            try {
-
-                ComparedRate dailyLivingComparedRate = AwardType.NOT_CONSIDERED.getKey()
-                    .equalsIgnoreCase(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion()) ? null :
-                    ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
-
-                ComparedRate mobilityComparedRate = AwardType.NOT_CONSIDERED.getKey()
-                    .equalsIgnoreCase(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()) ? null : ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
-
-                Set<ComparedRate> comparedRates = new HashSet<>();
-                if (dailyLivingComparedRate != null) {
-                    comparedRates.add(dailyLivingComparedRate);
-                }
-                if (mobilityComparedRate != null) {
-                    comparedRates.add(mobilityComparedRate);
-                }
-
-                // At least one higher,  and non lower, means the decision is in favour of appellant
-                if (comparedRates.contains(ComparedRate.Higher)) {
-                    return DECISION_IN_FAVOUR_OF_APPELLANT;
-                } else {
-                    // Otherwise, decision upheld
-                    return DECISION_UPHELD;
-                }
-
-            } catch (IllegalArgumentException e) {
-                log.error(e.getMessage());
-                return null;
-            }
-
-        }
+    public String getBenefitType() {
+        return benefitType;
     }
 
-    private Outcome useExplicitySetOutcome(SscsCaseData sscsCaseData) {
+    public abstract Outcome determineOutcome(SscsCaseData sscsCaseData);
+
+    /**
+     * Due to a bug with CCD related to hidden fields, hidden fields are not being unset
+     * on the final submission from CCD, so we need to reset them here
+     * See https://tools.hmcts.net/jira/browse/RDM-8200
+     * This method provides a hook to temporarily workaround this issue, and allow
+     * hidden fields to be unset.
+     *
+     */
+    public abstract void performPreOutcomeIntegrityAdjustments(SscsCaseData sscsCaseData);
+
+    public abstract Outcome determineOutcomeWithValidation(SscsCaseData sscsCaseData);
+
+    protected Outcome useExplicitySetOutcome(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getWriteFinalDecisionAllowedOrRefused() == null) {
             return null;
         } else {
@@ -93,4 +54,49 @@ public class DecisionNoticeOutcomeService {
             }
         }
     }
+
+    public void validate(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, SscsCaseData sscsCaseData) {
+
+        // Due to a bug with CCD related to hidden fields, hidden fields are not being unset
+        // on the final submission from CCD, so we need to reset them here
+        // See https://tools.hmcts.net/jira/browse/RDM-8200
+        // This is a temporary workaround for this issue.
+        performPreOutcomeIntegrityAdjustments(sscsCaseData);
+
+        List<String> validationErrorMessages = new ArrayList<>();
+        if (questionService.getPointsConditionEnumClasses() != null) {
+            for (Class<? extends PointsCondition<?>> pointsConditionEnumClass : questionService.getPointsConditionEnumClasses()) {
+                if (validationErrorMessages.isEmpty()) {
+                    getDecisionNoticePointsValidationErrorMessages(pointsConditionEnumClass, questionService, sscsCaseData)
+                        .forEach(validationErrorMessages::add);
+                }
+            }
+        }
+
+        validationErrorMessages.stream().forEach(preSubmitCallbackResponse::addError);
+
+        if (validationErrorMessages.isEmpty()) {
+
+            // Validate that we can determine an outcome
+            Outcome outcome = determineOutcomeWithValidation(preSubmitCallbackResponse.getData());
+            if (("ESA".equals(getBenefitType()) || "UC".equals(getBenefitType())) && outcome == null) {
+                throw new IllegalStateException("Unable to determine a validated outcome");
+            }
+        }
+    }
+
+
+    private <T extends PointsCondition<?>> List<String> getDecisionNoticePointsValidationErrorMessages(Class<T> enumType, DecisionNoticeQuestionService decisionNoticeQuestionService, SscsCaseData sscsCaseData) {
+
+        return Arrays.stream(enumType.getEnumConstants())
+            .filter(pointsCondition -> pointsCondition.isApplicable(
+                decisionNoticeQuestionService, sscsCaseData))
+            .map(pointsCondition ->
+                pointsCondition.getOptionalErrorMessage(decisionNoticeQuestionService, sscsCaseData))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toList());
+    }
+
+
 }

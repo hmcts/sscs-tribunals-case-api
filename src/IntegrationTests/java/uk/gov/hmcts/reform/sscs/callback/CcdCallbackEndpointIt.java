@@ -47,6 +47,7 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -135,12 +136,14 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
         @SuppressWarnings({"unchecked", "CastCanBeRemovedNarrowingVariableType"})
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
 
-        assertEquals(3, result.getData().getOriginalSender().getListItems().size());
-        assertEquals(4, result.getData().getFurtherEvidenceAction().getListItems().size());
+        assertEquals(4, result.getData().getOriginalSender().getListItems().size());
+        assertEquals(6, result.getData().getFurtherEvidenceAction().getListItems().size());
         assertEquals(ISSUE_FURTHER_EVIDENCE.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(0).getCode());
         assertEquals(OTHER_DOCUMENT_MANUAL.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(1).getCode());
-        assertEquals(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(2).getCode());
-        assertEquals(SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(3).getCode());
+        assertEquals(INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(2).getCode());
+        assertEquals(INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(3).getCode());
+        assertEquals(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(4).getCode());
+        assertEquals(SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(5).getCode());
     }
 
     @Test
@@ -230,6 +233,9 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
                     .willReturn(new UserInfo("16", "userId", "", "", "", Arrays.asList("caseworker", "citizen")));
 
         given(authTokenGenerator.generate()).willReturn("s2s token");
+
+        given(idamClient.getUserDetails(anyString())).willReturn(UserDetails.builder()
+                .forename("Chris").surname("Davis").build());
     }
 
     @Test
@@ -253,6 +259,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
 
     @Test
     public void shouldHandleInterlocEventCallback() throws Exception {
+        mockIdam();
         json = getJson("callback/interlocEventCallback.json");
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));

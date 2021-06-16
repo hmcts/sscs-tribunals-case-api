@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -69,10 +70,13 @@ public class CcdCallbackController {
     public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdMidEvent(
             @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
             @RequestHeader(AUTHORIZATION) String userAuthorisation,
-            @RequestBody String message) {
+            @RequestBody String message,
+            @RequestParam(value = "pageId", required = false, defaultValue = "") String pageId
+    ) {
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
-        log.info("Midevent sscs case callback `{}` received for Case ID `{}`", callback.getEvent(),
-            callback.getCaseDetails().getId());
+        callback.setPageId(pageId);
+        log.info("Midevent sscs case callback `{}` on page `{}` received for Case ID `{}`", callback.getEvent(),
+            callback.getPageId(), callback.getCaseDetails().getId());
 
         authorisationService.authorise(serviceAuthHeader);
         return performRequest(MID_EVENT, callback, userAuthorisation);

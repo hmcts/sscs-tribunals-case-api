@@ -42,6 +42,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
     }
 
     private void setDirectionTypeDropDown(SscsCaseData sscsCaseData) {
+
         List<DynamicListItem> listOptions = new ArrayList<>();
 
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.getCode(), APPEAL_TO_PROCEED.getLabel()));
@@ -52,8 +53,20 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
             listOptions.add(new DynamicListItem(REFUSE_EXTENSION.getCode(), REFUSE_EXTENSION.getLabel()));
         }
 
+        if (RequestOutcome.IN_PROGRESS.equals(sscsCaseData.getReinstatementOutcome())) {
+            listOptions.add(new DynamicListItem(GRANT_REINSTATEMENT.getCode(), GRANT_REINSTATEMENT.getLabel()));
+            listOptions.add(new DynamicListItem(REFUSE_REINSTATEMENT.getCode(), REFUSE_REINSTATEMENT.getLabel()));
+        }
+
+        if ("Yes".equalsIgnoreCase(sscsCaseData.getUrgentCase())) {
+            listOptions.add(new DynamicListItem(GRANT_URGENT_HEARING.getCode(), GRANT_URGENT_HEARING.getLabel()));
+            listOptions.add(new DynamicListItem(REFUSE_URGENT_HEARING.getCode(), REFUSE_URGENT_HEARING.getLabel()));
+        }
+
         DynamicListItem selectedValue = null != sscsCaseData.getDirectionTypeDl() && sscsCaseData.getDirectionTypeDl().getValue() != null
                 ? sscsCaseData.getDirectionTypeDl().getValue() : new DynamicListItem("", "");
+
+
         sscsCaseData.setDirectionTypeDl(new DynamicList(selectedValue, listOptions));
     }
 

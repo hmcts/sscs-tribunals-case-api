@@ -51,7 +51,8 @@
           "subscribeSms": "No",
           "subscribeEmail": "No",
           "wantSmsNotifications": null
-        }
+        },
+        "jointPartySubscription": null
       },
       "evidence": {
         "documents": []

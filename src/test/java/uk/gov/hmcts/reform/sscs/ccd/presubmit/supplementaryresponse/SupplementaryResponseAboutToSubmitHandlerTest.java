@@ -2,8 +2,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.supplementaryresponse;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 
 @RunWith(JUnitParamsRunner.class)
 public class SupplementaryResponseAboutToSubmitHandlerTest {
@@ -35,7 +37,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         handler = new SupplementaryResponseAboutToSubmitHandler();
 
         when(callback.getEvent()).thenReturn(EventType.DWP_SUPPLEMENTARY_RESPONSE);
@@ -150,5 +152,70 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         assertEquals("supplementaryResponse", response.getData().getDwpState());
         assertEquals("No", response.getData().getEvidenceHandled());
         assertNull(response.getData().getDwpOtherDoc());
+    }
+
+    @Test
+    public void givenASupplementaryResponseWithDwpSupplementaryResponseDocAndAudioVideoDwpOtherDoc_thenMoveOtherDocToAudioVideoEvidenceList() {
+        sscsCaseData.setDwpSupplementaryResponseDoc(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("test1.doc").documentUrl("myurl1").build()).build());
+        sscsCaseData.setDwpOtherDoc(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("test2.mp3").documentUrl("myurl2").build()).build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getData().getScannedDocuments().size());
+        assertEquals("test1.doc", response.getData().getScannedDocuments().get(0).getValue().getFileName());
+        assertEquals("myurl1", response.getData().getScannedDocuments().get(0).getValue().getUrl().getDocumentUrl());
+        assertEquals("other", response.getData().getScannedDocuments().get(0).getValue().getType());
+        assertEquals(DocumentSubtype.DWP_EVIDENCE.getValue(), response.getData().getScannedDocuments().get(0).getValue().getSubtype());
+        assertEquals(1, response.getData().getAudioVideoEvidence().size());
+        assertEquals("test2.mp3", response.getData().getAudioVideoEvidence().get(0).getValue().getFileName());
+        assertEquals("myurl2", response.getData().getAudioVideoEvidence().get(0).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals(UploadParty.DWP, response.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded());
+
+        assertEquals("supplementaryResponse", response.getData().getDwpState());
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), response.getData().getInterlocReviewState());
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), response.getData().getInterlocReferralReason());
+        assertEquals("No", response.getData().getEvidenceHandled());
+        assertNull(response.getData().getDwpOtherDoc());
+        assertNull(response.getData().getShowRip1DocPage());
+        assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
+    }
+
+    @Test
+    public void givenASupplementaryResponseWithDwpSupplementaryResponseDocAndAudioVideoDwpOtherDocAndRip1Doc_thenMoveOtherDocToAudioVideoEvidenceListAndLinkRip1Doc() {
+        sscsCaseData.setDwpSupplementaryResponseDoc(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("test1.doc").documentUrl("myurl1").build()).build());
+        sscsCaseData.setDwpOtherDoc(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("test2.mp3").documentUrl("myurl2").build()).build());
+        sscsCaseData.setRip1Doc(DocumentLink.builder().documentFilename("test3.pdf").documentUrl("myurl3").build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getData().getScannedDocuments().size());
+        assertEquals("test1.doc", response.getData().getScannedDocuments().get(0).getValue().getFileName());
+        assertEquals("myurl1", response.getData().getScannedDocuments().get(0).getValue().getUrl().getDocumentUrl());
+        assertEquals("other", response.getData().getScannedDocuments().get(0).getValue().getType());
+        assertEquals(DocumentSubtype.DWP_EVIDENCE.getValue(), response.getData().getScannedDocuments().get(0).getValue().getSubtype());
+        assertEquals(1, response.getData().getAudioVideoEvidence().size());
+        assertEquals("test2.mp3", response.getData().getAudioVideoEvidence().get(0).getValue().getFileName());
+        assertEquals("myurl2", response.getData().getAudioVideoEvidence().get(0).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("myurl3", response.getData().getAudioVideoEvidence().get(0).getValue().getRip1Document().getDocumentUrl());
+        assertEquals(UploadParty.DWP, response.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded());
+
+        assertEquals("supplementaryResponse", response.getData().getDwpState());
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), response.getData().getInterlocReviewState());
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), response.getData().getInterlocReferralReason());
+        assertEquals("No", response.getData().getEvidenceHandled());
+        assertNull(response.getData().getDwpOtherDoc());
+        assertNull(response.getData().getRip1Doc());
+        assertNull(response.getData().getShowRip1DocPage());
+    }
+
+    @Test
+    public void givenASupplementaryResponseAndInterlocReviewStateAlreadyReviewByJudge_thenLeaveAsReviewByJudge() {
+        sscsCaseData.setDwpSupplementaryResponseDoc(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("test1.doc").documentUrl("myurl1").build()).build());
+        sscsCaseData.setDwpOtherDoc(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("test2.mp3").documentUrl("myurl2").build()).build());
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("supplementaryResponse", response.getData().getDwpState());
+        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), response.getData().getInterlocReferralReason());
     }
 }

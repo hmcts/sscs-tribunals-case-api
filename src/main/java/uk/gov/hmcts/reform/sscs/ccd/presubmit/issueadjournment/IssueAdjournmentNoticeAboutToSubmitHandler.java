@@ -16,16 +16,15 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @Component
 @Slf4j
-public class IssueAdjournmentNoticeAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final FooterService footerService;
     private final Validator validator;
@@ -60,30 +59,33 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler implements PreSubmitCall
         }
 
         if (preSubmitCallbackResponse.getErrors().isEmpty()) {
-
-            sscsCaseData.setDwpState(ADJOURNMENT_NOTICE_ISSUED.getId());
+            SscsDocumentTranslationStatus documentTranslationStatus = sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
 
             calculateDueDate(sscsCaseData);
 
             if (sscsCaseData.getAdjournCasePreviewDocument() != null) {
+                createAdjournmentNoticeFromPreviewDraft(preSubmitCallbackResponse, documentTranslationStatus);
 
-                if (!preSubmitCallbackResponse.getErrors().isEmpty()) {
-                    return preSubmitCallbackResponse;
+                if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
+                    sscsCaseData.setDwpState(ADJOURNMENT_NOTICE_ISSUED.getId());
+                    if ("yes".equalsIgnoreCase(sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties())) {
+                        sscsCaseData.setState(State.NOT_LISTABLE);
+                    } else {
+                        sscsCaseData.setState(State.READY_TO_LIST);
+                    }
+                } else {
+                    log.info("Case is a Welsh case so Adjournment Notice requires translation for case id : {}", sscsCaseData.getCcdCaseId());
+                    clearBasicTransientFields(sscsCaseData);
+                    sscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
+                    log.info("Set the InterlocReviewState to {},  for case id : {}", sscsCaseData.getInterlocReviewState(), sscsCaseData.getCcdCaseId());
+                    sscsCaseData.setTranslationWorkOutstanding("Yes");
                 }
 
-                createAdjournmentNoticeFromPreviewDraft(preSubmitCallbackResponse);
+                preSubmitCallbackResponse.getData().getSscsDocument()
+                        .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
             } else {
                 preSubmitCallbackResponse.addError("There is no Draft Adjournment Notice on the case so adjournment cannot be issued");
             }
-
-            if ("yes".equalsIgnoreCase(sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties())) {
-                sscsCaseData.setState(State.NOT_LISTABLE);
-            } else {
-                sscsCaseData.setState(State.READY_TO_LIST);
-            }
-
-            preSubmitCallbackResponse.getData().getSscsDocument()
-                .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
         }
 
         return preSubmitCallbackResponse;
@@ -97,7 +99,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler implements PreSubmitCall
         }
     }
 
-    private void createAdjournmentNoticeFromPreviewDraft(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+    private void createAdjournmentNoticeFromPreviewDraft(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, SscsDocumentTranslationStatus documentTranslationStatus) {
 
         SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
 
@@ -109,10 +111,10 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler implements PreSubmitCall
             .documentBinaryUrl(docLink.getDocumentBinaryUrl())
             .build();
 
-        String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"));
+        String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
 
         footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, DocumentType.ADJOURNMENT_NOTICE, now,
-                null, null);
+                null, null, documentTranslationStatus);
     }
 
 }

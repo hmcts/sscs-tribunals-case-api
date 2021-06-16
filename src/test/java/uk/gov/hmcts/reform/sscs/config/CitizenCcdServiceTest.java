@@ -2,17 +2,15 @@ package uk.gov.hmcts.reform.sscs.config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_ARCHIVED;
 
 import java.util.Collections;
-import java.util.Optional;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -30,7 +28,8 @@ public class CitizenCcdServiceTest {
 
     private static final String CREATE_DRAFT = "createDraft";
     private static final String UPDATE_DRAFT = "updateDraft";
-    private static final IdamTokens IDAM_TOKENS = IdamTokens.builder().email("dummy@email.com").build();
+    private static final IdamTokens IDAM_TOKENS =
+            IdamTokens.builder().email("dummy@email.com").roles(List.of("citizen")).build();
 
     private CitizenCcdService citizenCcdService;
 
@@ -45,7 +44,7 @@ public class CitizenCcdServiceTest {
 
     @Before
     public void setup() {
-        initMocks(this);
+        openMocks(this);
         citizenCcdService = new CitizenCcdService(citizenCcdClient, sscsCcdConvertService, ccdService);
     }
 
@@ -92,15 +91,17 @@ public class CitizenCcdServiceTest {
     public void shouldArchiveADraftCase() {
         SscsCaseData caseData = SscsCaseData.builder().build();
         Long caseId = 123L;
-        when(citizenCcdClient.searchForCitizen(eq(IDAM_TOKENS))).thenReturn(Collections.singletonList(CaseDetails.builder().id(caseId).build()));
 
-        when(ccdService.updateCase(eq(caseData), eq(caseId), eq(DRAFT_ARCHIVED.getCcdType()),
-                eq("SSCS - draft archived"), eq("SSCS - draft archived"), eq(IDAM_TOKENS)))
-                .thenReturn(SscsCaseDetails.builder().build());
-        Optional<SscsCaseDetails> sscsCaseDetails = citizenCcdService.draftArchived(caseData, IDAM_TOKENS, IDAM_TOKENS);
+        StartEventResponse eventResponse = StartEventResponse.builder().build();
+        when(citizenCcdClient.startEventForCitizen(eq(IDAM_TOKENS), eq(caseId.toString()), eq(DRAFT_ARCHIVED.getCcdType())))
+                .thenReturn(eventResponse);
 
-        assertNotNull(sscsCaseDetails);
-        assertTrue(sscsCaseDetails.isPresent());
+        when(citizenCcdClient.submitEventForCitizen(eq(IDAM_TOKENS), eq(caseId.toString()), any()))
+                .thenReturn(CaseDetails.builder().build());
+
+        CaseDetails caseDetails = citizenCcdService.archiveDraft(caseData, IDAM_TOKENS, caseId);
+
+        assertNotNull(caseDetails);
     }
 
     @Test

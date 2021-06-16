@@ -6,6 +6,8 @@ properties([
 
 @Library("Infrastructure")
 
+import uk.gov.hmcts.contino.AppPipelineDsl
+
 def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
@@ -38,9 +40,22 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 withPipeline(type, product, component) {
+    after('akschartsinstall'){
+        // Vars needed for AKS testing
+        env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
+    }
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
     enableAksStagingDeployment()
     disableLegacyDeployment()
+
+    env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
+    onMaster() {
+        enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
+    }
+    onPR() {
+        enablePactAs([AppPipelineDsl.PactRoles.CONSUMER,
+                      AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK])
+    }
 }
 

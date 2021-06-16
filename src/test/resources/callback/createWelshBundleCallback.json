@@ -1,0 +1,663 @@
+{
+  "case_details": {
+    "id": 12345656789,
+    "jurisdiction": "SSCS",
+    "state": "appealCreated",
+    "case_type_id": "Benefit",
+    "created_date": [
+      2018,
+      10,
+      23,
+      15,
+      4,
+      48,
+      187000000
+    ],
+    "last_modified": [
+      2018,
+      10,
+      23,
+      15,
+      4,
+      48,
+      187000000
+    ],
+    "security_classification": "PUBLIC",
+    "case_data": {
+      "languagePreferenceWelsh" : "Yes",
+      "appeal": {
+        "appealReasons": {
+          "reasons": []
+        },
+        "appellant": {
+          "address": {
+            "line1": "My address",
+            "town": "Somewhere"
+          },
+          "appointee": {
+            "address": {},
+            "contact": {
+              "email": null,
+              "mobile": null,
+              "phone": null
+            },
+            "identity": {
+              "dob": null,
+              "nino": null
+            },
+            "name": {
+              "firstName": null,
+              "lastName": null,
+              "title": null
+            }
+          },
+          "contact": {
+            "email": null,
+            "mobile": null,
+            "phone": null
+          },
+          "identity": {
+            "dob": "1987-08-21",
+            "nino": "BB000000C"
+          },
+          "isAddressSameAsAppointee": null,
+          "isAppointee": "No",
+          "name": {
+            "firstName": "Donny",
+            "lastName": "Smith",
+            "title": "Mr"
+          }
+        },
+        "benefitType": {
+          "code": "PIP",
+          "description": "Personal Independence Payment"
+        },
+        "hearingOptions": {},
+        "hearingSubtype": {},
+        "hearingType": "oral",
+        "mrnDetails": {
+          "dwpIssuingOffice": "DWP PIP (1)",
+          "mrnDate": null,
+          "mrnLateReason": null,
+          "mrnMissingReason": null
+        },
+        "receivedVia": null,
+        "rep": {
+          "address": {},
+          "contact": {
+            "email": null,
+            "mobile": null,
+            "phone": null
+          },
+          "hasRepresentative": "No",
+          "name": {
+            "firstName": null,
+            "lastName": null,
+            "title": null
+          },
+          "organisation": null
+        },
+        "signer": null
+      },
+      "benefitCode": "011",
+      "bundleConfiguration": "sscs-bundle-unedited-config.yaml",
+      "caseCode": "011CC",
+      "dateSentToDwp": "2021-02-12",
+      "dwpDocuments": [
+        {
+          "value": {
+            "documentDateAdded": "2021-02-12",
+            "documentFileName": "Appendix 12 received on 12-02-2021",
+            "documentLink": {
+              "document_binary_url": "http://dm-store:5005/documents/093c9722-403c-42be-9af0-778291cbfb16/binary",
+              "document_filename": "Appendix 12 received on 12-02-2021.pdf",
+              "document_url": "http://dm-store:5005/documents/093c9722-403c-42be-9af0-778291cbfb16"
+            },
+            "documentType": "appendix12"
+          }
+        },
+        {
+          "value": {
+            "documentDateAdded": "2021-02-12",
+            "documentFileName": "DWP response received on 12-02-2021",
+            "documentLink": {
+              "document_binary_url": "http://dm-store:5005/documents/e6bdae57-3227-444e-8117-657285ecb849/binary",
+              "document_filename": "DWP response received on 12-02-2021.pdf",
+              "document_url": "http://dm-store:5005/documents/e6bdae57-3227-444e-8117-657285ecb849"
+            },
+            "documentType": "dwpResponse"
+          }
+        },
+        {
+          "value": {
+            "documentDateAdded": "2021-02-12",
+            "documentFileName": "DWP evidence received on 12-02-2021",
+            "documentLink": {
+              "document_binary_url": "http://dm-store:5005/documents/ac5c2471-0c37-4754-a034-8c4a0bdc9073/binary",
+              "document_filename": "DWP evidence received on 12-02-2021.pdf",
+              "document_url": "http://dm-store:5005/documents/ac5c2471-0c37-4754-a034-8c4a0bdc9073"
+            },
+            "documentType": "dwpEvidenceBundle"
+          }
+        },
+        {
+          "value": {
+            "documentDateAdded": "2021-02-08",
+            "documentFileName": "AT38",
+            "documentLink": {
+              "document_binary_url": "http://dm-store:5005/documents/e1d5c661-eca9-4625-b46f-5370257848eb/binary",
+              "document_filename": "AT38 received  on 08-02-2021.png",
+              "document_url": "http://dm-store:5005/documents/e1d5c661-eca9-4625-b46f-5370257848eb"
+            },
+            "documentType": "at38"
+          }
+        }
+      ],
+      "dwpEditedEvidenceReason": "phme",
+      "dwpFurtherEvidenceStates": "inProgress",
+      "dwpFurtherInfo": "No",
+      "dwpResponseDate": "2021-02-12",
+      "dwpState": "phmeGranted",
+      "dwpUploadAudioVideoEvidence": [],
+      "interlocReferralReason": "phmeRequest",
+      "interlocReviewState": "reviewByJudge",
+      "issueCode": "CC",
+      "jointPartyAddress": {},
+      "jointPartyAddressSameAsAppellant": "No",
+      "jointPartyIdentity": {
+        "dob": null,
+        "nino": null
+      },
+      "jointPartyName": {
+        "firstName": null,
+        "lastName": null,
+        "title": null
+      },
+      "phmeGranted": "Yes",
+      "region": "Alabama",
+      "regionalProcessingCenter": {
+        "address1": null,
+        "address2": null,
+        "address3": null,
+        "address4": null,
+        "city": null,
+        "email": null,
+        "faxNumber": null,
+        "name": null,
+        "phoneNumber": null,
+        "postcode": null
+      },
+      "selectWhoReviewsCase": {
+        "list_items": null,
+        "value": {
+          "code": "reviewByJudge",
+          "label": null
+        }
+      },
+      "subscriptions": {
+        "appellantSubscription": {
+          "email": null,
+          "lastLoggedIntoMya": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "tya": null,
+          "wantSmsNotifications": null
+        },
+        "appointeeSubscription": {
+          "email": null,
+          "lastLoggedIntoMya": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "tya": null,
+          "wantSmsNotifications": null
+        },
+        "jointPartySubscription": {
+          "email": null,
+          "lastLoggedIntoMya": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "tya": null,
+          "wantSmsNotifications": null
+        },
+        "representativeSubscription": {
+          "email": null,
+          "lastLoggedIntoMya": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "tya": null,
+          "wantSmsNotifications": null
+        },
+        "supporterSubscription": {
+          "email": null,
+          "lastLoggedIntoMya": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "tya": null,
+          "wantSmsNotifications": null
+        }
+      }
+    },
+    "data_classification": {
+      "dwpTimeExtension": {
+        "classification": "PUBLIC",
+        "value": [
+        ]
+      },
+      "generatedNino": "PUBLIC",
+      "hearings": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "value": {
+              "venue": {
+                "classification": "PUBLIC",
+                "value": {
+                  "name": "PUBLIC",
+                  "address": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "line1": "PUBLIC",
+                      "line2": "PUBLIC",
+                      "town": "PUBLIC",
+                      "county": "PUBLIC",
+                      "postcode": "PUBLIC"
+                    }
+                  },
+                  "googleMapLink": "PUBLIC"
+                }
+              },
+              "hearingDate": "PUBLIC",
+              "time": "PUBLIC",
+              "adjourned": "PUBLIC",
+              "eventDate": "PUBLIC",
+              "hearingId": "PUBLIC"
+            },
+            "id": "491adfdc-a8d3-430d-bd47-5ae3eac2149f"
+          }
+        ]
+      },
+      "subscriptions": {
+        "classification": "PUBLIC",
+        "value": {
+          "appellantSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "wantSmsNotifications": "PUBLIC",
+              "tya": "PUBLIC",
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "reason": "PUBLIC"
+            }
+          },
+          "representativeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "wantSmsNotifications": "PUBLIC",
+              "tya": "PUBLIC",
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "reason": "PUBLIC"
+            }
+          }
+        }
+      },
+      "evidence": {
+        "classification": "PUBLIC",
+        "value": {
+          "documents": {
+            "classification": "PUBLIC",
+            "value": [
+            ]
+          }
+        }
+      },
+      "caseReference": "PUBLIC",
+      "generatedSurname": "PUBLIC",
+      "regionalProcessingCenter": {
+        "classification": "PUBLIC",
+        "value": {
+          "faxNumber": "PUBLIC",
+          "address4": "PUBLIC",
+          "phoneNumber": "PUBLIC",
+          "name": "PUBLIC",
+          "address1": "PUBLIC",
+          "address2": "PUBLIC",
+          "address3": "PUBLIC",
+          "postcode": "PUBLIC",
+          "city": "PUBLIC"
+        }
+      },
+      "appeal": {
+        "classification": "PUBLIC",
+        "value": {
+          "mrnDetails": {
+            "classification": "PUBLIC",
+            "value": {
+            }
+          },
+          "appellant": {
+            "classification": "PUBLIC",
+            "value": {
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "title": "PUBLIC",
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC"
+                }
+              },
+              "address": {
+                "classification": "PUBLIC",
+                "value": {
+                }
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "phone": "PUBLIC",
+                  "mobile": "PUBLIC"
+                }
+              },
+              "identity": {
+                "classification": "PUBLIC",
+                "value": {
+                  "dob": "PUBLIC",
+                  "nino": "PUBLIC"
+                }
+              },
+              "isAppointee": "PUBLIC"
+            }
+          },
+          "benefitType": {
+            "classification": "PUBLIC",
+            "value": {
+              "code": "PUBLIC"
+            }
+          },
+          "hearingOptions": {
+            "classification": "PUBLIC",
+            "value": {
+              "wantsToAttend": "PUBLIC",
+              "other": "PUBLIC"
+            }
+          },
+          "appealReasons": {
+            "classification": "PUBLIC",
+            "value": {
+            }
+          },
+          "rep": {
+            "classification": "PUBLIC",
+            "value": {
+            }
+          },
+          "signer": "PUBLIC",
+          "hearingType": "PUBLIC"
+        }
+      },
+      "region": "PUBLIC",
+      "generatedDOB": "PUBLIC",
+      "events": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "value": {
+              "date": "PUBLIC",
+              "type": "PUBLIC",
+              "description": "PUBLIC"
+            },
+            "id": "324a9f42-b9a0-428d-ae22-24fa606a46cc"
+          },
+          {
+            "value": {
+              "date": "PUBLIC",
+              "type": "PUBLIC",
+              "description": "PUBLIC"
+            },
+            "id": "2b863cb1-5b99-4ac1-8b4c-f0b9c71f1fd8"
+          },
+          {
+            "value": {
+              "date": "PUBLIC",
+              "type": "PUBLIC",
+              "description": "PUBLIC"
+            },
+            "id": "b8c61d93-1e82-44c9-bfff-55339f829a0e"
+          },
+          {
+            "value": {
+              "date": "PUBLIC",
+              "type": "PUBLIC",
+              "description": "PUBLIC"
+            },
+            "id": "29a280db-7937-49db-ae7c-84c62581e3a2"
+          }
+        ]
+      }
+    },
+    "after_submit_callback_response": null,
+    "callback_response_status_code": null,
+    "callback_response_status": null,
+    "delete_draft_response_status_code": null,
+    "delete_draft_response_status": null,
+    "security_classifications": {
+      "dwpTimeExtension": {
+        "classification": "PUBLIC",
+        "value": [
+        ]
+      },
+      "generatedNino": "PUBLIC",
+      "hearings": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "value": {
+              "venue": {
+                "classification": "PUBLIC",
+                "value": {
+                  "name": "PUBLIC",
+                  "address": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "line1": "PUBLIC",
+                      "line2": "PUBLIC",
+                      "town": "PUBLIC",
+                      "county": "PUBLIC",
+                      "postcode": "PUBLIC"
+                    }
+                  },
+                  "googleMapLink": "PUBLIC"
+                }
+              },
+              "hearingDate": "PUBLIC",
+              "time": "PUBLIC",
+              "adjourned": "PUBLIC",
+              "eventDate": "PUBLIC",
+              "hearingId": "PUBLIC"
+            },
+            "id": "491adfdc-a8d3-430d-bd47-5ae3eac2149f"
+          }
+        ]
+      },
+      "subscriptions": {
+        "classification": "PUBLIC",
+        "value": {
+          "appellantSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "wantSmsNotifications": "PUBLIC",
+              "tya": "PUBLIC",
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "reason": "PUBLIC"
+            }
+          },
+          "representativeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "wantSmsNotifications": "PUBLIC",
+              "tya": "PUBLIC",
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "reason": "PUBLIC"
+            }
+          }
+        }
+      },
+      "evidence": {
+        "classification": "PUBLIC",
+        "value": {
+          "documents": {
+            "classification": "PUBLIC",
+            "value": [
+            ]
+          }
+        }
+      },
+      "caseReference": "PUBLIC",
+      "generatedSurname": "PUBLIC",
+      "regionalProcessingCenter": {
+        "classification": "PUBLIC",
+        "value": {
+          "faxNumber": "PUBLIC",
+          "address4": "PUBLIC",
+          "phoneNumber": "PUBLIC",
+          "name": "PUBLIC",
+          "address1": "PUBLIC",
+          "address2": "PUBLIC",
+          "address3": "PUBLIC",
+          "postcode": "PUBLIC",
+          "city": "PUBLIC"
+        }
+      },
+      "appeal": {
+        "classification": "PUBLIC",
+        "value": {
+          "mrnDetails": {
+            "classification": "PUBLIC",
+            "value": {
+            }
+          },
+          "appellant": {
+            "classification": "PUBLIC",
+            "value": {
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "title": "PUBLIC",
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC"
+                }
+              },
+              "address": {
+                "classification": "PUBLIC",
+                "value": {
+                }
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "phone": "PUBLIC",
+                  "mobile": "PUBLIC"
+                }
+              },
+              "identity": {
+                "classification": "PUBLIC",
+                "value": {
+                  "dob": "PUBLIC",
+                  "nino": "PUBLIC"
+                }
+              },
+              "isAppointee": "PUBLIC"
+            }
+          },
+          "benefitType": {
+            "classification": "PUBLIC",
+            "value": {
+              "code": "PUBLIC"
+            }
+          },
+          "hearingOptions": {
+            "classification": "PUBLIC",
+            "value": {
+              "wantsToAttend": "PUBLIC",
+              "other": "PUBLIC"
+            }
+          },
+          "appealReasons": {
+            "classification": "PUBLIC",
+            "value": {
+            }
+          },
+          "rep": {
+            "classification": "PUBLIC",
+            "value": {
+            }
+          },
+          "signer": "PUBLIC",
+          "hearingType": "PUBLIC"
+        }
+      },
+      "region": "PUBLIC",
+      "generatedDOB": "PUBLIC",
+      "events": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "value": {
+              "date": "PUBLIC",
+              "type": "PUBLIC",
+              "description": "PUBLIC"
+            },
+            "id": "324a9f42-b9a0-428d-ae22-24fa606a46cc"
+          },
+          {
+            "value": {
+              "date": "PUBLIC",
+              "type": "PUBLIC",
+              "description": "PUBLIC"
+            },
+            "id": "2b863cb1-5b99-4ac1-8b4c-f0b9c71f1fd8"
+          },
+          {
+            "value": {
+              "date": "PUBLIC",
+              "type": "PUBLIC",
+              "description": "PUBLIC"
+            },
+            "id": "b8c61d93-1e82-44c9-bfff-55339f829a0e"
+          },
+          {
+            "value": {
+              "date": "PUBLIC",
+              "type": "PUBLIC",
+              "description": "PUBLIC"
+            },
+            "id": "29a280db-7937-49db-ae7c-84c62581e3a2"
+          }
+        ]
+      }
+    }
+  },
+  "event_id": "createBundle"
+}

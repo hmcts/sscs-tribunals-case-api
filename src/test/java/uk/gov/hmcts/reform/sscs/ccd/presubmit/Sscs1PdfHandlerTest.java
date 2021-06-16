@@ -62,8 +62,11 @@ public class Sscs1PdfHandlerTest {
     @Parameters({
             "CREATE_APPEAL_PDF",
             "VALID_APPEAL_CREATED",
+            "DRAFT_TO_VALID_APPEAL_CREATED",
             "NON_COMPLIANT",
+            "DRAFT_TO_NON_COMPLIANT",
             "INCOMPLETE_APPLICATION_RECEIVED",
+            "DRAFT_TO_INCOMPLETE_APPLICATION",
     })
     public void givenASscs1PdfHandlerEventForSyaCases_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -75,8 +78,11 @@ public class Sscs1PdfHandlerTest {
     @Parameters({
             "CREATE_APPEAL_PDF, true",
             "VALID_APPEAL_CREATED, false",
+            "DRAFT_TO_VALID_APPEAL_CREATED, false",
             "NON_COMPLIANT, false",
+            "DRAFT_TO_NON_COMPLIANT, false",
             "INCOMPLETE_APPLICATION_RECEIVED, false",
+            "DRAFT_TO_INCOMPLETE_APPLICATION, false",
     })
     public void givenASscs1PdfHandlerEventForBulkScanCases_thenReturnAllowableValue(EventType eventType, boolean allowable) {
         caseDetails.getCaseData().getAppeal().setReceivedVia("Paper");
@@ -180,6 +186,17 @@ public class Sscs1PdfHandlerTest {
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         sscs1PdfHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+    }
+
+    @Test
+    public void shouldReturnErrorIfNullCreatedDate() throws CcdException {
+        when(emailHelper.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant())).thenReturn("Test");
+
+        callback.getCaseDetails().getCaseData().setCaseCreated(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = sscs1PdfHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
     }
 
     private SscsCaseData buildCaseDataWithoutPdf() {

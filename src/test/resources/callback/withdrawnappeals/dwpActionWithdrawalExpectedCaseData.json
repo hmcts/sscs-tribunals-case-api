@@ -81,6 +81,7 @@
       }
     },
     "signer": null,
+    "hearingSubtype":null,
     "hearingType": "paper",
     "receivedVia": "Paper"
   },
@@ -180,7 +181,8 @@
       "subscribeEmail": null,
       "subscribeSms": null,
       "reason": null
-    }
+    },
+    "jointPartySubscription": null
   },
   "regionalProcessingCenter": {
     "faxNumber": "0126 434 7983",

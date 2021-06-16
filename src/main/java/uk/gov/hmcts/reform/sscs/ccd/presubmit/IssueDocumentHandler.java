@@ -1,10 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.ADJOURNMENT_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -15,7 +12,6 @@ import uk.gov.hmcts.reform.docassembly.domain.FormPayload;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -32,36 +28,37 @@ public class IssueDocumentHandler {
     // Fields used for a short period in case progression are transient,
     // relevant for a short period of the case lifecycle.
     protected void clearTransientFields(SscsCaseData caseData, State beforeState) {
-        caseData.setBodyContent(null);
-        caseData.setPreviewDocument(null);
+        clearBasicTransientFields(caseData);
+        caseData.setExtensionNextEventDl(null);
         caseData.setSignedBy(null);
         caseData.setSignedRole(null);
+
+    }
+
+    protected void clearBasicTransientFields(SscsCaseData caseData) {
+        caseData.setBodyContent(null);
+        caseData.setPreviewDocument(null);
         caseData.setGenerateNotice(null);
         caseData.setWriteFinalDecisionGenerateNotice(null);
         caseData.setDateAdded(null);
         caseData.setSscsInterlocDirectionDocument(null);
         caseData.setSscsInterlocDecisionDocument(null);
-        caseData.setExtensionNextEventDl(null);
-
-        if (caseData.getDirectionTypeDl() != null && !DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
-                || !State.INTERLOCUTORY_REVIEW_STATE.equals(beforeState)) {
-            caseData.setDirectionTypeDl(null);
-        }
+        caseData.setAdjournCasePreviewDocument(null);
     }
 
-    protected NoticeIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish, String userAuthorisation) {
+    protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response, SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish, String userAuthorisation) {
         NoticeIssuedTemplateBody formPayload = NoticeIssuedTemplateBody.builder()
-            .appellantFullName(buildFullName(caseData))
-            .appointeeFullName(buildAppointeeName(caseData).orElse(null))
-            .caseId(caseData.getCcdCaseId())
-            .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
-            .noticeBody(caseData.getBodyContent())
-            .userName(caseData.getSignedBy())
-            .noticeType(documentTypeLabel.toUpperCase())
-            .userRole(caseData.getSignedRole())
-            .dateAdded(dateAdded)
-            .generatedDate(generatedDate)
-            .build();
+                .appellantFullName(buildFullName(caseData))
+                .appointeeFullName(buildAppointeeName(caseData).orElse(null))
+                .caseId(caseData.getCcdCaseId())
+                .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
+                .noticeBody(caseData.getBodyContent())
+                .userName(caseData.getSignedBy())
+                .noticeType(documentTypeLabel.toUpperCase())
+                .userRole(caseData.getSignedRole())
+                .dateAdded(dateAdded)
+                .generatedDate(generatedDate)
+                .build();
 
         if (isScottish) {
             formPayload = formPayload.toBuilder().image(NoticeIssuedTemplateBody.SCOTTISH_IMAGE).build();
@@ -94,7 +91,13 @@ public class IssueDocumentHandler {
 
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
 
-        FormPayload formPayload = createPayload(caseData, embeddedDocumentTypeLabel, dateAdded, LocalDate.now(), isScottish, userAuthorisation);
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+
+        FormPayload formPayload = createPayload(response, caseData, embeddedDocumentTypeLabel, dateAdded, LocalDate.now(), isScottish, userAuthorisation);
+
+        if (!response.getErrors().isEmpty()) {
+            return response;
+        }
 
         GenerateFileParams params = GenerateFileParams.builder()
                 .renditionOutputLocation(documentUrl)
@@ -119,7 +122,7 @@ public class IssueDocumentHandler {
 
         setDocumentOnCaseData(caseData, previewFile);
 
-        return new PreSubmitCallbackResponse<>(caseData);
+        return response;
     }
 
     /**

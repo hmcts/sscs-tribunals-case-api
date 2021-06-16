@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.handlers.updatenotlistable;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -23,20 +24,20 @@ public class UpdateNotListableAboutToSubmitHandlerTest extends BaseHandler {
     public void givenAboutToSubmitCallbackForEvent_shouldSetFields() throws Exception {
 
         RestAssured.given()
-                .log().method().log().headers().log().uri().log().body(true)
-                .contentType(ContentType.JSON)
-                .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
-                .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
-                .body(getJsonCallbackForTest("handlers/updatenotlistable/updateNotListableCallback.json"))
-                .post("/ccdAboutToSubmit")
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .rootPath("data")
-                .assertThat().body("directionDueDate", nullValue())
-                .assertThat().body("updateNotListableDirectionsFulfilled", nullValue())
-                .assertThat().body("updateNotListableInterlocReview", nullValue())
-                .assertThat().body("updateNotListableWhoReviewsCase", nullValue())
-                .assertThat().body("interlocReferralDate", equalTo(LocalDate.now().toString()))
-                .assertThat().body("interlocReviewState", equalTo("reviewByJudge"));
+            .log().method().log().headers().log().uri().log().body(true)
+            .contentType(ContentType.JSON)
+            .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
+            .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
+            .body(getJsonCallbackForTest("handlers/updatenotlistable/updateNotListableCallback.json"))
+            .post("/ccdAboutToSubmit")
+            .then()
+            .statusCode(HttpStatus.SC_OK)
+            .rootPath("data")
+            .assertThat().body("directionDueDate", nullValue())
+            .assertThat().body("updateNotListableDirectionsFulfilled", nullValue())
+            .assertThat().body("updateNotListableInterlocReview", nullValue())
+            .assertThat().body("updateNotListableWhoReviewsCase", nullValue())
+            .assertThat().body("interlocReferralDate", equalTo(LocalDate.now().toString()))
+            .assertThat().body("interlocReviewState", equalTo("reviewByJudge"));
     }
 }
