@@ -69,7 +69,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         assertJsonEquals(APPELLANT_NO_CONTACT_DETAILS_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
-    @Parameters({"DWP PIP ( 9),PIP,DWP PIP (9)", "null,carersAllowance,Carer’s Allowance Dispute Resolution Team","null,bereavementBenefit,Pensions Dispute Resolution Team"})
+    @Parameters({"DWP PIP ( 9),PIP,DWP PIP (9)", "null,carersAllowance,Carer’s Allowance Dispute Resolution Team","null,bereavementBenefit,Pensions Dispute Resolution Team","null,maternityAllowance,Walsall Benefit Centre",})
     @Test
     public void syaDwpIssuingOfficeTest(String issuingOffice, String beneiftCode, String expectedIssuing) {
 
