@@ -376,7 +376,7 @@ dependencies {
     testRuntime "org.junit.jupiter:junit-jupiter-engine:$versions.junitJupiter"
     testImplementation "org.junit.jupiter:junit-jupiter-api:$versions.junitJupiter"
 
-    e2eRuntime "org.junit.platform:junit-platform-commons:1.7.0"
+    e2eRuntime "org.junit.platform:junit-platform-commons:1.7.2"
 
     //pact contract testing
     contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact
