@@ -140,7 +140,7 @@ public class UploadWelshDocumentsAboutToStartHandlerTest {
                                 .documentUrl("/anotherUrl")
                                 .documentFilename("test.mp3")
                                 .build())
-                        .isAvDocumentLinkPresent(YesNo.YES)
+                        .shouldBundleIncludeDocLink(YesNo.YES)
                         .documentLink(DocumentLink.builder()
                                 .documentUrl("/rip1Url")
                                 .documentFilename("rip1.pdf")

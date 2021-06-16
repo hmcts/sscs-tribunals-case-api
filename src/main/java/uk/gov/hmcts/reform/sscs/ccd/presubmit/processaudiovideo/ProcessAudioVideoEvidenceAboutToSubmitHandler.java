@@ -163,8 +163,11 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
 
         String fileName = audioVideoEvidence.getFileName();
 
+        YesNo shouldIncludeRip1DocInBundle = YesNo.NO;
+
         if (audioVideoEvidence.getRip1Document() != null) {
             rip1Doc = buildRip1Doc(audioVideoEvidence);
+            shouldIncludeRip1DocInBundle = YesNo.YES;
             fileName = "RIP 1 document for A/V file: " + fileName;
 
             if (isWelshCase) {
@@ -182,7 +185,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
                         .partyUploaded(audioVideoEvidence.getPartyUploaded())
                         .dateApproved(LocalDate.now().toString())
                         .documentLink(rip1Doc)
-                        .isAvDocumentLinkPresent(YesNo.YES)
+                        .shouldBundleIncludeDocLink(shouldIncludeRip1DocInBundle)
                         .documentTranslationStatus(status)
                         .build())
                 .build();
@@ -201,9 +204,11 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
 
     private SscsDocument buildAudioVideoSscsDocument(AudioVideoEvidenceDetails audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response) {
         String fileName = audioVideoEvidence.getFileName();
+        YesNo shouldIncludeAppellantStatementDocInBundle = YesNo.NO;
 
         if (audioVideoEvidence.getStatementOfEvidencePdf() != null) {
             fileName = "Statement for A/V file: " + fileName;
+            shouldIncludeAppellantStatementDocInBundle = YesNo.YES;
         }
 
         return SscsDocument.builder().value(
@@ -215,7 +220,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
                         .partyUploaded(audioVideoEvidence.getPartyUploaded())
                         .dateApproved(LocalDate.now().toString())
                         .documentLink(audioVideoEvidence.getStatementOfEvidencePdf())
-                        .isAvDocumentLinkPresent(YesNo.YES)
+                        .shouldBundleIncludeDocLink(shouldIncludeAppellantStatementDocInBundle)
                         .build())
                 .build();
     }
