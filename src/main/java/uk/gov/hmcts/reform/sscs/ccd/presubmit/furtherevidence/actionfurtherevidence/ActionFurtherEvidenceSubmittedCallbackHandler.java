@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 
+import java.time.LocalDate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,12 +73,14 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     private SscsCaseDetails updateCase(Callback<SscsCaseData> callback, SscsCaseData caseData) {
         if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(),
             INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)) {
+            caseData.setInterlocReferralDate(LocalDate.now().toString());
             return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
-                AWAITING_ADMIN_ACTION.getId(), INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,
+                    REVIEW_BY_JUDGE.getId(), INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,
                 EventType.INTERLOC_INFORMATION_RECEIVED_ACTION_FURTHER_EVIDENCE, "Interloc information received event");
         }
         if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(),
             INFORMATION_RECEIVED_FOR_INTERLOC_TCW)) {
+            caseData.setInterlocReferralDate(LocalDate.now().toString());
             return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
                 REVIEW_BY_TCW.getId(), INFORMATION_RECEIVED_FOR_INTERLOC_TCW,
                 EventType.INTERLOC_INFORMATION_RECEIVED_ACTION_FURTHER_EVIDENCE, "Interloc information received event");
