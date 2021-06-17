@@ -132,6 +132,13 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 preSubmitCallbackResponse.addError("You must upload an edited DWP evidence bundle");
             }
         }
+        if (sscsCaseData.getDwpUploadAudioVideoEvidence() != null) {
+            for (AudioVideoEvidence audioVideoEvidence : sscsCaseData.getDwpUploadAudioVideoEvidence()) {
+                if (audioVideoEvidence.getValue().getRip1Document() != null && audioVideoEvidence.getValue().getDocumentLink() == null) {
+                    preSubmitCallbackResponse.addError("You must upload an audio/video document when submitting a RIP 1 document");
+                }
+            }
+        }
         return preSubmitCallbackResponse;
     }
 
