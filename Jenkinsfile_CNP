@@ -50,18 +50,18 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 withPipeline(type, product, component) {
-    after('akschartsinstall'){
-        // Vars needed for AKS testing
-        env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
-    }
-
-    before('smoketest:preview') {
-        env.CORE_CASE_DATA_API_URL="ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.service.core-compute-preview.internal"
-    }
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
     enableAksStagingDeployment()
     disableLegacyDeployment()
+
+    after('akschartsinstall'){
+        // Vars needed for AKS testing
+        env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
+    }
+    before('smoketest:preview') {
+        env.CORE_CASE_DATA_API_URL="ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+    }
 
     env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
     onMaster() {
