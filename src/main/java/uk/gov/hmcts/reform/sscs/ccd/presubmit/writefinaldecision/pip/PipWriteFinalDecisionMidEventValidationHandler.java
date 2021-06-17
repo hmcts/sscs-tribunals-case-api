@@ -107,7 +107,7 @@ public class PipWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     }
 
     @Override
-    protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData) {
+    protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData, String pageId) {
         sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
     }
 

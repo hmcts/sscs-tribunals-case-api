@@ -152,7 +152,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     }
 
     @Test
-    public void givenUcCaseWithWcaAppealFlowAndNotOnWorkCapabilityAssessmentPage_thenDoNotSetShowSummaryOfOutcomePage() {
+    public void givenUcCaseWithWcaAppealFlowAndNotOnWorkCapabilityAssessmentPage_thenDoNotSetShowSummaryOfOutcomePageOrShowShowDwpReassessAwardPage() {
 
         sscsCaseData.setWcaAppeal(YesNo.YES);
 
@@ -182,10 +182,24 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused(allowedFlow);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getPageId()).thenReturn("workCapabilityAssessment");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(expectedShowResult, response.getData().getShowDwpReassessAwardPage());
+    }
+
+    @Test
+    public void givenUcCaseWithWcaAppealFlowAndNotOnWorkCapabilityAssessmentPage_thenDoNotSetShowDwpReassessAwardPage() {
+
+        sscsCaseData.setWcaAppeal(YesNo.YES);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getPageId()).thenReturn("somethingElse");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getShowDwpReassessAwardPage());
     }
 
     @Test
