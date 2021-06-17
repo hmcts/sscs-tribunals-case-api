@@ -38,7 +38,7 @@ public class GenWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     }
 
     @Override
-    protected void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData) {
+    protected void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData, String pageId) {
         if (sscsCaseData.getWriteFinalDecisionGenerateNotice() != null && sscsCaseData.getWriteFinalDecisionGenerateNotice().equalsIgnoreCase(YesNo.YES.getValue())) {
             sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES);
             return;

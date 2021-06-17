@@ -72,7 +72,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
             preSubmitCallbackResponse.addWarning("Appellant is deceased. Copy the draft decision and amend offline, then upload the offline version.");
         }
 
-        setShowSummaryOfOutcomePage(sscsCaseData);
+        setShowSummaryOfOutcomePage(sscsCaseData, callback.getPageId());
         setShowWorkCapabilityAssessmentPage(sscsCaseData);
         setDwpReassessAwardPage(sscsCaseData);
 
@@ -89,7 +89,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
 
     protected abstract void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse);
 
-    protected abstract void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData);
+    protected abstract void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData, String pageId);
 
     protected abstract void setShowWorkCapabilityAssessmentPage(SscsCaseData sscsCaseData);
 

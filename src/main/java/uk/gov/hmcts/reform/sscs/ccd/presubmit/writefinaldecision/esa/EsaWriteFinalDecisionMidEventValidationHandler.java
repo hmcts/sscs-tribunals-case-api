@@ -63,12 +63,19 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     }
 
     @Override
-    protected void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getWcaAppeal() != null && NO.equals(sscsCaseData.getWcaAppeal())) {
-            sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YES);
-            return;
+    protected void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData, String pageId) {
+        // SSCS-9317 There is a strange 'feature' with CCD in that if you change your answers from the summary page, you receive any answers AFTER the flow in the callback as null.
+        // If you don't change what you set originally then it remembers what was set before you got to summary page. If you change, then it loses any fields associated with your change if affected by a show condition.
+        // In our scenario, if we changed the showFinalDecisionNoticeSummaryOfOutcomePage, the wcaAppeal field comes through as null so the showFinalDecisionNoticeSummaryOfOutcomePage was getting set to NO when
+        // coming back from the summary page. This means the page show condition related to the showFinalDecisionNoticeSummaryOfOutcomePage is set to NO and any fields lost.
+        // Therefore, we need to always skip setting this value, unless the pageId matches what we expect.
+        if (pageId != null && pageId.equals("workCapabilityAssessment")) {
+            if (sscsCaseData.getWcaAppeal() != null && NO.equals(sscsCaseData.getWcaAppeal())) {
+                sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YES);
+                return;
+            }
+            sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(NO);
         }
-        sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(NO);
     }
 
     @Override
