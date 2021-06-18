@@ -313,7 +313,7 @@ public class SubmitAppealService {
 
         log.info("Duplicate case {} found for Nino {} and benefit type {}. "
                         + "No need to continue with post create case processing.",
-                caseDetails.getId(), caseData.getGeneratedNino(),
+                caseDetails.getId(), caseData.getAppeal().getAppellant().getIdentity().getNino(),
                 caseData.getAppeal().getBenefitType().getCode());
         throw new DuplicateCaseException(
                 String.format("An appeal has already been submitted, for that decision date %s ",
