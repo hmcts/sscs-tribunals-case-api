@@ -56,7 +56,6 @@ withPipeline(type, product, component) {
     onPR() {
         enablePactAs([AppPipelineDsl.PactRoles.CONSUMER,
                       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK])
-        enableMutationTest()
     }
 }
 
