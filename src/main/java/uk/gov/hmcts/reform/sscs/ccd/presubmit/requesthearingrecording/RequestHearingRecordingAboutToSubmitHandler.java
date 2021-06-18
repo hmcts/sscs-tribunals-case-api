@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -41,20 +40,20 @@ public class RequestHearingRecordingAboutToSubmitHandler implements PreSubmitCal
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        DynamicListItem selectedRequestable = sscsCaseData.getRequestableHearingDetails().getValue();
+        DynamicListItem selectedRequestable = sscsCaseData.getHearingRecordingsData().getRequestableHearingDetails().getValue();
         String hearingId = selectedRequestable.getCode();
         String hearingName = selectedRequestable.getLabel();
 
         HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
                 .requestingParty("dwp").status("requested").requestedHearing(hearingId).requestedHearingName(hearingName).build()).build();
 
-        List<HearingRecordingRequest> hearingRecordingRequests = sscsCaseData.getHearingRecordingRequests();
+        List<HearingRecordingRequest> hearingRecordingRequests = sscsCaseData.getHearingRecordingsData().getHearingRecordingRequests();
         if (hearingRecordingRequests == null) {
             hearingRecordingRequests = new ArrayList<>();
         }
         hearingRecordingRequests.add(hearingRecordingRequest);
 
-        sscsCaseData.setHearingRecordingRequests(hearingRecordingRequests);
+        sscsCaseData.getHearingRecordingsData().setHearingRecordingRequests(hearingRecordingRequests);
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
