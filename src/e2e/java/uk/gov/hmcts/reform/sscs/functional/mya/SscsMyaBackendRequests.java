@@ -112,7 +112,7 @@ public class SscsMyaBackendRequests {
             .addTextBody("idamEmail", "mya-sscs-6920@mailinator.com")
             .build();
 
-        HttpResponse response = postRequest("/api/continuous-online-hearings/" + hearingId + "/evidence", data);
+        HttpResponse response = postRequest("/api/continuous-online-hearings/" + hearingId + "/singleevidence", data);
 
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
     }
