@@ -74,7 +74,7 @@ public class UploadHearingRecordingAboutToStartHandler implements PreSubmitCallb
             response.addError("No hearing has been conducted on this case");
             return response;
         }
-        sscsCaseData.setSelectHearingDetails(new DynamicList(new DynamicListItem("", ""), validHearings));
+        sscsCaseData.getHearingRecordingsData().setSelectHearingDetails(new DynamicList(new DynamicListItem("", ""), validHearings));
 
         return response;
     }

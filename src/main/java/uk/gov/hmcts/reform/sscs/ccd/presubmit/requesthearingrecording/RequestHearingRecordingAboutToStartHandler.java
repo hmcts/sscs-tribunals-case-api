@@ -45,6 +45,10 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
+        //create the lists that user won't have permission for
+
+
+
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if (sscsCaseData.getHearings() == null || sscsCaseData.getHearings().isEmpty()) {
@@ -64,7 +68,7 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
                 return response;
             }
 
-            List<HearingRecordingRequest> requests = sscsCaseData.getHearingRecordingRequests();
+            List<HearingRecordingRequest> requests = sscsCaseData.getHearingRecordingsData().getHearingRecordingRequests();
 
             if (requests != null && !requests.isEmpty()) {
                 List<HearingRecordingRequest> releasedHearingsCollection = new ArrayList<>();
@@ -81,12 +85,22 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
                         }
                     }
                 }
-                //sscsCaseData.setRequestedHearingDetails(new DynamicList(new DynamicListItem("", ""), requestedHearings));
-                sscsCaseData.setRequestedHearings(requestedHearingsCollection);
-                sscsCaseData.setReleasedHearings(releasedHearingsCollection);
+
+                if (!requestedHearingsCollection.isEmpty()) {
+                    sscsCaseData.getHearingRecordingsData().setRequestedHearings(requestedHearingsCollection);
+                    log.info("not empty");
+                } else {
+                    log.info("not setting the requested list");
+                }
+                if (!releasedHearingsCollection.isEmpty()) {
+                    sscsCaseData.getHearingRecordingsData().setReleasedHearings(releasedHearingsCollection);
+                    log.info("not empty");
+                } else {
+                    log.info("not setting the released list");
+                }
             }
 
-            sscsCaseData.setRequestableHearingDetails(new DynamicList(new DynamicListItem("", ""), validHearings));
+            sscsCaseData.getHearingRecordingsData().setRequestableHearingDetails(new DynamicList(new DynamicListItem("", ""), validHearings));
         }
         return response;
     }
