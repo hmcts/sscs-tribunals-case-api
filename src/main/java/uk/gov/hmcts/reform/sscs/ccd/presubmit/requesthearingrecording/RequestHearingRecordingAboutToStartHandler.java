@@ -73,27 +73,40 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
             if (requests != null && !requests.isEmpty()) {
                 List<HearingRecordingRequest> releasedHearingsCollection = new ArrayList<>();
                 List<HearingRecordingRequest> requestedHearingsCollection = new ArrayList<>();
+                StringBuilder requestedHearingText = new StringBuilder();
+                StringBuilder releasedHearingText = new StringBuilder();
 
                 for (HearingRecordingRequest request : requests) {
                     if (request.getValue().getRequestingParty().equals("dwp")) {
                         if (request.getValue().getStatus().equals("requested")) {
                             //moveFromListToList(request.getValue().getRequestedHearing(), validHearings, requestedHearings);
                             moveFromListToCollection(request, validHearings, requestedHearingsCollection);
+                            requestedHearingText.append(request.getValue().getRequestedHearingName());
+                            requestedHearingText.append(", ");
                         }
                         if (request.getValue().getStatus().equals("released")) {
                             moveFromListToCollection(request, validHearings, releasedHearingsCollection);
+                            releasedHearingText.append(request.getValue().getRequestedHearingName());
+                            releasedHearingText.append(", ");
                         }
                     }
                 }
 
+                if (validHearings.isEmpty()) {
+                    response.addError("There are no hearings to request on this case");
+                    return response;
+                }
+
                 if (!requestedHearingsCollection.isEmpty()) {
                     sscsCaseData.getHearingRecordingsData().setRequestedHearings(requestedHearingsCollection);
+                    sscsCaseData.getHearingRecordingsData().setRequestedHearingsTextList(requestedHearingText.substring(0, requestedHearingText.length() - 2));
                     log.info("not empty");
                 } else {
                     log.info("not setting the requested list");
                 }
                 if (!releasedHearingsCollection.isEmpty()) {
                     sscsCaseData.getHearingRecordingsData().setReleasedHearings(releasedHearingsCollection);
+                    sscsCaseData.getHearingRecordingsData().setReleasedHearingsTextList(releasedHearingText.substring(0, releasedHearingText.length() - 2));
                     log.info("not empty");
                 } else {
                     log.info("not setting the released list");
