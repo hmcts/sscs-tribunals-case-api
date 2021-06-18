@@ -58,12 +58,15 @@ withPipeline(type, product, component) {
     after('akschartsinstall'){
         // Vars needed for AKS testing
         env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
+        println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}""".stripIndent()
     }
-    after('sonarscan:preview') {
+    after('deploy:preview') {
         env.CORE_CASE_DATA_API_URL="ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+        println """Before deploy Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}""".stripIndent()
     }
-    before('smoketest:preview') {
+    before('deploy:preview') {
         env.CORE_CASE_DATA_API_URL="ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+        println """After deploy Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}""".stripIndent()
     }
 
     env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
@@ -73,10 +76,10 @@ withPipeline(type, product, component) {
     onPR() {
         enablePactAs([AppPipelineDsl.PactRoles.CONSUMER,
                       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK])
+        env.CORE_CASE_DATA_API_URL="ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+        println """On PR Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}""".stripIndent()
+
     }
 
-    println """\
-            Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL} - ${type} - ${product} - ${component}
-            """.stripIndent()
 }
 
