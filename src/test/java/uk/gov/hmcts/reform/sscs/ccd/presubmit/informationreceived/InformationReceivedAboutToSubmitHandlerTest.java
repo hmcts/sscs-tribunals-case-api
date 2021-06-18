@@ -48,7 +48,7 @@ public class InformationReceivedAboutToSubmitHandlerTest {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
                 .forename("Chris").surname("Davis").build().getFullName());
         when(callback.getEvent()).thenReturn(INTERLOC_INFORMATION_RECEIVED);
-        SscsCaseData sscsCaseData = SscsCaseData.builder().interlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId()).interlocReferralReason(InterlocReferralReason.OVER_300_PAGES.getId()).build();
+        SscsCaseData sscsCaseData = SscsCaseData.builder().interlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId()).interlocReferralReason(InterlocReferralReason.OVER_200_PAGES.getId()).build();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
