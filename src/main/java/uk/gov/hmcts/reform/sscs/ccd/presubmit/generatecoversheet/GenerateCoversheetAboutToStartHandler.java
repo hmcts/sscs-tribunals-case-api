@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.generatecoversheet;
 
 import static java.util.Collections.singletonList;
-import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
@@ -65,7 +64,7 @@ public class GenerateCoversheetAboutToStartHandler implements PreSubmitCallbackH
             uploadResponse = evidenceManagementService.upload(singletonList(file), DM_STORE_USER_ID);
         }
 
-        if (nonNull(uploadResponse) && nonNull(uploadResponse.getEmbedded()) && isNotEmpty(uploadResponse.getEmbedded().getDocuments())) {
+        if (uploadResponse != null && uploadResponse.getEmbedded() != null && isNotEmpty(uploadResponse.getEmbedded().getDocuments())) {
             String location = uploadResponse.getEmbedded().getDocuments().get(0).links.self.href;
             DocumentLink newDoc = DocumentLink.builder().documentFilename(FILENAME).documentUrl(location).documentBinaryUrl(location + "/binary").build();
             caseData.setPreviewDocument(newDoc);
