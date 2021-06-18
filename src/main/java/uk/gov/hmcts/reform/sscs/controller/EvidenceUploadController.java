@@ -40,11 +40,12 @@ public class EvidenceUploadController {
         this.coversheetService = coversheetService;
     }
 
-    //Code should be removed from this point after the release
+    //TODO: Remove this after releasing SSCS-9157
 
     @Autowired
     private TempEvidenceUploadService tempEvidenceUploadService;
 
+    //TODO: Remove this after releasing SSCS-9157
     @ApiOperation(value = "Upload evidence",
             notes = "Uploads evidence for an appeal which will be held in a draft state against the case that is not "
                     + "visible by a caseworker in CCD. You will need to submit the evidence for it to be visbale in CCD "
@@ -67,6 +68,7 @@ public class EvidenceUploadController {
         return uploadEvidence(() -> tempEvidenceUploadService.uploadDraftHearingEvidence(identifier, file));
     }
 
+    //TODO: Remove this after releasing SSCS-9157
     private ResponseEntity<Evidence> uploadEvidence(Supplier<Optional<Evidence>> uploadEvidence) {
         try {
             Optional<Evidence> evidenceOptional = uploadEvidence.get();
@@ -78,6 +80,7 @@ public class EvidenceUploadController {
         }
     }
 
+    //TODO: Remove this after releasing SSCS-9157
     @ApiOperation(value = "List evidence for a hearing",
             notes = "Lists the evidence that has already been uploaded for a hearing but is still in a draft state."
     )
@@ -94,6 +97,7 @@ public class EvidenceUploadController {
         return ResponseEntity.ok(tempEvidenceUploadService.listDraftHearingEvidence(identifier));
     }
 
+    //TODO: Remove this after releasing SSCS-9157
     @ApiOperation(value = "Delete MYA evidence",
             notes = "Deletes evidence for a MYA appeal. You need to have an appeal in CCD and an online hearing in MYA "
                     + "that references the appeal in CCD."
@@ -116,6 +120,7 @@ public class EvidenceUploadController {
         return hearingFound ? ResponseEntity.noContent().build() : notFound().build();
     }
 
+    //TODO: Remove this after releasing SSCS-9157
     @ApiOperation(value = "Submit MYA evidence",
             notes = "Submits the evidence that has already been uploaded in a draft state. This means it will be "
                     + "visible in CCD by a caseworker. You need to have an appeal in CCD "
@@ -138,7 +143,6 @@ public class EvidenceUploadController {
         return evidenceSubmitted ? ResponseEntity.noContent().build() : notFound().build();
     }
 
-    //Code should be removed upto this point after the release.
 
     @ApiOperation(value = "Submit MYA evidence",
             notes = "Submits the evidence attached to the request. This means it will be "

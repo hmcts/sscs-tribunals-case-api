@@ -49,10 +49,11 @@ import uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.EvidenceDescriptionPdfData;
 import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.DocumentManagementService;
 
+//TODO: Delete this class after releasing SSCS-9157
 @Slf4j
 @Service
 public class TempEvidenceUploadService {
-    //Delete this class after release of SSCS-9157
+
     private final DocumentManagementService documentManagementService;
     private final CcdService ccdService;
     private final IdamService idamService;
