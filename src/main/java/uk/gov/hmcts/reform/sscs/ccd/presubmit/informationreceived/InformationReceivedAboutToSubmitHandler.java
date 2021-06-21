@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.informationreceived;
 
-import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.findLabelById;
 
@@ -23,11 +22,11 @@ import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 @Slf4j
 public class InformationReceivedAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    public AddNoteService addNote;
+    public AddNoteService addNoteService;
 
     @Autowired
-    public InformationReceivedAboutToSubmitHandler(AddNoteService addNote) {
-        this.addNote = addNote;
+    public InformationReceivedAboutToSubmitHandler(AddNoteService addNoteService) {
+        this.addNoteService = addNoteService;
     }
 
     @Override
@@ -66,11 +65,11 @@ public class InformationReceivedAboutToSubmitHandler implements PreSubmitCallbac
 
             String tempNote = sscsCaseData.getTempNoteDetail();
 
-            if (nonNull(tempNote) && StringUtils.isNoneBlank(tempNote)) {
+            if (StringUtils.isNotEmpty(tempNote)) {
                 finalNote = finalNote + " - " + tempNote;
             }
 
-            addNote.addNote(userAuthorisation, sscsCaseData, finalNote);
+            addNoteService.addNote(userAuthorisation, sscsCaseData, finalNote);
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);

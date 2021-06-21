@@ -39,7 +39,7 @@ public class AddNoteServiceTest {
     }
 
     @Test
-    public void givenANonAddNoteEvent_thenReturnFalse() {
+    public void givenNoteNotBlank_AddNoteToAppealNotePad() {
         addNoteService.addNote(USER_AUTHORISATION, sscsCaseData, "new note");
         assertEquals(1, sscsCaseData.getAppealNotePad().getNotesCollection().size());
         assertEquals("new note", sscsCaseData.getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());

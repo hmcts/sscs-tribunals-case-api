@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static java.util.Objects.nonNull;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +21,7 @@ public class AddNoteService {
     }
 
     public void addNote(String userAuthorisation, SscsCaseData sscsCaseData, String note) {
-        if (nonNull(note) && StringUtils.isNoneBlank(note)) {
+        if (StringUtils.isNotEmpty(note)) {
             Note newNote = Note.builder().value(NoteDetails.builder().noteDetail(note).noteDate(LocalDate.now().toString())
                     .author(userDetailsService.buildLoggedInUserName(userAuthorisation)).build()).build();
             if (sscsCaseData.getAppealNotePad() == null || sscsCaseData.getAppealNotePad().getNotesCollection() == null) {
