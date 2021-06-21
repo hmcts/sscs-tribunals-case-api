@@ -2251,7 +2251,7 @@ logstash:
     initialDelaySeconds: 90
 
 sscs-evidence-share:
-  enabled: false
+  enabled: true
   image: hmctspublic.azurecr.io/sscs/evidence-share:latest
   releaseNameOverride: ${SERVICE_NAME}-sscs-evidence-share
   ingressHost: sscs-evidence-share-${SERVICE_FQDN}
@@ -2269,6 +2269,17 @@ sscs-evidence-share:
     ROBOTICS_EMAIL_TO: "fake"
     ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
     ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
+
+sscs-ccd-callback-orchestrator:
+  enabled: true
+  image: hmctspublic.azurecr.io/sscs/ccd-callback-orchestrator:latest
+  releaseNameOverride: ${SERVICE_NAME}-sscs-ccd-callback-orchestrator
+  ingressHost: sscs-ccd-callback-orchestrator-${SERVICE_FQDN}
+  readinessDelay: 90
+  environment:
+    SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
+    TOPIC_NAME: "sscs-evidenceshare-topic-aat"
+    AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
 
 sscs-tribunals-frontend:
   enabled: true

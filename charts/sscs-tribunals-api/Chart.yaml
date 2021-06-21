@@ -29,6 +29,10 @@ dependencies:
     version: 0.0.34
     repository: '@hmctspublic'
     condition: sscs-evidence-share.enabled
+  - name: sscs-ccd-callback-orchestrator
+    version: 0.0.23
+    repository: '@hmctspublic'
+    condition: sscs-ccd-callback-orchestrator.enabled
   - name: ccd
     version: 5.0.2
     repository: '@hmctspublic'
