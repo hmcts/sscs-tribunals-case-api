@@ -206,7 +206,7 @@ public class StoreAppellantStatementServiceTest {
         Statement statement = new Statement("some statement", tya);
         AppellantStatementPdfData data = new AppellantStatementPdfData(caseDetails, statement);
 
-        storeAppellantStatementService.storePdf(1234567890L, "onlineHearingId", data);
+        storeAppellantStatementService.storePdfAndUpdate(1234567890L, "onlineHearingId", data);
 
         ArgumentCaptor<String> acForPdfName = ArgumentCaptor.forClass(String.class);
         verify(ccdPdfService, times(1)).mergeDocIntoCcd(acForPdfName.capture(), any(),
@@ -232,7 +232,7 @@ public class StoreAppellantStatementServiceTest {
         Statement statement = new Statement("some statement", "someAppealNumber");
         AppellantStatementPdfData data = new AppellantStatementPdfData(caseDetails, statement);
 
-        storeAppellantStatementService.storePdf(1L, "onlineHearingId", data);
+        storeAppellantStatementService.storePdfAndUpdate(1L, "onlineHearingId", data);
 
         verify(evidenceManagementService, times(1))
             .download(eq(new URI("http://dm-store/scannedDoc")), anyString());
