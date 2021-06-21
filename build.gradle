@@ -431,7 +431,7 @@ jacocoTestReport {
 }
 
 pitest {
-    targetClasses = ['uk.gov.hmcts.sscs.*']
+    targetClasses = ['uk.gov.hmcts.reform.sscs.*']
     excludedClasses = ['uk.gov.hmcts.reform.sscs.config.*','uk.gov.hmcts.reform.sscs.models.*','uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication.java']
     threads = 16
     enableDefaultIncrementalAnalysis = true
