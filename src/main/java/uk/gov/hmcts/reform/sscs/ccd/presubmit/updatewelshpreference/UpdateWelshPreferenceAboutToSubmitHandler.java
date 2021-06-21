@@ -19,11 +19,11 @@ import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 @Slf4j
 public class UpdateWelshPreferenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    public AddNoteService addNote;
+    public AddNoteService addNoteService;
 
     @Autowired
-    public UpdateWelshPreferenceAboutToSubmitHandler(AddNoteService addNote) {
-        this.addNote = addNote;
+    public UpdateWelshPreferenceAboutToSubmitHandler(AddNoteService addNoteService) {
+        this.addNoteService = addNoteService;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class UpdateWelshPreferenceAboutToSubmitHandler implements PreSubmitCallb
             if (WELSH_TRANSLATION.getId().equals(caseData.getInterlocReviewState())) {
                 caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
                 String note = "Assigned to admin - Case no longer Welsh. Please cancel any Welsh translations";
-                addNote.addNote(userAuthorisation, caseData, note);
+                addNoteService.addNote(userAuthorisation, caseData, note);
             }
             caseData.setTranslationWorkOutstanding("No");
         }
