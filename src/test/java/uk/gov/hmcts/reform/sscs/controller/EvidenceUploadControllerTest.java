@@ -38,7 +38,7 @@ public class EvidenceUploadControllerTest {
         EvidenceDescription description = new EvidenceDescription("some description", "idamEmail");
         when(evidenceUploadService.submitHearingEvidence(someOnlineHearingId, description, file)).thenReturn(true);
 
-        ResponseEntity responseEntity = evidenceUploadController.submitEvidence(someOnlineHearingId, file, "some description", "idamEmail");
+        ResponseEntity responseEntity = evidenceUploadController.submitSingleEvidence(someOnlineHearingId, file, "some description", "idamEmail");
 
         assertThat(responseEntity.getStatusCode(), is(NO_CONTENT));
     }
@@ -49,7 +49,7 @@ public class EvidenceUploadControllerTest {
         EvidenceDescription description = new EvidenceDescription("some description", "idamEmail");
         when(evidenceUploadService.submitHearingEvidence(someOnlineHearingId, description, file)).thenReturn(false);
 
-        ResponseEntity responseEntity = evidenceUploadController.submitEvidence(someOnlineHearingId, file, "some description", "idamEmail");
+        ResponseEntity responseEntity = evidenceUploadController.submitSingleEvidence(someOnlineHearingId, file, "some description", "idamEmail");
 
         assertThat(responseEntity.getStatusCode(), is(NOT_FOUND));
     }
