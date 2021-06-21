@@ -180,8 +180,10 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/coversheet/PdfCoverSheet.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/controllers/CreateCaseController.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/PdfData.java," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/esa/EsaWriteFinalDecisionMidEventValidationHandler.java,"
-                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/uc/UcWriteFinalDecisionMidEventValidationHandler.java"
+                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/esa/EsaWriteFinalDecisionMidEventValidationHandler.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/uc/UcWriteFinalDecisionMidEventValidationHandler.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/service/evidence/TempEvidenceUploadService.java"
+        property "sonar.coverage.exclusions", "src/main/java/uk/gov/hmcts/reform/sscs/service/evidence/TempEvidenceUploadService.java"
         property "sonar.pitest.mode", "reuseReport"
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
     }
