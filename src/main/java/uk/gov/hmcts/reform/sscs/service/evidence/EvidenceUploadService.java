@@ -4,6 +4,7 @@ import static java.util.Collections.*;
 import static java.util.stream.Collectors.*;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.collections4.ListUtils.union;
+import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService.TEMP_UNIQUE_ID;
@@ -280,7 +281,7 @@ public class EvidenceUploadService {
         while (iterator.hasNext()) {
             SscsDocument document = iterator.next();
             String filename = document.getValue().getDocumentFileName();
-            if (filename != null && (filename.toLowerCase().endsWith("mp3") || filename.toLowerCase().endsWith("mp4"))) {
+            if (filename != null && (endsWithIgnoreCase(filename, "mp3") || endsWithIgnoreCase(filename, "mp4"))) {
                 audioVideoFiles.add(document);
                 iterator.remove();
             }

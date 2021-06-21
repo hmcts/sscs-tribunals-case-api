@@ -58,7 +58,12 @@ public class AddNoteAboutToSubmitHandler  implements PreSubmitCallbackHandler<Ss
 
         if (callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED && nonNull(sscsCaseData.getInterlocReferralReason())
                 && StringUtils.isNoneBlank(sscsCaseData.getInterlocReferralReason()) && nonNull(sscsCaseData.getSelectWhoReviewsCase())) {
+
             String reasonLabel = findLabelById(sscsCaseData.getInterlocReferralReason());
+
+            log.info("Add note details for case id {} - select who reviews case: {}, interloc referral reason: {}",
+                    sscsCaseData.getCcdCaseId(), sscsCaseData.getSelectWhoReviewsCase(), sscsCaseData.getInterlocReferralReason());
+
             if (nonNull(note) && StringUtils.isNoneBlank(note)) {
                 note = "Referred to interloc for " + sscsCaseData.getSelectWhoReviewsCase().getValue().getLabel().toLowerCase() + " - " + reasonLabel + " - " + note;
             } else {

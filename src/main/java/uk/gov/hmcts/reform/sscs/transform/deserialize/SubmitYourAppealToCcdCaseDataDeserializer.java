@@ -190,6 +190,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             case UC:
             case CARERS_ALLOWANCE:
             case BEREAVEMENT_BENEFIT:
+            case MATERNITY_ALLOWANCE:
                 result = dwpLookup.getDefaultDwpMappingByBenefitType(benefitType)
                         .map(office -> office.getMapping().getCcd())
                         .orElse(null);
