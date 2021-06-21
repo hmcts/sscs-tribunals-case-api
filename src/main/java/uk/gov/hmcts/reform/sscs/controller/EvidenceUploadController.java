@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.Evidence;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.EvidenceDescription;
 import uk.gov.hmcts.reform.sscs.service.coversheet.CoversheetService;
 import uk.gov.hmcts.reform.sscs.service.evidence.EvidenceUploadService;
+import uk.gov.hmcts.reform.sscs.service.evidence.TempEvidenceUploadService;
 import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.IllegalFileTypeException;
 
 @Slf4j
@@ -39,6 +40,12 @@ public class EvidenceUploadController {
         this.coversheetService = coversheetService;
     }
 
+    //TODO: Remove this after releasing SSCS-9157
+
+    @Autowired
+    private TempEvidenceUploadService tempEvidenceUploadService;
+
+    //TODO: Remove this after releasing SSCS-9157
     @ApiOperation(value = "Upload evidence",
             notes = "Uploads evidence for an appeal which will be held in a draft state against the case that is not "
                     + "visible by a caseworker in CCD. You will need to submit the evidence for it to be visbale in CCD "
@@ -58,9 +65,10 @@ public class EvidenceUploadController {
             @ApiParam(value = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx") @PathVariable("identifier") String identifier,
             @RequestParam("file") MultipartFile file
     ) {
-        return uploadEvidence(() -> evidenceUploadService.uploadDraftHearingEvidence(identifier, file));
+        return uploadEvidence(() -> tempEvidenceUploadService.uploadDraftHearingEvidence(identifier, file));
     }
 
+    //TODO: Remove this after releasing SSCS-9157
     private ResponseEntity<Evidence> uploadEvidence(Supplier<Optional<Evidence>> uploadEvidence) {
         try {
             Optional<Evidence> evidenceOptional = uploadEvidence.get();
@@ -72,6 +80,7 @@ public class EvidenceUploadController {
         }
     }
 
+    //TODO: Remove this after releasing SSCS-9157
     @ApiOperation(value = "List evidence for a hearing",
             notes = "Lists the evidence that has already been uploaded for a hearing but is still in a draft state."
     )
@@ -85,9 +94,10 @@ public class EvidenceUploadController {
     public ResponseEntity<List<Evidence>> listDraftEvidence(
             @PathVariable("identifier") String identifier
     ) {
-        return ResponseEntity.ok(evidenceUploadService.listDraftHearingEvidence(identifier));
+        return ResponseEntity.ok(tempEvidenceUploadService.listDraftHearingEvidence(identifier));
     }
 
+    //TODO: Remove this after releasing SSCS-9157
     @ApiOperation(value = "Delete MYA evidence",
             notes = "Deletes evidence for a MYA appeal. You need to have an appeal in CCD and an online hearing in MYA "
                     + "that references the appeal in CCD."
@@ -106,10 +116,11 @@ public class EvidenceUploadController {
             @PathVariable("identifier") String identifier,
             @PathVariable("evidenceId") String evidenceId
     ) {
-        boolean hearingFound = evidenceUploadService.deleteDraftHearingEvidence(identifier, evidenceId);
+        boolean hearingFound = tempEvidenceUploadService.deleteDraftHearingEvidence(identifier, evidenceId);
         return hearingFound ? ResponseEntity.noContent().build() : notFound().build();
     }
 
+    //TODO: Remove this after releasing SSCS-9157
     @ApiOperation(value = "Submit MYA evidence",
             notes = "Submits the evidence that has already been uploaded in a draft state. This means it will be "
                     + "visible in CCD by a caseworker. You need to have an appeal in CCD "
@@ -128,7 +139,34 @@ public class EvidenceUploadController {
             @PathVariable("identifier") String identifier,
             @RequestBody EvidenceDescription description
     ) {
-        boolean evidenceSubmitted = evidenceUploadService.submitHearingEvidence(identifier, description);
+        boolean evidenceSubmitted = tempEvidenceUploadService.submitHearingEvidence(identifier, description);
+        return evidenceSubmitted ? ResponseEntity.noContent().build() : notFound().build();
+    }
+
+
+    @ApiOperation(value = "Submit MYA evidence",
+            notes = "Submits the evidence attached to the request. This means it will be "
+                    + "visible in CCD by a caseworker. You need to have an appeal in CCD "
+                    + "and an online hearing in the references the appeal in CCD. Will create a cover sheet for the "
+                    + "evidence uploaded containing the file names and a description from the appellant."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Evidence has been submitted to the appeal"),
+            @ApiResponse(code = 404, message = "No online hearing found with online hearing id"),
+            @ApiResponse(code = 422, message = "The file cannot be added to the document store")
+    })
+    @PostMapping(
+            value = "{identifier}/singleevidence",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity submitSingleEvidence(
+            @ApiParam(value = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx") @PathVariable("identifier") String identifier,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("body") String body,
+            @RequestParam("idamEmail") String idamEmail
+    ) {
+        boolean evidenceSubmitted = evidenceUploadService.submitHearingEvidence(identifier, new EvidenceDescription(body, idamEmail), file);
         return evidenceSubmitted ? ResponseEntity.noContent().build() : notFound().build();
     }
 
