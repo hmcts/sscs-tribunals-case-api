@@ -5,7 +5,6 @@ import static java.util.Objects.requireNonNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
@@ -68,71 +67,50 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
                 return response;
             }
 
-            List<HearingRecordingRequest> requests = sscsCaseData.getHearingRecordingsData().getHearingRecordingRequests();
+            List<HearingRecordingRequest> requestedHearingsCollection = sscsCaseData.getHearingRecordingsData().getRequestedHearings();
+            List<HearingRecordingRequest> releasedHearingsCollection = sscsCaseData.getHearingRecordingsData().getReleasedHearings();
+            StringBuilder requestedHearingText = new StringBuilder();
+            StringBuilder releasedHearingText = new StringBuilder();
 
-            if (requests != null && !requests.isEmpty()) {
-                List<HearingRecordingRequest> releasedHearingsCollection = new ArrayList<>();
-                List<HearingRecordingRequest> requestedHearingsCollection = new ArrayList<>();
-                StringBuilder requestedHearingText = new StringBuilder();
-                StringBuilder releasedHearingText = new StringBuilder();
+            if (requestedHearingsCollection != null) {
+                requestedHearingsCollection.stream().filter(r -> r.getValue().getRequestingParty().equals(UploadParty.DWP.getValue()))
+                        .forEach(r -> removeFromListAndAddText(r, validHearings, requestedHearingText));
+            }
 
-                for (HearingRecordingRequest request : requests) {
-                    if (request.getValue().getRequestingParty().equals("dwp")) {
-                        if (request.getValue().getStatus().equals("requested")) {
-                            //moveFromListToList(request.getValue().getRequestedHearing(), validHearings, requestedHearings);
-                            moveFromListToCollection(request, validHearings, requestedHearingsCollection);
-                            requestedHearingText.append(request.getValue().getRequestedHearingName());
-                            requestedHearingText.append(", ");
-                        }
-                        if (request.getValue().getStatus().equals("released")) {
-                            moveFromListToCollection(request, validHearings, releasedHearingsCollection);
-                            releasedHearingText.append(request.getValue().getRequestedHearingName());
-                            releasedHearingText.append(", ");
-                        }
-                    }
-                }
+            if (releasedHearingsCollection != null) {
+                releasedHearingsCollection.stream().filter(r -> r.getValue().getRequestingParty().equals(UploadParty.DWP.getValue()))
+                        .forEach(r -> removeFromListAndAddText(r, validHearings, releasedHearingText));
+            }
 
-                if (validHearings.isEmpty()) {
-                    response.addError("There are no hearings to request on this case");
-                    return response;
-                }
 
-                if (!requestedHearingsCollection.isEmpty()) {
-                    sscsCaseData.getHearingRecordingsData().setRequestedHearings(requestedHearingsCollection);
-                    sscsCaseData.getHearingRecordingsData().setRequestedHearingsTextList(requestedHearingText.substring(0, requestedHearingText.length() - 2));
-                    log.info("not empty");
-                } else {
-                    log.info("not setting the requested list");
-                }
-                if (!releasedHearingsCollection.isEmpty()) {
-                    sscsCaseData.getHearingRecordingsData().setReleasedHearings(releasedHearingsCollection);
-                    sscsCaseData.getHearingRecordingsData().setReleasedHearingsTextList(releasedHearingText.substring(0, releasedHearingText.length() - 2));
-                    log.info("not empty");
-                } else {
-                    log.info("not setting the released list");
-                }
+            if (validHearings.isEmpty()) {
+                response.addError("There are no hearings to request on this case");
+                return response;
             }
 
             sscsCaseData.getHearingRecordingsData().setRequestableHearingDetails(new DynamicList(new DynamicListItem("", ""), validHearings));
+            if (requestedHearingsCollection != null && !requestedHearingsCollection.isEmpty()) {
+                sscsCaseData.getHearingRecordingsData().setRequestedHearings(requestedHearingsCollection);
+                sscsCaseData.getHearingRecordingsData().setRequestedHearingsTextList(requestedHearingText.substring(0, requestedHearingText.length() - 2));
+            } else {
+                sscsCaseData.getHearingRecordingsData().setRequestedHearingsTextList("There are no outstanding DWP hearing recording requests on this case");
+            }
+            if (releasedHearingsCollection != null && !releasedHearingsCollection.isEmpty()) {
+                sscsCaseData.getHearingRecordingsData().setReleasedHearings(releasedHearingsCollection);
+                sscsCaseData.getHearingRecordingsData().setReleasedHearingsTextList(releasedHearingText.substring(0, releasedHearingText.length() - 2));
+            } else {
+                sscsCaseData.getHearingRecordingsData().setReleasedHearingsTextList("No hearing recordings have been released to DWP on this case");
+            }
         }
         return response;
     }
 
-    private void moveFromListToCollection(HearingRecordingRequest requestedHearing, List<DynamicListItem> validHearings, List<HearingRecordingRequest> requestedHearingsCollection) {
+    private void removeFromListAndAddText(HearingRecordingRequest request, List<DynamicListItem> validHearings, StringBuilder stringBuilder) {
+        stringBuilder.append(request.getValue().getRequestedHearingName());
+        stringBuilder.append(", ");
         for (DynamicListItem item: validHearings) {
-            if (item.getCode().equals(requestedHearing.getValue().getRequestedHearing())) {
+            if (item.getCode().equals(request.getValue().getRequestedHearing())) {
                 validHearings.remove(item);
-                requestedHearingsCollection.add(requestedHearing);
-                break;
-            }
-        }
-    }
-
-    private void moveFromListToList(String requestedHearing, List<DynamicListItem> validHearings, List<DynamicListItem> otherHearings) {
-        for (DynamicListItem item: validHearings) {
-            if (item.getCode().equals(requestedHearing)) {
-                validHearings.remove(item);
-                otherHearings.add(item);
                 break;
             }
         }

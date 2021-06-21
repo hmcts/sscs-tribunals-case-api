@@ -2,12 +2,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.requesthearingrecording;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -45,43 +42,20 @@ public class RequestHearingRecordingAboutToSubmitHandler implements PreSubmitCal
         String hearingName = selectedRequestable.getLabel();
 
         HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
-                .requestingParty("dwp").status("requested").requestedHearing(hearingId).requestedHearingName(hearingName).build()).build();
+                .requestingParty(UploadParty.DWP.getValue()).status("requested").dateRequested(LocalDateTime.now())
+                .requestedHearing(hearingId).requestedHearingName(hearingName).build()).build();
 
-        List<HearingRecordingRequest> hearingRecordingRequests = sscsCaseData.getHearingRecordingsData().getHearingRecordingRequests();
+        List<HearingRecordingRequest> hearingRecordingRequests = sscsCaseData.getHearingRecordingsData().getRequestedHearings();
         if (hearingRecordingRequests == null) {
             hearingRecordingRequests = new ArrayList<>();
         }
         hearingRecordingRequests.add(hearingRecordingRequest);
 
-        sscsCaseData.getHearingRecordingsData().setHearingRecordingRequests(hearingRecordingRequests);
+        sscsCaseData.getHearingRecordingsData().setRequestedHearings(hearingRecordingRequests);
+        sscsCaseData.getHearingRecordingsData().setHearingRecordingRequestOutstanding(YesNo.YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-
         return response;
     }
-
-    private void moveFromListToList(String requestedHearing, List<DynamicListItem> validHearings, List<DynamicListItem> otherHearings) {
-        for (DynamicListItem item: validHearings) {
-            if (item.getCode().equals(requestedHearing)) {
-                validHearings.remove(item);
-                otherHearings.add(item);
-            }
-        }
-    }
-
-    private boolean isBeforeDate(LocalDateTime currentDate, String hearingDate, String hearingTime) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        return LocalDateTime.parse(hearingDate + " " + hearingTime, formatter).isBefore(currentDate);
-    }
-
-    @NotNull
-    private String selectHearing(Hearing hearing) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        DateTimeFormatter resultFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy");
-        return hearing.getValue().getVenue().getName() + " "
-            + hearing.getValue().getTime() + " "
-            + LocalDate.parse(hearing.getValue().getHearingDate(), formatter).format(resultFormatter);
-    }
-
 }

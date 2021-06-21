@@ -10,7 +10,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import java.util.Arrays;
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -58,16 +57,14 @@ public class RequestHearingRecordingAboutToStartHandlerTest {
 
     }
 
-    @Ignore
     @Test
     public void givenANonRequestHearingRecordingEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         assertFalse(handler.canHandle(ABOUT_TO_START, callback));
     }
 
-    @Ignore
     @Test
-    public void givenAHearingWithRecording_thenHearingInRequestableList() {
+    public void givenAHearingWithRecording_thenHearingInRequestableListAndMessagesInPlace() {
         sscsCaseData.setHearings(singletonList(Hearing.builder().value(
                 HearingDetails.builder().hearingId("an_id").venue(Venue.builder().name("venue name").build())
                         .hearingDate("2021-03-20")
@@ -75,24 +72,34 @@ public class RequestHearingRecordingAboutToStartHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertEquals(1, response.getData().getHearingRecordingsData().getRequestableHearingDetails().getListItems().size());
+        assertEquals("There are no outstanding DWP hearing recording requests on this case", response.getData().getHearingRecordingsData().getRequestedHearingsTextList());
+        assertEquals("No hearing recordings have been released to DWP on this case", response.getData().getHearingRecordingsData().getReleasedHearingsTextList());
     }
 
-    @Ignore
     @Test
     public void givenThreeHearingsWithRecording_thenThreeHearingInRequestableList() {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertEquals(3, response.getData().getHearingRecordingsData().getRequestableHearingDetails().getListItems().size());
     }
 
-    @Ignore
     @Test
     public void givenAHearingsRequested_thenHearingInRequestedList() {
         HearingRecordingRequest recordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder().requestingParty("dwp").requestedHearing("an_id2").status("requested").build()).build();
-        sscsCaseData.getHearingRecordingsData().setHearingRecordingRequests(singletonList(recordingRequest));
+        sscsCaseData.getHearingRecordingsData().setRequestedHearings(singletonList(recordingRequest));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals(2, response.getData().getHearingRecordingsData().getRequestableHearingDetails().getListItems().size());
         assertEquals(1, response.getData().getHearingRecordingsData().getRequestedHearings().size());
+    }
+
+    @Test
+    public void givenAHearingsReleased_thenHearingInReleasedList() {
+        HearingRecordingRequest recordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder().requestingParty("dwp").requestedHearing("an_id2").status("released").build()).build();
+        sscsCaseData.getHearingRecordingsData().setReleasedHearings(singletonList(recordingRequest));
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals(2, response.getData().getHearingRecordingsData().getRequestableHearingDetails().getListItems().size());
+        assertEquals(1, response.getData().getHearingRecordingsData().getReleasedHearings().size());
     }
 
 }
