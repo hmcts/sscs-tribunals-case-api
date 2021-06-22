@@ -4,6 +4,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -58,6 +60,16 @@ public class DateTimeUtilsTest {
         String localDateTimetoUtc = DateTimeUtils.convertLocalDateTimetoUtc(localDateTime);
 
         assertThat(localDateTimetoUtc, is("2018-12-01T10:15:00.000Z"));
+    }
+
+    @Test
+    public void shouldReturnTrueForTodayTimeInPast() {
+        assertTrue(DateTimeUtils.isDateInThePast(LocalDateTime.now().minusMinutes(1)));
+    }
+
+    @Test
+    public void shouldReturnFalseForTodayTime() {
+        assertFalse(DateTimeUtils.isDateInThePast(LocalDateTime.now().plusMinutes(1)));
     }
 
     @Test

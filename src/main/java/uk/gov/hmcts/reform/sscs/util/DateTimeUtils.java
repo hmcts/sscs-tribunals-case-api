@@ -54,6 +54,10 @@ public final class DateTimeUtils {
         return Optional.ofNullable(date).filter(d -> d.isBefore(LocalDate.now())).isPresent();
     }
 
+    public static boolean isDateInThePast(LocalDateTime dateTime) {
+        return Optional.ofNullable(dateTime).filter(d -> d.isBefore(LocalDateTime.now())).isPresent();
+    }
+
     public static boolean isDateInThePast(String dateString) {
         return isDateInThePast(getLocalDate(dateString).orElse(null));
     }
