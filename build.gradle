@@ -433,14 +433,14 @@ pitest {
     targetTests = ['uk.gov.hmcts.reform.sscs.*']
     excludedClasses = ['uk.gov.hmcts.reform.sscs.config.*',
                        'uk.gov.hmcts.reform.sscs.builder.*',
-                       'uk.gov.hmcts.reform.sscs.model.*',
                        'uk.gov.hmcts.reform.sscs.domain.*',
+                       'uk.gov.hmcts.reform.sscs.exception.*',
                        'uk.gov.hmcts.reform.sscs.healthcheck.*',
-                       '*Temp*',
-                       '*transform*',
+                       'uk.gov.hmcts.reform.sscs.model.*',
+                       'uk.gov.hmcts.reform.sscs.transform.*',
                        'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication']
     jvmArgs = ['-Xms1G','-Xmx3G']
-    threads = 20
+    threads = 100
     outputFormats = ['XML', 'HTML']
     timestampedReports = false
     mutationThreshold = 50
