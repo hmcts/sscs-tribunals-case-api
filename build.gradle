@@ -431,7 +431,7 @@ jacocoTestReport {
 }
 
 pitest {
-    targetClasses = ['uk.gov.hmcts.reform.sscs.*']
+    targetClasses = ['uk.gov.hmcts.reform.sscs.ccd.service.*']
     targetTests = ['uk.gov.hmcts.reform.sscs.*']
     excludedClasses = ['uk.gov.hmcts.reform.sscs.config.*',
                        'uk.gov.hmcts.reform.sscs.builder.*',
@@ -442,10 +442,10 @@ pitest {
                        '*transform*',
                        'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication']
     jvmArgs = ['-Xms1G','-Xmx3G']
-    threads = 10
+    threads = 20
     outputFormats = ['XML', 'HTML']
     timestampedReports = false
-    mutationThreshold = 10
+    mutationThreshold = 50
 }
 
 task smoke(type: Test) {
