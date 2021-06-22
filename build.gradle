@@ -433,8 +433,8 @@ jacocoTestReport {
 pitest {
     targetClasses = ['uk.gov.hmcts.reform.sscs.*']
     targetTests = ['uk.gov.hmcts.reform.sscs.*']
-    testPlugin = "junit5"
-    junit5PluginVersion = '0.12'
+//    testPlugin = "junit5"
+//    junit5PluginVersion = '0.12'
     excludedClasses = ['uk.gov.hmcts.reform.sscs.config.*',
                        'uk.gov.hmcts.reform.sscs.builder.*',
                        'uk.gov.hmcts.reform.sscs.model.*',
