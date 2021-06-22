@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 
@@ -54,7 +55,8 @@ public class AddNoteAboutToSubmitHandler  implements PreSubmitCallbackHandler<Ss
         String note = sscsCaseData.getTempNoteDetail();
 
         if (callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED && nonNull(sscsCaseData.getInterlocReferralReason())
-                && StringUtils.isNoneBlank(sscsCaseData.getInterlocReferralReason()) && nonNull(sscsCaseData.getSelectWhoReviewsCase())) {
+                && StringUtils.isNoneBlank(sscsCaseData.getInterlocReferralReason()) && !sscsCaseData.getInterlocReferralReason().equals(InterlocReferralReason.NONE.getId())
+                && nonNull(sscsCaseData.getSelectWhoReviewsCase())) {
 
             String reasonLabel = findLabelById(sscsCaseData.getInterlocReferralReason());
 
