@@ -429,7 +429,7 @@ jacocoTestReport {
 }
 
 pitest {
-    targetClasses = ['uk.gov.hmcts.reform.sscs.ccd.service.*']
+    targetClasses = ['uk.gov.hmcts.reform.sscs.service.*']
     targetTests = ['uk.gov.hmcts.reform.sscs.*']
     excludedClasses = ['uk.gov.hmcts.reform.sscs.config.*',
                        'uk.gov.hmcts.reform.sscs.builder.*',
