@@ -18,7 +18,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.38.0'
     id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.6.0'
-    id 'org.owasp.dependencycheck' version '6.2.1'
+    id 'org.owasp.dependencycheck' version '6.2.2'
     id 'au.com.dius.pact' version '4.2.6'
 }
 
@@ -180,7 +180,7 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/coversheet/PdfCoverSheet.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/controllers/CreateCaseController.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/PdfData.java," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/esa/EsaWriteFinalDecisionMidEventValidationHandler.java,"
+                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/esa/EsaWriteFinalDecisionMidEventValidationHandler.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/uc/UcWriteFinalDecisionMidEventValidationHandler.java"
         property "sonar.pitest.mode", "reuseReport"
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
@@ -254,7 +254,7 @@ dependencyManagement {
         }
 
         //CVE-2021-27807
-        dependencySet(group: 'org.apache.pdfbox', version: '2.0.23') {
+        dependencySet(group: 'org.apache.pdfbox', version: '2.0.24') {
             entry 'pdfbox-tools'
             entry 'preflight'
         }
@@ -264,7 +264,7 @@ dependencyManagement {
         }
 
         //CVE-2021-27807
-        dependencySet(group: 'org.apache.pdfbox', version: '2.0.23') {
+        dependencySet(group: 'org.apache.pdfbox', version: '2.0.24') {
             entry 'pdfbox'
             entry 'pdfbox-tools'
             entry 'preflight'
@@ -319,14 +319,14 @@ dependencies {
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
     compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.1'
     compile group: 'com.google.guava', name: 'guava', version: '30.1.1-jre'
-    compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.13.1'
+    compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.13.2'
 
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
 
     // Added to fix CVE-2020-13934, CVE-2020-13935, CVE-2020-17527
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.43'
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.43'
-    compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.6'
+    compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.7'
 
     // Safe to remove once Spring update their dependencies - see CVE-2019-14439 and add 'com.fasterxml.jackson.core' configurations.all above
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
@@ -345,7 +345,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.07'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.32'
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.37'
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.35'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
@@ -353,11 +353,11 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:$versions.lombok"
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.11.0'
-    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.26.0'
-    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.11.0'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.11.1'
+    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.27.0'
+    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.11.1'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
-    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.26.0'
+    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.27.0'
     testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
     // Added to fix CVE-2020-13934, CVE-2020-13935, CVE-2020-17527
@@ -376,7 +376,7 @@ dependencies {
     testRuntime "org.junit.jupiter:junit-jupiter-engine:$versions.junitJupiter"
     testImplementation "org.junit.jupiter:junit-jupiter-api:$versions.junitJupiter"
 
-    e2eRuntime "org.junit.platform:junit-platform-commons:1.7.0"
+    e2eRuntime "org.junit.platform:junit-platform-commons:1.7.2"
 
     //pact contract testing
     contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact
