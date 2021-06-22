@@ -433,8 +433,6 @@ jacocoTestReport {
 pitest {
     targetClasses = ['uk.gov.hmcts.reform.sscs.*']
     targetTests = ['uk.gov.hmcts.reform.sscs.*']
-//    testPlugin = "junit5"
-//    junit5PluginVersion = '0.12'
     excludedClasses = ['uk.gov.hmcts.reform.sscs.config.*',
                        'uk.gov.hmcts.reform.sscs.builder.*',
                        'uk.gov.hmcts.reform.sscs.model.*',
@@ -443,32 +441,11 @@ pitest {
                        '*Temp*',
                        '*transform*',
                        'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication']
-    threads = 50
-    enableDefaultIncrementalAnalysis = true
-    fileExtensionsToFilter.addAll('xml','json')
-    testSourceSets = [sourceSets.test]
-    mainSourceSets = [sourceSets.main]
-    outputFormats = ['XML', 'HTML']
     jvmArgs = ['-Xms1G','-Xmx3G']
-    coverageThreshold = 0
-    maxMutationsPerClass = 15
+    threads = 10
+    outputFormats = ['XML', 'HTML']
     timestampedReports = false
-    failWhenNoMutations = false
-    mutationThreshold = 50
-    detectInlinedCode = true
-    timeoutConstInMillis = 30000
-    mutators = ['CONDITIONALS_BOUNDARY',
-                'INCREMENTS',
-                'INVERT_NEGS',
-                'MATH',
-                'NEGATE_CONDITIONALS',
-                'VOID_METHOD_CALLS',
-                'EMPTY_RETURNS',
-                'FALSE_RETURNS',
-                'NULL_RETURNS',
-                'PRIMITIVE_RETURNS',
-                'TRUE_RETURNS',
-                'REMOVE_CONDITIONALS']
+    mutationThreshold = 10
 }
 
 task smoke(type: Test) {
