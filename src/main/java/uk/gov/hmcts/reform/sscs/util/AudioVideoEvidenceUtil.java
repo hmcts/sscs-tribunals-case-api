@@ -28,7 +28,8 @@ public class AudioVideoEvidenceUtil {
     }
 
     public static boolean isSelectedEvidence(AudioVideoEvidence evidence, SscsCaseData caseData) {
-        return evidence.getValue().getDocumentLink().getDocumentUrl().equals(caseData.getSelectedAudioVideoEvidence().getValue().getCode());
+        return evidence.getValue().getDocumentLink().getDocumentUrl()
+            .equals(caseData.getSelectedAudioVideoEvidence().getValue().getCode());
     }
 
     public static void setHasUnprocessedAudioVideoEvidenceFlag(SscsCaseData caseData) {
@@ -37,6 +38,7 @@ public class AudioVideoEvidenceUtil {
         } else {
             caseData.setHasUnprocessedAudioVideoEvidence(YES);
         }
-        log.info("HasUnprocessedAudioVideoEvidence flag has been set to {} for case id: {}", caseData.getHasUnprocessedAudioVideoEvidence(), caseData.getCcdCaseId());
+        log.info("HasUnprocessedAudioVideoEvidence flag has been set to {} for case id: {}",
+            caseData.getHasUnprocessedAudioVideoEvidence(), caseData.getCcdCaseId());
     }
 }
