@@ -429,8 +429,10 @@ jacocoTestReport {
 }
 
 pitest {
-    targetClasses = ['uk.gov.hmcts.reform.sscs.service.*']
-    targetTests = ['uk.gov.hmcts.reform.sscs.*']
+    junit5PluginVersion = '0.12'
+    verbose = true
+    targetClasses = ['uk.gov.hmcts.reform.sscs.service*']
+    targetTests = ['uk.gov.hmcts.reform.sscs.util*']
     excludedClasses = ['uk.gov.hmcts.reform.sscs.config.*',
                        'uk.gov.hmcts.reform.sscs.builder.*',
                        'uk.gov.hmcts.reform.sscs.domain.*',
@@ -439,8 +441,10 @@ pitest {
                        'uk.gov.hmcts.reform.sscs.model.*',
                        'uk.gov.hmcts.reform.sscs.transform.*',
                        'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication']
+    excludedMethods = ['equals', 'hashcode']
     jvmArgs = ['-Xms1G','-Xmx3G']
-    threads = 100
+    threads = 20
+    verbose = true
     outputFormats = ['XML', 'HTML']
     timestampedReports = false
     mutationThreshold = 50
