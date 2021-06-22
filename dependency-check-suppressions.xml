@@ -14,7 +14,7 @@
         <packageUrl regex="true">^pkg:maven/org\.apache\.xmlgraphics/batik\-i18n@.*$</packageUrl>
         <cve>CVE-2020-7791</cve>
     </suppress>
-    <suppress until="2021-07-01">
+    <suppress until="2021-08-01">
         <notes><![CDATA[
    file name: jdom2-2.0.6.jar
    ]]></notes>
