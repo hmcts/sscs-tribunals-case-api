@@ -249,7 +249,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
-    @Parameters({"Yes, YES", "NO, null"})
+    @Parameters({"Yes, YES", "No, NO"})
     public void givenGenerateNoticeValueAndCaseIsEsa_thenShouldSetShowWorkCapabilityAssessment(String isGenerateNotice, @Nullable YesNo showWorkCapabilityPage) {
         sscsCaseData.setWriteFinalDecisionGenerateNotice(isGenerateNotice);
 
