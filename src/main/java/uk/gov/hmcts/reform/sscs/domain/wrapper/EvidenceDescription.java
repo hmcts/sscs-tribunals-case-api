@@ -3,8 +3,10 @@ package uk.gov.hmcts.reform.sscs.domain.wrapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.EqualsAndHashCode;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@EqualsAndHashCode
 public class EvidenceDescription {
     @ApiModelProperty(example = "this is a description of the evidence", required = false)
     @JsonProperty(value = "body")

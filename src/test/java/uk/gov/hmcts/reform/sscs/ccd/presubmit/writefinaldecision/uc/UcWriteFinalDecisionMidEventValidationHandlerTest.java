@@ -236,7 +236,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     }
 
     @Test
-    @Parameters({"Yes, YES", "NO, null"})
+    @Parameters({"Yes, YES", "No, NO"})
     public void givenGenerateNoticeValueAndCaseIsUc_thenShouldSetShowWorkCapabilityAssessment(String isGenerateNotice, @Nullable YesNo showWorkCapabilityPage) {
         sscsCaseData.setWriteFinalDecisionGenerateNotice(isGenerateNotice);
 
