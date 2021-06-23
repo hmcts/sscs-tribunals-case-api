@@ -2251,7 +2251,7 @@ logstash:
     initialDelaySeconds: 90
 
 sscs-evidence-share:
-  enabled: true
+  enabled: false
   image: hmctspublic.azurecr.io/sscs/evidence-share:latest
   releaseNameOverride: ${SERVICE_NAME}-sscs-evidence-share
   ingressHost: sscs-evidence-share-${SERVICE_FQDN}
