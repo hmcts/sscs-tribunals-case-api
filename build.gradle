@@ -434,7 +434,6 @@ pitest {
     junit5PluginVersion = '0.12'
     verbose = true
     targetClasses = ['uk.gov.hmcts.reform.sscs.service*']
-    targetTests = ['uk.gov.hmcts.reform.sscs.util*']
     excludedClasses = ['uk.gov.hmcts.reform.sscs.config.*',
                        'uk.gov.hmcts.reform.sscs.builder.*',
                        'uk.gov.hmcts.reform.sscs.domain.*',
