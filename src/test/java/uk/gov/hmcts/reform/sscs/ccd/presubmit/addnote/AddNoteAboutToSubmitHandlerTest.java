@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -96,6 +97,19 @@ public class AddNoteAboutToSubmitHandlerTest {
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
+    }
+
+    @Test
+    public void testInterlocReferralReasonIsNoneAndResponseReviewedEvent_thenNoNoteIsAdded() {
+        when(callback.getEvent()).thenReturn(HMCTS_RESPONSE_REVIEWED);
+        sscsCaseData.setTempNoteDetail(null);
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.NONE.getId());
+        sscsCaseData.setSelectWhoReviewsCase(new DynamicList("Review by Judge"));
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getAppealNotePad());
     }
 
     @Test
