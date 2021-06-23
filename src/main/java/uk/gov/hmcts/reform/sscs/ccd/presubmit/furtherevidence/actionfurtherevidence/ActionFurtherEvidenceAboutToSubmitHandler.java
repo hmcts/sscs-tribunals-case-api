@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CONFIDENTIALITY
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REINSTATEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome.GRANTED;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.ActionFurtherEvidenceSubmittedCallbackHandler.isFurtherEvidenceActionOptionValid;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
@@ -387,6 +388,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         String fileName = bundleAdditionFilenameBuilder
             .build(documentType, bundleAddition, scannedDocument.getValue().getScannedDate());
 
+        YesNo evidenceIssued = isFurtherEvidenceActionOptionValid(sscsCaseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL) ? YesNo.YES : YesNo.NO;
+
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
             .documentType(documentType.getValue())
             .documentFileName(fileName)
@@ -395,7 +398,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             .editedDocumentLink(scannedDocument.getValue().getEditedUrl())
             .documentDateAdded(scannedDate)
             .controlNumber(scannedDocument.getValue().getControlNumber())
-            .evidenceIssued("No")
+            .evidenceIssued(evidenceIssued.getValue())
             .documentTranslationStatus(
                 sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null)
             .build()).build();

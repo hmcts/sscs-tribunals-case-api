@@ -100,8 +100,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         scannedDocumentList.add(scannedDocument);
         scannedDocumentList.add(scannedDocument2);
-        DynamicList furtherEvidenceActionList = buildFurtherEvidenceActionItemListForGivenOption("otherDocumentManual",
-            "Other document type - action manually");
+        DynamicList furtherEvidenceActionList = buildFurtherEvidenceActionItemListForGivenOption(ISSUE_FURTHER_EVIDENCE.getCode(),
+                ISSUE_FURTHER_EVIDENCE.getLabel());
 
         DynamicListItem value = new DynamicListItem("appellant", "Appellant (or Appointee)");
         DynamicList originalSender = new DynamicList(value, Collections.singletonList(value));
@@ -263,7 +263,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals("www.test.com", sscsDocumentDetail.getDocumentLink().getDocumentUrl());
         assertEquals("2019-06-13", sscsDocumentDetail.getDocumentDateAdded());
         assertEquals("123", sscsDocumentDetail.getControlNumber());
-        assertEquals(NO, response.getData().getSscsDocument().get(1).getValue().getEvidenceIssued());
+        String expectedEvidenceIssued = response.getData().getFurtherEvidenceAction().getValue().getCode().equalsIgnoreCase(OTHER_DOCUMENT_MANUAL.getCode()) ? YES : NO;
+        assertEquals(expectedEvidenceIssued, response.getData().getSscsDocument().get(1).getValue().getEvidenceIssued());
         assertNull(response.getData().getScannedDocuments());
         assertEquals(YES, response.getData().getEvidenceHandled());
     }
@@ -1074,8 +1075,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     public void isThreadSafe() throws Exception {
 
         DynamicList furtherEvidenceActionList =
-                buildFurtherEvidenceActionItemListForGivenOption("otherDocumentManual",
-                        "Other document type - action manually");
+                buildFurtherEvidenceActionItemListForGivenOption(OTHER_DOCUMENT_MANUAL.getCode(),
+                        OTHER_DOCUMENT_MANUAL.getLabel());
 
         DynamicList originalSender = buildOriginalSenderItemListForGivenOption("appellant",
                 "Appellant (or Appointee)");
