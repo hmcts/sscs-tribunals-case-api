@@ -101,41 +101,20 @@ public class SscsMyaBackendRequests {
         );
     }
 
-    public void uploadHearingEvidence(String hearingId, String fileName) throws IOException {
+    public void submitHearingEvidence(String hearingId, String description, String fileName) throws IOException {
         HttpEntity data = MultipartEntityBuilder.create()
             .setContentType(ContentType.MULTIPART_FORM_DATA)
             .addBinaryBody("file",
                 Objects.requireNonNull(this.getClass().getClassLoader().getResourceAsStream(fileName)),
                 ContentType.IMAGE_PNG,
                 fileName)
+            .addTextBody("body", description)
+            .addTextBody("idamEmail", "mya-sscs-6920@mailinator.com")
             .build();
 
-        HttpResponse response = putRequest("/api/continuous-online-hearings/" + hearingId + "/evidence", data);
-        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
-    }
+        HttpResponse response = postRequest("/api/continuous-online-hearings/" + hearingId + "/singleevidence", data);
 
-    public void deleteUploadEvidence(Long caseId, String evidenceId) throws IOException {
-        HttpResponse response = client.execute(addHeaders(delete(baseUrl + "/api/continuous-online-hearings/" + caseId + "/evidence/" + evidenceId)).build());
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
-    }
-
-    public void submitHearingEvidence(String hearingId, String description) throws IOException {
-        HttpResponse response = postRequest("/api/continuous-online-hearings/" + hearingId + "/evidence",
-            new StringEntity("{\n"
-                + "  \"body\": \"" + description + "\",\n"
-                + "  \"idamEmail\": \"mya-sscs-6920@mailinator.com\"\n"
-                + "}", APPLICATION_JSON)
-        );
-        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
-    }
-
-    public JSONArray getDraftHearingEvidence(String hearingId) throws IOException {
-        HttpResponse response = getRequest("/api/continuous-online-hearings/" + hearingId + "/evidence");
-        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
-
-        String responseBody = EntityUtils.toString(response.getEntity());
-
-        return new JSONArray(responseBody);
     }
 
     public void uploadAppellantStatement(String hearingId, String statement) throws IOException {

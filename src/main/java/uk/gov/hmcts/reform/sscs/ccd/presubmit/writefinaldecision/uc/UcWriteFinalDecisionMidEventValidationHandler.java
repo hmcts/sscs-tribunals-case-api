@@ -82,6 +82,8 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
     protected void setShowWorkCapabilityAssessmentPage(SscsCaseData sscsCaseData) {
         if (YES.getValue().equals(sscsCaseData.getWriteFinalDecisionGenerateNotice())) {
             sscsCaseData.setShowWorkCapabilityAssessmentPage(YES);
+        } else if (NO.getValue().equals(sscsCaseData.getWriteFinalDecisionGenerateNotice())) {
+            sscsCaseData.setShowWorkCapabilityAssessmentPage(NO);
         }
     }
 

@@ -131,7 +131,7 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData>
             response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
-        List<DynamicListItem> selectHearingDetails = response.getData().getSelectHearingDetails().getListItems();
+        List<DynamicListItem> selectHearingDetails = response.getData().getSscsHearingRecordingCaseData().getSelectHearingDetails().getListItems();
         assertEquals(1, selectHearingDetails.size());
         assertEquals("1111", selectHearingDetails.get(0).getCode());
         assertEquals("good value 09:00 06 Jun 2021", selectHearingDetails.get(0).getLabel());

@@ -82,6 +82,8 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     protected void setShowWorkCapabilityAssessmentPage(SscsCaseData sscsCaseData) {
         if (YES.getValue().equals(sscsCaseData.getWriteFinalDecisionGenerateNotice())) {
             sscsCaseData.setShowWorkCapabilityAssessmentPage(YES);
+        } else if (NO.getValue().equals(sscsCaseData.getWriteFinalDecisionGenerateNotice())) {
+            sscsCaseData.setShowWorkCapabilityAssessmentPage(NO);
         }
     }
 
