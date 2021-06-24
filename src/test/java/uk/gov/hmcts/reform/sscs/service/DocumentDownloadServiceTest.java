@@ -41,19 +41,32 @@ public class DocumentDownloadServiceTest {
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
+    String urlString;
+
     @Before
     public void setUp() {
         documentDownloadService = new DocumentDownloadService(documentDownloadClientApi,
-            authTokenGenerator);
+            authTokenGenerator, "http://dm-store:4506");
+        urlString = "http://dm-store:4506/documents/someDocId/binary";
     }
 
     @Test
-    public void givenDocumentUrl_shouldReturnFileSize() {
+    public void givenDocumentId_shouldReturnFileSize() {
         ResponseEntity<Resource> response = ResponseEntity.ok(new ByteArrayResource("test".getBytes()));
         given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
                 .willReturn(response);
         long size = documentDownloadService
             .getFileSize("19cd94a8-4280-406b-92c7-090b735159ca");
+        assertEquals(4L, size);
+    }
+
+    @Test
+    public void givenFullDocumentUrl_shouldReturnFileSize() {
+        ResponseEntity<Resource> response = ResponseEntity.ok(new ByteArrayResource("test".getBytes()));
+        given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
+                .willReturn(response);
+        long size = documentDownloadService
+                .getFileSize("http://dm-store:4506/documents/19cd94a8-4280-406b-92c7-090b735159ca");
         assertEquals(4L, size);
     }
 
@@ -148,6 +161,18 @@ public class DocumentDownloadServiceTest {
 
         String urlString = "http://somedomain/documents/someDocId/binary";
         documentDownloadService.downloadFile(urlString);
+    }
+
+    @Test
+    public void givenId_thenReturnUrl() {
+        String id = "someDocId";
+        assertEquals("/documents/" + id + "/binary", documentDownloadService.getDownloadUrl(id));
+    }
+
+    @Test
+    public void givenUrl_thenReturnUrl() {
+        String id = "someDocId";
+        assertEquals("/documents/" + id + "/binary", documentDownloadService.getDownloadUrl(urlString));
     }
 
     @SuppressWarnings("unused")
