@@ -192,6 +192,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
     @Test
     public void givenDirectionsDueDateIsToday_ThenDisplayAnError() {
         sscsCaseData.setDirectionDueDate(LocalDate.now().toString());
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(ISSUE_DIRECTIONS_NOTICE.getCode()));
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -205,6 +206,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
     public void givenDirectionsDueDateIsBeforeToday_ThenDisplayAnError() {
         String yesterdayDate = LocalDate.now().plus(-1, ChronoUnit.DAYS).toString();
         sscsCaseData.setDirectionDueDate(yesterdayDate);
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(ISSUE_DIRECTIONS_NOTICE.getCode()));
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -212,6 +214,19 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Directions due date must be in the future", error);
+    }
+
+    @Test
+    public void givenDirectionsDueDateIsBeforeTodayAndProcessAudioVideoActionIsNotIssueDirectionsNotice_ThenDoNotDisplayAnError() {
+        String yesterdayDate = LocalDate.now().plus(-1, ChronoUnit.DAYS).toString();
+        sscsCaseData.setDirectionDueDate(yesterdayDate);
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(ADMIT_EVIDENCE.getCode()));
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
     }
 
     public void givenActionDropDownNotSetThenSetValueAndOptions() {
