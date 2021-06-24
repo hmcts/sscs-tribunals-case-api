@@ -328,7 +328,9 @@
   "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/citizen/tya_GET" : "ignore",
   "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/citizen/cases/caseId/log_PUT" : "ignore",
   "100000_A Server Error response code was returned by the server_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/evidence_PUT" : "ignore",
-  "100000_A Server Error response code was returned by the server_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/singleevidence?body=body&idamEmail=idamEmail_POST" : "ignore"
+  "100000_A Server Error response code was returned by the server_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/singleevidence?body=body&idamEmail=idamEmail_POST" : "ignore",
+  "10023_Information Disclosure - Debug Error Messages_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/singleevidence?body=body&idamEmail=idamEmail_POST" : "ignore",
+  "90022_Application Error Disclosure_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/singleevidence?body=body&idamEmail=idamEmail_POST" : "ignore"
 
 
 }

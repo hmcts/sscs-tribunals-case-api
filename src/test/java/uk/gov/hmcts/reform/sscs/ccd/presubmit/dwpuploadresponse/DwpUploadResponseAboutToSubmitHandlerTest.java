@@ -116,16 +116,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenADwpUploadResponseEventWithEmptyDwpFurtherInfo_displayAnError() {
-        callback.getCaseDetails().getCaseData().setDwpFurtherInfo(null);
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(1, response.getErrors().size());
-
-        assertEquals("Further information to assist the tribunal cannot be empty.", response.getErrors().iterator().next());
-    }
-
-    @Test
     public void givenADwpUploadResponseEventWithEmptyDwpResponseDoc_displayAnError() {
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(null);
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
