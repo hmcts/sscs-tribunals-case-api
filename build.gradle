@@ -348,7 +348,7 @@ dependencies {
     compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.39'
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.35'
 
-    compile group:'org.overviewproject', name: 'mime-types', version: '1.0.1'
+    compile group:'org.overviewproject', name: 'mime-types', version: '1.0.2'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
     compile "org.projectlombok:lombok:$versions.lombok"
