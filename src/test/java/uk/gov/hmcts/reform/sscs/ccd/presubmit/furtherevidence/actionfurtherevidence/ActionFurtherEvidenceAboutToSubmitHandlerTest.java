@@ -263,7 +263,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals("www.test.com", sscsDocumentDetail.getDocumentLink().getDocumentUrl());
         assertEquals("2019-06-13", sscsDocumentDetail.getDocumentDateAdded());
         assertEquals("123", sscsDocumentDetail.getControlNumber());
-        String expectedEvidenceIssued = response.getData().getFurtherEvidenceAction().getValue().getCode().equalsIgnoreCase(OTHER_DOCUMENT_MANUAL.getCode()) ? YES : NO;
+        String expectedEvidenceIssued = ACTIONS_THAT_REQUIRES_EVIDENCE_ISSUED_SET_TO_YES_AND_NOT_BULK_PRINTED.contains(response.getData().getFurtherEvidenceAction().getValue().getCode()) ? YES : NO;
         assertEquals(expectedEvidenceIssued, response.getData().getSscsDocument().get(1).getValue().getEvidenceIssued());
         assertNull(response.getData().getScannedDocuments());
         assertEquals(YES, response.getData().getEvidenceHandled());

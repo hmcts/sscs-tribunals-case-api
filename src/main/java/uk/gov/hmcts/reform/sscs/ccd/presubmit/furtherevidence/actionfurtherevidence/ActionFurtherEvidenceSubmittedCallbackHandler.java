@@ -49,7 +49,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
             || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, OTHER_DOCUMENT_MANUAL);
     }
 
-    public static boolean isFurtherEvidenceActionOptionValid(DynamicList furtherEvidenceActionList,
+    private boolean isFurtherEvidenceActionOptionValid(DynamicList furtherEvidenceActionList,
                                                        FurtherEvidenceActionDynamicListItems interlocType) {
         if (furtherEvidenceActionList != null && furtherEvidenceActionList.getValue() != null
             && StringUtils.isNotBlank(furtherEvidenceActionList.getValue().getCode())) {
