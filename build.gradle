@@ -442,6 +442,9 @@ pitest {
                        'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication']
     excludedMethods = ['equals', 'hashcode']
     jvmArgs = ['-Xms1G','-Xmx3G']
+    enableDefaultIncrementalAnalysis = true
+    historyInputLocation = 'build/reports/pitest/fastermutationtesting'
+    historyOutputLocation = 'build/reports/pitest/fastermutationtestingoutput'
     threads = 20
     verbose = true
     outputFormats = ['XML', 'HTML']
