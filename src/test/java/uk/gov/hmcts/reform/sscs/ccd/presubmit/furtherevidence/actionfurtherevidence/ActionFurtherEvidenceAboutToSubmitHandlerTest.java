@@ -254,6 +254,37 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         }
     }
 
+    @Test
+    public void edgeCaseWhereEvidenceIsSentToBulkPrintSinceNoFurtherActionIsSelected() {
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder()
+                        .type(ScannedDocumentType.REINSTATEMENT_REQUEST.getValue())
+                        .fileName("bla.pdf")
+                        .subtype("sscs1")
+                        .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                        .scannedDate("2019-06-12T00:00:00.000")
+                        .controlNumber("123")
+                        .build()).build();
+        scannedDocumentList = new ArrayList<>();
+        scannedDocumentList.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(scannedDocumentList);
+        sscsCaseData.setFurtherEvidenceAction(
+                buildFurtherEvidenceActionItemListForGivenOption(null, null));
+        sscsCaseData.setOriginalSender(buildOriginalSenderItemListForGivenOption("appellant",
+                "Appellant (or Appointee)"));
+        sscsCaseData.setEvidenceHandled(NO);
+
+        when(callback.isIgnoreWarnings()).thenReturn(false);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(response.getData().getSscsDocument().size(), 1);
+        assertEquals(response.getData().getSscsDocument().get(0).getValue().getEvidenceIssued(), NO);
+        assertEquals(YES, response.getData().getEvidenceHandled());
+        assertEquals(0, response.getWarnings().size());
+    }
+
     private void assertHappyPaths(DocumentType expectedDocumentType,
         PreSubmitCallbackResponse<SscsCaseData> response) {
 
