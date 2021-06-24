@@ -25,6 +25,26 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
+      "sscsHearingRecordings": [
+        {
+          "value": {
+            "hearingId": "33445566",
+            "fileName": "file name"
+          }
+        },
+        {
+          "value": {
+            "hearingId": "44445566",
+            "fileName": "file name"
+          }
+        },
+        {
+          "value": {
+            "hearingId": "11445566",
+            "fileName": "file name"
+          }
+        }
+      ],
       "requestableHearingDetails": {
         "list_items": [
           {

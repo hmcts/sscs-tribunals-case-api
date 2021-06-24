@@ -51,7 +51,12 @@ public class RequestHearingRecordingAboutToStartHandlerTest {
                         .hearingDate("2021-03-20")
                         .time("15:15").build()).build();
 
+        SscsHearingRecording recording1 = SscsHearingRecording.builder().value(SscsHearingRecordingDetails.builder().hearingId("an_id1").build()).build();
+        SscsHearingRecording recording2 = SscsHearingRecording.builder().value(SscsHearingRecordingDetails.builder().hearingId("an_id2").build()).build();
+        SscsHearingRecording recording3 = SscsHearingRecording.builder().value(SscsHearingRecordingDetails.builder().hearingId("an_id3").build()).build();
+
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").hearings(Arrays.asList(hearing1, hearing2, hearing3)).build();
+        sscsCaseData.getSscsHearingRecordingCaseData().setSscsHearingRecordings(Arrays.asList(recording1, recording2, recording3));
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -66,40 +71,41 @@ public class RequestHearingRecordingAboutToStartHandlerTest {
     @Test
     public void givenAHearingWithRecording_thenHearingInRequestableListAndMessagesInPlace() {
         sscsCaseData.setHearings(singletonList(Hearing.builder().value(
-                HearingDetails.builder().hearingId("an_id").venue(Venue.builder().name("venue name").build())
+                HearingDetails.builder().hearingId("an_id1").venue(Venue.builder().name("venue name").build())
                         .hearingDate("2021-03-20")
                         .time("15:15").build()).build()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertEquals(1, response.getData().getHearingRecordingsData().getRequestableHearingDetails().getListItems().size());
-        assertEquals("There are no outstanding DWP hearing recording requests on this case", response.getData().getHearingRecordingsData().getRequestedHearingsTextList());
-        assertEquals("No hearing recordings have been released to DWP on this case", response.getData().getHearingRecordingsData().getReleasedHearingsTextList());
+        assertEquals(1, response.getData().getSscsHearingRecordingCaseData().getRequestableHearingDetails().getListItems().size());
+        assertEquals("There are no outstanding DWP hearing recording requests on this case", response.getData().getSscsHearingRecordingCaseData().getRequestedHearingsTextList());
+        assertEquals("No hearing recordings have been released to DWP on this case", response.getData().getSscsHearingRecordingCaseData().getReleasedHearingsTextList());
     }
 
     @Test
     public void givenThreeHearingsWithRecording_thenThreeHearingInRequestableList() {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertEquals(3, response.getData().getHearingRecordingsData().getRequestableHearingDetails().getListItems().size());
+        assertEquals(3, response.getData().getSscsHearingRecordingCaseData().getRequestableHearingDetails().getListItems().size());
     }
 
     @Test
     public void givenAHearingsRequested_thenHearingInRequestedList() {
         HearingRecordingRequest recordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder().requestingParty("dwp").requestedHearing("an_id2").status("requested").build()).build();
-        sscsCaseData.getHearingRecordingsData().setRequestedHearings(singletonList(recordingRequest));
+        sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(singletonList(recordingRequest));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals(2, response.getData().getHearingRecordingsData().getRequestableHearingDetails().getListItems().size());
-        assertEquals(1, response.getData().getHearingRecordingsData().getRequestedHearings().size());
+        assertEquals(2, response.getData().getSscsHearingRecordingCaseData().getRequestableHearingDetails().getListItems().size());
+        assertEquals(1, response.getData().getSscsHearingRecordingCaseData().getRequestedHearings().size());
     }
 
     @Test
     public void givenAHearingsReleased_thenHearingInReleasedList() {
         HearingRecordingRequest recordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder().requestingParty("dwp").requestedHearing("an_id2").status("released").build()).build();
-        sscsCaseData.getHearingRecordingsData().setReleasedHearings(singletonList(recordingRequest));
+        sscsCaseData.getSscsHearingRecordingCaseData().setReleasedHearings(singletonList(recordingRequest));
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals(2, response.getData().getHearingRecordingsData().getRequestableHearingDetails().getListItems().size());
-        assertEquals(1, response.getData().getHearingRecordingsData().getReleasedHearings().size());
+        assertEquals(2, response.getData().getSscsHearingRecordingCaseData().getRequestableHearingDetails().getListItems().size());
+        assertEquals(1, response.getData().getSscsHearingRecordingCaseData().getReleasedHearings().size());
     }
 
 }

@@ -3,8 +3,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.requesthearingrecording;
 import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -17,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Service
 @Slf4j
 public class RequestHearingRecordingAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+    private static final String UPLOAD_DATE_FORMATTER = "yyyy-MM-dd";
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -37,22 +40,27 @@ public class RequestHearingRecordingAboutToSubmitHandler implements PreSubmitCal
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        DynamicListItem selectedRequestable = sscsCaseData.getHearingRecordingsData().getRequestableHearingDetails().getValue();
+        DynamicListItem selectedRequestable = sscsCaseData.getSscsHearingRecordingCaseData().getRequestableHearingDetails().getValue();
         String hearingId = selectedRequestable.getCode();
         String hearingName = selectedRequestable.getLabel();
 
-        HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
-                .requestingParty(UploadParty.DWP.getValue()).status("requested").dateRequested(LocalDateTime.now())
-                .requestedHearing(hearingId).requestedHearingName(hearingName).build()).build();
+        List<SscsHearingRecording> sscsHearingRecordingList = sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings()
+                .stream().filter(r -> r.getValue().getHearingId().equals(hearingId)).collect(Collectors.toList());
 
-        List<HearingRecordingRequest> hearingRecordingRequests = sscsCaseData.getHearingRecordingsData().getRequestedHearings();
+        HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
+                .requestingParty(UploadParty.DWP.getValue()).status("requested")
+                .dateRequested(LocalDateTime.now().format(DateTimeFormatter.ofPattern(UPLOAD_DATE_FORMATTER)))
+                .requestedHearing(hearingId).requestedHearingName(hearingName).sscsHearingRecordingList(sscsHearingRecordingList).build()).build();
+
+
+        List<HearingRecordingRequest> hearingRecordingRequests = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();
         if (hearingRecordingRequests == null) {
             hearingRecordingRequests = new ArrayList<>();
         }
         hearingRecordingRequests.add(hearingRecordingRequest);
 
-        sscsCaseData.getHearingRecordingsData().setRequestedHearings(hearingRecordingRequests);
-        sscsCaseData.getHearingRecordingsData().setHearingRecordingRequestOutstanding(YesNo.YES);
+        sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(hearingRecordingRequests);
+        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YesNo.YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 

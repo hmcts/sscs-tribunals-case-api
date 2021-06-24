@@ -7,6 +7,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
@@ -53,7 +54,7 @@ public class RequestHearingRecordingAboutToSubmitHandlerTest {
         DynamicList dynamicList = new DynamicList(item1, validHearings);
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
-                .hearingRecordingsData(SscsHearingRecordingsData.builder().requestableHearingDetails(dynamicList).build()).build();
+                .sscsHearingRecordingCaseData(SscsHearingRecordingsData.builder().requestableHearingDetails(dynamicList).build()).build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -67,27 +68,33 @@ public class RequestHearingRecordingAboutToSubmitHandlerTest {
 
     @Test
     public void givenASelectedHearingRecording_thenAddToNewRequestList() {
+        SscsHearingRecording recording1 = SscsHearingRecording.builder().value(SscsHearingRecordingDetails.builder().hearingId("an_id1").build()).build();
+        sscsCaseData.getSscsHearingRecordingCaseData().setSscsHearingRecordings(Arrays.asList(recording1));
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(YesNo.YES, response.getData().getHearingRecordingsData().getHearingRecordingRequestOutstanding());
-        assertEquals(1, response.getData().getHearingRecordingsData().getRequestedHearings().size());
-        assertEquals("an_id1", response.getData().getHearingRecordingsData().getRequestedHearings().get(0).getValue().getRequestedHearing());
+        assertEquals(YesNo.YES, response.getData().getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding());
+        assertEquals(1, response.getData().getSscsHearingRecordingCaseData().getRequestedHearings().size());
+        assertEquals("an_id1", response.getData().getSscsHearingRecordingCaseData().getRequestedHearings().get(0).getValue().getRequestedHearing());
     }
 
     @Test
     public void givenASelectedHearingRecording_thenAddToExistingRequestList() {
+        SscsHearingRecording recording1 = SscsHearingRecording.builder().value(SscsHearingRecordingDetails.builder().hearingId("an_id1").build()).build();
+        sscsCaseData.getSscsHearingRecordingCaseData().setSscsHearingRecordings(Arrays.asList(recording1));
+
         HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
                 .requestingParty("dwp").status("requested").requestedHearing("some_id").requestedHearingName("some_name").build()).build();
         List<HearingRecordingRequest> hearingRecordingRequests = new ArrayList<>();
         hearingRecordingRequests.add(hearingRecordingRequest);
-        sscsCaseData.getHearingRecordingsData().setRequestedHearings(hearingRecordingRequests);
-        sscsCaseData.getHearingRecordingsData().setHearingRecordingRequestOutstanding(YesNo.YES);
+        sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(hearingRecordingRequests);
+        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YesNo.YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(YesNo.YES, response.getData().getHearingRecordingsData().getHearingRecordingRequestOutstanding());
-        assertEquals(2, response.getData().getHearingRecordingsData().getRequestedHearings().size());
-        assertEquals("an_id1", response.getData().getHearingRecordingsData().getRequestedHearings().get(1).getValue().getRequestedHearing());
+        assertEquals(YesNo.YES, response.getData().getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding());
+        assertEquals(2, response.getData().getSscsHearingRecordingCaseData().getRequestedHearings().size());
+        assertEquals("an_id1", response.getData().getSscsHearingRecordingCaseData().getRequestedHearings().get(1).getValue().getRequestedHearing());
     }
 
 
