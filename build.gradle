@@ -248,7 +248,7 @@ dependencyManagement {
         }
 
         //CVE-2021-22112
-        dependencySet(group: 'org.springframework.security', version: '5.4.6') {
+        dependencySet(group: 'org.springframework.security', version: '5.4.7') {
             entry 'spring-security-crypto'
             entry 'spring-security-config'
             entry 'spring-security-core'
@@ -347,10 +347,10 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.07'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.38'
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.39'
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.35'
 
-    compile group:'org.overviewproject', name: 'mime-types', version: '1.0.1'
+    compile group:'org.overviewproject', name: 'mime-types', version: '1.0.2'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
     compile "org.projectlombok:lombok:$versions.lombok"
