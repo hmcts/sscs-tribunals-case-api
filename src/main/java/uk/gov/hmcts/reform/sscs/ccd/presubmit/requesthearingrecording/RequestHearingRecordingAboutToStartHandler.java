@@ -50,16 +50,15 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if (sscsCaseData.getHearings() == null || sscsCaseData.getHearings().isEmpty()) {
-            response.addError("No hearing has been conducted on this case");
-            return response;
+            return returnError(response, "No hearing has been conducted on this case");
+
         } else {
             List<DynamicListItem> validHearings = sscsCaseData.getHearings().stream()
                     .filter(hearing -> isHearingWithRecording(hearing, sscsCaseData.getSscsHearingRecordingCaseData()))
                     .map(hearing -> new DynamicListItem(hearing.getValue().getHearingId(), selectHearing(hearing)))
                     .collect(Collectors.toList());
             if (validHearings.isEmpty()) {
-                response.addError("No hearing has been conducted on this case");
-                return response;
+                return returnError(response, "No hearing has been conducted on this case");
             }
 
             List<HearingRecordingRequest> requestedHearingsCollection = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();
@@ -79,8 +78,7 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
 
 
             if (validHearings.isEmpty()) {
-                response.addError("There are no hearings to request on this case");
-                return response;
+                return returnError(response, "There are no hearings to request on this case");
             }
 
             sscsCaseData.getSscsHearingRecordingCaseData().setRequestableHearingDetails(new DynamicList(new DynamicListItem("", ""), validHearings));
@@ -100,6 +98,11 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
         return response;
     }
 
+    private PreSubmitCallbackResponse<SscsCaseData> returnError(PreSubmitCallbackResponse<SscsCaseData> response, String message) {
+        response.addError(message);
+        return response;
+    }
+
     private boolean isHearingWithRecording(Hearing hearing, SscsHearingRecordingCaseData hearingRecordingsData) {
         List<SscsHearingRecording> sscsHearingRecordings = hearingRecordingsData.getSscsHearingRecordings();
 
@@ -112,11 +115,9 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
     private void removeFromListAndAddText(HearingRecordingRequest request, List<DynamicListItem> validHearings, StringBuilder stringBuilder) {
         stringBuilder.append(request.getValue().getRequestedHearingName());
         stringBuilder.append(", ");
-        for (DynamicListItem item: validHearings) {
-            if (item.getCode().equals(request.getValue().getRequestedHearing())) {
-                validHearings.remove(item);
-                break;
-            }
+        DynamicListItem item = validHearings.stream().filter(i -> i.getCode().equals(request.getValue().getRequestedHearing())).findFirst().orElse(null);
+        if (item != null) {
+            validHearings.remove(item);
         }
     }
 
