@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.requesthearingrecording;
 import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -120,11 +119,6 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
                 break;
             }
         }
-    }
-
-    private boolean isBeforeDate(LocalDateTime currentDate, String hearingDate, String hearingTime) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        return LocalDateTime.parse(hearingDate + " " + hearingTime, formatter).isBefore(currentDate);
     }
 
     @NotNull
