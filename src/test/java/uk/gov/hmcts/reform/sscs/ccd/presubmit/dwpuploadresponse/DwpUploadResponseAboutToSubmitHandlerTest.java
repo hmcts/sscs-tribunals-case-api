@@ -692,4 +692,33 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     }
 
+    @Test
+    public void givenADwpUploadResponseEventWithEmptyDocument_thenHandleThisCorrectly() {
+
+        callback.getCaseDetails().getCaseData().setDwpAT38Document(DwpResponseDocument.builder().build());
+
+        callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder()
+                .documentLink(
+                        DocumentLink.builder()
+                                .documentBinaryUrl("http://dm-store:5005/documents/defg-5678-xyzabcmnop/binary")
+                                .documentUrl("http://dm-store:5005/documents/defg-5678-xyzabcmnop")
+                                .documentFilename("testEvidenceBundleDocument.pdf")
+                                .build()
+                ).build());
+
+
+        callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder()
+                .documentLink(
+                        DocumentLink.builder()
+                                .documentBinaryUrl("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw/binary")
+                                .documentUrl("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw")
+                                .documentFilename("testResponseDocument.pdf")
+                                .build()
+                ).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(2, response.getData().getDwpDocuments().size());
+    }
+
 }
