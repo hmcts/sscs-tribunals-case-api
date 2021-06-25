@@ -53,7 +53,6 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
             response.addError("No hearing has been conducted on this case");
             return response;
         } else {
-            //FIXME add logic for hearings with recordings
             List<DynamicListItem> validHearings = sscsCaseData.getHearings().stream()
                     .filter(hearing -> isHearingWithRecording(hearing, sscsCaseData.getSscsHearingRecordingCaseData()))
                     .map(hearing -> new DynamicListItem(hearing.getValue().getHearingId(), selectHearing(hearing)))
