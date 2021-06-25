@@ -6,7 +6,6 @@ import io.restassured.RestAssured;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -20,15 +19,12 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 public class GetSavedCase  extends BaseHandler {
 
     private final String tcaInstance = System.getenv("TEST_URL");
-    @Value("${core_case_data.api.url}")
-    private String ccdUrl;
 
     @Test
     public void retrieveCaseFromCcd() throws Exception {
         RestAssured.baseURI = tcaInstance;
         RestAssured.useRelaxedHTTPSValidation();
 
-        log.info("The CCD URL is {}", ccdUrl);
         SscsCaseDetails sscsCaseDetails = createCaseInWithDwpState(2);
 
         String response = getMyaResponse(2, sscsCaseDetails.getId());

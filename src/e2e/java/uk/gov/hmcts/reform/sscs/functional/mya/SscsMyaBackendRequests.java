@@ -84,6 +84,7 @@ public class SscsMyaBackendRequests {
     }
 
     public CreatedCcdCase createOralCase(String emailAddress) throws IOException {
+        log.info("CREATE ORAL CASE URL: "+ baseUrl + "/api/case?hearingType=oral&email=" + emailAddress);
         HttpResponse createCaseResponse = client.execute(post(baseUrl + "/api/case?hearingType=oral&email=" + emailAddress)
                 .setHeader("Content-Length", "0")
                 .build());
