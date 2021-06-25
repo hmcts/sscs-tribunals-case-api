@@ -4,6 +4,7 @@ import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -59,4 +60,14 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
         handler.handle(callbackType, buildTestCallbackGivenEvent(eventType, ADMIN_APPEAL_WITHDRAWN_CALLBACK_JSON), USER_AUTHORISATION);
     }
 
+    @Test
+    public void movesWithdrawalDocumentToSscsDocumentsCollection() throws IOException {
+        PreSubmitCallbackResponse<SscsCaseData> actualResult = handler.handle(
+                CallbackType.ABOUT_TO_SUBMIT, buildTestCallbackGivenEvent(EventType.ADMIN_APPEAL_WITHDRAWN,
+                        "adminAppealWithdrawnCallbackWithdrawalDocument.json"), USER_AUTHORISATION);
+
+        assertEquals("withdrawalReceived", actualResult.getData().getDwpState());
+        assertThatJson(actualResult.getData().getSscsDocument().size()).isEqualTo(1);
+        assertEquals(LocalDate.now().toString(), actualResult.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+    }
 }
