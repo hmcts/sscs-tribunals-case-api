@@ -293,6 +293,15 @@ dependencyManagement {
             entry 'accessors-smart'
         }
 
+        //CVE-2021-30468
+        dependencySet(group: 'org.apache.cxf', version: '3.4.4') {
+            entry 'cxf-core'
+            entry 'cxf-rt-frontend-jaxrs'
+            entry 'cxf-rt-rs-client'
+            entry 'cxf-rt-security'
+            entry 'cxf-rt-transports-http'
+        }
+
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
         }
@@ -346,9 +355,9 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
     compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.39'
-    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.35'
+    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.36'
 
-    compile group:'org.overviewproject', name: 'mime-types', version: '1.0.1'
+    compile group:'org.overviewproject', name: 'mime-types', version: '1.0.2'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
     compile "org.projectlombok:lombok:$versions.lombok"
