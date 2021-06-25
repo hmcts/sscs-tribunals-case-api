@@ -102,7 +102,7 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
         return response;
     }
 
-    private boolean isHearingWithRecording(Hearing hearing, SscsHearingRecordingsData hearingRecordingsData) {
+    private boolean isHearingWithRecording(Hearing hearing, SscsHearingRecordingCaseData hearingRecordingsData) {
         List<SscsHearingRecording> sscsHearingRecordings = hearingRecordingsData.getSscsHearingRecordings();
 
         if (sscsHearingRecordings != null) {

@@ -54,7 +54,7 @@ public class RequestHearingRecordingAboutToSubmitHandlerTest {
         DynamicList dynamicList = new DynamicList(item1, validHearings);
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
-                .sscsHearingRecordingCaseData(SscsHearingRecordingsData.builder().requestableHearingDetails(dynamicList).build()).build();
+                .sscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder().requestableHearingDetails(dynamicList).build()).build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
