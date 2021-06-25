@@ -21,6 +21,7 @@ java:
     CORE_CASE_DATA_JURISDICTION_ID: SSCS
     CORE_CASE_DATA_CASE_TYPE_ID: Benefit
     TEST_URL: http://${SERVICE_FQDN}
+    CREATE_CCD_ENDPOINT: true
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
