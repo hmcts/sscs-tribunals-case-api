@@ -293,6 +293,15 @@ dependencyManagement {
             entry 'accessors-smart'
         }
 
+        //CVE-2021-30468
+        dependencySet(group: 'org.apache.cxf', version: '3.4.4') {
+            entry 'cxf-core'
+            entry 'cxf-rt-frontend-jaxrs'
+            entry 'cxf-rt-rs-client'
+            entry 'cxf-rt-security'
+            entry 'cxf-rt-transports-http'
+        }
+
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
         }
