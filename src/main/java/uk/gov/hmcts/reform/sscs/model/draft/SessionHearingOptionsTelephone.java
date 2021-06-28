@@ -4,6 +4,6 @@ import lombok.Value;
 
 @Value
 public class SessionHearingOptionsTelephone {
-    private String requested;
+    private Boolean requested;
     private String phoneNumber;
 }

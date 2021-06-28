@@ -4,6 +4,6 @@ import lombok.Value;
 
 @Value
 public class SessionHearingOptionsVideo {
-    private String requested;
+    private Boolean requested;
     private String email;
 }
