@@ -67,3 +67,5 @@ sscs-tribunals-frontend:
   enabled: false
 redis:
   enabled: false
+ccd:
+  enabled: false
