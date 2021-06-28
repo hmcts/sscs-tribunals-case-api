@@ -257,55 +257,84 @@
           }
         }
       ],
-      "selectHearingDetails":
-      {
-          "value": {
-            "code" : "33445566",
-            "label" : "Prudential House 23:00:00 06 Jun 2021"
+      "selectHearingDetails": {
+        "value": {
+          "code": "33445566",
+          "label": "Prudential House 23:00:00 06 Jun 2021"
+        },
+        "list_items": [
+          {
+            "code": "33445577",
+            "label": "Parish House 22:00:20 06 Jun 2021"
           },
-          "list_items" : [
-            {
-              "code" : "33445577",
-              "label" : "Parish House 22:00:20 06 Jun 2021"
-            },
-            {
-              "code" : "33445566",
-              "label" : "Prudential House 23:00:05 06 Jun 2021"
-            }
-          ]
+          {
+            "code": "33445566",
+            "label": "Prudential House 23:00:00 06 Jun 2021"
+          }
+        ]
       },
-      "hearingRecordings": [
-        {
-          "value": {
-            "documentLink" : {
-              "document_url" : "http://dm-store:5005/documents/6d3b7351-168e-42f6-90b7-d263000e1864",
-              "document_binary_url" : "http://dm-store:5005/documents/6d3b7351-168e-42f6-90b7-d263000e1864/binary",
-              "document_filename" : "recording1.MP4"
-            },
-            "fileName" : "recording1.MP4",
-            "hearingType" : "adjourned"
+      "hearingRecording": {
+        "recordings": [
+          {
+            "value": {
+              "document_url": "http://dm-store:5005/documents/6d3b7351-168e-42f6-90b7-d263000e1864",
+              "document_binary_url": "http://dm-store:5005/documents/6d3b7351-168e-42f6-90b7-d263000e1864/binary",
+              "document_filename": "recording1.MP4"
+            }
+          },
+          {
+            "value": {
+              "document_url": "http://dm-store:5005/documents/6d3b7351-168e-42f6-90b7-d263000e1864",
+              "document_binary_url": "http://dm-store:5005/documents/6d3b7351-168e-42f6-90b7-d263000e1864/binary",
+              "document_filename": "recording2.mp4"
+            }
+          },
+          {
+            "value": {
+              "document_url": "http://dm-store:5005/documents/6d3b7351-168e-42f6-90b7-d263000e1864",
+              "document_binary_url": "http://dm-store:5005/documents/6d3b7351-168e-42f6-90b7-d263000e1864/binary",
+              "document_filename": "recording3.mp3"
+            }
           }
-        },
+        ],
+        "hearingType": "adjourned"
+      },
+      "sscsHearingRecordings": [
         {
           "value": {
-            "documentLink" : {
-              "document_url" : "http://dm-store:5005/documents/6d3b7351-168e-42f6-90b7-d263000e1864",
-              "document_binary_url" : "http://dm-store:5005/documents/6d3b7351-168e-42f6-90b7-d263000e1864/binary",
-              "document_filename" : "recording2.mp4"
-            },
-            "fileName" : "recording2.mp4",
-            "hearingType" : "final"
-          }
-        },
-        {
-          "value": {
-            "documentLink" : {
-              "document_url" : "http://dm-store:5005/documents/6d3b7351-168e-42f6-90b7-d263000e1864",
-              "document_binary_url" : "http://dm-store:5005/documents/6d3b7351-168e-42f6-90b7-d263000e1864/binary",
-              "document_filename" : "recording3.mp3"
-            },
-            "fileName" : "recording3.mp3",
-            "hearingType" : "adjourned"
+            "recordings": [
+              {
+                "value": {
+                  "document_url": "/some-url",
+                  "document_binary_url": "/some-url/binary",
+                  "document_filename": "Adjourned Parish House 06 Jun 2021.mp4"
+                }
+              },
+              {
+                "value": {
+                  "document_url": "/some-url2",
+                  "document_binary_url": "/some-url2/binary",
+                  "document_filename": "Adjourned Parish House 06 Jun 2021 (2).MP4"
+                }
+              },
+              {
+                "value": {
+                  "document_url": "/some-url3",
+                  "document_binary_url": "/some-url3/binary",
+                  "document_filename": "Adjourned Parish House 06 Jun 2021 (3).mp3"
+                }
+              },
+              {
+                "value": {
+                  "document_url": "/some-url4",
+                  "document_binary_url": "/some-url4/binary",
+                  "document_filename": "Adjourned Parish House 06 Jun 2021 (4).mp4"
+                }
+              }
+            ],
+            "hearingType": "adjourned",
+            "hearingDate": "06-06-2021 10:00:20 PM",
+            "uploadDate": "today"
           }
         }
       ],

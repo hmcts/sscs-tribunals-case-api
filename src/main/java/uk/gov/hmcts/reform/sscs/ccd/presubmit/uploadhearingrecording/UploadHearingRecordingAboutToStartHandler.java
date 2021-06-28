@@ -59,7 +59,7 @@ public class UploadHearingRecordingAboutToStartHandler implements PreSubmitCallb
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         //Clear hearing recordings for the flow
-        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordings(null);
+        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecording(null);
         if (sscsCaseData.getHearings() == null || sscsCaseData.getHearings().isEmpty()) {
             response.addError("No hearing has been conducted on this case");
             return response;

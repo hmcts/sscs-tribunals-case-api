@@ -97,31 +97,14 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
 
     @Test
     public void givenHearingRecordings_thenReturnSscsRecordings() {
-        List<HearingRecording> hearingRecordings = new ArrayList<>();
-        hearingRecordings.add(HearingRecording.builder()
-            .value(HearingRecordingDetails.builder()
-                .hearingType(ADJOURNED.getKey())
-                .documentLink(DocumentLink.builder()
-                    .documentFilename("test-file1.MP4")
+        List<HearingRecordingDetails> details = new ArrayList<>();
+        details.add(
+            HearingRecordingDetails.builder().value(
+                DocumentLink.builder()
+                    .documentFilename("Adjourned good - value 06 Jun 2021.mp4")
                     .documentUrl("/some-url")
                     .documentBinaryUrl("/some-url/binary")
-                    .build()).build()).build());
-        hearingRecordings.add(HearingRecording.builder()
-            .value(HearingRecordingDetails.builder()
-                .hearingType(FINAL.getKey())
-                .documentLink(DocumentLink.builder()
-                    .documentFilename("test-file2.mp3")
-                    .documentUrl("/some-url2")
-                    .documentBinaryUrl("/some-url2/binary")
-                    .build()).build()).build());
-        hearingRecordings.add(HearingRecording.builder()
-            .value(HearingRecordingDetails.builder()
-                .hearingType(ADJOURNED.getKey())
-                .documentLink(DocumentLink.builder()
-                    .documentFilename("test-file3.mp4")
-                    .documentUrl("/some-url3")
-                    .documentBinaryUrl("/some-url3/binary")
-                    .build()).build()).build());
+                    .build()).build());
 
         List<SscsHearingRecording> existingRecordings = new ArrayList<>();
         existingRecordings.add(SscsHearingRecording.builder()
@@ -129,28 +112,27 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
                 .hearingType(ADJOURNED.getKey())
                 .uploadDate("today")
                 .hearingDate("06-06-2021 05:00:00 PM")
-                .documentLink(DocumentLink.builder()
-                    .documentFilename("Adjourned good - value 06 Jun 2021.mp4")
-                    .documentUrl("/some-url")
-                    .documentBinaryUrl("/some-url/binary")
-                    .build()).build()).build());
+                .recordings(details).build()).build());
         existingRecordings.add(SscsHearingRecording.builder()
             .value(SscsHearingRecordingDetails.builder()
                 .hearingType(ADJOURNED.getKey())
                 .uploadDate("today")
                 .hearingDate("08-06-2021 11:15:00 AM")
-                .documentLink(DocumentLink.builder()
-                    .documentFilename("Adjourned test 08 Jun 2021.mp3")
-                    .documentUrl("/some-url8")
-                    .documentBinaryUrl("/some-url8/binary")
-                    .build()).build()).build());
+                .recordings(new ArrayList<>()).build()).build());
+        existingRecordings.add(SscsHearingRecording.builder()
+            .value(SscsHearingRecordingDetails.builder()
+                .hearingType(FINAL.getKey())
+                .uploadDate("today")
+                .hearingDate("06-06-2021 05:00:00 PM")
+                .recordings(new ArrayList<>()).build()).build());
 
         sscsCaseData.setSscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder()
             .selectHearingDetails(new DynamicList(
                 new DynamicListItem("2222", "good - value 17:00:00 06 Jun 2021"), Collections.EMPTY_LIST))
-            .hearingRecordings(hearingRecordings)
+            .hearingRecording(createHearingRecording(ADJOURNED.getKey()))
             .sscsHearingRecordings(existingRecordings)
             .build());
+
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -158,31 +140,109 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
         assertEquals(YesNo.YES, response.getData().getSscsHearingRecordingCaseData().getShowHearingRecordings());
         List<SscsHearingRecording> sscsHearingRecordings =
             response.getData().getSscsHearingRecordingCaseData().getSscsHearingRecordings();
-        assertEquals(5, sscsHearingRecordings.size());
+        assertEquals(3, sscsHearingRecordings.size());
         assertNotNull(sscsHearingRecordings.get(1));
+        assertNotNull(sscsHearingRecordings.get(2));
+
+        assertEquals("adjourned", sscsHearingRecordings.get(0).getValue().getHearingType());
+        assertEquals("06-06-2021 05:00:00 PM", sscsHearingRecordings.get(0).getValue().getHearingDate());
+        assertNotNull(sscsHearingRecordings.get(0).getValue().getUploadDate());
+        assertEquals(4, sscsHearingRecordings.get(0).getValue().getRecordings().size());
+
         assertEquals("Adjourned good - value 06 Jun 2021 (2).MP4",
-            sscsHearingRecordings.get(1).getValue().getDocumentLink().getDocumentFilename());
-        assertEquals("adjourned", sscsHearingRecordings.get(1).getValue().getHearingType());
+            sscsHearingRecordings.get(0).getValue().getRecordings().get(1).getValue().getDocumentFilename());
+        assertEquals("Adjourned good - value 06 Jun 2021 (3).mp3",
+            sscsHearingRecordings.get(0).getValue().getRecordings().get(2).getValue().getDocumentFilename());
+        assertEquals("Adjourned good - value 06 Jun 2021 (4).mp4",
+            sscsHearingRecordings.get(0).getValue().getRecordings().get(3).getValue().getDocumentFilename());
+
+        assertEquals("final", sscsHearingRecordings.get(1).getValue().getHearingType());
         assertEquals("06-06-2021 05:00:00 PM", sscsHearingRecordings.get(1).getValue().getHearingDate());
         assertNotNull(sscsHearingRecordings.get(1).getValue().getUploadDate());
+        assertEquals(0, sscsHearingRecordings.get(1).getValue().getRecordings().size());
 
-        assertNotNull(sscsHearingRecordings.get(2));
-        assertEquals("Final good - value 06 Jun 2021.mp3",
-            sscsHearingRecordings.get(2).getValue().getDocumentLink().getDocumentFilename());
-        assertEquals("final", sscsHearingRecordings.get(2).getValue().getHearingType());
+        assertEquals("adjourned", sscsHearingRecordings.get(2).getValue().getHearingType());
+        assertEquals("08-06-2021 11:15:00 AM", sscsHearingRecordings.get(2).getValue().getHearingDate());
         assertNotNull(sscsHearingRecordings.get(2).getValue().getUploadDate());
+        assertEquals(0, sscsHearingRecordings.get(2).getValue().getRecordings().size());
 
-        assertNotNull(sscsHearingRecordings.get(3));
-        assertEquals("Adjourned good - value 06 Jun 2021 (3).mp4",
-            sscsHearingRecordings.get(3).getValue().getDocumentLink().getDocumentFilename());
-        assertEquals("adjourned", sscsHearingRecordings.get(3).getValue().getHearingType());
-        assertNotNull(sscsHearingRecordings.get(3).getValue().getUploadDate());
+    }
 
-        assertNotNull(sscsHearingRecordings.get(4));
-        assertEquals("Adjourned test 08 Jun 2021.mp3",
-            sscsHearingRecordings.get(4).getValue().getDocumentLink().getDocumentFilename());
-        assertEquals("adjourned", sscsHearingRecordings.get(4).getValue().getHearingType());
-        assertEquals("08-06-2021 11:15:00 AM", sscsHearingRecordings.get(4).getValue().getHearingDate());
+    @Test
+    public void givenNoExistingHearingRecordings_thenReturnSscsRecordings() {
+
+        sscsCaseData.setSscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder()
+            .selectHearingDetails(new DynamicList(
+                new DynamicListItem("2222", "good - value 17:00:00 06 Jun 2021"), Collections.EMPTY_LIST))
+            .hearingRecording(createHearingRecording(FINAL.getKey()))
+            .sscsHearingRecordings(null)
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+        assertEquals(YesNo.YES, response.getData().getSscsHearingRecordingCaseData().getShowHearingRecordings());
+        List<SscsHearingRecording> sscsHearingRecordings =
+            response.getData().getSscsHearingRecordingCaseData().getSscsHearingRecordings();
+        assertEquals(1, sscsHearingRecordings.size());
+        assertNotNull(sscsHearingRecordings.get(0));
+
+        assertEquals("final", sscsHearingRecordings.get(0).getValue().getHearingType());
+        assertEquals("06-06-2021 05:00:00 PM", sscsHearingRecordings.get(0).getValue().getHearingDate());
+        assertNotNull(sscsHearingRecordings.get(0).getValue().getUploadDate());
+        assertEquals(3, sscsHearingRecordings.get(0).getValue().getRecordings().size());
+
+        assertEquals("Final good - value 06 Jun 2021.MP4",
+            sscsHearingRecordings.get(0).getValue().getRecordings().get(0).getValue().getDocumentFilename());
+        assertEquals("Final good - value 06 Jun 2021 (2).mp3",
+            sscsHearingRecordings.get(0).getValue().getRecordings().get(1).getValue().getDocumentFilename());
+        assertEquals("Final good - value 06 Jun 2021 (3).mp4",
+            sscsHearingRecordings.get(0).getValue().getRecordings().get(2).getValue().getDocumentFilename());
+
+    }
+
+    private HearingRecording createHearingRecording(String hearingType) {
+        List<HearingRecordingDetails> details = new ArrayList<>();
+        details.add(
+            HearingRecordingDetails.builder()
+                .value(DocumentLink.builder()
+                    .documentFilename("test-file1.MP4")
+                    .documentUrl("/some-url")
+                    .documentBinaryUrl("/some-url/binary")
+                    .build()).build());
+        details.add(
+            HearingRecordingDetails.builder()
+                .value(
+                    DocumentLink.builder()
+                        .documentFilename("test-file2.mp3")
+                        .documentUrl("/some-url2")
+                        .documentBinaryUrl("/some-url2/binary")
+                        .build()).build());
+        details.add(
+            HearingRecordingDetails.builder()
+                .value(
+                    DocumentLink.builder()
+                        .documentFilename("test-file3.mp4")
+                        .documentUrl("/some-url3")
+                        .documentBinaryUrl("/some-url3/binary")
+                        .build()).build());
+        return HearingRecording.builder()
+            .hearingType(hearingType)
+            .recordings(details)
+            .build();
+    }
+
+    @Test
+    public void givenValidValue_thenCreateSscsRecordings() {
+        SscsHearingRecording sscsHearingRecording = handler.createSscsHearingRecording("today", FINAL.getKey());
+
+        assertNotNull(sscsHearingRecording);
+        assertEquals("final", sscsHearingRecording.getValue().getHearingType());
+        assertEquals("today", sscsHearingRecording.getValue().getHearingDate());
+        assertNotNull(sscsHearingRecording.getValue().getUploadDate());
+        assertNotNull(sscsHearingRecording.getValue().getRecordings());
+        assertEquals(0, sscsHearingRecording.getValue().getRecordings().size());
 
     }
 
@@ -191,7 +251,7 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
         sscsCaseData.setSscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder()
             .selectHearingDetails(new DynamicList(
                 new DynamicListItem("2222", "good - value 09:00:00 06 Jun 2021"), Collections.EMPTY_LIST))
-            .hearingRecordings(null)
+            .hearingRecording(null)
             .sscsHearingRecordings(null)
             .build());
         PreSubmitCallbackResponse<SscsCaseData> response =
@@ -221,11 +281,10 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
 
     @Test
     public void givenHearingRecordingPresent_thenReturnFileExtension() {
-        HearingRecording hearingRecording = HearingRecording.builder()
-            .value(HearingRecordingDetails.builder()
-                .documentLink(DocumentLink.builder()
-                    .documentFilename("test-file.MP4").build()).build()).build();
-        assertEquals(".MP4", handler.getFileExtension(hearingRecording));
+        DocumentLink documentLinks = DocumentLink.builder()
+            .documentFilename("test-file.MP4").build();
+
+        assertEquals(".MP4", handler.getFileExtension(documentLinks));
     }
 
     @Test
