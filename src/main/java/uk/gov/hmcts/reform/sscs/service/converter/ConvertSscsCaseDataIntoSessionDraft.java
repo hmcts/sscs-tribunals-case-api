@@ -10,20 +10,12 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReason;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.draft.*;
 import uk.gov.hmcts.reform.sscs.service.DocumentDownloadService;
 import uk.gov.hmcts.reform.sscs.transform.deserialize.HearingOptionArrangements;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
+
 
 @Service
 public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService<SscsCaseData, SessionDraft> {
@@ -150,10 +142,13 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
         if (appeal.getHearingSubtype() == null) {
             return null;
         } else {
+            Boolean wantsTelephone = YesNo.isNoOrNull(appeal.getHearingSubtype().getWantsHearingTypeTelephone()) ? Boolean.valueOf(false) : Boolean.valueOf(true);
+            Boolean wantsVideo = YesNo.isNoOrNull(appeal.getHearingSubtype().getWantsHearingTypeVideo()) ? Boolean.valueOf(false) : Boolean.valueOf(true);
+            Boolean wantsFaceToFace = YesNo.isNoOrNull(appeal.getHearingSubtype().getWantsHearingTypeFaceToFace()) ? Boolean.valueOf(false) : Boolean.valueOf(true);
 
-            SessionHearingOptionsTelephone telephone = new SessionHearingOptionsTelephone(appeal.getHearingSubtype().getWantsHearingTypeTelephone(), appeal.getHearingSubtype().getHearingTelephoneNumber());
-            SessionHearingOptionsVideo video = new SessionHearingOptionsVideo(appeal.getHearingSubtype().getWantsHearingTypeVideo(), appeal.getHearingSubtype().getHearingVideoEmail());
-            SessionHearingOptionsFaceToFace faceToFace = new SessionHearingOptionsFaceToFace(appeal.getHearingSubtype().getWantsHearingTypeFaceToFace());
+            SessionHearingOptionsTelephone telephone = new SessionHearingOptionsTelephone(wantsTelephone, appeal.getHearingSubtype().getHearingTelephoneNumber());
+            SessionHearingOptionsVideo video = new SessionHearingOptionsVideo(wantsVideo, appeal.getHearingSubtype().getHearingVideoEmail());
+            SessionHearingOptionsFaceToFace faceToFace = new SessionHearingOptionsFaceToFace(wantsFaceToFace);
 
             SessionHearingSelectOptions hearingSelectOptions = new SessionHearingSelectOptions(telephone, video, faceToFace);
             SessionHearingOptions options =  new SessionHearingOptions(hearingSelectOptions);
