@@ -76,6 +76,7 @@ xui-webapp:
           - system-user-password
 
 ccd:
+  enabled: true
   ccd:
     adminWeb:
       enabled: true

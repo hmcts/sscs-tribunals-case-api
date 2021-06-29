@@ -36,6 +36,7 @@ dependencies:
   - name: ccd
     version: 5.0.4
     repository: '@hmctspublic'
+    condition: ccd.enabled
     tags:
       - sscs-ccd-idam-pr
   - name: sscs-tribunals-frontend
