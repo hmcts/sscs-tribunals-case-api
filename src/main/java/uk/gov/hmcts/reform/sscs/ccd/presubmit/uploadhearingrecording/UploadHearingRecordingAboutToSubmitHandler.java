@@ -141,6 +141,12 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
     }
 
     SscsHearingRecording createSscsHearingRecording(String hearingDate, String type) {
+    private String getVenueName(SscsCaseData sscsCaseData, String hearingId) {
+        Hearing hearing = sscsCaseData.getHearings().stream().filter(h -> hearingId.equals(h.getValue().getHearingId())).findFirst().orElse(null);
+        return hearing.getValue().getVenue().getName();
+    }
+
+    private SscsHearingRecording createSscsHearingRecording(String hearingDate, String type, String hearingId, String venueName) {
         return SscsHearingRecording.builder()
             .value(SscsHearingRecordingDetails.builder()
                 .recordings(new ArrayList<>())
@@ -151,6 +157,16 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
                         .toUpperCase())
                 .build())
             .build();
+                .value(SscsHearingRecordingDetails.builder()
+                        .recordings(new ArrayList<>())
+                        .hearingDate(hearingDate)
+                        .hearingType(type)
+                        .hearingId(hearingId)
+                        .venue(venueName)
+                        .uploadDate(
+                                LocalDateTime.now().format(DateTimeFormatter.ofPattern(RECORDING_DATE_FORMATTER)).toUpperCase())
+                        .build())
+                .build();
     }
 
     private long countExistingRecordings(final List<SscsHearingRecording> sscsHearingRecordings,

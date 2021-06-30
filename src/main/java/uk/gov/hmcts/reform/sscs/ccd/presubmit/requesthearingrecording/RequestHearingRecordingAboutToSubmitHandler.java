@@ -50,7 +50,7 @@ public class RequestHearingRecordingAboutToSubmitHandler implements PreSubmitCal
         HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
                 .requestingParty(UploadParty.DWP.getValue()).status("requested")
                 .dateRequested(LocalDateTime.now().format(DateTimeFormatter.ofPattern(UPLOAD_DATE_FORMATTER)))
-                .requestedHearingId(hearingId).requestedHearingName(hearingName).sscsHearingRecordingList(sscsHearingRecordingList).build()).build();
+                .sscsHearingRecordingList(sscsHearingRecordingList).build()).build();
 
 
         List<HearingRecordingRequest> hearingRecordingRequests = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();

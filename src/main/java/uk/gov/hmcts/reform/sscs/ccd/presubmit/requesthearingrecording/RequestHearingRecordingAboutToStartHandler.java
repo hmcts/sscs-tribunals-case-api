@@ -68,12 +68,14 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
 
             if (requestedHearingsCollection != null) {
                 requestedHearingsCollection.stream().filter(r -> r.getValue().getRequestingParty().equals(UploadParty.DWP.getValue()))
-                        .forEach(r -> removeFromListAndAddText(r, validHearings, requestedHearingText));
+                        .forEach(r -> r.getValue().getSscsHearingRecordingList().stream()
+                                .forEach(hr -> removeFromListAndAddText(hr, validHearings, requestedHearingText)));
             }
 
             if (releasedHearingsCollection != null) {
                 releasedHearingsCollection.stream().filter(r -> r.getValue().getRequestingParty().equals(UploadParty.DWP.getValue()))
-                        .forEach(r -> removeFromListAndAddText(r, validHearings, releasedHearingText));
+                        .forEach(r -> r.getValue().getSscsHearingRecordingList().stream()
+                                .forEach(hr -> removeFromListAndAddText(hr, validHearings, releasedHearingText)));
             }
 
 
@@ -112,10 +114,10 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
         return false;
     }
 
-    private void removeFromListAndAddText(HearingRecordingRequest request, List<DynamicListItem> validHearings, StringBuilder stringBuilder) {
-        stringBuilder.append(request.getValue().getRequestedHearingName());
+    private void removeFromListAndAddText(SscsHearingRecording request, List<DynamicListItem> validHearings, StringBuilder stringBuilder) {
+        stringBuilder.append(request.getValue().getVenue() + " " + request.getValue().getHearingDate());
         stringBuilder.append(", ");
-        DynamicListItem item = validHearings.stream().filter(i -> i.getCode().equals(request.getValue().getRequestedHearingId())).findFirst().orElse(null);
+        DynamicListItem item = validHearings.stream().filter(i -> i.getCode().equals(request.getValue().getHearingId())).findFirst().orElse(null);
         if (item != null) {
             validHearings.remove(item);
         }
