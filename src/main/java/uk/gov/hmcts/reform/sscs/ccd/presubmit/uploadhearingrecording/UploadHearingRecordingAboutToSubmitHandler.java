@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRecordingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecording;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecordingDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
@@ -136,7 +135,6 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
                 h.getValue().getHearingDate().toLowerCase(),
                 DateTimeFormatter.ofPattern(RECORDING_DATE_FORMATTER, Locale.UK))));
             sscsCaseData.getSscsHearingRecordingCaseData().setSscsHearingRecordings(existingSscsHearingRecordings);
-            sscsCaseData.getSscsHearingRecordingCaseData().setShowHearingRecordings(YesNo.YES);
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
