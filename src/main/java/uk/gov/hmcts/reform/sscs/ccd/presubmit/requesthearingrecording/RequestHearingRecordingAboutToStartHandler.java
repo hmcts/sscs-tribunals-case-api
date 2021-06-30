@@ -115,7 +115,7 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
     private void removeFromListAndAddText(HearingRecordingRequest request, List<DynamicListItem> validHearings, StringBuilder stringBuilder) {
         stringBuilder.append(request.getValue().getRequestedHearingName());
         stringBuilder.append(", ");
-        DynamicListItem item = validHearings.stream().filter(i -> i.getCode().equals(request.getValue().getRequestedHearing())).findFirst().orElse(null);
+        DynamicListItem item = validHearings.stream().filter(i -> i.getCode().equals(request.getValue().getRequestedHearingId())).findFirst().orElse(null);
         if (item != null) {
             validHearings.remove(item);
         }

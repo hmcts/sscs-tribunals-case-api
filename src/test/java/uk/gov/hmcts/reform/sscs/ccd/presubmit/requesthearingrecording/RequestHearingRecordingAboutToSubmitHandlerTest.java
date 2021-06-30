@@ -75,7 +75,7 @@ public class RequestHearingRecordingAboutToSubmitHandlerTest {
 
         assertEquals(YesNo.YES, response.getData().getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding());
         assertEquals(1, response.getData().getSscsHearingRecordingCaseData().getRequestedHearings().size());
-        assertEquals("an_id1", response.getData().getSscsHearingRecordingCaseData().getRequestedHearings().get(0).getValue().getRequestedHearing());
+        assertEquals("an_id1", response.getData().getSscsHearingRecordingCaseData().getRequestedHearings().get(0).getValue().getRequestedHearingId());
     }
 
     @Test
@@ -84,7 +84,7 @@ public class RequestHearingRecordingAboutToSubmitHandlerTest {
         sscsCaseData.getSscsHearingRecordingCaseData().setSscsHearingRecordings(Arrays.asList(recording1));
 
         HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
-                .requestingParty("dwp").status("requested").requestedHearing("some_id").requestedHearingName("some_name").build()).build();
+                .requestingParty("dwp").status("requested").requestedHearingId("some_id").requestedHearingName("some_name").build()).build();
         List<HearingRecordingRequest> hearingRecordingRequests = new ArrayList<>();
         hearingRecordingRequests.add(hearingRecordingRequest);
         sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(hearingRecordingRequests);
@@ -94,7 +94,7 @@ public class RequestHearingRecordingAboutToSubmitHandlerTest {
 
         assertEquals(YesNo.YES, response.getData().getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding());
         assertEquals(2, response.getData().getSscsHearingRecordingCaseData().getRequestedHearings().size());
-        assertEquals("an_id1", response.getData().getSscsHearingRecordingCaseData().getRequestedHearings().get(1).getValue().getRequestedHearing());
+        assertEquals("an_id1", response.getData().getSscsHearingRecordingCaseData().getRequestedHearings().get(1).getValue().getRequestedHearingId());
     }
 
 

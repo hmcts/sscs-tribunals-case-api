@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadhearingrecording;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadhearingrecording.HearingTypeForRecording.ADJOURNED;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadhearingrecording.HearingTypeForRecording.FINAL;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
