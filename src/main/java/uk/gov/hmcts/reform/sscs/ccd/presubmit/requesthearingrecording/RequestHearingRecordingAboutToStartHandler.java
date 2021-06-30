@@ -78,7 +78,7 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
 
 
             if (validHearings.isEmpty()) {
-                return returnError(response, "There are no hearings to request on this case");
+                return returnError(response, "There are no hearing recordings available for request");
             }
 
             sscsCaseData.getSscsHearingRecordingCaseData().setRequestableHearingDetails(new DynamicList(new DynamicListItem("", ""), validHearings));
