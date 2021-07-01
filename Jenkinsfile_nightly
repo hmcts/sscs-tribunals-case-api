@@ -52,4 +52,5 @@ withNightlyPipeline(type, product, component) {
     enableSlackNotifications('#sscs-tech')
     enableSecurityScan()
     enableFullFunctionalTest()
-} 
+    enableMutationTest()
+}
