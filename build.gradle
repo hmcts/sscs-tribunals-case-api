@@ -24,6 +24,7 @@ plugins {
 
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+apply plugin: "info.solidsoft.pitest"
 
 gitProperties {
     gitPropertiesDir = new File("${project.rootDir}/src/main/resources/uk/gov/hmcts/reform/sscs")
@@ -180,8 +181,9 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/coversheet/PdfCoverSheet.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/controllers/CreateCaseController.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/PdfData.java," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/esa/EsaWriteFinalDecisionMidEventValidationHandler.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/esa/EsaWriteFinalDecisionMidEventValidationHandler.java," +      
                 "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/uc/UcWriteFinalDecisionMidEventValidationHandler.java"
+        property "sonar.host.url", "https://sonar.reform.hmcts.net/"
         property "sonar.pitest.mode", "reuseReport"
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
     }
@@ -200,7 +202,7 @@ configurations {
 def versions = [
         reformLogging: '5.1.7',
         springfoxSwagger: '2.8.0',
-        pitest: '1.3.2',
+        pitest: '1.4.2',
         gradlePitest: '1.3.0',
         sonarPitest: '0.5',
         pact: '4.1.7',
@@ -389,6 +391,10 @@ dependencies {
 
     e2eRuntime "org.junit.platform:junit-platform-commons:1.7.2"
 
+    compile group: 'org.pitest', name: 'pitest', version: versions.pitest
+    compile group:'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
+    compile group:'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: versions.sonarPitest
+
     //pact contract testing
     contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact
     contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact
@@ -434,9 +440,22 @@ jacocoTestReport {
 }
 
 pitest {
-    targetClasses = ['uk.gov.hmcts.sscs.*']
-    excludedClasses = ['uk.gov.hmcts.reform.sscs.config.*','uk.gov.hmcts.reform.sscs.models.*','uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication.java']
-    threads = 10
+    targetClasses = ['uk.gov.hmcts.reform.sscs.service.*']
+    excludedClasses = ['uk.gov.hmcts.reform.sscs.config.*',
+                       'uk.gov.hmcts.reform.sscs.builder.*',
+                       'uk.gov.hmcts.reform.sscs.domain.*',
+                       'uk.gov.hmcts.reform.sscs.exception.*',
+                       'uk.gov.hmcts.reform.sscs.healthcheck.*',
+                       'uk.gov.hmcts.reform.sscs.model.*',
+                       'uk.gov.hmcts.reform.sscs.transform.*',
+                       'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication']
+    excludedMethods = ['equals', 'hashcode']
+    jvmArgs = ['-Xms1G','-Xmx3G']
+    enableDefaultIncrementalAnalysis = true
+    historyInputLocation = 'build/reports/pitest/fastermutationtesting'
+    historyOutputLocation = 'build/reports/pitest/fastermutationtestingoutput'
+    threads = 20
+    verbose = true
     outputFormats = ['XML', 'HTML']
     timestampedReports = false
     mutationThreshold = 50
