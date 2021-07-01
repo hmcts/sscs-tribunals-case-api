@@ -58,7 +58,7 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
                     .map(hearing -> new DynamicListItem(hearing.getValue().getHearingId(), selectHearing(hearing)))
                     .collect(Collectors.toList());
             if (validHearings.isEmpty()) {
-                return returnError(response, "No hearing has been conducted on this case");
+                return returnError(response, "There are no hearings with hearing recordings on this case");
             }
 
             List<HearingRecordingRequest> requestedHearingsCollection = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();
