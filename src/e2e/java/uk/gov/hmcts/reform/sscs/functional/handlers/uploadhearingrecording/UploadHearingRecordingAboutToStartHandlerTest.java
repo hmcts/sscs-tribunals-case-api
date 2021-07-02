@@ -33,6 +33,6 @@ public class UploadHearingRecordingAboutToStartHandlerTest extends BaseHandler {
             .rootPath("data")
             .assertThat().body("selectHearingDetails.list_items[0].code", equalTo("33445566"))
             .assertThat()
-            .body("selectHearingDetails.list_items[0].label", equalTo("Prudential House 23:00 06 Jun 2021"));
+            .body("selectHearingDetails.list_items[0].label", equalTo("Prudential House 23:00:00 06 Jun 2021"));
     }
 }
