@@ -6,12 +6,15 @@ import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.tya.HearingRecordingResponse;
 import uk.gov.hmcts.reform.sscs.service.requesttype.RequestTypeService;
 
 
 import java.util.List;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
@@ -33,8 +36,9 @@ public class RequestTypeController {
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Hearing Recordings",
             response = HearingRecordingResponse.class)})
     @GetMapping(value = "/{identifier}/hearingrecording", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<HearingRecordingResponse> getHearingRecording(@PathVariable("identifier") String identifier) {
-        return ok(requestTypeService.findHearingRecordings(identifier));
+    public ResponseEntity<HearingRecordingResponse> getHearingRecording(@RequestHeader(AUTHORIZATION) String authorisation,
+                                                                        @PathVariable("identifier") String identifier) {
+        return ok(requestTypeService.findHearingRecordings(identifier, authorisation));
     }
 
 
@@ -46,9 +50,10 @@ public class RequestTypeController {
     })
     @PostMapping(value = "/{identifier}/recordingrequest",
             produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity submitHearingRecordingRequest(@PathVariable("identifier") String identifier,
+    public ResponseEntity submitHearingRecordingRequest(@RequestHeader(AUTHORIZATION) String authorisation,
+                                                        @PathVariable("identifier") String identifier,
                                                         @RequestParam("hearingIds") List<String> hearingIds) {
-        boolean requested = requestTypeService.requestHearingRecordings(identifier, hearingIds);
+        boolean requested = requestTypeService.requestHearingRecordings(identifier, hearingIds, authorisation);
         return requested ? ResponseEntity.noContent().build() : notFound().build();
     }
 }

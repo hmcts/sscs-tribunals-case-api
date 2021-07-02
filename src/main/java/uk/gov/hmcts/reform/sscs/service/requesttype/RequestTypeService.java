@@ -1,14 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service.requesttype;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.model.tya.HearingRecording;
-import uk.gov.hmcts.reform.sscs.model.tya.HearingRecordingRequest;
-import uk.gov.hmcts.reform.sscs.model.tya.HearingRecordingResponse;
-import uk.gov.hmcts.reform.sscs.service.OnlineHearingService;
+import static org.apache.commons.io.FilenameUtils.getExtension;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -18,8 +11,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.model.tya.HearingRecording;
+import uk.gov.hmcts.reform.sscs.model.tya.CitizenHearingRecording;
+import uk.gov.hmcts.reform.sscs.model.tya.HearingRecordingResponse;
+import uk.gov.hmcts.reform.sscs.service.OnlineHearingService;
 
 @Slf4j
 @Service
@@ -37,86 +40,107 @@ public class RequestTypeService {
         this.idamService = idamService;
     }
 
-    public HearingRecordingResponse findHearingRecordings(String identifier) {
+    /**
+     * Find hearing recordings for given case and release and outstanding hearing recording request made by the user
+     * @param identifier case id
+     * @param authorisation user authorisation token
+     * @return {code}HearingRecordingResponse that contains
+      */
+    public HearingRecordingResponse findHearingRecordings(String identifier, String authorisation) {
         Optional<SscsCaseDetails> caseDetails = onlineHearingService.getCcdCaseByIdentifier(identifier);
-        return caseDetails.map(x -> mapToHearingRecording(x.getData())).orElse(new HearingRecordingResponse());
+        UserDetails user = idamService.getUserDetails(authorisation);
+        return caseDetails.map(x -> mapToHearingRecording(x.getData(), user.getEmail())).orElse(new HearingRecordingResponse());
     }
 
-    public boolean requestHearingRecordings(String identifier, List<String> hearingIds) {
-        log.info("Hearing recordings request for {}", hearingIds);
+    /**
+     * Submit a new hearing recording request
+     * @param identifier case id
+     * @param hearingIds requesting hearing id
+     * @param authorisation user authorisation token
+     * @return boolean
+     */
+    public boolean requestHearingRecordings(String identifier, List<String> hearingIds, String authorisation) {
         Optional<SscsCaseDetails> caseDetails = onlineHearingService.getCcdCaseByIdentifier(identifier);
-        return caseDetails.map(x -> submitHearingRecordingRequest(x.getData(), x.getId(), hearingIds)).orElse(false);
+        UserDetails user = idamService.getUserDetails(authorisation);
+        return caseDetails.map(x -> submitHearingRecordingRequest(x.getData(), x.getId(), hearingIds, user.getEmail())).orElse(false);
     }
 
-    private HearingRecordingResponse mapToHearingRecording(SscsCaseData sscsCaseData) {
+    private HearingRecordingResponse mapToHearingRecording(SscsCaseData sscsCaseData, String idamEmail) {
         if (sscsCaseData.getHearings() == null || sscsCaseData.getHearings().isEmpty()) {
             return new HearingRecordingResponse();
         } else {
-            //FIXME pass request party
-            List<HearingRecordingRequest> releasedRecordings = sscsCaseData.getSscsHearingRecordingCaseData().getReleasedHearings()
-                    .stream()
-                    .filter(request -> UploadParty.APPELLANT.equals(request.getValue().getRequestingParty()))
+            UploadParty uploadParty = workRequestedParty(sscsCaseData, idamEmail);
+
+            List<HearingRecordingRequest> releasedHearingRecordings = sscsCaseData.getSscsHearingRecordingCaseData().getReleasedHearings();
+            List<CitizenHearingRecording> releasedRecordings = CollectionUtils.isEmpty(releasedHearingRecordings) ? List.of() :
+                    releasedHearingRecordings.stream()
+                    .filter(request -> uploadParty.getValue().equals(request.getValue().getRequestingParty()))
                     .flatMap(request -> request.getValue().getSscsHearingRecordingList().stream())
-                    .map(request -> selectHearingRecordings(request.getValue()))
+                    .map(request -> populateCitizenHearingRecordings(request.getValue()))
                     .collect(Collectors.toList());
 
-            List<HearingRecordingRequest> requestedRecordings = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings()
-                    .stream()
-                    .filter(request -> UploadParty.APPELLANT.equals(request.getValue().getRequestingParty()))
+            List<HearingRecordingRequest> requestedHearingRecordings =sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();
+            List<CitizenHearingRecording> requestedRecordings = CollectionUtils.isEmpty(requestedHearingRecordings) ? List.of() :
+                    requestedHearingRecordings.stream()
+                    .filter(request -> uploadParty.getValue().equals(request.getValue().getRequestingParty()))
                     .flatMap(request -> request.getValue().getSscsHearingRecordingList().stream())
-                    .map(request -> selectHearingRecordings(request.getValue()))
+                    .map(request -> populateCitizenHearingRecordings(request.getValue()))
                     .collect(Collectors.toList());
 
             List<String> allRequestedHearingIds = Stream.of(releasedRecordings, requestedRecordings)
                     .flatMap(Collection::stream)
-                    .map(r -> r.getHearingId())
+                    .map(CitizenHearingRecording::getHearingId)
                     .collect(Collectors.toList());
 
-            List<HearingRecordingRequest> requestabledRecordings = sscsCaseData.getHearings().stream()
+            List<CitizenHearingRecording> requestabledRecordings = sscsCaseData.getHearings().stream()
                     .filter(hearing -> isHearingWithRecording(hearing, sscsCaseData.getSscsHearingRecordingCaseData()))
                     .filter(hearing -> !allRequestedHearingIds.contains(hearing.getValue().getHearingId()))
-                    .map(hearing -> selectHearingRecordings(hearing, sscsCaseData.getSscsHearingRecordingCaseData()))
+                    .map(hearing -> populateCitizenHearingRecordings(hearing))
                     .collect(Collectors.toList());
 
             return new HearingRecordingResponse(releasedRecordings, requestedRecordings, requestabledRecordings);
         }
     }
 
-    private boolean submitHearingRecordingRequest(SscsCaseData sscsCaseData, Long ccdCaseId, List<String> hearingIds) {
-        List<SscsHearingRecording> sscsHearingRecordingList = sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings()
-                .stream().filter(r -> hearingIds.contains(r.getValue().getHearingId())).collect(Collectors.toList());
+    private boolean submitHearingRecordingRequest(SscsCaseData sscsCaseData, Long ccdCaseId, List<String> hearingIds, String idamEmail) {
 
-        //FIXME change the upload party
-        uk.gov.hmcts.reform.sscs.ccd.domain.HearingRecordingRequest hearingRecordingRequest = uk.gov.hmcts.reform.sscs.ccd.domain.HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
-                .requestingParty(UploadParty.APPELLANT.getValue()).status("requested")
-                .dateRequested(LocalDateTime.now().format(DateTimeFormatter.ofPattern(UPLOAD_DATE_FORMATTER)))
-                .sscsHearingRecordingList(sscsHearingRecordingList).build()).build();
+        List<HearingRecordingRequest> newHearingRequests = new ArrayList<>();
+        for (String hearingId : hearingIds) {
+            List<SscsHearingRecording> sscsHearingRecordingList = sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings()
+                    .stream().filter(r -> hearingId.equals(r.getValue().getHearingId())).collect(Collectors.toList());
 
-        List<uk.gov.hmcts.reform.sscs.ccd.domain.HearingRecordingRequest> hearingRecordingRequests = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();
+            UploadParty uploadParty = workRequestedParty(sscsCaseData, idamEmail);
+
+            HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
+                    .requestingParty(uploadParty.getValue()).status("requested")
+                    .dateRequested(LocalDateTime.now().format(DateTimeFormatter.ofPattern(UPLOAD_DATE_FORMATTER)))
+                    .sscsHearingRecordingList(sscsHearingRecordingList).build()).build();
+            newHearingRequests.add(hearingRecordingRequest);
+        }
+
+        List<HearingRecordingRequest> hearingRecordingRequests = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();
         if (hearingRecordingRequests == null) {
             hearingRecordingRequests = new ArrayList<>();
         }
-        hearingRecordingRequests.add(hearingRecordingRequest);
+        hearingRecordingRequests.addAll(newHearingRequests);
 
         sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(hearingRecordingRequests);
-        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YesNo.YES);
-        //FIXME change the event type
-        ccdService.updateCase(sscsCaseData, ccdCaseId, DWP_REQUEST_HEARING_RECORDING.getCcdType(),
+        ccdService.updateCase(sscsCaseData, ccdCaseId, CITIZEN_REQUEST_HEARING_RECORDING.getCcdType(),
                 "SSCS - hearing recording request from MYA",
                 "Requested hearing recordings", idamService.getIdamTokens());
         return true;
     }
 
-    private HearingRecordingRequest selectHearingRecordings(uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecordingDetails recording) {
-        return HearingRecordingRequest.builder()
+    private CitizenHearingRecording populateCitizenHearingRecordings(SscsHearingRecordingDetails recording) {
+        return CitizenHearingRecording.builder()
                 .hearingId(recording.getHearingId())
-                .venue("Venue")
+                .venue(recording.getVenue())
                 .hearingDate(recording.getHearingDate())
-                .hearingTime("Time")
                 .hearingRecordings(recording.getRecordings()
                         .stream()
                         .map(r -> HearingRecording.builder()
                                 .fileName(r.getValue().getDocumentFilename())
+                                .fileType(getExtension(r.getValue().getDocumentFilename()))
                                 .documentUrl(r.getValue().getDocumentUrl())
                                 .documentBinaryUrl(r.getValue().getDocumentBinaryUrl())
                                 .build())
@@ -124,11 +148,10 @@ public class RequestTypeService {
                 .build();
     }
 
-    private HearingRecordingRequest selectHearingRecordings(Hearing hearing, SscsHearingRecordingCaseData hearingRecordingsData) {
-        return HearingRecordingRequest.builder()
+    private CitizenHearingRecording populateCitizenHearingRecordings(Hearing hearing) {
+        return CitizenHearingRecording.builder()
                 .hearingId(hearing.getValue().getHearingId())
                 .hearingDate(hearing.getValue().getHearingDate())
-                .hearingTime(hearing.getValue().getTime())
                 .venue(hearing.getValue().getVenue().getName())
                 .build();
     }
@@ -140,5 +163,24 @@ public class RequestTypeService {
             return sscsHearingRecordings.stream().anyMatch(r -> r.getValue().getHearingId().equals(hearing.getValue().getHearingId()));
         }
         return false;
+    }
+
+    @NotNull
+    private UploadParty workRequestedParty(SscsCaseData caseData, String idamEmail) {
+        UploadParty uploader = UploadParty.APPELLANT;
+        Subscriptions subscriptions = caseData.getSubscriptions();
+        if (subscriptions != null) {
+            Subscription appointeeSubs = subscriptions.getAppointeeSubscription();
+            Subscription repSubs = subscriptions.getRepresentativeSubscription();
+            Subscription jpSubs = subscriptions.getJointPartySubscription();
+            if (appointeeSubs != null && idamEmail.equalsIgnoreCase(appointeeSubs.getEmail())) {
+                uploader = UploadParty.APPOINTEE;
+            } else if (repSubs != null && idamEmail.equalsIgnoreCase(repSubs.getEmail())) {
+                uploader = UploadParty.REP;
+            } else if (jpSubs != null && idamEmail.equalsIgnoreCase(jpSubs.getEmail())) {
+                uploader = UploadParty.JOINT_PARTY;
+            }
+        }
+        return uploader;
     }
 }

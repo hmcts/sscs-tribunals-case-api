@@ -11,10 +11,9 @@ import java.util.List;
 @Builder
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class HearingRecordingRequest {
+public class CitizenHearingRecording {
     private String hearingId;
     private String venue;
     private String hearingDate;
-    private String hearingTime;
     private List<HearingRecording> hearingRecordings;
 }

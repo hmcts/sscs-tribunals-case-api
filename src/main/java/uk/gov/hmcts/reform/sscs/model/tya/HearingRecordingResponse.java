@@ -16,7 +16,7 @@ import java.util.List;
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class HearingRecordingResponse {
-    private List<HearingRecordingRequest> releasedHearingRecordings;
-    private List<HearingRecordingRequest> outstandingHearingRecordings;
-    private List<HearingRecordingRequest> requestableHearingRecordings;
+    private List<CitizenHearingRecording> releasedHearingRecordings;
+    private List<CitizenHearingRecording> outstandingHearingRecordings;
+    private List<CitizenHearingRecording> requestableHearingRecordings;
 }

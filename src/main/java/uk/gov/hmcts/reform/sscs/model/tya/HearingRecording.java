@@ -12,6 +12,7 @@ import lombok.Value;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class HearingRecording {
     private String fileName;
+    private String fileType;
     private String documentUrl;
     private String documentBinaryUrl;
 }
