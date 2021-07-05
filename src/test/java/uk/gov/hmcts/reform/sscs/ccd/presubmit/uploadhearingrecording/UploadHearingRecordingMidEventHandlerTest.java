@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadhearingrecording;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -9,6 +8,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadhearingrecording.HearingTypeForRecording.FINAL;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,27 +94,35 @@ public class UploadHearingRecordingMidEventHandlerTest {
 
     @Test
     public void givenHearingRecordingListIsNull_ReturnResponse() {
-        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordings(null);
+        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecording(null);
         assertNoErrors();
     }
 
     @Test
     public void givenHearingRecordingListIsEmpty_ReturnResponse() {
-        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordings(Collections.EMPTY_LIST);
+        HearingRecording hearingRecording = HearingRecording.builder()
+            .hearingType(FINAL.getKey())
+            .recordings(Collections.EMPTY_LIST)
+            .build();
+        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecording(hearingRecording);
         assertNoErrors();
     }
 
     @Test
     public void givenHearingRecordingListHasLessThan500Mb_ReturnResponse() {
-        List<HearingRecording> recordings = new ArrayList<>();
-        recordings.add(HearingRecording.builder().value(
-            HearingRecordingDetails.builder().documentLink(
+        List<HearingRecordingDetails> details = new ArrayList<>();
+        details.add(
+            HearingRecordingDetails.builder().value(
                 DocumentLink.builder()
                     .documentFilename("Test 1.mp4")
                     .documentBinaryUrl("/some-link")
-                    .build()).build()).build());
+                    .build()).build());
+        HearingRecording recording = HearingRecording.builder()
+            .hearingType("adjourned")
+            .recordings(details)
+            .build();
 
-        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordings(unmodifiableList(recordings));
+        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecording(recording);
         ResponseEntity<Resource> resource = ResponseEntity.ok(new ByteArrayResource("test".getBytes()));
         when(documentDownloadService.downloadFile(any())).thenReturn(resource);
         when(documentDownloadService.getFileSize(any())).thenReturn(Long.valueOf(500 * 1024 * 1024));
@@ -123,15 +131,19 @@ public class UploadHearingRecordingMidEventHandlerTest {
 
     @Test
     public void givenHearingRecordingListHasGreaterThan500Mb_ReturnError() {
-        List<HearingRecording> recordings = new ArrayList<>();
-        recordings.add(HearingRecording.builder().value(
-            HearingRecordingDetails.builder().documentLink(
+        List<HearingRecordingDetails> details = new ArrayList<>();
+        details.add(
+            HearingRecordingDetails.builder().value(
                 DocumentLink.builder()
                     .documentFilename("Test 1.mp3")
                     .documentBinaryUrl("/some-link")
-                    .build()).build()).build());
+                    .build()).build());
+        HearingRecording recording = HearingRecording.builder()
+            .hearingType("final")
+            .recordings(details)
+            .build();
 
-        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordings(unmodifiableList(recordings));
+        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecording(recording);
         ResponseEntity<Resource> resource = ResponseEntity.ok(new ByteArrayResource("test".getBytes()));
         when(documentDownloadService.downloadFile(any())).thenReturn(resource);
         when(documentDownloadService.getFileSize(any())).thenReturn(Long.valueOf(501 * 1024 * 1024));
@@ -143,17 +155,21 @@ public class UploadHearingRecordingMidEventHandlerTest {
 
     @Test
     public void givenHearingRecordingListHasBadFileExtension_ReturnError() {
-        List<HearingRecording> recordings = new ArrayList<>();
-        recordings.add(HearingRecording.builder().value(
-            HearingRecordingDetails.builder().documentLink(
+        List<HearingRecordingDetails> details = new ArrayList<>();
+        details.add(
+            HearingRecordingDetails.builder().value(
                 DocumentLink.builder()
                     .documentFilename("Test 1.pdf")
                     .documentBinaryUrl("/some-link")
-                    .build()).build()).build());
+                    .build()).build());
+        HearingRecording recording = HearingRecording.builder()
+            .hearingType("final")
+            .recordings(details)
+            .build();
 
         ResponseEntity<Resource> resource = ResponseEntity.ok(new ByteArrayResource("test".getBytes()));
         when(documentDownloadService.downloadFile(any())).thenReturn(resource);
-        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordings(unmodifiableList(recordings));
+        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecording(recording);
 
         final PreSubmitCallbackResponse<SscsCaseData>
             response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
