@@ -71,7 +71,7 @@ public class PipScenarioEnhancedRateStandardRateTest {
                 + "\n\n"
                 + "Felix Sydney is entitled to the mobility component at the standard rate from 17/12/2020 for an indefinite period.\n"
                 + "\n"
-                + "Felix Sydney is limited in their ability to mobilise. They score 8 points.They satisfy the following descriptors:\n"
+                + "Felix Sydney is limited in their ability to mobilise. They score 8 points. They satisfy the following descriptors:\n"
                 + "\n"
                 + "12.Moving Around\tc.Can stand and then move unaided more than 20 metres but no more than 50 metres.\t8\n"
                 + "\n\n"
