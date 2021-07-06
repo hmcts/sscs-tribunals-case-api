@@ -142,7 +142,10 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
 
     private String getVenueName(SscsCaseData sscsCaseData, String hearingId) {
         Hearing hearing = sscsCaseData.getHearings().stream().filter(h -> hearingId.equals(h.getValue().getHearingId())).findFirst().orElse(null);
-        return hearing.getValue().getVenue().getName();
+        if (hearing != null && hearing.getValue() != null) {
+            return hearing.getValue().getVenue().getName();
+        }
+        return "";
     }
 
     protected SscsHearingRecording createSscsHearingRecording(String hearingDate, String type, String hearingId, String venueName) {
