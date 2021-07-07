@@ -46,13 +46,12 @@ public class CitizenRequestServiceTest {
     private IdamTokens idamTokens;
 
     private CitizenRequestService citizenRequestService;
-    private UserDetails user;
 
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        user = new UserDetails("id", E_MAIL, "first last", "first", "last", List.of("citizen"));
+        UserDetails user = new UserDetails("id", E_MAIL, "first last", "first", "last", List.of("citizen"));
         citizenRequestService = new CitizenRequestService(onlineHearingService, ccdService, idamService);
 
         when(onlineHearingService.getCcdCaseByIdentifier(IDENTIFIER)).thenReturn(Optional.of(caseDetails));
@@ -243,11 +242,11 @@ public class CitizenRequestServiceTest {
                         .build())
                 .build()));
         when(caseData.getSubscriptions()).thenReturn(Subscriptions.builder()
-                .appointeeSubscription(Subscription.builder().email(E_MAIL).build()).build());
+                .jointPartySubscription(Subscription.builder().email(E_MAIL).build()).build());
         when(caseData.getSscsHearingRecordingCaseData()).thenReturn(SscsHearingRecordingCaseData.builder()
                 .requestedHearings(List.of(HearingRecordingRequest.builder()
                                 .value(HearingRecordingRequestDetails.builder()
-                                        .requestingParty(UploadParty.APPOINTEE.getValue())
+                                        .requestingParty(UploadParty.JOINT_PARTY.getValue())
                                         .sscsHearingRecordingList(List.of(SscsHearingRecording.builder()
                                                 .value(SscsHearingRecordingDetails.builder()
                                                         .hearingId("id_1")
@@ -270,7 +269,7 @@ public class CitizenRequestServiceTest {
                                 .build()))
                 .releasedHearings(List.of(HearingRecordingRequest.builder()
                         .value(HearingRecordingRequestDetails.builder()
-                                .requestingParty(UploadParty.APPOINTEE.getValue())
+                                .requestingParty(UploadParty.JOINT_PARTY.getValue())
                                 .sscsHearingRecordingList(List.of(SscsHearingRecording.builder()
                                         .value(SscsHearingRecordingDetails.builder()
                                                 .hearingId("id_1")

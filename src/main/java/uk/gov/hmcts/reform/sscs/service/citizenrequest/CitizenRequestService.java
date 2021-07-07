@@ -170,12 +170,9 @@ public class CitizenRequestService {
         UploadParty uploader = UploadParty.APPELLANT;
         Subscriptions subscriptions = caseData.getSubscriptions();
         if (subscriptions != null) {
-            Subscription appointeeSubs = subscriptions.getAppointeeSubscription();
             Subscription repSubs = subscriptions.getRepresentativeSubscription();
             Subscription jpSubs = subscriptions.getJointPartySubscription();
-            if (appointeeSubs != null && idamEmail.equalsIgnoreCase(appointeeSubs.getEmail())) {
-                uploader = UploadParty.APPOINTEE;
-            } else if (repSubs != null && idamEmail.equalsIgnoreCase(repSubs.getEmail())) {
+            if (repSubs != null && idamEmail.equalsIgnoreCase(repSubs.getEmail())) {
                 uploader = UploadParty.REP;
             } else if (jpSubs != null && idamEmail.equalsIgnoreCase(jpSubs.getEmail())) {
                 uploader = UploadParty.JOINT_PARTY;
