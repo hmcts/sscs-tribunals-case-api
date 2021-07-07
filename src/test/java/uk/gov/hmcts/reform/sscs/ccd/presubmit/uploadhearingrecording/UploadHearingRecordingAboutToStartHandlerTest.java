@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +39,8 @@ import uk.gov.hmcts.reform.sscs.idam.UserRole;
 @RunWith(JUnitParamsRunner.class)
 public class UploadHearingRecordingAboutToStartHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
+    private static final String futureDate =
+        LocalDate.now().plusMonths(2).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     private final UserDetails
         userDetails =
         UserDetails.builder().roles(new ArrayList<>(asList("caseworker-sscs", UserRole.CTSC_CLERK.getValue()))).build();
@@ -114,8 +117,8 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
         hearingList.add(Hearing.builder().value(
             HearingDetails.builder()
                 .venue(Venue.builder().name("some value").build())
-                .hearingDate("2022-03-20")
-                .time("15:15").build()).build());
+                .hearingDate(futureDate)
+                .time("15:15:00").build()).build());
         hearingList.add(Hearing.builder().value(
             HearingDetails.builder()
                 .hearingId("1111")
@@ -125,16 +128,17 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
         hearingList.add(Hearing.builder().value(
             HearingDetails.builder()
                 .venue(Venue.builder().name("some value").build())
-                .hearingDate("2022-05-20")
+                .hearingDate(futureDate)
                 .time("10:10").build()).build());
         sscsCaseData.setHearings(unmodifiableList(hearingList));
         final PreSubmitCallbackResponse<SscsCaseData>
             response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
-        List<DynamicListItem> selectHearingDetails = response.getData().getSscsHearingRecordingCaseData().getSelectHearingDetails().getListItems();
+        List<DynamicListItem> selectHearingDetails =
+            response.getData().getSscsHearingRecordingCaseData().getSelectHearingDetails().getListItems();
         assertEquals(1, selectHearingDetails.size());
         assertEquals("1111", selectHearingDetails.get(0).getCode());
-        assertEquals("good value 09:00 06 Jun 2021", selectHearingDetails.get(0).getLabel());
+        assertEquals("good value 09:00:00 06 Jun 2021", selectHearingDetails.get(0).getLabel());
     }
 
     private void assertNoHearingsInThePastError() {
