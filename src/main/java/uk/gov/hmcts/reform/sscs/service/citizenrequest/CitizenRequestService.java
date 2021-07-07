@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.service.requesttype;
+package uk.gov.hmcts.reform.sscs.service.citizenrequest;
 
 import static org.apache.commons.io.FilenameUtils.getExtension;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
@@ -19,14 +19,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
-import uk.gov.hmcts.reform.sscs.model.tya.HearingRecording;
 import uk.gov.hmcts.reform.sscs.model.tya.CitizenHearingRecording;
+import uk.gov.hmcts.reform.sscs.model.tya.HearingRecording;
 import uk.gov.hmcts.reform.sscs.model.tya.HearingRecordingResponse;
 import uk.gov.hmcts.reform.sscs.service.OnlineHearingService;
 
 @Slf4j
 @Service
-public class RequestTypeService {
+public class CitizenRequestService {
     private static final String UPLOAD_DATE_FORMATTER = "yyyy-MM-dd";
 
     private final OnlineHearingService onlineHearingService;
@@ -34,26 +34,26 @@ public class RequestTypeService {
     private final IdamService idamService;
 
 
-    public RequestTypeService(OnlineHearingService onlineHearingService, CcdService ccdService, IdamService idamService) {
+    public CitizenRequestService(OnlineHearingService onlineHearingService, CcdService ccdService, IdamService idamService) {
         this.onlineHearingService = onlineHearingService;
         this.ccdService = ccdService;
         this.idamService = idamService;
     }
 
     /**
-     * Find hearing recordings for given case and release and outstanding hearing recording request made by the user
+     * Find hearing recordings for given case and release and outstanding hearing recording request made by the user.
      * @param identifier case id
      * @param authorisation user authorisation token
      * @return {code}HearingRecordingResponse that contains
       */
-    public HearingRecordingResponse findHearingRecordings(String identifier, String authorisation) {
+    public Optional<HearingRecordingResponse> findHearingRecordings(String identifier, String authorisation) {
         Optional<SscsCaseDetails> caseDetails = onlineHearingService.getCcdCaseByIdentifier(identifier);
         UserDetails user = idamService.getUserDetails(authorisation);
-        return caseDetails.map(x -> mapToHearingRecording(x.getData(), user.getEmail())).orElse(new HearingRecordingResponse());
+        return caseDetails.map(x -> mapToHearingRecording(x.getData(), user.getEmail()));
     }
 
     /**
-     * Submit a new hearing recording request
+     * Submit a new hearing recording request.
      * @param identifier case id
      * @param hearingIds requesting hearing id
      * @param authorisation user authorisation token
@@ -62,7 +62,7 @@ public class RequestTypeService {
     public boolean requestHearingRecordings(String identifier, List<String> hearingIds, String authorisation) {
         Optional<SscsCaseDetails> caseDetails = onlineHearingService.getCcdCaseByIdentifier(identifier);
         UserDetails user = idamService.getUserDetails(authorisation);
-        return caseDetails.map(x -> submitHearingRecordingRequest(x.getData(), x.getId(), hearingIds, user.getEmail())).orElse(false);
+        return caseDetails.map(sscsCase -> submitHearingRecordingRequest(sscsCase.getData(), sscsCase.getId(), hearingIds, user.getEmail())).orElse(false);
     }
 
     private HearingRecordingResponse mapToHearingRecording(SscsCaseData sscsCaseData, String idamEmail) {
@@ -79,7 +79,7 @@ public class RequestTypeService {
                     .map(request -> populateCitizenHearingRecordings(request.getValue()))
                     .collect(Collectors.toList());
 
-            List<HearingRecordingRequest> requestedHearingRecordings =sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();
+            List<HearingRecordingRequest> requestedHearingRecordings = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();
             List<CitizenHearingRecording> requestedRecordings = CollectionUtils.isEmpty(requestedHearingRecordings) ? List.of() :
                     requestedHearingRecordings.stream()
                     .filter(request -> uploadParty.getValue().equals(request.getValue().getRequestingParty()))
@@ -95,7 +95,7 @@ public class RequestTypeService {
             List<CitizenHearingRecording> requestabledRecordings = sscsCaseData.getHearings().stream()
                     .filter(hearing -> isHearingWithRecording(hearing, sscsCaseData.getSscsHearingRecordingCaseData()))
                     .filter(hearing -> !allRequestedHearingIds.contains(hearing.getValue().getHearingId()))
-                    .map(hearing -> populateCitizenHearingRecordings(hearing))
+                    .map(this::populateCitizenHearingRecordings)
                     .collect(Collectors.toList());
 
             return new HearingRecordingResponse(releasedRecordings, requestedRecordings, requestabledRecordings);
