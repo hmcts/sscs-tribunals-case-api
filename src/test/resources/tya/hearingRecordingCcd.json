@@ -1,29 +1,4 @@
 {
-  "id": 1625080769409918,
-  "jurisdiction": "SSCS",
-  "case_type_id": "Benefit",
-  "created_date": [
-    2021,
-    6,
-    30,
-    19,
-    19,
-    29,
-    419335000
-  ],
-  "last_modified": [
-    2021,
-    7,
-    2,
-    10,
-    46,
-    38,
-    497891000
-  ],
-  "state": "hearing",
-  "locked_by_user_id": null,
-  "security_level": null,
-  "case_data": {
     "caseCode": "051DD",
     "evidencePresent": "No",
     "subscriptions": {
@@ -322,7 +297,4 @@
     "isScottishCase": "No",
     "createdInGapsFrom": "readyToList",
     "issueCode": "DD"
-  },
-  "security_classification": "PUBLIC",
-  "callback_response_status": null
-}
+  }
