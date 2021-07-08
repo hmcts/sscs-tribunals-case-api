@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadhearingrecording;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -25,20 +26,7 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRecording;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRecordingDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecording;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecordingCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecordingDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
@@ -133,11 +121,15 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
             .sscsHearingRecordings(existingRecordings)
             .build());
 
+        sscsCaseData.setHearings(singletonList(Hearing.builder().value(
+                HearingDetails.builder().hearingId("2222").venue(Venue.builder().name("venue name").build())
+                        .hearingDate("2021-06-06")
+                        .time("17:00").build()).build()));
+
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
-        assertEquals(YesNo.YES, response.getData().getSscsHearingRecordingCaseData().getShowHearingRecordings());
         List<SscsHearingRecording> sscsHearingRecordings =
             response.getData().getSscsHearingRecordingCaseData().getSscsHearingRecordings();
         assertEquals(3, sscsHearingRecordings.size());
@@ -178,11 +170,15 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
             .sscsHearingRecordings(null)
             .build());
 
+        sscsCaseData.setHearings(singletonList(Hearing.builder().value(
+                HearingDetails.builder().hearingId("2222").venue(Venue.builder().name("venue name").build())
+                        .hearingDate("2021-06-06")
+                        .time("17:00").build()).build()));
+
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
-        assertEquals(YesNo.YES, response.getData().getSscsHearingRecordingCaseData().getShowHearingRecordings());
         List<SscsHearingRecording> sscsHearingRecordings =
             response.getData().getSscsHearingRecordingCaseData().getSscsHearingRecordings();
         assertEquals(1, sscsHearingRecordings.size());
@@ -235,7 +231,7 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
 
     @Test
     public void givenValidValue_thenCreateSscsRecordings() {
-        SscsHearingRecording sscsHearingRecording = handler.createSscsHearingRecording("today", FINAL.getKey());
+        SscsHearingRecording sscsHearingRecording = handler.createSscsHearingRecording("today", FINAL.getKey(), "aHearingId", "AVenueName");
 
         assertNotNull(sscsHearingRecording);
         assertEquals("final", sscsHearingRecording.getValue().getHearingType());
@@ -261,8 +257,6 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
         List<SscsHearingRecording> sscsHearingRecordings =
             response.getData().getSscsHearingRecordingCaseData().getSscsHearingRecordings();
         assertNull(sscsHearingRecordings);
-        assertNull(response.getData().getSscsHearingRecordingCaseData().getShowHearingRecordings());
-
     }
 
     @Test
