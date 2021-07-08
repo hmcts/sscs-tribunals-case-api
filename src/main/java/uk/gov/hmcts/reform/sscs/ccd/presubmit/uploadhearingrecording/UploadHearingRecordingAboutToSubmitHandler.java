@@ -21,16 +21,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRecording;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRecordingDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecording;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecordingDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
@@ -95,13 +86,18 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
                 .format(DateTimeFormatter.ofPattern(RECORDING_DATE_FORMATTER, Locale.UK)).toUpperCase();
 
             String hearingType = hearingRecording != null ? hearingRecording.getHearingType() : "";
+            String hearingId = sscsCaseData.getSscsHearingRecordingCaseData().getSelectHearingDetails().getValue().getCode();
+            String venueName = getVenueName(sscsCaseData, hearingId);
+
             Optional<SscsHearingRecording> sscsHearingRecordingOptional =
                 selectSscsHearingRecording(existingSscsHearingRecordings, venueDate, hearingType);
             SscsHearingRecording sscsHearingRecording =
                 sscsHearingRecordingOptional.isPresent() ? sscsHearingRecordingOptional.get() :
                     createSscsHearingRecording(
                         hearingDateTime,
-                        hearingType);
+                        hearingType,
+                            hearingId,
+                            venueName);
             if (!sscsHearingRecordingOptional.isPresent()) {
                 existingSscsHearingRecordings.add(sscsHearingRecording);
             }
@@ -139,23 +135,31 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
                 h.getValue().getHearingDate().toLowerCase(),
                 DateTimeFormatter.ofPattern(RECORDING_DATE_FORMATTER, Locale.UK))));
             sscsCaseData.getSscsHearingRecordingCaseData().setSscsHearingRecordings(existingSscsHearingRecordings);
-            sscsCaseData.getSscsHearingRecordingCaseData().setShowHearingRecordings(YesNo.YES);
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    SscsHearingRecording createSscsHearingRecording(String hearingDate, String type) {
+    private String getVenueName(SscsCaseData sscsCaseData, String hearingId) {
+        Hearing hearing = sscsCaseData.getHearings().stream().filter(h -> hearingId.equals(h.getValue().getHearingId())).findFirst().orElse(null);
+        if (hearing != null && hearing.getValue() != null) {
+            return hearing.getValue().getVenue().getName();
+        }
+        return "";
+    }
+
+    protected SscsHearingRecording createSscsHearingRecording(String hearingDate, String type, String hearingId, String venueName) {
         return SscsHearingRecording.builder()
-            .value(SscsHearingRecordingDetails.builder()
-                .recordings(new ArrayList<>())
-                .hearingDate(hearingDate)
-                .hearingType(type)
-                .uploadDate(
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern(RECORDING_DATE_FORMATTER, Locale.UK))
-                        .toUpperCase())
-                .build())
-            .build();
+                .value(SscsHearingRecordingDetails.builder()
+                        .recordings(new ArrayList<>())
+                        .hearingDate(hearingDate)
+                        .hearingType(type)
+                        .hearingId(hearingId)
+                        .venue(venueName)
+                        .uploadDate(
+                                LocalDateTime.now().format(DateTimeFormatter.ofPattern(RECORDING_DATE_FORMATTER)).toUpperCase())
+                        .build())
+                .build();
     }
 
     private long countExistingRecordings(final List<SscsHearingRecording> sscsHearingRecordings,
