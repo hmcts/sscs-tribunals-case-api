@@ -1,17 +1,20 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.DocumentType.REQUEST_FOR_HEARING_RECORDING;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.FileUploadScenario.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
@@ -54,42 +57,14 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
     }
 
     @Test
-    @Parameters({
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,Medical evidence,appellantEvidence,true, false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,Other evidence,appellantEvidence,true, false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,appellantEvidence,appellantEvidence,true, false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,representativeEvidence,appellantEvidence,true, false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,sscs1,dl6,true,false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,Decision Notice,dl6,true,false",
-        "ABOUT_TO_START,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,representativeEvidence,appellantEvidence,false, true",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,appealCreated,Medical evidence,appellantEvidence,true, false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,appealCreated,Other evidence,appellantEvidence,true, false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,appealCreated,appellantEvidence,appellantEvidence,true, false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,appealCreated,representativeEvidence,appellantEvidence,true, false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,appealCreated,dl6,sscs1,true,false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,appealCreated,DWP response,dl6,true,false",
-        "ABOUT_TO_SUBMIT,APPEAL_RECEIVED,withDwp,representativeEvidence,appellantEvidence,false,true",
-        "ABOUT_TO_SUBMIT,APPEAL_RECEIVED,withDwp,dl6,appellantEvidence,false, true",
-        "null,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,appellantEvidence,appellantEvidence,false, true",
-        "ABOUT_TO_SUBMIT,null,withDwp,appellantEvidence,appellantEvidence,false, false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,,,true,false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,nullSscsDocuments,appellantEvidence,true,false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,nullDocumentType,appellantEvidence,true,false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,nullSscsDocument,appellantEvidence,true,false"
-    })
-    public void canHandle(@Nullable CallbackType callbackType, @Nullable EventType eventType, String state,
-                          @Nullable String documentType,@Nullable String documentType2, boolean expectedResult,
-                          boolean expectToInitDrafts)
+    public void givenAValidHandleAndEventType_thenReturnTrue()
         throws IOException {
-        Callback<SscsCaseData> actualCallback = buildTestCallbackGivenData(eventType, state,
-            documentType, documentType2, UPLOAD_DOCUMENT_FE_CALLBACK_JSON);
-        boolean actualResult = handler.canHandle(callbackType, actualCallback);
+        Callback<SscsCaseData> actualCallback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE, "withDwp",
+            "representativeEvidence", "appellantEvidence", UPLOAD_DOCUMENT_FE_CALLBACK_JSON);
+        boolean actualResult = handler.canHandle(ABOUT_TO_SUBMIT, actualCallback);
 
-        assertEquals(expectedResult, actualResult);
+        assertTrue(actualResult);
 
-        if (expectToInitDrafts) {
-            assertNull(actualCallback.getCaseDetails().getCaseData().getDraftSscsFurtherEvidenceDocument());
-        }
     }
 
     @Test
@@ -352,6 +327,51 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
     private String getExpectedResponse() throws IOException {
         String expectedResponse = fetchData("uploaddocument/" + "expectedUploadDocumentFECallbackResponse.json");
         return expectedResponse.replace("DOCUMENT_DATE_ADDED_PLACEHOLDER", LocalDate.now().atStartOfDay().toString());
+    }
+
+    @Test
+    public void givenHearingRecordingRequest_thenMoveToRequestHearingsCollection() throws IOException {
+
+        Callback<SscsCaseData> actualCallback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE, "withDwp",
+                REQUEST_FOR_HEARING_RECORDING.getId(), APPELLANT_EVIDENCE.getId(), UPLOAD_DOCUMENT_FE_CALLBACK_JSON);
+
+        actualCallback.getCaseDetails().getCaseData().getSscsHearingRecordingCaseData().setRequestingParty(new DynamicList("appellant"));
+
+        PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(ABOUT_TO_SUBMIT, actualCallback, USER_AUTHORISATION);
+
+        assertEquals(1, actualCaseData.getData().getSscsHearingRecordingCaseData().getRequestedHearings().size());
+
+        HearingRecordingRequest hearingRecordingRequest = actualCaseData.getData().getSscsHearingRecordingCaseData().getRequestedHearings().get(0);
+        assertEquals("appellant", hearingRecordingRequest.getValue().getRequestingParty());
+        assertEquals("Requested", hearingRecordingRequest.getValue().getStatus());
+        assertEquals(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), hearingRecordingRequest.getValue().getDateRequested());
+
+        assertEquals(YesNo.YES, actualCaseData.getData().getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding());
+    }
+
+    @Test
+    public void givenHearingRecordingRequestAlreadyExistsAndANewHearingRequestIsAdded_thenAddToRequestHearingsCollection() throws IOException {
+
+        Callback<SscsCaseData> actualCallback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE, "withDwp",
+                REQUEST_FOR_HEARING_RECORDING.getId(), APPELLANT_EVIDENCE.getId(), UPLOAD_DOCUMENT_FE_CALLBACK_JSON);
+
+        actualCallback.getCaseDetails().getCaseData().getSscsHearingRecordingCaseData().setRequestingParty(new DynamicList("appellant"));
+
+        List<HearingRecordingRequest> hearingRecordingRequests = new ArrayList<>();
+        hearingRecordingRequests.add(HearingRecordingRequest.builder().build());
+
+        actualCallback.getCaseDetails().getCaseData().getSscsHearingRecordingCaseData().setRequestedHearings(hearingRecordingRequests);
+
+        PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(ABOUT_TO_SUBMIT, actualCallback, USER_AUTHORISATION);
+
+        assertEquals(2, actualCaseData.getData().getSscsHearingRecordingCaseData().getRequestedHearings().size());
+
+        HearingRecordingRequest hearingRecordingRequest = actualCaseData.getData().getSscsHearingRecordingCaseData().getRequestedHearings().get(1);
+        assertEquals("appellant", hearingRecordingRequest.getValue().getRequestingParty());
+        assertEquals("Requested", hearingRecordingRequest.getValue().getStatus());
+        assertEquals(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), hearingRecordingRequest.getValue().getDateRequested());
+
+        assertEquals(YesNo.YES, actualCaseData.getData().getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding());
     }
 
     @Test(expected = IllegalStateException.class)
