@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.DocumentType.REQUEST_FOR_HEARING_RECORDING;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPartiesOnCase;
 
@@ -59,11 +60,9 @@ public class UploadDocumentFurtherEvidenceMidEventHandler implements PreSubmitCa
     }
 
     private long countNumberOfHearingRecordingRequests(List<SscsFurtherEvidenceDoc> sscsFurtherEvidenceDocList) {
-        long requestHearingCount = 0;
-        if (sscsFurtherEvidenceDocList != null) {
-            requestHearingCount = sscsFurtherEvidenceDocList.stream().filter(e -> REQUEST_FOR_HEARING_RECORDING.getId().equals(e.getValue().getDocumentType())).count();
-        }
-        return requestHearingCount;
+        return emptyIfNull(sscsFurtherEvidenceDocList).stream()
+                .filter(e -> REQUEST_FOR_HEARING_RECORDING.getId().equals(e.getValue().getDocumentType()))
+                .count();
     }
 
     private void setPartiesToRequestInfoFrom(SscsCaseData sscsCaseData) {
