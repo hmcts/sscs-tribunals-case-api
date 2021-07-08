@@ -44,7 +44,7 @@ public class RequestInfoIncompleteApplicationAboutToStartHandler implements PreS
     }
     
     private void setPartiesToRequestInfoFrom(SscsCaseData sscsCaseData) {
-        List<DynamicListItem> listOptions = getPartiesOnCase(sscsCaseData, false, false);
+        List<DynamicListItem> listOptions = getPartiesOnCase(sscsCaseData);
 
         sscsCaseData.setInformationFromPartySelected(new DynamicList(listOptions.get(0), listOptions));
     }

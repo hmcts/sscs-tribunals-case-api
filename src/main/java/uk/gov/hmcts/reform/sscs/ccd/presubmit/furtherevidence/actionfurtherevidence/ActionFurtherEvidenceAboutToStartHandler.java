@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevid
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPartiesOnCase;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPartiesOnCaseWithDwpAndHmcts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +58,7 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
     }
 
     private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {
-        List<DynamicListItem> listOptions = getPartiesOnCase(sscsCaseData, true, true);
+        List<DynamicListItem> listOptions = getPartiesOnCaseWithDwpAndHmcts(sscsCaseData);
 
         sscsCaseData.setOriginalSender(new DynamicList(listOptions.get(0), listOptions));
     }

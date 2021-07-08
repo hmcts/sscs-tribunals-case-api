@@ -16,13 +16,11 @@ public class SscsUtil {
         //
     }
 
-    public static List<DynamicListItem> getPartiesOnCase(SscsCaseData sscsCaseData, boolean includeDwp, boolean includeHmcts) {
+    public static List<DynamicListItem> getPartiesOnCase(SscsCaseData sscsCaseData) {
         List<DynamicListItem> listOptions = new ArrayList<>();
 
         listOptions.add(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
-        if (includeDwp) {
-            listOptions.add(new DynamicListItem(DWP.getCode(), DWP.getLabel()));
-        }
+
         if (sscsCaseData.isThereAJointParty()) {
             listOptions.add(new DynamicListItem(JOINT_PARTY.getCode(), JOINT_PARTY.getLabel()));
         }
@@ -31,9 +29,16 @@ public class SscsUtil {
                 && equalsIgnoreCase(sscsCaseData.getAppeal().getRep().getHasRepresentative(), "yes")) {
             listOptions.add(new DynamicListItem(REPRESENTATIVE.getCode(), REPRESENTATIVE.getLabel()));
         }
-        if (includeHmcts) {
-            listOptions.add(new DynamicListItem(HMCTS.getCode(), HMCTS.getLabel()));
-        }
+
+        return listOptions;
+    }
+
+    public static List<DynamicListItem> getPartiesOnCaseWithDwpAndHmcts(SscsCaseData sscsCaseData) {
+        List<DynamicListItem> listOptions = getPartiesOnCase(sscsCaseData);
+
+        listOptions.add(new DynamicListItem(DWP.getCode(), DWP.getLabel()));
+
+        listOptions.add(new DynamicListItem(HMCTS.getCode(), HMCTS.getLabel()));
 
         return listOptions;
     }

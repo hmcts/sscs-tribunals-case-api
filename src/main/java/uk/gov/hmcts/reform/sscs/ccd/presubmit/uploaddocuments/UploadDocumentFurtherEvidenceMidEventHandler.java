@@ -49,14 +49,7 @@ public class UploadDocumentFurtherEvidenceMidEventHandler implements PreSubmitCa
 
     private boolean showRequestHearingsPage(PreSubmitCallbackResponse<SscsCaseData> callbackResponse) {
 
-        int requestHearingCount = 0;
-        if (callbackResponse.getData().getDraftSscsFurtherEvidenceDocument() != null) {
-            for (SscsFurtherEvidenceDoc sscsFurtherEvidenceDoc : callbackResponse.getData().getDraftSscsFurtherEvidenceDocument()) {
-                if (REQUEST_FOR_HEARING_RECORDING.getId().equals(sscsFurtherEvidenceDoc.getValue().getDocumentType())) {
-                    requestHearingCount++;
-                }
-            }
-        }
+        long requestHearingCount = countNumberOfHearingRecordingRequests(callbackResponse.getData().getDraftSscsFurtherEvidenceDocument());
 
         if (requestHearingCount > 1) {
             callbackResponse.addError("Only one request for hearing recording can be submitted at a time");
@@ -65,8 +58,16 @@ public class UploadDocumentFurtherEvidenceMidEventHandler implements PreSubmitCa
         return requestHearingCount == 1;
     }
 
+    private long countNumberOfHearingRecordingRequests(List<SscsFurtherEvidenceDoc> sscsFurtherEvidenceDocList) {
+        long requestHearingCount = 0;
+        if (sscsFurtherEvidenceDocList != null) {
+            requestHearingCount = sscsFurtherEvidenceDocList.stream().filter(e -> REQUEST_FOR_HEARING_RECORDING.getId().equals(e.getValue().getDocumentType())).count();
+        }
+        return requestHearingCount;
+    }
+
     private void setPartiesToRequestInfoFrom(SscsCaseData sscsCaseData) {
-        List<DynamicListItem> listOptions = getPartiesOnCase(sscsCaseData, false, false);
+        List<DynamicListItem> listOptions = getPartiesOnCase(sscsCaseData);
 
         sscsCaseData.getSscsHearingRecordingCaseData().setRequestingParty(new DynamicList(listOptions.get(0), listOptions));
     }
