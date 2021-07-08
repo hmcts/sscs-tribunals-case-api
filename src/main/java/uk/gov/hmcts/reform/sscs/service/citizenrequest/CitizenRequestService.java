@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.model.tya.CitizenHearingRecording;
 import uk.gov.hmcts.reform.sscs.model.tya.HearingRecording;
 import uk.gov.hmcts.reform.sscs.model.tya.HearingRecordingResponse;
@@ -69,12 +70,12 @@ public class CitizenRequestService {
         if (sscsCaseData.getHearings() == null || sscsCaseData.getHearings().isEmpty()) {
             return new HearingRecordingResponse();
         } else {
-            UploadParty uploadParty = workRequestedParty(sscsCaseData, idamEmail);
+            PartyItemList party = workRequestedParty(sscsCaseData, idamEmail);
 
             List<HearingRecordingRequest> releasedHearingRecordings = sscsCaseData.getSscsHearingRecordingCaseData().getReleasedHearings();
             List<CitizenHearingRecording> releasedRecordings = CollectionUtils.isEmpty(releasedHearingRecordings) ? List.of() :
                     releasedHearingRecordings.stream()
-                    .filter(request -> uploadParty.getValue().equals(request.getValue().getRequestingParty()))
+                    .filter(request -> party.getCode().equals(request.getValue().getRequestingParty()))
                     .flatMap(request -> request.getValue().getSscsHearingRecordingList().stream())
                     .map(request -> populateCitizenHearingRecordings(request.getValue()))
                     .collect(Collectors.toList());
@@ -82,7 +83,7 @@ public class CitizenRequestService {
             List<HearingRecordingRequest> requestedHearingRecordings = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();
             List<CitizenHearingRecording> requestedRecordings = CollectionUtils.isEmpty(requestedHearingRecordings) ? List.of() :
                     requestedHearingRecordings.stream()
-                    .filter(request -> uploadParty.getValue().equals(request.getValue().getRequestingParty()))
+                    .filter(request -> party.getCode().equals(request.getValue().getRequestingParty()))
                     .flatMap(request -> request.getValue().getSscsHearingRecordingList().stream())
                     .map(request -> populateCitizenHearingRecordings(request.getValue()))
                     .collect(Collectors.toList());
@@ -109,10 +110,10 @@ public class CitizenRequestService {
             List<SscsHearingRecording> sscsHearingRecordingList = sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings()
                     .stream().filter(r -> hearingId.equals(r.getValue().getHearingId())).collect(Collectors.toList());
 
-            UploadParty uploadParty = workRequestedParty(sscsCaseData, idamEmail);
+            PartyItemList party = workRequestedParty(sscsCaseData, idamEmail);
 
             HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
-                    .requestingParty(uploadParty.getValue()).status("requested")
+                    .requestingParty(party.getCode()).status("requested")
                     .dateRequested(LocalDateTime.now().format(DateTimeFormatter.ofPattern(UPLOAD_DATE_FORMATTER)))
                     .sscsHearingRecordingList(sscsHearingRecordingList).build()).build();
             newHearingRequests.add(hearingRecordingRequest);
@@ -166,18 +167,18 @@ public class CitizenRequestService {
     }
 
     @NotNull
-    private UploadParty workRequestedParty(SscsCaseData caseData, String idamEmail) {
-        UploadParty uploader = UploadParty.APPELLANT;
+    private PartyItemList workRequestedParty(SscsCaseData caseData, String idamEmail) {
+        PartyItemList party = PartyItemList.APPELLANT;
         Subscriptions subscriptions = caseData.getSubscriptions();
         if (subscriptions != null) {
             Subscription repSubs = subscriptions.getRepresentativeSubscription();
             Subscription jpSubs = subscriptions.getJointPartySubscription();
             if (repSubs != null && idamEmail.equalsIgnoreCase(repSubs.getEmail())) {
-                uploader = UploadParty.REP;
+                party = PartyItemList.REPRESENTATIVE;
             } else if (jpSubs != null && idamEmail.equalsIgnoreCase(jpSubs.getEmail())) {
-                uploader = UploadParty.JOINT_PARTY;
+                party = PartyItemList.JOINT_PARTY;
             }
         }
-        return uploader;
+        return party;
     }
 }
