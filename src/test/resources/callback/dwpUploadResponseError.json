@@ -23,19 +23,13 @@
       187000000
     ],
     "security_classification": "PUBLIC",
+    "dwpFurtherInfo": "No",
     "case_data": {
       "elementsDisputedList": [
         "testElement"
       ],
       "issueCode": "CC",
       "benefitCode": "003",
-      "dwpResponseDocument": {
-        "documentLink": {
-          "document_url": "http://dm-store:5005/documents/6a7cc2b4-2a32-468d-a3e9-d394b0503a26",
-          "document_binary_url": "http://dm-store:5005/documents/6a7cc2b4-2a32-468d-a3e9-d394b0503a26/binary",
-          "document_filename": "Screenshot 2019-10-22 at 16.13.26.pdf"
-        }
-      },
       "dwpEvidenceBundleDocument": {
         "documentLink": {
           "document_url": "http://dm-store:5005/documents/6a7cc2b4-2a32-468d-a3e9-d394b0503a23",
@@ -43,16 +37,6 @@
           "document_filename": "Screenshot 2019-10-22 at 16.13.23.pdf"
         }
       },
-      "dwpUploadAudioVideoEvidence": [
-        {
-          "value": {
-            "fileName": "file.mp3",
-            "documentLink": {
-              "document_url": "url"
-            }
-          }
-        }
-      ],
       "dwpTimeExtension": [
       ],
       "hearings": [

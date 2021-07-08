@@ -58,6 +58,30 @@
           "document_filename": "Screenshot 2019-10-22 at 16.13.20.pdf"
         }
       },
+      "dwpUploadAudioVideoEvidence": [
+        {
+          "value": {
+            "fileName": "file.mp3",
+            "documentLink": {
+              "document_url": "url"
+            },
+            "rip1Document": {
+              "document_url": "url"
+            }
+          }
+        },
+        {
+          "value": {
+            "fileName": "file2.mp3",
+            "documentLink": {
+              "document_url": "url2"
+            },
+            "rip1Document": {
+              "document_url": "url2"
+            }
+          }
+        }
+      ],
       "dwpTimeExtension": [
       ],
       "hearings": [

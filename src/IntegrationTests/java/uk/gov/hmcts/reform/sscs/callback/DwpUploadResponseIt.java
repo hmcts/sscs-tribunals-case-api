@@ -1,9 +1,12 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.PHME_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -32,9 +35,10 @@ public class DwpUploadResponseIt extends AbstractEventIt {
     }
 
     @Test
-    public void callToAboutToSubmit_willAddUcCaseCodeIfCaseIsUC() throws Exception {
+    public void callToAboutToSubmit_willAddUcCaseCodeIfCaseIsUC_AndAddAudioVideoEvidenceWithoutRip1Doc() throws Exception {
         json = json.replace("BENEFIT_CODE_PLACEHOLDER", "UC");
         json = json.replace("BENEFIT_DESCRIPTION_PLACEHOLDER", "Universal Credit");
+
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -43,12 +47,19 @@ public class DwpUploadResponseIt extends AbstractEventIt {
         assertEquals("US", result.getData().getIssueCode());
         assertEquals("001", result.getData().getBenefitCode());
         assertEquals("001US", result.getData().getCaseCode());
+        assertEquals(2, result.getData().getSscsDocument().size());
+        assertEquals("sscs1", result.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals("appellantEvidence", result.getData().getSscsDocument().get(1).getValue().getDocumentType());
         assertEquals(DwpState.RESPONSE_SUBMITTED_DWP.getId(), result.getData().getDwpState());
-        assertNull(result.getData().getInterlocReviewState());
+        assertEquals(1, result.getData().getAudioVideoEvidence().size());
+        assertNull(result.getData().getAudioVideoEvidence().get(0).getValue().getRip1Document());
+        assertEquals(REVIEW_BY_TCW.getId(), result.getData().getInterlocReviewState());
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), result.getData().getInterlocReferralReason());
+
     }
 
     @Test
-    public void callToAboutToSubmit_willMoveDocumentsToSscsDocumentsCollection() throws Exception {
+    public void callToAboutToSubmit_willMoveDocumentsToSscsDocumentsCollection_AndAddAudioVideoEvidenceWithoutRip1Doc() throws Exception {
         json = json.replace("BENEFIT_CODE_PLACEHOLDER", "PIP");
         json = json.replace("BENEFIT_DESCRIPTION_PLACEHOLDER", "Personal Independence Payment");
 
@@ -62,19 +73,36 @@ public class DwpUploadResponseIt extends AbstractEventIt {
         assertEquals(2, result.getData().getSscsDocument().size());
         assertEquals("sscs1", result.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("appellantEvidence", result.getData().getSscsDocument().get(1).getValue().getDocumentType());
-        assertNull(result.getData().getInterlocReviewState());
+        assertEquals(1, result.getData().getAudioVideoEvidence().size());
+        assertNull(result.getData().getAudioVideoEvidence().get(0).getValue().getRip1Document());
+        assertEquals(REVIEW_BY_TCW.getId(), result.getData().getInterlocReviewState());
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), result.getData().getInterlocReferralReason());
     }
 
     @Test
-    public void callToAboutToSubmit_willSetPhmeRequestIfPhmeIsSelected() throws Exception {
+    public void callToAboutToSubmit_willSetPhmeRequestIfPhmeIsSelected_AndAddAudioVideoEvidenceWithRip1Doc() throws Exception {
         setup("callback/dwpUploadResponsePhme.json");
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
+        assertEquals(2, result.getData().getAudioVideoEvidence().size());
+        assertNotNull(result.getData().getAudioVideoEvidence().get(0).getValue().getRip1Document());
+        assertNotNull(result.getData().getAudioVideoEvidence().get(1).getValue().getRip1Document());
         assertEquals(PHME_REQUEST.getId(), result.getData().getInterlocReferralReason());
         assertEquals(REVIEW_BY_JUDGE.getId(), result.getData().getInterlocReviewState());
+    }
+
+    @Test
+    public void callToAboutToSubmit_willErrorAsNoDwpResponseDocumentUploaded() throws Exception {
+        setup("callback/dwpUploadResponseError.json");
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+
+        assertEquals(1, result.getErrors().size());
     }
 
 }
