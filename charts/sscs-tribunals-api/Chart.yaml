@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.49
+version: 0.0.50
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
@@ -18,7 +18,7 @@ dependencies:
     repository: '@hmctspublic'
     condition: xui-webapp.enabled
   - name: elasticsearch
-    version: 7.8.1
+    version: 7.8.2
     repository: '@hmctspublic'
     condition: elastic.enabled
   - name: logstash
