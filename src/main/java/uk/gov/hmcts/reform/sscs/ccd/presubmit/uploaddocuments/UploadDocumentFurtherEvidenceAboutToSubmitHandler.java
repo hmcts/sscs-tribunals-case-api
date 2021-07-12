@@ -5,6 +5,7 @@ import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.DocumentType.REQUEST_FOR_HEARING_RECORDING;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
 import java.time.LocalDate;
@@ -87,11 +88,11 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
         moveDraftsToSscsDocs(caseData);
         moveDraftsToAudioVideoEvidence(caseData);
         caseData.setEvidenceHandled("No");
+        uploadHearingRecordingRequest(caseData);
 
         initDraftSscsFurtherEvidenceDocument(caseData);
         setHasUnprocessedAudioVideoEvidenceFlag(caseData);
 
-        uploadHearingRecordingRequest(caseData);
         return response;
     }
 
@@ -178,6 +179,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
         List<ScannedDocument> newScannedDocs = new ArrayList<>();
         caseData.getDraftSscsFurtherEvidenceDocument().stream()
             .filter(draftDoc -> DocumentUtil.isFileAPdf(draftDoc.getValue().getDocumentLink()))
+            .filter(draftDoc -> !REQUEST_FOR_HEARING_RECORDING.getId().equals(draftDoc.getValue().getDocumentType()))
             .forEach(draftDoc -> {
                 newScannedDocs.add(buildNewScannedDoc(draftDoc));
             });
@@ -222,23 +224,30 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
 
     private void uploadHearingRecordingRequest(SscsCaseData sscsCaseData) {
 
-        if (sscsCaseData.getSscsHearingRecordingCaseData() != null
+        if (sscsCaseData.getDraftSscsFurtherEvidenceDocument() != null) {
+            List<SscsFurtherEvidenceDoc> sscsFurtherEvidenceDocList = sscsCaseData.getDraftSscsFurtherEvidenceDocument().stream()
+                    .filter(draftDoc -> REQUEST_FOR_HEARING_RECORDING.getId().equals(draftDoc.getValue().getDocumentType())).collect(toList());
+
+            if (sscsCaseData.getSscsHearingRecordingCaseData() != null
                 && sscsCaseData.getSscsHearingRecordingCaseData().getRequestingParty() != null
                 && sscsCaseData.getSscsHearingRecordingCaseData().getRequestingParty().getValue() != null
-                && sscsCaseData.getSscsHearingRecordingCaseData().getRequestingParty().getValue().getCode() != null) {
+                && sscsCaseData.getSscsHearingRecordingCaseData().getRequestingParty().getValue().getCode() != null
+                && sscsFurtherEvidenceDocList != null && sscsFurtherEvidenceDocList.size() >= 1) {
 
-            HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
+                HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
                     .requestingParty(sscsCaseData.getSscsHearingRecordingCaseData().getRequestingParty().getValue().getCode()).status("Requested")
+                    .requestDocument(sscsFurtherEvidenceDocList.get(0).getValue().getDocumentLink())
                     .dateRequested(LocalDateTime.now().format(DateTimeFormatter.ofPattern(UPLOAD_DATE_FORMATTER))).build()).build();
 
-            List<HearingRecordingRequest> hearingRecordingRequests = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();
-            if (hearingRecordingRequests == null) {
-                hearingRecordingRequests = new ArrayList<>();
-            }
-            hearingRecordingRequests.add(hearingRecordingRequest);
+                List<HearingRecordingRequest> hearingRecordingRequests = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();
+                if (hearingRecordingRequests == null) {
+                    hearingRecordingRequests = new ArrayList<>();
+                }
+                hearingRecordingRequests.add(hearingRecordingRequest);
 
-            sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(hearingRecordingRequests);
-            sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YesNo.YES);
+                sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(hearingRecordingRequests);
+                sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YesNo.YES);
+            }
         }
     }
 }

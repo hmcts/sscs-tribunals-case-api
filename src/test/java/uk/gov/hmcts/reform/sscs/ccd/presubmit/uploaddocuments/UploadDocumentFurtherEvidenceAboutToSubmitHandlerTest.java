@@ -340,6 +340,10 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
         PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(ABOUT_TO_SUBMIT, actualCallback, USER_AUTHORISATION);
 
         assertEquals(1, actualCaseData.getData().getSscsHearingRecordingCaseData().getRequestedHearings().size());
+        assertEquals("reps-some-name.pdf", actualCaseData.getData().getSscsHearingRecordingCaseData().getRequestedHearings().get(0).getValue().getRequestDocument().getDocumentFilename());
+
+        assertEquals(1, actualCaseData.getData().getScannedDocuments().size());
+        assertEquals("appellant-some-name.pdf", actualCaseData.getData().getScannedDocuments().get(0).getValue().getFileName());
 
         HearingRecordingRequest hearingRecordingRequest = actualCaseData.getData().getSscsHearingRecordingCaseData().getRequestedHearings().get(0);
         assertEquals("appellant", hearingRecordingRequest.getValue().getRequestingParty());
@@ -365,6 +369,10 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
         PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(ABOUT_TO_SUBMIT, actualCallback, USER_AUTHORISATION);
 
         assertEquals(2, actualCaseData.getData().getSscsHearingRecordingCaseData().getRequestedHearings().size());
+        assertEquals("reps-some-name.pdf", actualCaseData.getData().getSscsHearingRecordingCaseData().getRequestedHearings().get(1).getValue().getRequestDocument().getDocumentFilename());
+
+        assertEquals(1, actualCaseData.getData().getScannedDocuments().size());
+        assertEquals("appellant-some-name.pdf", actualCaseData.getData().getScannedDocuments().get(0).getValue().getFileName());
 
         HearingRecordingRequest hearingRecordingRequest = actualCaseData.getData().getSscsHearingRecordingCaseData().getRequestedHearings().get(1);
         assertEquals("appellant", hearingRecordingRequest.getValue().getRequestingParty());
