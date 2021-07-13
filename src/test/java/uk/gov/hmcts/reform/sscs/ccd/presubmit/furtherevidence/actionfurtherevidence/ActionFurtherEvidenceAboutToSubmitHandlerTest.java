@@ -100,8 +100,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         scannedDocumentList.add(scannedDocument);
         scannedDocumentList.add(scannedDocument2);
-        DynamicList furtherEvidenceActionList = buildFurtherEvidenceActionItemListForGivenOption("otherDocumentManual",
-            "Other document type - action manually");
+        DynamicList furtherEvidenceActionList = buildFurtherEvidenceActionItemListForGivenOption(ISSUE_FURTHER_EVIDENCE.getCode(),
+                ISSUE_FURTHER_EVIDENCE.getLabel());
 
         DynamicListItem value = new DynamicListItem("appellant", "Appellant (or Appointee)");
         DynamicList originalSender = new DynamicList(value, Collections.singletonList(value));
@@ -254,6 +254,37 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         }
     }
 
+    @Test
+    public void edgeCaseWhereEvidenceIsSentToBulkPrintSinceNoFurtherActionIsSelected() {
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder()
+                        .type(ScannedDocumentType.REINSTATEMENT_REQUEST.getValue())
+                        .fileName("bla.pdf")
+                        .subtype("sscs1")
+                        .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                        .scannedDate("2019-06-12T00:00:00.000")
+                        .controlNumber("123")
+                        .build()).build();
+        scannedDocumentList = new ArrayList<>();
+        scannedDocumentList.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(scannedDocumentList);
+        sscsCaseData.setFurtherEvidenceAction(
+                buildFurtherEvidenceActionItemListForGivenOption(null, null));
+        sscsCaseData.setOriginalSender(buildOriginalSenderItemListForGivenOption("appellant",
+                "Appellant (or Appointee)"));
+        sscsCaseData.setEvidenceHandled(NO);
+
+        when(callback.isIgnoreWarnings()).thenReturn(false);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(response.getData().getSscsDocument().size(), 1);
+        assertEquals(response.getData().getSscsDocument().get(0).getValue().getEvidenceIssued(), NO);
+        assertEquals(YES, response.getData().getEvidenceHandled());
+        assertEquals(0, response.getWarnings().size());
+    }
+
     private void assertHappyPaths(DocumentType expectedDocumentType,
         PreSubmitCallbackResponse<SscsCaseData> response) {
 
@@ -263,7 +294,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals("www.test.com", sscsDocumentDetail.getDocumentLink().getDocumentUrl());
         assertEquals("2019-06-13", sscsDocumentDetail.getDocumentDateAdded());
         assertEquals("123", sscsDocumentDetail.getControlNumber());
-        assertEquals(NO, response.getData().getSscsDocument().get(1).getValue().getEvidenceIssued());
+        String expectedEvidenceIssued = ACTIONS_THAT_REQUIRES_EVIDENCE_ISSUED_SET_TO_YES_AND_NOT_BULK_PRINTED.contains(response.getData().getFurtherEvidenceAction().getValue().getCode()) ? YES : NO;
+        assertEquals(expectedEvidenceIssued, response.getData().getSscsDocument().get(1).getValue().getEvidenceIssued());
         assertNull(response.getData().getScannedDocuments());
         assertEquals(YES, response.getData().getEvidenceHandled());
     }
@@ -1074,8 +1106,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     public void isThreadSafe() throws Exception {
 
         DynamicList furtherEvidenceActionList =
-                buildFurtherEvidenceActionItemListForGivenOption("otherDocumentManual",
-                        "Other document type - action manually");
+                buildFurtherEvidenceActionItemListForGivenOption(OTHER_DOCUMENT_MANUAL.getCode(),
+                        OTHER_DOCUMENT_MANUAL.getLabel());
 
         DynamicList originalSender = buildOriginalSenderItemListForGivenOption("appellant",
                 "Appellant (or Appointee)");

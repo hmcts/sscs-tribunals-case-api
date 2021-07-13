@@ -44,7 +44,7 @@ public class UploadHearingRecordingAboutToStartHandler implements PreSubmitCallb
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_START)
-            && callback.getEvent() == EventType.UPLOAD_HEARING_RECORDING;
+                && callback.getEvent() == EventType.UPLOAD_HEARING_RECORDING;
     }
 
     @Override
@@ -58,23 +58,26 @@ public class UploadHearingRecordingAboutToStartHandler implements PreSubmitCallb
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        //Clear hearing recordings for the flow
+        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecording(null);
         if (sscsCaseData.getHearings() == null || sscsCaseData.getHearings().isEmpty()) {
             response.addError("No hearing has been conducted on this case");
             return response;
         }
 
         List<DynamicListItem> validHearings = sscsCaseData.getHearings().stream()
-            .filter(hearing -> DateTimeUtils.isDateInThePast(
-                LocalDateTime.parse(hearing.getValue().getHearingDate()
-                        + " " + checkHearingTime(hearing.getValue().getTime()),
-                    hearingTimeformatter)))
-            .map(hearing -> new DynamicListItem(hearing.getValue().getHearingId(), selectHearing(hearing)))
-            .collect(Collectors.toList());
+                .filter(hearing -> DateTimeUtils.isDateInThePast(
+                        LocalDateTime.parse(hearing.getValue().getHearingDate()
+                                        + " " + checkHearingTime(hearing.getValue().getTime()),
+                                hearingTimeformatter)))
+                .map(hearing -> new DynamicListItem(hearing.getValue().getHearingId(), selectHearing(hearing)))
+                .collect(Collectors.toList());
         if (validHearings.isEmpty()) {
             response.addError("No hearing has been conducted on this case");
             return response;
         }
-        sscsCaseData.setSelectHearingDetails(new DynamicList(new DynamicListItem("", ""), validHearings));
+        sscsCaseData.getSscsHearingRecordingCaseData().setSelectHearingDetails(
+                new DynamicList(new DynamicListItem("", ""), validHearings));
 
         return response;
     }
@@ -82,7 +85,7 @@ public class UploadHearingRecordingAboutToStartHandler implements PreSubmitCallb
     @NotNull
     private String selectHearing(Hearing hearing) {
         return hearing.getValue().getVenue().getName() + " "
-            + hearing.getValue().getTime() + " "
+            + checkHearingTime(hearing.getValue().getTime()) + " "
             + LocalDate.parse(hearing.getValue().getHearingDate(), formatter).format(resultFormatter);
     }
 
