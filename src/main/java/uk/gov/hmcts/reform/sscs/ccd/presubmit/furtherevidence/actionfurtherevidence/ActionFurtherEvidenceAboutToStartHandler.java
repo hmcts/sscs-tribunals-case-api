@@ -1,9 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
-import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPartiesOnCaseWithDwpAndHmcts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,21 +58,8 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
     }
 
     private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {
-        List<DynamicListItem> listOptions = new ArrayList<>();
-
-        listOptions.add(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
-        listOptions.add(new DynamicListItem(DWP.getCode(), DWP.getLabel()));
-        if (sscsCaseData.isThereAJointParty()) {
-            listOptions.add(new DynamicListItem(JOINT_PARTY.getCode(), JOINT_PARTY.getLabel()));
-        }
-
-        if (sscsCaseData.getAppeal().getRep() != null
-            && equalsIgnoreCase(sscsCaseData.getAppeal().getRep().getHasRepresentative(), "yes")) {
-            listOptions.add(new DynamicListItem(REPRESENTATIVE.getCode(), REPRESENTATIVE.getLabel()));
-        }
-        listOptions.add(new DynamicListItem(HMCTS.getCode(), HMCTS.getLabel()));
+        List<DynamicListItem> listOptions = getPartiesOnCaseWithDwpAndHmcts(sscsCaseData);
 
         sscsCaseData.setOriginalSender(new DynamicList(listOptions.get(0), listOptions));
-
     }
 }

@@ -84,7 +84,7 @@ public class RequestHearingRecordingAboutToSubmitHandlerTest {
         sscsCaseData.getSscsHearingRecordingCaseData().setSscsHearingRecordings(Arrays.asList(recording1));
 
         HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
-                .requestingParty("dwp").status("requested").build()).build();
+                .requestingParty("dwp").status("Requested").build()).build();
         List<HearingRecordingRequest> hearingRecordingRequests = new ArrayList<>();
         hearingRecordingRequests.add(hearingRecordingRequest);
         sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(hearingRecordingRequests);
