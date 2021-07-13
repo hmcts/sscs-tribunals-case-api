@@ -43,9 +43,6 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
-        //create the lists that user won't have permission for
-
-
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 

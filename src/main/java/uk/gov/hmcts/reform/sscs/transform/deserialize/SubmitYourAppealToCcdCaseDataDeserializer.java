@@ -48,6 +48,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         }
 
         String benefitCode = isDraft ? null : generateBenefitCode(appeal.getBenefitType().getCode(), addressName);
+
         String issueCode = isDraft ? null : generateIssueCode();
         String caseCode = isDraft ? null : generateCaseCode(benefitCode, issueCode);
 

@@ -42,13 +42,12 @@ public class RequestHearingRecordingAboutToSubmitHandler implements PreSubmitCal
 
         DynamicListItem selectedRequestable = sscsCaseData.getSscsHearingRecordingCaseData().getRequestableHearingDetails().getValue();
         String hearingId = selectedRequestable.getCode();
-        String hearingName = selectedRequestable.getLabel();
 
         List<SscsHearingRecording> sscsHearingRecordingList = sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings()
                 .stream().filter(r -> r.getValue().getHearingId().equals(hearingId)).collect(Collectors.toList());
 
         HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
-                .requestingParty(UploadParty.DWP.getValue()).status("requested")
+                .requestingParty(UploadParty.DWP.getValue()).status("Requested")
                 .dateRequested(LocalDateTime.now().format(DateTimeFormatter.ofPattern(UPLOAD_DATE_FORMATTER)))
                 .sscsHearingRecordingList(sscsHearingRecordingList).build()).build();
 
