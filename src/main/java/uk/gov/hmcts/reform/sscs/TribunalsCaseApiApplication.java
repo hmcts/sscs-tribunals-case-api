@@ -1,11 +1,10 @@
 package uk.gov.hmcts.reform.sscs;
 
+import feign.codec.Encoder;
+import feign.form.spring.SpringFormEncoder;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.validation.ValidatorFactory;
-
-import feign.codec.Encoder;
-import feign.form.spring.SpringFormEncoder;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Value;
