@@ -60,22 +60,13 @@ public class ManageDwpDocumentsAboutToSubmitHandler extends ResponseEventsAboutT
     private PreSubmitCallbackResponse<SscsCaseData> validateDwpDocuments(SscsCaseData sscsCaseData) {
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        validateDwpResponseDocument(sscsCaseData, preSubmitCallbackResponse);
         validateOneDwpResponseDocument(sscsCaseData, preSubmitCallbackResponse);
-        validateDwpEvidenceBundle(sscsCaseData, preSubmitCallbackResponse);
         validateOneDwpEvidenceBundle(sscsCaseData, preSubmitCallbackResponse);
 
         if (sscsCaseData.getDwpEditedEvidenceReason() != null) {
             validateEditedResponseAndBundle(sscsCaseData, preSubmitCallbackResponse);
         }
         return preSubmitCallbackResponse;
-    }
-
-    private void validateDwpResponseDocument(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        Optional<DwpDocument> dwpResponseDocument = getDwpDocument(sscsCaseData, DwpDocumentType.DWP_RESPONSE);
-        if (isDocumentEmptyOrInvalid(dwpResponseDocument)) {
-            preSubmitCallbackResponse.addError("DWP response document cannot be empty");
-        }
     }
 
     private void validateOneDwpResponseDocument(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
@@ -85,14 +76,6 @@ public class ManageDwpDocumentsAboutToSubmitHandler extends ResponseEventsAboutT
         }
     }
 
-    private void validateDwpEvidenceBundle(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        Optional<DwpDocument> dwpEvidenceBundleDocument = getDwpDocument(sscsCaseData, DwpDocumentType.DWP_EVIDENCE_BUNDLE);
-        if (isDocumentEmptyOrInvalid(dwpEvidenceBundleDocument)) {
-            preSubmitCallbackResponse.addError("DWP evidence bundle cannot be empty");
-        }
-    }
-
-
     private void validateOneDwpEvidenceBundle(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         final long numberOfDwpEvidenceBundleDocument = countDwpDocument(sscsCaseData, DwpDocumentType.DWP_EVIDENCE_BUNDLE);
         if (numberOfDwpEvidenceBundleDocument > 1) {
@@ -101,11 +84,18 @@ public class ManageDwpDocumentsAboutToSubmitHandler extends ResponseEventsAboutT
     }
 
     private void validateEditedResponseAndBundle(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        validateDwpEditedResponse(sscsCaseData, preSubmitCallbackResponse);
+        validateDwpEditedResponseIfThereIsAResponse(sscsCaseData, preSubmitCallbackResponse);
         validateOneDwpEditedResponse(sscsCaseData, preSubmitCallbackResponse);
 
-        validateDwpEditedEvidenceBundle(sscsCaseData, preSubmitCallbackResponse);
+        validateDwpEditedEvidenceBundleIfThereIsAnEvidenceBundle(sscsCaseData, preSubmitCallbackResponse);
         validateOneDwpEditedEvidenceBundle(sscsCaseData, preSubmitCallbackResponse);
+    }
+
+    private void validateDwpEditedResponseIfThereIsAResponse(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        Optional<DwpDocument> dwpResponseDocument = getDwpDocument(sscsCaseData, DwpDocumentType.DWP_RESPONSE);
+        if (!isDocumentEmpty(dwpResponseDocument)) {
+            validateDwpEditedResponse(sscsCaseData, preSubmitCallbackResponse);
+        }
     }
 
     private void validateDwpEditedResponse(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
@@ -120,6 +110,13 @@ public class ManageDwpDocumentsAboutToSubmitHandler extends ResponseEventsAboutT
         final long numberOfDwpEditedResponses = countEditedDwpDocument(sscsCaseData, DwpDocumentType.DWP_RESPONSE);
         if (numberOfDwpEditedResponses > 1) {
             preSubmitCallbackResponse.addError("Only one edited DWP response should be seen against each case, please correct");
+        }
+    }
+
+    private void validateDwpEditedEvidenceBundleIfThereIsAnEvidenceBundle(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        Optional<DwpDocument> dwpEvidenceBundleDocument = getDwpDocument(sscsCaseData, DwpDocumentType.DWP_EVIDENCE_BUNDLE);
+        if (!isDocumentEmpty(dwpEvidenceBundleDocument)) {
+            validateDwpEditedEvidenceBundle(sscsCaseData, preSubmitCallbackResponse);
         }
     }
 

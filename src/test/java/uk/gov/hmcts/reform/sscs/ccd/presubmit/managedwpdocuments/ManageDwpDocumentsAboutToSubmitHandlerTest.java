@@ -88,9 +88,7 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
     @Test
     @Parameters({
             "DWP_EVIDENCE_BUNDLE, true, You must upload an edited DWP evidence bundle",
-            "DWP_RESPONSE, true, You must upload an edited DWP response document",
-            "DWP_RESPONSE, false, DWP response document cannot be empty",
-            "DWP_EVIDENCE_BUNDLE, false, DWP evidence bundle cannot be empty"
+            "DWP_RESPONSE, true, You must upload an edited DWP response document"
     })
     public void shouldHaveErrorWhenDwpDocumentIsNotUploaded(DwpDocumentType documentType, boolean isEdited, String expectedErrorMessage) {
         addMandatoryDwpDocuments();
@@ -114,9 +112,7 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
     @Test
     @Parameters({
             "DWP_EVIDENCE_BUNDLE, true, You must upload an edited DWP evidence bundle",
-            "DWP_RESPONSE, true, You must upload an edited DWP response document",
-            "DWP_RESPONSE, false, DWP response document cannot be empty",
-            "DWP_EVIDENCE_BUNDLE, false, DWP evidence bundle cannot be empty"
+            "DWP_RESPONSE, true, You must upload an edited DWP response document"
     })
     public void shouldHaveErrorWhenDwpDocumentHasNoDocumentLink(DwpDocumentType documentType, boolean isEdited, String expectedErrorMessage) {
         addMandatoryDwpDocuments();
@@ -156,14 +152,6 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(isEdited ? 2 : 1));
         assertThat(response.getErrors().contains(expectedErrorMessage), is(true));
-    }
-
-    @Test
-    public void shouldShowErrorsWhenBothMandatoryDwpDocumentsAreMissing() {
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(response.getErrors().size(), is(2));
-        assertThat(response.getErrors().contains("DWP response document cannot be empty"), is(true));
-        assertThat(response.getErrors().contains("DWP evidence bundle cannot be empty"), is(true));
     }
 
     @Test
