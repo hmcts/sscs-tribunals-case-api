@@ -180,7 +180,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     private DwpResponseDocument buildDwpResponseDocumentWithDate(String documentType, String dateForFile, DocumentLink documentLink) {
 
-        if (documentLink.getDocumentFilename() == null) {
+        if (documentLink == null || documentLink.getDocumentFilename() == null) {
             return null;
         }
 

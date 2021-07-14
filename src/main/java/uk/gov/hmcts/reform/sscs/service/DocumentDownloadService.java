@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,11 +21,14 @@ public class DocumentDownloadService {
 
     private static final String OAUTH2_TOKEN = "oauth2Token";
     private static final String USER_ID = "sscs";
+    private final String documentManagementUrl;
 
     DocumentDownloadService(DocumentDownloadClientApi documentDownloadClientApi,
-                            AuthTokenGenerator authTokenGenerator) {
+                            AuthTokenGenerator authTokenGenerator,
+                            @Value("${document_management.url}") String documentManagementUrl) {
         this.documentDownloadClientApi = documentDownloadClientApi;
         this.authTokenGenerator = authTokenGenerator;
+        this.documentManagementUrl = documentManagementUrl;
     }
 
     public Long getFileSize(String urlString) {
@@ -91,7 +95,11 @@ public class DocumentDownloadService {
         return new UploadedEvidence(null, "", HttpHeaders.CONTENT_TYPE);
     }
 
-    private String getDownloadUrl(String urlString) {
-        return "/documents/" + urlString + "/binary";
+    protected String getDownloadUrl(String urlString) {
+        String path = urlString.replace(documentManagementUrl, "");
+        if (path.toLowerCase().contains("documents")) {
+            return path;
+        }
+        return "/documents/" + path + "/binary";
     }
 }

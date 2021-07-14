@@ -144,10 +144,24 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.setWcaAppeal(wcaFlow);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getPageId()).thenReturn("workCapabilityAssessment");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(expectedShowResult, response.getData().getShowFinalDecisionNoticeSummaryOfOutcomePage());
+    }
+
+    @Test
+    public void givenEsaCaseWithWcaAppealFlowAndNotOnWorkCapabilityAssessmentPage_thenDoNotSetShowSummaryOfOutcomePage() {
+
+        sscsCaseData.setWcaAppeal(YesNo.YES);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getPageId()).thenReturn("somethingElse");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getShowFinalDecisionNoticeSummaryOfOutcomePage());
     }
 
     @Test
@@ -168,10 +182,24 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused(allowedFlow);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getPageId()).thenReturn("workCapabilityAssessment");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(expectedShowResult, response.getData().getShowDwpReassessAwardPage());
+    }
+
+    @Test
+    public void givenEsaCaseWithWcaAppealFlowAndNotOnWorkCapabilityAssessmentPage_thenDoNotSetShowDwpReassessAwardPage() {
+
+        sscsCaseData.setWcaAppeal(YesNo.YES);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getPageId()).thenReturn("somethingElse");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getShowDwpReassessAwardPage());
     }
 
     @Test
@@ -249,7 +277,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
-    @Parameters({"Yes, YES", "NO, null"})
+    @Parameters({"Yes, YES", "No, NO"})
     public void givenGenerateNoticeValueAndCaseIsEsa_thenShouldSetShowWorkCapabilityAssessment(String isGenerateNotice, @Nullable YesNo showWorkCapabilityPage) {
         sscsCaseData.setWriteFinalDecisionGenerateNotice(isGenerateNotice);
 

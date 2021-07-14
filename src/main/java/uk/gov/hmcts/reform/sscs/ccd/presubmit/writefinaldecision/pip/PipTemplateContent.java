@@ -57,7 +57,7 @@ public abstract class PipTemplateContent extends WriteFinalDecisionTemplateConte
         if (points == null) {
             points = 0;
         }
-        return appellantName + " is " + (mobililtyIsSeverelyLimited ? "severely " : "") + "limited in their ability to mobilise. They score " + points + " point" + (points == 1 ? "." : "s.") + (descriptors != null && descriptors.size() > 0 ? "They satisfy the following descriptors:" : "");
+        return appellantName + " is " + (mobililtyIsSeverelyLimited ? "severely " : "") + "limited in their ability to mobilise. They score " + points + " point" + (points == 1 ? "." : "s.") + (descriptors != null && descriptors.size() > 0 ? " They satisfy the following descriptors:" : "");
     }
 
     public abstract PipScenario getScenario();

@@ -48,20 +48,20 @@ public abstract class StorePdfService<E, D extends PdfData> {
         this.evidenceManagementService = evidenceManagementService;
     }
 
-    public MyaEventActionContext storePdf(Long caseId, String onlineHearingId, D data) {
+    public MyaEventActionContext storePdfAndUpdate(Long caseId, String onlineHearingId, D data) {
         SscsCaseDetails caseDetails = data.getCaseDetails();
         String documentNamePrefix = documentNamePrefix(caseDetails, onlineHearingId, data);
         if (pdfHasNotAlreadyBeenCreated(caseDetails, documentNamePrefix)) {
             log.info("Creating pdf for [" + caseId + "]");
-            return storePdf(caseId, onlineHearingId, idamService.getIdamTokens(), data, documentNamePrefix);
+            return storePdfAndUpdate(caseId, onlineHearingId, idamService.getIdamTokens(), data, documentNamePrefix);
         } else {
             log.info("Loading pdf for [" + caseId + "]");
             return new MyaEventActionContext(loadPdf(caseDetails, documentNamePrefix), caseDetails);
         }
     }
 
-    private MyaEventActionContext storePdf(Long caseId, String onlineHearingId, IdamTokens idamTokens, D data,
-                                           String documentNamePrefix) {
+    private MyaEventActionContext storePdfAndUpdate(Long caseId, String onlineHearingId, IdamTokens idamTokens, D data,
+                                                    String documentNamePrefix) {
         SscsCaseDetails caseDetails = data.getCaseDetails();
         PdfAppealDetails pdfAppealDetails = getPdfAppealDetails(caseId, caseDetails);
         boolean isWelsh = caseDetails.getData().isLanguagePreferenceWelsh();
@@ -74,10 +74,40 @@ public abstract class StorePdfService<E, D extends PdfData> {
         String pdfName = getPdfName(documentNamePrefix, caseData.getCcdCaseId());
         log.info("Adding pdf to ccd for [" + caseId + "]");
         SscsCaseData sscsCaseData = ccdPdfService.mergeDocIntoCcd(pdfName, pdfBytes, caseId, caseData, idamTokens,
-            "Other evidence");
+                "Other evidence");
 
         return new MyaEventActionContext(pdf(pdfBytes, pdfName), data.getCaseDetails().toBuilder()
-            .data(sscsCaseData).build());
+                .data(sscsCaseData).build());
+    }
+
+    public MyaEventActionContext storePdf(Long caseId, String onlineHearingId, D data) {
+        SscsCaseDetails caseDetails = data.getCaseDetails();
+        String documentNamePrefix = documentNamePrefix(caseDetails, onlineHearingId, data);
+        if (pdfHasNotAlreadyBeenCreated(caseDetails, documentNamePrefix)) {
+            log.info("Creating pdf for [" + caseId + "]");
+            return storePdf(caseId, onlineHearingId, data, documentNamePrefix);
+        } else {
+            log.info("Loading pdf for [" + caseId + "]");
+            return new MyaEventActionContext(loadPdf(caseDetails, documentNamePrefix), caseDetails);
+        }
+    }
+
+    private MyaEventActionContext storePdf(Long caseId, String onlineHearingId, D data, String documentNamePrefix) {
+        SscsCaseDetails caseDetails = data.getCaseDetails();
+        PdfAppealDetails pdfAppealDetails = getPdfAppealDetails(caseId, caseDetails);
+        boolean isWelsh = caseDetails.getData().isLanguagePreferenceWelsh();
+
+        log.info("Storing pdf for [" + caseId + "]");
+        byte[] pdfBytes = pdfService.createPdf(getPdfContent(data, onlineHearingId, pdfAppealDetails),
+                isWelsh ? welshPdfTemplatePath : pdfTemplatePath);
+
+        SscsCaseData caseData = caseDetails.getData();
+        String pdfName = getPdfName(documentNamePrefix, caseData.getCcdCaseId());
+        log.info("Adding pdf to ccd for [" + caseId + "]");
+        SscsCaseData sscsCaseData = ccdPdfService.updateDoc(pdfName, pdfBytes, caseId, caseData, "Other evidence");
+
+        return new MyaEventActionContext(pdf(pdfBytes, pdfName), data.getCaseDetails().toBuilder()
+                .data(sscsCaseData).build());
     }
 
     private String getPdfName(String documentNamePrefix, String caseReference) {
