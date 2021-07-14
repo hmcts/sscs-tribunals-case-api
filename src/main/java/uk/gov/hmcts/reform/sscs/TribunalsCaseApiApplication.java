@@ -1,20 +1,16 @@
 package uk.gov.hmcts.reform.sscs;
 
-import feign.codec.Encoder;
-import feign.form.spring.SpringFormEncoder;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.validation.ValidatorFactory;
 import okhttp3.OkHttpClient;
-import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.cloud.openfeign.support.SpringEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -33,7 +29,7 @@ import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
                 "uk.gov.hmcts.reform.sscs.thirdparty",
                 "uk.gov.hmcts.reform.idam"
         })
-@ComponentScan(basePackages = {"uk.gov.hmcts.reform", "uk.gov.hmcts.reform.ccd.document.am"})
+@ComponentScan(basePackages = {"uk.gov.hmcts.reform"}, excludeFilters = {@ComponentScan.Filter(type = FilterType.REGEX, pattern = "uk.gov.hmcts.reform.ccd.document.am.config.ClientConfiguration")})
 @EnableScheduling
 public class TribunalsCaseApiApplication {
 
@@ -99,11 +95,6 @@ public class TribunalsCaseApiApplication {
             RestTemplate restTemplate
     ) {
         return new DocmosisPdfGenerationService(docmosisServiceEndpoint, docmosisServiceAccessKey, restTemplate);
-    }
-
-    @Bean
-    public Encoder feignFormEncoder(ObjectFactory<HttpMessageConverters> messageConverters) {
-        return new SpringFormEncoder(new SpringEncoder(messageConverters));
     }
 
 }
