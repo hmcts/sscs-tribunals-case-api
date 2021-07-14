@@ -1157,7 +1157,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .wantsSupport("No")
                         .build()
                 )
-                .hearingSubtype(new HearingSubtype("yes", "999", null, null, null))
+                .hearingSubtype(new HearingSubtype("Yes", "999", null, null, "No"))
                 .build()
             )
             .evidencePresent("no")
@@ -1167,7 +1167,9 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("yes", actual.getTheHearing().getAttendHearing());
         assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
         assertEquals("no", actual.getHearingSupport().getArrangements());
-        assertEquals("yes", actual.getHearingOptions().getSelectOptions().getTelephone().getRequested());
+        assertEquals(Boolean.valueOf("true"), actual.getHearingOptions().getSelectOptions().getTelephone().getRequested());
+        assertEquals(Boolean.valueOf("false"), actual.getHearingOptions().getSelectOptions().getVideo().getRequested());
+        assertEquals(Boolean.valueOf("false"), actual.getHearingOptions().getSelectOptions().getFaceToFace().getRequested());
         assertEquals("999", actual.getHearingOptions().getSelectOptions().getTelephone().getPhoneNumber());
     }
 

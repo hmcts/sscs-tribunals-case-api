@@ -4,6 +4,7 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.ISSUE_DIRECTIONS_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoEvidenceAboutToSubmitHandler.ACTIONS_THAT_REQUIRES_NOTICE;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.getDocumentType;
@@ -152,7 +153,9 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
     }
 
     private void validateDueDateIsInFuture(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (nonNull(preSubmitCallbackResponse.getData().getDirectionDueDate()) && !isDateInTheFuture(preSubmitCallbackResponse.getData().getDirectionDueDate())) {
+        if (preSubmitCallbackResponse.getData().getProcessAudioVideoAction() != null && preSubmitCallbackResponse.getData().getProcessAudioVideoAction().getValue() != null
+            && ISSUE_DIRECTIONS_NOTICE.getCode().equals(preSubmitCallbackResponse.getData().getProcessAudioVideoAction().getValue().getCode())
+            && nonNull(preSubmitCallbackResponse.getData().getDirectionDueDate()) && !isDateInTheFuture(preSubmitCallbackResponse.getData().getDirectionDueDate())) {
             preSubmitCallbackResponse.addError("Directions due date must be in the future");
         }
     }

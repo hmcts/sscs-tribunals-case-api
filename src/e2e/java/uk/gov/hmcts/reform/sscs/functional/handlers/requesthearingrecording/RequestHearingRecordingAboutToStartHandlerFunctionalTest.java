@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.functional.handlers.uploadhearingrecording;
+package uk.gov.hmcts.reform.sscs.functional.handlers.requesthearingrecording;
 
 import static org.hamcrest.Matchers.equalTo;
 
@@ -13,10 +13,11 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
+
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @SpringBootTest
-public class UploadHearingRecordingAboutToStartHandlerTest extends BaseHandler {
+public class RequestHearingRecordingAboutToStartHandlerFunctionalTest extends BaseHandler {
 
     @Test
     public void givenAboutToSubmitCallbackForEvent_shouldSetFields() throws Exception {
@@ -26,13 +27,20 @@ public class UploadHearingRecordingAboutToStartHandlerTest extends BaseHandler {
             .contentType(ContentType.JSON)
             .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
             .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
-            .body(getJsonCallbackForTest("handlers/uploadhearingrecording/hearingsAttendedCallback.json"))
+            .body(getJsonCallbackForTest("handlers/requesthearingrecording/requestHearingRecordingStartCallback.json"))
             .post("/ccdAboutToStart")
             .then()
             .statusCode(HttpStatus.SC_OK)
             .rootPath("data")
-            .assertThat().body("selectHearingDetails.list_items[0].code", equalTo("33445566"))
+            .assertThat().body("requestableHearingDetails.list_items[0].code", equalTo("44445566"))
             .assertThat()
-            .body("selectHearingDetails.list_items[0].label", equalTo("Prudential House 23:00:00 06 Jun 2021"));
+            .body("requestableHearingDetails.list_items[0].label", equalTo("Prudential House 12:00 04 Apr 2021"))
+            .assertThat().body("requestableHearingDetails.list_items[1].code", equalTo("33445566"))
+            .assertThat()
+            .body("requestableHearingDetails.list_items[1].label", equalTo("Prudential House 23:00 06 Jun 2021"))
+            .assertThat()
+            .body("requestedHearings[0].value.sscsHearingRecordingList[0].value.hearingId", equalTo("11445566"));
+
+
     }
 }
