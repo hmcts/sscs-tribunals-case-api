@@ -194,6 +194,16 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         String result = null;
         switch (Benefit.getBenefitByCode(benefitType)) {
             case UC:
+                if (mrnIsNotProvided(syaCaseWrapper) || (!mrnIsNotProvided(syaCaseWrapper) && StringUtils.isBlank(syaCaseWrapper.getMrn().getDwpIssuingOffice()))) {
+                    result = dwpLookup.getDefaultDwpMappingByBenefitType(benefitType)
+                                .map(office -> office.getMapping().getCcd())
+                                .orElse(null);
+                } else {
+                    result = dwpLookup.getDwpMappingByOffice(benefitType, syaCaseWrapper.getMrn().getDwpIssuingOffice())
+                            .map(office -> office.getMapping().getCcd())
+                            .orElse(null);
+                }
+                break;
             case CARERS_ALLOWANCE:
             case BEREAVEMENT_BENEFIT:
             case MATERNITY_ALLOWANCE:
