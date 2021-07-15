@@ -113,7 +113,7 @@ public class CitizenRequestService {
             PartyItemList party = workRequestedParty(sscsCaseData, idamEmail);
 
             HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
-                    .requestingParty(party.getCode()).status("requested")
+                    .requestingParty(party.getCode()).status("Requested")
                     .dateRequested(LocalDateTime.now().format(DateTimeFormatter.ofPattern(UPLOAD_DATE_FORMATTER)))
                     .sscsHearingRecordingList(sscsHearingRecordingList).build()).build();
             newHearingRequests.add(hearingRecordingRequest);
