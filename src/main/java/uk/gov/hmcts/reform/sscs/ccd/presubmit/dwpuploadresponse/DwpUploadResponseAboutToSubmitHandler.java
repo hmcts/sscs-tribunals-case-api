@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
 import static java.util.Collections.*;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.collections4.CollectionUtils.*;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
@@ -27,7 +29,8 @@ import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 @Slf4j
 public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private DwpDocumentService dwpDocumentService;
+    private static final DateTimeFormatter DD_MM_YYYY_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    private final DwpDocumentService dwpDocumentService;
 
     @Autowired
     public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService) {
@@ -51,11 +54,9 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = checkErrors(sscsCaseData);
 
-        preSubmitCallbackResponse = checkErrors(sscsCaseData, preSubmitCallbackResponse);
-
-        if (preSubmitCallbackResponse.getErrors() != null && preSubmitCallbackResponse.getErrors().size() > 0) {
+        if (isNotEmpty(preSubmitCallbackResponse.getErrors())) {
             return preSubmitCallbackResponse;
         }
 
@@ -63,11 +64,9 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
 
-        String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        handleEditedDocuments(sscsCaseData, todayDate, preSubmitCallbackResponse);
+        handleEditedDocuments(sscsCaseData);
         handleAudioVideoDocuments(sscsCaseData);
-
-        moveDocsToCorrectCollection(sscsCaseData, todayDate);
+        dwpDocumentService.moveDocsToCorrectCollection(sscsCaseData);
 
         checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
 
@@ -77,7 +76,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     }
 
     protected void handleAudioVideoDocuments(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getDwpUploadAudioVideoEvidence() == null || sscsCaseData.getDwpUploadAudioVideoEvidence().isEmpty()) {
+        if (isEmpty(sscsCaseData.getDwpUploadAudioVideoEvidence())) {
             return;
         }
 
@@ -110,7 +109,12 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         }
     }
 
-    private PreSubmitCallbackResponse<SscsCaseData> checkErrors(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+    private PreSubmitCallbackResponse<SscsCaseData> checkErrors(SscsCaseData sscsCaseData) {
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+
+        if (sscsCaseData.getDwpFurtherInfo() == null) {
+            preSubmitCallbackResponse.addError("Further information to assist the tribunal cannot be empty.");
+        }
 
         if (sscsCaseData.getDwpResponseDocument() == null) {
             preSubmitCallbackResponse.addError("DWP response document cannot be empty.");
@@ -139,44 +143,8 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         return preSubmitCallbackResponse;
     }
 
-    private void moveDocsToCorrectCollection(SscsCaseData sscsCaseData, String todayDate) {
-        if (sscsCaseData.getDwpAT38Document() != null) {
-            DwpResponseDocument at38 = buildDwpResponseDocumentWithDate(
-                    AppConstants.DWP_DOCUMENT_AT38_FILENAME_PREFIX,
-                    todayDate,
-                    sscsCaseData.getDwpAT38Document().getDocumentLink());
-
-            dwpDocumentService.addToDwpDocuments(sscsCaseData, at38, DwpDocumentType.AT_38);
-            sscsCaseData.setDwpAT38Document(null);
-        }
-
-        sscsCaseData.setDwpResponseDocument(buildDwpResponseDocumentWithDate(
-                AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX,
-                todayDate,
-                sscsCaseData.getDwpResponseDocument().getDocumentLink()));
-
-        dwpDocumentService.moveDwpResponseDocumentToDwpDocumentCollection(sscsCaseData);
-
-        sscsCaseData.setDwpEvidenceBundleDocument(buildDwpResponseDocumentWithDate(
-                AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX,
-                todayDate,
-                sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink()));
-
-        dwpDocumentService.moveDwpEvidenceBundleToDwpDocumentCollection(sscsCaseData);
-
-        if (sscsCaseData.getAppendix12Doc() != null && sscsCaseData.getAppendix12Doc().getDocumentLink() != null) {
-            DwpResponseDocument appendix12 = buildDwpResponseDocumentWithDate(
-                    AppConstants.DWP_DOCUMENT_APPENDIX12_FILENAME_PREFIX,
-                    todayDate,
-                    sscsCaseData.getAppendix12Doc().getDocumentLink());
-
-            dwpDocumentService.addToDwpDocuments(sscsCaseData, appendix12, DwpDocumentType.APPENDIX_12);
-            sscsCaseData.setAppendix12Doc(null);
-        }
-    }
-
-    private PreSubmitCallbackResponse<SscsCaseData> handleEditedDocuments(SscsCaseData sscsCaseData, String todayDate, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-
+    private void handleEditedDocuments(SscsCaseData sscsCaseData) {
+        String todayDate = LocalDate.now().format(DD_MM_YYYY_FORMAT);
         if (sscsCaseData.getDwpEditedEvidenceBundleDocument() != null
                 && sscsCaseData.getDwpEditedResponseDocument() != null
                 && sscsCaseData.getDwpEditedResponseDocument().getDocumentLink() != null) {
@@ -208,7 +176,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 }
             }
         }
-        return preSubmitCallbackResponse;
     }
 
     private DwpResponseDocument buildDwpResponseDocumentWithDate(String documentType, String dateForFile, DocumentLink documentLink) {

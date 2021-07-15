@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.isNull;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
@@ -11,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.model.AppConstants;
 
 @Service
 public class DwpDocumentService {
+    private static final DateTimeFormatter DD_MM_YYYY_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     public void addToDwpDocuments(SscsCaseData sscsCaseData, DwpResponseDocument dwpDocument, DwpDocumentType docType) {
 
@@ -61,8 +64,9 @@ public class DwpDocumentService {
         }
     }
 
-    public void moveDocsToCorrectCollection(SscsCaseData sscsCaseData, String todayDate) {
-        if (sscsCaseData.getDwpAT38Document() != null) {
+    public void moveDocsToCorrectCollection(SscsCaseData sscsCaseData) {
+        String todayDate = LocalDate.now().format(DD_MM_YYYY_FORMAT);
+        if (isDwpResponseDocumentNotNull(sscsCaseData.getDwpAT38Document())) {
             DwpResponseDocument at38 = buildDwpResponseDocumentWithDate(
                     AppConstants.DWP_DOCUMENT_AT38_FILENAME_PREFIX,
                     todayDate,
@@ -72,7 +76,7 @@ public class DwpDocumentService {
             sscsCaseData.setDwpAT38Document(null);
         }
 
-        if (sscsCaseData.getDwpResponseDocument() != null) {
+        if (isDwpResponseDocumentNotNull(sscsCaseData.getDwpResponseDocument())) {
             sscsCaseData.setDwpResponseDocument(buildDwpResponseDocumentWithDate(
                     AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX,
                     todayDate,
@@ -81,7 +85,7 @@ public class DwpDocumentService {
             moveDwpResponseDocumentToDwpDocumentCollection(sscsCaseData);
         }
 
-        if (sscsCaseData.getDwpEvidenceBundleDocument() != null) {
+        if (isDwpResponseDocumentNotNull(sscsCaseData.getDwpEvidenceBundleDocument())) {
             sscsCaseData.setDwpEvidenceBundleDocument(buildDwpResponseDocumentWithDate(
                     AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX,
                     todayDate,
@@ -90,7 +94,7 @@ public class DwpDocumentService {
             moveDwpEvidenceBundleToDwpDocumentCollection(sscsCaseData);
         }
 
-        if (sscsCaseData.getAppendix12Doc() != null && sscsCaseData.getAppendix12Doc().getDocumentLink() != null) {
+        if (isDwpResponseDocumentNotNull(sscsCaseData.getAppendix12Doc())) {
             DwpResponseDocument appendix12 = buildDwpResponseDocumentWithDate(
                     AppConstants.DWP_DOCUMENT_APPENDIX12_FILENAME_PREFIX,
                     todayDate,
@@ -99,6 +103,10 @@ public class DwpDocumentService {
             addToDwpDocuments(sscsCaseData, appendix12, DwpDocumentType.APPENDIX_12);
             sscsCaseData.setAppendix12Doc(null);
         }
+    }
+
+    private boolean isDwpResponseDocumentNotNull(DwpResponseDocument dwpResponseDocument) {
+        return dwpResponseDocument != null && dwpResponseDocument.getDocumentLink() != null;
     }
 
     private DwpResponseDocument buildDwpResponseDocumentWithDate(String documentType, String dateForFile, DocumentLink documentLink) {
@@ -117,5 +125,14 @@ public class DwpDocumentService {
                                 .documentFilename(documentType + " on " + dateForFile + fileExtension)
                                 .build()
                 ).build());
+    }
+
+    public void removeOldDwpDocuments(SscsCaseData sscsCaseData) {
+        sscsCaseData.setDwpAT38Document(null);
+        sscsCaseData.setDwpResponseDocument(null);
+        sscsCaseData.setDwpEditedResponseDocument(null);
+        sscsCaseData.setDwpEvidenceBundleDocument(null);
+        sscsCaseData.setDwpEditedEvidenceBundleDocument(null);
+        sscsCaseData.setAppendix12Doc(null);
     }
 }
