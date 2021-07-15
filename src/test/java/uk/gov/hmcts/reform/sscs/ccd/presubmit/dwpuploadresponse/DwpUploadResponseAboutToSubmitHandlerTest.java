@@ -25,13 +25,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
+import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @RunWith(JUnitParamsRunner.class)
 public class DwpUploadResponseAboutToSubmitHandlerTest {
@@ -46,13 +49,20 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private UserDetailsService userDetailsService;
+
     private DwpDocumentService dwpDocumentService;
 
     @Before
     public void setUp() {
         openMocks(this);
         dwpDocumentService = new DwpDocumentService();
-        dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService);
+        AddNoteService addNoteService = new AddNoteService(userDetailsService);
+        dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService, addNoteService);
+
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+                .forename("Chris").surname("Davis").build().getFullName());
 
         when(callback.getEvent()).thenReturn(EventType.DWP_UPLOAD_RESPONSE);
 
@@ -314,6 +324,9 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("reviewByJudge", response.getData().getSelectWhoReviewsCase().getValue().getCode());
         assertEquals("phmeRequest", response.getData().getInterlocReferralReason());
         assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
+        assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
+        assertEquals("Referred to interloc for review by judge - PHME request", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
+        assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
 
         dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
@@ -347,6 +360,9 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("reviewByJudge", response.getData().getSelectWhoReviewsCase().getValue().getCode());
         assertEquals("phmeRequest", response.getData().getInterlocReferralReason());
         assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
+        assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
+        assertEquals("Referred to interloc for review by judge - PHME request", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
+        assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
     }
 
     @Test
@@ -377,6 +393,9 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertNull(response.getData().getSelectWhoReviewsCase());
         assertEquals("phmeRequest", response.getData().getInterlocReferralReason());
         assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
+        assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
+        assertEquals("Referred to interloc for review by judge - PHME request", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
+        assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
     }
 
     @Test
