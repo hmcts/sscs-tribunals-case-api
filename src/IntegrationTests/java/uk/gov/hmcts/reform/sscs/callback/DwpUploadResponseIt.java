@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.callback;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.PHME_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
@@ -17,8 +18,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -28,6 +32,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 @RunWith(JUnitParamsRunner.class)
 public class DwpUploadResponseIt extends AbstractEventIt {
 
+    @MockBean
+    private IdamClient idamClient;
+
+    @MockBean
+    private UserDetails userDetails;
 
     @Before
     public void setup() throws IOException {
@@ -82,6 +91,10 @@ public class DwpUploadResponseIt extends AbstractEventIt {
     @Test
     public void callToAboutToSubmit_willSetPhmeRequestIfPhmeIsSelected_AndAddAudioVideoEvidenceWithRip1Doc() throws Exception {
         setup("callback/dwpUploadResponsePhme.json");
+
+        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        json = json.replace("BENEFIT_CODE_PLACEHOLDER", "PIP");
+        json = json.replace("BENEFIT_DESCRIPTION_PLACEHOLDER", "Personal Independence Payment");
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         assertHttpStatus(response, HttpStatus.OK);

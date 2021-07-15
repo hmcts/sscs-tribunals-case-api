@@ -199,8 +199,8 @@
           "isAddressSameAsAppointee": null
         },
         "benefitType": {
-          "code": "PIP",
-          "description": "Personal Independent Payment"
+          "code": "BENEFIT_CODE_PLACEHOLDER",
+          "description": "BENEFIT_DESCRIPTION_PLACEHOLDER"
         },
         "receivedVia": "PAPER",
         "hearingOptions": {
