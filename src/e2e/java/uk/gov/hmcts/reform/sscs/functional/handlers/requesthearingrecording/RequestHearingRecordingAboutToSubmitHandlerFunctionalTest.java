@@ -13,11 +13,10 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
-
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @SpringBootTest
-public class RequestHearingRecordingAboutToStartHandlerTest extends BaseHandler {
+public class RequestHearingRecordingAboutToSubmitHandlerFunctionalTest extends BaseHandler {
 
     @Test
     public void givenAboutToSubmitCallbackForEvent_shouldSetFields() throws Exception {
@@ -27,8 +26,8 @@ public class RequestHearingRecordingAboutToStartHandlerTest extends BaseHandler 
             .contentType(ContentType.JSON)
             .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
             .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
-            .body(getJsonCallbackForTest("handlers/requesthearingrecording/requestHearingRecordingStartCallback.json"))
-            .post("/ccdAboutToStart")
+            .body(getJsonCallbackForTest("handlers/requesthearingrecording/requestHearingRecordingAboutToSubmitCallback.json"))
+            .post("/ccdAboutToSubmit")
             .then()
             .statusCode(HttpStatus.SC_OK)
             .rootPath("data")
@@ -39,7 +38,12 @@ public class RequestHearingRecordingAboutToStartHandlerTest extends BaseHandler 
             .assertThat()
             .body("requestableHearingDetails.list_items[1].label", equalTo("Prudential House 23:00 06 Jun 2021"))
             .assertThat()
-            .body("requestedHearings[0].value.sscsHearingRecordingList[0].value.hearingId", equalTo("11445566"));
+            .body("requestedHearings[0].value.sscsHearingRecordingList[0].value.hearingId", equalTo("11445566"))
+            .assertThat()
+            .body("requestedHearings[1].value.sscsHearingRecordingList[0].value.hearingId", equalTo("33445566"))
+            .assertThat()
+            .body("hearingRecordingRequestOutstanding", equalTo("Yes"));
+
 
 
     }
