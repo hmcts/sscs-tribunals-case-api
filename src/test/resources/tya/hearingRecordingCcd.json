@@ -1,0 +1,300 @@
+{
+    "caseCode": "051DD",
+    "evidencePresent": "No",
+    "subscriptions": {
+      "appellantSubscription": {
+        "tya": "gYGeEyFKny",
+        "email": "sscs-citizen2@hmcts.net",
+        "mobile": "07534744128",
+        "reason": null,
+        "subscribeSms": "No",
+        "subscribeEmail": "Yes",
+        "lastLoggedIntoMya": "2021-06-30T21:16:41.451122",
+        "wantSmsNotifications": "No"
+      },
+      "appointeeSubscription": {
+        "tya": null,
+        "email": null,
+        "mobile": null,
+        "reason": null,
+        "subscribeSms": null,
+        "subscribeEmail": null,
+        "lastLoggedIntoMya": null,
+        "wantSmsNotifications": null
+      },
+      "supporterSubscription": {
+        "tya": null,
+        "email": null,
+        "mobile": null,
+        "reason": null,
+        "subscribeSms": null,
+        "subscribeEmail": null,
+        "lastLoggedIntoMya": null,
+        "wantSmsNotifications": null
+      },
+      "jointPartySubscription": {
+        "tya": null,
+        "email": null,
+        "mobile": null,
+        "reason": null,
+        "subscribeSms": null,
+        "subscribeEmail": null,
+        "lastLoggedIntoMya": null,
+        "wantSmsNotifications": null
+      },
+      "representativeSubscription": {
+        "tya": "z6pMItrBtr",
+        "email": null,
+        "mobile": null,
+        "reason": null,
+        "subscribeSms": "No",
+        "subscribeEmail": "No",
+        "lastLoggedIntoMya": null,
+        "wantSmsNotifications": "No"
+      }
+    },
+    "dwpRegionalCentre": "Birkenhead LM DRT",
+    "requestedHearings": [
+      {
+        "id": "eac70968-9900-4b5d-ac36-718009558ba0",
+        "value": {
+          "status": "requested",
+          "dateRequested": "2021-07-01",
+          "requestingParty": "appellant",
+          "sscsHearingRecordingList": [
+            {
+              "id": "72474881-2ea7-40ee-b9e9-61881c0be144",
+              "value": {
+                "venue": "Town House",
+                "hearingId": "1334234325",
+                "recordings": [
+                  {
+                    "id": "c6d533bc-f37f-493e-aa01-2cfb2fbb17db",
+                    "value": {
+                      "document_url": "http://dm-store:5005/documents/1432689d-fd1c-4d57-aaa3-52d4da030840",
+                      "document_filename": "Final Town House 16 Jun 2021.mp3",
+                      "document_binary_url": "http://dm-store:5005/documents/1432689d-fd1c-4d57-aaa3-52d4da030840/binary"
+                    }
+                  }
+                ],
+                "uploadDate": "30-06-2021 09:12:44 PM",
+                "hearingDate": "16-06-2021 01:30:00 PM",
+                "hearingType": "final"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "sscsHearingRecordings": [
+      {
+        "id": "7cc9989c-f7bc-48f4-8c03-efca9885e7e2",
+        "value": {
+          "venue": "Crown House",
+          "hearingId": "1290312038013",
+          "recordings": [
+            {
+              "id": "d9af87f6-f834-4752-80e8-f24bac05bb4c",
+              "value": {
+                "document_url": "http://dm-store:5005/documents/4fe557af-363f-4767-af12-97237b14aed0",
+                "document_filename": "Final Crown House 12 May 2021.mp3",
+                "document_binary_url": "http://dm-store:5005/documents/4fe557af-363f-4767-af12-97237b14aed0/binary"
+              }
+            }
+          ],
+          "uploadDate": "01-07-2021 08:38:00 PM",
+          "hearingDate": "12-05-2021 09:45:00 AM",
+          "hearingType": "final"
+        }
+      },
+      {
+        "id": "19f050b4-46d7-43b5-85b2-1ff610765b32",
+        "value": {
+          "venue": "Town House",
+          "hearingId": "1334234325",
+          "recordings": [
+            {
+              "id": "15ae6459-a6e4-4297-826e-2ca803384aea",
+              "value": {
+                "document_url": "http://dm-store:5005/documents/1432689d-fd1c-4d57-aaa3-52d4da030840",
+                "document_filename": "Final Town House 16 Jun 2021.mp3",
+                "document_binary_url": "http://dm-store:5005/documents/1432689d-fd1c-4d57-aaa3-52d4da030840/binary"
+              }
+            },
+            {
+              "id": "5b346ebc-99b7-404e-98ae-2cecd0b01f60",
+              "value": {
+                "document_url": "http://dm-store:5005/documents/44058c09-9d71-40b0-87a7-7753f46794cc",
+                "document_filename": "Final Town House 16 Jun 2021 (2).mp3",
+                "document_binary_url": "http://dm-store:5005/documents/44058c09-9d71-40b0-87a7-7753f46794cc/binary"
+              }
+            }
+          ],
+          "uploadDate": "30-06-2021 09:12:44 PM",
+          "hearingDate": "16-06-2021 01:30:00 PM",
+          "hearingType": "final"
+        }
+      }
+    ],
+    "appeal": {
+      "rep": {
+        "name": {
+          "title": null,
+          "lastName": null,
+          "firstName": null
+        },
+        "address": {},
+        "contact": {
+          "email": null,
+          "phone": null,
+          "mobile": null
+        },
+        "organisation": null,
+        "hasRepresentative": "No"
+      },
+      "signer": "Ras",
+      "appellant": {
+        "name": {
+          "title": "Mr.",
+          "lastName": "Esa",
+          "firstName": "Rasika"
+        },
+        "address": {
+          "town": "St, Albans",
+          "line1": "22, Wheatleys",
+          "line2": "test",
+          "county": "Hertfordshire",
+          "postcode": "HP4 9UE",
+          "postcodeLookup": "",
+          "postcodeAddress": ""
+        },
+        "contact": {
+          "email": "test@gmail.com",
+          "phone": null,
+          "mobile": "07534749999"
+        },
+        "identity": {
+          "dob": "1990-12-12",
+          "nino": "SA332211A"
+        },
+        "appointee": {
+          "name": {
+            "title": null,
+            "lastName": null,
+            "firstName": null
+          },
+          "address": {},
+          "contact": {
+            "email": null,
+            "phone": null,
+            "mobile": null
+          },
+          "identity": {
+            "dob": null,
+            "nino": null
+          }
+        },
+        "isAppointee": "No",
+        "isAddressSameAsAppointee": null
+      },
+      "mrnDetails": {
+        "mrnDate": "2021-06-12",
+        "mrnLateReason": null,
+        "dwpIssuingOffice": "Birkenhead LM DRT",
+        "mrnMissingReason": null
+      },
+      "benefitType": {
+        "code": "ESA",
+        "description": "Employment and Support Allowance"
+      },
+      "hearingType": "paper",
+      "receivedVia": "Online",
+      "appealReasons": {
+        "reasons": [
+          {
+            "id": "2a41f171-78d0-4a2f-be93-c2b3aa4bc877",
+            "value": {
+              "reason": "erwerw werw",
+              "description": "werwe werew"
+            }
+          }
+        ],
+        "otherReasons": "wer werwe"
+      },
+      "hearingOptions": {
+        "wantsToAttend": "No"
+      },
+      "hearingSubtype": {}
+    },
+    "benefitCode": "051",
+    "sscsDocument": [
+      {
+        "id": "afeff6aa-aabd-4258-ae22-76ef5f828f59",
+        "value": {
+          "documentLink": {
+            "document_url": "http://dm-store:5005/documents/1be7aad2-3db5-41dc-ae4b-d6e2c190bbc4",
+            "document_filename": "Esa_11A.pdf",
+            "document_binary_url": "http://dm-store:5005/documents/1be7aad2-3db5-41dc-ae4b-d6e2c190bbc4/binary"
+          },
+          "documentType": "sscs1",
+          "documentFileName": "Esa_11A.pdf",
+          "documentDateAdded": "2021-06-30"
+        }
+      }
+    ],
+    "processingVenue": "Watford",
+    "hearings": [
+      {
+        "id": "7b79acc9-e04a-4f36-a6ef-fceebf372d6d",
+        "value": {
+          "time": "09:45",
+          "venue": {
+            "name": "Crown House",
+            "address": {
+              "town": "Camden",
+              "line1": "12, Highstreet, test",
+              "line2": "Highstreet",
+              "county": "Hertfordshire",
+              "postcode": "AL3 9UE"
+            },
+            "googleMapLink": "https://goo.gl/maps/qWJA9cXXhiRjtTED6"
+          },
+          "adjourned": "Yes",
+          "eventDate": "2021-06-12",
+          "hearingId": "1290312038013",
+          "hearingDate": "2021-05-12"
+        }
+      }
+    ],
+    "isSaveAndReturn": "No",
+    "hearingRecording": {
+      "recordings": [
+        {
+          "id": "96c8cc50-0bb9-470b-808e-a57639569151",
+          "value": {
+            "document_url": "http://dm-store:5005/documents/4fe557af-363f-4767-af12-97237b14aed0",
+            "document_filename": "file_example_MP3_700KB.mp3",
+            "document_binary_url": "http://dm-store:5005/documents/4fe557af-363f-4767-af12-97237b14aed0/binary"
+          }
+        }
+      ],
+      "hearingType": "final"
+    },
+    "caseCreated": "2021-06-30",
+    "regionalProcessingCenter": {
+      "city": "BRADFORD",
+      "name": "BRADFORD",
+      "email": "SSCS_Bradford@justice.gov.uk",
+      "address1": "HM Courts & Tribunals Service",
+      "address2": "Social Security & Child Support Appeals",
+      "address3": "Phoenix House",
+      "address4": "Rushton Avenue",
+      "postcode": "BD3 7BH",
+      "faxNumber": "0126 434 7983",
+      "phoneNumber": "0300 123 1142"
+    },
+    "region": "BRADFORD",
+    "isScottishCase": "No",
+    "createdInGapsFrom": "readyToList",
+    "issueCode": "DD"
+  }
