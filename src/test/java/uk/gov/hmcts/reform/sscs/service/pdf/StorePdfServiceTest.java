@@ -122,7 +122,6 @@ public class StorePdfServiceTest {
         String documentUrl = "http://example.com/someDocument";
         SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId(CASE_ID)
-                .generatedNino("someNino")
                 .sscsDocument(singletonList(SscsDocument.builder()
                         .value(SscsDocumentDetails.builder()
                                 .documentFileName(fileNamePrefix + CASE_ID + ".pdf")

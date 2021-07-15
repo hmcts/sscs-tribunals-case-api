@@ -53,7 +53,7 @@ public class PipScenarioNotConsideredEnhancedRateTest {
             + "\n"
             + "Felix Sydney is entitled to the mobility component at the enhanced rate from 17/12/2020 for an indefinite period.\n"
             + "\n"
-            + "Felix Sydney is severely limited in their ability to mobilise. They score 12 points.They satisfy the following descriptors:\n"
+            + "Felix Sydney is severely limited in their ability to mobilise. They score 12 points. They satisfy the following descriptors:\n"
             + "\n"
             + "12.Moving Around\te.Can stand and then move more than 1 metre but no more than 20 metres, either aided or unaided.\t12\n"
             + "\n"

@@ -92,7 +92,7 @@ public class PipWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     }
 
     @Override
-    protected void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData) {
+    protected void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData, String pageId) {
         if (sscsCaseData.getWriteFinalDecisionIsDescriptorFlow() != null && sscsCaseData.getWriteFinalDecisionIsDescriptorFlow().equalsIgnoreCase(YesNo.NO.getValue())
             && sscsCaseData.getWriteFinalDecisionGenerateNotice() != null && sscsCaseData.getWriteFinalDecisionGenerateNotice().equalsIgnoreCase(YesNo.YES.getValue())) {
             sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES);
@@ -107,7 +107,7 @@ public class PipWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     }
 
     @Override
-    protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData) {
+    protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData, String pageId) {
         sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
     }
 

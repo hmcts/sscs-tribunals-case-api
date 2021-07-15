@@ -42,7 +42,13 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
         boolean isDraft = isDraft(syaCaseWrapper);
 
-        String benefitCode = isDraft ? null : generateBenefitCode(appeal.getBenefitType().getCode());
+        String addressName = null;
+        if (appeal.getMrnDetails() != null) {
+            addressName = appeal.getMrnDetails().getDwpIssuingOffice();
+        }
+
+        String benefitCode = isDraft ? null : generateBenefitCode(appeal.getBenefitType().getCode(), addressName);
+
         String issueCode = isDraft ? null : generateIssueCode();
         String caseCode = isDraft ? null : generateCaseCode(benefitCode, issueCode);
 

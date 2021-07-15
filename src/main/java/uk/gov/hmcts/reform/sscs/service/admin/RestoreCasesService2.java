@@ -147,7 +147,7 @@ public class RestoreCasesService2 {
 
         caseData.setProcessingVenue(airLookupService.lookupAirVenueNameByPostCode(postCode, caseData.getAppeal().getBenefitType()));
 
-        String benefitCode = generateBenefitCode(caseData.getAppeal().getBenefitType().getCode());
+        String benefitCode = generateBenefitCode(caseData.getAppeal().getBenefitType().getCode(), "");
         String issueCode = generateIssueCode();
         String caseCode = generateCaseCode(benefitCode, issueCode);
 
