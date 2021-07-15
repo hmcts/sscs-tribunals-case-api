@@ -52,28 +52,27 @@ public class UploadHearingRecordingMidEventHandler implements PreSubmitCallbackH
         final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
-        emptyIfNull(caseData.getSscsHearingRecordingCaseData().getHearingRecordings())
-            .stream()
-            .filter(Objects::nonNull)
-            .filter(hearingRecording -> hearingRecording.getValue() != null)
-            .filter(hearingRecording -> hearingRecording.getValue().getDocumentLink() != null)
-            .map(hearingRecording -> hearingRecording.getValue().getDocumentLink())
-            .filter(documentLink -> isInvalidFile(documentLink.getDocumentFilename()))
-            .findAny().ifPresent(d -> response.addError("The file type you uploaded is not accepted"));
+        if (caseData.getSscsHearingRecordingCaseData().getHearingRecording() != null) {
+            emptyIfNull(caseData.getSscsHearingRecordingCaseData().getHearingRecording().getRecordings())
+                .stream()
+                .filter(Objects::nonNull)
+                .filter(hearingRecording -> hearingRecording.getValue().getDocumentFilename() != null)
+                .filter(hearingRecording -> isInvalidFile(hearingRecording.getValue().getDocumentFilename()))
+                .findAny().ifPresent(d -> response.addError("The file type you uploaded is not accepted"));
 
-        if (!response.getErrors().isEmpty()) {
-            return response;
+            if (!response.getErrors().isEmpty()) {
+                return response;
+            }
+
+            emptyIfNull(caseData.getSscsHearingRecordingCaseData().getHearingRecording().getRecordings())
+                .stream()
+                .filter(Objects::nonNull)
+                .filter(recordingDetails -> recordingDetails.getValue().getDocumentBinaryUrl() != null)
+                .filter(recordingDetails ->
+                    documentDownloadService.getFileSize(recordingDetails.getValue().getDocumentBinaryUrl())
+                        > (500 * 1024 * 1024))
+                .findAny().ifPresent(d -> response.addError("The upload file size is more than the allowed limit"));
         }
-
-        emptyIfNull(caseData.getSscsHearingRecordingCaseData().getHearingRecordings())
-            .stream()
-            .filter(Objects::nonNull)
-            .filter(hearingRecording -> hearingRecording.getValue() != null)
-            .filter(hearingRecording -> hearingRecording.getValue().getDocumentLink() != null)
-            .map(hearingRecording -> hearingRecording.getValue().getDocumentLink())
-            .filter(documentLink -> documentDownloadService.getFileSize(documentLink.getDocumentBinaryUrl())
-                > (500 * 1024 * 1024))
-            .findAny().ifPresent(d -> response.addError("The upload file size is more than the allowed limit"));
 
         return response;
     }

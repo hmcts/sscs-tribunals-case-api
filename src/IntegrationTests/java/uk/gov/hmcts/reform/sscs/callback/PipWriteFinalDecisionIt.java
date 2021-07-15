@@ -729,7 +729,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         }
         assertIsParagraphWithText(components, 3, "Only the mobility component was in issue on this appeal and the daily living component was not considered. ");
         assertIsParagraphWithText(components, 4, "Joe Bloggs is entitled to the mobility component at the standard rate from 17/12/2020 for an indefinite period.");
-        assertIsParagraphWithText(components, 5, "Joe Bloggs is limited in their ability to mobilise. They score 8 points.They satisfy the following descriptors:");
+        assertIsParagraphWithText(components, 5, "Joe Bloggs is limited in their ability to mobilise. They score 8 points. They satisfy the following descriptors:");
         assertIsDescriptorTableWithDescriptors(components, 4, Descriptor.builder().activityQuestionNumber("12").activityAnswerLetter("c").activityQuestionValue("12. Moving around")
             .activityAnswerValue("Can stand and then move more than 200 metres, either aided or unaided.").activityAnswerPoints(8).build());
 
@@ -795,7 +795,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         } else {
             assertIsParagraphWithText(components, 4, "4. Joe Bloggs is entitled to the mobility component at the enhanced rate from 17/12/2020 to 17/12/2021.");
         }
-        assertIsParagraphWithText(components, 5, "Joe Bloggs is severely limited in their ability to mobilise. They score 12 points.They satisfy the following descriptors:");
+        assertIsParagraphWithText(components, 5, "Joe Bloggs is severely limited in their ability to mobilise. They score 12 points. They satisfy the following descriptors:");
         assertIsDescriptorTableWithDescriptors(components, 6, Descriptor.builder().activityQuestionNumber("12").activityAnswerLetter("e").activityQuestionValue("12. Moving around")
             .activityAnswerValue("Can stand and then move more than 1 metre but no more than 20 metres, either aided or unaided.").activityAnswerPoints(12).build());
         assertIsParagraphWithText(components, 6, "Reasons for decision 1");
@@ -986,7 +986,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
                 .activityAnswerValue("Needs prompting to be able to either prepare or cook a simple meal.").activityAnswerPoints(2).build(),
             Descriptor.builder().activityQuestionNumber("2").activityAnswerLetter("d").activityQuestionValue("2. Taking nutrition")
                 .activityAnswerValue("Needs prompting to be able to take nutrition.").activityAnswerPoints(4).build());
-        assertIsParagraphWithText(components, 5, "Joe Bloggs is limited in their ability to mobilise. They score 8 points.They satisfy the following descriptors:");
+        assertIsParagraphWithText(components, 5, "Joe Bloggs is limited in their ability to mobilise. They score 8 points. They satisfy the following descriptors:");
         assertIsDescriptorTableWithDescriptors(components, 6, Descriptor.builder().activityQuestionNumber("12").activityAnswerLetter("c").activityQuestionValue("12. Moving around")
             .activityAnswerValue("Can stand and then move unaided more than 20 metres but no more than 50 metres.").activityAnswerPoints(8).build());
         assertIsParagraphWithText(components, 6, "Reasons for decision 1");
@@ -1056,7 +1056,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         } else {
             assertIsParagraphWithText(components, 4, "Joe Bloggs is entitled to the mobility component at the enhanced rate from 17/12/2020 to 17/12/2021.");
         }
-        assertIsParagraphWithText(components, 5, "Joe Bloggs is severely limited in their ability to mobilise. They score 12 points.They satisfy the following descriptors:");
+        assertIsParagraphWithText(components, 5, "Joe Bloggs is severely limited in their ability to mobilise. They score 12 points. They satisfy the following descriptors:");
         assertIsDescriptorTableWithDescriptors(components, 6, Descriptor.builder().activityQuestionNumber("12").activityAnswerLetter("e").activityQuestionValue("12. Moving around")
             .activityAnswerValue("Can stand and then move more than 1 metre but no more than 20 metres, either aided or unaided.").activityAnswerPoints(12).build());
         assertIsParagraphWithText(components, 6, "Reasons for decision 1");
@@ -1274,7 +1274,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         } else {
             assertIsParagraphWithText(components, 5, "Joe Bloggs is entitled to the mobility component at the standard rate from 17/12/2020 to 17/12/2021.");
         }
-        assertIsParagraphWithText(components, 6, "Joe Bloggs is limited in their ability to mobilise. They score 8 points.They satisfy the following descriptors:");
+        assertIsParagraphWithText(components, 6, "Joe Bloggs is limited in their ability to mobilise. They score 8 points. They satisfy the following descriptors:");
         assertIsDescriptorTableWithDescriptors(components, 7, Descriptor.builder().activityQuestionNumber("12").activityAnswerLetter("c").activityQuestionValue("12. Moving around")
             .activityAnswerValue("Can stand and then move unaided more than 20 metres but no more than 50 metres.").activityAnswerPoints(8).build());
         assertIsParagraphWithText(components, 7, "Reasons for decision 1");
@@ -1348,7 +1348,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         } else {
             assertIsParagraphWithText(components, 5, "Joe Bloggs is entitled to the mobility component at the enhanced rate from 17/12/2020 to 17/12/2021.");
         }
-        assertIsParagraphWithText(components, 6, "Joe Bloggs is severely limited in their ability to mobilise. They score 12 points.They satisfy the following descriptors:");
+        assertIsParagraphWithText(components, 6, "Joe Bloggs is severely limited in their ability to mobilise. They score 12 points. They satisfy the following descriptors:");
         assertIsDescriptorTableWithDescriptors(components, 7, Descriptor.builder().activityQuestionNumber("12").activityAnswerLetter("e").activityQuestionValue("12. Moving around")
             .activityAnswerValue("Can stand and then move more than 1 metre but no more than 20 metres, either aided or unaided.").activityAnswerPoints(12).build());
         assertIsParagraphWithText(components, 7, "Reasons for decision 1");
@@ -1563,7 +1563,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         } else {
             assertIsParagraphWithText(components, 5, "Joe Bloggs is entitled to the mobility component at the standard rate from 17/12/2020 to 17/12/2021.");
         }
-        assertIsParagraphWithText(components, 6, "Joe Bloggs is limited in their ability to mobilise. They score 8 points.They satisfy the following descriptors:");
+        assertIsParagraphWithText(components, 6, "Joe Bloggs is limited in their ability to mobilise. They score 8 points. They satisfy the following descriptors:");
         assertIsDescriptorTableWithDescriptors(components, 7, Descriptor.builder().activityQuestionNumber("12").activityAnswerLetter("c").activityQuestionValue("12. Moving around")
             .activityAnswerValue("Can stand and then move unaided more than 20 metres but no more than 50 metres.").activityAnswerPoints(8).build());
         assertIsParagraphWithText(components, 7, "Reasons for decision 1");
@@ -1637,7 +1637,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         } else {
             assertIsParagraphWithText(components, 5, "Joe Bloggs is entitled to the mobility component at the enhanced rate from 17/12/2020 to 17/12/2021.");
         }
-        assertIsParagraphWithText(components, 6, "Joe Bloggs is severely limited in their ability to mobilise. They score 12 points.They satisfy the following descriptors:");
+        assertIsParagraphWithText(components, 6, "Joe Bloggs is severely limited in their ability to mobilise. They score 12 points. They satisfy the following descriptors:");
         assertIsDescriptorTableWithDescriptors(components, 7, Descriptor.builder().activityQuestionNumber("12").activityAnswerLetter("e").activityQuestionValue("12. Moving around")
             .activityAnswerValue("Can stand and then move more than 1 metre but no more than 20 metres, either aided or unaided.").activityAnswerPoints(12).build());
         assertIsParagraphWithText(components, 7, "Reasons for decision 1");
