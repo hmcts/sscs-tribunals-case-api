@@ -64,9 +64,9 @@ public class HmctsResponseReviewedIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
-        assertEquals(10, result.getData().getDwpPresentingOffice().getListItems().size());
+        assertEquals(11, result.getData().getDwpPresentingOffice().getListItems().size());
         assertEquals(listItem, result.getData().getDwpPresentingOffice().getValue());
-        assertEquals(10, result.getData().getDwpOriginatingOffice().getListItems().size());
+        assertEquals(11, result.getData().getDwpOriginatingOffice().getListItems().size());
         assertEquals(listItem, result.getData().getDwpOriginatingOffice().getValue());
     }
 
