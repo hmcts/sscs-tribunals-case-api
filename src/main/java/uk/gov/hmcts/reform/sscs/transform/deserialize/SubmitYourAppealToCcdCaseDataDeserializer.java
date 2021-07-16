@@ -197,6 +197,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             case CARERS_ALLOWANCE:
             case BEREAVEMENT_BENEFIT:
             case MATERNITY_ALLOWANCE:
+            case BEREAVEMENT_SUPPORT_PAYMENT_SCHEME:
                 result = dwpLookup.getDefaultDwpMappingByBenefitType(benefitType)
                         .map(office -> office.getMapping().getCcd())
                         .orElse(null);
