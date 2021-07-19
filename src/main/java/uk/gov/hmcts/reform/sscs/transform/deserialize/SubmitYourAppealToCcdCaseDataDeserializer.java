@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.BEREAVEMENT_BENEFIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CARERS_ALLOWANCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.MATERNITY_ALLOWANCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.*;
 import static uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator.generateAppealNumber;
 import static uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil.cleanPhoneNumber;
@@ -191,36 +194,24 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     private static String getDwpIssuingOffice(SyaCaseWrapper syaCaseWrapper) {
         DwpAddressLookupService dwpLookup = new DwpAddressLookupService();
         String benefitType = syaCaseWrapper.getBenefitType().getCode();
+        Benefit benefit = Benefit.getBenefitByCode(benefitType);
         String result = null;
-        switch (Benefit.getBenefitByCode(benefitType)) {
-            case UC:
-                if (mrnIsNotProvided(syaCaseWrapper) || (!mrnIsNotProvided(syaCaseWrapper) && StringUtils.isBlank(syaCaseWrapper.getMrn().getDwpIssuingOffice()))) {
-                    result = dwpLookup.getDefaultDwpMappingByBenefitType(benefitType)
-                                .map(office -> office.getMapping().getCcd())
-                                .orElse(null);
-                } else {
-                    result = dwpLookup.getDwpMappingByOffice(benefitType, syaCaseWrapper.getMrn().getDwpIssuingOffice())
-                            .map(office -> office.getMapping().getCcd())
-                            .orElse(null);
-                }
-                break;
-            case CARERS_ALLOWANCE:
-            case BEREAVEMENT_BENEFIT:
-            case MATERNITY_ALLOWANCE:
-                result = dwpLookup.getDefaultDwpMappingByBenefitType(benefitType)
+
+        if (benefit.equals(CARERS_ALLOWANCE) || benefit.equals(BEREAVEMENT_BENEFIT) || benefit.equals(MATERNITY_ALLOWANCE)
+                || (benefit.equals(UC) && (mrnIsNotProvided(syaCaseWrapper)
+                || StringUtils.isBlank(syaCaseWrapper.getMrn().getDwpIssuingOffice())))) {
+            result = dwpLookup.getDefaultDwpMappingByBenefitType(benefitType)
+                    .map(office -> office.getMapping().getCcd())
+                    .orElse(null);
+        } else if (!mrnIsNotProvided(syaCaseWrapper)) {
+            String dwpIssuingOffice = syaCaseWrapper.getMrn().getDwpIssuingOffice();
+            if (dwpIssuingOffice != null) {
+                result = dwpLookup.getDwpMappingByOffice(benefitType, dwpIssuingOffice)
                         .map(office -> office.getMapping().getCcd())
                         .orElse(null);
-                break;
-            default:
-                if (!mrnIsNotProvided(syaCaseWrapper)) {
-                    String dwpIssuingOffice = syaCaseWrapper.getMrn().getDwpIssuingOffice();
-                    if (dwpIssuingOffice != null) {
-                        result = dwpLookup.getDwpMappingByOffice(benefitType, dwpIssuingOffice)
-                                .map(office -> office.getMapping().getCcd())
-                                .orElse(null);
-                    }
-                }
+            }
         }
+
         return result;
     }
 

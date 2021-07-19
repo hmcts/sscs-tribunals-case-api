@@ -160,6 +160,16 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     }
 
     @Test
+    public void syaMissingMrnTestUcBenefitCode() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        syaCaseWrapper.setMrn(null);
+        syaCaseWrapper.getBenefitType().setCode("UC");
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
+                regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertEquals("Universal Credit", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+    }
+
+    @Test
     public void syaWithoutNotificationTest() {
         SyaCaseWrapper syaCaseWrapper = WITHOUT_NOTIFICATION.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
