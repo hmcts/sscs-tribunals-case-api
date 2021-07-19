@@ -112,7 +112,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         "DWP PIP (1),PIP,Newcastle", "DWP PIP (2),PIP,Glasgow", "DWP PIP (3),PIP,Bellevale", "DWP PIP (4),PIP,Glasgow",
         "DWP PIP (5),PIP,Springburn", "DWP PIP (6),PIP,Blackpool", "DWP PIP (7),PIP,Blackpool", "DWP PIP (8),PIP,Blackpool",
         "DWP PIP (9),PIP,Blackpool", "Inverness DRT,ESA,Inverness DRT","DWP PIP (),PIP,null",
-        "DWP PIP (11),PIP,null", "null,UC,Universal Credit", ",UC,Universal Credit", "null,PIP,null",
+        "DWP PIP (11),PIP,null", "null,UC,Universal Credit", ",UC,Universal Credit", "null,PIP,Newcastle",
         "null,carersAllowance,Carers Allowance", "DWP PIP (5),carersAllowance,Carers Allowance",
         "null,bereavementBenefit,Bereavement Benefit", ",bereavementBenefit,Bereavement Benefit"
     })
@@ -153,7 +153,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         syaCaseWrapper.setMrn(null);
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
             regionalProcessingCenter.getName(), regionalProcessingCenter);
-        assertNull(caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+        assertEquals("DWP PIP (1)", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
         assertNull(caseData.getAppeal().getMrnDetails().getMrnDate());
         assertNull(caseData.getAppeal().getMrnDetails().getMrnLateReason());
         assertNull(caseData.getAppeal().getMrnDetails().getMrnMissingReason());
@@ -167,6 +167,9 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
                 regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertEquals("Universal Credit", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+        assertNull(caseData.getAppeal().getMrnDetails().getMrnDate());
+        assertNull(caseData.getAppeal().getMrnDetails().getMrnLateReason());
+        assertNull(caseData.getAppeal().getMrnDetails().getMrnMissingReason());
     }
 
     @Test
