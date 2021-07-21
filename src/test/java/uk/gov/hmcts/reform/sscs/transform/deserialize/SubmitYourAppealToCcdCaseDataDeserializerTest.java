@@ -116,7 +116,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         "DWP PIP (11),PIP,null", "null,UC,Universal Credit", ",UC,Universal Credit", "null,PIP,null",
         "null,carersAllowance,Carers Allowance", "DWP PIP (5),carersAllowance,Carers Allowance",
         "null,bereavementBenefit,Bereavement Benefit", ",bereavementBenefit,Bereavement Benefit",
-        "null,bereavementSupportPaymentScheme,Bereavement Benefit", ",bereavementSupportPaymentScheme,Bereavement Support Payment Scheme"
+        "null,bereavementSupportPaymentScheme,Bereavement Support Payment", ",bereavementSupportPaymentScheme,Bereavement Support Payment"
     })
     @Test
     public void givenADwpIssuingOffice_shouldMapToTheDwpRegionalCenter(@Nullable String dwpIssuingOffice,
