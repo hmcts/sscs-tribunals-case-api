@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
+import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 
 @Component
@@ -28,10 +29,12 @@ import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private DwpDocumentService dwpDocumentService;
+    private AddNoteService addNoteService;
 
     @Autowired
-    public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService) {
+    public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService, AddNoteService addNoteService) {
         this.dwpDocumentService = dwpDocumentService;
+        this.addNoteService = addNoteService;
     }
 
     @Override
@@ -64,7 +67,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
 
         String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        handleEditedDocuments(sscsCaseData, todayDate, preSubmitCallbackResponse);
+        handleEditedDocuments(sscsCaseData, todayDate, preSubmitCallbackResponse, userAuthorisation);
         handleAudioVideoDocuments(sscsCaseData);
 
         moveDocsToCorrectCollection(sscsCaseData, todayDate);
@@ -175,7 +178,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         }
     }
 
-    private PreSubmitCallbackResponse<SscsCaseData> handleEditedDocuments(SscsCaseData sscsCaseData, String todayDate, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+    private PreSubmitCallbackResponse<SscsCaseData> handleEditedDocuments(SscsCaseData sscsCaseData, String todayDate, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, String userAuthorisation) {
 
         if (sscsCaseData.getDwpEditedEvidenceBundleDocument() != null
                 && sscsCaseData.getDwpEditedResponseDocument() != null
@@ -185,6 +188,9 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
             if (StringUtils.equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "phme")) {
                 sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHME_REQUEST.getId());
+                sscsCaseData.setInterlocReferralDate(LocalDate.now().toString());
+                String note = "Referred to interloc for review by judge - PHME request";
+                addNoteService.addNote(userAuthorisation, sscsCaseData, note);
             }
 
             sscsCaseData.setDwpEditedResponseDocument(buildDwpResponseDocumentWithDate(

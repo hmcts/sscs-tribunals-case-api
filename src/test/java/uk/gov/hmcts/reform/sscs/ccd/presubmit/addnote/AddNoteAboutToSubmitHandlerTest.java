@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -43,7 +44,8 @@ public class AddNoteAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new AddNoteAboutToSubmitHandler(userDetailsService);
+        AddNoteService addNoteService = new AddNoteService(userDetailsService);
+        handler = new AddNoteAboutToSubmitHandler(addNoteService);
 
         when(callback.getEvent()).thenReturn(EventType.ADD_NOTE);
 
