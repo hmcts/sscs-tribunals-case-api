@@ -185,9 +185,9 @@ public class SubmitAppealService {
             sessionDraft = convertAIntoBService.convert(caseDetails);
         }
 
-        log.info("GET Draft case with CCD Id {} , IDAM Id {} and roles {} ",
+        log.info("GET Draft case with CCD Id {} , IDAM Id {} and roles {} and benefit type {}",
                 (caseDetails == null) ? null : caseDetails.getCcdCaseId(), idamTokens.getUserId(),
-            idamTokens.getRoles());
+            idamTokens.getRoles(), sessionDraft.getBenefitType() != null ? sessionDraft.getBenefitType().getBenefitType() : "null");
 
         return (sessionDraft != null) ? Optional.of(sessionDraft) : Optional.empty();
     }
@@ -201,6 +201,16 @@ public class SubmitAppealService {
         List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(idamTokens);
 
         log.info("GET all Draft cases with IDAM Id {} and roles {}", idamTokens.getUserId(), idamTokens.getRoles());
+        StringBuffer logStr = new StringBuffer("");
+        caseDetailsList.stream().filter(c -> c.getAppeal() == null
+                || c.getAppeal().getBenefitType() == null
+                || c.getAppeal().getBenefitType().getCode() == null
+                || c.getAppeal().getBenefitType().getDescription() == null)
+                .forEach(c -> logStr.append("Benefit type is null for : ").append(c.getCcdCaseId()));
+
+        if (logStr.length() > 0) {
+            log.info(logStr.toString());
+        }
 
         return caseDetailsList.stream()
                 .map(convertAIntoBService::convert)
