@@ -191,20 +191,29 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     private static String getDwpIssuingOffice(SyaCaseWrapper syaCaseWrapper) {
         DwpAddressLookupService dwpLookup = new DwpAddressLookupService();
         String benefitType = syaCaseWrapper.getBenefitType().getCode();
-        String result;
-
-        if (!mrnIsNotProvided(syaCaseWrapper) && StringUtils.isNoneBlank(syaCaseWrapper.getMrn().getDwpIssuingOffice())) {
-            result = dwpLookup.getDwpMappingByOffice(benefitType, syaCaseWrapper.getMrn().getDwpIssuingOffice())
-                    .map(office -> office.getMapping().getCcd())
-                    .orElse(null);
-        } else {
-            result = dwpLookup.getDefaultDwpMappingByBenefitType(benefitType)
-                    .map(office -> office.getMapping().getCcd())
-                    .orElse(null);;
+        String result = null;
+        switch (Benefit.getBenefitByCode(benefitType)) {
+            case UC:
+            case CARERS_ALLOWANCE:
+            case BEREAVEMENT_BENEFIT:
+            case MATERNITY_ALLOWANCE:
+            case BEREAVEMENT_SUPPORT_PAYMENT_SCHEME:
+                result = dwpLookup.getDefaultDwpMappingByBenefitType(benefitType)
+                        .map(office -> office.getMapping().getCcd())
+                        .orElse(null);
+                break;
+            default:
+                if (!mrnIsNotProvided(syaCaseWrapper)) {
+                    String dwpIssuingOffice = syaCaseWrapper.getMrn().getDwpIssuingOffice();
+                    if (dwpIssuingOffice != null) {
+                        result = dwpLookup.getDwpMappingByOffice(benefitType, dwpIssuingOffice)
+                                .map(office -> office.getMapping().getCcd())
+                                .orElse(null);
+                    }
+                }
         }
         return result;
     }
-
 
     private static String getMrnDate(SyaCaseWrapper syaCaseWrapper) {
         if (mrnIsNull(syaCaseWrapper)) {
