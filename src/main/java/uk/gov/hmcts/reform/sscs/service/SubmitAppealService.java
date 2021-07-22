@@ -186,8 +186,9 @@ public class SubmitAppealService {
         }
 
         log.info("GET Draft case with CCD Id {} , IDAM Id {} and roles {} and benefit type {}",
-                (caseDetails == null) ? null : caseDetails.getCcdCaseId(), idamTokens.getUserId(),
-            idamTokens.getRoles(), sessionDraft.getBenefitType() != null ? sessionDraft.getBenefitType().getBenefitType() : "null");
+                (caseDetails == null) ? null : caseDetails.getCcdCaseId(), idamTokens.getUserId(), idamTokens.getRoles(),
+                (caseDetails != null && caseDetails.getAppeal() != null && caseDetails.getAppeal().getBenefitType() != null)
+                        ? caseDetails.getAppeal().getBenefitType().getCode() : "null");
 
         return (sessionDraft != null) ? Optional.of(sessionDraft) : Optional.empty();
     }
