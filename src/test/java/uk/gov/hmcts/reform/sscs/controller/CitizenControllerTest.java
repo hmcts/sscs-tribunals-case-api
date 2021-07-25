@@ -56,6 +56,42 @@ public class CitizenControllerTest {
     }
 
     @Test
+    public void getActiveOnlineHearings() {
+        String oauthToken = "oAuth";
+        String userId = "userId";
+
+        when(idamService.generateServiceAuthorization()).thenReturn("serviceAuth");
+        when(idamService.getUserDetails(oauthToken)).thenReturn(idamUserDetails);
+        List<OnlineHearing> expectedOnlineHearings = asList(someOnlineHearing(1), someOnlineHearing(2));
+        when(citizenLoginService.findActiveCasesForCitizen(
+                argThat(tokens -> userId.equals(tokens.getUserId()) && oauthToken.equals(tokens.getIdamOauth2Token())))
+        ).thenReturn(expectedOnlineHearings);
+
+        ResponseEntity<List<OnlineHearing>> onlineHearings = underTest.getActiveOnlineHearings(oauthToken);
+
+        assertThat(onlineHearings.getStatusCode(), is(HttpStatus.OK));
+        assertThat(onlineHearings.getBody(), is(expectedOnlineHearings));
+    }
+
+    @Test
+    public void getDormantOnlineHearings() {
+        String oauthToken = "oAuth";
+        String userId = "userId";
+
+        when(idamService.generateServiceAuthorization()).thenReturn("serviceAuth");
+        when(idamService.getUserDetails(oauthToken)).thenReturn(idamUserDetails);
+        List<OnlineHearing> expectedOnlineHearings = asList(someOnlineHearing(1), someOnlineHearing(2));
+        when(citizenLoginService.findDormantCasesForCitizen(
+                argThat(tokens -> userId.equals(tokens.getUserId()) && oauthToken.equals(tokens.getIdamOauth2Token())))
+        ).thenReturn(expectedOnlineHearings);
+
+        ResponseEntity<List<OnlineHearing>> onlineHearings = underTest.getDormantOnlineHearings(oauthToken);
+
+        assertThat(onlineHearings.getStatusCode(), is(HttpStatus.OK));
+        assertThat(onlineHearings.getBody(), is(expectedOnlineHearings));
+    }
+
+    @Test
     public void associateUserWithCase() {
         String oauthToken = "oAuth";
         String tya = "tya";

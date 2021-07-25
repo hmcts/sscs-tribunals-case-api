@@ -69,6 +69,40 @@ public class CitizenController {
         return ResponseEntity.ok(casesForCitizen);
     }
 
+    @GetMapping(value = "/cases/active")
+    @ApiOperation(value = "Loads active cases associated with a citizen",
+            notes = "Loads the active cases that have been associated with a citizen in CCD. If a tya parameter is provided "
+                    + "then the list will be limited to the case with the tya number or be empty if the case has not "
+                    + "been associated with the user. Gets the user from the token in the Authorization header."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "A list of the hearings associated with a citizen and tya number.")
+    })
+    public ResponseEntity<java.util.List<OnlineHearing>> getActiveOnlineHearings(
+            @ApiParam(value = "user authorisation header", example = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdW") @RequestHeader(AUTHORIZATION) String authorisation) {
+
+        List<OnlineHearing> casesForCitizen = citizenLoginService.findActiveCasesForCitizen(getUserTokens(authorisation));
+
+        return ResponseEntity.ok(casesForCitizen);
+    }
+
+    @GetMapping(value = "/cases/dormant")
+    @ApiOperation(value = "Loads dormant cases associated with a citizen",
+            notes = "Loads the dormant cases that have been associated with a citizen in CCD. If a tya parameter is provided "
+                    + "then the list will be limited to the case with the tya number or be empty if the case has not "
+                    + "been associated with the user. Gets the user from the token in the Authorization header."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "A list of the hearings associated with a citizen and tya number.")
+    })
+    public ResponseEntity<java.util.List<OnlineHearing>> getDormantOnlineHearings(
+            @ApiParam(value = "user authorisation header", example = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdW") @RequestHeader(AUTHORIZATION) String authorisation) {
+
+        List<OnlineHearing> casesForCitizen = citizenLoginService.findDormantCasesForCitizen(getUserTokens(authorisation));
+
+        return ResponseEntity.ok(casesForCitizen);
+    }
+
     private IdamTokens getUserTokens(String oauth2Token) {
         UserDetails userDetails = idamService.getUserDetails(oauth2Token);
         return IdamTokens.builder()
