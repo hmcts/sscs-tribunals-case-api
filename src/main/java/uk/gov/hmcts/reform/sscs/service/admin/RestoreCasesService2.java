@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service.admin;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish.IsScottishHandler.isScottishCase;
+import static uk.gov.hmcts.reform.sscs.exception.BenefitMappingException.createException;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.*;
 import static uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService.getFirstHalfOfPostcode;
 
@@ -147,7 +148,8 @@ public class RestoreCasesService2 {
 
         caseData.setProcessingVenue(airLookupService.lookupAirVenueNameByPostCode(postCode, caseData.getAppeal().getBenefitType()));
 
-        String benefitCode = generateBenefitCode(caseData.getAppeal().getBenefitType().getCode(), "");
+        String benefitCode = generateBenefitCode(caseData.getAppeal().getBenefitType().getCode(), "")
+                .orElseThrow(() -> createException(caseData.getAppeal().getBenefitType().getCode()));
         String issueCode = generateIssueCode();
         String caseCode = generateCaseCode(benefitCode, issueCode);
 
