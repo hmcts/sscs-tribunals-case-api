@@ -42,8 +42,8 @@ import uk.gov.hmcts.reform.sscs.service.DocumentDownloadService;
 public class UploadHearingRecordingMidEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private final UserDetails
-        userDetails =
-        UserDetails.builder().roles(new ArrayList<>(asList("caseworker-sscs", UserRole.CTSC_CLERK.getValue()))).build();
+            userDetails =
+            UserDetails.builder().roles(new ArrayList<>(asList("caseworker-sscs", UserRole.CTSC_CLERK.getValue()))).build();
     private UploadHearingRecordingMidEventHandler handler;
     @Mock
     private Callback<SscsCaseData> callback;
@@ -60,7 +60,7 @@ public class UploadHearingRecordingMidEventHandlerTest {
         openMocks(this);
         handler = new UploadHearingRecordingMidEventHandler(documentDownloadService, idamService);
         sscsCaseData = SscsCaseData.builder().appeal(
-            Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
+                Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getEvent()).thenReturn(EventType.UPLOAD_HEARING_RECORDING);
@@ -148,7 +148,7 @@ public class UploadHearingRecordingMidEventHandlerTest {
         when(documentDownloadService.downloadFile(any())).thenReturn(resource);
         when(documentDownloadService.getFileSize(any())).thenReturn(Long.valueOf(501 * 1024 * 1024));
         final PreSubmitCallbackResponse<SscsCaseData>
-            response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+                response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
         assertEquals("The upload file size is more than the allowed limit", response.getErrors().toArray()[0]);
     }
@@ -172,7 +172,7 @@ public class UploadHearingRecordingMidEventHandlerTest {
         sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecording(recording);
 
         final PreSubmitCallbackResponse<SscsCaseData>
-            response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+                response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
         assertEquals("The file type you uploaded is not accepted", response.getErrors().toArray()[0]);
     }
@@ -191,7 +191,7 @@ public class UploadHearingRecordingMidEventHandlerTest {
 
     private void assertNoErrors() {
         final PreSubmitCallbackResponse<SscsCaseData>
-            response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+                response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
     }
 

@@ -39,7 +39,7 @@ public class UploadHearingRecordingMidEventHandler implements PreSubmitCallbackH
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.MID_EVENT)
-            && callback.getEvent() == EventType.UPLOAD_HEARING_RECORDING;
+                && callback.getEvent() == EventType.UPLOAD_HEARING_RECORDING;
     }
 
     @Override
