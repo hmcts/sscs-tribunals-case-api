@@ -304,6 +304,11 @@ dependencyManagement {
             entry 'cxf-rt-transports-http'
         }
 
+        //CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
+        dependencySet(group: 'org.apache.commons', version: '1.21') {
+            entry 'commons-compress'
+        }
+
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
         }
@@ -356,7 +361,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.07'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.4.50'
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.4.52'
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.40'
 
     compile group:'org.overviewproject', name: 'mime-types', version: '1.0.2'

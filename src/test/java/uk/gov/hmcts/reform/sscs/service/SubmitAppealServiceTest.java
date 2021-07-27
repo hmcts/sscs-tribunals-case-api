@@ -647,6 +647,22 @@ public class SubmitAppealServiceTest {
         assertEquals(READY_TO_LIST.getId(), caseData.getCreatedInGapsFrom());
     }
 
+    @Test
+    public void givenAUcCaseWithRecoveryFromEstatesOffice_thenSetOfficeCorrecty() {
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+        SyaBenefitType syaBenefitType = new SyaBenefitType("Universal Credit", "UC");
+        appealData.setBenefitType(syaBenefitType);
+
+        SyaMrn mrn = new SyaMrn();
+        mrn.setDwpIssuingOffice("Recovery from Estates");
+        appealData.setMrn(mrn);
+
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
+        assertEquals(READY_TO_LIST.getId(), caseData.getCreatedInGapsFrom());
+        assertEquals("RfE", caseData.getDwpRegionalCentre());
+        assertEquals("UC Recovery from Estates", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+    }
+
     @Test(expected = CcdException.class)
     public void givenExceptionWhenSearchingForCaseInCcd_shouldThrowException() {
         given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq(appealData.getAppellant().getNino()), any(IdamTokens.class)))
