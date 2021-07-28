@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 
 
 @Service
@@ -42,13 +43,12 @@ public class RequestHearingRecordingAboutToSubmitHandler implements PreSubmitCal
 
         DynamicListItem selectedRequestable = sscsCaseData.getSscsHearingRecordingCaseData().getRequestableHearingDetails().getValue();
         String hearingId = selectedRequestable.getCode();
-        String hearingName = selectedRequestable.getLabel();
 
         List<SscsHearingRecording> sscsHearingRecordingList = sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings()
                 .stream().filter(r -> r.getValue().getHearingId().equals(hearingId)).collect(Collectors.toList());
 
         HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
-                .requestingParty(UploadParty.DWP.getValue()).status("requested")
+                .requestingParty(PartyItemList.DWP.getCode()).status("Requested")
                 .dateRequested(LocalDateTime.now().format(DateTimeFormatter.ofPattern(UPLOAD_DATE_FORMATTER)))
                 .sscsHearingRecordingList(sscsHearingRecordingList).build()).build();
 

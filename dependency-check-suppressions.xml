@@ -21,4 +21,14 @@
         <packageUrl regex="true">^pkg:maven/org\.jdom/jdom2@.*$</packageUrl>
         <cve>CVE-2021-33813</cve>
     </suppress>
+    <suppress until="2021-08-01">
+        <notes><![CDATA[
+   file name: jquery-1.11.3.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/jquery@.*$</packageUrl>
+        <cve>CVE-2015-9251</cve>
+        <cve>CVE-2019-11358</cve>
+        <cve>CVE-2020-11022</cve>
+        <cve>CVE-2020-11023</cve>
+    </suppress>
 </suppressions>

@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 
 
 @Service
@@ -43,9 +44,6 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
-        //create the lists that user won't have permission for
-
-
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
@@ -67,13 +65,13 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
             StringBuilder releasedHearingText = new StringBuilder();
 
             if (requestedHearingsCollection != null) {
-                requestedHearingsCollection.stream().filter(r -> r.getValue().getRequestingParty().equals(UploadParty.DWP.getValue()))
+                requestedHearingsCollection.stream().filter(r -> r.getValue().getRequestingParty().equals(PartyItemList.DWP.getCode()))
                         .forEach(r -> r.getValue().getSscsHearingRecordingList().stream()
                                 .forEach(hr -> removeFromListAndAddText(hr, validHearings, requestedHearingText)));
             }
 
             if (releasedHearingsCollection != null) {
-                releasedHearingsCollection.stream().filter(r -> r.getValue().getRequestingParty().equals(UploadParty.DWP.getValue()))
+                releasedHearingsCollection.stream().filter(r -> r.getValue().getRequestingParty().equals(PartyItemList.DWP.getCode()))
                         .forEach(r -> r.getValue().getSscsHearingRecordingList().stream()
                                 .forEach(hr -> removeFromListAndAddText(hr, validHearings, releasedHearingText)));
             }

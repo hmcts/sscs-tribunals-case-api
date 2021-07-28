@@ -63,7 +63,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first", "last", Arrays.asList("caseworker-sscs-clerk")));
+        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first last", "first", "last", Arrays.asList("caseworker-sscs-clerk")));
     }
 
     @Test
@@ -154,7 +154,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
     @Test
     public void givenEmptyDwpEvidenceBundleDocumentLinkWithDwpDocumentsPatternForSuperUser_thenReturnWarning() {
 
-        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first", "last", Arrays.asList("caseworker-sscs-superuser")));
+        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first last", "first", "last", Arrays.asList("caseworker-sscs-superuser")));
 
         List<DwpDocument> dwpDocuments = new ArrayList<>();
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).build()).build());
@@ -174,7 +174,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
 
     @Test
     public void givenEmptyDwpEvidenceBundleDocumentLinkWithOldPatternForSuperUser_thenReturnWarning() {
-        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first", "last", Arrays.asList("caseworker-sscs-superuser")));
+        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first last", "first", "last", Arrays.asList("caseworker-sscs-superuser")));
 
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().build());
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
@@ -191,7 +191,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
 
     @Test
     public void givenEmptyDwpResponseDocumentLinkWithDwpDocumentsPatternForSuperUser_thenReturnWarning() {
-        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first", "last", Arrays.asList("caseworker-sscs-superuser")));
+        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first last", "first", "last", Arrays.asList("caseworker-sscs-superuser")));
         List<DwpDocument> dwpDocuments = new ArrayList<>();
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).build()).build());
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
@@ -209,7 +209,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
 
     @Test
     public void givenEmptyDwpResponseDocumentLinkWithOldPatternForSuperUser_thenReturnWarning() {
-        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first", "last", Arrays.asList("caseworker-sscs-superuser")));
+        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first last", "first", "last", Arrays.asList("caseworker-sscs-superuser")));
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().build());
 

@@ -1,0 +1,25 @@
+{
+  "releasedHearingRecordings": [],
+  "outstandingHearingRecordings": [
+    {
+      "hearingId": "1334234325",
+      "venue": "Town House",
+      "hearingDate": "16-06-2021 01:30:00 PM",
+      "hearingRecordings": [
+        {
+          "fileName": "Final Town House 16 Jun 2021.mp3",
+          "fileType": "mp3",
+          "documentUrl": "http://dm-store:5005/documents/1432689d-fd1c-4d57-aaa3-52d4da030840",
+          "documentBinaryUrl": "http://dm-store:5005/documents/1432689d-fd1c-4d57-aaa3-52d4da030840/binary"
+        }
+      ]
+    }
+  ],
+  "requestableHearingRecordings": [
+    {
+      "hearingId": "1290312038013",
+      "venue": "Crown House",
+      "hearingDate": "2021-05-12"
+    }
+  ]
+}
