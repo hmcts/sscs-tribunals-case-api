@@ -5,6 +5,7 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.collections4.ListUtils.union;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
 import java.time.LocalDate;
@@ -18,7 +19,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
 
@@ -26,10 +26,14 @@ import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
 @Slf4j
 public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+
+    public static final String SUPPLEMENTARY_RESPONSE_DOCUMENT_CANNOT_BE_EMPTY = "Supplementary response document cannot be empty";
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
+
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
                 && callback.getEvent() == EventType.DWP_SUPPLEMENTARY_RESPONSE;
@@ -52,14 +56,14 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
             responseDocuments.add(sscsCaseData.getDwpSupplementaryResponseDoc());
             sscsCaseData.setDwpSupplementaryResponseDoc(null);
         } else {
-            callbackResponse.addError("Supplementary response document cannot be empty");
+            callbackResponse.addError(SUPPLEMENTARY_RESPONSE_DOCUMENT_CANNOT_BE_EMPTY);
         }
 
         if (sscsCaseData.getDwpOtherDoc() != null && sscsCaseData.getDwpOtherDoc().getDocumentLink() != null) {
             if (DocumentUtil.isFileAMedia(sscsCaseData.getDwpOtherDoc().getDocumentLink())) {
                 addAudioVideoEvidence(sscsCaseData);
                 if (!REVIEW_BY_JUDGE.getId().equals(sscsCaseData.getInterlocReviewState())) {
-                    sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId());
+                    sscsCaseData.setInterlocReviewState(REVIEW_BY_TCW.getId());
                 }
                 sscsCaseData.setInterlocReferralReason(REVIEW_AUDIO_VIDEO_EVIDENCE.getId());
             } else {
@@ -73,8 +77,8 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
 
         if (responseDocuments.size() > 0) {
             sscsCaseData.setScannedDocuments(buildScannedDocsList(sscsCaseData, responseDocuments));
-            sscsCaseData.setEvidenceHandled("No");
-            sscsCaseData.setDwpState("supplementaryResponse");
+            sscsCaseData.setEvidenceHandled(YesNo.NO.getValue());
+            sscsCaseData.setDwpState(DwpState.SUPPLEMENTARY_RESPONSE.getId());
         }
 
         setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
