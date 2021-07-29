@@ -84,11 +84,11 @@ public abstract class AbstractEventIt {
         return mockMvc.perform(requestBuilder).andReturn().getResponse();
     }
 
-    public PreSubmitCallbackResponse deserialize(String source) {
+    public PreSubmitCallbackResponse<SscsCaseData> deserialize(String source) {
         try {
             return mapper.readValue(
                     source,
-                    new TypeReference<PreSubmitCallbackResponse<SscsCaseData>>() {
+                    new TypeReference<>() {
                     }
             );
 
