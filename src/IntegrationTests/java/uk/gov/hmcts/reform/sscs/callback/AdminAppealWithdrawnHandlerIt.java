@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
 import static org.junit.Assert.assertEquals;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.WITHDRAWAL_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.WITHDRAWAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -30,7 +31,7 @@ public class AdminAppealWithdrawnHandlerIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         assertEquals(4, result.getData().getSscsDocument().size());
-        assertEquals("withdrawalRequest", result.getData().getSscsDocument().get(3).getValue().getDocumentType());
+        assertEquals(WITHDRAWAL_REQUEST.getValue(), result.getData().getSscsDocument().get(3).getValue().getDocumentType());
         assertEquals(WITHDRAWAL_RECEIVED.getId(), result.getData().getDwpState());
     }
 
