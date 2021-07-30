@@ -40,13 +40,14 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
     }
 
     @Test
-    public void handle() throws IOException {
+    public void handleDoesNotAddNewDocumentToSscsDocuments() throws IOException {
         PreSubmitCallbackResponse<SscsCaseData> actualResult = handler.handle(
             CallbackType.ABOUT_TO_SUBMIT, buildTestCallbackGivenEvent(EventType.ADMIN_APPEAL_WITHDRAWN,
                 ADMIN_APPEAL_WITHDRAWN_CALLBACK_JSON), USER_AUTHORISATION);
 
         String expectedCaseData = fetchData("callback/withdrawnappeals/adminAppealWithdrawnExpectedCaseData.json");
         assertEquals("withdrawalReceived", actualResult.getData().getDwpState());
+        assertEquals(1, actualResult.getData().getSscsDocument().size());
         assertThatJson(actualResult.getData()).isEqualTo(expectedCaseData);
     }
 
