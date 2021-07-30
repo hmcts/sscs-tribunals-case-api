@@ -304,6 +304,11 @@ dependencyManagement {
             entry 'cxf-rt-transports-http'
         }
 
+        //CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
+        dependencySet(group: 'org.apache.commons', version: '1.21') {
+            entry 'commons-compress'
+        }
+
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
         }
@@ -347,7 +352,7 @@ dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
-    compile group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.5'
+    compile group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.6'
     compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.1'
 
     compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.4'
@@ -356,7 +361,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.07'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.4.54-RC3-SSCS-9309'
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.4.53'
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.40'
 
     compile group:'org.overviewproject', name: 'mime-types', version: '1.0.2'
