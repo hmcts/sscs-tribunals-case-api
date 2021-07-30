@@ -117,20 +117,9 @@
       },
       "dateSentToDwp": "2019-09-01",
       "withdrawalDocument": {
-          "documentType": null,
-          "documentEmailContent": null,
-          "documentDateAdded": null,
-          "documentFileName": null,
-          "controlNumber": null,
-          "documentComment": null,
-          "evidenceIssued": null,
-          "bundleAddition": null,
-          "documentLink": {
-            "document_url": "http://dm-store:8080/documents/7d80b978-51d1-49e9-9791-07f86ae83bc6",
-            "document_binary_url": "http://dm-store:8080/documents/7d80b978-51d1-49e9-9791-07f86ae83bc6/binary",
-            "document_filename": "Screenshot 2019-08-30 at 16.56.20.pdf"
-          },
-        "id": "1e745b1e-3c9b-4eb2-8ce4-97aebe9f737f"
+        "document_url": "http://dm-store:8080/documents/7d80b978-51d1-49e9-9791-07f86ae83bc6",
+        "document_binary_url": "http://dm-store:8080/documents/7d80b978-51d1-49e9-9791-07f86ae83bc6/binary",
+        "document_filename": "withdrawnDoc.pdf"
       },
       "dwpTimeExtension": [],
       "hearings": [{
