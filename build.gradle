@@ -366,6 +366,7 @@ dependencies {
 
     compile group:'org.overviewproject', name: 'mime-types', version: '1.0.2'
 
+    compile 'javax.xml.bind:jaxb-api:2.3.1'
     testCompile group: 'io.rest-assured', name: 'rest-assured'
     compile "org.projectlombok:lombok:$versions.lombok"
     annotationProcessor "org.projectlombok:lombok:$versions.lombok"
