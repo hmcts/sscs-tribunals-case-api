@@ -1,22 +1,22 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.ZoneId.of;
 import static java.time.ZonedDateTime.now;
 import static java.util.Base64.getDecoder;
 import static java.util.Base64.getEncoder;
 import static javax.crypto.Mac.getInstance;
-import static javax.xml.bind.DatatypeConverter.printBase64Binary;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +29,7 @@ import uk.gov.hmcts.reform.sscs.exception.TokenException;
 public class MessageAuthenticationService {
     private static final Logger LOG = getLogger(MessageAuthenticationService.class);
 
-    public static final Charset CHARSET = StandardCharsets.UTF_8;
+    public static final Charset CHARSET = UTF_8;
     public static final String ZONE_ID = "Europe/London";
     public static final String MAC_ALGO = "HmacSHA256";
     public static final String ERROR_MESSAGE = "Error while decrypting HMAC token ";
@@ -107,6 +107,10 @@ public class MessageAuthenticationService {
         }
 
         return macToken;
+    }
+
+    private String printBase64Binary(byte[] digest) {
+        return new String(Base64.encodeBase64(digest), UTF_8);
     }
 
     private InvalidSubscriptionTokenException logInvalidSubscriptionTokenException(Exception ex, String encryptedToken) {
