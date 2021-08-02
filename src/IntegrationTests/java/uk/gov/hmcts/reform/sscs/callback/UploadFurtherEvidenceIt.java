@@ -1,21 +1,17 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
-import static java.lang.Long.parseLong;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
-import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.jetbrains.annotations.NotNull;
@@ -24,9 +20,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.mock.web.MockHttpServletResponse;
-import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
@@ -47,7 +40,7 @@ public class UploadFurtherEvidenceIt extends AbstractEventIt {
                 .state(State.READY_TO_LIST)
                 .interlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId())
                 .appeal(Appeal.builder().build()).build();
-        setJson();
+        setJson(sscsCaseData, UPLOAD_FURTHER_EVIDENCE);
     }
 
 
@@ -56,11 +49,9 @@ public class UploadFurtherEvidenceIt extends AbstractEventIt {
     public void shouldMoveOneDraftUploadsToSscsDocumentsOrAudioVideoEvidence(String fileType) throws Exception {
         final List<DraftSscsDocument> draftDocs = getDraftSscsDocuments(format("document.%s", fileType));
         sscsCaseData.setDraftFurtherEvidenceDocuments(draftDocs);
-        setJson();
+        setJson(sscsCaseData, UPLOAD_FURTHER_EVIDENCE);
         
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
-        assertHttpStatus(response, HttpStatus.OK);
-        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+        PreSubmitCallbackResponse<SscsCaseData> result = assertResponseOkAndGetResult(ABOUT_TO_SUBMIT);
 
         assertThat(result.getErrors().size(), is(0));
         assertThat(result.getData().getDraftFurtherEvidenceDocuments(), is(nullValue()));
@@ -76,15 +67,6 @@ public class UploadFurtherEvidenceIt extends AbstractEventIt {
             assertEquals(YesNo.YES, result.getData().getHasUnprocessedAudioVideoEvidence());
         }
     }
-
-    private void setJson() throws JsonProcessingException {
-        CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(parseLong(sscsCaseData.getCcdCaseId()), JURISDICTION,
-                sscsCaseData.getState(), sscsCaseData, LocalDateTime.now());
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(),
-                EventType.UPLOAD_FURTHER_EVIDENCE, false);
-        json = mapper.writeValueAsString(callback);
-    }
-
 
     @NotNull
     private List<DraftSscsDocument> getDraftSscsDocuments(String fileName) {
