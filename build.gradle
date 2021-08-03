@@ -106,6 +106,12 @@ task functional(type: Test) {
     exclude "uk/gov/hmcts/reform/sscs/smoke/**"
 }
 
+task fortifyScan(type: JavaExec)  {
+    main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
+    classpath += sourceSets.test.runtimeClasspath
+    jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+}
+
 jacoco {
     toolVersion = "0.8.2"
 }
@@ -368,6 +374,8 @@ dependencies {
 
     compile 'javax.xml.bind:jaxb-api:2.3.1'
     testCompile group: 'io.rest-assured', name: 'rest-assured'
+    testCompile 'com.github.hmcts:fortify-client:1.2.1:all'
+
     compile "org.projectlombok:lombok:$versions.lombok"
     annotationProcessor "org.projectlombok:lombok:$versions.lombok"
 
