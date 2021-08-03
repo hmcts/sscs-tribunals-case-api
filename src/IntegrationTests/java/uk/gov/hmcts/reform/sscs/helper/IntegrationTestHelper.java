@@ -13,12 +13,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
 public class IntegrationTestHelper {
 
     private IntegrationTestHelper() {
 
+    }
+
+    public static MockHttpServletRequestBuilder getRequestWithAuthHeader(String json, CallbackType callbackType) {
+        return getRequestWithAuthHeader(json, getEndpoint(callbackType));
     }
 
     public static MockHttpServletRequestBuilder getRequestWithAuthHeader(String json, String endpoint) {
@@ -56,5 +61,16 @@ public class IntegrationTestHelper {
         links.self = link;
         document.links = links;
         return document;
+    }
+
+    private static String getEndpoint(CallbackType callbackType) {
+        switch (callbackType) {
+            case MID_EVENT: return "/ccdMidEvent";
+            case ABOUT_TO_START: return "/ccdAboutToStart";
+            case ABOUT_TO_SUBMIT: return "/ccdAboutToSubmit";
+            case SUBMITTED: return "/ccdSubmittedEvent";
+            default:
+                throw new IllegalStateException("Unexpected value: " + callbackType);
+        }
     }
 }

@@ -19,7 +19,7 @@ plugins {
     id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.6.0'
     id 'org.owasp.dependencycheck' version '6.2.2'
-    id 'au.com.dius.pact' version '4.2.8'
+    id 'au.com.dius.pact' version '4.2.9'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -104,6 +104,12 @@ task functional(type: Test) {
     setClasspath(sourceSets.e2e.runtimeClasspath)
     include "uk/gov/hmcts/reform/sscs/functional/**"
     exclude "uk/gov/hmcts/reform/sscs/smoke/**"
+}
+
+task fortifyScan(type: JavaExec)  {
+    main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
+    classpath += sourceSets.test.runtimeClasspath
+    jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
 jacoco {
@@ -352,7 +358,7 @@ dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
-    compile group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.5'
+    compile group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.6'
     compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.1'
 
     compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.4'
@@ -361,12 +367,15 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.07'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.53-RC-SSCS-9341'
-    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.40'
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.4.55'
+    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.41'
 
     compile group:'org.overviewproject', name: 'mime-types', version: '1.0.2'
 
+    compile 'javax.xml.bind:jaxb-api:2.3.1'
     testCompile group: 'io.rest-assured', name: 'rest-assured'
+    testCompile 'com.github.hmcts:fortify-client:1.2.1:all'
+
     compile "org.projectlombok:lombok:$versions.lombok"
     annotationProcessor "org.projectlombok:lombok:$versions.lombok"
 
