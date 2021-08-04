@@ -7,6 +7,8 @@ import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -16,6 +18,13 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
 public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private final boolean hearingRecordingFeatureEnabled;
+
+    @Autowired
+    public DirectionIssuedAboutToStartHandler(@Value("${feature.hearing-recording.enabled}") boolean hearingRecordingFeatureEnabled) {
+        this.hearingRecordingFeatureEnabled = hearingRecordingFeatureEnabled;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -47,6 +56,10 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
 
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.getCode(), APPEAL_TO_PROCEED.getLabel()));
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.getCode(), PROVIDE_INFORMATION.getLabel()));
+
+        if (hearingRecordingFeatureEnabled) {
+            listOptions.add(new DynamicListItem(REFUSE_HEARING_RECORDING_REQUEST.getCode(), REFUSE_HEARING_RECORDING_REQUEST.getLabel()));
+        }
 
         if ("Yes".equalsIgnoreCase(sscsCaseData.getTimeExtensionRequested())) {
             listOptions.add(new DynamicListItem(GRANT_EXTENSION.getCode(), GRANT_EXTENSION.getLabel()));
