@@ -160,18 +160,18 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 && ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
             caseData = updateCaseAfterExtensionRefused(caseData, null, State.WITH_DWP);
 
-        } else if (DirectionTypeItemList.GRANT_REINSTATEMENT.getCode().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
+        } else if (DirectionType.GRANT_REINSTATEMENT.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData = updateCaseAfterReinstatementGranted(caseData, documentTranslationStatus);
 
-        } else if (DirectionTypeItemList.REFUSE_REINSTATEMENT.getCode().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
+        } else if (DirectionType.REFUSE_REINSTATEMENT.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData = updateCaseAfterReinstatementRefused(caseData, documentTranslationStatus);
 
         } else if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)
-            && DirectionTypeItemList.GRANT_URGENT_HEARING.getCode().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
+            && DirectionType.GRANT_URGENT_HEARING.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData = updateCaseAfterUrgentHearingGranted(caseData);
 
         } else if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)
-            && DirectionTypeItemList.REFUSE_URGENT_HEARING.getCode().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
+            && DirectionType.REFUSE_URGENT_HEARING.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData = updateCaseAfterUrgentHearingRefused(caseData);
 
         } else {
