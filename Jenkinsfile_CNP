@@ -86,15 +86,15 @@ withPipeline(type, product, component) {
     enableAksStagingDeployment()
     disableLegacyDeployment()
 
-    //after('akschartsinstall'){
+    after('akschartsinstall'){
         // Vars needed for AKS testing
-        //env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
+        env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
         //if (env.BRANCH_NAME.startsWith("PR")) {
             //env.CORE_CASE_DATA_API_URL = "ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.service.core-compute-preview.internal"
             //println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}""".stripIndent()
         //}
-        //println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}. - The branch name is ${env.BRANCH_NAME}""".stripIndent()
-    //}
+        println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}. - The branch name is ${env.BRANCH_NAME}""".stripIndent()
+    }
 
     env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
     onMaster() {
