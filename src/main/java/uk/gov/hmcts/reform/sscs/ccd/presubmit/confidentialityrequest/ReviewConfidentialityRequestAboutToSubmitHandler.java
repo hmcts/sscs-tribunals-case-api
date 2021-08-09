@@ -62,6 +62,10 @@ public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubm
 
                     sscsCaseData.setInterlocReviewState(interlocReviewState);
                     sscsCaseData.setIsConfidentialCase(YesNo.YES);
+
+                    if (!enhancedConfidentialityFeature) {
+                        sscsCaseData.setIsProgressingViaGaps(YesNo.YES.getValue());
+                    }
                     log.info("'Confidentiality granted - appellant: {}, jointParty: {}, for case id {}", appellantGrantedNow, jointPartyGrantedNow, sscsCaseData.getCcdCaseId());
                 } else {
                     sscsCaseData.setInterlocReviewState(null);
