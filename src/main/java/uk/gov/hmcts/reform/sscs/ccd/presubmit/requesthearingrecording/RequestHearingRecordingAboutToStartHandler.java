@@ -60,7 +60,7 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
             }
 
             List<HearingRecordingRequest> requestedHearingsCollection = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();
-            List<HearingRecordingRequest> releasedHearingsCollection = sscsCaseData.getSscsHearingRecordingCaseData().getReleasedHearings();
+            List<HearingRecordingRequest> releasedHearingsCollection = sscsCaseData.getSscsHearingRecordingCaseData().getDwpReleasedHearings();
             StringBuilder requestedHearingText = new StringBuilder();
             StringBuilder releasedHearingText = new StringBuilder();
 
@@ -89,7 +89,7 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
                 sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearingsTextList("There are no outstanding DWP hearing recording requests on this case");
             }
             if (releasedHearingsCollection != null && !releasedHearingsCollection.isEmpty()) {
-                sscsCaseData.getSscsHearingRecordingCaseData().setReleasedHearings(releasedHearingsCollection);
+                sscsCaseData.getSscsHearingRecordingCaseData().setDwpReleasedHearings(releasedHearingsCollection);
                 sscsCaseData.getSscsHearingRecordingCaseData().setReleasedHearingsTextList(releasedHearingText.substring(0, releasedHearingText.length() - 2));
             } else {
                 sscsCaseData.getSscsHearingRecordingCaseData().setReleasedHearingsTextList("No hearing recordings have been released to DWP on this case");

@@ -104,12 +104,12 @@ public class RequestHearingRecordingAboutToStartHandlerTest {
         SscsHearingRecording sscsHearingRecording = SscsHearingRecording.builder().value(SscsHearingRecordingDetails.builder().hearingId("an_id2").build()).build();
         HearingRecordingRequest recordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
                 .requestingParty("dwp").status("Released").sscsHearingRecordingList(Arrays.asList(sscsHearingRecording)).build()).build();
-        sscsCaseData.getSscsHearingRecordingCaseData().setReleasedHearings(singletonList(recordingRequest));
+        sscsCaseData.getSscsHearingRecordingCaseData().setDwpReleasedHearings(singletonList(recordingRequest));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals(2, response.getData().getSscsHearingRecordingCaseData().getRequestableHearingDetails().getListItems().size());
-        assertEquals(1, response.getData().getSscsHearingRecordingCaseData().getReleasedHearings().size());
+        assertEquals(1, response.getData().getSscsHearingRecordingCaseData().getDwpReleasedHearings().size());
     }
 
 }
