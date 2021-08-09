@@ -67,7 +67,7 @@
           "tya": ""
         }
       },
-      "withdrawalDocument": {
+      "previewDocument": {
         "document_url" : "http://www.withdrwal.com",
         "document_binary_url" : "http://www.withdrwal.com/binary",
         "document_filename" : "withdrwal doc1"

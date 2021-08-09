@@ -37,7 +37,7 @@ public class AdminAppealWithdrawnHandler implements PreSubmitCallbackHandler<Ssc
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setDwpState(WITHDRAWAL_RECEIVED.getId());
 
-        DocumentLink documentDetails = caseData.getWithdrawalDocument();
+        DocumentLink documentDetails = caseData.getPreviewDocument();
         if (nonNull(documentDetails)) {
             addToSscsDocuments(caseData, documentDetails);
         }
@@ -56,6 +56,6 @@ public class AdminAppealWithdrawnHandler implements PreSubmitCallbackHandler<Ssc
         List<SscsDocument> allDocuments = new ArrayList<>(ofNullable(caseData.getSscsDocument()).orElse(emptyList()));
         allDocuments.add(SscsDocument.builder().value(details).build());
         caseData.setSscsDocument(allDocuments);
-        caseData.setWithdrawalDocument(null);
+        caseData.setPreviewDocument(null);
     }
 }
