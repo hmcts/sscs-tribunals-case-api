@@ -8,13 +8,12 @@ import static uk.gov.hmcts.reform.sscs.model.RequestStatus.GRANTED;
 import static uk.gov.hmcts.reform.sscs.model.RequestStatus.REFUSED;
 import static uk.gov.hmcts.reform.sscs.model.RequestStatus.REQUESTED;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -23,13 +22,18 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.model.RequestStatus;
+import uk.gov.hmcts.reform.sscs.service.processhearingrecordingrequest.ProcessHearingRecordingRequestService;
 
 @Service
 @Slf4j
 public class ProcessHearingRecordingRequestAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private static final DateTimeFormatter RESULT_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy");
+    private final ProcessHearingRecordingRequestService processHearingRecordingRequestService;
+
+    @Autowired
+    public ProcessHearingRecordingRequestAboutToStartHandler(ProcessHearingRecordingRequestService processHearingRecordingRequestService) {
+        this.processHearingRecordingRequestService = processHearingRecordingRequestService;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -80,7 +84,7 @@ public class ProcessHearingRecordingRequestAboutToStartHandler implements PreSub
         DynamicList appellant = toDynamicList(PartyItemList.APPELLANT, h, sscsCaseData);
         ProcessHearingRecordingRequestDetails value = new ProcessHearingRecordingRequestDetails(h.getValue().getHearingId(),
                 selectHearingTitle(h, sscsCaseData.getHearings()),
-                selectHearing(h),
+                processHearingRecordingRequestService.getFormattedHearingInformation(h),
                 getRecordings(h, sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings()),
                 dwp,
                 jointParty,
@@ -90,12 +94,13 @@ public class ProcessHearingRecordingRequestAboutToStartHandler implements PreSub
     }
 
     private DynamicList toDynamicList(PartyItemList party, Hearing h, SscsCaseData sscsCaseData) {
-        final Optional<RequestStatus> status = getSelectedItemFor(party, h, sscsCaseData);
-        final DynamicListItem selected = status
+        final Optional<RequestStatus> partyStatus = processHearingRecordingRequestService.getSelectedItemFor(party, h, sscsCaseData);
+        final DynamicListItem selected = partyStatus
                 .map(this::toDynamicListItem)
-                .orElse(new DynamicListItem("---Select value---", ""));
+                .orElse(new DynamicListItem("", ""));
 
         List<DynamicListItem> others = List.of(GRANTED, REFUSED, REQUESTED).stream()
+                .filter(status -> isPartyStatusRequestedOrOtherOptions(partyStatus, status))
                 .map(this::toDynamicListItem)
                 .collect(Collectors.toList());
 
@@ -103,29 +108,18 @@ public class ProcessHearingRecordingRequestAboutToStartHandler implements PreSub
 
     }
 
+    private boolean isPartyStatusRequestedOrOtherOptions(Optional<RequestStatus> partyStatus, RequestStatus status) {
+        return !status.equals(REQUESTED) || isPartyStatusRequested(partyStatus);
+    }
+
+    private boolean isPartyStatusRequested(Optional<RequestStatus> partyStatus) {
+        return partyStatus.filter(s -> s.equals(REQUESTED)).isPresent();
+    }
+
     private DynamicListItem toDynamicListItem(RequestStatus rs) {
         return new DynamicListItem(rs.getLabel(), rs.getLabel());
     }
 
-    private Optional<RequestStatus> getSelectedItemFor(PartyItemList party, Hearing hearing,  SscsCaseData sscsCaseData) {
-        boolean hasRequestedHearingRecordings = emptyIfNull(sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings()).stream()
-                .filter(r -> r.getValue().getRequestingParty().equals(party.getCode()))
-                .flatMap(r -> r.getValue().getSscsHearingRecordingList().stream())
-                .anyMatch(hr -> hr.getValue().getHearingId().equals(hearing.getValue().getHearingId()));
-        if (hasRequestedHearingRecordings) {
-            return Optional.of(REQUESTED);
-        }
-
-        List<HearingRecordingRequest> releasedHearings = (party == PartyItemList.DWP) ? sscsCaseData.getSscsHearingRecordingCaseData().getDwpReleasedHearings() : sscsCaseData.getSscsHearingRecordingCaseData().getCitizenReleasedHearings();
-        boolean hasGrantedHearingRecordings = emptyIfNull(releasedHearings).stream()
-                .filter(r -> r.getValue().getRequestingParty().equals(party.getCode()))
-                .flatMap(r -> r.getValue().getSscsHearingRecordingList().stream())
-                .anyMatch(hr -> hr.getValue().getHearingId().equals(hearing.getValue().getHearingId()));
-        if (hasGrantedHearingRecordings) {
-            return Optional.of(GRANTED);
-        }
-        return Optional.empty();
-    }
 
     private List<CcdValue<DocumentLink>> getRecordings(Hearing h, List<SscsHearingRecording> sscsHearingRecordings) {
         return emptyIfNull(sscsHearingRecordings).stream()
@@ -136,21 +130,9 @@ public class ProcessHearingRecordingRequestAboutToStartHandler implements PreSub
     }
 
     @NotNull
-    private String selectHearing(Hearing hearing) {
-        return hearing.getValue().getVenue().getName() + " "
-            + checkHearingTime(hearing.getValue().getTime()) + " "
-            + LocalDate.parse(hearing.getValue().getHearingDate(), FORMATTER).format(RESULT_FORMATTER);
-    }
-
-    @NotNull
     private String selectHearingTitle(Hearing hearing, List<Hearing> hearings) {
         int index = hearings.indexOf(hearing) + 1;
         return String.format("Hearing %s", index);
-    }
-
-    @NotNull
-    private String checkHearingTime(String hearingTime) {
-        return (hearingTime.length() == 5) ? (hearingTime + ":00") : hearingTime;
     }
 
 }
