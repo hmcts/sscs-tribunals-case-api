@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.requesthearingrecording;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -59,22 +61,22 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
                 return returnError(response, "There are no hearings with hearing recordings on this case");
             }
 
-            List<HearingRecordingRequest> requestedHearingsCollection = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();
-            List<HearingRecordingRequest> releasedHearingsCollection = sscsCaseData.getSscsHearingRecordingCaseData().getReleasedHearings();
+            List<HearingRecordingRequest> requestedHearingsCollection = emptyIfNull(sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings());
+            List<HearingRecordingRequest> releasedHearingsCollection = emptyIfNull(sscsCaseData.getSscsHearingRecordingCaseData().getDwpReleasedHearings());
             StringBuilder requestedHearingText = new StringBuilder();
             StringBuilder releasedHearingText = new StringBuilder();
 
-            if (requestedHearingsCollection != null) {
-                requestedHearingsCollection.stream().filter(r -> r.getValue().getRequestingParty().equals(PartyItemList.DWP.getCode()))
-                        .forEach(r -> r.getValue().getSscsHearingRecordingList().stream()
-                                .forEach(hr -> removeFromListAndAddText(hr, validHearings, requestedHearingText)));
-            }
 
-            if (releasedHearingsCollection != null) {
-                releasedHearingsCollection.stream().filter(r -> r.getValue().getRequestingParty().equals(PartyItemList.DWP.getCode()))
-                        .forEach(r -> r.getValue().getSscsHearingRecordingList().stream()
-                                .forEach(hr -> removeFromListAndAddText(hr, validHearings, releasedHearingText)));
-            }
+            requestedHearingsCollection.stream()
+                    .filter(r -> r.getValue().getRequestingParty().equals(PartyItemList.DWP.getCode()))
+                    .forEach(r -> r.getValue().getSscsHearingRecordingList()
+                            .forEach(hr -> removeFromListAndAddText(hr, validHearings, requestedHearingText)));
+
+
+            releasedHearingsCollection.stream()
+                    .filter(r -> r.getValue().getRequestingParty().equals(PartyItemList.DWP.getCode()))
+                    .forEach(r -> r.getValue().getSscsHearingRecordingList()
+                            .forEach(hr -> removeFromListAndAddText(hr, validHearings, releasedHearingText)));
 
 
             if (validHearings.isEmpty()) {
@@ -82,14 +84,14 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
             }
 
             sscsCaseData.getSscsHearingRecordingCaseData().setRequestableHearingDetails(new DynamicList(new DynamicListItem("", ""), validHearings));
-            if (requestedHearingsCollection != null && !requestedHearingsCollection.isEmpty()) {
+            if (isNotEmpty(requestedHearingsCollection)) {
                 sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(requestedHearingsCollection);
                 sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearingsTextList(requestedHearingText.substring(0, requestedHearingText.length() - 2));
             } else {
                 sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearingsTextList("There are no outstanding DWP hearing recording requests on this case");
             }
-            if (releasedHearingsCollection != null && !releasedHearingsCollection.isEmpty()) {
-                sscsCaseData.getSscsHearingRecordingCaseData().setReleasedHearings(releasedHearingsCollection);
+            if (isNotEmpty(releasedHearingsCollection)) {
+                sscsCaseData.getSscsHearingRecordingCaseData().setDwpReleasedHearings(releasedHearingsCollection);
                 sscsCaseData.getSscsHearingRecordingCaseData().setReleasedHearingsTextList(releasedHearingText.substring(0, releasedHearingText.length() - 2));
             } else {
                 sscsCaseData.getSscsHearingRecordingCaseData().setReleasedHearingsTextList("No hearing recordings have been released to DWP on this case");
@@ -115,10 +117,7 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
     private void removeFromListAndAddText(SscsHearingRecording request, List<DynamicListItem> validHearings, StringBuilder stringBuilder) {
         stringBuilder.append(request.getValue().getVenue() + " " + request.getValue().getHearingDate());
         stringBuilder.append(", ");
-        DynamicListItem item = validHearings.stream().filter(i -> i.getCode().equals(request.getValue().getHearingId())).findFirst().orElse(null);
-        if (item != null) {
-            validHearings.remove(item);
-        }
+        validHearings.stream().filter(i -> i.getCode().equals(request.getValue().getHearingId())).findFirst().ifPresent(validHearings::remove);
     }
 
     @NotNull

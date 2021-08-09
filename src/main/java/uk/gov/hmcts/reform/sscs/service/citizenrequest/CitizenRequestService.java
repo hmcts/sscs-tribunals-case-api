@@ -72,7 +72,7 @@ public class CitizenRequestService {
         } else {
             PartyItemList party = workRequestedParty(sscsCaseData, idamEmail);
 
-            List<HearingRecordingRequest> releasedHearingRecordings = sscsCaseData.getSscsHearingRecordingCaseData().getReleasedHearings();
+            List<HearingRecordingRequest> releasedHearingRecordings = sscsCaseData.getSscsHearingRecordingCaseData().getCitizenReleasedHearings();
             List<CitizenHearingRecording> releasedRecordings = CollectionUtils.isEmpty(releasedHearingRecordings) ? List.of() :
                     releasedHearingRecordings.stream()
                     .filter(request -> party.getCode().equals(request.getValue().getRequestingParty()))
