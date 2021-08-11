@@ -62,32 +62,24 @@ public class ProcessHearingRecordingRequestMidEventHandler implements PreSubmitC
     }
 
     private void validateParty(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response) {
-        Optional<Hearing> hearingOptional = response.getData().getHearings().stream()
-                .filter(hearing -> hearing.getValue().getHearingId().equals(processHearingRecordingRequest.getValue().getHearingId()))
-                .findFirst();
-
+        Optional<Hearing> hearingOptional = getHearingFromHearingRecordingRequest(processHearingRecordingRequest, response);
         if (hearingOptional.isPresent()) {
-            final DynamicList dynamicList = partyOption(party, processHearingRecordingRequest);
-
-            final Optional<RequestStatus> requestStatus = processHearingRecordingRequestService.getRequestStatus(party, hearingOptional.get(), response.getData());
-            if (requestStatus.isPresent() && requestStatus.get().equals(RequestStatus.GRANTED) && RequestStatus.REFUSED.getLabel().equals(dynamicList.getValue().getCode())) {
-                response.addWarning("Are you sure you want to change the request status");
-            }
+            validateIfRequestStatusChangedFromGrantedToRefused(party, processHearingRecordingRequest, response, hearingOptional);
         }
-
-
     }
 
-    private DynamicList partyOption(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest) {
-        switch (party) {
-            case DWP:
-                return processHearingRecordingRequest.getValue().getDwp();
-            case JOINT_PARTY:
-                return processHearingRecordingRequest.getValue().getJointParty();
-            default:
-                return processHearingRecordingRequest.getValue().getAppellant();
-
+    private void validateIfRequestStatusChangedFromGrantedToRefused(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response, Optional<Hearing> hearingOptional) {
+        final Optional<RequestStatus> requestStatus = processHearingRecordingRequestService.getRequestStatus(party, hearingOptional.get(), response.getData());
+        final Optional<RequestStatus> changedRequestStatus = processHearingRecordingRequestService.getChangedRequestStatus(party, processHearingRecordingRequest);
+        if (requestStatus.isPresent() && changedRequestStatus.isPresent() && requestStatus.get().equals(RequestStatus.GRANTED) && changedRequestStatus.get().equals(RequestStatus.REFUSED)) {
+            response.addWarning("Are you sure you want to change the request status");
         }
+    }
+
+    private Optional<Hearing> getHearingFromHearingRecordingRequest(ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response) {
+        return response.getData().getHearings().stream()
+                .filter(hearing -> hearing.getValue().getHearingId().equals(processHearingRecordingRequest.getValue().getHearingId()))
+                .findFirst();
     }
 
 }
