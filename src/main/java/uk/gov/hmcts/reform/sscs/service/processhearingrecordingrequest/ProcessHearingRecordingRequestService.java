@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service.processhearingrecordingrequest;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.model.RequestStatus.GRANTED;
+import static uk.gov.hmcts.reform.sscs.model.RequestStatus.REFUSED;
 import static uk.gov.hmcts.reform.sscs.model.RequestStatus.REQUESTED;
 
 import java.time.LocalDate;
@@ -22,25 +23,33 @@ public class ProcessHearingRecordingRequestService {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter RESULT_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy");
 
+    public Optional<RequestStatus> getRequestStatus(PartyItemList party, Hearing hearing, SscsCaseData sscsCaseData) {
+        return hasGrantedHearingRecordings(party, hearing, sscsCaseData)
+                .or(() -> hasRefusedHearingRecordings(party, hearing, sscsCaseData))
+                .or(() -> hasRequestedHearingRecordings(party, hearing, sscsCaseData));
+    }
 
-    public Optional<RequestStatus> getSelectedItemFor(PartyItemList party, Hearing hearing, SscsCaseData sscsCaseData) {
-        boolean hasRequestedHearingRecordings = emptyIfNull(sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings()).stream()
-                .filter(r -> r.getValue().getRequestingParty().equals(party.getCode()))
-                .flatMap(r -> r.getValue().getSscsHearingRecordingList().stream())
-                .anyMatch(hr -> hr.getValue().getHearingId().equals(hearing.getValue().getHearingId()));
-        if (hasRequestedHearingRecordings) {
-            return Optional.of(REQUESTED);
-        }
+    private Optional<RequestStatus> hasRequestedHearingRecordings(PartyItemList party, Hearing hearing, SscsCaseData sscsCaseData) {
+        boolean hasRequestedHearingRecordings = hasHearingRequestInCollection(party, hearing, sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings());
+        return hasRequestedHearingRecordings ? Optional.of(REQUESTED) : Optional.empty();
+    }
 
+    private Optional<RequestStatus> hasGrantedHearingRecordings(PartyItemList party, Hearing hearing, SscsCaseData sscsCaseData) {
         List<HearingRecordingRequest> releasedHearings = (party == PartyItemList.DWP) ? sscsCaseData.getSscsHearingRecordingCaseData().getDwpReleasedHearings() : sscsCaseData.getSscsHearingRecordingCaseData().getCitizenReleasedHearings();
-        boolean hasGrantedHearingRecordings = emptyIfNull(releasedHearings).stream()
+        boolean hasGrantedHearingRecordings = hasHearingRequestInCollection(party, hearing, releasedHearings);
+        return hasGrantedHearingRecordings ? Optional.of(GRANTED) : Optional.empty();
+    }
+
+    private Optional<RequestStatus> hasRefusedHearingRecordings(PartyItemList party, Hearing hearing, SscsCaseData sscsCaseData) {
+        boolean hasRefusedHearings = hasHearingRequestInCollection(party, hearing, sscsCaseData.getSscsHearingRecordingCaseData().getRefusedHearings());
+        return hasRefusedHearings ? Optional.of(REFUSED) : Optional.empty();
+    }
+
+    private boolean hasHearingRequestInCollection(PartyItemList party, Hearing hearing, List<HearingRecordingRequest> hearingRecordingCollection) {
+        return emptyIfNull(hearingRecordingCollection).stream()
                 .filter(r -> r.getValue().getRequestingParty().equals(party.getCode()))
                 .flatMap(r -> r.getValue().getSscsHearingRecordingList().stream())
                 .anyMatch(hr -> hr.getValue().getHearingId().equals(hearing.getValue().getHearingId()));
-        if (hasGrantedHearingRecordings) {
-            return Optional.of(GRANTED);
-        }
-        return Optional.empty();
     }
 
 

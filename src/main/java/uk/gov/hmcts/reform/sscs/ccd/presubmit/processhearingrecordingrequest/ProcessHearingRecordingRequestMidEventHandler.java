@@ -55,6 +55,10 @@ public class ProcessHearingRecordingRequestMidEventHandler implements PreSubmitC
 
     private void validateRequest(ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response) {
         validateParty(PartyItemList.APPELLANT, processHearingRecordingRequest, response);
+        validateParty(PartyItemList.DWP, processHearingRecordingRequest, response);
+        if (response.getData().isThereAJointParty()) {
+            validateParty(PartyItemList.JOINT_PARTY, processHearingRecordingRequest, response);
+        }
     }
 
     private void validateParty(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response) {
@@ -65,7 +69,7 @@ public class ProcessHearingRecordingRequestMidEventHandler implements PreSubmitC
         if (hearingOptional.isPresent()) {
             final DynamicList dynamicList = partyOption(party, processHearingRecordingRequest);
 
-            final Optional<RequestStatus> requestStatus = processHearingRecordingRequestService.getSelectedItemFor(party, hearingOptional.get(), response.getData());
+            final Optional<RequestStatus> requestStatus = processHearingRecordingRequestService.getRequestStatus(party, hearingOptional.get(), response.getData());
             if (requestStatus.isPresent() && requestStatus.get().equals(RequestStatus.GRANTED) && uk.gov.hmcts.reform.sscs.ccd.domain.RequestStatus.REFUSED.getValue().equals(dynamicList.getValue().getCode())) {
                 response.addWarning("Are you sure you want to change the request status");
             }
