@@ -80,9 +80,9 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setShowWorkCapabilityAssessmentPage(SscsCaseData sscsCaseData) {
-        if (YES.getValue().equals(sscsCaseData.getWriteFinalDecisionGenerateNotice())) {
+        if (YES.getValue().equals(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             sscsCaseData.setShowWorkCapabilityAssessmentPage(YES);
-        } else if (NO.getValue().equals(sscsCaseData.getWriteFinalDecisionGenerateNotice())) {
+        } else if (NO.getValue().equals(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             sscsCaseData.setShowWorkCapabilityAssessmentPage(NO);
         }
     }
@@ -90,9 +90,9 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     @Override
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData, String pageId) {
         if (pageId != null && pageId.equals("workCapabilityAssessment")) {
-            if (YesNo.YES.getValue().equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionGenerateNotice())
+            if (YesNo.YES.getValue().equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())
                     && sscsCaseData.isWcaAppeal()
-                    && "allowed".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionAllowedOrRefused())) {
+                    && "allowed".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused())) {
                 sscsCaseData.setShowDwpReassessAwardPage(YesNo.YES);
                 return;
             }

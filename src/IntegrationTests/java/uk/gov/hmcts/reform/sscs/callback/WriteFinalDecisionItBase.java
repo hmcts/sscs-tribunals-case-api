@@ -82,7 +82,7 @@ public abstract class WriteFinalDecisionItBase extends AbstractEventIt {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -165,8 +165,8 @@ public abstract class WriteFinalDecisionItBase extends AbstractEventIt {
         assertNull(result.getData().getOutcome());
 
 
-        assertNotNull(result.getData().getWriteFinalDecisionGeneratedDate());
-        assertEquals(LocalDate.now().toString(), result.getData().getWriteFinalDecisionGeneratedDate());
+        assertNotNull(result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionGeneratedDate());
+        assertEquals(LocalDate.now().toString(), result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionGeneratedDate());
 
         assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals(LocalDate.now().toString(), result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
@@ -194,9 +194,9 @@ public abstract class WriteFinalDecisionItBase extends AbstractEventIt {
         assertNull(result.getData().getOutcome());
 
 
-        assertNotNull(result.getData().getWriteFinalDecisionGeneratedDate());
+        assertNotNull(result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionGeneratedDate());
 
-        assertEquals(LocalDate.now().toString(), result.getData().getWriteFinalDecisionGeneratedDate());
+        assertEquals(LocalDate.now().toString(), result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionGeneratedDate());
 
         assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals(LocalDate.now().toString(), result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());

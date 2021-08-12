@@ -22,12 +22,12 @@ public class PipDecisionNoticeOutcomeService extends DecisionNoticeOutcomeServic
 
     public Outcome determineOutcome(SscsCaseData sscsCaseData) {
 
-        if (sscsCaseData.getWriteFinalDecisionIsDescriptorFlow() == null) {
+        if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow() == null) {
             // We need at least this flag to be set in order to determine outcome
             return null;
         } else {
-            if (sscsCaseData.isDailyLivingAndOrMobilityDecision()) {
-                if ("yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionGenerateNotice())) {
+            if (sscsCaseData.getSscsFinalDecisionCaseData().isDailyLivingAndOrMobilityDecision()) {
+                if ("yes".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
                     // If we are generating the notice we use the daily living/mobility descriptors
                     // to determine outcome
                     return determineGenerateNoticeDailyLivingOrMobilityFlowOutcome(sscsCaseData);
