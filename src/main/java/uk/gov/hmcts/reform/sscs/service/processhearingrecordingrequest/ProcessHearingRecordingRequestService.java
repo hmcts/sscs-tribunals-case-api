@@ -7,13 +7,12 @@ import static uk.gov.hmcts.reform.sscs.model.RequestStatus.REQUESTED;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import javax.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRecordingRequest;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.model.RequestStatus;
 
@@ -52,6 +51,25 @@ public class ProcessHearingRecordingRequestService {
                 .anyMatch(hr -> hr.getValue().getHearingId().equals(hearing.getValue().getHearingId()));
     }
 
+    public Optional<RequestStatus> getChangedRequestStatus(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest) {
+        switch (party) {
+            case DWP:
+                return toRequestStatus(processHearingRecordingRequest.getValue().getDwp());
+            case JOINT_PARTY:
+                return toRequestStatus(processHearingRecordingRequest.getValue().getJointParty());
+            case APPELLANT: default:
+                return toRequestStatus(processHearingRecordingRequest.getValue().getAppellant());
+        }
+    }
+
+    private Optional<RequestStatus> toRequestStatus(DynamicList dynamicList) {
+        if (dynamicList != null && dynamicList.getValue() != null && dynamicList.getValue().getCode() != null) {
+            return Arrays.stream(RequestStatus.values())
+                    .filter(s -> s.getLabel().equals(dynamicList.getValue().getCode()))
+                    .findFirst();
+        }
+        return Optional.empty();
+    }
 
     @NotNull
     public String getFormattedHearingInformation(Hearing hearing) {
@@ -64,5 +82,4 @@ public class ProcessHearingRecordingRequestService {
     private String checkHearingTime(String hearingTime) {
         return (hearingTime.length() == 5) ? (hearingTime + ":00") : hearingTime;
     }
-
 }

@@ -1,5 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.processhearingrecordingrequest;
 
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.openMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processhearingrecordingrequest.ProcessHearingRecordingRequestAboutToStartHandlerTest.HEARING;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processhearingrecordingrequest.ProcessHearingRecordingRequestAboutToStartHandlerTest.recording;
+
+import java.util.ArrayList;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -13,17 +23,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
 import uk.gov.hmcts.reform.sscs.service.processhearingrecordingrequest.ProcessHearingRecordingRequestService;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertFalse;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processhearingrecordingrequest.ProcessHearingRecordingRequestAboutToStartHandlerTest.HEARING;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processhearingrecordingrequest.ProcessHearingRecordingRequestAboutToStartHandlerTest.recording;
 
 @RunWith(JUnitParamsRunner.class)
 public class ProcessHearingRecordingRequestMidEventHandlerTest {

@@ -9,20 +9,14 @@ import static uk.gov.hmcts.reform.sscs.model.RequestStatus.REFUSED;
 import static uk.gov.hmcts.reform.sscs.model.RequestStatus.REQUESTED;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRecordingRequest;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRecordingRequestDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecording;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecordingCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecordingDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.model.RequestStatus;
 
@@ -90,6 +84,36 @@ public class ProcessHearingRecordingRequestServiceTest {
                 .hearings(newArrayList(HEARING)).build();
         final Optional<RequestStatus> requestStatus = service.getRequestStatus(party, HEARING, sscsCaseData);
         assertThat(requestStatus, is(Optional.of(REFUSED)));
+    }
+
+    @Test
+    @Parameters({
+            "APPELLANT, GRANTED", "APPELLANT, REFUSED", "APPELLANT, REQUESTED",
+            "DWP, GRANTED",  "DWP, REFUSED", "DWP, REQUESTED",
+            "JOINT_PARTY, GRANTED", "JOINT_PARTY, REFUSED", "JOINT_PARTY, REQUESTED"})
+    public void getChangedRequestStatus(PartyItemList party, RequestStatus status) {
+        final Optional<RequestStatus> changedRequestStatus = service.getChangedRequestStatus(party, processHearingRecordingRequests(status));
+        assertThat(changedRequestStatus.isPresent(), is(true));
+        assertThat(changedRequestStatus.get(), is(status));
+    }
+
+    private ProcessHearingRecordingRequest processHearingRecordingRequests(RequestStatus status) {
+        return ProcessHearingRecordingRequest.builder()
+                .value(ProcessHearingRecordingRequestDetails.builder()
+                        .hearingId(HEARING.getValue().getHearingId())
+                        .jointParty(dynamicList(status))
+                        .dwp(dynamicList(status))
+                        .appellant(dynamicList(status))
+                        .jointParty(dynamicList(status))
+                        .build())
+                .build();
+    }
+
+    private DynamicList dynamicList(RequestStatus value) {
+        return new DynamicList(new DynamicListItem(value.getLabel(), value.getLabel()),
+                List.of(GRANTED, REQUESTED, REFUSED).stream()
+                        .map(status -> new DynamicListItem(status.getLabel(), status.getLabel()))
+                        .collect(Collectors.toList()));
     }
 
     private HearingRecordingRequest getHearingRecordingRequest(PartyItemList party, RequestStatus status) {
