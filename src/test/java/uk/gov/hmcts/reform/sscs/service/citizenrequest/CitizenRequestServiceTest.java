@@ -511,7 +511,6 @@ public class CitizenRequestServiceTest {
         assertThat(response, is(true));
         assertThat(caseData.getSscsHearingRecordingCaseData().getRequestedHearings().size(), is(1));
         HearingRecordingRequest hearingRecordingRequest = caseData.getSscsHearingRecordingCaseData().getRequestedHearings().get(0);
-        assertThat(hearingRecordingRequest.getValue().getStatus(), is("Requested"));
         assertThat(hearingRecordingRequest.getValue().getRequestingParty(), is(PartyItemList.JOINT_PARTY.getCode()));
         assertThat(hearingRecordingRequest.getValue().getDateRequested(), is(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))));
         assertThat(hearingRecordingRequest.getValue().getSscsHearingRecordingList().size(), is(1));

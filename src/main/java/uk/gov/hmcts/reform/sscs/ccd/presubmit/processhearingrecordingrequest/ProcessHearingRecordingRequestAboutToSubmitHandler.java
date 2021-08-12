@@ -1,14 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.processhearingrecordingrequest;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.mutableEmptyListIfNull;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -41,73 +42,134 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
         }
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        final SscsHearingRecordingCaseData sscsHearingRecordingCaseData =
+        SscsHearingRecordingCaseData sscsHearingRecordingCaseData =
                 sscsCaseData.getSscsHearingRecordingCaseData();
-        final List<HearingRecordingRequest> unprocessedHearingRecordingsRequests =
-                Optional.ofNullable(sscsHearingRecordingCaseData.getRequestedHearings())
-                        .orElse(Collections.emptyList());
 
-        List<HearingRecordingRequest> allHearingRecordingsRequests = Stream.of(unprocessedHearingRecordingsRequests,
-                        Optional.ofNullable(sscsHearingRecordingCaseData.getDwpReleasedHearings())
-                                .orElse(Collections.emptyList()),
-                        Optional.ofNullable(sscsHearingRecordingCaseData.getCitizenReleasedHearings())
-                                .orElse(Collections.emptyList()),
-                        Optional.ofNullable(sscsHearingRecordingCaseData.getRefusedHearings())
-                                .orElse(Collections.emptyList()))
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+        sscsHearingRecordingCaseData.getProcessHearingRecordingRequests().stream()
+                .forEach(processHearingRecordingRequest -> {
+                    processHearingRecordings(sscsCaseData,
+                            processHearingRecordingRequest, PartyItemList.DWP);
+                    processHearingRecordings(sscsCaseData,
+                            processHearingRecordingRequest, PartyItemList.APPELLANT);
+                    processHearingRecordings(sscsCaseData,
+                            processHearingRecordingRequest, PartyItemList.JOINT_PARTY);
+                });
 
-        processGrantedRequests(sscsCaseData, allHearingRecordingsRequests);
-        processRefusedRequests(sscsCaseData, allHearingRecordingsRequests);
-
-        if (unprocessedHearingRecordingsRequests.isEmpty()) {
+        if (mutableEmptyListIfNull(sscsHearingRecordingCaseData.getRequestedHearings()).isEmpty()) {
             sscsHearingRecordingCaseData.setHearingRecordingRequestOutstanding(YesNo.NO);
         }
+
+        sscsHearingRecordingCaseData.setProcessHearingRecordingRequests(Collections.emptyList());
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    private void processRefusedRequests(SscsCaseData sscsCaseData,
-                                        List<HearingRecordingRequest> allHearingRecordingsRequests) {
+    private void processHearingRecordings(SscsCaseData sscsCaseData,
+                                          ProcessHearingRecordingRequest processHearingRecordingRequest,
+                                          PartyItemList partyItemList) {
 
-        final SscsHearingRecordingCaseData sscsHearingRecordingCaseData = sscsCaseData.getSscsHearingRecordingCaseData();
-        final List<HearingRecordingRequest> refusedHearingRecordingRequests =
-                allHearingRecordingsRequests.stream()
-                        .filter(req -> req.getValue().getStatus().equals(RequestStatus.REFUSED.getValue()))
-                        .collect(Collectors.toList());
 
-        sscsHearingRecordingCaseData.getRefusedHearings().addAll(refusedHearingRecordingRequests);
-        sscsHearingRecordingCaseData.getRequestedHearings().removeAll(refusedHearingRecordingRequests);
+        SscsHearingRecordingCaseData sscsHearingRecordingCaseData =
+                sscsCaseData.getSscsHearingRecordingCaseData();
+        ProcessHearingRecordingRequestDetails processHearingRecordingRequestValue =
+                processHearingRecordingRequest.getValue();
 
-        if (refusedHearingRecordingRequests.stream().filter(req -> req.getValue().getRequestingParty()
-                .equals(PartyItemList.DWP.getCode())).findAny().isPresent()) {
+        String status = null;
+        switch (partyItemList) {
+            case DWP:
+                DynamicList dwpRequestStatus = processHearingRecordingRequestValue.getDwp();
+                if (dwpRequestStatus != null) {
+                    status = dwpRequestStatus.getValue().getCode();
+                    break;
+                } else {
+                    return;
+                }
+            case APPELLANT:
+                DynamicList appellantRequestStatus = processHearingRecordingRequestValue.getDwp();
+                if (appellantRequestStatus != null) {
+                    status = appellantRequestStatus.getValue().getCode();
+                    break;
+                } else {
+                    return;
+                }
+            case JOINT_PARTY:
+                DynamicList jointPartyStatus = processHearingRecordingRequestValue.getDwp();
+                if (jointPartyStatus != null) {
+                    status = jointPartyStatus.getValue().getCode();
+                    break;
+                } else {
+                    return;
+                }
+            default:
+        }
 
-            sscsHearingRecordingCaseData.getDwpReleasedHearings().removeAll(refusedHearingRecordingRequests);
-            sscsCaseData.setDwpState(DwpState.HEARING_RECORDING_REFUSED.getLabel());
-        } else {
-            sscsHearingRecordingCaseData.getCitizenReleasedHearings().removeAll(refusedHearingRecordingRequests);
+        organiseHearingRequestsLists(sscsCaseData, partyItemList, sscsHearingRecordingCaseData
+                , processHearingRecordingRequestValue, status);
+    }
+
+    private void organiseHearingRequestsLists(SscsCaseData sscsCaseData, PartyItemList partyItemList,
+                                              SscsHearingRecordingCaseData sscsHearingRecordingCaseData,
+                                              ProcessHearingRecordingRequestDetails processHearingRecordingRequestValue,
+                                              String status) {
+
+        List<HearingRecordingRequest> dwpReleasedHearings =
+                mutableEmptyListIfNull(sscsHearingRecordingCaseData.getDwpReleasedHearings());
+        List<HearingRecordingRequest> citizenReleasedHearings =
+                mutableEmptyListIfNull(sscsHearingRecordingCaseData.getCitizenReleasedHearings());
+        List<HearingRecordingRequest> refusedHearings =
+                mutableEmptyListIfNull(sscsHearingRecordingCaseData.getRefusedHearings());
+        List<HearingRecordingRequest> requestedHearings =
+                mutableEmptyListIfNull(sscsHearingRecordingCaseData.getRequestedHearings());
+
+        Set<HearingRecordingRequest> allHearingRecordingsRequests = Stream
+                .of(requestedHearings, dwpReleasedHearings, citizenReleasedHearings, refusedHearings)
+                .flatMap(Collection::stream).collect(Collectors.toSet());
+
+        if (StringUtils.isNotBlank(status) && !status.equals(RequestStatus.REQUESTED)) {
+
+            Set<HearingRecordingRequest> partyHearingRecordingsRequests = allHearingRecordingsRequests.stream()
+                    .filter(isFromRequestingParty(partyItemList))
+                    .filter(hasHearingId(processHearingRecordingRequestValue.getHearingId()))
+                    .collect(Collectors.toSet());
+
+            if (status.equals(RequestStatus.GRANTED.getValue())) {
+                if (partyItemList.equals(PartyItemList.DWP)) {
+                    dwpReleasedHearings.addAll(partyHearingRecordingsRequests);
+                    sscsCaseData.setDwpState(DwpState.HEARING_RECORDING_PROCESSED.getLabel());
+                } else {
+                    citizenReleasedHearings.addAll(partyHearingRecordingsRequests);
+                }
+                refusedHearings.removeAll(partyHearingRecordingsRequests);
+                requestedHearings.removeAll(partyHearingRecordingsRequests);
+            } else if (status.equals(RequestStatus.REFUSED.getValue())) {
+                if (partyItemList.equals(PartyItemList.DWP)) {
+                    dwpReleasedHearings.removeAll(partyHearingRecordingsRequests);
+                    sscsCaseData.setDwpState(DwpState.HEARING_RECORDING_PROCESSED.getLabel());
+                } else {
+                    citizenReleasedHearings.removeAll(partyHearingRecordingsRequests);
+                }
+                refusedHearings.addAll(partyHearingRecordingsRequests);
+                requestedHearings.removeAll(partyHearingRecordingsRequests);
+            }
+
+            sscsHearingRecordingCaseData.setDwpReleasedHearings(dwpReleasedHearings);
+            sscsHearingRecordingCaseData.setCitizenReleasedHearings(citizenReleasedHearings);
+            sscsHearingRecordingCaseData.setRequestedHearings(requestedHearings);
+            sscsHearingRecordingCaseData.setRefusedHearings(refusedHearings);
         }
     }
 
-    private void processGrantedRequests(SscsCaseData sscsCaseData,
-                                        List<HearingRecordingRequest> allHearingRecordingsRequests) {
+    @NotNull
+    private Predicate<HearingRecordingRequest> isFromRequestingParty(PartyItemList party) {
+        return recordingRequest -> recordingRequest.getValue().getRequestingParty().equals(party.getCode());
+    }
 
-        final SscsHearingRecordingCaseData sscsHearingRecordingCaseData = sscsCaseData.getSscsHearingRecordingCaseData();
-        final List<HearingRecordingRequest> refusedHearingRecordingRequests =
-                allHearingRecordingsRequests.stream()
-                        .filter(req -> req.getValue().getStatus().equals(RequestStatus.GRANTED.getValue()))
-                        .collect(Collectors.toList());
-
-        sscsHearingRecordingCaseData.getRefusedHearings().removeAll(refusedHearingRecordingRequests);
-        sscsHearingRecordingCaseData.getRequestedHearings().removeAll(refusedHearingRecordingRequests);
-
-        if (refusedHearingRecordingRequests.stream().filter(req -> req.getValue().getRequestingParty()
-                .equals(PartyItemList.DWP.getCode())).findAny().isPresent()) {
-
-            sscsHearingRecordingCaseData.getDwpReleasedHearings().addAll(refusedHearingRecordingRequests);
-            sscsCaseData.setDwpState(DwpState.HEARING_RECORDING_RELEASED.getLabel());
-        } else {
-            sscsHearingRecordingCaseData.getCitizenReleasedHearings().addAll(refusedHearingRecordingRequests);
-        }
+    @NotNull
+    private Predicate<HearingRecordingRequest> hasHearingId(String hearingId) {
+        return recordingRequest ->
+                recordingRequest.getValue().getSscsHearingRecordingList().stream()
+                        .filter(hearing -> hearing.getValue().getHearingId()
+                                .equals(hearingId))
+                        .findAny().isPresent();
     }
 }

@@ -43,5 +43,8 @@ public class SscsUtil {
         return listOptions;
     }
 
+    public static <T> List<T> mutableEmptyListIfNull(List<T> list) {
+        return list == null ? new ArrayList<T>() : list;
+    }
 
 }

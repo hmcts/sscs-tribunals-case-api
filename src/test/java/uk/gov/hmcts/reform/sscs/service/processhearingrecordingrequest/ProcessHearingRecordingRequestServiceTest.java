@@ -124,7 +124,6 @@ public class ProcessHearingRecordingRequestServiceTest {
         return HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
                 .dateRequested(LocalDate.now().toString())
                 .sscsHearingRecordingList(newArrayList(sscsHearingRecording))
-                .status(status.name())
                 .requestingParty(party.getCode()).build()).build();
     }
 
