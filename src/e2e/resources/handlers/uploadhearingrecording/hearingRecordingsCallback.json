@@ -257,7 +257,8 @@
           }
         }
       ],
-      "selectHearingDetails": {
+      "selectHearingDetails":
+      {
         "value": {
           "code": "33445566",
           "label": "Prudential House 23:00:00 06 Jun 2021"
@@ -297,7 +298,7 @@
             }
           }
         ],
-        "hearingType": "adjourned"
+        "hearingType": "final"
       },
       "sscsHearingRecordings": [
         {
@@ -334,6 +335,7 @@
             ],
             "hearingType": "adjourned",
             "hearingDate": "06-06-2021 10:00:20 PM",
+            "hearingId": "33445566",
             "uploadDate": "today"
           }
         }

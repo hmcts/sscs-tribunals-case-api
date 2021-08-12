@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadhearingrecording;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadhearingrecording.HearingTypeForRecording.ADJOURNED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadhearingrecording.HearingTypeForRecording.FINAL;
 
 import java.util.ArrayList;
@@ -25,14 +24,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRecording;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRecordingDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
@@ -147,6 +139,7 @@ public class UploadHearingRecordingMidEventHandlerTest {
         ResponseEntity<Resource> resource = ResponseEntity.ok(new ByteArrayResource("test".getBytes()));
         when(documentDownloadService.downloadFile(any())).thenReturn(resource);
         when(documentDownloadService.getFileSize(any())).thenReturn(Long.valueOf(501 * 1024 * 1024));
+        when(callback.getPageId()).thenReturn("addRecording");
         final PreSubmitCallbackResponse<SscsCaseData>
                 response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
@@ -170,7 +163,7 @@ public class UploadHearingRecordingMidEventHandlerTest {
         ResponseEntity<Resource> resource = ResponseEntity.ok(new ByteArrayResource("test".getBytes()));
         when(documentDownloadService.downloadFile(any())).thenReturn(resource);
         sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecording(recording);
-
+        when(callback.getPageId()).thenReturn("addRecording");
         final PreSubmitCallbackResponse<SscsCaseData>
                 response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
@@ -187,6 +180,44 @@ public class UploadHearingRecordingMidEventHandlerTest {
         assertTrue(handler.isInvalidFile("test.MP33"));
         assertTrue(handler.isInvalidFile("test.pdf"));
         assertTrue(handler.isInvalidFile("testmp4"));
+    }
+
+    @Test
+    public void givenHearingRecordingExistForSelectedHearingId_thenReturnExistingRecordings() {
+        SscsHearingRecording recording = SscsHearingRecording.builder()
+                .value(SscsHearingRecordingDetails.builder()
+                        .hearingId("2222")
+                        .build())
+                .build();
+
+        sscsCaseData.setSscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder()
+                .selectHearingDetails(new DynamicList(
+                        new DynamicListItem("2222", "good - value 17:00:00 06 Jun 2021"), Collections.EMPTY_LIST))
+                .sscsHearingRecordings(List.of(recording))
+                .build());
+
+        when(callback.getPageId()).thenReturn("selectHearing");
+        final PreSubmitCallbackResponse<SscsCaseData>
+                response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response.getData().getSscsHearingRecordingCaseData().getExistingHearingRecordings());
+        assertEquals("2222", response.getData().getSscsHearingRecordingCaseData().getExistingHearingRecordings().getHearingId());
+        assertEquals("Yes", response.getData().getSscsHearingRecordingCaseData().getHearingRecordingExist().getValue());
+    }
+
+    @Test
+    public void givenHearingRecordingDoesntExistForSelectedHearingId_thenReturnNullExistingRecordings() {
+        sscsCaseData.setSscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder()
+                .selectHearingDetails(new DynamicList(
+                        new DynamicListItem("2222", "good - value 17:00:00 06 Jun 2021"), Collections.EMPTY_LIST))
+                .build());
+
+        when(callback.getPageId()).thenReturn("selectHearing");
+        final PreSubmitCallbackResponse<SscsCaseData>
+                response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getSscsHearingRecordingCaseData().getExistingHearingRecordings());
+        assertNotEquals("Yes", response.getData().getSscsHearingRecordingCaseData().getHearingRecordingExist());
     }
 
     private void assertNoErrors() {

@@ -33,28 +33,24 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest extends BaseHandler 
             .statusCode(HttpStatus.SC_OK)
             .rootPath("data")
 
-            .assertThat().body("sscsHearingRecordings[0].value.hearingType", equalTo("adjourned"))
+            .assertThat().body("sscsHearingRecordings[0].value.hearingType", equalTo("final"))
             .assertThat().body("sscsHearingRecordings[0].value.hearingDate", equalTo("06-06-2021 10:00:20 PM"))
             .assertThat().body("sscsHearingRecordings[0].value", hasKey("uploadDate"))
 
-            .assertThat().body("sscsHearingRecordings[1].value.hearingType", equalTo("adjourned"))
-            .assertThat().body("sscsHearingRecordings[1].value.hearingDate", equalTo("06-06-2021 11:00:00 PM"))
-            .assertThat().body("sscsHearingRecordings[1].value", hasKey("uploadDate"))
+            .assertThat().body("sscsHearingRecordings[0].value.recordings[0].value.document_filename",
+            equalTo("Final Prudential House 06 Jun 2021.MP4"))
+            .assertThat().body("sscsHearingRecordings[0].value.recordings[0].value", hasKey(("document_url")))
+            .assertThat().body("sscsHearingRecordings[0].value.recordings[0].value", hasKey(("document_binary_url")))
 
-            .assertThat().body("sscsHearingRecordings[1].value.recordings[0].value.document_filename",
-            equalTo("Adjourned Prudential House 06 Jun 2021.MP4"))
-            .assertThat().body("sscsHearingRecordings[1].value.recordings[0].value", hasKey(("document_url")))
-            .assertThat().body("sscsHearingRecordings[1].value.recordings[0].value", hasKey(("document_binary_url")))
+            .assertThat().body("sscsHearingRecordings[0].value.recordings[1].value.document_filename",
+            equalTo("Final Prudential House 06 Jun 2021 (2).mp4"))
+            .assertThat().body("sscsHearingRecordings[0].value.recordings[1].value", hasKey(("document_url")))
+            .assertThat().body("sscsHearingRecordings[0].value.recordings[1].value", hasKey(("document_binary_url")))
 
-            .assertThat().body("sscsHearingRecordings[1].value.recordings[1].value.document_filename",
-            equalTo("Adjourned Prudential House 06 Jun 2021 (2).mp4"))
-            .assertThat().body("sscsHearingRecordings[1].value.recordings[1].value", hasKey(("document_url")))
-            .assertThat().body("sscsHearingRecordings[1].value.recordings[1].value", hasKey(("document_binary_url")))
-
-            .assertThat().body("sscsHearingRecordings[1].value.recordings[2].value.document_filename",
-            equalTo("Adjourned Prudential House 06 Jun 2021 (3).mp3"))
-            .assertThat().body("sscsHearingRecordings[1].value.recordings[2].value", hasKey(("document_url")))
-            .assertThat().body("sscsHearingRecordings[1].value.recordings[2].value", hasKey(("document_binary_url")));
+            .assertThat().body("sscsHearingRecordings[0].value.recordings[2].value.document_filename",
+            equalTo("Final Prudential House 06 Jun 2021 (3).mp3"))
+            .assertThat().body("sscsHearingRecordings[0].value.recordings[2].value", hasKey(("document_url")))
+            .assertThat().body("sscsHearingRecordings[0].value.recordings[2].value", hasKey(("document_binary_url")));
 
     }
 }
