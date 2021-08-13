@@ -117,8 +117,8 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
     }
 
     private void clearTransientFields(SscsCaseData sscsCaseData) {
-//        sscsCaseData.getSscsHearingRecordingCaseData().setExistingHearingRecordings(null);
-//        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingExist(null);
+        sscsCaseData.getSscsHearingRecordingCaseData().setExistingHearingRecordings(null);
+        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingExist(null);
     }
 
     protected SscsHearingRecording createSscsHearingRecording(String hearingDate, String type, String hearingId, String venueName) {
