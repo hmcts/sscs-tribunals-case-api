@@ -315,6 +315,9 @@ dependencyManagement {
             entry 'commons-compress'
         }
 
+        //CVE-2021-28170
+        dependency group: 'org.glassfish', name: 'jakarta.el', version: '4.0.1'
+
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
         }
