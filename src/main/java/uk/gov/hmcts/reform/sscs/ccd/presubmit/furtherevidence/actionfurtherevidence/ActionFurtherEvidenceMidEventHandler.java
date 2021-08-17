@@ -19,10 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -63,7 +62,28 @@ public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHa
         buildSscsDocumentFromScan(sscsCaseData, caseDetails.getId(), callback.isIgnoreWarnings(),
             preSubmitCallbackResponse);
 
+        if (showPostponementDetailsPage(preSubmitCallbackResponse)) {
+            sscsCaseData.setShowPostponementDetailsPage(YesNo.YES);
+        }
+
         return preSubmitCallbackResponse;
+    }
+
+    private boolean showPostponementDetailsPage(PreSubmitCallbackResponse<SscsCaseData> callbackResponse) {
+
+        long requestHearingCount = getNumberOfPostponementRequests(callbackResponse.getData().getScannedDocuments());
+
+        if (requestHearingCount > 1) {
+            callbackResponse.addError("Only one request for postponement can be submitted at a time");
+        }
+
+        return requestHearingCount == 1;
+    }
+
+    private long getNumberOfPostponementRequests(List<ScannedDocument> scannedDocuments) {
+        return emptyIfNull(scannedDocuments).stream()
+                .filter(doc -> doc.getValue().getType().equals(DocumentType.POSTPONEMENT_REQUEST.getValue()))
+                .count();
     }
 
     private void buildSscsDocumentFromScan(SscsCaseData sscsCaseData, long caseId, Boolean ignoreWarnings,
