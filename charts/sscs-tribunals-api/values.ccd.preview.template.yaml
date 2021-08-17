@@ -22,6 +22,7 @@ java:
     CORE_CASE_DATA_CASE_TYPE_ID: Benefit
     TEST_URL: http://${SERVICE_FQDN}
     CREATE_CCD_ENDPOINT: true
+    DUMMY: true
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
