@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -128,6 +131,30 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
         assertFalse(actionFurtherEvidenceAboutToSubmitHandler.canHandle(ABOUT_TO_SUBMIT, callback));
+    }
+
+    @Test
+    public void givenAPostponementRequestWithoutDetails_thenAddAnError() {
+        List<ScannedDocument> docs = new ArrayList<>();
+        when(caseDetails.getState()).thenReturn(State.HEARING);
+        sscsCaseData.getFurtherEvidenceAction().setValue(
+                new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
+                        FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getLabel()));
+
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+                .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
+                        .fileName("Testing.jpg").url(DocumentLink.builder()
+                                .documentUrl("test.com").build()).build()).build();
+
+        docs.add(scannedDocument);
+
+        sscsCaseData.setScannedDocuments(docs);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors(), is(not(empty())));
+        assertThat(response.getErrors().iterator().next(),
+                is(ActionFurtherEvidenceAboutToSubmitHandler.POSTPONEMENT_DETAILS_IS_MANDATORY));
     }
 
     @Test
