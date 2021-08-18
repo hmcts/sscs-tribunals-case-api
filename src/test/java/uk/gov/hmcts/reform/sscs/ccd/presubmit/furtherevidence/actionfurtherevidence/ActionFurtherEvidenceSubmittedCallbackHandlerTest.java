@@ -88,16 +88,15 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
                 ACTION_FURTHER_EVIDENCE, false);
 
         return new Object[]{
-                new Object[]{SUBMITTED, callbackWithValidEventAndInformationReceivedForInterlocTcwOption, true},
-                new Object[]{SUBMITTED, callbackWithValidEventAndInformationReceivedForInterlocJudgeOption, true},
-                new Object[]{SUBMITTED, callbackWithValidEventAndIssueFurtherEvidenceOption, true},
-                new Object[]{ABOUT_TO_SUBMIT, callbackWithValidEventAndInformationReceivedForInterlocTcwOption, false},
-                new Object[]{SUBMITTED, callbackWithValidEventAndOtherDocumentManual, true},
-                new Object[]{SUBMITTED, callbackWithWrongEventAndValidOption, false},
-                new Object[]{SUBMITTED, callbackWithRightEventAndNullField, false},
-                new Object[]{SUBMITTED, callbackWithValidEventAndSendToInterlocReviewByJudgeOption, true},
-                new Object[]{SUBMITTED, callbackWithValidEventAndSendToInterlocReviewByTcwOption, true}
-        };
+            new Object[]{SUBMITTED, callbackWithValidEventAndInformationReceivedForInterlocTcwOption, true},
+            new Object[]{SUBMITTED, callbackWithValidEventAndInformationReceivedForInterlocJudgeOption, true},
+            new Object[]{SUBMITTED, callbackWithValidEventAndIssueFurtherEvidenceOption, true},
+            new Object[]{ABOUT_TO_SUBMIT, callbackWithValidEventAndInformationReceivedForInterlocTcwOption, false},
+            new Object[]{SUBMITTED, callbackWithValidEventAndOtherDocumentManual, true},
+            new Object[]{SUBMITTED, callbackWithWrongEventAndValidOption, false},
+            new Object[]{SUBMITTED, callbackWithRightEventAndNullField, false},
+            new Object[]{SUBMITTED, callbackWithValidEventAndSendToInterlocReviewByJudgeOption, true},
+            new Object[]{SUBMITTED, callbackWithValidEventAndSendToInterlocReviewByTcwOption, true}};
     }
 
     private Callback<SscsCaseData> buildCallback(String dynamicListItemCode, EventType eventType) {
@@ -243,8 +242,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
                         eq("Actioned manually"), any(IdamTokens.class));
     }
 
-
-    public void givenFurtherEvidenceActionSelectedOption_shouldTriggerEventAndUpdateCaseCorrectly() {
+    @Test
+    public void givenFurtherEvidenceActionPostponementRequest_shouldTriggerEventAndUpdateCaseCorrectly() {
 
         String eventType = "validSendToInterloc";
 
@@ -270,7 +269,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         then(ccdService).should(times(1))
                 .updateCase(eq(callback.getCaseDetails().getCaseData()), eq(123L), eq(eventType),
-                        ActionFurtherEvidenceSubmittedCallbackHandler.TCW_REVIEW_POSTPONEMENT_REQUEST,
+                        eq(ActionFurtherEvidenceSubmittedCallbackHandler.TCW_REVIEW_POSTPONEMENT_REQUEST),
                         anyString(), any(IdamTokens.class));
     }
 }
