@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_REQUEST;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 
