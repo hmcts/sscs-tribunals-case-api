@@ -105,10 +105,10 @@ public class ProcessHearingRecordingRequestAboutToStartHandlerTest {
         assertThat(processHearingRecordingRequest.getHearingTitle(), is("Hearing 1"));
         assertThat(processHearingRecordingRequest.getHearingInformation(), is("Venue 1 12:00:00 18 May 2021"));
         assertThat(processHearingRecordingRequest.getRecordings().size(), is(1));
-        assertThat(processHearingRecordingRequest.getAppellant().getValue().getCode(), is("-"));
+        assertThat(processHearingRecordingRequest.getAppellant().getValue().getCode(), is(""));
         assertThat(processHearingRecordingRequest.getAppellant().getListItems().stream().map(DynamicListItem::getCode).collect(Collectors.toList()), is(List.of("Granted", "Refused")));
-        assertThat(processHearingRecordingRequest.getDwp().getValue().getCode(), is("-"));
-        assertThat(processHearingRecordingRequest.getJointParty().getValue().getCode(), is("-"));
+        assertThat(processHearingRecordingRequest.getDwp().getValue().getCode(), is(""));
+        assertThat(processHearingRecordingRequest.getJointParty().getValue().getCode(), is(""));
     }
 
     @Test
