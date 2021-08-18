@@ -13,6 +13,7 @@ import javax.validation.Validator;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
+import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,7 +38,11 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetailsBefore;
 
-    protected static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+    protected static Validator validator = Validation.byDefaultProvider()
+            .configure()
+            .messageInterpolator(new ParameterMessageInterpolator())
+            .buildValidatorFactory()
+            .getValidator();
 
     private SscsCaseData sscsCaseData;
     private SscsCaseData sscsCaseDataBefore;

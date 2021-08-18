@@ -13,6 +13,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +42,11 @@ public class ElementsDisputedMidEventValidationHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    protected static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+    protected static Validator validator = Validation.byDefaultProvider()
+            .configure()
+            .messageInterpolator(new ParameterMessageInterpolator())
+            .buildValidatorFactory()
+            .getValidator();
 
     @Before
     public void setUp() throws IOException {
