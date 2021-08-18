@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.58
+version: 0.0.59
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
@@ -34,7 +34,7 @@ dependencies:
     repository: '@hmctspublic'
     condition: sscs-ccd-callback-orchestrator.enabled
   - name: ccd
-    version: 5.0.4
+    version: 5.0.6
     repository: '@hmctspublic'
     condition: ccd.enabled
     tags:
