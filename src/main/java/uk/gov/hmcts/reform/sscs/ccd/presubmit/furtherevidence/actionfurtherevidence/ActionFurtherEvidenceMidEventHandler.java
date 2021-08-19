@@ -32,7 +32,7 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 @Slf4j
 public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    public static final String POSTPONEMENTS_REVIEWED_BY_TCW = "Postponements requests need to be reviewed by TCW";
+    public static final String POSTPONEMENTS_REVIEWED_BY_TCW = "Postponement requests need to be reviewed by TCW";
     public static final String POSTPONEMENT_IN_HEARING_STATE = "You can only submit a postponement request on cases in 'hearing' state";
     public static final String ONLY_ONE_POSTPONEMENT_AT_A_TIME = "Only one request for postponement can be submitted at a time";
     private final FooterService footerService;
