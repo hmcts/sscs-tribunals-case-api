@@ -84,8 +84,9 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
                 } else {
                     return;
                 }
+                //TODO:Add unit tests for this, should be part of SSCS-9239
             case APPELLANT:
-                DynamicList appellantRequestStatus = processHearingRecordingRequestValue.getDwp();
+                DynamicList appellantRequestStatus = processHearingRecordingRequestValue.getAppellant();
                 if (appellantRequestStatus != null) {
                     status = appellantRequestStatus.getValue().getCode();
                     break;
@@ -93,7 +94,7 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
                     return;
                 }
             case JOINT_PARTY:
-                DynamicList jointPartyStatus = processHearingRecordingRequestValue.getDwp();
+                DynamicList jointPartyStatus = processHearingRecordingRequestValue.getJointParty();
                 if (jointPartyStatus != null) {
                     status = jointPartyStatus.getValue().getCode();
                     break;
@@ -103,8 +104,8 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
             default:
         }
 
-        organiseHearingRequestsLists(sscsCaseData, partyItemList, sscsHearingRecordingCaseData
-                , processHearingRecordingRequestValue, status);
+        organiseHearingRequestsLists(sscsCaseData, partyItemList, sscsHearingRecordingCaseData,
+                processHearingRecordingRequestValue, status);
     }
 
     private void organiseHearingRequestsLists(SscsCaseData sscsCaseData, PartyItemList partyItemList,
@@ -135,7 +136,7 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
             if (status.equals(RequestStatus.GRANTED.getValue())) {
                 if (partyItemList.equals(PartyItemList.DWP)) {
                     dwpReleasedHearings.addAll(partyHearingRecordingsRequests);
-                    sscsCaseData.setDwpState(DwpState.HEARING_RECORDING_PROCESSED.getLabel());
+                    sscsCaseData.setDwpState(DwpState.HEARING_RECORDING_PROCESSED.getId());
                 } else {
                     citizenReleasedHearings.addAll(partyHearingRecordingsRequests);
                 }
@@ -144,7 +145,7 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
             } else if (status.equals(RequestStatus.REFUSED.getValue())) {
                 if (partyItemList.equals(PartyItemList.DWP)) {
                     dwpReleasedHearings.removeAll(partyHearingRecordingsRequests);
-                    sscsCaseData.setDwpState(DwpState.HEARING_RECORDING_PROCESSED.getLabel());
+                    sscsCaseData.setDwpState(DwpState.HEARING_RECORDING_PROCESSED.getId());
                 } else {
                     citizenReleasedHearings.removeAll(partyHearingRecordingsRequests);
                 }
