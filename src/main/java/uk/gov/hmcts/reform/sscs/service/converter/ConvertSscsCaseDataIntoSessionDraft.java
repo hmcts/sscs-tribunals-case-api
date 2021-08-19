@@ -428,7 +428,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
     private SessionDwpIssuingOfficeEsa buildDwpIssuingOfficeEsa(Appeal appeal) {
         if (mrnDatePresent(appeal)
             && StringUtils.isNotBlank(appeal.getMrnDetails().getDwpIssuingOffice())
-            && "ESA".equalsIgnoreCase(appeal.getBenefitType().getCode())) {
+            && !"PIP".equalsIgnoreCase(appeal.getBenefitType().getCode())) {
             return new SessionDwpIssuingOfficeEsa(appeal.getMrnDetails().getDwpIssuingOffice());
         }
         return null;
