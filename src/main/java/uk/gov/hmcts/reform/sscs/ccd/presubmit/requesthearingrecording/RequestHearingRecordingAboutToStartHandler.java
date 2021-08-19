@@ -110,10 +110,10 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
         return false;
     }
 
-    private void removeFromListAndAddText(SscsHearingRecording request, List<DynamicListItem> validHearings, StringBuilder stringBuilder) {
-        stringBuilder.append(request.getValue().getVenue() + " " + request.getValue().getHearingDate());
+    private void removeFromListAndAddText(SscsHearingRecordingDetails request, List<DynamicListItem> validHearings, StringBuilder stringBuilder) {
+        stringBuilder.append(request.getVenue() + " " + request.getHearingDate());
         stringBuilder.append(", ");
-        validHearings.stream().filter(i -> i.getCode().equals(request.getValue().getHearingId())).findFirst().ifPresent(validHearings::remove);
+        validHearings.stream().filter(i -> i.getCode().equals(request.getHearingId())).findFirst().ifPresent(validHearings::remove);
     }
 
     @NotNull

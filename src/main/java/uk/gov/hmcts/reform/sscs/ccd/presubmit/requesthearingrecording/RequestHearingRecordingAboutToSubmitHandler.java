@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -40,28 +41,31 @@ public class RequestHearingRecordingAboutToSubmitHandler implements PreSubmitCal
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
+
         DynamicListItem selectedRequestable = sscsCaseData.getSscsHearingRecordingCaseData().getRequestableHearingDetails().getValue();
         String hearingId = selectedRequestable.getCode();
 
-        SscsHearingRecording sscsHearingRecording = sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings()
-                .stream().filter(r -> r.getValue().getHearingId().equals(hearingId)).findFirst().orElse(null);
+        Optional<SscsHearingRecording> sscsHearingRecording = sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings()
+                .stream().filter(r -> r.getValue().getHearingId().equals(hearingId)).findFirst();
 
-        HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
-                .requestingParty(PartyItemList.DWP.getCode())
-                .dateRequested(LocalDateTime.now().format(DateTimeFormatter.ofPattern(UPLOAD_DATE_FORMATTER)))
-                .sscsHearingRecording(sscsHearingRecording).build()).build();
+        if (sscsHearingRecording.isPresent()) {
+            HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
+                    .requestingParty(PartyItemList.DWP.getCode())
+                    .dateRequested(LocalDateTime.now().format(DateTimeFormatter.ofPattern(UPLOAD_DATE_FORMATTER)))
+                    .sscsHearingRecording(sscsHearingRecording.get().getValue()).build()).build();
 
+            List<HearingRecordingRequest> hearingRecordingRequests = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();
+            if (hearingRecordingRequests == null) {
+                hearingRecordingRequests = new ArrayList<>();
+            }
+            hearingRecordingRequests.add(hearingRecordingRequest);
 
-        List<HearingRecordingRequest> hearingRecordingRequests = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();
-        if (hearingRecordingRequests == null) {
-            hearingRecordingRequests = new ArrayList<>();
+            sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(hearingRecordingRequests);
+            sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YesNo.YES);
+        } else {
+            response.addError("Hearing record not found");
         }
-        hearingRecordingRequests.add(hearingRecordingRequest);
-
-        sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(hearingRecordingRequests);
-        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YesNo.YES);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         return response;
     }

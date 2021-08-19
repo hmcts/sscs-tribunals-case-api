@@ -86,18 +86,17 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
         //Existing sscs hearing recording for the same hearing
         Optional<SscsHearingRecording> existingSscsHearingRecordings = selectSscsHearingRecording(sscsHearingRecordings, hearingId);
         if (existingSscsHearingRecordings.isPresent()) {
-            List<SscsHearingRecording> existingRecordingList = new ArrayList<>();
-            existingRecordingList.add(existingSscsHearingRecordings.get());
+            List<SscsHearingRecordingDetails> existingRecordingList = new ArrayList<>();
+            existingRecordingList.add(existingSscsHearingRecordings.get().getValue());
 
             //Collect request related sscs hearing recordings
             existingRecordingList.addAll(getRequestedSscsHearingRecordings(sscsCaseData.getSscsHearingRecordingCaseData(), hearingId));
 
             //Update existing sscs hearing recording data
-            for (SscsHearingRecording existing : existingRecordingList) {
-                SscsHearingRecordingDetails sscsHearingRecordingDetails = existing.getValue();
-                sscsHearingRecordingDetails.setHearingType(hearingType.getKey());
-                sscsHearingRecordingDetails.setUploadDate(LocalDateTime.now().format(RECORDING_DATE_FORMATTER).toUpperCase());
-                sscsHearingRecordingDetails.setRecordings(hearingRecordings);
+            for (SscsHearingRecordingDetails existing : existingRecordingList) {
+                existing.setHearingType(hearingType.getKey());
+                existing.setUploadDate(LocalDateTime.now().format(RECORDING_DATE_FORMATTER).toUpperCase());
+                existing.setRecordings(hearingRecordings);
             }
             response.addWarning("The hearing recording you have just uploaded will replace the existing hearing recording(s)");
         } else {
@@ -171,21 +170,22 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
     }
 
 
-    private List<SscsHearingRecording> getRequestedSscsHearingRecordings(SscsHearingRecordingCaseData sscsHearingRecordingCaseData,
+    private List<SscsHearingRecordingDetails> getRequestedSscsHearingRecordings(SscsHearingRecordingCaseData sscsHearingRecordingCaseData,
                                                                          String hearingId) {
-        List<SscsHearingRecording> requestedHearingRecordings = new ArrayList<>();
+        List<SscsHearingRecordingDetails> requestedHearingRecordings = new ArrayList<>();
 
-        requestedHearingRecordings.addAll(filterRequestedHearingRecordings(sscsHearingRecordingCaseData.getReleasedHearings(), hearingId));
+        requestedHearingRecordings.addAll(filterRequestedHearingRecordings(sscsHearingRecordingCaseData.getDwpReleasedHearings(), hearingId));
+        requestedHearingRecordings.addAll(filterRequestedHearingRecordings(sscsHearingRecordingCaseData.getCitizenReleasedHearings(), hearingId));
         requestedHearingRecordings.addAll(filterRequestedHearingRecordings(sscsHearingRecordingCaseData.getRequestedHearings(), hearingId));
 
         return requestedHearingRecordings;
     }
 
-    private List<SscsHearingRecording> filterRequestedHearingRecordings(List<HearingRecordingRequest> requests, String hearingId) {
+    private List<SscsHearingRecordingDetails> filterRequestedHearingRecordings(List<HearingRecordingRequest> requests, String hearingId) {
         if (requests != null) {
             return requests.stream()
                     .map(request -> request.getValue().getSscsHearingRecording())
-                    .filter(recording -> hearingId.equalsIgnoreCase(recording.getValue().getHearingId()))
+                    .filter(recording -> hearingId.equalsIgnoreCase(recording.getHearingId()))
                     .collect(Collectors.toList());
         }
         return List.of();

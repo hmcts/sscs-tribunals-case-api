@@ -62,24 +62,21 @@
           "dateRequested": "2021-07-01",
           "requestingParty": "appellant",
           "sscsHearingRecording": {
-            "id": "72474881-2ea7-40ee-b9e9-61881c0be144",
-            "value": {
-              "venue": "Town House",
-              "hearingId": "1334234325",
-              "recordings": [
-                {
-                  "id": "c6d533bc-f37f-493e-aa01-2cfb2fbb17db",
-                  "value": {
-                    "document_url": "http://dm-store:5005/documents/1432689d-fd1c-4d57-aaa3-52d4da030840",
-                    "document_filename": "Final Town House 16 Jun 2021.mp3",
-                    "document_binary_url": "http://dm-store:5005/documents/1432689d-fd1c-4d57-aaa3-52d4da030840/binary"
-                  }
+            "venue": "Town House",
+            "hearingId": "1334234325",
+            "recordings": [
+              {
+                "id": "c6d533bc-f37f-493e-aa01-2cfb2fbb17db",
+                "value": {
+                  "document_url": "http://dm-store:5005/documents/1432689d-fd1c-4d57-aaa3-52d4da030840",
+                  "document_filename": "Final Town House 16 Jun 2021.mp3",
+                  "document_binary_url": "http://dm-store:5005/documents/1432689d-fd1c-4d57-aaa3-52d4da030840/binary"
                 }
-              ],
-              "uploadDate": "30-06-2021 09:12:44 PM",
-              "hearingDate": "16-06-2021 01:30:00 PM",
-              "hearingType": "final"
-            }
+              }
+            ],
+            "uploadDate": "30-06-2021 09:12:44 PM",
+            "hearingDate": "16-06-2021 01:30:00 PM",
+            "hearingType": "final"
           }
         }
       }

@@ -76,14 +76,14 @@ public class CitizenRequestService {
             List<CitizenHearingRecording> releasedRecordings = CollectionUtils.isEmpty(releasedHearingRecordings) ? List.of() :
                     releasedHearingRecordings.stream()
                     .filter(request -> party.getCode().equals(request.getValue().getRequestingParty()))
-                    .map(request -> populateCitizenHearingRecordings(request.getValue().getSscsHearingRecording().getValue()))
+                    .map(request -> populateCitizenHearingRecordings(request.getValue().getSscsHearingRecording()))
                     .collect(Collectors.toList());
 
             List<HearingRecordingRequest> requestedHearingRecordings = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();
             List<CitizenHearingRecording> requestedRecordings = CollectionUtils.isEmpty(requestedHearingRecordings) ? List.of() :
                     requestedHearingRecordings.stream()
                     .filter(request -> party.getCode().equals(request.getValue().getRequestingParty()))
-                    .map(request -> populateCitizenHearingRecordings(request.getValue().getSscsHearingRecording().getValue()))
+                    .map(request -> populateCitizenHearingRecordings(request.getValue().getSscsHearingRecording()))
                     .collect(Collectors.toList());
 
             List<String> allRequestedHearingIds = Stream.of(releasedRecordings, requestedRecordings)
@@ -105,16 +105,18 @@ public class CitizenRequestService {
 
         List<HearingRecordingRequest> newHearingRequests = new ArrayList<>();
         for (String hearingId : hearingIds) {
-            SscsHearingRecording sscsHearingRecording = sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings()
-                    .stream().filter(r -> hearingId.equals(r.getValue().getHearingId())).findFirst().orElse(null);
+            Optional<SscsHearingRecording> sscsHearingRecording = sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings()
+                    .stream().filter(r -> hearingId.equals(r.getValue().getHearingId())).findFirst();
 
             PartyItemList party = workRequestedParty(sscsCaseData, idamEmail);
 
-            HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
-                    .requestingParty(party.getCode())
-                    .dateRequested(LocalDateTime.now().format(DateTimeFormatter.ofPattern(UPLOAD_DATE_FORMATTER)))
-                    .sscsHearingRecording(sscsHearingRecording).build()).build();
-            newHearingRequests.add(hearingRecordingRequest);
+            if (sscsHearingRecording.isPresent()) {
+                HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
+                        .requestingParty(party.getCode())
+                        .dateRequested(LocalDateTime.now().format(DateTimeFormatter.ofPattern(UPLOAD_DATE_FORMATTER)))
+                        .sscsHearingRecording(sscsHearingRecording.get().getValue()).build()).build();
+                newHearingRequests.add(hearingRecordingRequest);
+            }
         }
 
         List<HearingRecordingRequest> hearingRecordingRequests = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();

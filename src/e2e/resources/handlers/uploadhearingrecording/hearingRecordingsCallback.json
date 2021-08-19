@@ -307,22 +307,20 @@
             "status": "requested",
             "dateRequested": "2021-06-10T12:00:34.013",
             "sscsHearingRecording": {
-              "value" : {
-                "hearingType": "adjourned",
-                "hearingDate": "06-06-2021 10:00:20 PM",
-                "hearingId": "33445566",
-                "uploadDate": "today",
-                "venue" : "Prudential House",
-                "recordings": [
-                  {
-                    "value": {
-                      "document_url": "/some-url",
-                      "document_binary_url": "/some-url/binary",
-                      "document_filename": "Adjourned Parish House 06 Jun 2021.mp4"
-                    }
+              "hearingType": "adjourned",
+              "hearingDate": "06-06-2021 10:00:20 PM",
+              "hearingId": "33445566",
+              "uploadDate": "today",
+              "venue" : "Prudential House",
+              "recordings": [
+                {
+                  "value": {
+                    "document_url": "/some-url",
+                    "document_binary_url": "/some-url/binary",
+                    "document_filename": "Adjourned Parish House 06 Jun 2021.mp4"
                   }
-                ]
-              }
+                }
+              ]
             }
           }
         }

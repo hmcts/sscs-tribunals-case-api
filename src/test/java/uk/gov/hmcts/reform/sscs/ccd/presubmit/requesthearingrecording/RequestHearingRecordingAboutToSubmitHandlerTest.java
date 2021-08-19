@@ -75,7 +75,7 @@ public class RequestHearingRecordingAboutToSubmitHandlerTest {
 
         assertEquals(YesNo.YES, response.getData().getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding());
         assertEquals(1, response.getData().getSscsHearingRecordingCaseData().getRequestedHearings().size());
-        assertEquals("an_id1", response.getData().getSscsHearingRecordingCaseData().getRequestedHearings().get(0).getValue().getSscsHearingRecording().getValue().getHearingId());
+        assertEquals("an_id1", response.getData().getSscsHearingRecordingCaseData().getRequestedHearings().get(0).getValue().getSscsHearingRecording().getHearingId());
     }
 
     @Test
@@ -94,7 +94,7 @@ public class RequestHearingRecordingAboutToSubmitHandlerTest {
 
         assertEquals(YesNo.YES, response.getData().getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding());
         assertEquals(2, response.getData().getSscsHearingRecordingCaseData().getRequestedHearings().size());
-        assertEquals("an_id1", response.getData().getSscsHearingRecordingCaseData().getRequestedHearings().get(1).getValue().getSscsHearingRecording().getValue().getHearingId());
+        assertEquals("an_id1", response.getData().getSscsHearingRecordingCaseData().getRequestedHearings().get(1).getValue().getSscsHearingRecording().getHearingId());
     }
 
 

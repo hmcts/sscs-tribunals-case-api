@@ -194,15 +194,13 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
         List<HearingRecordingRequest> requested = new ArrayList<>();
         requested.add(HearingRecordingRequest.builder()
                 .value(HearingRecordingRequestDetails.builder()
-                        .sscsHearingRecording(SscsHearingRecording.builder()
-                                .value(SscsHearingRecordingDetails.builder()
-                                        .hearingType(ADJOURNED.getKey())
-                                        .uploadDate("today")
-                                        .hearingDate("06-06-2021 05:00:00 PM")
-                                        .hearingId("2222")
-                                        .venue("good - value")
-                                        .recordings(details).build())
-                                .build())
+                        .sscsHearingRecording(SscsHearingRecordingDetails.builder()
+                                .hearingType(ADJOURNED.getKey())
+                                .uploadDate("today")
+                                .hearingDate("06-06-2021 05:00:00 PM")
+                                .hearingId("2222")
+                                .venue("good - value")
+                                .recordings(details).build())
                         .build())
                 .build());
 
@@ -223,22 +221,22 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
-        SscsHearingRecording sscsHearingRecording =
+        SscsHearingRecordingDetails sscsHearingRecording =
                 response.getData().getSscsHearingRecordingCaseData().getRequestedHearings().get(0).getValue().getSscsHearingRecording();
 
-        assertEquals("adjourned", sscsHearingRecording.getValue().getHearingType());
-        assertEquals("06-06-2021 05:00:00 PM", sscsHearingRecording.getValue().getHearingDate());
-        assertEquals("good - value", sscsHearingRecording.getValue().getVenue());
-        assertEquals("2222", sscsHearingRecording.getValue().getHearingId());
-        assertNotNull(sscsHearingRecording.getValue().getUploadDate());
-        assertEquals(3, sscsHearingRecording.getValue().getRecordings().size());
+        assertEquals("adjourned", sscsHearingRecording.getHearingType());
+        assertEquals("06-06-2021 05:00:00 PM", sscsHearingRecording.getHearingDate());
+        assertEquals("good - value", sscsHearingRecording.getVenue());
+        assertEquals("2222", sscsHearingRecording.getHearingId());
+        assertNotNull(sscsHearingRecording.getUploadDate());
+        assertEquals(3, sscsHearingRecording.getRecordings().size());
 
         assertEquals("Adjourned good - value 06 Jun 2021.MP4",
-                sscsHearingRecording.getValue().getRecordings().get(0).getValue().getDocumentFilename());
+                sscsHearingRecording.getRecordings().get(0).getValue().getDocumentFilename());
         assertEquals("Adjourned good - value 06 Jun 2021 (2).mp3",
-                sscsHearingRecording.getValue().getRecordings().get(1).getValue().getDocumentFilename());
+                sscsHearingRecording.getRecordings().get(1).getValue().getDocumentFilename());
         assertEquals("Adjourned good - value 06 Jun 2021 (3).mp4",
-                sscsHearingRecording.getValue().getRecordings().get(2).getValue().getDocumentFilename());
+                sscsHearingRecording.getRecordings().get(2).getValue().getDocumentFilename());
     }
 
 
@@ -267,15 +265,13 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
         List<HearingRecordingRequest> released = new ArrayList<>();
         released.add(HearingRecordingRequest.builder()
                 .value(HearingRecordingRequestDetails.builder()
-                        .sscsHearingRecording(SscsHearingRecording.builder()
-                                .value(SscsHearingRecordingDetails.builder()
-                                        .hearingType(ADJOURNED.getKey())
-                                        .uploadDate("today")
-                                        .hearingDate("06-06-2021 05:00:00 PM")
-                                        .hearingId("2222")
-                                        .venue("good - value")
-                                        .recordings(details).build())
-                                .build())
+                        .sscsHearingRecording(SscsHearingRecordingDetails.builder()
+                                .hearingType(ADJOURNED.getKey())
+                                .uploadDate("today")
+                                .hearingDate("06-06-2021 05:00:00 PM")
+                                .hearingId("2222")
+                                .venue("good - value")
+                                .recordings(details).build())
                         .build())
                 .build());
 
@@ -296,22 +292,22 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
-        SscsHearingRecording sscsHearingRecording =
+        SscsHearingRecordingDetails sscsHearingRecording =
                 response.getData().getSscsHearingRecordingCaseData().getReleasedHearings().get(0).getValue().getSscsHearingRecording();
 
-        assertEquals("adjourned", sscsHearingRecording.getValue().getHearingType());
-        assertEquals("06-06-2021 05:00:00 PM", sscsHearingRecording.getValue().getHearingDate());
-        assertEquals("good - value", sscsHearingRecording.getValue().getVenue());
-        assertEquals("2222", sscsHearingRecording.getValue().getHearingId());
-        assertNotNull(sscsHearingRecording.getValue().getUploadDate());
-        assertEquals(3, sscsHearingRecording.getValue().getRecordings().size());
+        assertEquals("adjourned", sscsHearingRecording.getHearingType());
+        assertEquals("06-06-2021 05:00:00 PM", sscsHearingRecording.getHearingDate());
+        assertEquals("good - value", sscsHearingRecording.getVenue());
+        assertEquals("2222", sscsHearingRecording.getHearingId());
+        assertNotNull(sscsHearingRecording.getUploadDate());
+        assertEquals(3, sscsHearingRecording.getRecordings().size());
 
         assertEquals("Adjourned good - value 06 Jun 2021.MP4",
-                sscsHearingRecording.getValue().getRecordings().get(0).getValue().getDocumentFilename());
+                sscsHearingRecording.getRecordings().get(0).getValue().getDocumentFilename());
         assertEquals("Adjourned good - value 06 Jun 2021 (2).mp3",
-                sscsHearingRecording.getValue().getRecordings().get(1).getValue().getDocumentFilename());
+                sscsHearingRecording.getRecordings().get(1).getValue().getDocumentFilename());
         assertEquals("Adjourned good - value 06 Jun 2021 (3).mp4",
-                sscsHearingRecording.getValue().getRecordings().get(2).getValue().getDocumentFilename());
+                sscsHearingRecording.getRecordings().get(2).getValue().getDocumentFilename());
     }
 
     @Test
