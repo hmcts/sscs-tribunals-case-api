@@ -44,6 +44,6 @@ dependencies:
     repository: '@hmctspublic'
     condition: sscs-tribunals-frontend.enabled
   - name: redis
-    version: 14.8.8
+    version: 14.8.11
     repository: "https://charts.bitnami.com/bitnami"
     condition: redis.enabled
