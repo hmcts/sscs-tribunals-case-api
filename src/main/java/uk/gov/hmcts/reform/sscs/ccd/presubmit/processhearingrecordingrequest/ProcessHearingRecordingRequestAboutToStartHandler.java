@@ -97,7 +97,7 @@ public class ProcessHearingRecordingRequestAboutToStartHandler implements PreSub
         final Optional<RequestStatus> partyStatus = processHearingRecordingRequestService.getRequestStatus(party, h, sscsCaseData);
         final DynamicListItem selected = partyStatus
                 .map(this::toDynamicListItem)
-                .orElse(new DynamicListItem("-", "-"));
+                .orElse(new DynamicListItem("", ""));
 
         List<DynamicListItem> others = List.of(GRANTED, REFUSED, REQUESTED).stream()
                 .filter(status -> isPartyStatusRequestedOrOtherOptions(partyStatus, status))

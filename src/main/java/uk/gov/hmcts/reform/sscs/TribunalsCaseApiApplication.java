@@ -4,6 +4,7 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.validation.ValidatorFactory;
 import okhttp3.OkHttpClient;
+import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -65,7 +66,9 @@ public class TribunalsCaseApiApplication {
 
     @Bean
     ValidatorFactory validator() {
-        return new LocalValidatorFactoryBean();
+        final LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean();
+        localValidatorFactoryBean.setMessageInterpolator(new ParameterMessageInterpolator());
+        return localValidatorFactoryBean;
     }
 
     @Bean

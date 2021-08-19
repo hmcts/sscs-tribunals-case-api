@@ -34,7 +34,7 @@ import uk.gov.hmcts.reform.sscs.service.processhearingrecordingrequest.ProcessHe
 public class ProcessHearingRecordingRequestAboutToStartHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-    static final Hearing HEARING = getHearing();
+    static final Hearing HEARING = getHearing(1);
 
     private final ProcessHearingRecordingRequestAboutToStartHandler handler = new ProcessHearingRecordingRequestAboutToStartHandler(new ProcessHearingRecordingRequestService());
 
@@ -60,7 +60,7 @@ public class ProcessHearingRecordingRequestAboutToStartHandlerTest {
                 .hearings(List.of(HEARING))
 
                 .sscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder()
-                        .sscsHearingRecordings(List.of(recording(1), recording(2)))
+                        .sscsHearingRecordings(List.of(recording(1)))
                         .build())
                 .build();
 
@@ -70,16 +70,17 @@ public class ProcessHearingRecordingRequestAboutToStartHandlerTest {
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
     }
 
-    static SscsHearingRecording recording(int i) {
+    static SscsHearingRecording recording(int hearingId) {
+        final Hearing hearing = getHearing(hearingId);
         return SscsHearingRecording.builder()
                 .value(SscsHearingRecordingDetails.builder()
-                        .hearingId(HEARING.getValue().getHearingId())
-                        .venue(HEARING.getValue().getVenue().getName())
-                        .hearingDate(HEARING.getValue().getHearingDate())
+                        .hearingId(hearing.getValue().getHearingId())
+                        .venue(hearing.getValue().getVenue().getName())
+                        .hearingDate(hearing.getValue().getHearingDate())
                         .hearingType("Adjourned")
                         .uploadDate(LocalDate.now().toString())
                         .recordings(List.of(HearingRecordingDetails.builder()
-                                .value(DocumentLink.builder().documentBinaryUrl(format("https://example/%s", i)).build())
+                                .value(DocumentLink.builder().documentBinaryUrl(format("https://example/%s", hearingId)).build())
                                 .build()))
                         .build())
                 .build();
@@ -103,11 +104,11 @@ public class ProcessHearingRecordingRequestAboutToStartHandlerTest {
         assertThat(processHearingRecordingRequest.getHearingId(), is(HEARING.getValue().getHearingId()));
         assertThat(processHearingRecordingRequest.getHearingTitle(), is("Hearing 1"));
         assertThat(processHearingRecordingRequest.getHearingInformation(), is("Venue 1 12:00:00 18 May 2021"));
-        assertThat(processHearingRecordingRequest.getRecordings().size(), is(2));
-        assertThat(processHearingRecordingRequest.getAppellant().getValue().getCode(), is("-"));
+        assertThat(processHearingRecordingRequest.getRecordings().size(), is(1));
+        assertThat(processHearingRecordingRequest.getAppellant().getValue().getCode(), is(""));
         assertThat(processHearingRecordingRequest.getAppellant().getListItems().stream().map(DynamicListItem::getCode).collect(Collectors.toList()), is(List.of("Granted", "Refused")));
-        assertThat(processHearingRecordingRequest.getDwp().getValue().getCode(), is("-"));
-        assertThat(processHearingRecordingRequest.getJointParty().getValue().getCode(), is("-"));
+        assertThat(processHearingRecordingRequest.getDwp().getValue().getCode(), is(""));
+        assertThat(processHearingRecordingRequest.getJointParty().getValue().getCode(), is(""));
     }
 
     @Test
@@ -122,12 +123,12 @@ public class ProcessHearingRecordingRequestAboutToStartHandlerTest {
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 
-    static Hearing getHearing() {
+    static Hearing getHearing(int hearingId) {
         HearingDetails hearingDetails = HearingDetails.builder()
-                .hearingId("1")
+                .hearingId(String.valueOf(hearingId))
                 .hearingDate("2021-05-18")
                 .time("12:00")
-                .venue(Venue.builder().name("Venue 1").build())
+                .venue(Venue.builder().name(format("Venue %s", hearingId)).build())
                 .build();
         return Hearing.builder().value(hearingDetails).build();
     }

@@ -243,6 +243,7 @@ dependencyManagement {
         dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.50') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
+            entry 'tomcat-annotations-api'
             entry 'tomcat-embed-websocket'
         }
 
@@ -345,11 +346,6 @@ dependencies {
 
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
 
-    // Added to fix CVE-2020-13934, CVE-2020-13935, CVE-2020-17527
-    compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.50'
-    compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.50'
-    compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.10'
-
     // Safe to remove once Spring update their dependencies - see CVE-2019-14439 and add 'com.fasterxml.jackson.core' configurations.all above
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
 
@@ -386,11 +382,6 @@ dependencies {
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.27.0'
     testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
-
-    // Added to fix CVE-2020-13934, CVE-2020-13935, CVE-2020-17527
-    testCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.50'
-    testCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.50'
-    testCompile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '10.0.8'
 
     testCompile 'pl.pragmatists:JUnitParams:1.1.1'
 
