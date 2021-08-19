@@ -99,9 +99,9 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(), SEND_TO_INTERLOC_REVIEW_BY_TCW)) {
             setSelectWhoReviewsCaseField(caseData, REVIEW_BY_TCW);
             String reason = null;
-            if (emptyIfNull(caseData.getScannedDocuments()).stream()
-                    .anyMatch(scannedDocument -> scannedDocument.getValue().getType() != null
-                            && scannedDocument.getValue().getType().equals(DocumentType.POSTPONEMENT_REQUEST
+            if (emptyIfNull(caseData.getSscsDocument()).stream()
+                    .anyMatch(document -> document.getValue().getDocumentType() != null
+                            && document.getValue().getDocumentType().equals(DocumentType.POSTPONEMENT_REQUEST
                             .getValue()))) {
                 reason = TCW_REVIEW_POSTPONEMENT_REQUEST;
             } else {

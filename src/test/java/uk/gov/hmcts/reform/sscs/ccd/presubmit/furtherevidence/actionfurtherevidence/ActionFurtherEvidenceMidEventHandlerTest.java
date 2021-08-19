@@ -7,10 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -90,6 +87,27 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
 
     @Test
     public void givenAPostponementRequestInInterlocTcwActionAndCaseInHearing_thenAddNoError() {
+
+        when(caseDetails.getState()).thenReturn(State.HEARING);
+        sscsCaseData.getFurtherEvidenceAction().setValue(
+                new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
+                        FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getLabel()));
+
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+                .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
+                        .fileName("Testing.jpg").url(DocumentLink.builder()
+                                .documentUrl("test.com").build()).build()).build();
+        sscsCaseData.setPostponementRequest(PostponementRequest.builder().postponementRequestDetails("Anything").build());
+
+        sscsCaseData.setScannedDocuments(Arrays.asList(scannedDocument));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors(), is(empty()));
+    }
+
+    @Test
+    public void givenAPostponementRequestWithoutDetails_thenAddNoError() {
         List<ScannedDocument> docs = new ArrayList<>();
         when(caseDetails.getState()).thenReturn(State.HEARING);
         sscsCaseData.getFurtherEvidenceAction().setValue(
@@ -98,7 +116,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder()
                 .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
-                        .fileName("Testing.jpg").documentRequestDetails("Anything").url(DocumentLink.builder()
+                        .fileName("Testing.jpg").url(DocumentLink.builder()
                                 .documentUrl("test.com").build()).build()).build();
 
         docs.add(scannedDocument);
@@ -119,8 +137,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
                         FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE.getLabel()));
         ScannedDocument scannedDocument = ScannedDocument.builder()
                 .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
-                        .fileName("Testing.jpg").documentRequestDetails("Anything")
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).build())
+                        .fileName("Testing.jpg").url(DocumentLink.builder().documentUrl("test.com").build()).build())
                 .build();
 
         docs.add(scannedDocument);
@@ -143,8 +160,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
                         FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getLabel()));
         ScannedDocument scannedDocument = ScannedDocument.builder()
                 .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
-                        .fileName("Testing.jpg").documentRequestDetails("Anything")
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).build())
+                        .fileName("Testing.jpg").url(DocumentLink.builder().documentUrl("test.com").build()).build())
                 .build();
 
         docs.add(scannedDocument);
@@ -167,14 +183,12 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
                         FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getLabel()));
         ScannedDocument scannedDocument = ScannedDocument.builder()
                 .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
-                        .fileName("Testing.jpg").documentRequestDetails("Anything")
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).build())
+                        .fileName("Testing.jpg").url(DocumentLink.builder().documentUrl("test.com").build()).build())
                 .build();
 
         ScannedDocument scannedDocument2 = ScannedDocument.builder()
                 .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
-                        .fileName("Testing.jpg").documentRequestDetails("Anything")
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).build())
+                        .fileName("Testing.jpg").url(DocumentLink.builder().documentUrl("test.com").build()).build())
                 .build();
 
         docs.add(scannedDocument);

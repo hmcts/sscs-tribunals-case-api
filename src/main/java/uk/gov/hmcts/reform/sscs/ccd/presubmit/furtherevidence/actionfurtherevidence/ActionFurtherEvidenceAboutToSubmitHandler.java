@@ -8,6 +8,7 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CONFIDENTIALITY_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REINSTATEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome.GRANTED;
@@ -36,27 +37,13 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.ScannedDocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @Component
 @Slf4j
@@ -73,12 +60,16 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private final FooterService footerService;
     private final BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder;
+    private UserDetailsService userDetailsService;
+
 
     @Autowired
     public ActionFurtherEvidenceAboutToSubmitHandler(FooterService footerService,
-                                                     BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder) {
+                                                     BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder,
+                                                     UserDetailsService userDetailsService) {
         this.footerService = footerService;
         this.bundleAdditionFilenameBuilder = bundleAdditionFilenameBuilder;
+        this.userDetailsService = userDetailsService;
     }
 
     public static void checkWarningsAndErrors(SscsCaseData sscsCaseData, ScannedDocument scannedDocument, String caseId,
@@ -97,15 +88,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         if (isBlank(scannedDocument.getValue().getFileName())) {
             preSubmitCallbackResponse.addError("No document file name so could not process");
-        }
-
-        Optional<ScannedDocument> postponementRequest = emptyIfNull(sscsCaseData.getScannedDocuments()).stream()
-                .filter(doc -> StringUtils.isNotBlank(doc.getValue().getType())
-                        && doc.getValue().getType().equals(DocumentType.POSTPONEMENT_REQUEST.getValue())).findAny();
-        if (postponementRequest.isPresent()
-                && StringUtils.isBlank(postponementRequest.get().getValue().getDocumentRequestDetails())) {
-            preSubmitCallbackResponse.addError(POSTPONEMENT_DETAILS_IS_MANDATORY);
-
         }
 
         if (isBlank(scannedDocument.getValue().getType())) {
@@ -203,10 +185,33 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         }
 
+        if (emptyIfNull(sscsCaseData.getScannedDocuments()).stream()
+                .anyMatch(doc -> doc.getValue() != null && StringUtils.isNotBlank(doc.getValue().getType())
+                        && doc.getValue().getType().equals(DocumentType.POSTPONEMENT_REQUEST.getValue()))) {
+            String details = sscsCaseData.getPostponementRequest().getPostponementRequestDetails();
+            if (StringUtils.isBlank(details)) {
+                preSubmitCallbackResponse.addError(POSTPONEMENT_DETAILS_IS_MANDATORY);
+            } else {
+                if (sscsCaseData.getAppealNotePad() == null) {
+                    sscsCaseData.setAppealNotePad(NotePad.builder().notesCollection(new ArrayList<>()).build());
+                }
+                sscsCaseData.getAppealNotePad().getNotesCollection()
+                        .add(createPostponementRequestNote(userAuthorisation, details));
+            }
+        }
+
         buildSscsDocumentFromScan(sscsCaseData, caseDetails.getState(), callback.isIgnoreWarnings(),
                 preSubmitCallbackResponse);
 
+        sscsCaseData.setPostponementRequest(null);
+
         return preSubmitCallbackResponse;
+    }
+
+    private Note createPostponementRequestNote(String userAuthorisation, String details) {
+        return Note.builder().value(NoteDetails.builder().noteDetail(details)
+                .author(userDetailsService.buildLoggedInUserName(userAuthorisation))
+                .noteDate(LocalDate.now().toString()).build()).build();
     }
 
     private void checkForWarnings(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
@@ -387,13 +392,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         DocumentType documentType = getSubtype(sscsCaseData.getOriginalSender().getValue().getCode(), scannedDocument);
 
         String bundleAddition = null;
+        String originalSenderCode = sscsCaseData.getOriginalSender().getValue().getCode();
         if (caseState != null
                 && isCorrectActionTypeForBundleAddition(sscsCaseData, scannedDocument)
                 && isCaseStateAdditionValid(caseState)) {
 
             log.info("adding footer appendix document link: {} and caseId {}", url, sscsCaseData.getCcdCaseId());
 
-            String originalSenderCode = sscsCaseData.getOriginalSender().getValue().getCode();
             String documentFooterText = stream(PartyItemList.values())
                     .filter(f -> f.getCode().equals(originalSenderCode))
                     .findFirst()
@@ -404,6 +409,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             url = footerService.addFooter(url, documentFooterText, bundleAddition);
         }
 
+        String requestingParty = null;
+        if (documentType.equals(POSTPONEMENT_REQUEST)) {
+            requestingParty = originalSenderCode;
+        }
+
         String fileName = bundleAdditionFilenameBuilder
                 .build(documentType, bundleAddition, scannedDocument.getValue().getScannedDate());
 
@@ -412,6 +422,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentType(documentType.getValue())
                 .documentFileName(fileName)
+                .originalPartySender(requestingParty)
                 .bundleAddition(bundleAddition)
                 .documentLink(url)
                 .editedDocumentLink(scannedDocument.getValue().getEditedUrl())
@@ -456,6 +467,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
         if (ScannedDocumentType.URGENT_HEARING_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
             return URGENT_HEARING_REQUEST;
+        }
+        if (ScannedDocumentType.POSTPONEMENT_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
+            return POSTPONEMENT_REQUEST;
         }
 
         final Optional<DocumentType> optionalDocumentType = stream(PartyItemList.values())

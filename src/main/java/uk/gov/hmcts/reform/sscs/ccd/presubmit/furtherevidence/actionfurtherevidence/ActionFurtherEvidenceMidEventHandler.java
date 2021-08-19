@@ -68,7 +68,7 @@ public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHa
                 preSubmitCallbackResponse);
 
         if (showPostponementDetailsPage(preSubmitCallbackResponse)) {
-            sscsCaseData.setShowPostponementDetailsPage(YesNo.YES);
+            sscsCaseData.getPostponementRequest().setShowPostponementDetailsPage(YesNo.YES);
         }
 
         validatePostponementRequests(caseDetails, sscsCaseData, preSubmitCallbackResponse);

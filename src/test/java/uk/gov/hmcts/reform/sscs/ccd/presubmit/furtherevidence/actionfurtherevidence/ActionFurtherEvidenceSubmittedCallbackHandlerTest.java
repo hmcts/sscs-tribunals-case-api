@@ -251,8 +251,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
                 FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
                 ACTION_FURTHER_EVIDENCE);
 
-        callback.getCaseDetails().getCaseData().setScannedDocuments(Arrays.asList(ScannedDocument.builder()
-                .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue()).build())
+        callback.getCaseDetails().getCaseData().setSscsDocument(Arrays.asList(SscsDocument.builder()
+                .value(SscsDocumentDetails.builder().documentType(DocumentType.POSTPONEMENT_REQUEST.getValue()).build())
                 .build()));
 
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
