@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -15,6 +16,12 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Component
 @Slf4j
 public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private final boolean enhancedConfidentialityFeature;
+
+    public ReviewConfidentialityRequestAboutToSubmitHandler(@Value("${feature.enhancedConfidentiality.enabled}")  boolean enhancedConfidentialityFeature) {
+        this.enhancedConfidentialityFeature = enhancedConfidentialityFeature;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -50,11 +57,15 @@ public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubm
                 boolean jointPartyGrantedNow = processJointPartyAndReturnWhetherGrantedNow(sscsCaseData);
 
                 if (appellantGrantedNow || jointPartyGrantedNow) {
-                    String interlocReviewState = !State.RESPONSE_RECEIVED.equals(callback.getCaseDetails().getState())
+                    String interlocReviewState = !enhancedConfidentialityFeature && !State.RESPONSE_RECEIVED.equals(callback.getCaseDetails().getState())
                         ? InterlocReviewState.AWAITING_ADMIN_ACTION.getId() : null;
 
                     sscsCaseData.setInterlocReviewState(interlocReviewState);
                     sscsCaseData.setIsConfidentialCase(YesNo.YES);
+
+                    if (!enhancedConfidentialityFeature) {
+                        sscsCaseData.setIsProgressingViaGaps(YesNo.YES.getValue());
+                    }
                     log.info("'Confidentiality granted - appellant: {}, jointParty: {}, for case id {}", appellantGrantedNow, jointPartyGrantedNow, sscsCaseData.getCcdCaseId());
                 } else {
                     sscsCaseData.setInterlocReviewState(null);

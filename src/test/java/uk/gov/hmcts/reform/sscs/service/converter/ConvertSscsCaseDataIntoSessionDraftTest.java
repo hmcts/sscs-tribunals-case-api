@@ -120,6 +120,22 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
     }
 
     @Test
+    public void givenBenefitType_shouldReturnResponseBenefitTypeStringWithoutCode() {
+        caseData = SscsCaseData.builder()
+                .appeal(Appeal.builder()
+                        .benefitType(BenefitType.builder()
+                                .code("bereavementBenefit")
+                                .description("Bereavement Benefit")
+                                .build())
+                        .build())
+                .build();
+
+        SessionDraft actualSessionDraft = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        assertEquals("Bereavement Benefit",
+                actualSessionDraft.getBenefitType().getBenefitType());
+    }
+
+    @Test
     @Parameters(method = "generateMrnLateScenarios")
     public void givenMrnIsLate_shouldResponseWithCorrectMrnLateResponse(
         MrnDetails mrnDetails, String expectedReason) {

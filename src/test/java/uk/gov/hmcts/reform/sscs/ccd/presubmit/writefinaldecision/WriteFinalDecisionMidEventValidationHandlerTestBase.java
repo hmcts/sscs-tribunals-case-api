@@ -15,6 +15,7 @@ import junitparams.JUnitParamsRunner;
 import junitparams.NamedParameters;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
+import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,7 +59,11 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
     protected abstract void setValidPointsAndActivitiesScenario(SscsCaseData caseData, String descriptorFlowValue);
 
-    protected static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+    protected static Validator validator = Validation.byDefaultProvider()
+            .configure()
+            .messageInterpolator(new ParameterMessageInterpolator())
+            .buildValidatorFactory()
+            .getValidator();
 
     protected abstract WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService);
 
