@@ -50,7 +50,26 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest extends BaseHandler 
             .assertThat().body("sscsHearingRecordings[0].value.recordings[2].value.document_filename",
             equalTo("Final Prudential House 06 Jun 2021 (3).mp3"))
             .assertThat().body("sscsHearingRecordings[0].value.recordings[2].value", hasKey(("document_url")))
-            .assertThat().body("sscsHearingRecordings[0].value.recordings[2].value", hasKey(("document_binary_url")));
+            .assertThat().body("sscsHearingRecordings[0].value.recordings[2].value", hasKey(("document_binary_url")))
+
+            .assertThat().body("requestedHearings[0].value.sscsHearingRecording.value.hearingType", equalTo("final"))
+            .assertThat().body("requestedHearings[0].value.sscsHearingRecording.value.hearingDate", equalTo("06-06-2021 10:00:20 PM"))
+            .assertThat().body("requestedHearings[0].value.sscsHearingRecording.value", hasKey("uploadDate"))
+
+            .assertThat().body("requestedHearings[0].value.sscsHearingRecording.value.recordings[0].value.document_filename",
+            equalTo("Final Prudential House 06 Jun 2021.MP4"))
+            .assertThat().body("requestedHearings[0].value.sscsHearingRecording.value.recordings[0].value", hasKey(("document_url")))
+            .assertThat().body("requestedHearings[0].value.sscsHearingRecording.value.recordings[0].value", hasKey(("document_binary_url")))
+
+            .assertThat().body("requestedHearings[0].value.sscsHearingRecording.value.recordings[1].value.document_filename",
+            equalTo("Final Prudential House 06 Jun 2021 (2).mp4"))
+            .assertThat().body("requestedHearings[0].value.sscsHearingRecording.value.recordings[1].value", hasKey(("document_url")))
+            .assertThat().body("requestedHearings[0].value.sscsHearingRecording.value.recordings[1].value", hasKey(("document_binary_url")))
+
+            .assertThat().body("requestedHearings[0].value.sscsHearingRecording.value.recordings[2].value.document_filename",
+            equalTo("Final Prudential House 06 Jun 2021 (3).mp3"))
+            .assertThat().body("requestedHearings[0].value.sscsHearingRecording.value.recordings[2].value", hasKey(("document_url")))
+            .assertThat().body("requestedHearings[0].value.sscsHearingRecording.value.recordings[2].value", hasKey(("document_binary_url")));
 
     }
 }

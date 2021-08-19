@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -44,13 +43,13 @@ public class RequestHearingRecordingAboutToSubmitHandler implements PreSubmitCal
         DynamicListItem selectedRequestable = sscsCaseData.getSscsHearingRecordingCaseData().getRequestableHearingDetails().getValue();
         String hearingId = selectedRequestable.getCode();
 
-        List<SscsHearingRecording> sscsHearingRecordingList = sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings()
-                .stream().filter(r -> r.getValue().getHearingId().equals(hearingId)).collect(Collectors.toList());
+        SscsHearingRecording sscsHearingRecording = sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings()
+                .stream().filter(r -> r.getValue().getHearingId().equals(hearingId)).findFirst().orElse(null);
 
         HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
                 .requestingParty(PartyItemList.DWP.getCode())
                 .dateRequested(LocalDateTime.now().format(DateTimeFormatter.ofPattern(UPLOAD_DATE_FORMATTER)))
-                .sscsHearingRecordingList(sscsHearingRecordingList).build()).build();
+                .sscsHearingRecording(sscsHearingRecording).build()).build();
 
 
         List<HearingRecordingRequest> hearingRecordingRequests = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();

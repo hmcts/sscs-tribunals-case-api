@@ -154,7 +154,7 @@ public class CitizenRequestServiceTest {
                 .citizenReleasedHearings(List.of(HearingRecordingRequest.builder()
                         .value(HearingRecordingRequestDetails.builder()
                                 .requestingParty(PartyItemList.APPELLANT.getCode())
-                                .sscsHearingRecordingList(List.of(SscsHearingRecording.builder()
+                                .sscsHearingRecording(SscsHearingRecording.builder()
                                         .value(SscsHearingRecordingDetails.builder()
                                                 .hearingId("id_1")
                                                 .hearingDate("2021-01-03")
@@ -167,7 +167,7 @@ public class CitizenRequestServiceTest {
                                                                 .build())
                                                         .build()))
                                                 .build())
-                                        .build()))
+                                        .build())
                                 .build())
                         .build()))
                 .build());
@@ -200,7 +200,7 @@ public class CitizenRequestServiceTest {
                 .requestedHearings(List.of(HearingRecordingRequest.builder()
                         .value(HearingRecordingRequestDetails.builder()
                                 .requestingParty(PartyItemList.APPELLANT.getCode())
-                                .sscsHearingRecordingList(List.of(SscsHearingRecording.builder()
+                                .sscsHearingRecording(SscsHearingRecording.builder()
                                         .value(SscsHearingRecordingDetails.builder()
                                                 .hearingId("id_1")
                                                 .hearingDate("2021-01-03")
@@ -213,7 +213,7 @@ public class CitizenRequestServiceTest {
                                                                 .build())
                                                         .build()))
                                                 .build())
-                                        .build()))
+                                        .build())
                                 .build())
                         .build()))
                 .build());
@@ -248,7 +248,7 @@ public class CitizenRequestServiceTest {
                 .requestedHearings(List.of(HearingRecordingRequest.builder()
                                 .value(HearingRecordingRequestDetails.builder()
                                         .requestingParty(PartyItemList.JOINT_PARTY.getCode())
-                                        .sscsHearingRecordingList(List.of(SscsHearingRecording.builder()
+                                        .sscsHearingRecording(SscsHearingRecording.builder()
                                                 .value(SscsHearingRecordingDetails.builder()
                                                         .hearingId("id_1")
                                                         .hearingDate("2021-01-03")
@@ -261,7 +261,7 @@ public class CitizenRequestServiceTest {
                                                                         .build())
                                                                 .build()))
                                                         .build())
-                                                .build()))
+                                                .build())
                                         .build())
                                 .build(),
                         HearingRecordingRequest.builder()
@@ -271,7 +271,7 @@ public class CitizenRequestServiceTest {
                 .citizenReleasedHearings(List.of(HearingRecordingRequest.builder()
                         .value(HearingRecordingRequestDetails.builder()
                                 .requestingParty(PartyItemList.JOINT_PARTY.getCode())
-                                .sscsHearingRecordingList(List.of(SscsHearingRecording.builder()
+                                .sscsHearingRecording(SscsHearingRecording.builder()
                                         .value(SscsHearingRecordingDetails.builder()
                                                 .hearingId("id_1")
                                                 .hearingDate("2021-01-03")
@@ -284,7 +284,7 @@ public class CitizenRequestServiceTest {
                                                                 .build())
                                                         .build()))
                                                 .build())
-                                        .build()))
+                                        .build())
                                 .build())
                         .build(),
                         HearingRecordingRequest.builder()
@@ -352,7 +352,7 @@ public class CitizenRequestServiceTest {
                 .requestedHearings(List.of(HearingRecordingRequest.builder()
                                 .value(HearingRecordingRequestDetails.builder()
                                         .requestingParty(PartyItemList.APPELLANT.getCode())
-                                        .sscsHearingRecordingList(List.of(SscsHearingRecording.builder()
+                                        .sscsHearingRecording(SscsHearingRecording.builder()
                                                 .value(SscsHearingRecordingDetails.builder()
                                                         .hearingId("id_1")
                                                         .hearingDate("2021-01-03")
@@ -365,13 +365,13 @@ public class CitizenRequestServiceTest {
                                                                         .build())
                                                                 .build()))
                                                         .build())
-                                                .build()))
+                                                .build())
                                         .build())
                                 .build()))
                 .citizenReleasedHearings(List.of(HearingRecordingRequest.builder()
                                 .value(HearingRecordingRequestDetails.builder()
                                         .requestingParty(PartyItemList.APPELLANT.getCode())
-                                        .sscsHearingRecordingList(List.of(SscsHearingRecording.builder()
+                                        .sscsHearingRecording(SscsHearingRecording.builder()
                                                 .value(SscsHearingRecordingDetails.builder()
                                                         .hearingId("id_2")
                                                         .hearingDate("2021-01-03")
@@ -384,7 +384,7 @@ public class CitizenRequestServiceTest {
                                                                         .build())
                                                                 .build()))
                                                         .build())
-                                                .build()))
+                                                .build())
                                         .build())
                                 .build()))
                 .build());
@@ -415,7 +415,7 @@ public class CitizenRequestServiceTest {
                 .requestedHearings(List.of(HearingRecordingRequest.builder()
                                 .value(HearingRecordingRequestDetails.builder()
                                         .requestingParty(PartyItemList.REPRESENTATIVE.getCode())
-                                        .sscsHearingRecordingList(List.of(SscsHearingRecording.builder()
+                                        .sscsHearingRecording(SscsHearingRecording.builder()
                                                 .value(SscsHearingRecordingDetails.builder()
                                                         .hearingId("id_1")
                                                         .hearingDate("2021-01-03")
@@ -424,7 +424,7 @@ public class CitizenRequestServiceTest {
                                                                 .value(DocumentLink.builder().build())
                                                                 .build()))
                                                         .build())
-                                                .build()))
+                                                .build())
                                         .build())
                                 .build(),
                         HearingRecordingRequest.builder()
@@ -454,7 +454,7 @@ public class CitizenRequestServiceTest {
                 .requestedHearings(List.of(HearingRecordingRequest.builder()
                                 .value(HearingRecordingRequestDetails.builder()
                                         .requestingParty(PartyItemList.JOINT_PARTY.getCode())
-                                        .sscsHearingRecordingList(List.of(SscsHearingRecording.builder()
+                                        .sscsHearingRecording(SscsHearingRecording.builder()
                                                 .value(SscsHearingRecordingDetails.builder()
                                                         .hearingId("id_1")
                                                         .hearingDate("2021-01-03")
@@ -463,7 +463,7 @@ public class CitizenRequestServiceTest {
                                                                 .value(DocumentLink.builder().build())
                                                                 .build()))
                                                         .build())
-                                                .build()))
+                                                .build())
                                         .build())
                                 .build(),
                         HearingRecordingRequest.builder()
@@ -513,9 +513,8 @@ public class CitizenRequestServiceTest {
         HearingRecordingRequest hearingRecordingRequest = caseData.getSscsHearingRecordingCaseData().getRequestedHearings().get(0);
         assertThat(hearingRecordingRequest.getValue().getRequestingParty(), is(PartyItemList.JOINT_PARTY.getCode()));
         assertThat(hearingRecordingRequest.getValue().getDateRequested(), is(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))));
-        assertThat(hearingRecordingRequest.getValue().getSscsHearingRecordingList().size(), is(1));
-        assertThat(hearingRecordingRequest.getValue().getSscsHearingRecordingList().get(0).getValue().getHearingId(), is("id_1"));
-        assertThat(hearingRecordingRequest.getValue().getSscsHearingRecordingList().get(0).getValue().getVenue(), is("Town House"));
+        assertThat(hearingRecordingRequest.getValue().getSscsHearingRecording().getValue().getHearingId(), is("id_1"));
+        assertThat(hearingRecordingRequest.getValue().getSscsHearingRecording().getValue().getVenue(), is("Town House"));
     }
 
     @Test

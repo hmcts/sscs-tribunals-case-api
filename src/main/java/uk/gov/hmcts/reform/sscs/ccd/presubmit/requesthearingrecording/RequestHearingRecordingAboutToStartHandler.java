@@ -66,18 +66,14 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
             StringBuilder requestedHearingText = new StringBuilder();
             StringBuilder releasedHearingText = new StringBuilder();
 
-
             requestedHearingsCollection.stream()
                     .filter(r -> r.getValue().getRequestingParty().equals(PartyItemList.DWP.getCode()))
-                    .forEach(r -> r.getValue().getSscsHearingRecordingList()
-                            .forEach(hr -> removeFromListAndAddText(hr, validHearings, requestedHearingText)));
+                    .forEach(r -> removeFromListAndAddText(r.getValue().getSscsHearingRecording(), validHearings, requestedHearingText));
 
 
             releasedHearingsCollection.stream()
                     .filter(r -> r.getValue().getRequestingParty().equals(PartyItemList.DWP.getCode()))
-                    .forEach(r -> r.getValue().getSscsHearingRecordingList()
-                            .forEach(hr -> removeFromListAndAddText(hr, validHearings, releasedHearingText)));
-
+                    .forEach(r -> removeFromListAndAddText(r.getValue().getSscsHearingRecording(), validHearings, releasedHearingText));
 
             if (validHearings.isEmpty()) {
                 return returnError(response, "There are no hearing recordings available for request");

@@ -6,12 +6,9 @@ import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,15 +79,26 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
         LocalDateTime hearingDateTime = parseHearingDateTime(hearingDetails);
         String venueName = hearingDetails.getVenue().getName();
 
+        //Create new collection of hearing recordings
+        List<HearingRecordingDetails> hearingRecordings =
+                createHearingRecordingDocuments(recordings, hearingType.getValue(), venueName, hearingDateTime.format(HEARING_DOCUMENT_TIME_FORMATTER));
+
         //Existing sscs hearing recording for the same hearing
         Optional<SscsHearingRecording> existingSscsHearingRecordings = selectSscsHearingRecording(sscsHearingRecordings, hearingId);
-
-        SscsHearingRecordingDetails sscsHearingRecordingDetails;
         if (existingSscsHearingRecordings.isPresent()) {
+            List<SscsHearingRecording> existingRecordingList = new ArrayList<>();
+            existingRecordingList.add(existingSscsHearingRecordings.get());
+
+            //Collect request related sscs hearing recordings
+            existingRecordingList.addAll(getRequestedSscsHearingRecordings(sscsCaseData.getSscsHearingRecordingCaseData(), hearingId));
+
             //Update existing sscs hearing recording data
-            sscsHearingRecordingDetails = existingSscsHearingRecordings.get().getValue();
-            sscsHearingRecordingDetails.setHearingType(hearingType.getKey());
-            sscsHearingRecordingDetails.setUploadDate(LocalDateTime.now().format(RECORDING_DATE_FORMATTER).toUpperCase());
+            for (SscsHearingRecording existing : existingRecordingList) {
+                SscsHearingRecordingDetails sscsHearingRecordingDetails = existing.getValue();
+                sscsHearingRecordingDetails.setHearingType(hearingType.getKey());
+                sscsHearingRecordingDetails.setUploadDate(LocalDateTime.now().format(RECORDING_DATE_FORMATTER).toUpperCase());
+                sscsHearingRecordingDetails.setRecordings(hearingRecordings);
+            }
             response.addWarning("The hearing recording you have just uploaded will replace the existing hearing recording(s)");
         } else {
             //Create new sscs hearing recording
@@ -99,17 +107,12 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
                     hearingType.getKey(),
                     hearingId,
                     venueName);
+            newSscsHearingRecording.getValue().setRecordings(hearingRecordings);
             sscsHearingRecordings.add(newSscsHearingRecording);
-            sscsHearingRecordingDetails = newSscsHearingRecording.getValue();
         }
 
-        //Create new collection of hearing recordings
-        List<HearingRecordingDetails> hearingRecordings =
-                createHearingRecordingDocuments(recordings, hearingType.getValue(), venueName, hearingDateTime.format(HEARING_DOCUMENT_TIME_FORMATTER));
-        sscsHearingRecordingDetails.setRecordings(hearingRecordings);
-
         sscsHearingRecordings.sort(Comparator.comparing(h ->
-                LocalDate.parse( h.getValue().getHearingDate().toLowerCase(), RECORDING_DATE_FORMATTER)));
+                LocalDate.parse(h.getValue().getHearingDate().toLowerCase(), RECORDING_DATE_FORMATTER)));
 
         clearTransientFields(sscsCaseData);
 
@@ -165,6 +168,27 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
                 .filter(sscsHearingRecording -> sscsHearingRecording.getValue() != null)
                 .filter(sscsHearingRecording -> sscsHearingRecording.getValue().getHearingId().equalsIgnoreCase(hearingId))
                 .findFirst();
+    }
+
+
+    private List<SscsHearingRecording> getRequestedSscsHearingRecordings(SscsHearingRecordingCaseData sscsHearingRecordingCaseData,
+                                                                         String hearingId) {
+        List<SscsHearingRecording> requestedHearingRecordings = new ArrayList<>();
+
+        requestedHearingRecordings.addAll(filterRequestedHearingRecordings(sscsHearingRecordingCaseData.getReleasedHearings(), hearingId));
+        requestedHearingRecordings.addAll(filterRequestedHearingRecordings(sscsHearingRecordingCaseData.getRequestedHearings(), hearingId));
+
+        return requestedHearingRecordings;
+    }
+
+    private List<SscsHearingRecording> filterRequestedHearingRecordings(List<HearingRecordingRequest> requests, String hearingId) {
+        if (requests != null) {
+            return requests.stream()
+                    .map(request -> request.getValue().getSscsHearingRecording())
+                    .filter(recording -> hearingId.equalsIgnoreCase(recording.getValue().getHearingId()))
+                    .collect(Collectors.toList());
+        }
+        return List.of();
     }
 
     protected String createFileName(String venue, String hearingDate, int fileCount, String hearingType, DocumentLink documentLink) {

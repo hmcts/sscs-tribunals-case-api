@@ -91,7 +91,7 @@ public class RequestHearingRecordingAboutToStartHandlerTest {
     public void givenAHearingsRequested_thenHearingInRequestedList() {
         SscsHearingRecording sscsHearingRecording = SscsHearingRecording.builder().value(SscsHearingRecordingDetails.builder().hearingId("an_id2").build()).build();
         HearingRecordingRequest recordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
-                .requestingParty("dwp").sscsHearingRecordingList(Arrays.asList(sscsHearingRecording)).build()).build();
+                .requestingParty("dwp").sscsHearingRecording(sscsHearingRecording).build()).build();
         sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(singletonList(recordingRequest));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
@@ -103,7 +103,7 @@ public class RequestHearingRecordingAboutToStartHandlerTest {
     public void givenAHearingsReleased_thenHearingInReleasedList() {
         SscsHearingRecording sscsHearingRecording = SscsHearingRecording.builder().value(SscsHearingRecordingDetails.builder().hearingId("an_id2").build()).build();
         HearingRecordingRequest recordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
-                .requestingParty("dwp").sscsHearingRecordingList(Arrays.asList(sscsHearingRecording)).build()).build();
+                .requestingParty("dwp").sscsHearingRecording(sscsHearingRecording).build()).build();
         sscsCaseData.getSscsHearingRecordingCaseData().setDwpReleasedHearings(singletonList(recordingRequest));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
