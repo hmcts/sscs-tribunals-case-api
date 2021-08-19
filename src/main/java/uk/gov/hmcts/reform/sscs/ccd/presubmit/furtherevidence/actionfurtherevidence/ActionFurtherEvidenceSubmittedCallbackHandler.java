@@ -94,7 +94,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
             setSelectWhoReviewsCaseField(caseData, REVIEW_BY_JUDGE);
             return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
                     REVIEW_BY_JUDGE.getId(), SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
-                    EventType.VALID_SEND_TO_INTERLOC, "Send a case to a judge for review");
+                    EventType.VALID_SEND_TO_INTERLOC, TCW_REVIEW_SEND_TO_JUDGE);
         }
         if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(), SEND_TO_INTERLOC_REVIEW_BY_TCW)) {
             setSelectWhoReviewsCaseField(caseData, REVIEW_BY_TCW);
