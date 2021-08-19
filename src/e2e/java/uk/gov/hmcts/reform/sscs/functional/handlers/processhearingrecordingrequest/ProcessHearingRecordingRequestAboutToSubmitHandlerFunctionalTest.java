@@ -11,7 +11,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
@@ -26,23 +26,17 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandlerFunctionalTest ex
             .contentType(ContentType.JSON)
             .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
             .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
-            .body(getJsonCallbackForTest("handlers/requesthearingrecording/processHearingRecordingRequestAboutToSubmitCallback.json"))
+            .body(getJsonCallbackForTest("handlers/processhearingrecordingrequest/processHearingRecordingRequestAboutToSubmitCallback.json"))
             .post("/ccdAboutToSubmit")
             .then()
             .statusCode(HttpStatus.SC_OK)
             .rootPath("data")
-            .assertThat().body("requestableHearingDetails.list_items[0].code", equalTo("44445566"))
             .assertThat()
-            .body("requestableHearingDetails.list_items[0].label", equalTo("Prudential House 12:00 04 Apr 2021"))
-            .assertThat().body("requestableHearingDetails.list_items[1].code", equalTo("33445566"))
+            .body("requestedHearings", is(empty()))
             .assertThat()
-            .body("requestableHearingDetails.list_items[1].label", equalTo("Prudential House 23:00 06 Jun 2021"))
+            .body("dwpReleasedHearings[0].value.sscsHearingRecordingList[0].value.hearingId", equalTo("12345566767"))
             .assertThat()
-            .body("requestedHearings[0].value.sscsHearingRecordingList[0].value.hearingId", equalTo("11445566"))
-            .assertThat()
-            .body("requestedHearings[1].value.sscsHearingRecordingList[0].value.hearingId", equalTo("33445566"))
-            .assertThat()
-            .body("hearingRecordingRequestOutstanding", equalTo("Yes"));
+            .body("hearingRecordingRequestOutstanding", equalTo("No"));
 
 
 

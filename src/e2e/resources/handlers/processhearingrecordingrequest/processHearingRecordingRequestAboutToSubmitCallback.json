@@ -131,7 +131,7 @@
             "hearingInformation": "asdgsdfgsdfgsdfg 12:12:00 12 Dec 2000",
             "dwp": {
               "value": {
-                "code": "Refused",
+                "code": "Granted",
                 "label": "Refused"
               },
               "list_items": [
