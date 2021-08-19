@@ -145,7 +145,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         ScannedDocument scannedDocument = ScannedDocument.builder()
                 .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
                         .fileName("Testing.jpg").url(DocumentLink.builder()
-                                .documentUrl("test.com").build()).build()).build();
+                                .documentUrl("test1.com").build()).build()).build();
 
 
         sscsCaseData.setScannedDocuments(Arrays.asList(scannedDocument));
