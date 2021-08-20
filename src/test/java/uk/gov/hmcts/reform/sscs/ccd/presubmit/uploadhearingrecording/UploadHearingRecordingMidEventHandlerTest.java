@@ -216,7 +216,7 @@ public class UploadHearingRecordingMidEventHandlerTest {
                 response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getSscsHearingRecordingCaseData().getExistingHearingRecordings());
-        assertNotEquals("Yes", response.getData().getSscsHearingRecordingCaseData().getHearingRecordingExist());
+        assertNotEquals(YesNo.YES, response.getData().getSscsHearingRecordingCaseData().getHearingRecordingExist());
     }
 
     private void assertNoErrors() {
