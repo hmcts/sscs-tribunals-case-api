@@ -54,7 +54,7 @@ public class UploadHearingRecordingMidEventHandler implements PreSubmitCallbackH
         if ("selectHearing".equalsIgnoreCase(callback.getPageId()) && caseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings() != null) {
             populateHearingRecordings(caseData);
         } else if ("addRecording".equalsIgnoreCase(callback.getPageId()) && caseData.getSscsHearingRecordingCaseData().getHearingRecording() != null) {
-            validateHearingRecordings(caseData, response, callback.getPageId());
+            validateHearingRecordings(caseData, response);
         }
 
         return response;
@@ -70,7 +70,7 @@ public class UploadHearingRecordingMidEventHandler implements PreSubmitCallbackH
         caseData.getSscsHearingRecordingCaseData().setHearingRecordingExist(existing == null ? YesNo.NO : YesNo.YES);
     }
 
-    private void validateHearingRecordings(final SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response, String pageId) {
+    private void validateHearingRecordings(final SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         emptyIfNull(caseData.getSscsHearingRecordingCaseData().getHearingRecording().getRecordings())
                 .stream()
                 .filter(Objects::nonNull)
