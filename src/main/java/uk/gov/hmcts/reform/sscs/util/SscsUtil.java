@@ -5,6 +5,8 @@ import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -44,7 +46,7 @@ public class SscsUtil {
     }
 
     public static <T> List<T> mutableEmptyListIfNull(List<T> list) {
-        return list == null ? new ArrayList<T>() : list;
+        return Optional.ofNullable(list).orElse(new ArrayList<>());
     }
 
 }
