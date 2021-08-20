@@ -61,11 +61,9 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
             return response;
         }
 
-        List<SscsHearingRecording> sscsHearingRecordings = sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings();
-        if (sscsHearingRecordings == null) {
-            sscsHearingRecordings = new ArrayList<>();
-            sscsCaseData.getSscsHearingRecordingCaseData().setSscsHearingRecordings(sscsHearingRecordings);
-        }
+        List<SscsHearingRecording> sscsHearingRecordings = Optional
+                .ofNullable(sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings())
+                .orElse(new ArrayList<>());
 
         //New hearing recording data
         final List<HearingRecordingDetails> recordings = hearingRecording.getRecordings();
@@ -112,6 +110,7 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
 
         sscsHearingRecordings.sort(Comparator.comparing(h ->
                 LocalDate.parse(h.getValue().getHearingDate().toLowerCase(), RECORDING_DATE_FORMATTER)));
+        sscsCaseData.getSscsHearingRecordingCaseData().setSscsHearingRecordings(sscsHearingRecordings);
 
         clearTransientFields(sscsCaseData);
 

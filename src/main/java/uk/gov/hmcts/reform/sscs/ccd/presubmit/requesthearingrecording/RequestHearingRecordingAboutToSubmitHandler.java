@@ -47,7 +47,7 @@ public class RequestHearingRecordingAboutToSubmitHandler implements PreSubmitCal
         String hearingId = selectedRequestable.getCode();
 
         Optional<SscsHearingRecording> sscsHearingRecording = sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings()
-                .stream().filter(r -> r.getValue().getHearingId().equals(hearingId)).findFirst();
+                .stream().filter(r -> r.getValue().getHearingId().equals(hearingId)).findAny();
 
         if (sscsHearingRecording.isPresent()) {
             HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
@@ -55,10 +55,7 @@ public class RequestHearingRecordingAboutToSubmitHandler implements PreSubmitCal
                     .dateRequested(LocalDateTime.now().format(DateTimeFormatter.ofPattern(UPLOAD_DATE_FORMATTER)))
                     .sscsHearingRecording(sscsHearingRecording.get().getValue()).build()).build();
 
-            List<HearingRecordingRequest> hearingRecordingRequests = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();
-            if (hearingRecordingRequests == null) {
-                hearingRecordingRequests = new ArrayList<>();
-            }
+            List<HearingRecordingRequest> hearingRecordingRequests = Optional.ofNullable(sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings()).orElse(new ArrayList<>());
             hearingRecordingRequests.add(hearingRecordingRequest);
 
             sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(hearingRecordingRequests);
