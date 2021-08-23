@@ -6,6 +6,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REJECT_HEARING_RECORDING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.NONE;
@@ -173,6 +174,10 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         } else if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)
             && DirectionType.REFUSE_URGENT_HEARING.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData = updateCaseAfterUrgentHearingRefused(caseData);
+
+        } else if (DirectionType.REFUSE_HEARING_RECORDING_REQUEST.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
+            caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
+            caseData.setInterlocReferralReason(REJECT_HEARING_RECORDING_REQUEST.getId());
 
         } else {
             caseData.setInterlocReviewState(null);
