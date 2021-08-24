@@ -513,6 +513,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertTrue(response.getData().getState().equals(State.DORMANT_APPEAL_STATE));
         assertTrue(response.getData().getInterlocReviewState().equals(AWAITING_ADMIN_ACTION.getId()));
         assertEquals(REJECT_HEARING_RECORDING_REQUEST.getId(), response.getData().getInterlocReferralReason());
+        assertEquals(DIRECTION_ACTION_REQUIRED.getId(), response.getData().getDwpState());
     }
 
     @Test
