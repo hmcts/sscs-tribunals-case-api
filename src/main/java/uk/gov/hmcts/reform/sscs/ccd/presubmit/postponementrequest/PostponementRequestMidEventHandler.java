@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.postponementrequest;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -34,8 +34,7 @@ public class PostponementRequestMidEventHandler implements PreSubmitCallbackHand
 
         return callbackType.equals(CallbackType.MID_EVENT)
                 && callback.getEvent() == EventType.POSTPONEMENT_REQUEST
-                && callback.getCaseDetails() != null
-                && State.HEARING.equals(callback.getCaseDetails().getState());
+                && callback.getCaseDetails() != null;
     }
 
     @Override
@@ -45,7 +44,7 @@ public class PostponementRequestMidEventHandler implements PreSubmitCallbackHand
 
         final String requestDetails = sscsCaseData.getPostponementRequest().getPostponementRequestDetails();
 
-        if (isEmpty(requestDetails)) {
+        if (isBlank(requestDetails)) {
             response.addError("Please enter request details to generate a postponement request document");
             return response;
         }

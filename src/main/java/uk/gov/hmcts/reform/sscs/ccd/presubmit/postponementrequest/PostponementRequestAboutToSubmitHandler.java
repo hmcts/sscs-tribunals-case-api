@@ -25,8 +25,7 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
                 && callback.getEvent() == EventType.POSTPONEMENT_REQUEST
-                && callback.getCaseDetails() != null
-                && State.HEARING.equals(callback.getCaseDetails().getState());
+                && callback.getCaseDetails() != null;
     }
 
     @Override

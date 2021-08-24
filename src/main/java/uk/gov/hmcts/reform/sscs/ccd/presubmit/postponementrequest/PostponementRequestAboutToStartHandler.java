@@ -22,8 +22,7 @@ public class PostponementRequestAboutToStartHandler implements PreSubmitCallback
 
         return callbackType.equals(CallbackType.ABOUT_TO_START)
                 && callback.getEvent() == EventType.POSTPONEMENT_REQUEST
-                && callback.getCaseDetails() != null
-                && State.HEARING.equals(callback.getCaseDetails().getState());
+                && callback.getCaseDetails() != null;
     }
 
     @Override
