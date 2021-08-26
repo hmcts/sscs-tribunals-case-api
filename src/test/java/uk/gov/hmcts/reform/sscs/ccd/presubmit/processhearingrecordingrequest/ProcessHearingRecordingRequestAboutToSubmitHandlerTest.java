@@ -175,9 +175,9 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandlerTest {
         SscsHearingRecordingCaseData sscsHearingRecordingCaseDataResponse = response.getData()
                 .getSscsHearingRecordingCaseData();
         assertThat("Check RefusedHearings has been reduced",
-                sscsHearingRecordingCaseDataResponse.getRefusedHearings(), is(empty()));
+                sscsHearingRecordingCaseDataResponse.getRefusedHearings(), anyOf(nullValue(), empty()));
         assertThat("Check DwpReleasedHearings is populated",
-                sscsHearingRecordingCaseDataResponse.getDwpReleasedHearings(), is(empty()));
+                sscsHearingRecordingCaseDataResponse.getDwpReleasedHearings(), anyOf(nullValue(), empty()));
         assertThat("Check RequestedHearings has the correct Hearing",
                 sscsHearingRecordingCaseDataResponse.getRequestedHearings().get(0).getValue()
                         .getSscsHearingRecordingList().get(0).getValue().getHearingId(), is("an_id1"));
