@@ -64,12 +64,12 @@ public class ProcessHearingRecordingRequestMidEventHandler implements PreSubmitC
     private void validateParty(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response) {
         Optional<Hearing> hearingOptional = getHearingFromHearingRecordingRequest(processHearingRecordingRequest, response);
         if (hearingOptional.isPresent()) {
-            validateIfRequestStatusChangedFromGrantedToRefused(party, processHearingRecordingRequest, response, hearingOptional);
+            validateIfRequestStatusChangedFromGrantedToRefused(party, processHearingRecordingRequest, response, hearingOptional.get());
         }
     }
 
-    private void validateIfRequestStatusChangedFromGrantedToRefused(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response, Optional<Hearing> hearingOptional) {
-        final Optional<RequestStatus> requestStatus = processHearingRecordingRequestService.getRequestStatus(party, hearingOptional.get(), response.getData());
+    private void validateIfRequestStatusChangedFromGrantedToRefused(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response, Hearing hearingOptional) {
+        final Optional<RequestStatus> requestStatus = processHearingRecordingRequestService.getRequestStatus(party, hearingOptional, response.getData());
         final Optional<RequestStatus> changedRequestStatus = processHearingRecordingRequestService.getChangedRequestStatus(party, processHearingRecordingRequest);
         if (requestStatus.isPresent() && changedRequestStatus.isPresent() && requestStatus.get().equals(RequestStatus.GRANTED) && changedRequestStatus.get().equals(RequestStatus.REFUSED)) {
             response.addWarning("Are you sure you want to change the request status");

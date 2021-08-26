@@ -128,7 +128,7 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
                 .of(requestedHearings, dwpReleasedHearings, citizenReleasedHearings, refusedHearings)
                 .flatMap(Collection::stream).collect(Collectors.toSet());
 
-        if (StringUtils.isNotBlank(status) && !status.equals(RequestStatus.REQUESTED)) {
+        if (StringUtils.isNotBlank(status) && !status.equals(RequestStatus.REQUESTED.getValue())) {
 
             Set<HearingRecordingRequest> partyHearingRecordingsRequests = allHearingRecordingsRequests.stream()
                     .filter(isFromRequestingParty(partyItemList))
