@@ -137,7 +137,8 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
             if (status.equals(RequestStatus.GRANTED.getValue())) {
                 refusedHearings.removeAll(partyHearingRecordingsRequests);
                 requestedHearings.removeAll(partyHearingRecordingsRequests);
-                partyHearingRecordingsRequests.stream().forEach(req -> req.getValue().setDateApproved(LocalDate.now().toString()));
+                partyHearingRecordingsRequests.stream().forEach(req -> req.getValue()
+                        .setDateApproved(LocalDate.now().toString()));
                 if (partyItemList.equals(PartyItemList.DWP)) {
                     dwpReleasedHearings.addAll(partyHearingRecordingsRequests);
                     sscsCaseData.setDwpState(DwpState.HEARING_RECORDING_PROCESSED.getId());
