@@ -85,6 +85,7 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
                     return;
                 }
                 //TODO:Add unit tests for this, should be part of SSCS-9239
+                /*
             case APPELLANT:
                 DynamicList appellantRequestStatus = processHearingRecordingRequestValue.getAppellant();
                 if (appellantRequestStatus != null) {
@@ -101,6 +102,7 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
                 } else {
                     return;
                 }
+                 */
             default:
         }
 
