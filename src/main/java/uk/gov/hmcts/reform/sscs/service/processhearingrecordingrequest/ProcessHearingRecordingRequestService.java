@@ -57,6 +57,8 @@ public class ProcessHearingRecordingRequestService {
                 return toRequestStatus(processHearingRecordingRequest.getValue().getDwp());
             case JOINT_PARTY:
                 return toRequestStatus(processHearingRecordingRequest.getValue().getJointParty());
+            case REPRESENTATIVE:
+                return toRequestStatus(processHearingRecordingRequest.getValue().getRep());
             case APPELLANT: default:
                 return toRequestStatus(processHearingRecordingRequest.getValue().getAppellant());
         }

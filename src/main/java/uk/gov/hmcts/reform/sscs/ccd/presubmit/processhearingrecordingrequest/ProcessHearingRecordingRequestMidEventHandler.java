@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.processhearingrecordingrequest;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.List;
 import java.util.Optional;
@@ -59,19 +62,37 @@ public class ProcessHearingRecordingRequestMidEventHandler implements PreSubmitC
         if (response.getData().isThereAJointParty()) {
             validateParty(PartyItemList.JOINT_PARTY, processHearingRecordingRequest, response);
         }
+        boolean caseHasARepresentative = isYes(ofNullable(response.getData().getAppeal().getRep()).map(Representative::getHasRepresentative).orElse(NO.getValue()));
+
+        if (caseHasARepresentative) {
+            validateParty(PartyItemList.REPRESENTATIVE, processHearingRecordingRequest, response);
+        }
     }
 
     private void validateParty(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response) {
         Optional<Hearing> hearingOptional = getHearingFromHearingRecordingRequest(processHearingRecordingRequest, response);
         if (hearingOptional.isPresent()) {
-            validateIfRequestStatusChangedFromGrantedToRefused(party, processHearingRecordingRequest, response, hearingOptional);
+            validateHearing(party, processHearingRecordingRequest, response, hearingOptional);
         }
     }
 
-    private void validateIfRequestStatusChangedFromGrantedToRefused(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response, Optional<Hearing> hearingOptional) {
+    private void validateHearing(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response, Optional<Hearing> hearingOptional) {
         final Optional<RequestStatus> requestStatus = processHearingRecordingRequestService.getRequestStatus(party, hearingOptional.get(), response.getData());
         final Optional<RequestStatus> changedRequestStatus = processHearingRecordingRequestService.getChangedRequestStatus(party, processHearingRecordingRequest);
-        if (requestStatus.isPresent() && changedRequestStatus.isPresent() && requestStatus.get().equals(RequestStatus.GRANTED) && changedRequestStatus.get().equals(RequestStatus.REFUSED)) {
+        if (requestStatus.isPresent() && changedRequestStatus.isPresent()) {
+            validateIfRequestStatusChangedFromGrantedToRefused(requestStatus.get(), changedRequestStatus.get(), response);
+            validateIfRequestStatusChangedFromRefusedToGranted(requestStatus.get(), changedRequestStatus.get(), response);
+        }
+    }
+
+    private void validateIfRequestStatusChangedFromGrantedToRefused(RequestStatus requestStatus, RequestStatus changedRequestStatus, PreSubmitCallbackResponse<SscsCaseData> response) {
+        if (requestStatus.equals(RequestStatus.GRANTED) && changedRequestStatus.equals(RequestStatus.REFUSED)) {
+            response.addWarning("Are you sure you want to change the request status");
+        }
+    }
+
+    private void validateIfRequestStatusChangedFromRefusedToGranted(RequestStatus requestStatus, RequestStatus changedRequestStatus, PreSubmitCallbackResponse<SscsCaseData> response) {
+        if (requestStatus.equals(RequestStatus.REFUSED) && changedRequestStatus.equals(RequestStatus.GRANTED)) {
             response.addWarning("Are you sure you want to change the request status");
         }
     }

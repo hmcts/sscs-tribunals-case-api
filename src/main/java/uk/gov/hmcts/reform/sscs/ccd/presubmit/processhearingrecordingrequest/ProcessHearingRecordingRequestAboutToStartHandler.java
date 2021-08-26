@@ -82,13 +82,15 @@ public class ProcessHearingRecordingRequestAboutToStartHandler implements PreSub
         DynamicList dwp = toDynamicList(PartyItemList.DWP, h, sscsCaseData);
         DynamicList jointParty = toDynamicList(PartyItemList.JOINT_PARTY, h, sscsCaseData);
         DynamicList appellant = toDynamicList(PartyItemList.APPELLANT, h, sscsCaseData);
+        DynamicList rep = toDynamicList(PartyItemList.REPRESENTATIVE, h, sscsCaseData);
         ProcessHearingRecordingRequestDetails value = new ProcessHearingRecordingRequestDetails(h.getValue().getHearingId(),
                 selectHearingTitle(h, sscsCaseData.getHearings()),
                 processHearingRecordingRequestService.getFormattedHearingInformation(h),
                 getRecordings(h, sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings()),
                 dwp,
                 jointParty,
-                appellant
+                appellant,
+                rep
         );
         return new ProcessHearingRecordingRequest(value);
     }

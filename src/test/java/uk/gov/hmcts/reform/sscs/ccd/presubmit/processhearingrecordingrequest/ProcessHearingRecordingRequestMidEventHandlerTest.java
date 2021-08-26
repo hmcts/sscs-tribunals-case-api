@@ -27,18 +27,7 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRecordingRequest;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRecordingRequestDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ProcessHearingRecordingRequest;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ProcessHearingRecordingRequestDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecordingCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
@@ -68,7 +57,13 @@ public class ProcessHearingRecordingRequestMidEventHandlerTest {
         openMocks(this);
 
         sscsCaseData = SscsCaseData.builder()
-                .appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build())
+                .appeal(Appeal.builder()
+                        .mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build())
+                        .rep(Representative.builder()
+                                .hasRepresentative(YES.getValue())
+                                .organisation("org")
+                                .build())
+                        .build())
                 .jointParty(YES.getValue())
                 .hearings(List.of(HEARING, getHearing(2)))
                 .sscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder()
@@ -84,13 +79,13 @@ public class ProcessHearingRecordingRequestMidEventHandlerTest {
 
 
     @Test
-    @Parameters({"APPELLANT", "DWP", "JOINT_PARTY"})
+    @Parameters({"REPRESENTATIVE", "APPELLANT", "DWP", "JOINT_PARTY"})
     public void changingRequestFromGrantedToRefusedReturnsWarning(PartyItemList party) {
 
         setReleasedHearingsForParty(party);
 
         sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequests(
-                List.of(getProcessHearingRecordingRequestDetails(party))
+                List.of(getProcessHearingRecordingRequestDetails(party, true))
         );
         final PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -99,26 +94,43 @@ public class ProcessHearingRecordingRequestMidEventHandlerTest {
         assertThat(response.getWarnings().iterator().next(), is("Are you sure you want to change the request status"));
     }
 
-    private ProcessHearingRecordingRequest getProcessHearingRecordingRequestDetails(PartyItemList party) {
+    @Test
+    @Parameters({"REPRESENTATIVE", "APPELLANT", "DWP", "JOINT_PARTY"})
+    public void changingRequestFromRefusedToGrantedReturnsWarning(PartyItemList party) {
+
+        setRefusedHearingsForParty(party);
+
+        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequests(
+                List.of(getProcessHearingRecordingRequestDetails(party, false))
+        );
+        final PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(1));
+        assertThat(response.getWarnings().iterator().next(), is("Are you sure you want to change the request status"));
+    }
+
+    private ProcessHearingRecordingRequest getProcessHearingRecordingRequestDetails(PartyItemList party, boolean setRefusedForParty) {
         return ProcessHearingRecordingRequest.builder()
                 .value(ProcessHearingRecordingRequestDetails.builder()
                         .hearingId(HEARING.getValue().getHearingId())
-                        .appellant(getDynamicList(party, APPELLANT))
-                        .dwp(getDynamicList(party, DWP))
-                        .jointParty(getDynamicList(party, JOINT_PARTY))
+                        .appellant(getDynamicList(party, APPELLANT, setRefusedForParty))
+                        .dwp(getDynamicList(party, DWP, setRefusedForParty))
+                        .jointParty(getDynamicList(party, JOINT_PARTY, setRefusedForParty))
+                        .rep(getDynamicList(party, REPRESENTATIVE, setRefusedForParty))
                         .build())
                 .build();
     }
 
     @Test
-    @Parameters({"APPELLANT", "DWP", "JOINT_PARTY"})
+    @Parameters({"APPELLANT", "DWP", "JOINT_PARTY", "REPRESENTATIVE"})
     public void changingFromRequestedToRefusedHasNoWarningsOrErrors(PartyItemList party) {
         sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(
                 List.of(hearingRecordingRequest(party))
         );
 
         sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequests(
-                List.of(getProcessHearingRecordingRequestDetails(party))
+                List.of(getProcessHearingRecordingRequestDetails(party, true))
         );
         final PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -137,6 +149,10 @@ public class ProcessHearingRecordingRequestMidEventHandlerTest {
         }
     }
 
+    private void setRefusedHearingsForParty(PartyItemList party) {
+        sscsCaseData.getSscsHearingRecordingCaseData().setRefusedHearings(List.of(hearingRecordingRequest(party)));
+    }
+
     private HearingRecordingRequest hearingRecordingRequest(PartyItemList party) {
         return HearingRecordingRequest.builder()
                 .value(HearingRecordingRequestDetails.builder()
@@ -147,8 +163,8 @@ public class ProcessHearingRecordingRequestMidEventHandlerTest {
     }
 
     @NotNull
-    private DynamicList getDynamicList(PartyItemList party, PartyItemList appellant) {
-        return new DynamicList(refusedSelectedIfTrueElseGranted(party.equals(appellant)), getListItems());
+    private DynamicList getDynamicList(PartyItemList party, PartyItemList partyItemList, boolean setRefusedForParty) {
+        return new DynamicList(refusedSelectedIfTrueElseGranted(party.equals(partyItemList) && setRefusedForParty), getListItems());
     }
 
     @NotNull
