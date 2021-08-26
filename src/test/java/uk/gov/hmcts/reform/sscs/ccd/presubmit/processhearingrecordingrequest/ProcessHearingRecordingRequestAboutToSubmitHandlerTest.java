@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -78,6 +79,9 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandlerTest {
         assertThat("Check DwpReleasedHearings has the correct Hearing",
                 sscsHearingRecordingCaseDataResponse.getDwpReleasedHearings().get(0).getValue()
                         .getSscsHearingRecordingList().get(0).getValue().getHearingId(), is("an_id1"));
+        assertThat("Check DwpReleasedHearings has the correct approved date",
+                sscsHearingRecordingCaseDataResponse.getDwpReleasedHearings().get(0).getValue()
+                        .getDateApproved(), is(LocalDate.now().toString()));
         assertThat("Check DwpState is PROCESSED", sscsCaseData.getDwpState(),
                 is(DwpState.HEARING_RECORDING_PROCESSED.getId()));
     }
@@ -103,6 +107,9 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandlerTest {
                 sscsHearingRecordingCaseDataResponse.getDwpReleasedHearings(), is(empty()));
         assertThat("Check RefusedHearings was populated",
                 sscsHearingRecordingCaseDataResponse.getRefusedHearings(), is(not(empty())));
+        assertThat("Check RefusedHearings has no approved date",
+                sscsHearingRecordingCaseDataResponse.getRefusedHearings().get(0).getValue()
+                        .getDateApproved(), is(nullValue()));
         assertThat("Check DwpState is PROCESSED", sscsCaseData.getDwpState(),
                 is(DwpState.HEARING_RECORDING_PROCESSED.getId()));
     }
@@ -112,9 +119,9 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandlerTest {
         SscsHearingRecording recording1 = SscsHearingRecording.builder().value(SscsHearingRecordingDetails.builder()
                 .hearingId("an_id1").build()).build();
         HearingRecordingRequest request1 = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails
-                .builder().sscsHearingRecordingList(Arrays.asList(recording1))
+                .builder().dateApproved(LocalDate.now().toString()).sscsHearingRecordingList(Arrays.asList(recording1))
                 .requestingParty(PartyItemList.DWP.getCode()).build()).build();
-        sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(new ArrayList<>(Arrays.asList(request1)));
+        sscsCaseData.getSscsHearingRecordingCaseData().setDwpReleasedHearings(new ArrayList<>(Arrays.asList(request1)));
         sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequests(Arrays
                 .asList(getDwpProcessHearingRecordingRequests(RequestStatus.REFUSED, "an_id1")));
 
@@ -129,6 +136,9 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandlerTest {
         assertThat("Check RefusedHearings has the correct Hearing",
                 sscsHearingRecordingCaseDataResponse.getRefusedHearings().get(0).getValue()
                         .getSscsHearingRecordingList().get(0).getValue().getHearingId(), is("an_id1"));
+        assertThat("Check RefusedHearings has no approved date",
+                sscsHearingRecordingCaseDataResponse.getRefusedHearings().get(0).getValue()
+                        .getDateApproved(), is(nullValue()));
         assertThat("Check DwpState is PROCESSED", sscsCaseData.getDwpState(),
                 is(DwpState.HEARING_RECORDING_PROCESSED.getId()));
     }
@@ -140,7 +150,7 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandlerTest {
         HearingRecordingRequest request1 = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails
                 .builder().sscsHearingRecordingList(Arrays.asList(recording1))
                 .requestingParty(PartyItemList.DWP.getCode()).build()).build();
-        sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(new ArrayList<>(Arrays.asList(request1)));
+        sscsCaseData.getSscsHearingRecordingCaseData().setRefusedHearings(new ArrayList<>(Arrays.asList(request1)));
         sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequests(Arrays
                 .asList(getDwpProcessHearingRecordingRequests(RequestStatus.GRANTED, "an_id1")));
 

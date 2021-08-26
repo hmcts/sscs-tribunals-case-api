@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.processhearingrecordingrequest;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.mutableEmptyListIfNull;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -134,15 +135,17 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
                     .collect(Collectors.toSet());
 
             if (status.equals(RequestStatus.GRANTED.getValue())) {
+                refusedHearings.removeAll(partyHearingRecordingsRequests);
+                requestedHearings.removeAll(partyHearingRecordingsRequests);
+                partyHearingRecordingsRequests.stream().forEach(req -> req.getValue().setDateApproved(LocalDate.now().toString()));
                 if (partyItemList.equals(PartyItemList.DWP)) {
                     dwpReleasedHearings.addAll(partyHearingRecordingsRequests);
                     sscsCaseData.setDwpState(DwpState.HEARING_RECORDING_PROCESSED.getId());
                 } else {
                     citizenReleasedHearings.addAll(partyHearingRecordingsRequests);
                 }
-                refusedHearings.removeAll(partyHearingRecordingsRequests);
-                requestedHearings.removeAll(partyHearingRecordingsRequests);
             } else if (status.equals(RequestStatus.REFUSED.getValue())) {
+                requestedHearings.removeAll(partyHearingRecordingsRequests);
                 if (partyItemList.equals(PartyItemList.DWP)) {
                     dwpReleasedHearings.removeAll(partyHearingRecordingsRequests);
                     sscsCaseData.setDwpState(DwpState.HEARING_RECORDING_PROCESSED.getId());
@@ -150,7 +153,7 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
                     citizenReleasedHearings.removeAll(partyHearingRecordingsRequests);
                 }
                 refusedHearings.addAll(partyHearingRecordingsRequests);
-                requestedHearings.removeAll(partyHearingRecordingsRequests);
+                refusedHearings.stream().forEach(req -> req.getValue().setDateApproved(null));
             }
 
             sscsHearingRecordingCaseData.setDwpReleasedHearings(dwpReleasedHearings);
