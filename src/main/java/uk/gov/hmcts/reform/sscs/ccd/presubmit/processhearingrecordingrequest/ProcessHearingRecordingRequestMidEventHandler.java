@@ -71,13 +71,11 @@ public class ProcessHearingRecordingRequestMidEventHandler implements PreSubmitC
 
     private void validateParty(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response) {
         Optional<Hearing> hearingOptional = getHearingFromHearingRecordingRequest(processHearingRecordingRequest, response);
-        if (hearingOptional.isPresent()) {
-            validateHearing(party, processHearingRecordingRequest, response, hearingOptional);
-        }
+        hearingOptional.ifPresent(hearing -> validateHearing(party, processHearingRecordingRequest, response, hearing));
     }
 
-    private void validateHearing(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response, Optional<Hearing> hearingOptional) {
-        final Optional<RequestStatus> requestStatus = processHearingRecordingRequestService.getRequestStatus(party, hearingOptional.get(), response.getData());
+    private void validateHearing(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response, Hearing hearing) {
+        final Optional<RequestStatus> requestStatus = processHearingRecordingRequestService.getRequestStatus(party, hearing, response.getData());
         final Optional<RequestStatus> changedRequestStatus = processHearingRecordingRequestService.getChangedRequestStatus(party, processHearingRecordingRequest);
         if (requestStatus.isPresent() && changedRequestStatus.isPresent()) {
             validateIfRequestStatusChangedFromGrantedToRefused(requestStatus.get(), changedRequestStatus.get(), response);
