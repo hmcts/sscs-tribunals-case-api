@@ -109,6 +109,7 @@ public class ProcessHearingRecordingRequestAboutToStartHandlerTest {
         assertThat(processHearingRecordingRequest.getAppellant().getListItems().stream().map(DynamicListItem::getCode).collect(Collectors.toList()), is(List.of("Granted", "Refused")));
         assertThat(processHearingRecordingRequest.getDwp().getValue().getCode(), is(""));
         assertThat(processHearingRecordingRequest.getJointParty().getValue().getCode(), is(""));
+        assertThat(processHearingRecordingRequest.getRep().getValue().getCode(), is(""));
     }
 
     @Test
