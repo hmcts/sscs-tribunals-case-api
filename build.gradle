@@ -19,7 +19,7 @@ plugins {
     id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.6.0'
     id 'org.owasp.dependencycheck' version '6.2.2'
-    id 'au.com.dius.pact' version '4.2.9'
+    id 'au.com.dius.pact' version '4.2.10'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -232,7 +232,7 @@ dependencyManagement {
         dependency group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.69'
 
         // resolves: CVE-2019-10101, CVE-2019-10102, CVE-2019-10103, CVE-2020-15824
-        dependencySet(group: 'org.jetbrains.kotlin', version: '1.5.21') {
+        dependencySet(group: 'org.jetbrains.kotlin', version: '1.5.30') {
             entry 'kotlin-stdlib'
             entry 'kotlin-stdlib-common'
             entry 'kotlin-stdlib-jdk8'
@@ -379,9 +379,9 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:$versions.lombok"
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.11.2'
-    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.27.0'
-    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.11.2'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.12.3'
+    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.28.0'
+    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.12.1'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.27.0'
     testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
