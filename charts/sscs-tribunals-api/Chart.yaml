@@ -40,7 +40,7 @@ dependencies:
     tags:
       - sscs-ccd-idam-pr
   - name: sscs-tribunals-frontend
-    version: 0.2.21
+    version: 0.2.22
     repository: '@hmctspublic'
     condition: sscs-tribunals-frontend.enabled
   - name: redis
