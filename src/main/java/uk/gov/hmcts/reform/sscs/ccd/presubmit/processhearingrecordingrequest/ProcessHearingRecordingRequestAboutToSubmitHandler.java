@@ -114,14 +114,14 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
                                               ProcessHearingRecordingRequestDetails processHearingRecordingRequestValue,
                                               String status) {
 
-        List<HearingRecordingRequest> dwpReleasedHearings =
-                mutableEmptyListIfNull(sscsHearingRecordingCaseData.getDwpReleasedHearings());
-        List<HearingRecordingRequest> citizenReleasedHearings =
-                mutableEmptyListIfNull(sscsHearingRecordingCaseData.getCitizenReleasedHearings());
-        List<HearingRecordingRequest> refusedHearings =
-                mutableEmptyListIfNull(sscsHearingRecordingCaseData.getRefusedHearings());
-        List<HearingRecordingRequest> requestedHearings =
-                mutableEmptyListIfNull(sscsHearingRecordingCaseData.getRequestedHearings());
+        Set<HearingRecordingRequest> dwpReleasedHearings =
+                new HashSet<>(mutableEmptyListIfNull(sscsHearingRecordingCaseData.getDwpReleasedHearings()));
+        Set<HearingRecordingRequest> citizenReleasedHearings =
+                new HashSet<>(mutableEmptyListIfNull(sscsHearingRecordingCaseData.getCitizenReleasedHearings()));
+        Set<HearingRecordingRequest> refusedHearings =
+                new HashSet<>(mutableEmptyListIfNull(sscsHearingRecordingCaseData.getRefusedHearings()));
+        Set<HearingRecordingRequest> requestedHearings =
+                new HashSet<>(mutableEmptyListIfNull(sscsHearingRecordingCaseData.getRequestedHearings()));
 
         Set<HearingRecordingRequest> allHearingRecordingsRequests = Stream
                 .of(requestedHearings, dwpReleasedHearings, citizenReleasedHearings, refusedHearings)
@@ -157,10 +157,10 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
                 refusedHearings.stream().forEach(req -> req.getValue().setDateApproved(null));
             }
 
-            sscsHearingRecordingCaseData.setDwpReleasedHearings(dwpReleasedHearings);
-            sscsHearingRecordingCaseData.setCitizenReleasedHearings(citizenReleasedHearings);
-            sscsHearingRecordingCaseData.setRequestedHearings(requestedHearings);
-            sscsHearingRecordingCaseData.setRefusedHearings(refusedHearings);
+            sscsHearingRecordingCaseData.setDwpReleasedHearings(List.copyOf(dwpReleasedHearings));
+            sscsHearingRecordingCaseData.setCitizenReleasedHearings(List.copyOf(citizenReleasedHearings));
+            sscsHearingRecordingCaseData.setRequestedHearings(List.copyOf(requestedHearings));
+            sscsHearingRecordingCaseData.setRefusedHearings(List.copyOf(refusedHearings));
         }
     }
 
