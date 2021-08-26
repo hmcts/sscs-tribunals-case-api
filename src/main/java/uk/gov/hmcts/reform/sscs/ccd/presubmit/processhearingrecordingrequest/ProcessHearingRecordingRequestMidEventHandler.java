@@ -71,9 +71,7 @@ public class ProcessHearingRecordingRequestMidEventHandler implements PreSubmitC
 
     private void validateParty(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response) {
         Optional<Hearing> hearingOptional = getHearingFromHearingRecordingRequest(processHearingRecordingRequest, response);
-        if (hearingOptional.isPresent()) {
-            validateHearing(party, processHearingRecordingRequest, response, hearingOptional.get());
-        }
+        hearingOptional.ifPresent(hearing -> validateHearing(party, processHearingRecordingRequest, response, hearing));
     }
 
     private void validateHearing(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response, Hearing hearing) {
