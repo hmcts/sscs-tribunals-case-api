@@ -13,7 +13,9 @@ import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_EVIDENCE_
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX;
 import static uk.gov.hmcts.reform.sscs.util.ConfidentialityRequestUtil.isAtLeastOneRequestInProgress;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -80,6 +82,13 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
+        if (isBundleAdditionWarning(sscsCaseData)) {
+            PreSubmitCallbackResponse<SscsCaseData> response =
+                new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
+            response.addWarning("Some documents in this Bundle contain the same addition letter. Are you sure you want to proceed?");
+            return response;
+        }
+
         moveDocsToDwpCollectionIfOldPattern(sscsCaseData);
 
         setDocumentFileNameIfNotSet(sscsCaseData);
@@ -116,6 +125,20 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         setDocumentFileNameOnDwpResponseDocument(sscsCaseData);
         setDocumentFileNameOnDwpEvidenceDocument(sscsCaseData);
         setDocumentFileNameOnSscsDocuments(sscsCaseData);
+    }
+
+    private boolean isBundleAdditionWarning(SscsCaseData sscsCaseData) {
+        List<String> bundleAdditions = emptyIfNull(sscsCaseData.getSscsDocument())
+            .stream()
+            .filter(document -> document.getValue() != null)
+            .map(document -> document.getValue().getBundleAddition())
+            .filter(bundleAddition -> bundleAddition != null)
+            .map(String::toUpperCase)
+            .collect(Collectors.toList());
+
+        return emptyIfNull(bundleAdditions).stream()
+            .filter(addition -> Collections.frequency(bundleAdditions, addition) > 1)
+            .count() > 0;
     }
 
     private void setDocumentFileNameOnDwpResponseDocument(SscsCaseData sscsCaseData) {
