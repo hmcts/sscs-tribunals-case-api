@@ -122,6 +122,7 @@ public class PostponementRequestAboutToSubmitHandlerTest {
         assertThat(document.getValue().getDocumentLink().getDocumentFilename(), is("example.pdf"));
         assertThat(document.getValue().getPartyUploaded(), is(UploadParty.DWP));
         assertThat(sscsCaseData.getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_TCW.getId()));
+        assertThat(sscsCaseData.getInterlocReferralReason(), is("Review hearing postponement request"));
     }
 
 

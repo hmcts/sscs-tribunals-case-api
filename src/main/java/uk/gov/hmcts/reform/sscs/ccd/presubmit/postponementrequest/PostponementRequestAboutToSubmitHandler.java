@@ -47,6 +47,7 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
         final SscsDocument sscsDocument = buildNewSscsDocumentFromPostponementRequest(sscsCaseData);
         addToSscsDocuments(sscsCaseData, sscsDocument);
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId());
+        sscsCaseData.setInterlocReferralReason("Review hearing postponement request");
         clearTransientFields(sscsCaseData);
     }
 
