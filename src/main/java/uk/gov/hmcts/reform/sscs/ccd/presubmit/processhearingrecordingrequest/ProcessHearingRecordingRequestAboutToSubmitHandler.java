@@ -171,9 +171,7 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
 
     @NotNull
     private Predicate<HearingRecordingRequest> hasHearingId(String hearingId) {
-        return recordingRequest ->
-                recordingRequest.getValue().getSscsHearingRecordingList().stream()
-                        .anyMatch(hearing -> hearing.getValue().getHearingId()
-                                .equals(hearingId));
+        return recordingRequest -> recordingRequest.getValue().getSscsHearingRecording().getHearingId()
+                                .equals(hearingId);
     }
 }

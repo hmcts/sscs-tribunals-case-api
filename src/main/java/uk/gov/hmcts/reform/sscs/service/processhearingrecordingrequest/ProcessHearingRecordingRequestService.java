@@ -47,8 +47,7 @@ public class ProcessHearingRecordingRequestService {
     private boolean hasHearingRequestInCollection(PartyItemList party, Hearing hearing, List<HearingRecordingRequest> hearingRecordingCollection) {
         return emptyIfNull(hearingRecordingCollection).stream()
                 .filter(r -> r.getValue().getRequestingParty().equals(party.getCode()))
-                .flatMap(r -> r.getValue().getSscsHearingRecordingList().stream())
-                .anyMatch(hr -> hr.getValue().getHearingId().equals(hearing.getValue().getHearingId()));
+                .anyMatch(hr -> hr.getValue().getSscsHearingRecording().getHearingId().equals(hearing.getValue().getHearingId()));
     }
 
     public Optional<RequestStatus> getChangedRequestStatus(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest) {

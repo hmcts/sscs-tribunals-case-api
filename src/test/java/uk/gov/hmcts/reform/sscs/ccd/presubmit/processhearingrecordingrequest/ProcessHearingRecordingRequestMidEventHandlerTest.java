@@ -157,7 +157,7 @@ public class ProcessHearingRecordingRequestMidEventHandlerTest {
         return HearingRecordingRequest.builder()
                 .value(HearingRecordingRequestDetails.builder()
                         .requestingParty(party.getCode())
-                        .sscsHearingRecordingList(List.of(recording(1)))
+                        .sscsHearingRecording(recording(1).getValue())
                         .build())
                 .build();
     }

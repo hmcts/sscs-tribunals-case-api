@@ -280,7 +280,7 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
                         new DynamicListItem("2222", "good - value 17:00:00 06 Jun 2021"), Collections.EMPTY_LIST))
                 .hearingRecording(createHearingRecording(ADJOURNED.getKey()))
                 .sscsHearingRecordings(existingRecordings)
-                .releasedHearings(released)
+                .dwpReleasedHearings(released)
                 .build());
 
         sscsCaseData.setHearings(singletonList(Hearing.builder().value(
@@ -293,7 +293,7 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
 
         assertEquals(0, response.getErrors().size());
         SscsHearingRecordingDetails sscsHearingRecording =
-                response.getData().getSscsHearingRecordingCaseData().getReleasedHearings().get(0).getValue().getSscsHearingRecording();
+                response.getData().getSscsHearingRecordingCaseData().getDwpReleasedHearings().get(0).getValue().getSscsHearingRecording();
 
         assertEquals("adjourned", sscsHearingRecording.getHearingType());
         assertEquals("06-06-2021 05:00:00 PM", sscsHearingRecording.getHearingDate());
