@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
@@ -47,7 +48,7 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
         final SscsDocument sscsDocument = buildNewSscsDocumentFromPostponementRequest(sscsCaseData);
         addToSscsDocuments(sscsCaseData, sscsDocument);
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId());
-        sscsCaseData.setInterlocReferralReason("Review hearing postponement request");
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId());
         clearTransientFields(sscsCaseData);
     }
 
@@ -61,7 +62,10 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
     }
 
     private void clearTransientFields(SscsCaseData sscsCaseData) {
-        sscsCaseData.setPostponementRequest(null);
+        sscsCaseData.getPostponementRequest().setPostponementRequestDetails(null);
+        sscsCaseData.getPostponementRequest().setPostponementRequestHearingVenue(null);
+        sscsCaseData.getPostponementRequest().setPostponementPreviewDocument(null);
+        sscsCaseData.getPostponementRequest().setPostponementRequestHearingDateAndTime(null);
     }
 
     private void addToSscsDocuments(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
