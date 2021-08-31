@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.processhearingrecordingrequest;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.mutableEmptyListIfNull;
 
@@ -54,6 +55,8 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
                             processHearingRecordingRequest, PartyItemList.APPELLANT);
                     processHearingRecordings(sscsCaseData,
                             processHearingRecordingRequest, PartyItemList.JOINT_PARTY);
+                    processHearingRecordings(sscsCaseData,
+                            processHearingRecordingRequest, PartyItemList.REPRESENTATIVE);
                 });
 
         if (mutableEmptyListIfNull(sscsHearingRecordingCaseData.getRequestedHearings()).isEmpty()) {
@@ -69,9 +72,6 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
                                           ProcessHearingRecordingRequest processHearingRecordingRequest,
                                           PartyItemList partyItemList) {
 
-
-        SscsHearingRecordingCaseData sscsHearingRecordingCaseData =
-                sscsCaseData.getSscsHearingRecordingCaseData();
         ProcessHearingRecordingRequestDetails processHearingRecordingRequestValue =
                 processHearingRecordingRequest.getValue();
 
@@ -79,16 +79,17 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
         switch (partyItemList) {
             case DWP:
                 DynamicList dwpRequestStatus = processHearingRecordingRequestValue.getDwp();
-                if (dwpRequestStatus != null) {
+                if (nonNull(dwpRequestStatus) && nonNull(dwpRequestStatus.getValue())
+                        && nonNull(dwpRequestStatus.getValue().getCode())) {
                     status = dwpRequestStatus.getValue().getCode();
                     break;
                 } else {
                     return;
                 }
-                //TODO:Add unit tests for this, should be part of SSCS-9239
             case APPELLANT:
                 DynamicList appellantRequestStatus = processHearingRecordingRequestValue.getAppellant();
-                if (appellantRequestStatus != null) {
+                if (nonNull(appellantRequestStatus) && nonNull(appellantRequestStatus.getValue())
+                        && nonNull(appellantRequestStatus.getValue().getCode())) {
                     status = appellantRequestStatus.getValue().getCode();
                     break;
                 } else {
@@ -96,16 +97,27 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
                 }
             case JOINT_PARTY:
                 DynamicList jointPartyStatus = processHearingRecordingRequestValue.getJointParty();
-                if (jointPartyStatus != null) {
+                if (nonNull(jointPartyStatus) && nonNull(jointPartyStatus.getValue())
+                        && nonNull(jointPartyStatus.getValue().getCode())) {
                     status = jointPartyStatus.getValue().getCode();
                     break;
                 } else {
                     return;
                 }
+            case REPRESENTATIVE:
+                DynamicList representativeStatus = processHearingRecordingRequestValue.getRep();
+                if (nonNull(representativeStatus) && nonNull(representativeStatus.getValue())
+                        && nonNull(representativeStatus.getValue().getCode())) {
+                    status = representativeStatus.getValue().getCode();
+                    break;
+                } else {
+                    return;
+                }
             default:
+                return;
         }
 
-        organiseHearingRequestsLists(sscsCaseData, partyItemList, sscsHearingRecordingCaseData,
+        organiseHearingRequestsLists(sscsCaseData, partyItemList, sscsCaseData.getSscsHearingRecordingCaseData(),
                 processHearingRecordingRequestValue, status);
     }
 
@@ -129,10 +141,16 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
 
         if (StringUtils.isNotBlank(status) && !status.equals(RequestStatus.REQUESTED.getValue())) {
 
+            String hearingId = processHearingRecordingRequestValue.getHearingId();
+
             Set<HearingRecordingRequest> partyHearingRecordingsRequests = allHearingRecordingsRequests.stream()
                     .filter(isFromRequestingParty(partyItemList))
-                    .filter(hasHearingId(processHearingRecordingRequestValue.getHearingId()))
+                    .filter(hasHearingId(hearingId))
                     .collect(Collectors.toSet());
+
+            if (partyHearingRecordingsRequests.isEmpty()) {
+                createNewHearingRecordingRequest(partyItemList, sscsHearingRecordingCaseData, hearingId, partyHearingRecordingsRequests);
+            }
 
             if (status.equals(RequestStatus.GRANTED.getValue())) {
                 refusedHearings.removeAll(partyHearingRecordingsRequests);
@@ -162,6 +180,17 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
             sscsHearingRecordingCaseData.setRequestedHearings(List.copyOf(requestedHearings));
             sscsHearingRecordingCaseData.setRefusedHearings(List.copyOf(refusedHearings));
         }
+    }
+
+    private void createNewHearingRecordingRequest(PartyItemList partyItemList, SscsHearingRecordingCaseData sscsHearingRecordingCaseData, String hearingId, Set<HearingRecordingRequest> partyHearingRecordingsRequests) {
+        List<SscsHearingRecording> recordings = sscsHearingRecordingCaseData.getSscsHearingRecordings().stream()
+                .filter(sscsHearing -> sscsHearing.getValue().getHearingId().equals(hearingId))
+                .collect(Collectors.toList());
+        HearingRecordingRequest recordingRequest = HearingRecordingRequest.builder()
+                .value(HearingRecordingRequestDetails.builder()
+                        .sscsHearingRecordingList(recordings).dateRequested(LocalDate.now().toString())
+                        .requestingParty(partyItemList.getCode()).build()).build();
+        partyHearingRecordingsRequests.add(recordingRequest);
     }
 
     @NotNull
