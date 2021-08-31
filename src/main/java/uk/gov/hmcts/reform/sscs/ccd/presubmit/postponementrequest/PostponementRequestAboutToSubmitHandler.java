@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.postponementrequest;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -49,6 +50,7 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
         addToSscsDocuments(sscsCaseData, sscsDocument);
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId());
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId());
+        sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(YES);
         clearTransientFields(sscsCaseData);
     }
 
@@ -79,7 +81,7 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
                 .documentType(DocumentType.POSTPONEMENT_REQUEST.getValue())
                 .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
                 .partyUploaded(UploadParty.DWP)
-                .shouldBundleIncludeDocLink(YesNo.NO)
+                .shouldBundleIncludeDocLink(NO)
                 .build()).build();
     }
 

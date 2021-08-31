@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.postponementrequest.PostponementRequestAboutToStartHandlerTest.getHearing;
 
 import java.time.LocalDateTime;
@@ -124,6 +125,7 @@ public class PostponementRequestAboutToSubmitHandlerTest {
         assertThat(document.getValue().getPartyUploaded(), is(UploadParty.DWP));
         assertThat(sscsCaseData.getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_TCW.getId()));
         assertThat(sscsCaseData.getInterlocReferralReason(), is(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId()));
+        assertThat(sscsCaseData.getPostponementRequest().getUnprocessedPostponementRequest(), is(YES));
     }
 
 }
