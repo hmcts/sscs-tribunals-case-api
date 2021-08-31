@@ -6,6 +6,7 @@ import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.counting;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
@@ -13,8 +14,8 @@ import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_EVIDENCE_
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX;
 import static uk.gov.hmcts.reform.sscs.util.ConfidentialityRequestUtil.isAtLeastOneRequestInProgress;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,16 +83,15 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        if (isBundleAdditionWarning(sscsCaseData)) {
-            PreSubmitCallbackResponse<SscsCaseData> response =
-                new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
-            response.addWarning("Some documents in this Bundle contain the same addition letter. Are you sure you want to proceed?");
-            return response;
-        }
-
         moveDocsToDwpCollectionIfOldPattern(sscsCaseData);
 
         setDocumentFileNameIfNotSet(sscsCaseData);
+
+        if (hasBundleAdditionsWithSameCharacter(sscsCaseData) && !callback.isIgnoreWarnings()) {
+            PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
+            response.addWarning("Some documents in this Bundle contain the same addition letter. Are you sure you want to proceed?");
+            return response;
+        }
 
         clearExistingBundles(callback);
 
@@ -127,18 +127,18 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         setDocumentFileNameOnSscsDocuments(sscsCaseData);
     }
 
-    private boolean isBundleAdditionWarning(SscsCaseData sscsCaseData) {
-        List<String> bundleAdditions = emptyIfNull(sscsCaseData.getSscsDocument())
+    private boolean hasBundleAdditionsWithSameCharacter(SscsCaseData sscsCaseData) {
+        return emptyIfNull(sscsCaseData.getSscsDocument())
             .stream()
             .filter(document -> document.getValue() != null)
             .map(document -> document.getValue().getBundleAddition())
             .filter(bundleAddition -> bundleAddition != null)
             .map(String::toUpperCase)
-            .collect(Collectors.toList());
-
-        return emptyIfNull(bundleAdditions).stream()
-            .filter(addition -> Collections.frequency(bundleAdditions, addition) > 1)
+            .collect(Collectors.groupingBy(Function.identity(), counting()))    // create a map {A=2,B=1}
+            .entrySet().stream()
+            .filter(bundleAdditionItem -> bundleAdditionItem.getValue() > 1)
             .count() > 0;
+
     }
 
     private void setDocumentFileNameOnDwpResponseDocument(SscsCaseData sscsCaseData) {
