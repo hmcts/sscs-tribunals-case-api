@@ -48,16 +48,8 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
                 sscsCaseData.getSscsHearingRecordingCaseData();
 
         sscsHearingRecordingCaseData.getProcessHearingRecordingRequests().stream()
-                .forEach(processHearingRecordingRequest -> {
-                    processHearingRecordings(sscsCaseData,
-                            processHearingRecordingRequest, PartyItemList.DWP);
-                    processHearingRecordings(sscsCaseData,
-                            processHearingRecordingRequest, PartyItemList.APPELLANT);
-                    processHearingRecordings(sscsCaseData,
-                            processHearingRecordingRequest, PartyItemList.JOINT_PARTY);
-                    processHearingRecordings(sscsCaseData,
-                            processHearingRecordingRequest, PartyItemList.REPRESENTATIVE);
-                });
+                .forEach(processHearingRecordingRequest -> processPartyRequests(sscsCaseData,
+                        sscsHearingRecordingCaseData, processHearingRecordingRequest));
 
         if (mutableEmptyListIfNull(sscsHearingRecordingCaseData.getRequestedHearings()).isEmpty()) {
             sscsHearingRecordingCaseData.setHearingRecordingRequestOutstanding(YesNo.NO);
@@ -68,63 +60,43 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    private void processHearingRecordings(SscsCaseData sscsCaseData,
-                                          ProcessHearingRecordingRequest processHearingRecordingRequest,
-                                          PartyItemList partyItemList) {
-
+    private void processPartyRequests(SscsCaseData sscsCaseData, SscsHearingRecordingCaseData sscsHearingRecordingCaseData, ProcessHearingRecordingRequest processHearingRecordingRequest) {
         ProcessHearingRecordingRequestDetails processHearingRecordingRequestValue =
                 processHearingRecordingRequest.getValue();
-
-        String status = null;
-        switch (partyItemList) {
-            case DWP:
-                DynamicList dwpRequestStatus = processHearingRecordingRequestValue.getDwp();
-                if (nonNull(dwpRequestStatus) && nonNull(dwpRequestStatus.getValue())
-                        && nonNull(dwpRequestStatus.getValue().getCode())) {
-                    status = dwpRequestStatus.getValue().getCode();
-                    break;
-                } else {
-                    return;
-                }
-            case APPELLANT:
-                DynamicList appellantRequestStatus = processHearingRecordingRequestValue.getAppellant();
-                if (nonNull(appellantRequestStatus) && nonNull(appellantRequestStatus.getValue())
-                        && nonNull(appellantRequestStatus.getValue().getCode())) {
-                    status = appellantRequestStatus.getValue().getCode();
-                    break;
-                } else {
-                    return;
-                }
-            case JOINT_PARTY:
-                DynamicList jointPartyStatus = processHearingRecordingRequestValue.getJointParty();
-                if (nonNull(jointPartyStatus) && nonNull(jointPartyStatus.getValue())
-                        && nonNull(jointPartyStatus.getValue().getCode())) {
-                    status = jointPartyStatus.getValue().getCode();
-                    break;
-                } else {
-                    return;
-                }
-            case REPRESENTATIVE:
-                DynamicList representativeStatus = processHearingRecordingRequestValue.getRep();
-                if (nonNull(representativeStatus) && nonNull(representativeStatus.getValue())
-                        && nonNull(representativeStatus.getValue().getCode())) {
-                    status = representativeStatus.getValue().getCode();
-                    break;
-                } else {
-                    return;
-                }
-            default:
-                return;
+        if (isPartyItemSet(processHearingRecordingRequestValue.getDwp())) {
+            processHearingRecordingsRequestsForParty(sscsCaseData, PartyItemList.DWP, sscsHearingRecordingCaseData,
+                    processHearingRecordingRequestValue, processHearingRecordingRequestValue.getDwp()
+                            .getValue().getCode());
         }
-
-        organiseHearingRequestsLists(sscsCaseData, partyItemList, sscsCaseData.getSscsHearingRecordingCaseData(),
-                processHearingRecordingRequestValue, status);
+        if (isPartyItemSet(processHearingRecordingRequestValue.getAppellant())) {
+            processHearingRecordingsRequestsForParty(sscsCaseData, PartyItemList.APPELLANT, sscsHearingRecordingCaseData,
+                    processHearingRecordingRequestValue, processHearingRecordingRequestValue.getAppellant()
+                            .getValue().getCode());
+        }
+        if (isPartyItemSet(processHearingRecordingRequestValue.getJointParty())) {
+            processHearingRecordingsRequestsForParty(sscsCaseData, PartyItemList.JOINT_PARTY, sscsHearingRecordingCaseData,
+                    processHearingRecordingRequestValue, processHearingRecordingRequestValue.getJointParty()
+                            .getValue().getCode());
+        }
+        if (isPartyItemSet(processHearingRecordingRequestValue.getRep())) {
+            processHearingRecordingsRequestsForParty(sscsCaseData, PartyItemList.REPRESENTATIVE, sscsHearingRecordingCaseData,
+                    processHearingRecordingRequestValue, processHearingRecordingRequestValue.getRep()
+                            .getValue().getCode());
+        }
     }
 
-    private void organiseHearingRequestsLists(SscsCaseData sscsCaseData, PartyItemList partyItemList,
-                                              SscsHearingRecordingCaseData sscsHearingRecordingCaseData,
-                                              ProcessHearingRecordingRequestDetails processHearingRecordingRequestValue,
-                                              String status) {
+    private boolean isPartyItemSet(DynamicList item) {
+        if (nonNull(item) && nonNull(item.getValue()) && nonNull(item.getValue().getCode())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void processHearingRecordingsRequestsForParty(SscsCaseData sscsCaseData, PartyItemList partyItemList,
+                                                          SscsHearingRecordingCaseData sscsHearingRecordingCaseData,
+                                                          ProcessHearingRecordingRequestDetails processHearingRecordingRequestValue,
+                                                          String status) {
 
         Set<HearingRecordingRequest> dwpReleasedHearings =
                 new HashSet<>(mutableEmptyListIfNull(sscsHearingRecordingCaseData.getDwpReleasedHearings()));
