@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
@@ -45,6 +46,7 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
         ensureSscsDocumentsIsNotNull(sscsCaseData);
         final SscsDocument sscsDocument = buildNewSscsDocumentFromPostponementRequest(sscsCaseData);
         addToSscsDocuments(sscsCaseData, sscsDocument);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId());
         clearTransientFields(sscsCaseData);
     }
 

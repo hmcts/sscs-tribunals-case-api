@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
@@ -120,6 +121,7 @@ public class PostponementRequestAboutToSubmitHandlerTest {
         assertThat(document.getValue().getDocumentType(), is(DocumentType.POSTPONEMENT_REQUEST.getValue()));
         assertThat(document.getValue().getDocumentLink().getDocumentFilename(), is("example.pdf"));
         assertThat(document.getValue().getPartyUploaded(), is(UploadParty.DWP));
+        assertThat(sscsCaseData.getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_TCW.getId()));
     }
 
 
