@@ -81,7 +81,6 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
                 .documentType(DocumentType.POSTPONEMENT_REQUEST.getValue())
                 .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
                 .partyUploaded(UploadParty.DWP)
-                .shouldBundleIncludeDocLink(NO)
                 .build()).build();
     }
 
