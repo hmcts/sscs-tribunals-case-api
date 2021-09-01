@@ -86,11 +86,7 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
     }
 
     private boolean isPartyItemSet(DynamicList item) {
-        if (nonNull(item) && nonNull(item.getValue()) && nonNull(item.getValue().getCode())) {
-            return true;
-        } else {
-            return false;
-        }
+        return nonNull(item) && nonNull(item.getValue()) && nonNull(item.getValue().getCode());
     }
 
     private void processHearingRecordingsRequestsForParty(SscsCaseData sscsCaseData, PartyItemList partyItemList,
