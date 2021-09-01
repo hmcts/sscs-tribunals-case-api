@@ -32,6 +32,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -265,11 +267,12 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        assertEquals("reviewByTcw", captor.getValue().getInterlocReviewState());
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), captor.getValue().getInterlocReviewState());
+        assertEquals(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId(), captor.getValue().getInterlocReferralReason());
 
         then(ccdService).should(times(1))
                 .updateCase(eq(callback.getCaseDetails().getCaseData()), eq(123L), eq(eventType),
-                        eq(ActionFurtherEvidenceSubmittedCallbackHandler.TCW_REVIEW_POSTPONEMENT_REQUEST),
+                        eq(ActionFurtherEvidenceSubmittedCallbackHandler.TCW_REVIEW_SEND_TO_JUDGE),
                         anyString(), any(IdamTokens.class));
     }
 }

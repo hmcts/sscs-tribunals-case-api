@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -98,19 +99,12 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         }
         if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(), SEND_TO_INTERLOC_REVIEW_BY_TCW)) {
             setSelectWhoReviewsCaseField(caseData, REVIEW_BY_TCW);
-            String reason = null;
-            if (emptyIfNull(caseData.getSscsDocument()).stream()
-                    .anyMatch(document -> document.getValue().getDocumentType() != null
-                            && document.getValue().getDocumentType().equals(DocumentType.POSTPONEMENT_REQUEST
-                            .getValue()))) {
-                reason = TCW_REVIEW_POSTPONEMENT_REQUEST;
-            } else {
-                reason = TCW_REVIEW_SEND_TO_JUDGE;
+            if (isPostponementRequest(caseData)) {
+                caseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId());
             }
-
             return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
-                    REVIEW_BY_TCW.getId(), SEND_TO_INTERLOC_REVIEW_BY_TCW,
-                    EventType.VALID_SEND_TO_INTERLOC, reason);
+                    REVIEW_BY_TCW.getId(), SEND_TO_INTERLOC_REVIEW_BY_TCW, EventType.VALID_SEND_TO_INTERLOC,
+                    TCW_REVIEW_SEND_TO_JUDGE);
         }
         if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL)
                 && isValidUrgentDocument(caseData)) {
@@ -125,6 +119,13 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
                 EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Issue to all parties",
                 "Issue to all parties", idamService.getIdamTokens());
+    }
+
+    private boolean isPostponementRequest(SscsCaseData caseData) {
+        return emptyIfNull(caseData.getSscsDocument()).stream()
+                .anyMatch(document -> document.getValue().getDocumentType() != null
+                        && document.getValue().getDocumentType().equals(DocumentType.POSTPONEMENT_REQUEST
+                        .getValue()));
     }
 
     private boolean isValidUrgentDocument(SscsCaseData caseData) {
