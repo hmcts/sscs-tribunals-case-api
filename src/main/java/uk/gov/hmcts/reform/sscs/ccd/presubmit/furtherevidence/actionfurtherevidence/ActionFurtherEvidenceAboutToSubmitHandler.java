@@ -195,14 +195,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 }
                 sscsCaseData.getAppealNotePad().getNotesCollection()
                         .add(createPostponementRequestNote(userAuthorisation, details));
-                sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(YesNo.YES);
+                sscsCaseData.setPostponementRequest(PostponementRequest.builder().unprocessedPostponementRequest(YesNo.YES).build());
             }
         }
 
         buildSscsDocumentFromScan(sscsCaseData, caseDetails.getState(), callback.isIgnoreWarnings(),
                 preSubmitCallbackResponse);
-
-        sscsCaseData.getPostponementRequest().setShowPostponementDetailsPage(null);
 
         return preSubmitCallbackResponse;
     }
