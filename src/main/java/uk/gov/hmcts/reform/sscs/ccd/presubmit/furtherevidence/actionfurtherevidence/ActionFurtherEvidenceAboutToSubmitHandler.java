@@ -185,9 +185,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         }
 
-        if (emptyIfNull(sscsCaseData.getScannedDocuments()).stream()
-                .anyMatch(doc -> doc.getValue() != null && StringUtils.isNotBlank(doc.getValue().getType())
-                        && doc.getValue().getType().equals(DocumentType.POSTPONEMENT_REQUEST.getValue()))) {
+        if (isPostponementRequest(sscsCaseData)) {
             String details = sscsCaseData.getPostponementRequest().getPostponementRequestDetails();
             if (StringUtils.isBlank(details)) {
                 preSubmitCallbackResponse.addError(POSTPONEMENT_DETAILS_IS_MANDATORY);
@@ -197,15 +195,22 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 }
                 sscsCaseData.getAppealNotePad().getNotesCollection()
                         .add(createPostponementRequestNote(userAuthorisation, details));
+                sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(YesNo.YES);
             }
         }
 
         buildSscsDocumentFromScan(sscsCaseData, caseDetails.getState(), callback.isIgnoreWarnings(),
                 preSubmitCallbackResponse);
 
-        sscsCaseData.setPostponementRequest(null);
+        sscsCaseData.getPostponementRequest().setShowPostponementDetailsPage(null);
 
         return preSubmitCallbackResponse;
+    }
+
+    private boolean isPostponementRequest(SscsCaseData sscsCaseData) {
+        return emptyIfNull(sscsCaseData.getScannedDocuments()).stream()
+                .anyMatch(doc -> doc.getValue() != null && StringUtils.isNotBlank(doc.getValue().getType())
+                        && doc.getValue().getType().equals(DocumentType.POSTPONEMENT_REQUEST.getValue()));
     }
 
     private Note createPostponementRequestNote(String userAuthorisation, String details) {
