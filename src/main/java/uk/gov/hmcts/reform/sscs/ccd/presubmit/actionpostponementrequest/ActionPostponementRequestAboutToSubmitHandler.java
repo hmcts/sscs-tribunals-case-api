@@ -67,5 +67,4 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
                 .author(userDetailsService.buildLoggedInUserName(userAuthorisation))
                 .noteDate(LocalDate.now().toString()).build()).build();
     }
-
 }
