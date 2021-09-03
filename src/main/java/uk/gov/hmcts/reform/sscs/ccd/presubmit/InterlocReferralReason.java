@@ -19,8 +19,7 @@ public enum InterlocReferralReason {
     OVER_13_MONTHS_AND_GROUNDS_MISSING("over13MonthsAndGroundsMissing", "Grounds for appeal missing"),
     COMPLEX_CASE("complexCase", "Complex Case"),
     ADVICE_ON_HOW_TO_PROCEED("adviceOnHowToProceed", "Advice on how to proceed"),
-    REJECT_HEARING_RECORDING_REQUEST("rejectHearingRecordingRequest", "Reject hearing recording request"),
-    REVIEW_POSTPONEMENT_REQUEST("reviewPostponementRequest", "Review hearing postponement request");
+    REJECT_HEARING_RECORDING_REQUEST("rejectHearingRecordingRequest", "Reject hearing recording request");
 
     private final String id;
     private final String label;
