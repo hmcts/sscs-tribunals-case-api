@@ -1,13 +1,16 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -19,9 +22,21 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
@@ -49,31 +64,31 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
         when(footerService.isReadablePdf(any())).thenReturn(PdfState.OK);
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder()
-                        .fileName("bla.pdf")
-                        .type("type")
-                        .subtype("sscs1")
-                        .url(DocumentLink.builder().documentUrl("www.test.com").build())
-                        .scannedDate("2019-06-13T00:00:00.000")
-                        .controlNumber("123")
-                        .build()).build();
+            ScannedDocumentDetails.builder()
+                .fileName("bla.pdf")
+                .type("type")
+                .subtype("sscs1")
+                .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                .scannedDate("2019-06-13T00:00:00.000")
+                .controlNumber("123")
+                .build()).build();
 
         scannedDocumentList.add(scannedDocument);
         DynamicList furtherEvidenceActionList = buildFurtherEvidenceActionItemListForGivenOption("otherDocumentManual",
-                "Other document type - action manually");
+            "Other document type - action manually");
 
         DynamicListItem value = new DynamicListItem("appellant", "Appellant (or Appointee)");
         DynamicList originalSender = new DynamicList(value, Collections.singletonList(value));
 
         sscsCaseData = SscsCaseData.builder()
-                .ccdCaseId("1234")
-                .scannedDocuments(scannedDocumentList)
-                .furtherEvidenceAction(furtherEvidenceActionList)
-                .originalSender(originalSender)
-                .appeal(Appeal.builder().appellant(
-                                Appellant.builder().address(Address.builder().line1("My Road").postcode("TS1 2BA").build()).build())
-                        .build())
-                .build();
+            .ccdCaseId("1234")
+            .scannedDocuments(scannedDocumentList)
+            .furtherEvidenceAction(furtherEvidenceActionList)
+            .originalSender(originalSender)
+            .appeal(Appeal.builder().appellant(
+                Appellant.builder().address(Address.builder().line1("My Road").postcode("TS1 2BA").build()).build())
+                .build())
+            .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -82,125 +97,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     private DynamicList buildFurtherEvidenceActionItemListForGivenOption(String code, String label) {
         DynamicListItem selectedOption = new DynamicListItem(code, label);
         return new DynamicList(selectedOption,
-                Collections.singletonList(selectedOption));
-    }
-
-    @Test
-    public void givenAPostponementRequestInInterlocTcwActionAndCaseInHearing_thenAddNoError() {
-
-        when(caseDetails.getState()).thenReturn(State.HEARING);
-        sscsCaseData.getFurtherEvidenceAction().setValue(
-                new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
-                        FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getLabel()));
-
-        ScannedDocument scannedDocument = ScannedDocument.builder()
-                .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
-                        .fileName("Testing.jpg").url(DocumentLink.builder()
-                                .documentUrl("test.com").build()).build()).build();
-        sscsCaseData.setPostponementRequest(PostponementRequest.builder().postponementRequestDetails("Anything").build());
-
-        sscsCaseData.setScannedDocuments(Arrays.asList(scannedDocument));
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors(), is(empty()));
-    }
-
-    @Test
-    public void givenAPostponementRequestWithoutDetails_thenAddNoError() {
-        List<ScannedDocument> docs = new ArrayList<>();
-        when(caseDetails.getState()).thenReturn(State.HEARING);
-        sscsCaseData.getFurtherEvidenceAction().setValue(
-                new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
-                        FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getLabel()));
-
-        ScannedDocument scannedDocument = ScannedDocument.builder()
-                .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
-                        .fileName("Testing.jpg").url(DocumentLink.builder()
-                                .documentUrl("test.com").build()).build()).build();
-
-        docs.add(scannedDocument);
-
-        sscsCaseData.setScannedDocuments(docs);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors(), is(empty()));
-    }
-
-    @Test
-    public void givenAPostponementRequestInOtherThanInterlocTcwAction_thenAddAnError() {
-        List<ScannedDocument> docs = new ArrayList<>();
-        when(caseDetails.getState()).thenReturn(State.HEARING);
-        sscsCaseData.getFurtherEvidenceAction().setValue(
-                new DynamicListItem(FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE.getCode(),
-                        FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE.getLabel()));
-        ScannedDocument scannedDocument = ScannedDocument.builder()
-                .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
-                        .fileName("Testing.jpg").url(DocumentLink.builder().documentUrl("test.com").build()).build())
-                .build();
-
-        docs.add(scannedDocument);
-
-        sscsCaseData.setScannedDocuments(docs);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors(), is(not(empty())));
-        assertThat(response.getErrors().iterator().next(),
-                is(ActionFurtherEvidenceMidEventHandler.POSTPONEMENTS_REVIEWED_BY_TCW));
-    }
-
-    @Test
-    public void givenAPostponementRequestInOtherThanHearingState_thenAddAnError() {
-        List<ScannedDocument> docs = new ArrayList<>();
-        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
-        sscsCaseData.getFurtherEvidenceAction().setValue(
-                new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
-                        FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getLabel()));
-        ScannedDocument scannedDocument = ScannedDocument.builder()
-                .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
-                        .fileName("Testing.jpg").url(DocumentLink.builder().documentUrl("test.com").build()).build())
-                .build();
-
-        docs.add(scannedDocument);
-
-        sscsCaseData.setScannedDocuments(docs);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors(), is(not(empty())));
-        assertThat(response.getErrors().iterator().next(),
-                is(ActionFurtherEvidenceMidEventHandler.POSTPONEMENT_IN_HEARING_STATE));
-    }
-
-    @Test
-    public void givenMoreThanOnePostponementRequest_thenAddAnError() {
-        List<ScannedDocument> docs = new ArrayList<>();
-        when(caseDetails.getState()).thenReturn(State.HEARING);
-        sscsCaseData.getFurtherEvidenceAction().setValue(
-                new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
-                        FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getLabel()));
-        ScannedDocument scannedDocument = ScannedDocument.builder()
-                .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
-                        .fileName("Testing.jpg").url(DocumentLink.builder().documentUrl("test.com").build()).build())
-                .build();
-
-        ScannedDocument scannedDocument2 = ScannedDocument.builder()
-                .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
-                        .fileName("Testing.jpg").url(DocumentLink.builder().documentUrl("test.com").build()).build())
-                .build();
-
-        docs.add(scannedDocument);
-        docs.add(scannedDocument2);
-
-        sscsCaseData.setScannedDocuments(docs);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors(), is(not(empty())));
-        assertThat(response.getErrors().iterator().next(),
-                is(ActionFurtherEvidenceMidEventHandler.ONLY_ONE_POSTPONEMENT_AT_A_TIME));
+            Collections.singletonList(selectedOption));
     }
 
     @Test
@@ -220,11 +117,11 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     public void givenACaseWithScannedDocumentsAndSscsCaseDocuments_thenAppendNewDocumentsToSscsDocumentsList() {
         List<SscsDocument> sscsDocuments = new ArrayList<>();
         SscsDocument doc = SscsDocument.builder()
-                .value(SscsDocumentDetails.builder()
-                        .documentType("appellantEvidence")
-                        .documentFileName("exist.pdf")
-                        .build())
-                .build();
+            .value(SscsDocumentDetails.builder()
+                .documentType("appellantEvidence")
+                .documentFileName("exist.pdf")
+                .build())
+            .build();
         sscsDocuments.add(doc);
 
         sscsCaseData.setScannedDocuments(scannedDocumentList);
@@ -240,10 +137,10 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     @Test
     public void givenACaseWithScannedDocumentWithNoFileName_showAnError() {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder()
-                        .type("type")
-                        .url(DocumentLink.builder().documentUrl("www.test.com").build())
-                        .build()).build();
+            ScannedDocumentDetails.builder()
+                .type("type")
+                .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                .build()).build();
 
         scannedDocumentList.add(scannedDocument);
 
@@ -257,10 +154,10 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     @Test
     public void givenACaseWithScannedDocumentWithNoDocumentType_showAWarning() {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder()
-                        .fileName("type.pdf")
-                        .url(DocumentLink.builder().documentUrl("www.test.com").build())
-                        .build()).build();
+            ScannedDocumentDetails.builder()
+                .fileName("type.pdf")
+                .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                .build()).build();
 
         scannedDocumentList.add(scannedDocument);
 
@@ -287,7 +184,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("Testing.jpg").build()).build();
+            ScannedDocumentDetails.builder().fileName("Testing.jpg").build()).build();
 
         docs.add(scannedDocument);
 
@@ -305,9 +202,9 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("Testing.jpg")
-                        .url(DocumentLink.builder().documentUrl("test.com").build())
-                        .editedUrl(DocumentLink.builder().documentUrl("test").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName("Testing.jpg")
+                .url(DocumentLink.builder().documentUrl("test.com").build())
+                .editedUrl(DocumentLink.builder().documentUrl("test").build()).build()).build();
 
         docs.add(scannedDocument);
 
@@ -319,7 +216,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
         assertEquals(1, response.getErrors().size());
 
         assertEquals("Case is not marked as confidential so cannot upload an edited document",
-                response.getErrors().iterator().next());
+            response.getErrors().iterator().next());
     }
 
     @Test
@@ -328,8 +225,8 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName(filename)
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName(filename)
+                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
 
         docs.add(scannedDocument);
 
@@ -345,11 +242,11 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     @Test
     public void givenACaseWithUnreadableScannedDocument_showAnError() {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder()
-                        .fileName("Testing.jpg")
-                        .type("type")
-                        .url(DocumentLink.builder().documentUrl("www.test.com").build())
-                        .build()).build();
+            ScannedDocumentDetails.builder()
+                .fileName("Testing.jpg")
+                .type("type")
+                .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                .build()).build();
 
         scannedDocumentList.add(scannedDocument);
         when(footerService.isReadablePdf(any())).thenReturn(PdfState.UNREADABLE);
@@ -367,11 +264,11 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     @Test
     public void givenACaseWithPasswordEncryptedScannedDocument_showAnError() {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder()
-                        .fileName("Testing.jpg")
-                        .type("type")
-                        .url(DocumentLink.builder().documentUrl("www.test.com").build())
-                        .build()).build();
+            ScannedDocumentDetails.builder()
+                .fileName("Testing.jpg")
+                .type("type")
+                .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                .build()).build();
 
         scannedDocumentList.add(scannedDocument);
         when(footerService.isReadablePdf(any())).thenReturn(PdfState.PASSWORD_ENCRYPTED);
