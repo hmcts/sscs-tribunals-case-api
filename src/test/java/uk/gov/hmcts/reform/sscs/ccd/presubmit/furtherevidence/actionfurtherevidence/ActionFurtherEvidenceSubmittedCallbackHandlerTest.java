@@ -17,7 +17,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -32,8 +34,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -69,25 +69,25 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
     private Object[] generateCanHandleScenarios() {
         Callback<SscsCaseData> callbackWithValidEventAndInformationReceivedForInterlocTcwOption =
-                buildCallback("informationReceivedForInterlocTcw", ACTION_FURTHER_EVIDENCE);
+            buildCallback("informationReceivedForInterlocTcw", ACTION_FURTHER_EVIDENCE);
         Callback<SscsCaseData> callbackWithValidEventAndInformationReceivedForInterlocJudgeOption =
-                buildCallback("informationReceivedForInterlocJudge", ACTION_FURTHER_EVIDENCE);
+            buildCallback("informationReceivedForInterlocJudge", ACTION_FURTHER_EVIDENCE);
         Callback<SscsCaseData> callbackWithValidEventAndIssueFurtherEvidenceOption =
-                buildCallback("issueFurtherEvidence", ACTION_FURTHER_EVIDENCE);
+            buildCallback("issueFurtherEvidence", ACTION_FURTHER_EVIDENCE);
         Callback<SscsCaseData> callbackWithValidEventAndOtherDocumentManual =
-                buildCallback("otherDocumentManual", ACTION_FURTHER_EVIDENCE);
+            buildCallback("otherDocumentManual", ACTION_FURTHER_EVIDENCE);
         Callback<SscsCaseData> callbackWithWrongEventAndValidOption =
-                buildCallback("informationReceivedForInterlocJudge", APPEAL_RECEIVED);
+            buildCallback("informationReceivedForInterlocJudge", APPEAL_RECEIVED);
         Callback<SscsCaseData> callbackWithValidEventAndSendToInterlocReviewByJudgeOption =
-                buildCallback("sendToInterlocReviewByJudge", ACTION_FURTHER_EVIDENCE);
+            buildCallback("sendToInterlocReviewByJudge", ACTION_FURTHER_EVIDENCE);
         Callback<SscsCaseData> callbackWithValidEventAndSendToInterlocReviewByTcwOption =
-                buildCallback("sendToInterlocReviewByTcw", ACTION_FURTHER_EVIDENCE);
+            buildCallback("sendToInterlocReviewByTcw", ACTION_FURTHER_EVIDENCE);
 
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-                State.INTERLOCUTORY_REVIEW_STATE, SscsCaseData.builder().build(), LocalDateTime.now());
+            State.INTERLOCUTORY_REVIEW_STATE, SscsCaseData.builder().build(), LocalDateTime.now());
 
         Callback<SscsCaseData> callbackWithRightEventAndNullField = new Callback<>(caseDetails, Optional.empty(),
-                ACTION_FURTHER_EVIDENCE, false);
+            ACTION_FURTHER_EVIDENCE, false);
 
         return new Object[]{
             new Object[]{SUBMITTED, callbackWithValidEventAndInformationReceivedForInterlocTcwOption, true},
@@ -98,32 +98,33 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             new Object[]{SUBMITTED, callbackWithWrongEventAndValidOption, false},
             new Object[]{SUBMITTED, callbackWithRightEventAndNullField, false},
             new Object[]{SUBMITTED, callbackWithValidEventAndSendToInterlocReviewByJudgeOption, true},
-            new Object[]{SUBMITTED, callbackWithValidEventAndSendToInterlocReviewByTcwOption, true}};
+            new Object[]{SUBMITTED, callbackWithValidEventAndSendToInterlocReviewByTcwOption, true}
+        };
     }
 
     private Callback<SscsCaseData> buildCallback(String dynamicListItemCode, EventType eventType) {
         DynamicList dynamicList = new DynamicList(new DynamicListItem(dynamicListItemCode, "label"),
-                Collections.singletonList(new DynamicListItem(dynamicListItemCode, "label")));
+            Collections.singletonList(new DynamicListItem(dynamicListItemCode, "label")));
         SscsCaseData sscsCaseData = SscsCaseData.builder()
-                .furtherEvidenceAction(dynamicList)
-                .build();
+            .furtherEvidenceAction(dynamicList)
+            .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-                State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now());
+            State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now());
         return new Callback<>(caseDetails, Optional.empty(), eventType, false);
     }
 
     @Test
     public void givenIssueToAllParties_shouldUpdateCaseCorrectly() {
         Callback<SscsCaseData> callback = buildCallback("issueFurtherEvidence",
-                ACTION_FURTHER_EVIDENCE);
+            ACTION_FURTHER_EVIDENCE);
 
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
         ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
 
         given(ccdService.updateCase(captor.capture(), anyLong(), eq("issueFurtherEvidence"),
-                anyString(), anyString(), any(IdamTokens.class)))
-                .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+            anyString(), anyString(), any(IdamTokens.class)))
+            .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
@@ -132,13 +133,13 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
     @Test
     @Parameters({
-            "informationReceivedForInterlocJudge, reviewByJudge, interlocInformationReceivedActionFurtherEvidence",
-            "informationReceivedForInterlocTcw, reviewByTcw, interlocInformationReceivedActionFurtherEvidence",
-            "sendToInterlocReviewByJudge, reviewByJudge, validSendToInterloc",
-            "sendToInterlocReviewByTcw, reviewByTcw, validSendToInterloc"
+        "informationReceivedForInterlocJudge, reviewByJudge, interlocInformationReceivedActionFurtherEvidence",
+        "informationReceivedForInterlocTcw, reviewByTcw, interlocInformationReceivedActionFurtherEvidence",
+        "sendToInterlocReviewByJudge, reviewByJudge, validSendToInterloc",
+        "sendToInterlocReviewByTcw, reviewByTcw, validSendToInterloc"
     })
     public void givenFurtherEvidenceActionSelectedOption_shouldTriggerEventAndUpdateCaseCorrectly(
-            String furtherEvidenceActionSelectedOption, String interlocReviewState, String eventType) {
+        String furtherEvidenceActionSelectedOption, String interlocReviewState, String eventType) {
 
         Callback<SscsCaseData> callback = buildCallback(furtherEvidenceActionSelectedOption, ACTION_FURTHER_EVIDENCE);
 
@@ -147,8 +148,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
 
         given(ccdService.updateCase(captor.capture(), anyLong(), eq(eventType), anyString(), anyString(),
-                any(IdamTokens.class)))
-                .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+            any(IdamTokens.class)))
+            .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
@@ -160,8 +161,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         }
 
         then(ccdService).should(times(1))
-                .updateCase(eq(callback.getCaseDetails().getCaseData()), eq(123L), eq(eventType), anyString(),
-                        anyString(), any(IdamTokens.class));
+            .updateCase(eq(callback.getCaseDetails().getCaseData()), eq(123L), eq(eventType), anyString(),
+                anyString(), any(IdamTokens.class));
     }
 
     @Test
@@ -244,35 +245,4 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
                         eq("Actioned manually"), any(IdamTokens.class));
     }
 
-    @Test
-    public void givenFurtherEvidenceActionPostponementRequest_shouldTriggerEventAndUpdateCaseCorrectly() {
-
-        String eventType = "validSendToInterloc";
-
-        Callback<SscsCaseData> callback = buildCallback(
-                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
-                ACTION_FURTHER_EVIDENCE);
-
-        callback.getCaseDetails().getCaseData().setSscsDocument(Arrays.asList(SscsDocument.builder()
-                .value(SscsDocumentDetails.builder().documentType(DocumentType.POSTPONEMENT_REQUEST.getValue()).build())
-                .build()));
-
-        given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
-
-        ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
-
-        given(ccdService.updateCase(captor.capture(), anyLong(), eq(eventType), anyString(), anyString(),
-                any(IdamTokens.class)))
-                .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
-
-        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
-
-        assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), captor.getValue().getInterlocReviewState());
-        assertEquals(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId(), captor.getValue().getInterlocReferralReason());
-
-        then(ccdService).should(times(1))
-                .updateCase(eq(callback.getCaseDetails().getCaseData()), eq(123L), eq(eventType),
-                        eq(ActionFurtherEvidenceSubmittedCallbackHandler.TCW_REVIEW_SEND_TO_JUDGE),
-                        anyString(), any(IdamTokens.class));
-    }
 }
