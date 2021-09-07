@@ -6,6 +6,8 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.*;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -18,8 +20,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase;
+import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 
 @RunWith(JUnitParamsRunner.class)
 public class ValidSendToInterlocAboutToSubmitHandlerTest {
@@ -62,16 +68,17 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"reviewByTcw, Review by TCW", "reviewByJudge, Review by Judge"})
-    public void setsEvidenceHandledFlagToNoForDocumentSelected(String code, String selectedLabel) {
+    @Parameters({"REVIEW_BY_TCW", "REVIEW_BY_JUDGE"})
+    public void setsEvidenceHandledFlagToNoForDocumentSelected(SelectWhoReviewsCase selectWhoReviewsCase) {
 
         sscsCaseData = sscsCaseData.toBuilder()
                 .selectWhoReviewsCase(new DynamicList(
-                        new DynamicListItem(code, selectedLabel),
-                        Arrays.asList(new DynamicListItem("reviewByJudge", "Review by Judge"),
-                                new DynamicListItem("reviewByTcw", "Review by TCW"))
+                        new DynamicListItem(selectWhoReviewsCase.getId(), selectWhoReviewsCase.getLabel()),
+                        Arrays.asList(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()),
+                                new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()),
+                                new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()))
                 ))
-                .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem(code, selectedLabel), null)).build();
+                .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem(selectWhoReviewsCase.getId(), selectWhoReviewsCase.getLabel()), null)).build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -79,15 +86,60 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
 
-        assertEquals(code, response.getData().getInterlocReviewState());
+        assertEquals(selectWhoReviewsCase.getId(), response.getData().getInterlocReviewState());
         assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
         assertNull(response.getData().getSelectWhoReviewsCase());
         assertNull(response.getData().getDirectionDueDate());
     }
 
     @Test
+    @Parameters({"APPELLANT, APPELLANT", "REPRESENTATIVE, REP", "JOINT_PARTY, JOINT_PARTY"})
+    public void givenPostponementRequestInterlocSendToTcw_setsEvidenceHandledFlagToNoForDocumentSelected(PartyItemList originalSenderParty, UploadParty uploadParty) {
+
+        DynamicListItem value = new DynamicListItem(originalSenderParty.getCode(), originalSenderParty.getLabel());
+        DynamicList originalSender = new DynamicList(value, Collections.singletonList(value));
+
+        sscsCaseData = sscsCaseData.toBuilder()
+                .selectWhoReviewsCase(new DynamicList(
+                        new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()),
+                        Arrays.asList(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()),
+                                new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()),
+                                new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()))
+                ))
+                .postponementRequest(PostponementRequest.builder()
+                        .postponementRequestDetails("Here are some details")
+                        .postponementRequestHearingVenue("Venue 1")
+                        .postponementPreviewDocument(DocumentLink.builder()
+                                .documentBinaryUrl("http://example.com")
+                                .documentFilename("example.pdf")
+                                .build()).build())
+                .originalSender(originalSender).build();
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(Collections.EMPTY_SET, response.getErrors());
+
+        assertEquals(REVIEW_BY_TCW.getId(), response.getData().getInterlocReviewState());
+        assertEquals(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId(), response.getData().getInterlocReferralReason());
+        assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
+        assertEquals(YES, sscsCaseData.getPostponementRequest().getUnprocessedPostponementRequest());
+        assertNull(response.getData().getSelectWhoReviewsCase());
+        assertNull(response.getData().getDirectionDueDate());
+        assertNull(response.getData().getPostponementRequest().getPostponementRequestDetails());
+        assertNull(response.getData().getPostponementRequest().getPostponementPreviewDocument());
+
+        assertEquals(1, sscsCaseData.getSscsDocument().size());
+        final SscsDocument document = sscsCaseData.getSscsDocument().get(0);
+        assertEquals(DocumentType.POSTPONEMENT_REQUEST.getValue(), document.getValue().getDocumentType());
+        assertEquals("example.pdf", document.getValue().getDocumentLink().getDocumentFilename());
+        assertEquals(uploadParty, document.getValue().getPartyUploaded());
+    }
+
+    @Test
     @Parameters({"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
-    public void returnAnErrorIfNoSelectedDocument(EventType eventType) {
+    public void returnAnErrorIfNoSelectWhoReviewsCaseSelected(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
 
         sscsCaseData = sscsCaseData.toBuilder().selectWhoReviewsCase(null).build();
@@ -96,6 +148,26 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
 
         assertEquals(1, response.getErrors().size());
         assertEquals("Must select who reviews the appeal.", response.getErrors().toArray()[0]);
+    }
+
+    @Test
+    @Parameters({"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
+    public void givenPostponementRequestInterlocSendToTcw_returnAnErrorIfNoOriginalSenderSelected(EventType eventType) {
+        when(callback.getEvent()).thenReturn(eventType);
+
+        sscsCaseData = sscsCaseData.toBuilder().selectWhoReviewsCase(new DynamicList(
+                new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()),
+                Arrays.asList(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()),
+                        new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()),
+                        new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()))
+                ))
+                .originalSender(null).build();
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+        assertEquals("Must select original sender", response.getErrors().toArray()[0]);
     }
 
     @Test(expected = IllegalStateException.class)
