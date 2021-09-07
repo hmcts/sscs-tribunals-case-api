@@ -6,12 +6,13 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.SEND_TO_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ListingOption.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ListingOption.NOT_LISTABLE;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.mutableEmptyListIfNull;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+
 
 
 @Service
@@ -62,19 +64,46 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         if (isSendToJudge(postponementRequest)) {
             sendToJudge(userAuthorisation, sscsCaseData);
         } else if (isGrantPostponement(postponementRequest)) {
-            if (isReadyToList(postponementRequest)) {
-                sscsCaseData.setState(State.READY_TO_LIST);
-            }else if(isNotListable(postponementRequest)){
-                sscsCaseData.setState(State.NOT_LISTABLE);
-            }
-            sscsCaseData.setInterlocReferralReason(null);
-            sscsCaseData.setInterlocReviewState(null);
-            addDirectionNotice(sscsCaseData);
-            sscsCaseData.setPostponementRequest(PostponementRequest.builder().unprocessedPostponementRequest(YesNo.NO)
-                    .build());
+            grantPostponement(sscsCaseData, postponementRequest);
         }
 
         return response;
+    }
+
+    private void grantPostponement(SscsCaseData sscsCaseData, PostponementRequest postponementRequest) {
+
+        if (isReadyToList(postponementRequest)) {
+            sscsCaseData.setState(State.READY_TO_LIST);
+        }else if(isNotListable(postponementRequest)){
+            sscsCaseData.setState(State.NOT_LISTABLE);
+        }
+
+        updatePartyUnavailability(sscsCaseData);
+
+        sscsCaseData.setInterlocReferralReason(null);
+        sscsCaseData.setInterlocReviewState(null);
+        sscsCaseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
+        addDirectionNotice(sscsCaseData);
+        sscsCaseData.setPostponementRequest(PostponementRequest.builder().unprocessedPostponementRequest(YesNo.NO)
+                .build());
+    }
+
+    private void updatePartyUnavailability(SscsCaseData sscsCaseData) {
+        Optional<Hearing> futureHearing = sscsCaseData.getHearings().stream()
+                .filter(hearing -> getLocalDate(hearing.getValue().getHearingDate()).isAfter(LocalDate.now()))
+                .findAny();
+
+        if(futureHearing.isPresent()) {
+            String hearingDateString = getLocalDate(futureHearing.get().getValue().getHearingDate()).toString();
+            DateRange dateRange = DateRange.builder()
+                    .start(hearingDateString)
+                    .end(hearingDateString)
+                    .build();
+            HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
+            List<ExcludeDate> excludedDates =  mutableEmptyListIfNull(hearingOptions.getExcludeDates());
+            excludedDates.add(ExcludeDate.builder().value(dateRange).build());
+            hearingOptions.setExcludeDates(excludedDates);
+        }
     }
 
     private void sendToJudge(String userAuthorisation, SscsCaseData sscsCaseData) {
@@ -119,5 +148,9 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
 
     private boolean isSendToJudge(PostponementRequest postponementRequest) {
         return postponementRequest.getActionPostponementRequestSelected().equals(SEND_TO_JUDGE.getValue());
+    }
+
+    private static LocalDate getLocalDate(String dateStr) {
+        return LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
     }
 }
