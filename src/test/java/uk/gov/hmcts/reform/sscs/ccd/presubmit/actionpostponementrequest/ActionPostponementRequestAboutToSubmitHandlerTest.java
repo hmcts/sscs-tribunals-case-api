@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 
@@ -34,12 +35,15 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     @Mock
     private UserDetailsService userDetailsService;
 
+    @Mock
+    private FooterService footerService;
+
     private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService);
+        handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService);
 
         when(callback.getEvent()).thenReturn(EventType.PROCESS_HEARING_RECORDING_REQUEST);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
