@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest;
 
+import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,12 +19,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 
-import java.util.Objects;
-
-import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.ISSUE_DIRECTIONS_NOTICE;
-import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
 
 @Component
 @Slf4j
@@ -38,11 +36,8 @@ public class ActionPostponementRequestMidEventHandler extends IssueDocumentHandl
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        return callbackType == CallbackType.MID_EVENT
-                && callback.getEvent() == EventType.ACTION_POSTPONEMENT_REQUEST
-                && Objects.nonNull(callback.getCaseDetails())
-                && Objects.nonNull(callback.getCaseDetails().getCaseData())
-                && callback.getCaseDetails().getCaseData().isGenerateNotice();
+        return callbackType.equals(CallbackType.MID_EVENT)
+                && callback.getEvent() == EventType.ACTION_POSTPONEMENT_REQUEST;
     }
 
     @Override
@@ -57,10 +52,10 @@ public class ActionPostponementRequestMidEventHandler extends IssueDocumentHandl
             return response;
         }
 
-        if(isGrantPostponement(caseData.getPostponementRequest())) {
+        if (isGrantPostponement(caseData.getPostponementRequest())) {
             String templateId = documentConfiguration.getDocuments()
                     .get(caseData.getLanguagePreference()).get(EventType.DIRECTION_ISSUED);
-            return issueDocument(callback, DocumentType.DECISION_NOTICE, templateId, generateFile, userAuthorisation);
+            response = issueDocument(callback, DocumentType.DIRECTION_NOTICE, templateId, generateFile, userAuthorisation);
         }
 
         return response;

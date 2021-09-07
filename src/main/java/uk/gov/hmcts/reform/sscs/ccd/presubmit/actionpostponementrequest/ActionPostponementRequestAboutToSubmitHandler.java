@@ -2,10 +2,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ListingOption.NOT_LISTABLE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ListingOption.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.SEND_TO_JUDGE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.ListingOption.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.ListingOption.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.mutableEmptyListIfNull;
 
 import java.time.LocalDate;
@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
-
 
 
 @Service
@@ -74,7 +73,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
 
         if (isReadyToList(postponementRequest)) {
             sscsCaseData.setState(State.READY_TO_LIST);
-        }else if(isNotListable(postponementRequest)){
+        } else if (isNotListable(postponementRequest)) {
             sscsCaseData.setState(State.NOT_LISTABLE);
         }
 
@@ -93,14 +92,15 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
                 .filter(hearing -> getLocalDate(hearing.getValue().getHearingDate()).isAfter(LocalDate.now()))
                 .findAny();
 
-        if(futureHearing.isPresent()) {
-            String hearingDateString = getLocalDate(futureHearing.get().getValue().getHearingDate()).toString();
+        if (futureHearing.isPresent()) {
+            String hearingDateString = getLocalDate(futureHearing.get().getValue().getHearingDate())
+                    .format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
             DateRange dateRange = DateRange.builder()
                     .start(hearingDateString)
                     .end(hearingDateString)
                     .build();
             HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
-            List<ExcludeDate> excludedDates =  mutableEmptyListIfNull(hearingOptions.getExcludeDates());
+            List<ExcludeDate> excludedDates = mutableEmptyListIfNull(hearingOptions.getExcludeDates());
             excludedDates.add(ExcludeDate.builder().value(dateRange).build());
             hearingOptions.setExcludeDates(excludedDates);
         }
@@ -119,12 +119,6 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
                 .build());
     }
 
-    private Note createPostponementRequestNote(String userAuthorisation, String details) {
-        return Note.builder().value(NoteDetails.builder().noteDetail(details)
-                .author(userDetailsService.buildLoggedInUserName(userAuthorisation))
-                .noteDate(LocalDate.now().toString()).build()).build();
-    }
-
     private void addDirectionNotice(SscsCaseData caseData) {
         DocumentLink url = caseData.getPreviewDocument();
         SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
@@ -132,6 +126,12 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
                 Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now())
                         .format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
                 caseData.getDateAdded(), null, documentTranslationStatus);
+    }
+
+    private Note createPostponementRequestNote(String userAuthorisation, String details) {
+        return Note.builder().value(NoteDetails.builder().noteDetail(details)
+                .author(userDetailsService.buildLoggedInUserName(userAuthorisation))
+                .noteDate(LocalDate.now().toString()).build()).build();
     }
 
     private boolean isNotListable(PostponementRequest postponementRequest) {
