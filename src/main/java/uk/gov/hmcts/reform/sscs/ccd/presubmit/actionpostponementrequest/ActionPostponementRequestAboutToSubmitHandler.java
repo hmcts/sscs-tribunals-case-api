@@ -63,27 +63,18 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
             sendToJudge(userAuthorisation, sscsCaseData);
         } else if (isGrantPostponement(postponementRequest)) {
             if (isReadyToList(postponementRequest)) {
-                sscsCaseData.setInterlocReferralReason(null);
-                sscsCaseData.setInterlocReviewState(null);
+                sscsCaseData.setState(State.READY_TO_LIST);
+            }else if(isNotListable(postponementRequest)){
+                sscsCaseData.setState(State.NOT_LISTABLE);
             }
+            sscsCaseData.setInterlocReferralReason(null);
+            sscsCaseData.setInterlocReviewState(null);
             addDirectionNotice(sscsCaseData);
             sscsCaseData.setPostponementRequest(PostponementRequest.builder().unprocessedPostponementRequest(YesNo.NO)
                     .build());
         }
 
         return response;
-    }
-
-    private boolean isReadyToList(PostponementRequest postponementRequest) {
-        return postponementRequest.getListingOption().equals(READY_TO_LIST.getValue());
-    }
-
-    private boolean isGrantPostponement(PostponementRequest postponementRequest) {
-        return postponementRequest.getActionPostponementRequestSelected().equals(GRANT.getValue());
-    }
-
-    private boolean isSendToJudge(PostponementRequest postponementRequest) {
-        return postponementRequest.getActionPostponementRequestSelected().equals(SEND_TO_JUDGE.getValue());
     }
 
     private void sendToJudge(String userAuthorisation, SscsCaseData sscsCaseData) {
@@ -112,5 +103,21 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
                 Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now())
                         .format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
                 caseData.getDateAdded(), null, documentTranslationStatus);
+    }
+
+    private boolean isNotListable(PostponementRequest postponementRequest) {
+        return postponementRequest.getListingOption().equals(NOT_LISTABLE.getValue());
+    }
+
+    private boolean isReadyToList(PostponementRequest postponementRequest) {
+        return postponementRequest.getListingOption().equals(READY_TO_LIST.getValue());
+    }
+
+    private boolean isGrantPostponement(PostponementRequest postponementRequest) {
+        return postponementRequest.getActionPostponementRequestSelected().equals(GRANT.getValue());
+    }
+
+    private boolean isSendToJudge(PostponementRequest postponementRequest) {
+        return postponementRequest.getActionPostponementRequestSelected().equals(SEND_TO_JUDGE.getValue());
     }
 }
