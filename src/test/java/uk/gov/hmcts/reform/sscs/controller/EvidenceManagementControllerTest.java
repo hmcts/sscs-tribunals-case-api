@@ -95,9 +95,6 @@ public class EvidenceManagementControllerTest {
     public void shouldUploadEvidenceDocumentListSecureDocStore() {
         controller = new EvidenceManagementController(evidenceManagementService, evidenceManagementSecureDocStoreService, fileToPdfConversionService, true, idamService);
 
-        uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse uploadResponse =
-                mock(uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse.class);
-
         uk.gov.hmcts.reform.ccd.document.am.model.Document.Links links = new uk.gov.hmcts.reform.ccd.document.am.model.Document.Links();;
         links.binary = new uk.gov.hmcts.reform.ccd.document.am.model.Document.Link();
         links.self = new uk.gov.hmcts.reform.ccd.document.am.model.Document.Link();
@@ -113,6 +110,8 @@ public class EvidenceManagementControllerTest {
                         .links(links)
                         .build();
 
+        uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse uploadResponse =
+                mock(uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse.class);
         when(uploadResponse.getDocuments()).thenReturn(Collections.singletonList(document));
         MultipartFile file = mock(MultipartFile.class);
         List<MultipartFile> files = Collections.singletonList(file);
