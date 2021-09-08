@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.service.SubmitAppealService.DM_STORE_USER_ID;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
@@ -51,17 +52,17 @@ public class EvidenceManagementControllerTest {
     }
 
     @Test(expected = EvidenceDocumentsMissingException.class)
-    public void shouldThrowEvidenceDocumentsMissingExceptionIfThereAreNoFilesInTheRequest() {
+    public void shouldThrowEvidenceDocumentsMissingExceptionIfThereAreNoFilesInTheRequest() throws JsonProcessingException {
         controller.upload(null);
     }
 
     @Test(expected = EvidenceDocumentsMissingException.class)
-    public void shouldThrowEvidenceDocumentsMissingExceptionForEmptyFileList() {
+    public void shouldThrowEvidenceDocumentsMissingExceptionForEmptyFileList() throws JsonProcessingException {
         controller.upload(Collections.emptyList());
     }
 
     @Test
-    public void shouldUploadEvidenceDocumentList() {
+    public void shouldUploadEvidenceDocumentList() throws JsonProcessingException {
         UploadResponse uploadResponse = mock(UploadResponse.class);
         UploadResponse.Embedded uploadResponseEmbedded = mock(UploadResponse.Embedded.class);
 
@@ -92,7 +93,7 @@ public class EvidenceManagementControllerTest {
     }
 
     @Test
-    public void shouldUploadEvidenceDocumentListSecureDocStore() {
+    public void shouldUploadEvidenceDocumentListSecureDocStore() throws JsonProcessingException {
         controller = new EvidenceManagementController(evidenceManagementService, evidenceManagementSecureDocStoreService, fileToPdfConversionService, true, idamService);
 
         uk.gov.hmcts.reform.ccd.document.am.model.Document.Links links = new uk.gov.hmcts.reform.ccd.document.am.model.Document.Links();;
@@ -131,7 +132,7 @@ public class EvidenceManagementControllerTest {
     }
 
     @Test(expected = FileToPdfConversionException.class)
-    public void shouldUploadEvidenceDocumentListLogsParseException() {
+    public void shouldUploadEvidenceDocumentListLogsParseException() throws JsonProcessingException {
 
         MultipartFile file = mock(MultipartFile.class);
         List<MultipartFile> files = Collections.singletonList(file);
