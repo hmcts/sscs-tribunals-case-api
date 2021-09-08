@@ -2,10 +2,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.SEND_TO_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.mutableEmptyListIfNull;
 
 import java.time.LocalDate;
