@@ -31,8 +31,6 @@ import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 @Slf4j
 public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-
-    public static final String DD_MM_YYYY = "dd-MM-yyyy";
     public static final String POSTPONEMENT_DETAILS_SENT_TO_JUDGE_PREFIX = "Postponement sent to judge - ";
 
     private UserDetailsService userDetailsService;
@@ -70,6 +68,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
             grantPostponement(sscsCaseData, postponementRequest);
         }
 
+        clearTransientFields(sscsCaseData);
         return response;
     }
 
@@ -93,16 +92,12 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
 
     private void updatePartyUnavailability(SscsCaseData sscsCaseData) {
         Optional<Hearing> futureHearing = sscsCaseData.getHearings().stream()
-                .filter(hearing -> getLocalDate(hearing.getValue().getHearingDate()).isAfter(LocalDate.now()))
+                .filter(hearing -> LocalDate.parse(hearing.getValue().getHearingDate()).isAfter(LocalDate.now()))
                 .findAny();
 
         if (futureHearing.isPresent()) {
-            String hearingDateString = getLocalDate(futureHearing.get().getValue().getHearingDate())
-                    .format(DateTimeFormatter.ofPattern(DD_MM_YYYY));
-            DateRange dateRange = DateRange.builder()
-                    .start(hearingDateString)
-                    .end(hearingDateString)
-                    .build();
+            String hearingDateString = LocalDate.parse(futureHearing.get().getValue().getHearingDate()).toString();
+            DateRange dateRange = DateRange.builder().start(hearingDateString).end(hearingDateString).build();
             HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
             List<ExcludeDate> excludedDates = mutableEmptyListIfNull(hearingOptions.getExcludeDates());
             excludedDates.add(ExcludeDate.builder().value(dateRange).build());
@@ -125,11 +120,11 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
 
     private void addDirectionNotice(SscsCaseData caseData) {
         DocumentLink url = caseData.getPreviewDocument();
-        SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
-        footerService.createFooterAndAddDocToCase(url, caseData, POSTPONEMENT_REQUEST_DIRECTION_NOTICE,
-                Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now())
-                        .format(DateTimeFormatter.ofPattern(DD_MM_YYYY)),
-                caseData.getDateAdded(), null, documentTranslationStatus);
+        String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        SscsDocumentTranslationStatus documentTranslationStatus =
+                caseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
+        footerService.createFooterAndAddDocToCase(url, caseData, POSTPONEMENT_REQUEST_DIRECTION_NOTICE, now,
+                null, null, documentTranslationStatus);
     }
 
     private Note createPostponementRequestNote(String userAuthorisation, String details) {
@@ -154,7 +149,16 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         return postponementRequest.getActionPostponementRequestSelected().equals(SEND_TO_JUDGE.getValue());
     }
 
-    private static LocalDate getLocalDate(String dateStr) {
-        return LocalDate.parse(dateStr, DateTimeFormatter.ofPattern(DD_MM_YYYY));
+    private void clearTransientFields(SscsCaseData caseData) {
+        caseData.setBodyContent(null);
+        caseData.setPreviewDocument(null);
+        caseData.setGenerateNotice(null);
+        caseData.setReservedToJudge(null);
+        caseData.setGenerateNotice(null);
+        caseData.setSignedBy(null);
+        caseData.setSignedRole(null);
+        caseData.setDateAdded(null);
+        caseData.setTempNoteDetail(null);
+        caseData.setShowRip1DocPage(null);
     }
 }
