@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 @Slf4j
 public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    public static final String POSTPONEMENT_DETAILS_SENT_TO_JUDGE_PREFIX = "Postponement sent to judge - ";
     private UserDetailsService userDetailsService;
 
     @Autowired
@@ -63,7 +64,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     }
 
     private Note createPostponementRequestNote(String userAuthorisation, String details) {
-        return Note.builder().value(NoteDetails.builder().noteDetail(details)
+        return Note.builder().value(NoteDetails.builder().noteDetail(POSTPONEMENT_DETAILS_SENT_TO_JUDGE_PREFIX + details)
                 .author(userDetailsService.buildLoggedInUserName(userAuthorisation))
                 .noteDate(LocalDate.now().toString()).build()).build();
     }
