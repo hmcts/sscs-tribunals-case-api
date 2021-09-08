@@ -57,9 +57,11 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_JUDGE.getId()));
-        assertThat(response.getData().getInterlocReferralReason(), is(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId()));
+        assertThat(response.getData().getInterlocReferralReason(), is(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST
+                .getId()));
         assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.YES));
         assertThat(response.getData().getAppealNotePad().getNotesCollection().stream()
-                .anyMatch(note -> note.getValue().getNoteDetail().equals("Request Detail Test")), is(true));
+                .anyMatch(note -> note.getValue().getNoteDetail().equals(ActionPostponementRequestAboutToSubmitHandler
+                        .POSTPONEMENT_DETAILS_SENT_TO_JUDGE_PREFIX + "Request Detail Test")), is(true));
     }
 }
