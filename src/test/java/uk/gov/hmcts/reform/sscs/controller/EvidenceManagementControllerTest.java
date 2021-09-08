@@ -14,7 +14,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
+import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.exception.EvidenceDocumentsMissingException;
 import uk.gov.hmcts.reform.sscs.exception.FileToPdfConversionException;
@@ -35,7 +37,7 @@ public class EvidenceManagementControllerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        controller = new EvidenceManagementController(evidenceManagementService, fileToPdfConversionService);
+        controller = new EvidenceManagementController(evidenceManagementService, null, fileToPdfConversionService, false, null);
     }
 
     @Test(expected = EvidenceDocumentsMissingException.class)
@@ -50,22 +52,32 @@ public class EvidenceManagementControllerTest {
 
     @Test
     public void shouldUploadEvidenceDocumentList() {
-
-        MultipartFile file = mock(MultipartFile.class);
-        List<MultipartFile> files = Collections.singletonList(file);
-
         UploadResponse uploadResponse = mock(UploadResponse.class);
         UploadResponse.Embedded uploadResponseEmbedded = mock(UploadResponse.Embedded.class);
 
         when(uploadResponse.getEmbedded()).thenReturn(uploadResponseEmbedded);
+        Document document = new Document();
+        document.mimeType = "application/pdf";
+        document.size = 656;
+        Document.Links links = new Document.Links();;
+        links.binary = new Document.Link();
+        links.self = new Document.Link();
+        links.binary.href = "binaryUrl";
+        links.self.href = "selfURL";
+        document.links = links;
+
+        when(uploadResponse.getEmbedded().getDocuments()).thenReturn(Collections.singletonList(document));
+        MultipartFile file = mock(MultipartFile.class);
+        List<MultipartFile> files = Collections.singletonList(file);
         when(fileToPdfConversionService.convert(files)).thenReturn(files);
         when(evidenceManagementService.upload(files, DM_STORE_USER_ID)).thenReturn(uploadResponse);
 
-        UploadResponse.Embedded actualUploadResponseEmbedded = controller.upload(files);
+        ResponseEntity<String> actualUploadResponseEmbedded = controller.upload(files);
+
+        String json = "{\"documents\": [{\"classification\":null,\"size\":656,\"mimeType\":\"application/pdf\",\"originalDocumentName\":null,\"createdBy\":null,\"modifiedOn\":null,\"createdOn\":null,\"_links\":{\"self\":{\"href\":\"selfURL\"},\"binary\":{\"href\":\"binaryUrl\"}}}]}";
 
         verify(evidenceManagementService, times(1)).upload(files, DM_STORE_USER_ID);
-        assertThat(actualUploadResponseEmbedded, equalTo(uploadResponseEmbedded));
-
+        assertThat(actualUploadResponseEmbedded.getBody(), equalTo(json));
     }
 
     @Test(expected = FileToPdfConversionException.class)

@@ -2,20 +2,28 @@ package uk.gov.hmcts.reform.sscs.controller;
 
 import static uk.gov.hmcts.reform.sscs.service.SubmitAppealService.DM_STORE_USER_ID;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import uk.gov.hmcts.reform.ccd.document.am.model.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.exception.EvidenceDocumentsMissingException;
 import uk.gov.hmcts.reform.sscs.exception.FileToPdfConversionException;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
 
@@ -24,13 +32,22 @@ import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
 public class EvidenceManagementController {
 
     private final EvidenceManagementService evidenceManagementService;
+    private final EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService;
     private final FileToPdfConversionService fileToPdfConversionService;
+    private final boolean secureDocStoreEnabled;
+    private IdamService idamService;
 
     @Autowired
     public EvidenceManagementController(EvidenceManagementService evidenceManagementService,
-                                        FileToPdfConversionService fileToPdfConversionService) {
+                                        EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService,
+                                        FileToPdfConversionService fileToPdfConversionService,
+                                        @Value("${feature.secure-doc-store.enabled:false}") boolean secureDocStoreEnabled,
+                                        IdamService idamService) {
         this.evidenceManagementService = evidenceManagementService;
+        this.evidenceManagementSecureDocStoreService = evidenceManagementSecureDocStoreService;
         this.fileToPdfConversionService = fileToPdfConversionService;
+        this.secureDocStoreEnabled = secureDocStoreEnabled;
+        this.idamService = idamService;
     }
 
     @ApiOperation(value = "Upload additional evidence converted to PDF",
@@ -46,7 +63,7 @@ public class EvidenceManagementController {
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public UploadResponse.Embedded upload(
+    public ResponseEntity<String> upload(
         @RequestParam("file") List<MultipartFile> files
     ) {
         if (null == files || files.isEmpty()) {
@@ -55,15 +72,35 @@ public class EvidenceManagementController {
 
         try {
             List<MultipartFile> convertedFiles = fileToPdfConversionService.convert(files);
-            return evidenceManagementService
-                .upload(convertedFiles, DM_STORE_USER_ID)
-                .getEmbedded();
+
+            if (secureDocStoreEnabled) {
+                List<Document> documents = evidenceManagementSecureDocStoreService
+                        .upload(convertedFiles, idamService.getIdamTokens()).getDocuments();
+                ObjectMapper objectMapper = new ObjectMapper();
+
+                String jsonText =  "{\"documents\": " + objectMapper.writeValueAsString(documents) + "}";
+                return ResponseEntity.ok(jsonText);
+            } else {
+                UploadResponse.Embedded embedded = evidenceManagementService
+                        .upload(convertedFiles, DM_STORE_USER_ID)
+                        .getEmbedded();
+                List<uk.gov.hmcts.reform.document.domain.Document> documents = embedded.getDocuments();
+                ObjectMapper objectMapper = new ObjectMapper();
+
+                String jsonText =  "{\"documents\": " + objectMapper.writeValueAsString(documents) + "}";
+                return ResponseEntity.ok(jsonText);
+            }
+
 
         } catch (FileToPdfConversionException e) {
             log.error("Error while converting files for evidence upload: " + e.getMessage());
             throw e;
+        } catch (JsonProcessingException e) {
+            log.error("Error while processing json for evidence upload: " + e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error adding evidence");
         }
-
     }
 
 }
