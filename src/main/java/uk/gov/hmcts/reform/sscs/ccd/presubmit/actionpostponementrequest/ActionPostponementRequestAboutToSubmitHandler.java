@@ -59,7 +59,6 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
-
         PostponementRequest postponementRequest = sscsCaseData.getPostponementRequest();
 
         if (isSendToJudge(postponementRequest)) {
