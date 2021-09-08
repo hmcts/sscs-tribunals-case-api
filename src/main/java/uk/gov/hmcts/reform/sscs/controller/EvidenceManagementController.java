@@ -65,7 +65,7 @@ public class EvidenceManagementController {
     )
     public ResponseEntity<String> upload(
         @RequestParam("file") List<MultipartFile> files
-    ) {
+    ) throws JsonProcessingException {
         if (null == files || files.isEmpty()) {
             throw new EvidenceDocumentsMissingException();
         }
@@ -95,11 +95,6 @@ public class EvidenceManagementController {
         } catch (FileToPdfConversionException e) {
             log.error("Error while converting files for evidence upload: " + e.getMessage());
             throw e;
-        } catch (JsonProcessingException e) {
-            log.error("Error while processing json for evidence upload: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error adding evidence");
         }
     }
 
