@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 @Slf4j
 public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    public static final String DD_MM_YYYY = "dd-MM-yyyy";
     private UserDetailsService userDetailsService;
     private final FooterService footerService;
 
@@ -94,7 +95,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
 
         if (futureHearing.isPresent()) {
             String hearingDateString = getLocalDate(futureHearing.get().getValue().getHearingDate())
-                    .format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+                    .format(DateTimeFormatter.ofPattern(DD_MM_YYYY));
             DateRange dateRange = DateRange.builder()
                     .start(hearingDateString)
                     .end(hearingDateString)
@@ -124,7 +125,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
         footerService.createFooterAndAddDocToCase(url, caseData, POSTPONEMENT_REQUEST_DIRECTION_NOTICE,
                 Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now())
-                        .format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+                        .format(DateTimeFormatter.ofPattern(DD_MM_YYYY)),
                 caseData.getDateAdded(), null, documentTranslationStatus);
     }
 
@@ -151,6 +152,6 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     }
 
     private static LocalDate getLocalDate(String dateStr) {
-        return LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        return LocalDate.parse(dateStr, DateTimeFormatter.ofPattern(DD_MM_YYYY));
     }
 }
