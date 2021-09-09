@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
 
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +53,8 @@ public class ActionPostponementRequestMidEventHandler extends IssueDocumentHandl
             return response;
         }
 
-        if (isGrantPostponement(caseData.getPostponementRequest())) {
+        PostponementRequest postponementRequest = caseData.getPostponementRequest();
+        if (isGrantPostponement(postponementRequest) || isRefusePostponement(postponementRequest)) {
             String templateId = documentConfiguration.getDocuments()
                     .get(caseData.getLanguagePreference()).get(EventType.DIRECTION_ISSUED);
             response = issueDocument(callback, DocumentType.DIRECTION_NOTICE, templateId, generateFile, userAuthorisation);
@@ -62,12 +64,17 @@ public class ActionPostponementRequestMidEventHandler extends IssueDocumentHandl
     }
 
     private void validateDueDateIsInFuture(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (nonNull(preSubmitCallbackResponse.getData().getDirectionDueDate()) && !isDateInTheFuture(preSubmitCallbackResponse.getData().getDirectionDueDate())) {
+        if (nonNull(preSubmitCallbackResponse.getData().getDirectionDueDate())
+                && !isDateInTheFuture(preSubmitCallbackResponse.getData().getDirectionDueDate())) {
             preSubmitCallbackResponse.addError("Directions due date must be in the future");
         }
     }
 
     private boolean isGrantPostponement(PostponementRequest postponementRequest) {
         return postponementRequest.getActionPostponementRequestSelected().equals(GRANT.getValue());
+    }
+
+    private boolean isRefusePostponement(PostponementRequest postponementRequest) {
+        return postponementRequest.getActionPostponementRequestSelected().equals(REFUSE.getValue());
     }
 }

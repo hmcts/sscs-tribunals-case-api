@@ -86,8 +86,29 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAGrantedPostponementAndReadyToList_thenSetReviewStateAndReferralReasonAndFlagAndAddNoteAndUnavailabilityUpdatedAndDwpStateAndDecisionDocAdded() {
-        populateGrantPosponementSscsCaseData();
+    public void givenARefusedPostponement_thenClearReviewStateAndReferralReasonAndFlagAndAndStateIsUnchangedAddNoteAndDwpStateAndDecisionDocAdded() {
+        populatePostponementSscsCaseData();
+
+        sscsCaseData.setState(State.HEARING);
+        sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("refuse")
+                .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
+                eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
+        assertThat(response.getData().getInterlocReviewState(), is(nullValue()));
+        assertThat(response.getData().getInterlocReferralReason(), is(nullValue()));
+        assertThat(response.getData().getState(), is(State.HEARING));
+        assertThat(response.getData().getSscsDocument(), is(not(empty())));
+        assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.NO));
+        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
+    }
+
+    @Test
+    public void givenAGrantedPostponementAndReadyToList_thenClearReviewStateAndReferralReasonAndFlagAndAddNoteAndUnavailabilityUpdatedAndDwpStateAndDecisionDocAdded() {
+        populatePostponementSscsCaseData();
 
         sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
                 .listingOption("readyToList").build());
@@ -101,16 +122,16 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getInterlocReferralReason(), is(nullValue()));
         assertThat(response.getData().getState(), is(State.READY_TO_LIST));
         assertThat(response.getData().getAppeal().getHearingOptions().getExcludeDates().stream()
-                        .anyMatch(excludeDate -> excludeDate.getValue().getStart()
-                                .equals(LocalDate.now().plusDays(1).toString())), is(true));
+                .anyMatch(excludeDate -> excludeDate.getValue().getStart()
+                        .equals(LocalDate.now().plusDays(1).toString())), is(true));
         assertThat(response.getData().getSscsDocument(), is(not(empty())));
         assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.NO));
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
     }
 
     @Test
-    public void givenAGrantedPostponementAndNotListable_thenSetReviewStateAndReferralReasonAndFlagAndAddNoteAndUnavailabilityUpdatedAndDwpStateAndDecisionDocAdded() {
-        populateGrantPosponementSscsCaseData();
+    public void givenAGrantedPostponementAndNotListable_thenClearReviewStateAndReferralReasonAndFlagAndAddNoteAndUnavailabilityUpdatedAndDwpStateAndDecisionDocAdded() {
+        populatePostponementSscsCaseData();
 
         sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
                 .listingOption("notListable").build());
@@ -124,13 +145,13 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getInterlocReferralReason(), is(nullValue()));
         assertThat(response.getData().getState(), is(State.NOT_LISTABLE));
         assertThat(response.getData().getAppeal().getHearingOptions().getExcludeDates().stream()
-                        .anyMatch(excludeDate -> excludeDate.getValue().getStart()
-                                .equals(LocalDate.now().plusDays(1).toString())), is(true));
+                .anyMatch(excludeDate -> excludeDate.getValue().getStart()
+                        .equals(LocalDate.now().plusDays(1).toString())), is(true));
         assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.NO));
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
     }
 
-    private void populateGrantPosponementSscsCaseData() {
+    private void populatePostponementSscsCaseData() {
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
                 .hearingDate(LocalDate.now().plusDays(1).toString())
                 .build()).build()));

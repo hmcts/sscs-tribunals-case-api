@@ -2,8 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.SEND_TO_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.mutableEmptyListIfNull;
@@ -65,6 +64,8 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
             sendToJudge(userAuthorisation, sscsCaseData);
         } else if (isGrantPostponement(postponementRequest)) {
             grantPostponement(sscsCaseData, postponementRequest);
+        } else if (isRefusePostponement(postponementRequest)) {
+            clearInterlocAndSetFlags(sscsCaseData);
         }
 
         clearTransientFields(sscsCaseData);
@@ -80,7 +81,10 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         }
 
         updatePartyUnavailability(sscsCaseData);
+        clearInterlocAndSetFlags(sscsCaseData);
+    }
 
+    private void clearInterlocAndSetFlags(SscsCaseData sscsCaseData) {
         sscsCaseData.setInterlocReferralReason(null);
         sscsCaseData.setInterlocReviewState(null);
         sscsCaseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
@@ -146,6 +150,10 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
 
     private boolean isSendToJudge(PostponementRequest postponementRequest) {
         return postponementRequest.getActionPostponementRequestSelected().equals(SEND_TO_JUDGE.getValue());
+    }
+
+    private boolean isRefusePostponement(PostponementRequest postponementRequest) {
+        return postponementRequest.getActionPostponementRequestSelected().equals(REFUSE.getValue());
     }
 
     private void clearTransientFields(SscsCaseData caseData) {
