@@ -235,7 +235,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
                 && sscsFurtherEvidenceDocList != null && sscsFurtherEvidenceDocList.size() >= 1) {
 
                 HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
-                    .requestingParty(sscsCaseData.getSscsHearingRecordingCaseData().getRequestingParty().getValue().getCode()).status("Requested")
+                    .requestingParty(sscsCaseData.getSscsHearingRecordingCaseData().getRequestingParty().getValue().getCode())
                     .requestDocument(sscsFurtherEvidenceDocList.get(0).getValue().getDocumentLink())
                     .dateRequested(LocalDateTime.now().format(DateTimeFormatter.ofPattern(UPLOAD_DATE_FORMATTER))).build()).build();
 

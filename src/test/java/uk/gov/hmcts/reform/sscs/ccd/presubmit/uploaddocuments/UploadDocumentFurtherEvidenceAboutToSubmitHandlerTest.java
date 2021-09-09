@@ -347,7 +347,6 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
 
         HearingRecordingRequest hearingRecordingRequest = actualCaseData.getData().getSscsHearingRecordingCaseData().getRequestedHearings().get(0);
         assertEquals("appellant", hearingRecordingRequest.getValue().getRequestingParty());
-        assertEquals("Requested", hearingRecordingRequest.getValue().getStatus());
         assertEquals(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), hearingRecordingRequest.getValue().getDateRequested());
 
         assertEquals(YesNo.YES, actualCaseData.getData().getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding());
@@ -376,7 +375,6 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
 
         HearingRecordingRequest hearingRecordingRequest = actualCaseData.getData().getSscsHearingRecordingCaseData().getRequestedHearings().get(1);
         assertEquals("appellant", hearingRecordingRequest.getValue().getRequestingParty());
-        assertEquals("Requested", hearingRecordingRequest.getValue().getStatus());
         assertEquals(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), hearingRecordingRequest.getValue().getDateRequested());
 
         assertEquals(YesNo.YES, actualCaseData.getData().getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding());
