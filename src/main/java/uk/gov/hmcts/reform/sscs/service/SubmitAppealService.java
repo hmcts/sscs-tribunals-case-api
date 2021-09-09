@@ -260,6 +260,10 @@ public class SubmitAppealService {
 
         try {
             List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(caseData.getAppeal().getAppellant().getIdentity().getNino(), idamTokens);
+            if (!matchedByNinoCases.isEmpty()) {
+                log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino "
+                        + caseData.getAppeal().getAppellant().getIdentity().getNino() + " before filtering non exact matches");
+            }
             caseDetails = matchedByNinoCases.stream().filter(createNinoAndBenefitTypeAndMrnDatePredicate(caseData)).findFirst().orElse(null);
 
             if (caseDetails == null) {
