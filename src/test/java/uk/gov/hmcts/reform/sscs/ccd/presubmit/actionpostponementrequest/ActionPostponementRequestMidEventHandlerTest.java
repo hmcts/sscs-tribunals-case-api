@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -82,6 +83,12 @@ public class ActionPostponementRequestMidEventHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.ACTION_POSTPONEMENT_REQUEST);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(generateFile.assemble(any())).thenReturn(URL);
+    }
+
+    @Test
+    public void givenAValidMidEvent_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(EventType.ACTION_POSTPONEMENT_REQUEST);
+        assertTrue(handler.canHandle(MID_EVENT, callback));
     }
 
     @Test
