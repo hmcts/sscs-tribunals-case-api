@@ -263,6 +263,8 @@ public class SubmitAppealService {
             if (!matchedByNinoCases.isEmpty()) {
                 log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino "
                         + caseData.getAppeal().getAppellant().getIdentity().getNino() + " before filtering non exact matches");
+            } else {
+                log.info("No matching cases for Nino {}", caseData.getAppeal().getAppellant().getIdentity().getNino());
             }
             caseDetails = matchedByNinoCases.stream().filter(createNinoAndBenefitTypeAndMrnDatePredicate(caseData)).findFirst().orElse(null);
 
