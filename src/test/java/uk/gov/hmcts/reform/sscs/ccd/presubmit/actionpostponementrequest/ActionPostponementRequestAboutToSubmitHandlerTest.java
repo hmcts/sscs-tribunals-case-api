@@ -108,7 +108,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
 
     public void givenAGrantedPostponementAndReadyToList_thenClearReviewStateAndReferralReasonAndFlagAndAddNoteAndDwpStateAndDecisionDocAdded() {
-        populateGrantPosponementSscsCaseData();
+        populatePostponementSscsCaseData();
 
         sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
                 .listingOption("readyToList").build());
@@ -128,7 +128,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
     @Test
     public void givenAGrantedPostponementAndNotListable_thenClearReviewStateAndReferralReasonAndFlagAndAddNoteAndDwpStateAndDecisionDocAdded() {
-        populateGrantPosponementSscsCaseData();
+        populatePostponementSscsCaseData();
 
         sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
                 .listingOption("notListable").build());
