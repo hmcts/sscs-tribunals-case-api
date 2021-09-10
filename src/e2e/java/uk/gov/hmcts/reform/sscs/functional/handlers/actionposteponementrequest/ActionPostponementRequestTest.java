@@ -38,6 +38,6 @@ public class ActionPostponementRequestTest extends BaseHandler {
                 .assertThat()
                 .body("interlocReferralReason", is("reviewPostponementRequest"))
                 .assertThat()
-                .body("appealNotePad.notesCollection[0].value.noteDetail", equalTo("E2ETestDetails"));
+                .body("appealNotePad.notesCollection[0].value.noteDetail", equalTo("Postponement sent to judge - E2ETestDetails"));
     }
 }
