@@ -86,7 +86,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAGrantedPostponementAndReadyToList_thenSetReviewStateAndReferralReasonAndFlagAndAddNoteAndUnavailabilityUpdatedAndDwpStateAndDecisionDocAdded() {
+    public void givenAGrantedPostponementAndReadyToList_thenSetReviewStateAndReferralReasonAndFlagAndAddNoteAndDwpStateAndDecisionDocAdded() {
         populateGrantPosponementSscsCaseData();
 
         sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
@@ -100,16 +100,13 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getInterlocReviewState(), is(nullValue()));
         assertThat(response.getData().getInterlocReferralReason(), is(nullValue()));
         assertThat(response.getData().getState(), is(State.READY_TO_LIST));
-        assertThat(response.getData().getAppeal().getHearingOptions().getExcludeDates().stream()
-                        .anyMatch(excludeDate -> excludeDate.getValue().getStart()
-                                .equals(LocalDate.now().plusDays(1).toString())), is(true));
         assertThat(response.getData().getSscsDocument(), is(not(empty())));
         assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.NO));
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
     }
 
     @Test
-    public void givenAGrantedPostponementAndNotListable_thenSetReviewStateAndReferralReasonAndFlagAndAddNoteAndUnavailabilityUpdatedAndDwpStateAndDecisionDocAdded() {
+    public void givenAGrantedPostponementAndNotListable_thenSetReviewStateAndReferralReasonAndFlagAndAddNoteAndDwpStateAndDecisionDocAdded() {
         populateGrantPosponementSscsCaseData();
 
         sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
@@ -123,9 +120,6 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getInterlocReviewState(), is(nullValue()));
         assertThat(response.getData().getInterlocReferralReason(), is(nullValue()));
         assertThat(response.getData().getState(), is(State.NOT_LISTABLE));
-        assertThat(response.getData().getAppeal().getHearingOptions().getExcludeDates().stream()
-                        .anyMatch(excludeDate -> excludeDate.getValue().getStart()
-                                .equals(LocalDate.now().plusDays(1).toString())), is(true));
         assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.NO));
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
     }
