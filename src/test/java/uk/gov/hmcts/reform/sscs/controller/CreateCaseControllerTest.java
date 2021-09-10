@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -54,5 +55,21 @@ public class CreateCaseControllerTest {
         assertThat(createCaseResponse.getBody().get("id"), is(caseId.toString()));
         assertThat(createCaseResponse.getBody().get("case_reference"), is(caseRef));
         assertThat(createCaseResponse.getBody().get("appellant_tya"), is(someTyaValue));
+    }
+
+    @Test
+    public void twoCallsToRandomNinoAreDifferent() {
+        CreateCaseController createCaseController = new CreateCaseController(ccdService, idamService);
+        String nino1 = createCaseController.getRandomNino();
+        String nino2 = createCaseController.getRandomNino();
+        assertThat(nino1, not(nino2));
+    }
+
+    @Test
+    public void twoCallsToRandomMrnDateHaveAGoodChanceOfBeingDifferent() {
+        CreateCaseController createCaseController = new CreateCaseController(ccdService, idamService);
+        String mrnDate1 = createCaseController.getRandomMrnDate();
+        String mrnDate2 = createCaseController.getRandomMrnDate();
+        assertThat(mrnDate1, not(mrnDate2));
     }
 }

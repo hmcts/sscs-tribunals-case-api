@@ -15,7 +15,10 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
@@ -129,10 +132,24 @@ public class CreateCaseController {
                     )
                     .build();
             sscsCaseData.getAppeal().setHearingType(hearingType);
+            sscsCaseData.getAppeal().getAppellant().getIdentity().setNino(getRandomNino());
+            sscsCaseData.getAppeal().getMrnDetails().setMrnDate(getRandomMrnDate());
         } catch (IOException e) {
             throw new CreateCaseException(e);
         }
 
         return sscsCaseData;
+    }
+
+    public String getRandomNino() {
+        return RandomStringUtils.random(9, true, true).toUpperCase();
+    }
+
+    public String getRandomMrnDate() {
+        long minDay = LocalDate.now().minusDays(1).toEpochDay();
+        long maxDay = LocalDate.now().minusDays(28).toEpochDay();
+        long randomDay = ThreadLocalRandom.current().nextLong(maxDay, minDay);
+        LocalDate randomDate = LocalDate.ofEpochDay(randomDay);
+        return randomDate.toString();
     }
 }
