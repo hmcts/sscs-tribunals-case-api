@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -75,7 +76,7 @@ public class ActionPostponementRequestMidEventHandlerTest {
                         .name(Name.builder().firstName("APPELLANT").lastName("LastNamE").build())
                         .identity(Identity.builder().build()).build()).build())
                 .directionDueDate(LocalDate.now().plusDays(1).toString())
-                .postponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant").build())
+                .postponementRequest(PostponementRequest.builder().build())
                 .build();
 
         capture = ArgumentCaptor.forClass(GenerateFileParams.class);
@@ -105,7 +106,9 @@ public class ActionPostponementRequestMidEventHandlerTest {
     }
 
     @Test
-    public void givenLanguagePreferenceIsEnglish_NoticeIsGeneratedAndPopulatedInPreviewDocumentField() {
+    @Parameters({"grant", "refuse"})
+    public void givenLanguagePreferenceIsEnglish_NoticeIsGeneratedAndPopulatedInPreviewDocumentField(String actionSelected) {
+        sscsCaseData.getPostponementRequest().setActionPostponementRequestSelected(actionSelected);
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
