@@ -141,6 +141,7 @@ public class CreateCaseController {
         return sscsCaseData;
     }
 
+    @SuppressWarnings("squid:S2245")
     public String getRandomNino() {
         return RandomStringUtils.random(9, true, true).toUpperCase();
     }
@@ -148,6 +149,7 @@ public class CreateCaseController {
     public String getRandomMrnDate() {
         long minDay = LocalDate.now().minusDays(1).toEpochDay();
         long maxDay = LocalDate.now().minusDays(28).toEpochDay();
+        @SuppressWarnings("squid:S2245")
         long randomDay = ThreadLocalRandom.current().nextLong(maxDay, minDay);
         LocalDate randomDate = LocalDate.ofEpochDay(randomDay);
         return randomDate.toString();
