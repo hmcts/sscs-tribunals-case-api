@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
 import static java.util.stream.Collectors.joining;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.ResponseEntity.created;
+import static uk.gov.hmcts.reform.sscs.controller.SyaController.logBadRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiOperation;
@@ -18,28 +21,36 @@ import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.exception.CreateCaseException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @RestController
 @ConditionalOnProperty("create_ccd_endpoint")
+@Slf4j
 public class CreateCaseController {
 
+    private final SubmitAppealService submitAppealService;
     private final CcdService ccdService;
     private final IdamService idamService;
 
     public CreateCaseController(
+            @Autowired SubmitAppealService submitAppealService,
             @Autowired CcdService ccdService,
             @Autowired IdamService idamService
     ) {
+        this.submitAppealService = submitAppealService;
         this.ccdService = ccdService;
         this.idamService = idamService;
     }
@@ -132,8 +143,6 @@ public class CreateCaseController {
                     )
                     .build();
             sscsCaseData.getAppeal().setHearingType(hearingType);
-            sscsCaseData.getAppeal().getAppellant().getIdentity().setNino(getRandomNino());
-            sscsCaseData.getAppeal().getMrnDetails().setMrnDate(getRandomMrnDate());
         } catch (IOException e) {
             throw new CreateCaseException(e);
         }
@@ -141,17 +150,48 @@ public class CreateCaseController {
         return sscsCaseData;
     }
 
+
+    @ApiOperation(value = "submitAppeal",
+            notes = "Creates a case from the SYA details - Used for tests",
+            response = String.class, responseContainer = "Appeal details")
+    @ApiResponses(value = {@ApiResponse(code = 201, message = "Submitted appeal successfully",
+            response = String.class)})
+    @PostMapping(value = "/api/appeals", consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> createAppeals(@RequestHeader(value = AUTHORIZATION, required = false)
+                                                        String authorisation, @RequestBody SyaCaseWrapper syaCaseWrapper) {
+
+        if (syaCaseWrapper.getAppellant() == null
+                || syaCaseWrapper.getBenefitType() == null
+                || syaCaseWrapper.getBenefitType().getCode() == null) {
+            logBadRequest(syaCaseWrapper);
+        }
+        syaCaseWrapper.getAppellant().setNino(getRandomNino());
+        syaCaseWrapper.getMrn().setDate(getRandomMrnDate());
+        log.info("Appeal with Nino - {} and benefit type {} received", syaCaseWrapper.getAppellant().getNino(),
+                syaCaseWrapper.getBenefitType().getCode());
+        Long caseId = submitAppealService.submitAppeal(syaCaseWrapper, authorisation);
+
+        log.info("Case {} with benefit type - {} processed successfully",
+                caseId,
+                syaCaseWrapper.getBenefitType().getCode());
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(caseId).toUri();
+
+        log.info(location.toString());
+        return created(location).build();
+    }
+
     @SuppressWarnings("squid:S2245")
     public String getRandomNino() {
         return RandomStringUtils.random(9, true, true).toUpperCase();
     }
 
-    public String getRandomMrnDate() {
+    public LocalDate getRandomMrnDate() {
         long minDay = LocalDate.now().minusDays(1).toEpochDay();
         long maxDay = LocalDate.now().minusDays(28).toEpochDay();
         @SuppressWarnings("squid:S2245")
         long randomDay = ThreadLocalRandom.current().nextLong(maxDay, minDay);
-        LocalDate randomDate = LocalDate.ofEpochDay(randomDay);
-        return randomDate.toString();
+        return LocalDate.ofEpochDay(randomDay);
     }
 }

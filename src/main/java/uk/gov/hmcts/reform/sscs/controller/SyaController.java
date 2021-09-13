@@ -65,7 +65,7 @@ public class SyaController {
         return created(location).build();
     }
 
-    private void logBadRequest(SyaCaseWrapper syaCaseWrapper) {
+    static void logBadRequest(SyaCaseWrapper syaCaseWrapper) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("SYA data for bad request: ");
         if (syaCaseWrapper.getBenefitType() != null) {
