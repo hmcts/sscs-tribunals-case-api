@@ -99,7 +99,7 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
                 .documentFileName(sscsCaseData.getPostponementRequest().getPostponementPreviewDocument().getDocumentFilename())
                 .documentType(DocumentType.POSTPONEMENT_REQUEST.getValue())
                 .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
-                .partyUploaded(uploadParty)
+                .originalPartySender(uploadParty.getValue())
                 .build()).build();
     }
 

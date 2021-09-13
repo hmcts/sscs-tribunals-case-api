@@ -134,7 +134,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
         final SscsDocument document = sscsCaseData.getSscsDocument().get(0);
         assertEquals(DocumentType.POSTPONEMENT_REQUEST.getValue(), document.getValue().getDocumentType());
         assertEquals("example.pdf", document.getValue().getDocumentLink().getDocumentFilename());
-        assertEquals(uploadParty, document.getValue().getPartyUploaded());
+        assertEquals(uploadParty.getValue(), document.getValue().getOriginalPartySender());
     }
 
     @Test
