@@ -75,7 +75,7 @@ public class CreateCaseControllerTest {
     }
 
     @Test
-    public void shouldReturnHttpStatusCode201ForTheSubmittedAppeal() throws Exception {
+    public void shouldReturnHttpStatusCode201ForTheSubmittedTestAppeal() throws Exception {
         when(submitAppealService.submitAppeal(any(SyaCaseWrapper.class), any(String.class))).thenReturn(1L);
 
         String json = getSyaCaseWrapperJson("json/sya.json");
