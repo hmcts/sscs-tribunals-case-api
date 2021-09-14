@@ -151,10 +151,10 @@ public class CreateCaseController {
     }
 
 
-    @ApiOperation(value = "submitAppeal",
-            notes = "Creates a case from the SYA details - Used for tests",
-            response = String.class, responseContainer = "Appeal details")
-    @ApiResponses(value = {@ApiResponse(code = 201, message = "Submitted appeal successfully",
+    @ApiOperation(value = "submitTestAppeal",
+            notes = "Creates a case from the SYA details - Used for tests. Changes the mrn date and nino to a random value",
+            response = String.class, responseContainer = "Test appeal details")
+    @ApiResponses(value = {@ApiResponse(code = 201, message = "Submitted test appeal successfully",
             response = String.class)})
     @PostMapping(value = "/api/appeals", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createAppeals(@RequestHeader(value = AUTHORIZATION, required = false)
