@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -15,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -74,7 +76,7 @@ public class ActionPostponementRequestMidEventHandlerTest {
                         .name(Name.builder().firstName("APPELLANT").lastName("LastNamE").build())
                         .identity(Identity.builder().build()).build()).build())
                 .directionDueDate(LocalDate.now().plusDays(1).toString())
-                .postponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant").build())
+                .postponementRequest(PostponementRequest.builder().build())
                 .build();
 
         capture = ArgumentCaptor.forClass(GenerateFileParams.class);
@@ -82,6 +84,12 @@ public class ActionPostponementRequestMidEventHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.ACTION_POSTPONEMENT_REQUEST);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(generateFile.assemble(any())).thenReturn(URL);
+    }
+
+    @Test
+    public void givenAValidMidEvent_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(EventType.ACTION_POSTPONEMENT_REQUEST);
+        assertTrue(handler.canHandle(MID_EVENT, callback));
     }
 
     @Test
@@ -98,7 +106,9 @@ public class ActionPostponementRequestMidEventHandlerTest {
     }
 
     @Test
-    public void givenLanguagePreferenceIsEnglish_NoticeIsGeneratedAndPopulatedInPreviewDocumentField() {
+    @Parameters({"grant", "refuse"})
+    public void givenLanguagePreferenceIsEnglish_NoticeIsGeneratedAndPopulatedInPreviewDocumentField(String actionSelected) {
+        sscsCaseData.getPostponementRequest().setActionPostponementRequestSelected(actionSelected);
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));

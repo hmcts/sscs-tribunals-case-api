@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -67,6 +68,12 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenAValidAboutToSubmitEvent_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(EventType.ACTION_POSTPONEMENT_REQUEST);
+        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+    }
+
+    @Test
     public void givenASendToJudge_thenSetReviewStateAndReferralReasonAndAddNote() {
         sscsCaseData.setPostponementRequest(PostponementRequest.builder()
                 .actionPostponementRequestSelected("sendToJudge")
@@ -86,8 +93,29 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAGrantedPostponementAndReadyToList_thenSetReviewStateAndReferralReasonAndFlagAndAddNoteAndDwpStateAndDecisionDocAdded() {
-        populateGrantPosponementSscsCaseData();
+    public void givenARefusedPostponement_thenClearReviewStateAndReferralReasonAndFlagAndAndStateIsUnchangedAddNoteAndDwpStateAndDecisionDocAdded() {
+        populatePostponementSscsCaseData();
+
+        sscsCaseData.setState(State.HEARING);
+        sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("refuse")
+                .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
+                eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
+        assertThat(response.getData().getInterlocReviewState(), is(nullValue()));
+        assertThat(response.getData().getInterlocReferralReason(), is(nullValue()));
+        assertThat(response.getData().getState(), is(State.HEARING));
+        assertThat(response.getData().getSscsDocument(), is(not(empty())));
+        assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.NO));
+        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
+    }
+
+    @Test
+    public void givenAGrantedPostponementAndReadyToList_thenClearReviewStateAndReferralReasonAndFlagAndAddNoteAndDwpStateAndDecisionDocAdded() {
+        populatePostponementSscsCaseData();
 
         sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
                 .listingOption("readyToList").build());
@@ -106,8 +134,8 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAGrantedPostponementAndNotListable_thenSetReviewStateAndReferralReasonAndFlagAndAddNoteAndDwpStateAndDecisionDocAdded() {
-        populateGrantPosponementSscsCaseData();
+    public void givenAGrantedPostponementAndNotListable_thenClearReviewStateAndReferralReasonAndFlagAndAddNoteAndDwpStateAndDecisionDocAdded() {
+        populatePostponementSscsCaseData();
 
         sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
                 .listingOption("notListable").build());
@@ -124,7 +152,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
     }
 
-    private void populateGrantPosponementSscsCaseData() {
+    private void populatePostponementSscsCaseData() {
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
                 .hearingDate(LocalDate.now().plusDays(1).toString())
                 .build()).build()));
