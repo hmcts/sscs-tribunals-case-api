@@ -26,8 +26,8 @@
     "case_data": {
       "selectWhoReviewsCase": {
         "value": {
-          "code": "reviewByTcw",
-          "label": "Review by TCW"
+          "code": "postponementRequestInterlocSendToTcw",
+          "label": "Postponement request for interloc - send to TCW"
         },
         "list_items": [
           {
@@ -43,6 +43,27 @@
             "label": "Postponement request for interloc - send to TCW"
           }
         ]
+      },
+      "originalSender": {
+        "value": {
+          "code": "appellant",
+          "label": "Appellant (or Appointee)"
+        },
+        "list_items": [
+          {
+            "code": "appellant",
+            "label": "Appellant (or Appointee)"
+          },
+          {
+            "code": "representative",
+            "label": "Representative"
+          }
+        ]
+      },
+      "postponementPreviewDocument": {
+        "document_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c",
+        "document_binary_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c/binary",
+        "document_filename": "postponementPreviewDocument.pdf"
       },
       "dwpTimeExtension": [
       ],
@@ -244,7 +265,6 @@
           "id": "29a280db-7937-49db-ae7c-84c62581e3a2"
         }
       ],
-      "originalSender": {},
       "furtherEvidenceAction": {}
     },
     "data_classification": {
