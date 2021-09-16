@@ -10,6 +10,9 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.WELSH_TRANSLATION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest.ActionPostponementRequestAboutToSubmitHandler.POSTPONEMENT_DETAILS_SENT_TO_JUDGE_PREFIX;
 
 import java.time.LocalDate;
@@ -150,6 +153,25 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getState(), is(State.NOT_LISTABLE));
         assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.NO));
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
+    }
+
+    @Test
+    public void givenDirectionNoticeAddedToWelshCase_thenSetInterlocReviewStateAndTranslationRequiredFlag() {
+        populatePostponementSscsCaseData();
+
+        sscsCaseData.setState(State.HEARING);
+        sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("refuse")
+                .build());
+        sscsCaseData.setLanguagePreferenceWelsh(YES.getValue());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
+                eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(TRANSLATION_REQUIRED));
+        assertThat(response.getData().getInterlocReviewState(), is(WELSH_TRANSLATION.getId()));
+        assertThat(response.getData().getTranslationWorkOutstanding(), is(YES.getValue()));
+        assertThat(response.getData().getSscsDocument(), is(not(empty())));
     }
 
     private void populatePostponementSscsCaseData() {
