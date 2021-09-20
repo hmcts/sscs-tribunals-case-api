@@ -204,28 +204,23 @@
             "dateRequested": "2021-08-19",
             "requestDocument": null,
             "requestingParty": "dwp",
-            "sscsHearingRecordingList": [
-              {
-                "id": "7db49624-e2a3-423f-a578-11266f7be5c9",
-                "value": {
-                  "venue": "asdgsdfgsdfgsdfg",
-                  "hearingId": "12345566767",
-                  "recordings": [
-                    {
-                      "id": "b6ef0df3-fcc7-43cb-8ca6-fa0923277648",
-                      "value": {
-                        "document_url": "http://dm-store:5005/documents/75b515f7-e5ad-4f1d-99ad-18ffb1a98d10",
-                        "document_filename": "Final asdgsdfgsdfgsdfg 12 Dec 2000.mp3",
-                        "document_binary_url": "http://dm-store:5005/documents/75b515f7-e5ad-4f1d-99ad-18ffb1a98d10/binary"
-                      }
-                    }
-                  ],
-                  "uploadDate": "19-08-2021 09:25:51 AM",
-                  "hearingDate": "12-12-2000 12:12:00 PM",
-                  "hearingType": "final"
+            "sscsHearingRecording": {
+              "venue": "asdgsdfgsdfgsdfg",
+              "hearingId": "12345566767",
+              "recordings": [
+                {
+                  "id": "b6ef0df3-fcc7-43cb-8ca6-fa0923277648",
+                  "value": {
+                    "document_url": "http://dm-store:5005/documents/75b515f7-e5ad-4f1d-99ad-18ffb1a98d10",
+                    "document_filename": "Final asdgsdfgsdfgsdfg 12 Dec 2000.mp3",
+                    "document_binary_url": "http://dm-store:5005/documents/75b515f7-e5ad-4f1d-99ad-18ffb1a98d10/binary"
+                  }
                 }
-              }
-            ]
+              ],
+              "uploadDate": "19-08-2021 09:25:51 AM",
+              "hearingDate": "12-12-2000 12:12:00 PM",
+              "hearingType": "final"
+            }
           }
         }
       ],
