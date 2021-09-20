@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.PostponeRequestTemplateBody;
@@ -42,14 +43,16 @@ public class ValidSendToInterlocMidEventHandler implements PreSubmitCallbackHand
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        final String requestDetails = sscsCaseData.getPostponementRequest().getPostponementRequestDetails();
+        if (SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId().equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode())) {
+            final String requestDetails = sscsCaseData.getPostponementRequest().getPostponementRequestDetails();
 
-        if (isBlank(requestDetails)) {
-            response.addError("Please enter request details to generate a postponement request document");
-            return response;
+            if (isBlank(requestDetails)) {
+                response.addError("Please enter request details to generate a postponement request document");
+                return response;
+            }
+
+            generatePostponementRequestPdfAndSetPreviewDocument(userAuthorisation, sscsCaseData, requestDetails);
         }
-
-        generatePostponementRequestPdfAndSetPreviewDocument(userAuthorisation, sscsCaseData, requestDetails);
 
         return response;
     }

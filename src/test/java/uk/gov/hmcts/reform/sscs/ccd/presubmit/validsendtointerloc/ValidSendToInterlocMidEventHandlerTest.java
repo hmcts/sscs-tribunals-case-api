@@ -3,12 +3,14 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc.ValidSendToInterlocMidEventHandler.FILENAME;
 
 import java.time.LocalDateTime;
@@ -61,6 +63,7 @@ public class ValidSendToInterlocMidEventHandlerTest {
         sscsCaseData = SscsCaseData.builder()
                 .appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build())
                 .state(State.HEARING)
+                .selectWhoReviewsCase(new DynamicList(new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()), null))
                 .postponementRequest(PostponementRequest.builder()
                         .postponementRequestDetails("Here are some details")
                         .postponementRequestHearingVenue("Venue 1")
@@ -124,5 +127,19 @@ public class ValidSendToInterlocMidEventHandlerTest {
                 .documentFilename(FILENAME)
                 .build();
         assertThat(sscsCaseData.getPostponementRequest().getPostponementPreviewDocument(), is(documentLink));
+    }
+
+    @Test
+    @Parameters({"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
+    public void givenNonPostponementRequest_thenDoNothing(EventType eventType) {
+        sscsCaseData.setSelectWhoReviewsCase(new DynamicList(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()), null));
+
+        when(callback.getEvent()).thenReturn(eventType);
+        sscsCaseData.getPostponementRequest().setPostponementRequestDetails(null);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+        verifyNoInteractions(generateFile);
     }
 }
