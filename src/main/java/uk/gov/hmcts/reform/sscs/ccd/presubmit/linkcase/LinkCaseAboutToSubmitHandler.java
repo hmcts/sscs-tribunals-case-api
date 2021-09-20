@@ -56,7 +56,7 @@ public class LinkCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
         if (linkedCaseMap.keySet().size() > 10) {
             preSubmitCallbackResponse.addError("Case cannot be linked as number of linked cases exceeds the limit");
         } else {
-            updateLinkedCases(linkedCaseMap, sscsCaseData.getCcdCaseId());
+            updateLinkedCases(linkedCaseMap, sscsCaseData.getCcdCaseId(), preSubmitCallbackResponse);
         }
         return preSubmitCallbackResponse;
     }
@@ -79,10 +79,14 @@ public class LinkCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
         return linkedCaseMap;
     }
 
-    private void updateLinkedCases(Map<CaseLink, SscsCaseData> linkedCaseMap, String caseInCallback) {
+    private void updateLinkedCases(Map<CaseLink, SscsCaseData> linkedCaseMap, String caseInCallback, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         for (CaseLink caseLink : linkedCaseMap.keySet()) {
 
             SscsCaseData sscsCaseData = linkedCaseMap.get(caseLink);
+
+            if (sscsCaseData.getCcdCaseId().equals(caseInCallback)) {
+                preSubmitCallbackResponse.addError("You can’t link the case to itself, please correct");
+            }
 
             List<CaseLink> linkedCaseList = Lists.newArrayList(linkedCaseMap.keySet());
             linkedCaseList.remove(caseLink);
