@@ -80,7 +80,7 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
                 .documentFileName(sscsCaseData.getPostponementRequest().getPostponementPreviewDocument().getDocumentFilename())
                 .documentType(DocumentType.POSTPONEMENT_REQUEST.getValue())
                 .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
-                .partyUploaded(UploadParty.DWP)
+                .originalPartySender(UploadParty.DWP.getValue())
                 .build()).build();
     }
 

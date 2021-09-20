@@ -7,7 +7,10 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.AT_38;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_EVIDENCE_BUNDLE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_RESPONSE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.UCB;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_TCW;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -55,6 +58,7 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
         setOfficeDropdowns(sscsCaseData);
         setDefaultFieldValues(sscsCaseData);
         setDwpDocuments(sscsCaseData);
+        setSelectWhoReviewsCase(sscsCaseData);
 
         final PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
         if (sscsCaseData.getCreatedInGapsFrom() == null || !sscsCaseData.getCreatedInGapsFrom().equals("readyToList")) {
@@ -130,6 +134,14 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
 
     private Optional<DwpDocument> findDwpDocument(DwpDocumentType dwpDocumentType, Stream<DwpDocument> stream) {
         return stream.filter(d -> d.getValue().getDocumentType().equals(dwpDocumentType.getValue())).findFirst();
+    }
+
+    private void setSelectWhoReviewsCase(SscsCaseData sscsCaseData) {
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()));
+        listOptions.add(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()));
+
+        sscsCaseData.setSelectWhoReviewsCase(new DynamicList(new DynamicListItem("", ""), listOptions));
     }
 
 }

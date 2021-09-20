@@ -122,7 +122,7 @@ public class PostponementRequestAboutToSubmitHandlerTest {
         final SscsDocument document = sscsCaseData.getSscsDocument().get(0);
         assertThat(document.getValue().getDocumentType(), is(DocumentType.POSTPONEMENT_REQUEST.getValue()));
         assertThat(document.getValue().getDocumentLink().getDocumentFilename(), is("example.pdf"));
-        assertThat(document.getValue().getPartyUploaded(), is(UploadParty.DWP));
+        assertThat(document.getValue().getOriginalPartySender(), is(UploadParty.DWP.getValue()));
         assertThat(sscsCaseData.getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_TCW.getId()));
         assertThat(sscsCaseData.getInterlocReferralReason(), is(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId()));
         assertThat(sscsCaseData.getPostponementRequest().getUnprocessedPostponementRequest(), is(YES));
