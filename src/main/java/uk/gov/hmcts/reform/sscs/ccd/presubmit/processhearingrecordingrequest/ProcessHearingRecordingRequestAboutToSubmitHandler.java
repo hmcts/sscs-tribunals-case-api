@@ -151,14 +151,16 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
     }
 
     private void createNewHearingRecordingRequest(PartyItemList partyItemList, SscsHearingRecordingCaseData sscsHearingRecordingCaseData, String hearingId, Set<HearingRecordingRequest> partyHearingRecordingsRequests) {
-        List<SscsHearingRecording> recordings = sscsHearingRecordingCaseData.getSscsHearingRecordings().stream()
-                .filter(sscsHearing -> sscsHearing.getValue().getHearingId().equals(hearingId))
-                .collect(Collectors.toList());
-        HearingRecordingRequest recordingRequest = HearingRecordingRequest.builder()
-                .value(HearingRecordingRequestDetails.builder()
-                        .sscsHearingRecordingList(recordings).dateRequested(LocalDate.now().toString())
-                        .requestingParty(partyItemList.getCode()).build()).build();
-        partyHearingRecordingsRequests.add(recordingRequest);
+        Optional<SscsHearingRecording> recording = sscsHearingRecordingCaseData.getSscsHearingRecordings().stream()
+                .filter(sscsHearing -> sscsHearing.getValue().getHearingId().equals(hearingId)).findAny();
+
+        if (recording.isPresent()) {
+            HearingRecordingRequest recordingRequest = HearingRecordingRequest.builder()
+                    .value(HearingRecordingRequestDetails.builder()
+                            .sscsHearingRecording(recording.get().getValue()).dateRequested(LocalDate.now().toString())
+                            .requestingParty(partyItemList.getCode()).build()).build();
+            partyHearingRecordingsRequests.add(recordingRequest);
+        }
     }
 
     @NotNull
