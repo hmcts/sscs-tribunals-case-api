@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.postponementrequest.PostponementRequestAboutToStartHandlerTest.getHearing;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.postponementrequest.PostponementRequestMidEventHandler.FILENAME;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.FILENAME;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.postponementrequest;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -11,14 +10,11 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
-import uk.gov.hmcts.reform.sscs.model.docassembly.PostponeRequestTemplateBody;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 public class PostponementRequestMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private static final String TITLE = "Postponement Request";
-    static final String FILENAME = "Postponement Request.pdf";
     private final GenerateFile generateFile;
     private final String templateId;
 
@@ -42,47 +38,7 @@ public class PostponementRequestMidEventHandler implements PreSubmitCallbackHand
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        final String requestDetails = sscsCaseData.getPostponementRequest().getPostponementRequestDetails();
-
-        if (isBlank(requestDetails)) {
-            response.addError("Please enter request details to generate a postponement request document");
-            return response;
-        }
-
-        generatePostponementRequestPdfAndSetPreviewDocument(userAuthorisation, sscsCaseData, requestDetails);
-
-        return response;
+        return SscsUtil.processPostponementRequestPdfAndSetPreviewDocument(userAuthorisation, sscsCaseData, response,
+                generateFile, templateId);
     }
-
-    private void generatePostponementRequestPdfAndSetPreviewDocument(String userAuthorisation, SscsCaseData sscsCaseData, String requestDetails) {
-        GenerateFileParams params = getGenerateFileParams(userAuthorisation, requestDetails);
-        final String generatedFileUrl = generateFile.assemble(params);
-        setPostponementPreviewDocument(sscsCaseData, generatedFileUrl);
-    }
-
-    private void setPostponementPreviewDocument(SscsCaseData sscsCaseData, String generatedFileUrl) {
-        sscsCaseData.getPostponementRequest().setPostponementPreviewDocument(getPreviewDocumentLink(generatedFileUrl));
-    }
-
-    private DocumentLink getPreviewDocumentLink(String generatedFileUrl) {
-        return DocumentLink.builder()
-                .documentFilename(FILENAME)
-                .documentBinaryUrl(generatedFileUrl + "/binary")
-                .documentUrl(generatedFileUrl)
-                .build();
-    }
-
-    private GenerateFileParams getGenerateFileParams(String userAuthorisation, String requestDetails) {
-        return GenerateFileParams.builder()
-                .renditionOutputLocation(null)
-                .templateId(templateId)
-                .formPayload(getFormPayload(requestDetails))
-                .userAuthentication(userAuthorisation)
-                .build();
-    }
-
-    private PostponeRequestTemplateBody getFormPayload(String requestDetails) {
-        return PostponeRequestTemplateBody.builder().title(TITLE).text(requestDetails).build();
-    }
-
 }
