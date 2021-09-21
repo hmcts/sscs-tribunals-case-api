@@ -35,7 +35,7 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandlerFunctionalTest ex
             .assertThat()
             .body("requestedHearings", is(empty()))
             .assertThat()
-            .body("dwpReleasedHearings[0].value.sscsHearingRecordingList[0].value.hearingId", equalTo("12345566767"))
+            .body("dwpReleasedHearings[0].value.sscsHearingRecording.hearingId", equalTo("12345566767"))
             .assertThat()
             .body("hearingRecordingRequestOutstanding", equalTo("No"));
 
