@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @SpringBootTest
-public class ProcessHearingRecordingRequestAboutToSubmitHandlerFunctionalTest extends BaseHandler {
+public class ActionHearingRecordingRequestAboutToSubmitHandlerFunctionalTest extends BaseHandler {
 
     @Test
     public void givenAboutToSubmitCallbackForEvent_shouldSetFields() throws Exception {

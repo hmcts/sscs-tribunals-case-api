@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.service.processhearingrecordingrequest;
+package uk.gov.hmcts.reform.sscs.service.actionhearingrecordingrequest;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.model.RequestStatus.GRANTED;
@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.model.RequestStatus;
 
 @Service
-public class ProcessHearingRecordingRequestService {
+public class ActionHearingRecordingRequestService {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter RESULT_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy");
