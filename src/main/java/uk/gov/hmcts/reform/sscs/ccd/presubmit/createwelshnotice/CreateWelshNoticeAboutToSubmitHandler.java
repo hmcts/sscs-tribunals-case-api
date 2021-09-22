@@ -178,7 +178,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
 
     private String getEnglishNoticeType(String noticeType) {
         if (AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE.getLabel().equals(noticeType)
-            || POSTPONEMENT_REQUEST_DIRECTION_NOTICE.getLabel().equals(noticeType) ) {
+            || POSTPONEMENT_REQUEST_DIRECTION_NOTICE.getLabel().equals(noticeType)) {
             return DIRECTION_NOTICE.getLabel();
         }
         return noticeType;
