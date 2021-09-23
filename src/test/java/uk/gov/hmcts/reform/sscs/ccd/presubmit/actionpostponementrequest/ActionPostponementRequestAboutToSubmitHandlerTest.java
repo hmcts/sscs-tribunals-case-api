@@ -57,7 +57,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         openMocks(this);
         handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService);
 
-        when(callback.getEvent()).thenReturn(EventType.PROCESS_HEARING_RECORDING_REQUEST);
+        when(callback.getEvent()).thenReturn(EventType.ACTION_POSTPONEMENT_REQUEST);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
@@ -69,7 +69,6 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
     @Test
     public void givenAValidAboutToSubmitEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.ACTION_POSTPONEMENT_REQUEST);
         assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
