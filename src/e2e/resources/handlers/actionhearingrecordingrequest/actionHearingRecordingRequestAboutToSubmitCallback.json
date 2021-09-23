@@ -2620,6 +2620,6 @@
       "region": "PUBLIC"
     }
   },
-  "event_id": "processHearingRecordingRequest",
+  "event_id": "actionHearingRecordingRequest",
   "ignore_warning": false
 }

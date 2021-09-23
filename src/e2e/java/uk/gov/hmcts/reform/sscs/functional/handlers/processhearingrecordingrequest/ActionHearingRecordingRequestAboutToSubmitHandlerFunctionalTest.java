@@ -27,7 +27,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerFunctionalTest ext
             .contentType(ContentType.JSON)
             .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
             .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
-            .body(getJsonCallbackForTest("handlers/processhearingrecordingrequest/processHearingRecordingRequestAboutToSubmitCallback.json"))
+            .body(getJsonCallbackForTest("handlers/actionhearingrecordingrequest/actionHearingRecordingRequestAboutToSubmitCallback.json"))
             .post("/ccdAboutToSubmit")
             .then()
             .statusCode(HttpStatus.SC_OK)
