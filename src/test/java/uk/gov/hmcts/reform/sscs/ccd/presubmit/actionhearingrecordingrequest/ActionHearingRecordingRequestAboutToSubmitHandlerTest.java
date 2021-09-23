@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 
-
 @RunWith(JUnitParamsRunner.class)
 public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
 
