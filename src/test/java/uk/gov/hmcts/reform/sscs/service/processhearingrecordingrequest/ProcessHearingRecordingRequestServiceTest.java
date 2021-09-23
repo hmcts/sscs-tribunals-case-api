@@ -117,13 +117,13 @@ public class ProcessHearingRecordingRequestServiceTest {
     }
 
     private HearingRecordingRequest getHearingRecordingRequest(PartyItemList party, RequestStatus status) {
-        SscsHearingRecording sscsHearingRecording = SscsHearingRecording.builder().value(SscsHearingRecordingDetails.builder()
+        SscsHearingRecordingDetails sscsHearingRecording = SscsHearingRecordingDetails.builder()
                 .hearingId(HEARING.getValue().getHearingId())
                 .venue(HEARING.getValue().getVenue().getName())
-                .build()).build();
+                .build();
         return HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
                 .dateRequested(LocalDate.now().toString())
-                .sscsHearingRecordingList(newArrayList(sscsHearingRecording))
+                .sscsHearingRecording(sscsHearingRecording)
                 .requestingParty(party.getCode()).build()).build();
     }
 

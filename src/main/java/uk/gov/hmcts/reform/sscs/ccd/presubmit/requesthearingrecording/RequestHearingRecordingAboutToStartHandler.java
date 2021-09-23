@@ -66,18 +66,14 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
             StringBuilder requestedHearingText = new StringBuilder();
             StringBuilder releasedHearingText = new StringBuilder();
 
-
             requestedHearingsCollection.stream()
                     .filter(r -> r.getValue().getRequestingParty().equals(PartyItemList.DWP.getCode()))
-                    .forEach(r -> r.getValue().getSscsHearingRecordingList()
-                            .forEach(hr -> removeFromListAndAddText(hr, validHearings, requestedHearingText)));
+                    .forEach(r -> removeFromListAndAddText(r.getValue().getSscsHearingRecording(), validHearings, requestedHearingText));
 
 
             releasedHearingsCollection.stream()
                     .filter(r -> r.getValue().getRequestingParty().equals(PartyItemList.DWP.getCode()))
-                    .forEach(r -> r.getValue().getSscsHearingRecordingList()
-                            .forEach(hr -> removeFromListAndAddText(hr, validHearings, releasedHearingText)));
-
+                    .forEach(r -> removeFromListAndAddText(r.getValue().getSscsHearingRecording(), validHearings, releasedHearingText));
 
             if (validHearings.isEmpty()) {
                 return returnError(response, "There are no hearing recordings available for request");
@@ -114,10 +110,10 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
         return false;
     }
 
-    private void removeFromListAndAddText(SscsHearingRecording request, List<DynamicListItem> validHearings, StringBuilder stringBuilder) {
-        stringBuilder.append(request.getValue().getVenue() + " " + request.getValue().getHearingDate());
+    private void removeFromListAndAddText(SscsHearingRecordingDetails request, List<DynamicListItem> validHearings, StringBuilder stringBuilder) {
+        stringBuilder.append(request.getVenue() + " " + request.getHearingDate());
         stringBuilder.append(", ");
-        validHearings.stream().filter(i -> i.getCode().equals(request.getValue().getHearingId())).findFirst().ifPresent(validHearings::remove);
+        validHearings.stream().filter(i -> i.getCode().equals(request.getHearingId())).findFirst().ifPresent(validHearings::remove);
     }
 
     @NotNull
