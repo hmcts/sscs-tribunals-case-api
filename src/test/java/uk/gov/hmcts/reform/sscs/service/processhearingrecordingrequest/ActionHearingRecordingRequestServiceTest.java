@@ -19,11 +19,12 @@ import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.model.RequestStatus;
+import uk.gov.hmcts.reform.sscs.service.actionhearingrecordingrequest.ActionHearingRecordingRequestService;
 
 @RunWith(JUnitParamsRunner.class)
-public class ProcessHearingRecordingRequestServiceTest {
+public class ActionHearingRecordingRequestServiceTest {
 
-    private final ProcessHearingRecordingRequestService service = new ProcessHearingRecordingRequestService();
+    private final ActionHearingRecordingRequestService service = new ActionHearingRecordingRequestService();
     private static final Hearing HEARING = getHearing();
 
     @Test
@@ -117,13 +118,13 @@ public class ProcessHearingRecordingRequestServiceTest {
     }
 
     private HearingRecordingRequest getHearingRecordingRequest(PartyItemList party, RequestStatus status) {
-        SscsHearingRecording sscsHearingRecording = SscsHearingRecording.builder().value(SscsHearingRecordingDetails.builder()
+        SscsHearingRecordingDetails sscsHearingRecording = SscsHearingRecordingDetails.builder()
                 .hearingId(HEARING.getValue().getHearingId())
                 .venue(HEARING.getValue().getVenue().getName())
-                .build()).build();
+                .build();
         return HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
                 .dateRequested(LocalDate.now().toString())
-                .sscsHearingRecordingList(newArrayList(sscsHearingRecording))
+                .sscsHearingRecording(sscsHearingRecording)
                 .requestingParty(party.getCode()).build()).build();
     }
 

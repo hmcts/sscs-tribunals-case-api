@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.processhearingrecordingrequest;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest;
 
 
 import static java.util.Objects.requireNonNull;
@@ -22,17 +22,17 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.model.RequestStatus;
-import uk.gov.hmcts.reform.sscs.service.processhearingrecordingrequest.ProcessHearingRecordingRequestService;
+import uk.gov.hmcts.reform.sscs.service.actionhearingrecordingrequest.ActionHearingRecordingRequestService;
 
 @Service
 @Slf4j
-public class ProcessHearingRecordingRequestAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class ActionHearingRecordingRequestAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final ProcessHearingRecordingRequestService processHearingRecordingRequestService;
+    private final ActionHearingRecordingRequestService actionHearingRecordingRequestService;
 
     @Autowired
-    public ProcessHearingRecordingRequestAboutToStartHandler(ProcessHearingRecordingRequestService processHearingRecordingRequestService) {
-        this.processHearingRecordingRequestService = processHearingRecordingRequestService;
+    public ActionHearingRecordingRequestAboutToStartHandler(ActionHearingRecordingRequestService actionHearingRecordingRequestService) {
+        this.actionHearingRecordingRequestService = actionHearingRecordingRequestService;
     }
 
     @Override
@@ -41,7 +41,7 @@ public class ProcessHearingRecordingRequestAboutToStartHandler implements PreSub
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_START)
-                && callback.getEvent() == EventType.PROCESS_HEARING_RECORDING_REQUEST;
+                && callback.getEvent() == EventType.ACTION_HEARING_RECORDING_REQUEST;
     }
 
     @Override
@@ -85,7 +85,7 @@ public class ProcessHearingRecordingRequestAboutToStartHandler implements PreSub
         DynamicList rep = toDynamicList(PartyItemList.REPRESENTATIVE, h, sscsCaseData);
         ProcessHearingRecordingRequestDetails value = new ProcessHearingRecordingRequestDetails(h.getValue().getHearingId(),
                 selectHearingTitle(h, sscsCaseData.getHearings()),
-                processHearingRecordingRequestService.getFormattedHearingInformation(h),
+                actionHearingRecordingRequestService.getFormattedHearingInformation(h),
                 getRecordings(h, sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings()),
                 dwp,
                 jointParty,
@@ -96,7 +96,7 @@ public class ProcessHearingRecordingRequestAboutToStartHandler implements PreSub
     }
 
     private DynamicList toDynamicList(PartyItemList party, Hearing h, SscsCaseData sscsCaseData) {
-        final Optional<RequestStatus> partyStatus = processHearingRecordingRequestService.getRequestStatus(party, h, sscsCaseData);
+        final Optional<RequestStatus> partyStatus = actionHearingRecordingRequestService.getRequestStatus(party, h, sscsCaseData);
         final DynamicListItem selected = partyStatus
                 .map(this::toDynamicListItem)
                 .orElse(new DynamicListItem("", ""));
