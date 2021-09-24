@@ -301,9 +301,31 @@ public class CreateBundleAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
+        assertEquals(0, response.getWarnings().size());
         assertEquals(2, response.getData().getMultiBundleConfiguration().size());
         assertEquals("bundleEnglishEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
         assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
+    }
+
+    @Test
+    public void givenDocumentsWithSameAddition_thenShowWarning() {
+
+        List<SscsDocument> documents = new ArrayList<>();
+        documents.add(
+            SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("test.pdf").editedDocumentLink(DocumentLink.builder().documentFilename("test.pdf").build()).bundleAddition("A").build()).build()
+        );
+        documents.add(
+            SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("test2.pdf").editedDocumentLink(DocumentLink.builder().documentFilename("test2.pdf").build()).bundleAddition("B").build()).build()
+        );
+        documents.add(
+            SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("test3.pdf").editedDocumentLink(DocumentLink.builder().documentFilename("test3.pdf").build()).bundleAddition("a").build()).build()
+        );
+
+        sscsCaseData.setSscsDocument(documents);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getWarnings().size());
+        assertEquals("Some documents in this Bundle contain the same addition letter. Are you sure you want to proceed?", response.getWarnings().toArray()[0]);
     }
 
     @Test

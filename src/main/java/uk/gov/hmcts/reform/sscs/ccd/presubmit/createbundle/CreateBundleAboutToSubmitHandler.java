@@ -6,6 +6,7 @@ import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.counting;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
@@ -14,6 +15,8 @@ import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_
 import static uk.gov.hmcts.reform.sscs.util.ConfidentialityRequestUtil.isAtLeastOneRequestInProgress;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -84,6 +87,12 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
         setDocumentFileNameIfNotSet(sscsCaseData);
 
+        if (hasBundleAdditionsWithSameCharacter(sscsCaseData) && !callback.isIgnoreWarnings()) {
+            PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
+            response.addWarning("Some documents in this Bundle contain the same addition letter. Are you sure you want to proceed?");
+            return response;
+        }
+
         clearExistingBundles(callback);
 
         createPdfsForAnyAudioVideoEvidence(sscsCaseData);
@@ -116,6 +125,20 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         setDocumentFileNameOnDwpResponseDocument(sscsCaseData);
         setDocumentFileNameOnDwpEvidenceDocument(sscsCaseData);
         setDocumentFileNameOnSscsDocuments(sscsCaseData);
+    }
+
+    private boolean hasBundleAdditionsWithSameCharacter(SscsCaseData sscsCaseData) {
+        return emptyIfNull(sscsCaseData.getSscsDocument())
+            .stream()
+            .filter(document -> document.getValue() != null)
+            .map(document -> document.getValue().getBundleAddition())
+            .filter(bundleAddition -> bundleAddition != null)
+            .map(String::toUpperCase)
+            .collect(Collectors.groupingBy(Function.identity(), counting()))    // create a map {A=2,B=1}
+            .entrySet().stream()
+            .filter(bundleAdditionItem -> bundleAdditionItem.getValue() > 1)
+            .count() > 0;
+
     }
 
     private void setDocumentFileNameOnDwpResponseDocument(SscsCaseData sscsCaseData) {

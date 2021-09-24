@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.processhearingrecordingrequest;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -9,7 +9,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processhearingrecordingrequest.ProcessHearingRecordingRequestAboutToStartHandlerTest.*;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest.ActionHearingRecordingRequestAboutToStartHandlerTest.*;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
 import static uk.gov.hmcts.reform.sscs.model.RequestStatus.GRANTED;
 import static uk.gov.hmcts.reform.sscs.model.RequestStatus.REFUSED;
@@ -33,13 +33,13 @@ import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.model.RequestStatus;
-import uk.gov.hmcts.reform.sscs.service.processhearingrecordingrequest.ProcessHearingRecordingRequestService;
+import uk.gov.hmcts.reform.sscs.service.actionhearingrecordingrequest.ActionHearingRecordingRequestService;
 
 @RunWith(JUnitParamsRunner.class)
-public class ProcessHearingRecordingRequestMidEventHandlerTest {
+public class ActionHearingRecordingRequestMidEventHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-    private final ProcessHearingRecordingRequestMidEventHandler handler = new ProcessHearingRecordingRequestMidEventHandler(new ProcessHearingRecordingRequestService());
+    private final ActionHearingRecordingRequestMidEventHandler handler = new ActionHearingRecordingRequestMidEventHandler(new ActionHearingRecordingRequestService());
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -72,7 +72,7 @@ public class ProcessHearingRecordingRequestMidEventHandlerTest {
                 .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(callback.getEvent()).thenReturn(EventType.PROCESS_HEARING_RECORDING_REQUEST);
+        when(callback.getEvent()).thenReturn(EventType.ACTION_HEARING_RECORDING_REQUEST);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
     }
@@ -157,7 +157,7 @@ public class ProcessHearingRecordingRequestMidEventHandlerTest {
         return HearingRecordingRequest.builder()
                 .value(HearingRecordingRequestDetails.builder()
                         .requestingParty(party.getCode())
-                        .sscsHearingRecordingList(List.of(recording(1)))
+                        .sscsHearingRecording(recording(1).getValue())
                         .build())
                 .build();
     }
