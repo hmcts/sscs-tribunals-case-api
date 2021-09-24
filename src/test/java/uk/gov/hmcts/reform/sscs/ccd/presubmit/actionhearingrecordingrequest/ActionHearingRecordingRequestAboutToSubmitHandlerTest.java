@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.processhearingrecordingrequest;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -21,12 +21,11 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 
-
 @RunWith(JUnitParamsRunner.class)
-public class ProcessHearingRecordingRequestAboutToSubmitHandlerTest {
+public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-    ProcessHearingRecordingRequestAboutToSubmitHandler handler;
+    ActionHearingRecordingRequestAboutToSubmitHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -39,9 +38,9 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new ProcessHearingRecordingRequestAboutToSubmitHandler();
+        handler = new ActionHearingRecordingRequestAboutToSubmitHandler();
 
-        when(callback.getEvent()).thenReturn(EventType.PROCESS_HEARING_RECORDING_REQUEST);
+        when(callback.getEvent()).thenReturn(EventType.ACTION_HEARING_RECORDING_REQUEST);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")

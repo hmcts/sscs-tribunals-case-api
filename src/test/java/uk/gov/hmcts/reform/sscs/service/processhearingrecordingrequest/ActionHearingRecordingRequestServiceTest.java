@@ -19,11 +19,12 @@ import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.model.RequestStatus;
+import uk.gov.hmcts.reform.sscs.service.actionhearingrecordingrequest.ActionHearingRecordingRequestService;
 
 @RunWith(JUnitParamsRunner.class)
-public class ProcessHearingRecordingRequestServiceTest {
+public class ActionHearingRecordingRequestServiceTest {
 
-    private final ProcessHearingRecordingRequestService service = new ProcessHearingRecordingRequestService();
+    private final ActionHearingRecordingRequestService service = new ActionHearingRecordingRequestService();
     private static final Hearing HEARING = getHearing();
 
     @Test
