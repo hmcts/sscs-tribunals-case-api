@@ -2,20 +2,15 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadhearingrecording;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadhearingrecording.HearingTypeForRecording.ADJOURNED;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadhearingrecording.HearingTypeForRecording.FINAL;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -29,8 +24,9 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 @Slf4j
 public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private static final String RECORDING_DATE_FORMATTER = "dd-MM-yyyy hh:mm:ss a";
-    private static final String HEARING_TIME_FORMATTER = "HH:mm:ss dd MMM yyyy";
+    private static final DateTimeFormatter RECORDING_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm:ss a", Locale.UK);
+    private static final DateTimeFormatter HEARING_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss yyyy-MM-dd");
+    private static final DateTimeFormatter HEARING_DOCUMENT_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy");
     private final IdamService idamService;
 
     @Autowired
@@ -44,7 +40,7 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() == EventType.UPLOAD_HEARING_RECORDING;
+                && callback.getEvent() == EventType.UPLOAD_HEARING_RECORDING;
     }
 
     @Override
@@ -56,96 +52,74 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
-        final String venueDate =
-            getHearingVenueDate(sscsCaseData.getSscsHearingRecordingCaseData().getSelectHearingDetails());
-
-        List<SscsHearingRecording> existingSscsHearingRecordings =
-            sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings();
-        int adjournedCount = 1;
-        int finalCount = 1;
-
-        if (existingSscsHearingRecordings == null || existingSscsHearingRecordings.isEmpty()) {
-            existingSscsHearingRecordings = new ArrayList<>();
-        } else {
-            adjournedCount =
-                (int) (countExistingRecordings(existingSscsHearingRecordings, ADJOURNED.getValue() + " "
-                    + venueDate, ADJOURNED.getKey()) + 1);
-            finalCount =
-                (int) (countExistingRecordings(existingSscsHearingRecordings, FINAL.getValue() + " " + venueDate,
-                    FINAL.getKey()) + 1);
-        }
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         final HearingRecording hearingRecording = sscsCaseData.getSscsHearingRecordingCaseData().getHearingRecording();
-        final List<HearingRecordingDetails> recordings =
-            hearingRecording != null ? hearingRecording.getRecordings() : new ArrayList<>();
 
-        if (recordings != null && !recordings.isEmpty()) {
-            String hearingDateTime = LocalDateTime.parse(getHearingDateTime(
-                sscsCaseData.getSscsHearingRecordingCaseData().getSelectHearingDetails()),
-                DateTimeFormatter.ofPattern(HEARING_TIME_FORMATTER))
-                .format(DateTimeFormatter.ofPattern(RECORDING_DATE_FORMATTER, Locale.UK)).toUpperCase();
-
-            String hearingType = hearingRecording != null ? hearingRecording.getHearingType() : "";
-            String hearingId = sscsCaseData.getSscsHearingRecordingCaseData().getSelectHearingDetails().getValue().getCode();
-            String venueName = getVenueName(sscsCaseData, hearingId);
-
-            Optional<SscsHearingRecording> sscsHearingRecordingOptional =
-                selectSscsHearingRecording(existingSscsHearingRecordings, venueDate, hearingType);
-            SscsHearingRecording sscsHearingRecording =
-                sscsHearingRecordingOptional.isPresent() ? sscsHearingRecordingOptional.get() :
-                    createSscsHearingRecording(
-                        hearingDateTime,
-                        hearingType,
-                            hearingId,
-                            venueName);
-            if (!sscsHearingRecordingOptional.isPresent()) {
-                existingSscsHearingRecordings.add(sscsHearingRecording);
-            }
-
-            List<HearingRecordingDetails> sscsRecordings = sscsHearingRecording.getValue().getRecordings();
-
-            for (HearingRecordingDetails recordingDetails : recordings) {
-                if (ADJOURNED.getKey().equals(hearingType)) {
-                    sscsRecordings.add(
-                        HearingRecordingDetails.builder().value(
-                            DocumentLink.builder()
-                                .documentFilename(createFileName(venueDate, adjournedCount, ADJOURNED.getValue())
-                                    + getFileExtension(recordingDetails.getValue()))
-                                .documentUrl(recordingDetails.getValue().getDocumentUrl())
-                                .documentBinaryUrl(recordingDetails.getValue().getDocumentBinaryUrl())
-                                .build()).build());
-                    adjournedCount++;
-                } else if (FINAL.getKey().equals(hearingType)) {
-                    sscsRecordings.add(
-                        HearingRecordingDetails.builder().value(
-                            DocumentLink.builder()
-                                .documentFilename(
-                                    createFileName(venueDate, finalCount, FINAL.getValue())
-                                        + getFileExtension(recordingDetails.getValue()))
-                                .documentUrl(recordingDetails.getValue().getDocumentUrl())
-                                .documentBinaryUrl(recordingDetails.getValue().getDocumentBinaryUrl())
-                                .build()).build());
-                    finalCount++;
-                }
-            }
+        if (hearingRecording == null || hearingRecording.getRecordings().isEmpty()) {
+            clearTransientFields(sscsCaseData);
+            return response;
         }
 
-        if (!existingSscsHearingRecordings.isEmpty()) {
-            existingSscsHearingRecordings.sort(Comparator.comparing(h -> LocalDate.parse(
-                h.getValue().getHearingDate().toLowerCase(),
-                DateTimeFormatter.ofPattern(RECORDING_DATE_FORMATTER, Locale.UK))));
-            sscsCaseData.getSscsHearingRecordingCaseData().setSscsHearingRecordings(existingSscsHearingRecordings);
+        List<SscsHearingRecording> sscsHearingRecordings = Optional
+                .ofNullable(sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings())
+                .orElse(new ArrayList<>());
+
+        //New hearing recording data
+        final List<HearingRecordingDetails> recordings = hearingRecording.getRecordings();
+        HearingTypeForRecording hearingType = HearingTypeForRecording.valueOf(hearingRecording.getHearingType().toUpperCase());
+
+        //Information of the hearing that recordings are uploaded
+        String hearingId = sscsCaseData.getSscsHearingRecordingCaseData().getSelectHearingDetails().getValue().getCode();
+        HearingDetails hearingDetails = sscsCaseData.getHearings().stream()
+                .filter(hearing -> hearing.getValue().getHearingId().equalsIgnoreCase(hearingId))
+                .findFirst().orElseThrow().getValue();
+        LocalDateTime hearingDateTime = parseHearingDateTime(hearingDetails);
+        String venueName = hearingDetails.getVenue().getName();
+
+        //Create new collection of hearing recordings
+        List<HearingRecordingDetails> hearingRecordings =
+                createHearingRecordingDocuments(recordings, hearingType.getValue(), venueName, hearingDateTime.format(HEARING_DOCUMENT_TIME_FORMATTER));
+
+        //Existing sscs hearing recording for the same hearing
+        Optional<SscsHearingRecording> existingSscsHearingRecordings = selectSscsHearingRecording(sscsHearingRecordings, hearingId);
+        if (existingSscsHearingRecordings.isPresent()) {
+            List<SscsHearingRecordingDetails> existingRecordingList = new ArrayList<>();
+            existingRecordingList.add(existingSscsHearingRecordings.get().getValue());
+
+            //Collect request related sscs hearing recordings
+            existingRecordingList.addAll(getRequestedSscsHearingRecordings(sscsCaseData.getSscsHearingRecordingCaseData(), hearingId));
+
+            //Update existing sscs hearing recording data
+            for (SscsHearingRecordingDetails existing : existingRecordingList) {
+                existing.setHearingType(hearingType.getKey());
+                existing.setUploadDate(LocalDateTime.now().format(RECORDING_DATE_FORMATTER).toUpperCase());
+                existing.setRecordings(hearingRecordings);
+            }
+            response.addWarning("The hearing recording you have just uploaded will replace the existing hearing recording(s)");
+        } else {
+            //Create new sscs hearing recording
+            SscsHearingRecording newSscsHearingRecording = createSscsHearingRecording(
+                    hearingDateTime.format(RECORDING_DATE_FORMATTER).toUpperCase(),
+                    hearingType.getKey(),
+                    hearingId,
+                    venueName);
+            newSscsHearingRecording.getValue().setRecordings(hearingRecordings);
+            sscsHearingRecordings.add(newSscsHearingRecording);
         }
 
-        return new PreSubmitCallbackResponse<>(sscsCaseData);
+        sscsHearingRecordings.sort(Comparator.comparing(h ->
+                LocalDate.parse(h.getValue().getHearingDate().toLowerCase(), RECORDING_DATE_FORMATTER)));
+        sscsCaseData.getSscsHearingRecordingCaseData().setSscsHearingRecordings(sscsHearingRecordings);
+
+        clearTransientFields(sscsCaseData);
+
+        return response;
     }
 
-    private String getVenueName(SscsCaseData sscsCaseData, String hearingId) {
-        Hearing hearing = sscsCaseData.getHearings().stream().filter(h -> hearingId.equals(h.getValue().getHearingId())).findFirst().orElse(null);
-        if (hearing != null && hearing.getValue() != null) {
-            return hearing.getValue().getVenue().getName();
-        }
-        return "";
+    private void clearTransientFields(SscsCaseData sscsCaseData) {
+        sscsCaseData.getSscsHearingRecordingCaseData().setExistingHearingRecordings(null);
+        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingExist(null);
     }
 
     protected SscsHearingRecording createSscsHearingRecording(String hearingDate, String type, String hearingId, String venueName) {
@@ -157,66 +131,81 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
                         .hearingId(hearingId)
                         .venue(venueName)
                         .uploadDate(
-                                LocalDateTime.now().format(DateTimeFormatter.ofPattern(RECORDING_DATE_FORMATTER)).toUpperCase())
+                                LocalDateTime.now().format(RECORDING_DATE_FORMATTER).toUpperCase())
                         .build())
                 .build();
     }
 
-    private long countExistingRecordings(final List<SscsHearingRecording> sscsHearingRecordings,
-                                         String hearingTypeVenueDate, String selectedHearingType) {
-        AtomicLong count = new AtomicLong(0L);
-        selectSscsHearingRecording(sscsHearingRecordings, hearingTypeVenueDate, selectedHearingType).ifPresent(
-            sscsHearingRecording -> count.set(sscsHearingRecording.getValue().getRecordings().stream()
-                .filter(recordingDetails -> recordingDetails.getValue().getDocumentFilename()
-                    .contains(hearingTypeVenueDate)).count()));
+    private List<HearingRecordingDetails> createHearingRecordingDocuments(List<HearingRecordingDetails> recordings,
+                                                                           String hearingType, String venue, String date) {
+        List<HearingRecordingDetails> sscsRecordings = new ArrayList<>();
+        int count = 1;
+        for (HearingRecordingDetails recordingDetails : recordings) {
+            sscsRecordings.add(HearingRecordingDetails.builder()
+                    .value(DocumentLink.builder()
+                            .documentFilename(createFileName(venue, date, count++, hearingType, recordingDetails.getValue()))
+                            .documentUrl(recordingDetails.getValue().getDocumentUrl())
+                            .documentBinaryUrl(recordingDetails.getValue().getDocumentBinaryUrl())
+                            .build())
+                    .build());
+        }
 
-        return count.get();
+        return sscsRecordings;
+    }
+
+    @NotNull
+    private LocalDateTime parseHearingDateTime(HearingDetails hearingDetails) {
+        String hearingTime = (hearingDetails.getTime().length() == 5) ? (hearingDetails.getTime() + ":00") : hearingDetails.getTime();
+        return LocalDateTime.parse(hearingTime + " " + hearingDetails.getHearingDate(), HEARING_TIME_FORMATTER);
     }
 
     private Optional<SscsHearingRecording> selectSscsHearingRecording(
-        final List<SscsHearingRecording> sscsHearingRecordings, String venueDate,
-        String selectedHearingType) {
+            final List<SscsHearingRecording> sscsHearingRecordings, String hearingId) {
 
         return emptyIfNull(sscsHearingRecordings).stream()
-            .filter(sscsHearingRecording -> sscsHearingRecording.getValue() != null)
-            .filter(sscsHearingRecording -> sscsHearingRecording.getValue().getHearingDate() != null)
-            .filter(sscsHearingRecording -> sscsHearingRecording.getValue().getHearingType() != null)
-            .filter(
-                sscsHearingRecording -> sscsHearingRecording.getValue().getHearingType().equals(selectedHearingType))
-            .filter(sscsHearingRecording -> venueDate.contains(
-                LocalDateTime.parse(
-                    sscsHearingRecording.getValue().getHearingDate().toLowerCase(),
-                    DateTimeFormatter.ofPattern(RECORDING_DATE_FORMATTER, Locale.UK))
-                    .format(DateTimeFormatter.ofPattern("dd MMM yyyy"))))
-            .filter(sscsHearingRecording -> sscsHearingRecording.getValue().getRecordings().stream()
-                .allMatch(recordingDetails -> recordingDetails.getValue().getDocumentFilename().contains(venueDate)))
-            .findFirst();
+                .filter(sscsHearingRecording -> sscsHearingRecording.getValue() != null)
+                .filter(sscsHearingRecording -> sscsHearingRecording.getValue().getHearingId().equalsIgnoreCase(hearingId))
+                .findFirst();
     }
 
-    String createFileName(String venueDate, int fileCount, String hearingType) {
-        return (fileCount == 1) ? (hearingType + " " + venueDate) :
-            hearingType + " " + venueDate + " (" + fileCount + ")";
+
+    private List<SscsHearingRecordingDetails> getRequestedSscsHearingRecordings(SscsHearingRecordingCaseData sscsHearingRecordingCaseData,
+                                                                         String hearingId) {
+        List<SscsHearingRecordingDetails> requestedHearingRecordings = new ArrayList<>();
+
+        requestedHearingRecordings.addAll(filterRequestedHearingRecordings(sscsHearingRecordingCaseData.getDwpReleasedHearings(), hearingId));
+        requestedHearingRecordings.addAll(filterRequestedHearingRecordings(sscsHearingRecordingCaseData.getCitizenReleasedHearings(), hearingId));
+        requestedHearingRecordings.addAll(filterRequestedHearingRecordings(sscsHearingRecordingCaseData.getRequestedHearings(), hearingId));
+
+        return requestedHearingRecordings;
     }
 
-    String getHearingVenueDate(DynamicList selectedHearings) {
-        AtomicReference<String> result = new AtomicReference<>("");
-        Optional.ofNullable(selectedHearings.getValue().getLabel())
-            .ifPresent(v -> result.set(v.substring(0, v.length() - 21) + " " + v.substring(v.length() - 11)));
-        return result.get();
+    private List<SscsHearingRecordingDetails> filterRequestedHearingRecordings(List<HearingRecordingRequest> requests, String hearingId) {
+        if (requests != null) {
+            return requests.stream()
+                    .map(request -> request.getValue().getSscsHearingRecording())
+                    .filter(recording -> hearingId.equalsIgnoreCase(recording.getHearingId()))
+                    .collect(Collectors.toList());
+        }
+        return List.of();
     }
 
-    String getHearingDateTime(DynamicList selectedHearings) {
-        AtomicReference<String> result = new AtomicReference<>("");
-        Optional.ofNullable(selectedHearings.getValue().getLabel())
-            .ifPresent(d -> result.set(d.substring(d.length() - 20)));
-        return result.get();
+    protected String createFileName(String venue, String hearingDate, int fileCount, String hearingType, DocumentLink documentLink) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(hearingType).append(" ")
+                .append(venue).append(" ")
+                .append(hearingDate);
+        if (fileCount > 1) {
+            builder.append(" (").append(fileCount).append(")");
+        }
+        builder.append(getFileExtension(documentLink));
+        return builder.toString();
     }
 
-    String getFileExtension(DocumentLink documentLink) {
+    protected String getFileExtension(DocumentLink documentLink) {
         AtomicReference<String> result = new AtomicReference<>("");
         Optional.ofNullable(documentLink.getDocumentFilename())
             .ifPresent(f -> result.set(f.substring(f.length() - 4)));
         return result.get();
     }
-
 }

@@ -23,7 +23,6 @@ public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler
     private static Map<EventType, String> createMappings() {
         Map<EventType, String> eventTypeToSecondaryStatus = new HashMap<>();
         eventTypeToSecondaryStatus.put(EventType.TCW_DIRECTION_ISSUED, AWAITING_INFORMATION.getId());
-        eventTypeToSecondaryStatus.put(EventType.INTERLOC_INFORMATION_RECEIVED, AWAITING_ADMIN_ACTION.getId());
         eventTypeToSecondaryStatus.put(EventType.JUDGE_DIRECTION_ISSUED, AWAITING_INFORMATION.getId());
         eventTypeToSecondaryStatus.put(EventType.TCW_REFER_TO_JUDGE, REVIEW_BY_JUDGE.getId());
         eventTypeToSecondaryStatus.put(EventType.NON_COMPLIANT, REVIEW_BY_TCW.getId());

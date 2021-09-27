@@ -406,8 +406,11 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
     private SessionBenefitType buildSessionBenefitType(BenefitType benefitType) {
         if (benefitType == null) {
             return null;
+        } else if (StringUtils.length(benefitType.getCode()) <= 3) {
+            return new SessionBenefitType(benefitType.getDescription() + " (" + benefitType.getCode() + ")");
+        } else {
+            return new SessionBenefitType(benefitType.getDescription());
         }
-        return new SessionBenefitType(benefitType.getDescription() + " (" + benefitType.getCode() + ")");
     }
 
     private SessionDwpIssuingOffice buildDwpIssuingOffice(Appeal appeal) {
@@ -425,7 +428,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
     private SessionDwpIssuingOfficeEsa buildDwpIssuingOfficeEsa(Appeal appeal) {
         if (mrnDatePresent(appeal)
             && StringUtils.isNotBlank(appeal.getMrnDetails().getDwpIssuingOffice())
-            && "ESA".equalsIgnoreCase(appeal.getBenefitType().getCode())) {
+            && !"PIP".equalsIgnoreCase(appeal.getBenefitType().getCode())) {
             return new SessionDwpIssuingOfficeEsa(appeal.getMrnDetails().getDwpIssuingOffice());
         }
         return null;

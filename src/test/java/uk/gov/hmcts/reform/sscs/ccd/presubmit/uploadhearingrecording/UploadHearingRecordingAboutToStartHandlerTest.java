@@ -42,8 +42,8 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
     private static final String futureDate =
         LocalDate.now().plusMonths(2).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     private final UserDetails
-        userDetails =
-        UserDetails.builder().roles(new ArrayList<>(asList("caseworker-sscs", UserRole.CTSC_CLERK.getValue()))).build();
+            userDetails =
+            UserDetails.builder().roles(new ArrayList<>(asList("caseworker-sscs", UserRole.CTSC_CLERK.getValue()))).build();
     private UploadHearingRecordingAboutToStartHandler handler;
     @Mock
     private Callback<SscsCaseData> callback;
@@ -58,7 +58,7 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
         openMocks(this);
         handler = new UploadHearingRecordingAboutToStartHandler(idamService);
         sscsCaseData = SscsCaseData.builder().appeal(
-            Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
+                Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getEvent()).thenReturn(EventType.UPLOAD_HEARING_RECORDING);
@@ -105,9 +105,9 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
     @Test
     public void givenHearingsListHasFutureDate_ReturnError() {
         sscsCaseData.setHearings(singletonList(Hearing.builder().value(
-            HearingDetails.builder()
-                .hearingDate("2022-03-20")
-                .time("15:15").build()).build()));
+                HearingDetails.builder()
+                        .hearingDate("2022-03-20")
+                        .time("15:15").build()).build()));
         assertNoHearingsInThePastError();
     }
 
@@ -120,11 +120,11 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
                 .hearingDate(futureDate)
                 .time("15:15:00").build()).build());
         hearingList.add(Hearing.builder().value(
-            HearingDetails.builder()
-                .hearingId("1111")
-                .venue(Venue.builder().name("good value").build())
-                .hearingDate("2021-06-06")
-                .time("09:00").build()).build());
+                HearingDetails.builder()
+                        .hearingId("1111")
+                        .venue(Venue.builder().name("good value").build())
+                        .hearingDate("2021-06-06")
+                        .time("09:00").build()).build());
         hearingList.add(Hearing.builder().value(
             HearingDetails.builder()
                 .venue(Venue.builder().name("some value").build())
@@ -132,7 +132,7 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
                 .time("10:10").build()).build());
         sscsCaseData.setHearings(unmodifiableList(hearingList));
         final PreSubmitCallbackResponse<SscsCaseData>
-            response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+                response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
         List<DynamicListItem> selectHearingDetails =
             response.getData().getSscsHearingRecordingCaseData().getSelectHearingDetails().getListItems();
@@ -143,7 +143,7 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
 
     private void assertNoHearingsInThePastError() {
         final PreSubmitCallbackResponse<SscsCaseData>
-            response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+                response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
         assertEquals("No hearing has been conducted on this case", response.getErrors().toArray()[0]);
     }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CARERS_ALLOWANCE;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.*;
 import static uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator.generateAppealNumber;
@@ -15,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
+import uk.gov.hmcts.reform.sscs.exception.BenefitMappingException;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
@@ -47,7 +49,8 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             addressName = appeal.getMrnDetails().getDwpIssuingOffice();
         }
 
-        String benefitCode = isDraft ? null : generateBenefitCode(appeal.getBenefitType().getCode(), addressName);
+        String benefitCode = isDraft ? null : generateBenefitCode(appeal.getBenefitType().getCode(), addressName)
+                .orElseThrow(() -> BenefitMappingException.createException(appeal.getBenefitType().getCode()));
 
         String issueCode = isDraft ? null : generateIssueCode();
         String caseCode = isDraft ? null : generateCaseCode(benefitCode, issueCode);
@@ -79,7 +82,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     private static String getDwpRegionalCenterGivenDwpIssuingOffice(String benefitTypeCode, String dwpIssuingOffice) {
         DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
 
-        if (dwpIssuingOffice == null && ! (CARERS_ALLOWANCE == Benefit.getBenefitByCode(benefitTypeCode))) {
+        if (dwpIssuingOffice == null && ! (CARERS_ALLOWANCE == Benefit.getBenefitOptionalByCode(benefitTypeCode).orElse(null))) {
             return null;
         }
         return dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(benefitTypeCode, dwpIssuingOffice);
@@ -173,7 +176,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         return null == syaCaseWrapper.getMrn();
     }
 
-    private static boolean mrnIsNotProvided(SyaCaseWrapper syaCaseWrapper) {
+    private static boolean mrnIsNullOrUndefined(SyaCaseWrapper syaCaseWrapper) {
         if (mrnIsNull(syaCaseWrapper)) {
             return true;
         }
@@ -192,25 +195,17 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         DwpAddressLookupService dwpLookup = new DwpAddressLookupService();
         String benefitType = syaCaseWrapper.getBenefitType().getCode();
         String result = null;
-        switch (Benefit.getBenefitByCode(benefitType)) {
-            case UC:
-            case CARERS_ALLOWANCE:
-            case BEREAVEMENT_BENEFIT:
-            case MATERNITY_ALLOWANCE:
-                result = dwpLookup.getDefaultDwpMappingByBenefitType(benefitType)
-                        .map(office -> office.getMapping().getCcd())
-                        .orElse(null);
-                break;
-            default:
-                if (!mrnIsNotProvided(syaCaseWrapper)) {
-                    String dwpIssuingOffice = syaCaseWrapper.getMrn().getDwpIssuingOffice();
-                    if (dwpIssuingOffice != null) {
-                        result = dwpLookup.getDwpMappingByOffice(benefitType, dwpIssuingOffice)
-                                .map(office -> office.getMapping().getCcd())
-                                .orElse(null);
-                    }
-                }
+
+        if (!mrnIsNullOrUndefined(syaCaseWrapper) && isNotBlank(syaCaseWrapper.getMrn().getDwpIssuingOffice())) {
+            result = dwpLookup.getDwpMappingByOffice(benefitType, syaCaseWrapper.getMrn().getDwpIssuingOffice())
+                    .map(office -> office.getMapping().getCcd())
+                    .orElse(null);
+        } else {
+            result = dwpLookup.getDefaultDwpMappingByBenefitType(benefitType)
+                    .map(office -> office.getMapping().getCcd())
+                    .orElse(null);;
         }
+
         return result;
     }
 
@@ -534,7 +529,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             final String subscribeSms = getSubscribeSms(smsNotify);
 
             final String email = syaCaseWrapper.getContactDetails().getEmailAddress();
-            final String wantEmailNotifications = StringUtils.isNotBlank(email) ? YES : NO;
+            final String wantEmailNotifications = isNotBlank(email) ? YES : NO;
 
             final String mobile = getMobile(syaCaseWrapper, smsNotify);
 
@@ -572,8 +567,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 && syaCaseWrapper.getRepresentative() != null
                 && syaCaseWrapper.getRepresentative().getContactDetails() != null) {
 
-            boolean emailAddressExists = StringUtils
-                    .isNotBlank(syaCaseWrapper.getRepresentative().getContactDetails().getEmailAddress());
+            boolean emailAddressExists = isNotBlank(syaCaseWrapper.getRepresentative().getContactDetails().getEmailAddress());
             boolean isMobileNumber = PhoneNumbersUtil.isValidMobileNumber(
                     syaCaseWrapper.getRepresentative().getContactDetails().getPhoneNumber());
 
@@ -607,7 +601,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             String subscribeSms = getSubscribeSms(smsNotify);
 
             String email = syaCaseWrapper.getAppointee().getContactDetails().getEmailAddress();
-            String wantEmailNotifications = StringUtils.isNotBlank(email) ? YES : NO;
+            String wantEmailNotifications = isNotBlank(email) ? YES : NO;
             String mobile = getPhoneNumberWithOutSpaces(
                     getNotificationSmsNumber(smsNotify, syaCaseWrapper.getAppointee().getContactDetails()));
 
@@ -720,7 +714,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static String getPhoneNumberWithOutSpaces(String phoneNumber) {
-        if (StringUtils.isNotBlank(phoneNumber)) {
+        if (isNotBlank(phoneNumber)) {
             return phoneNumber.replaceAll("\\s", "");
         }
         return phoneNumber;

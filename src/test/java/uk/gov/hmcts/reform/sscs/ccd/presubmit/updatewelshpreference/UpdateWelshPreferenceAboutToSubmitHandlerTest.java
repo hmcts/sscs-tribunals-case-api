@@ -30,7 +30,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.addnote.AddNoteAboutToSubmitHandler;
+import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -46,14 +46,12 @@ public class UpdateWelshPreferenceAboutToSubmitHandlerTest {
     @Mock
     private UserDetailsService userDetailsService;
 
-    @Mock
-    private AddNoteAboutToSubmitHandler addNote;
 
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        addNote = new AddNoteAboutToSubmitHandler(userDetailsService);
-        handler = new UpdateWelshPreferenceAboutToSubmitHandler(addNote);
+        AddNoteService addNoteService = new AddNoteService(userDetailsService);
+        handler = new UpdateWelshPreferenceAboutToSubmitHandler(addNoteService);
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
                 .forename("Chris").surname("Davis").build().getFullName());
         when(callback.getEvent()).thenReturn(UPDATE_WELSH_PREFERENCE);

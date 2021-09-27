@@ -50,7 +50,6 @@ public class InterlocServiceHandlerTest {
     @Test
     @Parameters({
         "TCW_DIRECTION_ISSUED, ABOUT_TO_SUBMIT, true",
-        "INTERLOC_INFORMATION_RECEIVED, ABOUT_TO_SUBMIT, true",
         "JUDGE_DIRECTION_ISSUED, ABOUT_TO_SUBMIT, true",
         "TCW_REFER_TO_JUDGE, ABOUT_TO_SUBMIT, true",
         "NON_COMPLIANT, ABOUT_TO_SUBMIT, true",
@@ -77,7 +76,6 @@ public class InterlocServiceHandlerTest {
     @Test
     @Parameters({
         "TCW_DIRECTION_ISSUED, awaitingInformation",
-        "INTERLOC_INFORMATION_RECEIVED, awaitingAdminAction",
         "JUDGE_DIRECTION_ISSUED, awaitingInformation",
         "TCW_DECISION_APPEAL_TO_PROCEED, none",
         "JUDGE_DECISION_APPEAL_TO_PROCEED, none",

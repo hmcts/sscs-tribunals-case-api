@@ -13,17 +13,17 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.addnote.AddNoteAboutToSubmitHandler;
+import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 
 @Service
 @Slf4j
 public class UpdateWelshPreferenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    public AddNoteAboutToSubmitHandler addNote;
+    public AddNoteService addNoteService;
 
     @Autowired
-    public UpdateWelshPreferenceAboutToSubmitHandler(AddNoteAboutToSubmitHandler addNote) {
-        this.addNote = addNote;
+    public UpdateWelshPreferenceAboutToSubmitHandler(AddNoteService addNoteService) {
+        this.addNoteService = addNoteService;
     }
 
     @Override
@@ -42,8 +42,8 @@ public class UpdateWelshPreferenceAboutToSubmitHandler implements PreSubmitCallb
         if (!caseData.isLanguagePreferenceWelsh()) {
             if (WELSH_TRANSLATION.getId().equals(caseData.getInterlocReviewState())) {
                 caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
-                caseData.setTempNoteDetail("Assigned to admin - Case no longer Welsh. Please cancel any Welsh translations");
-                addNote.handle(callbackType, callback, userAuthorisation);
+                String note = "Assigned to admin - Case no longer Welsh. Please cancel any Welsh translations";
+                addNoteService.addNote(userAuthorisation, caseData, note);
             }
             caseData.setTranslationWorkOutstanding("No");
         }

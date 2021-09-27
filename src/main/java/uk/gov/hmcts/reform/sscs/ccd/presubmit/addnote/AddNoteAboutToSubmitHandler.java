@@ -4,8 +4,6 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.findLabelById;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,17 +14,17 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 
 @Component
 @Slf4j
 public class AddNoteAboutToSubmitHandler  implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    protected final UserDetailsService userDetailsService;
+    protected final AddNoteService addNoteService;
 
     @Autowired
-    public AddNoteAboutToSubmitHandler(UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
+    public AddNoteAboutToSubmitHandler(AddNoteService addNoteService) {
+        this.addNoteService = addNoteService;
     }
 
     @Override
@@ -42,8 +40,7 @@ public class AddNoteAboutToSubmitHandler  implements PreSubmitCallbackHandler<Ss
                 || callback.getEvent() == EventType.TCW_REFER_TO_JUDGE
                 || callback.getEvent() == EventType.SEND_TO_ADMIN
                 || callback.getEvent() == EventType.ADMIN_APPEAL_WITHDRAWN
-                || callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED
-                || callback.getEvent() == EventType.UPDATE_WELSH_PREFERENCE);
+                || callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED);
     }
 
     @Override
@@ -73,15 +70,7 @@ public class AddNoteAboutToSubmitHandler  implements PreSubmitCallbackHandler<Ss
             }
         }
 
-        if (nonNull(note) && StringUtils.isNoneBlank(note)) {
-            Note newNote = Note.builder().value(NoteDetails.builder().noteDetail(note).noteDate(LocalDate.now().toString())
-                    .author(userDetailsService.buildLoggedInUserName(userAuthorisation)).build()).build();
-            if (sscsCaseData.getAppealNotePad() == null || sscsCaseData.getAppealNotePad().getNotesCollection() == null) {
-                sscsCaseData.setAppealNotePad(NotePad.builder().notesCollection(new ArrayList<Note>()).build());
-            }
-            sscsCaseData.getAppealNotePad().getNotesCollection().add(newNote);
-            sscsCaseData.setTempNoteDetail(null);
-        }
+        addNoteService.addNote(userAuthorisation, sscsCaseData, note);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
