@@ -115,10 +115,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     private PreSubmitCallbackResponse<SscsCaseData> checkErrors(SscsCaseData sscsCaseData) {
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (sscsCaseData.getDwpFurtherInfo() == null) {
-            preSubmitCallbackResponse.addError("Further information to assist the tribunal cannot be empty.");
-        }
-
         if (sscsCaseData.getDwpResponseDocument() == null) {
             preSubmitCallbackResponse.addError("DWP response document cannot be empty.");
         }
