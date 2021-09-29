@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.service.processhearingrecordingrequest;
+package uk.gov.hmcts.reform.sscs.service.actionhearingrecordingrequest;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.model.RequestStatus.GRANTED;
@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.model.RequestStatus;
 
 @Service
-public class ProcessHearingRecordingRequestService {
+public class ActionHearingRecordingRequestService {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter RESULT_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy");
@@ -47,8 +47,7 @@ public class ProcessHearingRecordingRequestService {
     private boolean hasHearingRequestInCollection(PartyItemList party, Hearing hearing, List<HearingRecordingRequest> hearingRecordingCollection) {
         return emptyIfNull(hearingRecordingCollection).stream()
                 .filter(r -> r.getValue().getRequestingParty().equals(party.getCode()))
-                .flatMap(r -> r.getValue().getSscsHearingRecordingList().stream())
-                .anyMatch(hr -> hr.getValue().getHearingId().equals(hearing.getValue().getHearingId()));
+                .anyMatch(hr -> hr.getValue().getSscsHearingRecording().getHearingId().equals(hearing.getValue().getHearingId()));
     }
 
     public Optional<RequestStatus> getChangedRequestStatus(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest) {

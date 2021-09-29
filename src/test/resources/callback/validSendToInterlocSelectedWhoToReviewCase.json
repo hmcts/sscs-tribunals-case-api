@@ -37,6 +37,10 @@
           {
             "code": "reviewByJudge",
             "label": "Review by Judge"
+          },
+          {
+            "code": "postponementRequestInterlocSendToTcw",
+            "label": "Postponement request for interloc - send to TCW"
           }
         ]
       },

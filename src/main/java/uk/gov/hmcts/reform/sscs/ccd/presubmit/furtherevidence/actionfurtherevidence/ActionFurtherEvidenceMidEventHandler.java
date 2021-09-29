@@ -11,18 +11,19 @@ import static uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState.UNREADABLE;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -31,6 +32,9 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 @Slf4j
 public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    public static final String POSTPONEMENTS_REVIEWED_BY_TCW = "Postponement requests need to be reviewed by TCW";
+    public static final String POSTPONEMENT_IN_HEARING_STATE = "You can only submit a postponement request on cases in 'hearing' state";
+    public static final String ONLY_ONE_POSTPONEMENT_AT_A_TIME = "Only one request for postponement can be submitted at a time";
     private final FooterService footerService;
 
     @Autowired
@@ -44,7 +48,7 @@ public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHa
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.MID_EVENT)
-            && callback.getEvent() == EventType.ACTION_FURTHER_EVIDENCE;
+                && callback.getEvent() == EventType.ACTION_FURTHER_EVIDENCE;
     }
 
     @Override
@@ -58,12 +62,55 @@ public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHa
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse =
-            new PreSubmitCallbackResponse<>(sscsCaseData);
+                new PreSubmitCallbackResponse<>(sscsCaseData);
 
         buildSscsDocumentFromScan(sscsCaseData, caseDetails.getId(), callback.isIgnoreWarnings(),
-            preSubmitCallbackResponse);
+                preSubmitCallbackResponse);
+
+        if (showPostponementDetailsPage(preSubmitCallbackResponse)) {
+            sscsCaseData.getPostponementRequest().setShowPostponementDetailsPage(YesNo.YES);
+        }
+
+        validatePostponementRequests(caseDetails, sscsCaseData, preSubmitCallbackResponse);
 
         return preSubmitCallbackResponse;
+    }
+
+    private void validatePostponementRequests(CaseDetails<SscsCaseData> caseDetails, SscsCaseData sscsCaseData,
+                                              PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+
+        Optional<ScannedDocument> postponementRequest = emptyIfNull(sscsCaseData.getScannedDocuments()).stream()
+                .filter(doc -> StringUtils.isNotBlank(doc.getValue().getType())
+                        && doc.getValue().getType().equals(DocumentType.POSTPONEMENT_REQUEST.getValue())).findAny();
+
+        if (postponementRequest.isPresent()) {
+            if (!sscsCaseData.getFurtherEvidenceAction().getValue().getCode()
+                    .equals(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode())) {
+                preSubmitCallbackResponse.addError(POSTPONEMENTS_REVIEWED_BY_TCW);
+            }
+
+            if (!caseDetails.getState().equals(State.HEARING)) {
+                preSubmitCallbackResponse.addError(POSTPONEMENT_IN_HEARING_STATE);
+            }
+        }
+    }
+
+    private boolean showPostponementDetailsPage(PreSubmitCallbackResponse<SscsCaseData> callbackResponse) {
+
+        long requestHearingCount = getNumberOfPostponementRequests(callbackResponse.getData().getScannedDocuments());
+
+        if (requestHearingCount > 1) {
+            callbackResponse.addError(ONLY_ONE_POSTPONEMENT_AT_A_TIME);
+        }
+
+        return requestHearingCount == 1;
+    }
+
+    private long getNumberOfPostponementRequests(List<ScannedDocument> scannedDocuments) {
+        return emptyIfNull(scannedDocuments).stream()
+                .filter(doc -> doc.getValue().getType() != null
+                        && doc.getValue().getType().equals(DocumentType.POSTPONEMENT_REQUEST.getValue()))
+                .count();
     }
 
     private void buildSscsDocumentFromScan(SscsCaseData sscsCaseData, long caseId, Boolean ignoreWarnings,
@@ -134,24 +181,24 @@ public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHa
 
     private void addPdfEncryptedError(long caseId, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, List<String> encryptedPdfLinks) {
         preSubmitCallbackResponse.addError(
-            "The below PDF document(s) cannot be password protected, please correct this");
+                "The below PDF document(s) cannot be password protected, please correct this");
         addFileErrors(encryptedPdfLinks, preSubmitCallbackResponse);
         log.error("{} – {} failed due to encrypted PDF(s)\n{}", caseId, EventType.ACTION_FURTHER_EVIDENCE,
-            getFormattedFileUrl(encryptedPdfLinks));
+                getFormattedFileUrl(encryptedPdfLinks));
     }
 
     private void addPdfUnreadableError(long caseId, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, List<String> unreadablePdfLinks) {
         preSubmitCallbackResponse
-            .addError("The below PDF document(s) are not readable, please correct this");
+                .addError("The below PDF document(s) are not readable, please correct this");
         addFileErrors(unreadablePdfLinks, preSubmitCallbackResponse);
         log.error("{} – {} failed due to broken PDF(s)\n{}", caseId, EventType.ACTION_FURTHER_EVIDENCE,
-            getFormattedFileUrl(unreadablePdfLinks));
+                getFormattedFileUrl(unreadablePdfLinks));
     }
 
     private String getFormattedFileUrl(List<String> errors) {
         StringBuilder fileUrls = new StringBuilder("");
         errors.forEach(
-            error -> fileUrls.append(error).append("\n")
+                error -> fileUrls.append(error).append("\n")
         );
         fileUrls.delete(fileUrls.lastIndexOf("\n"), fileUrls.length());
         return fileUrls.toString();

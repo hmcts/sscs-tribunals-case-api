@@ -38,9 +38,9 @@ public class RequestHearingRecordingAboutToSubmitHandlerFunctionalTest extends B
             .assertThat()
             .body("requestableHearingDetails.list_items[1].label", equalTo("Prudential House 23:00 06 Jun 2021"))
             .assertThat()
-            .body("requestedHearings[0].value.sscsHearingRecordingList[0].value.hearingId", equalTo("11445566"))
+            .body("requestedHearings[0].value.sscsHearingRecording.hearingId", equalTo("11445566"))
             .assertThat()
-            .body("requestedHearings[1].value.sscsHearingRecordingList[0].value.hearingId", equalTo("33445566"))
+            .body("requestedHearings[1].value.sscsHearingRecording.hearingId", equalTo("33445566"))
             .assertThat()
             .body("hearingRecordingRequestOutstanding", equalTo("Yes"));
 
