@@ -42,10 +42,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper) {
-        return convertSyaToCcdCaseData(syaCaseWrapper);
-    }
-
-    public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper) {
         Appeal appeal = getAppeal(syaCaseWrapper);
 
         boolean isDraft = isDraft(syaCaseWrapper);

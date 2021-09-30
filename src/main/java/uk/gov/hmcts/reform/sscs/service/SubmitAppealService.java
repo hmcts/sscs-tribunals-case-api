@@ -8,8 +8,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService.getFirstHalfOfPostcode;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -60,7 +58,7 @@ public class SubmitAppealService {
                         IdamService idamService,
                         ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
                         AirLookupService airLookupService,
-                        EvidenceManagementSecureDocStoreService secureDocStoreService){
+                        EvidenceManagementSecureDocStoreService secureDocStoreService) {
 
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
