@@ -150,7 +150,7 @@ public class SupplementaryResponseIt extends AbstractEventIt {
 
     private void setJson() throws JsonProcessingException {
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(parseLong(sscsCaseData.getCcdCaseId()), JURISDICTION,
-                sscsCaseData.getState(), sscsCaseData, LocalDateTime.now());
+                sscsCaseData.getState(), sscsCaseData, LocalDateTime.now(), "Benefit");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(),
                 EventType.DWP_SUPPLEMENTARY_RESPONSE, false);
         json = mapper.writeValueAsString(callback);

@@ -305,7 +305,7 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
             .state(State.VALID_APPEAL)
             .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-            State.VALID_APPEAL, sscsCaseData, LocalDateTime.now());
+            State.VALID_APPEAL, sscsCaseData, LocalDateTime.now(), "Benefit");
         return new Callback<>(caseDetails, Optional.empty(), UPLOAD_WELSH_DOCUMENT, false);
     }
 
@@ -314,7 +314,7 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
             .state(State.INTERLOCUTORY_REVIEW_STATE)
             .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-            State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now());
+            State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit");
         return new Callback<>(caseDetails, Optional.empty(), UPLOAD_WELSH_DOCUMENT, false);
     }
 
