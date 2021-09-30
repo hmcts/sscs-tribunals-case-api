@@ -8,6 +8,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService.getFirstHalfOfPostcode;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -48,6 +50,7 @@ public class SubmitAppealService {
     private final IdamService idamService;
     private final ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
     private final AirLookupService airLookupService;
+    private final EvidenceManagementSecureDocStoreService secureDocStoreService;
 
     @SuppressWarnings("squid:S107")
     @Autowired
@@ -56,7 +59,8 @@ public class SubmitAppealService {
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
                         ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
-                        AirLookupService airLookupService) {
+                        AirLookupService airLookupService,
+                        EvidenceManagementSecureDocStoreService secureDocStoreService){
 
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
@@ -64,6 +68,7 @@ public class SubmitAppealService {
         this.idamService = idamService;
         this.convertAIntoBService = convertAIntoBService;
         this.airLookupService = airLookupService;
+        this.secureDocStoreService = secureDocStoreService;
     }
 
     public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
@@ -115,6 +120,19 @@ public class SubmitAppealService {
 
         try {
             SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal);
+
+            List<SscsDocument> existingDocuments = sscsCaseData.getSscsDocument();
+            for (SscsDocument sscsDocument: existingDocuments) {
+                //getting error from this call due to not being able to read document before its attached to case
+                if (secureDocStoreService.getDocumentExists(sscsDocument.getValue()
+                        .getDocumentLink().getDocumentUrl(), idamTokens)) {
+                    DocumentLink existingDocumentLink = sscsDocument.getValue().getDocumentLink();
+                    DocumentLink newDocumentLink = DocumentLink.builder().documentUrl(existingDocumentLink.getDocumentUrl())
+                            .documentBinaryUrl(existingDocumentLink.getDocumentBinaryUrl())
+                            .documentFilename(existingDocumentLink.getDocumentFilename()).build();
+                    sscsDocument.getValue().setDocumentLink(newDocumentLink);
+                }
+            }
 
             CaseDetails caseDetails = citizenCcdService.updateCase(sscsCaseData, EventType.UPDATE_DRAFT.getCcdType(), "Update draft",
                     "Update draft in CCD", idamTokens, appeal.getCcdCaseId());
