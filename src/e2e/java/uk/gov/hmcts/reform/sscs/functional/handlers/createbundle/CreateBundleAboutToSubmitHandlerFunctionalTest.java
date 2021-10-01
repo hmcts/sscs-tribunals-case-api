@@ -6,7 +6,6 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static uk.gov.hmcts.reform.sscs.functional.handlers.PdfHelper.getPdf;
 
 import java.util.List;
-import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,7 +47,6 @@ public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler 
 
         runEvent(caseDetails.getData(), EventType.CREATE_BUNDLE);
 
-        verifyAsyncBundleHasTakenPlace(caseDetails);
         final SscsCaseDetails updatedCaseDetails = getByCaseId(caseDetails.getId());
         assertThat(updatedCaseDetails.getData().getCaseBundles(), is(notNullValue()));
         assertThat(updatedCaseDetails.getData().getCaseBundles().size(), is(2));
@@ -92,8 +90,6 @@ public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler 
         caseDetails = addDocumentsToCase(caseDetails.getData(), docs);
         runEvent(caseDetails.getData(), EventType.CREATE_BUNDLE);
 
-        verifyAsyncBundleHasTakenPlace(caseDetails);
-
         final SscsCaseDetails updatedCaseDetails = getByCaseId(caseDetails.getId());
         assertThat(updatedCaseDetails.getData().getCaseBundles(), is(notNullValue()));
         assertThat(updatedCaseDetails.getData().getCaseBundles().size(), is(1));
@@ -104,21 +100,4 @@ public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler 
         assertThat(folders.get(1).getValue().getName(), is("Further additions"));
         assertThat(folders.get(1).getValue().getDocuments().size(), is(3));
     }
-
-    private void verifyAsyncBundleHasTakenPlace(final SscsCaseDetails caseDetails) {
-        IntStream.range(0, 15)
-                .peek(i -> log.info("sleeping one second to verify the async bundle action has taken place."))
-                .peek(i -> sleepOneSecond())
-                .mapToObj(i -> getByCaseId(caseDetails.getId()))
-                .anyMatch(data -> data.getData().getCaseBundles() != null && data.getData().getCaseBundles().size() > 0);
-    }
-
-    private void sleepOneSecond() {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            log.error("Error sleeping", e);
-        }
-    }
-
 }
