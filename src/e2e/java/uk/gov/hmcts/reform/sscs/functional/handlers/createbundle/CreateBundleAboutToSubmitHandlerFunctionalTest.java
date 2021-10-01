@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.sscs.functional.handlers.createbundle;
 
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static uk.gov.hmcts.reform.sscs.functional.handlers.PdfHelper.getPdf;
 
 import java.util.List;
+import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,6 +58,14 @@ public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler 
         assertThat(bundle2.getTitle(), is("SSCS Bundle Edited"));
         validateBundleFolder(bundle1.getFolders());
         validateBundleFolder(bundle2.getFolders());
+
+        verifyAsyncBundleStatus(updatedCaseDetails);
+        final SscsCaseDetails asyncUpdate = getByCaseId(caseDetails.getId());
+        assertThat(asyncUpdate.getData().getCaseBundles().get(0).getValue().getStitchStatus(), is("DONE"));
+        assertThat(asyncUpdate.getData().getCaseBundles().get(0).getValue().getStitchedDocument(), is(notNullValue()));
+        assertThat(asyncUpdate.getData().getCaseBundles().get(1).getValue().getStitchStatus(), is("DONE"));
+        assertThat(asyncUpdate.getData().getCaseBundles().get(1).getValue().getStitchedDocument(), is(notNullValue()));
+
     }
 
     private void validateBundleFolder(List<BundleFolder> bundleFolders) {
@@ -99,5 +109,30 @@ public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler 
         assertThat(folders.get(0).getValue().getDocuments().size(), is(2));
         assertThat(folders.get(1).getValue().getName(), is("Further additions"));
         assertThat(folders.get(1).getValue().getDocuments().size(), is(3));
+
+        verifyAsyncBundleStatus(updatedCaseDetails);
+        final SscsCaseDetails asyncUpdate = getByCaseId(caseDetails.getId());
+        assertThat(asyncUpdate.getData().getCaseBundles().get(0).getValue().getStitchStatus(), is("DONE"));
+        assertThat(asyncUpdate.getData().getCaseBundles().get(0).getValue().getStitchedDocument(), is(notNullValue()));
     }
+
+    private void verifyAsyncBundleStatus(final SscsCaseDetails caseDetails) {
+        IntStream.range(0, 30)
+                .peek(i -> log.info("sleeping one second to verify the async bundle action has taken place."))
+                .peek(i -> sleepOneSecond())
+                .mapToObj(i -> getByCaseId(caseDetails.getId()))
+                .anyMatch(data -> data.getData().getCaseBundles() != null
+                        && data.getData().getCaseBundles().size() > 0
+                        && !equalsIgnoreCase(data.getData().getCaseBundles().get(0).getValue().getStitchStatus(), "NEW")
+                );
+    }
+
+    private void sleepOneSecond() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            log.error("Error sleeping", e);
+        }
+    }
+
 }
