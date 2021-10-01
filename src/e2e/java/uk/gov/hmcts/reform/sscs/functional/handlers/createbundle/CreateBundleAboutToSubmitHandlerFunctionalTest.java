@@ -123,8 +123,7 @@ public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler 
                 .mapToObj(i -> getByCaseId(caseDetails.getId()))
                 .anyMatch(data -> data.getData().getCaseBundles() != null
                         && data.getData().getCaseBundles().size() > 0
-                        && !equalsIgnoreCase(data.getData().getCaseBundles().get(0).getValue().getStitchStatus(), "NEW")
-                );
+                        && !equalsIgnoreCase(data.getData().getCaseBundles().get(0).getValue().getStitchStatus(), "NEW"));
     }
 
     private void sleepOneSecond() {
