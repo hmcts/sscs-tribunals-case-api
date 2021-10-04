@@ -396,7 +396,7 @@ dependencies {
     testRuntime "org.junit.jupiter:junit-jupiter-engine:$versions.junitJupiter"
     testImplementation "org.junit.jupiter:junit-jupiter-api:$versions.junitJupiter"
 
-    e2eRuntime "org.junit.platform:junit-platform-commons:1.7.2"
+    e2eRuntime "org.junit.platform:junit-platform-commons:1.8.1"
 
     compile group: 'org.pitest', name: 'pitest', version: versions.pitest
     compile group:'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
@@ -416,7 +416,7 @@ dependencies {
     contractTestRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junitJupiter
 
     contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junitJupiter
-    contractTestRuntime "org.junit.platform:junit-platform-commons:1.7.0"
+    contractTestRuntime "org.junit.platform:junit-platform-commons:1.8.1"
 
     contractTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.29') {
         force = true
