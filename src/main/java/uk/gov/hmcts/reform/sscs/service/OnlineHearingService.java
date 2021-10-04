@@ -78,7 +78,8 @@ public class OnlineHearingService {
     private AppealDetails convertAppealDetails(SscsCaseDetails sscsCaseDetails) {
         return new AppealDetails(sscsCaseDetails.getData().getCaseCreated(),
                 sscsCaseDetails.getData().getAppeal().getMrnDetails().getMrnDate(),
-                sscsCaseDetails.getData().getAppeal().getBenefitType().getCode()
+                sscsCaseDetails.getData().getAppeal().getBenefitType().getCode(),
+                sscsCaseDetails.getData().getState().getId()
         );
     }
 
