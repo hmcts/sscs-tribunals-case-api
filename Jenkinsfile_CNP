@@ -7,10 +7,14 @@ properties([
 @Library("Infrastructure")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
+import uk.gov.hmcts.contino.GithubAPI
+import uk.gov.hmcts.contino.GradleBuilder
 
 def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
+
+def gradleBuilder = new GradleBuilder(this, product)
 
 def secrets = [
     'sscs-${env}'      : [
@@ -63,7 +67,10 @@ def secretsForPR = [
         'ccd-${env}'      : [
                 secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_IDAM_CLIENT_SECRET'),
                 secret('postcode-info-address-lookup-token', 'ADDRESS_LOOKUP_TOKEN'),
-                secret('ccd-admin-web-oauth2-client-secret', 'ADMIN_WEB_IDAM_SECRET')
+                secret('ccd-admin-web-oauth2-client-secret', 'ADMIN_WEB_IDAM_SECRET'),
+                secret('idam-data-store-system-user-password', 'IDAM_DATA_STORE_SYSTEM_USER_PASSWORD'),
+                secret('idam-data-store-system-user-username', 'IDAM_DATA_STORE_SYSTEM_USER_USERNAME'),
+                secret('idam-data-store-client-secret', 'IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET')
         ]
 ]
 
@@ -89,14 +96,21 @@ withPipeline(type, product, component) {
     disableLegacyDeployment()
     syncBranchesWithMaster(branchesToSync)
 
+    before('akschartsinstall'){
+        gradleBuilder.gradle('setupCcdDef')
+    }
+
     after('akschartsinstall'){
         // Vars needed for AKS testing
         env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
         env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-        //if (env.BRANCH_NAME.startsWith("PR")) {
-            //env.CORE_CASE_DATA_API_URL = "ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.service.core-compute-preview.internal"
-            //println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}""".stripIndent()
-        //}
+        if (env.BRANCH_NAME.startsWith("PR")) {
+            def githubApi = new GithubAPI(this)
+            for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd") ) {
+                env.CORE_CASE_DATA_API_URL = "ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+                println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}""".stripIndent()
+            }
+        }
         println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}. - The branch name is ${env.BRANCH_NAME}""".stripIndent()
     }
 
