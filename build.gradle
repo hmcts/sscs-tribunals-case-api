@@ -497,6 +497,10 @@ task runAndPublishConsumerPactTests(type: Test){
 
 }
 
+task setupCcdDef(type: Exec){
+    commandLine 'sh', 'setupCcdDef.sh'
+}
+
 runAndPublishConsumerPactTests.dependsOn contract
 
 runAndPublishConsumerPactTests.finalizedBy pactPublish
