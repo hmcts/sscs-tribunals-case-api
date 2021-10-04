@@ -504,7 +504,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenUcbSelectedAndUploadedUcbDoc_thenNoErrors() {
         sscsCaseData.setDwpUcb(YES.getValue());
-        sscsCaseData.setDwpUcbEvidenceDocument(DocumentLink.builder().build());
+        sscsCaseData.setDwpUcbEvidenceDocument(getPdfDocument().getDocumentLink());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
