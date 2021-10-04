@@ -193,7 +193,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         }
     }
 
-    private void validateDocumentIsAPdf(String documentMessage, DocumentLink documentLink , PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+    private void validateDocumentIsAPdf(String documentMessage, DocumentLink documentLink, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (!isFileAPdf(documentLink)) {
             preSubmitCallbackResponse.addError(format("%s must be a PDF.", documentMessage));
         }

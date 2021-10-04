@@ -492,13 +492,13 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenUcbSelectedIsNo_thenTheFieldsAreCleared() {
         sscsCaseData.setDwpUcb(NO.getValue());
-        sscsCaseData.setDwpUcbEvidenceDocument(DocumentLink.builder().build());
+        sscsCaseData.setDwpUcbEvidenceDocument(getPdfDocument().getDocumentLink());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(sscsCaseData.getDwpUcb(), is(nullValue()));
         assertThat(sscsCaseData.getDwpUcbEvidenceDocument(), is(nullValue()));
-        assertThat(sscsCaseData.getDwpDocuments(), is(nullValue()));
+        assertThat(sscsCaseData.getDwpDocuments().size(), is(2));
     }
 
     @Test
@@ -510,7 +510,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getErrors().size(), is(0));
         assertThat(sscsCaseData.getDwpUcb(), is(YES.getValue()));
         assertThat(sscsCaseData.getDwpUcbEvidenceDocument(), is(nullValue()));
-        assertThat(sscsCaseData.getDwpDocuments().size(), is(1));
+        assertThat(sscsCaseData.getDwpDocuments().size(), is(3));
     }
 
     @Test
@@ -803,6 +803,17 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
         assertThat(response.getErrors().iterator().next(), is("Appendix 12 document must be a PDF."));
+    }
+
+    @Test
+    public void ucbEvidenceDocument_mustBeAPdf() {
+        sscsCaseData.setDwpUcb(YES.getValue());
+        sscsCaseData.setDwpUcbEvidenceDocument(getMovieDocument().getDocumentLink());
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getErrors().iterator().next(), is("UCB document must be a PDF."));
     }
 
 }
