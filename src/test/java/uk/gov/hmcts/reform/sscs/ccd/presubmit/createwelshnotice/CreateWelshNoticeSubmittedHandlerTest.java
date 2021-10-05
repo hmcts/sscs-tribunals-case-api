@@ -99,7 +99,7 @@ public class CreateWelshNoticeSubmittedHandlerTest {
             .sscsWelshPreviewNextEvent(sscsWelshPreviewNextEvent)
             .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-            State.VALID_APPEAL, sscsCaseData, LocalDateTime.now());
+            State.VALID_APPEAL, sscsCaseData, LocalDateTime.now(), "Benefit");
         return new Callback<>(caseDetails, Optional.empty(), CREATE_WELSH_NOTICE, false);
     }
 

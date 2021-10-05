@@ -26,6 +26,7 @@ import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -56,6 +57,9 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
     private DwpDocumentService dwpDocumentService;
 
+    private ArgumentCaptor<BundleCallback<SscsCaseData>> capture = ArgumentCaptor.forClass(BundleCallback.class);
+
+
     @Before
     public void setUp() {
         openMocks(this);
@@ -69,6 +73,8 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(caseDetails.getCaseTypeId()).thenReturn("Benefit");
+        when(caseDetails.getJurisdiction()).thenReturn("SSCS");
         when(serviceRequestExecutor.post(any(), any())).thenReturn(new PreSubmitCallbackResponse<>(sscsCaseData));
     }
 
@@ -109,10 +115,13 @@ public class CreateBundleAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(NO.getValue());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
+        verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
         assertEquals(2, response.getData().getMultiBundleConfiguration().size());
         assertEquals("bundleEnglishEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
         assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
+        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
     @Test
@@ -124,10 +133,13 @@ public class CreateBundleAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(YES.getValue());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
+        verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
         assertEquals(2, response.getData().getMultiBundleConfiguration().size());
         assertEquals("bundleWelshEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
         assertEquals("bundleWelshConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
+        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
     @Test
@@ -143,9 +155,12 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
+        verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
         assertEquals(1, response.getData().getMultiBundleConfiguration().size());
         assertEquals(expectedConfigFile, response.getData().getMultiBundleConfiguration().get(0).getValue());
+        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
     @Test
@@ -205,7 +220,10 @@ public class CreateBundleAboutToSubmitHandlerTest {
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(bundleAudioVideoPdfService).createAudioVideoPdf(sscsCaseData);
-        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
+        verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
+        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
     @Test
@@ -284,10 +302,13 @@ public class CreateBundleAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(langPreference);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
+        verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
         assertEquals(2, response.getData().getMultiBundleConfiguration().size());
         assertEquals(expectedBundleConfig1, response.getData().getMultiBundleConfiguration().get(0).getValue());
         assertEquals(expectedBundleConfig2, response.getData().getMultiBundleConfiguration().get(1).getValue());
+        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
     @Test
@@ -300,11 +321,14 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
+        verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
         assertEquals(0, response.getWarnings().size());
         assertEquals(2, response.getData().getMultiBundleConfiguration().size());
         assertEquals("bundleEnglishEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
         assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
+        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
     @Test
@@ -337,9 +361,12 @@ public class CreateBundleAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(langPreference);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
+        verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
         assertEquals(1, response.getData().getMultiBundleConfiguration().size());
         assertEquals(expectedBundleName, response.getData().getMultiBundleConfiguration().get(0).getValue());
+        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
     @Test
@@ -352,9 +379,12 @@ public class CreateBundleAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(langPreference);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
+        verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
         assertEquals(1, response.getData().getMultiBundleConfiguration().size());
         assertEquals(expectedBundleName, response.getData().getMultiBundleConfiguration().get(0).getValue());
+        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
     private void addEditedSscsDocuments() {
@@ -379,8 +409,11 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
+        verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
         assertNull(response.getData().getCaseBundles());
+        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
 
