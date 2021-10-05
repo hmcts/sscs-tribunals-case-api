@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.service.adjourncase.AdjournCaseService;
 
 @Component
 @Slf4j
@@ -81,6 +82,8 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
                     sscsCaseData.setTranslationWorkOutstanding("Yes");
                 }
 
+                AdjournCaseService.clearTransientFields(sscsCaseData);
+
                 preSubmitCallbackResponse.getData().getSscsDocument()
                         .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
             } else {
@@ -95,7 +98,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         if (sscsCaseData.getAdjournCaseDirectionsDueDate() != null && !"".equalsIgnoreCase(sscsCaseData.getAdjournCaseDirectionsDueDate())) {
             sscsCaseData.setDirectionDueDate(sscsCaseData.getAdjournCaseDirectionsDueDate());
         } else if (sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset() != null && !"".equalsIgnoreCase(sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset())) {
-            sscsCaseData.setDirectionDueDate(LocalDate.now().plusDays(Integer.valueOf(sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset())).toString());
+            sscsCaseData.setDirectionDueDate(LocalDate.now().plusDays(Integer.parseInt(sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset())).toString());
         }
     }
 
