@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.processhearingrecordingrequest;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 
 @Service
 @Slf4j
-public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -31,7 +31,7 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandler implements PreSu
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.PROCESS_HEARING_RECORDING_REQUEST;
+                && callback.getEvent() == EventType.ACTION_HEARING_RECORDING_REQUEST;
 
     }
 

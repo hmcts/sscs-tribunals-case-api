@@ -27,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -57,10 +58,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     SEND_TO_INTERLOC_REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_TCW).stream()
             .map(FurtherEvidenceActionDynamicListItems::getCode)
             .collect(Collectors.toUnmodifiableList());
+    private static final Set<State> ADDITION_VALID_STATES = Set.of(State.DORMANT_APPEAL_STATE, State.RESPONSE_RECEIVED, State.READY_TO_LIST, State.HEARING, State.NOT_LISTABLE, State.WITH_DWP);
 
     private final FooterService footerService;
     private final BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder;
-    private UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
 
 
     @Autowired
@@ -454,11 +456,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private Boolean isCaseStateAdditionValid(State caseState) {
-        return caseState.equals(State.DORMANT_APPEAL_STATE)
-                || caseState.equals(State.RESPONSE_RECEIVED)
-                || caseState.equals(State.READY_TO_LIST)
-                || caseState.equals(State.HEARING)
-                || caseState.equals(State.WITH_DWP);
+        return ADDITION_VALID_STATES.contains(caseState);
     }
 
     private DocumentType getSubtype(String originalSenderCode, ScannedDocument scannedDocument) {

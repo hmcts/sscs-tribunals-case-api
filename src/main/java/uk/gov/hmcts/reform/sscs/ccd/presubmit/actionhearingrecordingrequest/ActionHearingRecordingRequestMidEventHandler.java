@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.processhearingrecordingrequest;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
@@ -18,17 +18,17 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.model.RequestStatus;
-import uk.gov.hmcts.reform.sscs.service.processhearingrecordingrequest.ProcessHearingRecordingRequestService;
+import uk.gov.hmcts.reform.sscs.service.actionhearingrecordingrequest.ActionHearingRecordingRequestService;
 
 @Component
 @Slf4j
-public class ProcessHearingRecordingRequestMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final ProcessHearingRecordingRequestService processHearingRecordingRequestService;
+    private final ActionHearingRecordingRequestService actionHearingRecordingRequestService;
 
     @Autowired
-    public ProcessHearingRecordingRequestMidEventHandler(ProcessHearingRecordingRequestService processHearingRecordingRequestService) {
-        this.processHearingRecordingRequestService = processHearingRecordingRequestService;
+    public ActionHearingRecordingRequestMidEventHandler(ActionHearingRecordingRequestService actionHearingRecordingRequestService) {
+        this.actionHearingRecordingRequestService = actionHearingRecordingRequestService;
     }
 
     @Override
@@ -37,7 +37,7 @@ public class ProcessHearingRecordingRequestMidEventHandler implements PreSubmitC
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.MID_EVENT)
-                && callback.getEvent() == EventType.PROCESS_HEARING_RECORDING_REQUEST;
+                && callback.getEvent() == EventType.ACTION_HEARING_RECORDING_REQUEST;
     }
 
     @Override
@@ -75,8 +75,8 @@ public class ProcessHearingRecordingRequestMidEventHandler implements PreSubmitC
     }
 
     private void validateHearing(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response, Hearing hearing) {
-        final Optional<RequestStatus> requestStatus = processHearingRecordingRequestService.getRequestStatus(party, hearing, response.getData());
-        final Optional<RequestStatus> changedRequestStatus = processHearingRecordingRequestService.getChangedRequestStatus(party, processHearingRecordingRequest);
+        final Optional<RequestStatus> requestStatus = actionHearingRecordingRequestService.getRequestStatus(party, hearing, response.getData());
+        final Optional<RequestStatus> changedRequestStatus = actionHearingRecordingRequestService.getChangedRequestStatus(party, processHearingRecordingRequest);
         if (requestStatus.isPresent() && changedRequestStatus.isPresent()) {
             validateIfRequestStatusChangedFromGrantedToRefused(requestStatus.get(), changedRequestStatus.get(), response);
             validateIfRequestStatusChangedFromRefusedToGranted(requestStatus.get(), changedRequestStatus.get(), response);
