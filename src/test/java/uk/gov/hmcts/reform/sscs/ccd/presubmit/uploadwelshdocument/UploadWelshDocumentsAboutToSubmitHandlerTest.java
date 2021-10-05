@@ -271,7 +271,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
             .sscsWelshPreviewDocuments(welshDocuments)
             .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-            state, sscsCaseData, LocalDateTime.now());
+            state, sscsCaseData, LocalDateTime.now(), "Benefit");
         return new Callback<>(caseDetails, Optional.empty(), eventType, false);
     }
 

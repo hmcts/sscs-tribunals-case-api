@@ -20,7 +20,6 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 
 @RunWith(JUnitParamsRunner.class)
 public class AdjournCaseAboutToStartHandlerTest {
@@ -34,14 +33,12 @@ public class AdjournCaseAboutToStartHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
-    private PreviewDocumentService previewDocumentService;
     private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() {
         openMocks(this);
-        previewDocumentService = new PreviewDocumentService();
-        handler = new AdjournCaseAboutToStartHandler(previewDocumentService);
+        handler = new AdjournCaseAboutToStartHandler();
 
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
