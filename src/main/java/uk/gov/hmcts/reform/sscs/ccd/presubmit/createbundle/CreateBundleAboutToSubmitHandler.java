@@ -93,8 +93,6 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
             return response;
         }
 
-        clearExistingBundles(callback);
-
         createPdfsForAnyAudioVideoEvidence(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
@@ -117,10 +115,6 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
     private void createPdfsForAnyAudioVideoEvidence(SscsCaseData sscsCaseData) {
         bundleAudioVideoPdfService.createAudioVideoPdf(sscsCaseData);
-    }
-
-    private void clearExistingBundles(Callback<SscsCaseData> callback) {
-        callback.getCaseDetails().getCaseData().setCaseBundles(null);
     }
 
     private void setDocumentFileNameIfNotSet(SscsCaseData sscsCaseData) {

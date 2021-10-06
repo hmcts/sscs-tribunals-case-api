@@ -5,7 +5,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -398,7 +397,7 @@ public class CreateBundleAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenCaseWithPreviouslyCreatedBundles_thenClearAllBundles() {
+    public void givenCaseWithPreviouslyCreatedBundles_thenDoNotClearBundles() {
         addMandatoryDwpDocuments();
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(NO.getValue());
         callback.getCaseDetails().getCaseData().setPhmeGranted(YES);
@@ -410,12 +409,13 @@ public class CreateBundleAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
-        assertNull(response.getData().getCaseBundles());
+        assertEquals(1, response.getData().getCaseBundles().size());
+
+        assertEquals(callback.getCaseDetails().getCaseData().getCaseBundles().get(0), response.getData().getCaseBundles().get(0));
         assertEquals("Benefit", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
         assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
-
 
     private void addMandatoryDwpDocuments() {
         List<DwpDocument> dwpDocuments = new ArrayList<>();
