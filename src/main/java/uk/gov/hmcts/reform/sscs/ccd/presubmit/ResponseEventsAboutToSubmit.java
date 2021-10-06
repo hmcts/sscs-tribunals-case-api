@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,6 +24,8 @@ public class ResponseEventsAboutToSubmit {
         DocumentLink dwpUcbEvidenceDocument = sscsCaseData.getDwpUcbEvidenceDocument();
         if (isYes(sscsCaseData.getDwpUcb()) && dwpUcbEvidenceDocument == null) {
             preSubmitCallbackResponse.addError("Please upload a UCB document");
+        } else if (isYes(sscsCaseData.getDwpUcb()) && !isFileAPdf(dwpUcbEvidenceDocument)) {
+            preSubmitCallbackResponse.addError("UCB document must be a PDF.");
         } else if (!isYes(sscsCaseData.getDwpUcb()) && preSubmitCallbackResponse.getErrors().isEmpty()) {
             sscsCaseData.setDwpUcb(null);
             sscsCaseData.setDwpUcbEvidenceDocument(null);
