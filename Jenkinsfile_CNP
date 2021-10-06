@@ -76,6 +76,8 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
   ]
 }
 
+def branchesToSync = ['demo', 'ithc', 'perftest']
+
 withPipeline(type, product, component) {
     if (env.BRANCH_NAME.startsWith("PR")) {
         loadVaultSecrets(secretsForPR)
@@ -85,6 +87,7 @@ withPipeline(type, product, component) {
     enableSlackNotifications('#sscs-tech')
     enableAksStagingDeployment()
     disableLegacyDeployment()
+    syncBranchesWithMaster(branchesToSync)
 
     after('akschartsinstall'){
         // Vars needed for AKS testing

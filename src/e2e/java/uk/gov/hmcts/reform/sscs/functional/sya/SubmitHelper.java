@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ThreadLocalRandom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -27,6 +28,14 @@ public class SubmitHelper {
 
     public SscsCaseDetails findCaseInCcd(Long id, IdamTokens idamTokens) {
         return ccdService.getByCaseId(id, idamTokens);
+    }
+
+    public LocalDate getRandomMrnDate() {
+        long minDay = LocalDate.now().minusDays(1).toEpochDay();
+        long maxDay = LocalDate.now().minusDays(28).toEpochDay();
+        @SuppressWarnings("squid:S2245")
+        long randomDay = ThreadLocalRandom.current().nextLong(maxDay, minDay);
+        return LocalDate.ofEpochDay(randomDay);
     }
 
     public String getRandomNino() {

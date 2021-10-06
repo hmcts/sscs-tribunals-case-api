@@ -91,7 +91,7 @@ public abstract class AbstractEventIt {
 
     protected void setJson(SscsCaseData sscsCaseData, EventType eventType) throws JsonProcessingException {
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(parseLong(sscsCaseData.getCcdCaseId()), JURISDICTION,
-                sscsCaseData.getState(), sscsCaseData, LocalDateTime.now());
+                sscsCaseData.getState(), sscsCaseData, LocalDateTime.now(), "Benefit");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(),
                 eventType, false);
         json = mapper.writeValueAsString(callback);

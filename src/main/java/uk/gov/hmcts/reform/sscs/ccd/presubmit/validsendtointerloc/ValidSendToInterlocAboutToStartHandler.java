@@ -1,18 +1,29 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.abouttostart;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.*;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPartiesOnCase;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
-@Service
-public class SelectWhoReviewsCaseDropdownHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+@Component
+@Slf4j
+public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private final boolean postponementsFeature;
+
+    public ValidSendToInterlocAboutToStartHandler(@Value("${feature.postponements.enabled}")  boolean postponementsFeature) {
+        this.postponementsFeature = postponementsFeature;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -20,8 +31,7 @@ public class SelectWhoReviewsCaseDropdownHandler implements PreSubmitCallbackHan
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_START)
-                && (callback.getEvent() == EventType.VALID_SEND_TO_INTERLOC
-                || callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED
+            && (callback.getEvent() == EventType.VALID_SEND_TO_INTERLOC
                 || callback.getEvent() == EventType.ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE);
     }
 
@@ -35,16 +45,27 @@ public class SelectWhoReviewsCaseDropdownHandler implements PreSubmitCallbackHan
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         setSelectWhoReviewsCase(sscsCaseData);
+        setOriginalSenderDropdown(sscsCaseData);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
     private void setSelectWhoReviewsCase(SscsCaseData sscsCaseData) {
         List<DynamicListItem> listOptions = new ArrayList<>();
-        listOptions.add(new DynamicListItem("reviewByTcw", "Review by TCW"));
-        listOptions.add(new DynamicListItem("reviewByJudge", "Review by Judge"));
+        listOptions.add(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()));
+        listOptions.add(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()));
+
+        if (postponementsFeature) {
+            listOptions.add(new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()));
+        }
 
         sscsCaseData.setSelectWhoReviewsCase(new DynamicList(new DynamicListItem("", ""), listOptions));
+    }
+
+    private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {
+        List<DynamicListItem> listOptions = getPartiesOnCase(sscsCaseData);
+
+        sscsCaseData.setOriginalSender(new DynamicList(listOptions.get(0), listOptions));
     }
 
 }
