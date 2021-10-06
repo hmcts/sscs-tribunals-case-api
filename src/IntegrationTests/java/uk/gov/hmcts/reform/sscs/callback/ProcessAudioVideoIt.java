@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWi
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import javax.servlet.http.HttpServletResponse;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.IOUtils;
@@ -88,7 +89,39 @@ public class ProcessAudioVideoIt extends AbstractEventIt {
         assertEquals(InterlocReferralReason.NONE.getId(), caseData.getInterlocReferralReason());
         assertEquals(DIRECTION_ACTION_REQUIRED.getId(), caseData.getDwpState());
         assertEquals(2, caseData.getSscsDocument().size());
-        assertEquals("evidence.mp3", caseData.getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("Addition A - Audio/Video evidence direction notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".pdf", caseData.getSscsDocument().get(1).getValue().getDocumentFileName());
+        assertEquals("A", caseData.getSscsDocument().get(1).getValue().getBundleAddition());
+        assertEquals("Addition B - Statement for A/V file: evidence.mp3", caseData.getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("evidence.mp3", caseData.getSscsDocument().get(0).getValue().getAvDocumentLink().getDocumentFilename());
+        assertEquals("B", caseData.getSscsDocument().get(0).getValue().getBundleAddition());
+
+        assertNull(caseData.getAudioVideoEvidence());
+    }
+
+    @Test
+    public void shouldHandleProcessAudioVideoEventCallbackWithAdmitEvidenceSelectedAndRip1Document() throws Exception {
+        setJsonAndReplace("callback/processAudioVideoEvidenceWithRip1DocumentCallback.json", "SELECTED_AUDIO_VIDEO_ACTION_PLACEHOLDER", "admitEvidence");
+
+        HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+
+        assertHttpStatus(response, HttpStatus.OK);
+
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
+        SscsCaseData caseData = result.getData();
+
+        assertNull(caseData.getInterlocReviewState());
+        assertEquals(InterlocReferralReason.NONE.getId(), caseData.getInterlocReferralReason());
+        assertEquals(DIRECTION_ACTION_REQUIRED.getId(), caseData.getDwpState());
+        assertEquals(2, caseData.getSscsDocument().size());
+        assertEquals("Addition A - Audio/Video evidence direction notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".pdf", caseData.getSscsDocument().get(1).getValue().getDocumentFileName());
+        assertEquals("A", caseData.getSscsDocument().get(1).getValue().getBundleAddition());
+        assertEquals("Addition B - RIP 1 document for A/V file: evidence.mp3", caseData.getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("B", caseData.getSscsDocument().get(0).getValue().getBundleAddition());
+        assertEquals("dwp", caseData.getSscsDocument().get(0).getValue().getPartyUploaded().getValue());
+        assertEquals("evidence.mp3", caseData.getDwpDocuments().get(0).getValue().getDocumentFileName());
+        assertEquals("evidence.mp3", caseData.getDwpDocuments().get(0).getValue().getAvDocumentLink().getDocumentFilename());
+        assertEquals("dwp", caseData.getDwpDocuments().get(0).getValue().getPartyUploaded().getValue());
+
         assertNull(caseData.getAudioVideoEvidence());
     }
 

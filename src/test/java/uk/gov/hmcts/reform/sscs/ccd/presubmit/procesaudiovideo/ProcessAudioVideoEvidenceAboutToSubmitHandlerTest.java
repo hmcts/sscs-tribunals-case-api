@@ -11,6 +11,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.RIP1;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.DIRECTION_ACTION_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.*;
 
@@ -143,6 +144,8 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.PROCESS_AUDIO_VIDEO);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn("John Lewis");
+        when(footerService.getNextBundleAddition(any())).thenReturn("A");
+        when(footerService.addFooter(any(), any(), eq("A"))).thenReturn(DocumentLink.builder().documentFilename("New doc with footer").build());
     }
 
     @Test
@@ -193,20 +196,24 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getDateAdded());
         assertNull(response.getData().getReservedToJudge());
 
+        DocumentLink expectedDocumentLink = DocumentLink.builder().documentFilename("statement1.pdf").documentUrl("statement1.url").documentBinaryUrl("statement1.url/binary").build();
+
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
+        verify(footerService).addFooter(eq(expectedDocumentLink), eq("Statement of audio/video evidence"), eq("A"));
+
         assertNull(response.getData().getInterlocReviewState());
         assertEquals(InterlocReferralReason.NONE.getId(), response.getData().getInterlocReferralReason());
         assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
         assertEquals(1, response.getData().getAudioVideoEvidence().size());
         assertEquals(1, response.getData().getSscsDocument().size());
         assertEquals(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getSscsDocument().get(0).getValue().getAvDocumentLink());
-        assertEquals(YesNo.YES, response.getData().getSscsDocument().get(0).getValue().getShouldBundleIncludeDocLink());
+        assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
         assertEquals(LocalDate.now().toString(), response.getData().getSscsDocument().get(0).getValue().getDateApproved());
         assertEquals(LocalDate.now().toString(), response.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
-        assertEquals("Statement for A/V file: music.mp3", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("Addition A - Statement for A/V file: music.mp3", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals(DocumentType.AUDIO_DOCUMENT.getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("Appellant", response.getData().getSscsDocument().get(0).getValue().getPartyUploaded().getLabel());
-        assertEquals(DocumentLink.builder().documentFilename("statement1.pdf").documentUrl("statement1.url").documentBinaryUrl("statement1.url/binary").build(), response.getData().getSscsDocument().get(0).getValue().getDocumentLink());
+        assertEquals("New doc with footer", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentFilename());
         assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
     }
 
@@ -232,23 +239,27 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getDateAdded());
         assertNull(response.getData().getReservedToJudge());
 
+        DocumentLink expectedDocumentLink = DocumentLink.builder().documentFilename("statement1.pdf").documentUrl("statement1.url").documentBinaryUrl("statement1.url/binary").build();
+
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
+        verify(footerService).addFooter(eq(expectedDocumentLink), eq("Statement of audio/video evidence"), eq("A"));
+
         assertNull(response.getData().getInterlocReviewState());
         assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
         assertEquals(1, response.getData().getAudioVideoEvidence().size());
         assertEquals(2, response.getData().getSscsDocument().size());
         assertEquals(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getSscsDocument().get(0).getValue().getAvDocumentLink());
-        assertEquals(YesNo.YES, response.getData().getSscsDocument().get(0).getValue().getShouldBundleIncludeDocLink());
+        assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
         assertEquals(LocalDate.now().toString(), response.getData().getSscsDocument().get(0).getValue().getDateApproved());
         assertEquals(LocalDate.now().toString(), response.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
-        assertEquals("Statement for A/V file: music.mp3", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("Addition A - Statement for A/V file: music.mp3", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals(DocumentType.AUDIO_DOCUMENT.getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("Appellant", response.getData().getSscsDocument().get(0).getValue().getPartyUploaded().getLabel());
-        assertEquals(DocumentLink.builder().documentFilename("statement1.pdf").documentUrl("statement1.url").documentBinaryUrl("statement1.url/binary").build(), response.getData().getSscsDocument().get(0).getValue().getDocumentLink());
+        assertEquals("New doc with footer", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentFilename());
     }
 
     @Test
-    public void givenAdmitEvidenceFromAppellantWithExistingSscsDocumentsAndNoStatementOfEvidence_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToSscsDocumentsCollectionAndDoNotIncludeStatementInBundle() {
+    public void givenAdmitEvidenceFromAppellantWithExistingSscsDocumentsAndNoStatementOfEvidence_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToSscsDocumentsCollection() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(ADMIT_EVIDENCE.getCode()));
 
         AudioVideoEvidenceDetails selectedAudioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder()
@@ -305,7 +316,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertEquals(1, response.getData().getAudioVideoEvidence().size());
         assertEquals(2, response.getData().getSscsDocument().size());
         assertEquals(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getSscsDocument().get(0).getValue().getAvDocumentLink());
-        assertEquals(YesNo.NO, response.getData().getSscsDocument().get(0).getValue().getShouldBundleIncludeDocLink());
+        assertNull(response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
         assertEquals(LocalDate.now().toString(), response.getData().getSscsDocument().get(0).getValue().getDateApproved());
         assertEquals(LocalDate.now().toString(), response.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
         assertEquals("music.mp3", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
@@ -405,19 +416,27 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getReservedToJudge());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
+        verify(footerService).addFooter(eq(DocumentLink.builder().documentFilename("RIP 1 document uploaded on " + LocalDate.now().toString() + ".pdf").documentUrl("rip1.com").documentBinaryUrl("rip1.com/binary").build()), eq("RIP 1 document"), eq("A"));
+
         assertNull(response.getData().getInterlocReviewState());
         assertEquals(InterlocReferralReason.NONE.getId(), response.getData().getInterlocReferralReason());
         assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
         assertNull(response.getData().getAudioVideoEvidence());
         assertEquals(1, response.getData().getDwpDocuments().size());
         assertEquals(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getDwpDocuments().get(0).getValue().getAvDocumentLink());
-        assertEquals(YesNo.YES, response.getData().getDwpDocuments().get(0).getValue().getShouldBundleIncludeDocLink());
+        assertNull(response.getData().getDwpDocuments().get(0).getValue().getBundleAddition());
         assertEquals(LocalDate.now().toString(), response.getData().getDwpDocuments().get(0).getValue().getDateApproved());
         assertEquals(LocalDate.now().toString(), response.getData().getDwpDocuments().get(0).getValue().getDocumentDateAdded());
-        assertEquals("RIP 1 document for A/V file: video.mp4", response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
+        assertEquals("video.mp4", response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
         assertEquals("videoDocument", response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
         assertEquals("DWP", response.getData().getDwpDocuments().get(0).getValue().getPartyUploaded().getLabel());
-        assertEquals(DocumentLink.builder().documentFilename("RIP 1 document uploaded on " + LocalDate.now().toString() + ".pdf").documentUrl("rip1.com").documentBinaryUrl("rip1.com/binary").build(), response.getData().getDwpDocuments().get(0).getValue().getDocumentLink());
+        // RIP1
+        assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
+        assertEquals(RIP1.getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals("New doc with footer", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentFilename());
+        assertEquals("Addition A - RIP 1 document for A/V file: video.mp4", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("DWP", response.getData().getSscsDocument().get(0).getValue().getPartyUploaded().getLabel());
+
     }
 
     @Test
@@ -462,12 +481,14 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getAudioVideoEvidence());
         assertEquals(2, response.getData().getDwpDocuments().size());
         assertEquals(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getDwpDocuments().get(0).getValue().getAvDocumentLink());
-        assertEquals(YesNo.NO, response.getData().getDwpDocuments().get(0).getValue().getShouldBundleIncludeDocLink());
+        assertNull(response.getData().getDwpDocuments().get(0).getValue().getBundleAddition());
         assertEquals(LocalDate.now().toString(), response.getData().getDwpDocuments().get(0).getValue().getDateApproved());
         assertEquals(LocalDate.now().toString(), response.getData().getDwpDocuments().get(0).getValue().getDocumentDateAdded());
         assertEquals("video.mp4", response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
         assertEquals("videoDocument", response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
         assertEquals("DWP", response.getData().getDwpDocuments().get(0).getValue().getPartyUploaded().getLabel());
+
+        //FIXME: Check RIP1 empty in sscs documents
     }
 
     @Test
@@ -609,7 +630,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAdmitEvidenceFromDwpWithRip1DocumentForWelshCase_willSetInterlockReviewStateAndDocumentTranslationStatus() {
+    public void givenAdmitEvidenceFromDwpWithRip1DocumentForWelshCase_willSetInterlocReviewStateAndDocumentTranslationStatus() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.ADMIT_EVIDENCE.getCode()));
         sscsCaseData.setLanguagePreferenceWelsh("Yes");
 
@@ -636,6 +657,8 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getReservedToJudge());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));
+        verify(footerService).addFooter(eq(DocumentLink.builder().documentFilename("RIP 1 document uploaded on " + LocalDate.now().toString() + ".pdf").documentUrl("rip1.com").documentBinaryUrl("rip1.com/binary").build()), eq("RIP 1 document"), eq("A"));
+
         assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.WELSH_TRANSLATION.getId()));
         assertEquals(InterlocReferralReason.NONE.getId(), response.getData().getInterlocReferralReason());
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
@@ -644,11 +667,16 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertEquals(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getDwpDocuments().get(0).getValue().getAvDocumentLink());
         assertEquals(LocalDate.now().toString(), response.getData().getDwpDocuments().get(0).getValue().getDateApproved());
         assertEquals(LocalDate.now().toString(), response.getData().getDwpDocuments().get(0).getValue().getDocumentDateAdded());
-        assertEquals("RIP 1 document for A/V file: video.mp4", response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
+        assertEquals("video.mp4", response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
         assertEquals("videoDocument", response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
         assertEquals("DWP", response.getData().getDwpDocuments().get(0).getValue().getPartyUploaded().getLabel());
-        assertEquals(DocumentLink.builder().documentFilename("RIP 1 document uploaded on " + LocalDate.now().toString() + ".pdf").documentUrl("rip1.com").documentBinaryUrl("rip1.com/binary").build(), response.getData().getDwpDocuments().get(0).getValue().getDocumentLink());
-        assertEquals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED, response.getData().getDwpDocuments().get(0).getValue().getDocumentTranslationStatus());
+        // RIP1
+        assertEquals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED, response.getData().getSscsDocument().get(0).getValue().getDocumentTranslationStatus());
+        assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
+        assertEquals(RIP1.getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals("New doc with footer", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentFilename());
+        assertEquals("Addition A - RIP 1 document for A/V file: video.mp4", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("DWP", response.getData().getSscsDocument().get(0).getValue().getPartyUploaded().getLabel());
     }
 
     @Test

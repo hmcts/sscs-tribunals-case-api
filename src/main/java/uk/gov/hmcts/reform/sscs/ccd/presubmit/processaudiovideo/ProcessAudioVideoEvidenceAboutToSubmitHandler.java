@@ -5,6 +5,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.RIP1;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.DIRECTION_ACTION_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessedAction.DIRECTION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessedAction.SENT_TO_ADMIN;
@@ -20,10 +21,7 @@ import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnproce
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -136,7 +134,10 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
             AudioVideoEvidenceDetails selectedAudioVideoEvidenceDetails = caseData.getSelectedAudioVideoEvidenceDetails();
 
             if (UploadParty.DWP.equals(selectedAudioVideoEvidenceDetails.getPartyUploaded())) {
-                dwpDocuments.add(buildAudioVideoDwpDocument(selectedAudioVideoEvidenceDetails, response, caseData.isLanguagePreferenceWelsh()));
+                dwpDocuments.add(buildAudioVideoDwpDocument(selectedAudioVideoEvidenceDetails, response));
+                if (selectedAudioVideoEvidenceDetails.getRip1Document() != null) {
+                    sscsDocuments.add(buildRip1Document(selectedAudioVideoEvidenceDetails, response, caseData.isLanguagePreferenceWelsh()));
+                }
             } else {
                 sscsDocuments.add(buildAudioVideoSscsDocument(selectedAudioVideoEvidenceDetails, response));
             }
@@ -157,41 +158,49 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         }
     }
 
-    private DwpDocument buildAudioVideoDwpDocument(AudioVideoEvidenceDetails audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response, boolean isWelshCase) {
-        DocumentLink rip1Doc = null;
-        SscsDocumentTranslationStatus status = null;
-
-        String fileName = audioVideoEvidence.getFileName();
-
-        YesNo shouldIncludeRip1DocInBundle = YesNo.NO;
-
-        if (audioVideoEvidence.getRip1Document() != null) {
-            rip1Doc = buildRip1Doc(audioVideoEvidence);
-            shouldIncludeRip1DocInBundle = YesNo.YES;
-            fileName = "RIP 1 document for A/V file: " + fileName;
-
-            if (isWelshCase) {
-                response.getData().setInterlocReviewState(WELSH_TRANSLATION.getId());
-                status = SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
-            }
-        }
+    private DwpDocument buildAudioVideoDwpDocument(AudioVideoEvidenceDetails audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response) {
 
         return DwpDocument.builder().value(
                 DwpDocumentDetails.builder()
                         .avDocumentLink(audioVideoEvidence.getDocumentLink())
-                        .documentFileName(fileName)
+                        .documentFileName(audioVideoEvidence.getFileName())
                         .documentType(findAudioVideoDocumentType(audioVideoEvidence, response))
                         .documentDateAdded(audioVideoEvidence.getDateAdded().toString())
                         .partyUploaded(audioVideoEvidence.getPartyUploaded())
                         .dateApproved(LocalDate.now().toString())
-                        .documentLink(rip1Doc)
-                        .shouldBundleIncludeDocLink(shouldIncludeRip1DocInBundle)
-                        .documentTranslationStatus(status)
                         .build())
                 .build();
     }
 
-    private DocumentLink buildRip1Doc(AudioVideoEvidenceDetails audioVideoEvidence) {
+    private SscsDocument buildRip1Document(AudioVideoEvidenceDetails audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response, boolean isWelshCase) {
+
+        DocumentLink rip1Doc = buildRip1DocumentLink(audioVideoEvidence);
+        String bundleAddition = footerService.getNextBundleAddition(response.getData().getSscsDocument());
+        DocumentLink url = footerService.addFooter(rip1Doc, RIP1.getLabel(), bundleAddition);
+        String fileName = "Addition " + bundleAddition + " - RIP 1 document for A/V file: " + audioVideoEvidence.getFileName();
+
+        SscsDocumentTranslationStatus status = null;
+
+        if (isWelshCase) {
+            response.getData().setInterlocReviewState(WELSH_TRANSLATION.getId());
+            status = SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
+        }
+
+        return SscsDocument.builder().value(
+                SscsDocumentDetails.builder()
+                        .documentFileName(fileName)
+                        .documentType(RIP1.getValue())
+                        .documentDateAdded(audioVideoEvidence.getDateAdded().toString())
+                        .partyUploaded(audioVideoEvidence.getPartyUploaded())
+                        .dateApproved(LocalDate.now().toString())
+                        .documentTranslationStatus(status)
+                        .documentLink(url)
+                        .bundleAddition(bundleAddition)
+                        .build())
+                .build();
+    }
+
+    private DocumentLink buildRip1DocumentLink(AudioVideoEvidenceDetails audioVideoEvidence) {
         String rip1FileName = "RIP 1 document uploaded on " + audioVideoEvidence.getDateAdded().toString() + ".pdf";
 
         return DocumentLink.builder()
@@ -204,11 +213,13 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
 
     private SscsDocument buildAudioVideoSscsDocument(AudioVideoEvidenceDetails audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response) {
         String fileName = audioVideoEvidence.getFileName();
-        YesNo shouldIncludeAppellantStatementDocInBundle = YesNo.NO;
+        String bundleAddition = null;
+        DocumentLink url = null;
 
         if (audioVideoEvidence.getStatementOfEvidencePdf() != null) {
-            fileName = "Statement for A/V file: " + fileName;
-            shouldIncludeAppellantStatementDocInBundle = YesNo.YES;
+            bundleAddition = footerService.getNextBundleAddition(response.getData().getSscsDocument());
+            url = footerService.addFooter(audioVideoEvidence.getStatementOfEvidencePdf(), "Statement of audio/video evidence", bundleAddition);
+            fileName = "Addition " + bundleAddition + " - Statement for A/V file: " + fileName;
         }
 
         return SscsDocument.builder().value(
@@ -219,8 +230,8 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
                         .documentDateAdded(audioVideoEvidence.getDateAdded().toString())
                         .partyUploaded(audioVideoEvidence.getPartyUploaded())
                         .dateApproved(LocalDate.now().toString())
-                        .documentLink(audioVideoEvidence.getStatementOfEvidencePdf())
-                        .shouldBundleIncludeDocLink(shouldIncludeAppellantStatementDocInBundle)
+                        .documentLink(url)
+                        .bundleAddition(bundleAddition)
                         .build())
                 .build();
     }
