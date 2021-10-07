@@ -9,7 +9,7 @@ java:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
     CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-${SERVICE_FQDN}"
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
-    BUNDLE_URL: "http://em-ccd-orchestrator-aat.service.core-compute-aat.internal"
+    BUNDLE_URL: http://em-ccd-orchestrator-${SERVICE_FQDN}
     CCD_UI_BASE_URL: https://case-management-web-${SERVICE_FQDN}
     IDAM_S2S_AUTH: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
@@ -38,6 +38,18 @@ idam-pr:
     CCD-DATASTORE-API:
       - http://ccd-data-store-api-${SERVICE_FQDN}/oauth2redirect
 
+rpa-em-ccd-orchestrator:
+  java:
+    image: hmctspublic.azurecr.io/em/ccdorc:latest
+    environment:
+      IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
+      OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net
+      S2S_BASE_URI: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      EM_STITCHING_API_URL: http://em-stitching-aat.service.core-compute-aat.internal
+      DM_STORE_APP_URL: http://dm-store-aat.service.core-compute-aat.internal
+      CCD_DATA_API_URL: http://ccd-data-store-api-${SERVICE_FQDN}
+      CALLBACK_DOMAIN: http://em-ccd-orchestrator-${SERVICE_FQDN}
+    ingressHost: em-ccd-orchestrator-${SERVICE_FQDN}
 
 xui-webapp:
   enabled: true
