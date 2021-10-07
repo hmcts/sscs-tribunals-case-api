@@ -91,7 +91,7 @@ public class ProcessAudioVideoIt extends AbstractEventIt {
         assertEquals(2, caseData.getSscsDocument().size());
         assertEquals("Addition A - Audio/Video evidence direction notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".pdf", caseData.getSscsDocument().get(1).getValue().getDocumentFileName());
         assertEquals("A", caseData.getSscsDocument().get(1).getValue().getBundleAddition());
-        assertEquals("Addition B - Statement for A/V file: evidence.mp3", caseData.getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("Addition B - Appellant - Statement for A/V file: evidence.mp3", caseData.getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("evidence.mp3", caseData.getSscsDocument().get(0).getValue().getAvDocumentLink().getDocumentFilename());
         assertEquals("B", caseData.getSscsDocument().get(0).getValue().getBundleAddition());
 
@@ -115,7 +115,7 @@ public class ProcessAudioVideoIt extends AbstractEventIt {
         assertEquals(2, caseData.getSscsDocument().size());
         assertEquals("Addition A - Audio/Video evidence direction notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".pdf", caseData.getSscsDocument().get(1).getValue().getDocumentFileName());
         assertEquals("A", caseData.getSscsDocument().get(1).getValue().getBundleAddition());
-        assertEquals("Addition B - RIP 1 document for A/V file: evidence.mp3", caseData.getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("Addition B - DWP - RIP 1 document for A/V file: evidence.mp3", caseData.getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("B", caseData.getSscsDocument().get(0).getValue().getBundleAddition());
         assertEquals("dwp", caseData.getSscsDocument().get(0).getValue().getPartyUploaded().getValue());
         assertEquals("evidence.mp3", caseData.getDwpDocuments().get(0).getValue().getDocumentFileName());

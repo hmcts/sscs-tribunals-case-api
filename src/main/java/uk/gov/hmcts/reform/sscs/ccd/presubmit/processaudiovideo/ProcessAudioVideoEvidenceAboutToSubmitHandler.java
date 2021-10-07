@@ -177,7 +177,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         DocumentLink rip1Doc = buildRip1DocumentLink(audioVideoEvidence);
         String bundleAddition = footerService.getNextBundleAddition(response.getData().getSscsDocument());
         DocumentLink url = footerService.addFooter(rip1Doc, RIP1.getLabel(), bundleAddition);
-        String fileName = "Addition " + bundleAddition + " - RIP 1 document for A/V file: " + audioVideoEvidence.getFileName();
+        String fileName = "Addition " + bundleAddition + " - " + audioVideoEvidence.getPartyUploaded().getLabel() + " - RIP 1 document for A/V file: " + audioVideoEvidence.getFileName();
 
         SscsDocumentTranslationStatus status = null;
 
@@ -219,7 +219,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         if (audioVideoEvidence.getStatementOfEvidencePdf() != null) {
             bundleAddition = footerService.getNextBundleAddition(response.getData().getSscsDocument());
             url = footerService.addFooter(audioVideoEvidence.getStatementOfEvidencePdf(), "Statement of audio/video evidence", bundleAddition);
-            fileName = "Addition " + bundleAddition + " - Statement for A/V file: " + fileName;
+            fileName = "Addition " + bundleAddition + " - " + audioVideoEvidence.getPartyUploaded().getLabel() + " - Statement for A/V file: " + fileName;
         }
 
         return SscsDocument.builder().value(

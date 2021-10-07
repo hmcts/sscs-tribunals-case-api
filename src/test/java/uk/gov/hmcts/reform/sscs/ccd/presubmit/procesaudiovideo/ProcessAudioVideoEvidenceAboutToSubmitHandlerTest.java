@@ -210,7 +210,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
         assertEquals(LocalDate.now().toString(), response.getData().getSscsDocument().get(0).getValue().getDateApproved());
         assertEquals(LocalDate.now().toString(), response.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
-        assertEquals("Addition A - Statement for A/V file: music.mp3", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("Addition A - Appellant - Statement for A/V file: music.mp3", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals(DocumentType.AUDIO_DOCUMENT.getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("Appellant", response.getData().getSscsDocument().get(0).getValue().getPartyUploaded().getLabel());
         assertEquals("New doc with footer", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentFilename());
@@ -252,7 +252,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
         assertEquals(LocalDate.now().toString(), response.getData().getSscsDocument().get(0).getValue().getDateApproved());
         assertEquals(LocalDate.now().toString(), response.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
-        assertEquals("Addition A - Statement for A/V file: music.mp3", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("Addition A - Appellant - Statement for A/V file: music.mp3", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals(DocumentType.AUDIO_DOCUMENT.getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("Appellant", response.getData().getSscsDocument().get(0).getValue().getPartyUploaded().getLabel());
         assertEquals("New doc with footer", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentFilename());
@@ -434,7 +434,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
         assertEquals(RIP1.getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("New doc with footer", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentFilename());
-        assertEquals("Addition A - RIP 1 document for A/V file: video.mp4", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("Addition A - DWP - RIP 1 document for A/V file: video.mp4", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("DWP", response.getData().getSscsDocument().get(0).getValue().getPartyUploaded().getLabel());
 
     }
@@ -675,7 +675,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
         assertEquals(RIP1.getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("New doc with footer", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentFilename());
-        assertEquals("Addition A - RIP 1 document for A/V file: video.mp4", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("Addition A - DWP - RIP 1 document for A/V file: video.mp4", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("DWP", response.getData().getSscsDocument().get(0).getValue().getPartyUploaded().getLabel());
     }
 
