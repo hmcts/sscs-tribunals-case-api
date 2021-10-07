@@ -368,12 +368,12 @@
   "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/request/identifier/hearingrecording_GET" : "ignore",
   "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/appeals_POST" : "ignore",
   "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/statement_POST" : "ignore",
-  "10010_Cookie No HttpOnly Flag_http://****-tribunals-api-aat.service.core-compute-aat.internal/api/request/identifier/recordingrequest?hearingIds=hearingIds_POST" : "ignore",
-  "10054_Cookie without SameSite Attribute_http://****-tribunals-api-aat.service.core-compute-aat.internal/api/request/identifier/recordingrequest?hearingIds=hearingIds_POST" : "ignore",
-  "10054_Cookie without SameSite Attribute_http://****-tribunals-api-aat.service.core-compute-aat.internal/appeals_POST" : "ignore",
-  "10096_Timestamp Disclosure - Unix_http://****-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/singleevidence?body=body&idamEmail=idamEmail_POST" : "ignore",
-  "10096_Timestamp Disclosure - Unix_http://****-tribunals-api-aat.service.core-compute-aat.internal/api/request/identifier/recordingrequest?hearingIds=hearingIds_POST" : "ignore",
-  "90033_Loosely Scoped Cookie_http://****-tribunals-api-aat.service.core-compute-aat.internal/api/request/identifier/recordingrequest?hearingIds=hearingIds_POST" : "ignore"
+  "10010_Cookie No HttpOnly Flag_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/request/identifier/recordingrequest?hearingIds=hearingIds_POST" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/request/identifier/recordingrequest?hearingIds=hearingIds_POST" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/appeals_POST" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/singleevidence?body=body&idamEmail=idamEmail_POST" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/request/identifier/recordingrequest?hearingIds=hearingIds_POST" : "ignore",
+  "90033_Loosely Scoped Cookie_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/request/identifier/recordingrequest?hearingIds=hearingIds_POST" : "ignore"
 
 
 
