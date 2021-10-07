@@ -9,6 +9,7 @@ java:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
     CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-${SERVICE_FQDN}"
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
+    BUNDLE_URL: "http://em-ccd-orchestrator-aat.service.core-compute-aat.internal"
     CCD_UI_BASE_URL: https://case-management-web-${SERVICE_FQDN}
     IDAM_S2S_AUTH: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
@@ -208,7 +209,7 @@ ccd:
       - sscs-citizen2@hmcts.net|SSCS|Benefit|appealCreated
 
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.10.12nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.10.18nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: https://ccd-admin-web-${SERVICE_FQDN}/oauth2redirect
     environment:
