@@ -30,7 +30,7 @@ public class DwpDocumentService {
                     documentFileName,
                     null,
                     LocalDateTime.now(),
-                    dwpDocument.getDocumentLink(), editedDocumentLink, editedReason, null, null, null, null, null, null, null, null);
+                    dwpDocument.getDocumentLink(), editedDocumentLink, editedReason, null, null, null, null, null, null, null);
 
             DwpDocument doc = new DwpDocument(dwpDocumentDetails);
 
