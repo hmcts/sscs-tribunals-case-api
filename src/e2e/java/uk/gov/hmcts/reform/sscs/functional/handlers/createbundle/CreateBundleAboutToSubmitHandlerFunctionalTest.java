@@ -73,7 +73,7 @@ public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler 
         assertThat(bundleFolders.get(0).getValue().getName(), is("DWP"));
         assertThat(bundleFolders.get(0).getValue().getDocuments().size(), is(2));
         assertThat(bundleFolders.get(1).getValue().getName(), is("Further additions"));
-        assertThat(bundleFolders.get(1).getValue().getDocuments().size(), is(2));
+        assertThat(bundleFolders.get(1).getValue().getDocuments().size(), is(0));
     }
 
     @Test
@@ -108,7 +108,7 @@ public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler 
         assertThat(folders.get(0).getValue().getName(), is("DWP"));
         assertThat(folders.get(0).getValue().getDocuments().size(), is(2));
         assertThat(folders.get(1).getValue().getName(), is("Further additions"));
-        assertThat(folders.get(1).getValue().getDocuments().size(), is(3));
+        assertThat(folders.get(1).getValue().getDocuments().size(), is(1));
 
         verifyAsyncBundleStatus(updatedCaseDetails);
         final SscsCaseDetails asyncUpdate = getByCaseId(caseDetails.getId());
