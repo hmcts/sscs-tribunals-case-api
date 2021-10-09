@@ -219,11 +219,12 @@ ccd:
       AUTH_PROVIDER_BASE_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       CCD_USER_PROFILE_URL: http://${SERVICE_NAME}-ccd-user-profile-api
     users:
+      - system.update@hmcts.net|SSCS|Benefit|appealCreated
       - sscs.superuser@mailinator.com|SSCS|Benefit|appealCreated
       - sscs-citizen2@hmcts.net|SSCS|Benefit|appealCreated
 
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.10.18nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.10.19nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: https://ccd-admin-web-${SERVICE_FQDN}/oauth2redirect
     environment:
