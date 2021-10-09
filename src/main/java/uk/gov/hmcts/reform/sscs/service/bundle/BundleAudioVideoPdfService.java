@@ -61,7 +61,7 @@ public class BundleAudioVideoPdfService {
                 String location = uploadResponse.getEmbedded().getDocuments().get(0).links.self.href;
                 DocumentLink newDocLink = DocumentLink.builder().documentFilename(file.getOriginalFilename()).documentUrl(location).documentBinaryUrl(location + "/binary").build();
 
-                sscsCaseData.setAudioVideoEvidenceBundleDocument(AudioVideoEvidenceBundleDocument.builder().documentLink(newDocLink).documentFileName("Audio/video document").build());
+                sscsCaseData.setAudioVideoEvidenceBundleDocument(AudioVideoEvidenceBundleDocument.builder().documentLink(newDocLink).documentFileName("Audio/video evidence document").build());
             }
         }
     }
