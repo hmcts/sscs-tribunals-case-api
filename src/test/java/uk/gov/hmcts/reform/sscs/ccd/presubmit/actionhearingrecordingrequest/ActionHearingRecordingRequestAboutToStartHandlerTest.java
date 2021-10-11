@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.processhearingrecordingrequest;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -28,15 +28,15 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
-import uk.gov.hmcts.reform.sscs.service.processhearingrecordingrequest.ProcessHearingRecordingRequestService;
+import uk.gov.hmcts.reform.sscs.service.actionhearingrecordingrequest.ActionHearingRecordingRequestService;
 
 @RunWith(JUnitParamsRunner.class)
-public class ProcessHearingRecordingRequestAboutToStartHandlerTest {
+public class ActionHearingRecordingRequestAboutToStartHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     static final Hearing HEARING = getHearing(1);
 
-    private final ProcessHearingRecordingRequestAboutToStartHandler handler = new ProcessHearingRecordingRequestAboutToStartHandler(new ProcessHearingRecordingRequestService());
+    private final ActionHearingRecordingRequestAboutToStartHandler handler = new ActionHearingRecordingRequestAboutToStartHandler(new ActionHearingRecordingRequestService());
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -65,7 +65,7 @@ public class ProcessHearingRecordingRequestAboutToStartHandlerTest {
                 .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(callback.getEvent()).thenReturn(EventType.PROCESS_HEARING_RECORDING_REQUEST);
+        when(callback.getEvent()).thenReturn(EventType.ACTION_HEARING_RECORDING_REQUEST);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
     }

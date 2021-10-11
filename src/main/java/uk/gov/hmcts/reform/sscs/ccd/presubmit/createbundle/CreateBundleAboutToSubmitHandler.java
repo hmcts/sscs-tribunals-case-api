@@ -106,10 +106,12 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         }
 
         log.info("Setting the bundleConfiguration on the case {} for case id {}", sscsCaseData.getBundleConfiguration(), callback.getCaseDetails().getId());
-        return sendToBundleService(callback);
+
+        BundleCallback<SscsCaseData> bundleCallback = new BundleCallback(callback);
+        return sendToBundleService(bundleCallback);
     }
 
-    private PreSubmitCallbackResponse<SscsCaseData> sendToBundleService(Callback<SscsCaseData> callback) {
+    private PreSubmitCallbackResponse<SscsCaseData> sendToBundleService(BundleCallback<SscsCaseData> callback) {
         return serviceRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
     }
 

@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @SpringBootTest
-public class ProcessHearingRecordingRequestAboutToSubmitHandlerFunctionalTest extends BaseHandler {
+public class ActionHearingRecordingRequestAboutToSubmitHandlerFunctionalTest extends BaseHandler {
 
     @Test
     public void givenAboutToSubmitCallbackForEvent_shouldSetFields() throws Exception {
@@ -27,7 +27,7 @@ public class ProcessHearingRecordingRequestAboutToSubmitHandlerFunctionalTest ex
             .contentType(ContentType.JSON)
             .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
             .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
-            .body(getJsonCallbackForTest("handlers/processhearingrecordingrequest/processHearingRecordingRequestAboutToSubmitCallback.json"))
+            .body(getJsonCallbackForTest("handlers/actionhearingrecordingrequest/actionHearingRecordingRequestAboutToSubmitCallback.json"))
             .post("/ccdAboutToSubmit")
             .then()
             .statusCode(HttpStatus.SC_OK)

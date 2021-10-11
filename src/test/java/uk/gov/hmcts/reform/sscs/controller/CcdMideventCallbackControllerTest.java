@@ -114,7 +114,7 @@ public class CcdMideventCallbackControllerTest {
 
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build()).build();
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
-                new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now()),
+                new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
                 Optional.empty(), INTERLOC_INFORMATION_RECEIVED, false));
 
         PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(SscsCaseData.builder().interlocReviewState("new_state").build());
@@ -148,7 +148,7 @@ public class CcdMideventCallbackControllerTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
 
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
-            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now()),
+            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
             Optional.empty(), ADMIN_RESTORE_CASES, false));
 
         String expectedErrorsString = Arrays.asList("\"" + status.toString() + "\"").toString();
@@ -181,7 +181,7 @@ public class CcdMideventCallbackControllerTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
 
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
-            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now()),
+            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
             Optional.empty(), ADMIN_RESTORE_CASES, false));
 
         String expectedErrorsString = Arrays.asList("\"" + status.toString() + "\"").toString();
@@ -214,7 +214,7 @@ public class CcdMideventCallbackControllerTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
 
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
-            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now()),
+            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
             Optional.empty(), ADMIN_RESTORE_CASES, false));
 
         String expectedWarningsString = Arrays.asList("\"" + status.toString() + "\"", "Completed - no more cases").toString();
@@ -244,7 +244,7 @@ public class CcdMideventCallbackControllerTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
 
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
-            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now()),
+            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
             Optional.empty(), ADMIN_RESTORE_CASES, false));
 
         String expectedErrorsString = Arrays.asList("anything").toString();
@@ -272,7 +272,7 @@ public class CcdMideventCallbackControllerTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
 
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
-            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now()),
+            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
             Optional.empty(), ADMIN_RESTORE_CASES, false));
 
         String expectedErrorsString = Arrays.asList("anything").toString();
@@ -310,7 +310,7 @@ public class CcdMideventCallbackControllerTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
 
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
-            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now()),
+            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
             Optional.empty(), ADMIN_RESTORE_CASES, false));
 
         String expectedWarningsString = Arrays.asList("\"" + status.toString() + "\"", "Completed - no more cases").toString();
