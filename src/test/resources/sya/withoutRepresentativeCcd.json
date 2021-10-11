@@ -43,6 +43,8 @@
         "nino": "AB877533C"
       },
       "isAddressSameAsAppointee": "No",
+      "confidentialityRequired": null,
+      "role": null,
       "appointee": null
     },
     "benefitType": {
