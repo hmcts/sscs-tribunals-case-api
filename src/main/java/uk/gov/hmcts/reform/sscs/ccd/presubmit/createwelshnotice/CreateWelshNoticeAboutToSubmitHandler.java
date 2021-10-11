@@ -50,6 +50,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
         NEXT_EVENT_MAP.put(DIRECTION_NOTICE.getValue(), DIRECTION_ISSUED_WELSH.getCcdType());
         NEXT_EVENT_MAP.put(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE.getValue(), PROCESS_AUDIO_VIDEO_WELSH.getCcdType());
         NEXT_EVENT_MAP.put(ADJOURNMENT_NOTICE.getValue(), ISSUE_ADJOURNMENT_NOTICE_WELSH.getCcdType());
+        NEXT_EVENT_MAP.put(POSTPONEMENT_REQUEST_DIRECTION_NOTICE.getValue(), ACTION_POSTPONEMENT_REQUEST_WELSH.getCcdType());
     }
 
     @Autowired
@@ -176,7 +177,8 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
     }
 
     private String getEnglishNoticeType(String noticeType) {
-        if (AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE.getLabel().equals(noticeType)) {
+        if (AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE.getLabel().equals(noticeType)
+            || POSTPONEMENT_REQUEST_DIRECTION_NOTICE.getLabel().equals(noticeType)) {
             return DIRECTION_NOTICE.getLabel();
         }
         return noticeType;
