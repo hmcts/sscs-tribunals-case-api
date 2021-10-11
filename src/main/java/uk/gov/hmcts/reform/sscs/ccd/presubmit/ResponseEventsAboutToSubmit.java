@@ -41,7 +41,7 @@ public class ResponseEventsAboutToSubmit {
                 "UCB document",
                 null,
                 LocalDateTime.now(),
-                dwpUcbEvidenceDocument, null, null, null, null, null, null, null, null, null, null);
+                dwpUcbEvidenceDocument, null, null, null, null, null, null, null, null, null);
         DwpDocument dwpDocument = new DwpDocument(dwpDocumentDetails);
         if (isNull(sscsCaseData.getDwpDocuments())) {
             sscsCaseData.setDwpDocuments(new ArrayList<>());
