@@ -94,7 +94,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
             return response;
         }
 
-        moveExistingBundlesToHistoricalBundles(sscsCaseData);
+        moveExistingBundlesToHistoricalBundlesThenClearExistingBundles(sscsCaseData);
 
         createPdfsForAnyAudioVideoEvidence(sscsCaseData);
 
@@ -120,7 +120,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         bundleAudioVideoPdfService.createAudioVideoPdf(sscsCaseData);
     }
 
-    private void moveExistingBundlesToHistoricalBundles(SscsCaseData sscsCaseData) {
+    private void moveExistingBundlesToHistoricalBundlesThenClearExistingBundles(SscsCaseData sscsCaseData) {
         List<Bundle> historicalBundles = new ArrayList<>();
         if (nonNull(sscsCaseData.getHistoricalBundles())) {
             historicalBundles.addAll(sscsCaseData.getHistoricalBundles());
