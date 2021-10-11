@@ -52,13 +52,7 @@ em-ccdorc:
       DM_STORE_APP_URL: http://dm-store-aat.service.core-compute-aat.internal
       CCD_DATA_API_URL: http://ccd-data-store-api-${SERVICE_FQDN}
       CALLBACK_DOMAIN: http://em-ccdorc-${SERVICE_FQDN}
-    keyVaults:
-      em-ccdorc:
-        resourceGroup: em-ccdorc
-        secrets:
-          - AppInsightsInstrumentationKey
-          - microservicekey-em-ccd-orchestrator
-          - notification-api-key
+    keyVaults: []
 
 xui-webapp:
   enabled: true
