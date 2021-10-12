@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_RE
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -110,6 +111,11 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
                 caseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
         footerService.createFooterAndAddDocToCase(url, caseData, POSTPONEMENT_REQUEST_DIRECTION_NOTICE, now,
                 null, null, documentTranslationStatus);
+        if (documentTranslationStatus != null) {
+            caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
+            log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
+            caseData.setTranslationWorkOutstanding(YES.getValue());
+        }
     }
 
     private Note createPostponementRequestNote(String userAuthorisation, String details) {

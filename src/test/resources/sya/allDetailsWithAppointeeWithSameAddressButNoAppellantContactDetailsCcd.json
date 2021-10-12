@@ -45,6 +45,8 @@
         "nino": "AB877533C"
       },
       "isAppointee": "Yes",
+      "confidentialityRequired": null,
+      "role": null,
       "isAddressSameAsAppointee": "Yes",
       "appointee": {
         "name": {
