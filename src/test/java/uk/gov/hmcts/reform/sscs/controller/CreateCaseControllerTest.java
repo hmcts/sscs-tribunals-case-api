@@ -97,6 +97,9 @@ public class CreateCaseControllerTest {
     public void twoCallsToRandomMrnDateHaveAGoodChanceOfBeingDifferent() {
         LocalDate mrnDate1 = controller.getRandomMrnDate();
         LocalDate mrnDate2 = controller.getRandomMrnDate();
+        if (mrnDate2.equals(mrnDate1)) {
+            mrnDate2 = controller.getRandomMrnDate();
+        }
         assertThat(mrnDate1, not(mrnDate2));
     }
 

@@ -32,6 +32,8 @@
           "nino": "JT 12 34 56 D"
         },
         "isAppointee": null,
+        "confidentialityRequired": null,
+        "role": null,
         "appointee": {
           "name": null,
           "address": null,

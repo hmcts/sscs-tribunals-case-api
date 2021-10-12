@@ -22,7 +22,7 @@
     {
       "id": "0aaf2558-6840-4818-91d6-d21f3f99dca3",
       "value": {
-        "documentLink": {
+        "avDocumentLink": {
           "document_url": "http://dm-store:5005/documents/6d3b7351-168e-42f6-90b7-d263000e1864",
           "document_filename": "appellant 2019-11-03 at 18.49.24.mp3",
           "document_binary_url": "http://dm-store:5005/documents/6d3b7351-168e-42f6-90b7-d263000e1864/binary"
@@ -36,7 +36,7 @@
     {
       "id": "a5408305-7685-4f7c-95f6-31aaf5207541",
       "value": {
-        "documentLink": {
+        "avDocumentLink": {
           "document_url": "http://dm-store:5005/documents/4efb3e1d-e78a-4f9f-8734-5c0501a6f8e4",
           "document_filename": "appointee.mp4",
           "document_binary_url": "http://dm-store:5005/documents/4efb3e1d-e78a-4f9f-8734-5c0501a6f8e4/binary"

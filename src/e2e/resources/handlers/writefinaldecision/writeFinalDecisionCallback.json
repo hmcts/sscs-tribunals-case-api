@@ -195,6 +195,7 @@
             "nino": "JT 12 34 56 D"
           },
           "appointee": null,
+          "confidentialityRequired": null,
           "isAddressSameAsAppointee": null
         },
         "benefitType": {

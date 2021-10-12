@@ -64,6 +64,7 @@ public class CreateWelshNoticeAboutToStartHandler implements PreSubmitCallbackHa
                         && (a.getValue().getDocumentType().equals(DECISION_NOTICE.getValue())
                         || a.getValue().getDocumentType().equals(ADJOURNMENT_NOTICE.getValue())
                         || a.getValue().getDocumentType().equals(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE.getValue())
+                        || a.getValue().getDocumentType().equals(POSTPONEMENT_REQUEST_DIRECTION_NOTICE.getValue())
                         || a.getValue().getDocumentType().equals(DIRECTION_NOTICE.getValue())))
                 .collect(Collectors.toList());
 
