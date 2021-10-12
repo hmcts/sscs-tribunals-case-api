@@ -118,20 +118,7 @@ public class SubmitAppealService {
 
         try {
             SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal);
-
-            List<SscsDocument> existingDocuments = sscsCaseData.getSscsDocument();
-            for (SscsDocument sscsDocument: existingDocuments) {
-                //getting error from this call due to not being able to read document before its attached to case
-                if (secureDocStoreService.getDocumentExists(sscsDocument.getValue()
-                        .getDocumentLink().getDocumentUrl(), idamTokens)) {
-                    DocumentLink existingDocumentLink = sscsDocument.getValue().getDocumentLink();
-                    DocumentLink newDocumentLink = DocumentLink.builder().documentUrl(existingDocumentLink.getDocumentUrl())
-                            .documentBinaryUrl(existingDocumentLink.getDocumentBinaryUrl())
-                            .documentFilename(existingDocumentLink.getDocumentFilename()).build();
-                    sscsDocument.getValue().setDocumentLink(newDocumentLink);
-                }
-            }
-
+            
             CaseDetails caseDetails = citizenCcdService.updateCase(sscsCaseData, EventType.UPDATE_DRAFT.getCcdType(), "Update draft",
                     "Update draft in CCD", idamTokens, appeal.getCcdCaseId());
 
