@@ -79,7 +79,7 @@ public class CreateWelshNoticeAboutToStartHandlerTest {
     }
 
     @Test
-    @Parameters({"DIRECTION_NOTICE", "ADJOURNMENT_NOTICE", "DECISION_NOTICE", "AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE"})
+    @Parameters({"DIRECTION_NOTICE", "ADJOURNMENT_NOTICE", "DECISION_NOTICE", "AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE", "POSTPONEMENT_REQUEST_DIRECTION_NOTICE"})
     public void originalDocumentDropDownWhenSscsDocumentTranslationStatusIsSet(DocumentType documentType) {
         sscsCaseData = SscsCaseData.builder()
                 .sscsDocument(getSscsDocument(documentType))
