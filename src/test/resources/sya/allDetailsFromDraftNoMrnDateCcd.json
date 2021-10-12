@@ -46,8 +46,8 @@
         "nino": "ZRPVJDDBS"
       },
       "isAppointee": "No",
+      "role": {},
       "confidentialityRequired": null,
-      "role": null,
       "isAddressSameAsAppointee": "No",
       "appointee": {
         "name": {

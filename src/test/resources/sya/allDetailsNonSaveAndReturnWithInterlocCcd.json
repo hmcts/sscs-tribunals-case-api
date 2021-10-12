@@ -45,9 +45,9 @@
         "dob": "1990-02-26",
         "nino": "AB877533C"
       },
+      "role":{},
       "isAppointee": "No",
       "confidentialityRequired": null,
-      "role": null,
       "isAddressSameAsAppointee": "No",
       "appointee": {
         "name": {
