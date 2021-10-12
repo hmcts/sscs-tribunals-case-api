@@ -52,7 +52,6 @@ em-ccdorc:
       DM_STORE_APP_URL: http://dm-store-aat.service.core-compute-aat.internal
       CCD_DATA_API_URL: http://ccd-data-store-api-${SERVICE_FQDN}
       CALLBACK_DOMAIN: http://em-ccdorc-${SERVICE_FQDN}
-    keyVaults: []
 
 xui-webapp:
   enabled: true
