@@ -196,7 +196,6 @@
           },
           "appointee": null,
           "confidentialityRequired": null,
-          "role": "",
           "isAddressSameAsAppointee": null
         },
         "benefitType": {

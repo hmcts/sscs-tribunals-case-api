@@ -118,7 +118,6 @@
           },
           "isAddressSameAsAppointee": "No",
           "confidentialityRequired": null,
-          "role": "",
           "isAppointee": "No",
           "name": {
             "firstName": "Joe",
