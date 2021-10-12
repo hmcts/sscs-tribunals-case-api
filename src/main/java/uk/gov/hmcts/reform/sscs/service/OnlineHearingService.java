@@ -79,7 +79,7 @@ public class OnlineHearingService {
         return new AppealDetails(sscsCaseDetails.getData().getCaseCreated(),
                 sscsCaseDetails.getData().getAppeal().getMrnDetails().getMrnDate(),
                 sscsCaseDetails.getData().getAppeal().getBenefitType().getCode(),
-                sscsCaseDetails.getData().getState().getId()
+                sscsCaseDetails.getState()
         );
     }
 
