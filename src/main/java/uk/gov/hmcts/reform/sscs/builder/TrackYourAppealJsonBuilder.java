@@ -198,6 +198,7 @@ public class TrackYourAppealJsonBuilder {
             documentNode.put("name", d.getValue().getDocumentFileName());
             documentNode.put("type", d.getValue().getDocumentType());
             if (d.getValue().getAvDocumentLink() != null) {
+                documentNode.put("name", d.getValue().getAvDocumentLink().getDocumentFilename());
                 documentNode.put("url", stripUrl(d.getValue().getAvDocumentLink().getDocumentBinaryUrl()));
             }
             avEvidenceNode.add(documentNode);
