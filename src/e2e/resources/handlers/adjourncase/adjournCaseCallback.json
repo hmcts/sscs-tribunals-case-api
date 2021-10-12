@@ -117,6 +117,7 @@
             "nino": "AB877533C"
           },
           "isAddressSameAsAppointee": "No",
+          "confidentialityRequired": null,
           "isAppointee": "No",
           "name": {
             "firstName": "Joe",
