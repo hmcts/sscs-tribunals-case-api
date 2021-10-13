@@ -1,17 +1,13 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-import static org.apache.commons.text.WordUtils.capitalizeFully;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.text.WordUtils;
 import uk.gov.hmcts.reform.docassembly.domain.FormPayload;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -58,7 +54,7 @@ public class IssueDocumentHandler {
                 .appointeeFullName(buildAppointeeName(caseData).orElse(null))
                 .caseId(caseData.getCcdCaseId())
                 .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
-                .noticeBody(ofNullable(caseData.getBodyContent())
+                .noticeBody(Optional.ofNullable(caseData.getBodyContent())
                         .orElse(caseData.getDirectionNoticeContent()))
                 .userName(caseData.getSignedBy())
                 .noticeType(documentTypeLabel.toUpperCase())
@@ -88,15 +84,15 @@ public class IssueDocumentHandler {
             throw new IllegalStateException("Generate notice has not been set");
         }
 
-        String documentUrl = ofNullable(getDocumentFromCaseData(caseData)).map(DocumentLink::getDocumentUrl).orElse(null);
+        String documentUrl = Optional.ofNullable(getDocumentFromCaseData(caseData)).map(DocumentLink::getDocumentUrl).orElse(null);
 
-        LocalDate dateAdded = ofNullable(caseData.getDateAdded()).orElse(LocalDate.now());
+        LocalDate dateAdded = Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now());
 
         String documentTypeLabel = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
 
         String embeddedDocumentTypeLabel = (FINAL_DECISION_NOTICE.equals(documentType) ? "Decision Notice" : documentTypeLabel);
 
-        boolean isScottish = ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
+        boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
@@ -113,13 +109,13 @@ public class IssueDocumentHandler {
                 .userAuthentication(userAuthorisation)
                 .build();
 
-        log.info(format("Generating %s document isScottish = %s", documentTypeLabel, isScottish));
+        log.info(String.format("Generating %s document isScottish = %s", documentTypeLabel, isScottish));
 
         final String generatedFileUrl = generateFile.assemble(params);
 
         documentTypeLabel = documentTypeLabel + ((DRAFT_DECISION_NOTICE.equals(documentType) || DRAFT_ADJOURNMENT_NOTICE.equals(documentType)) ? " generated" : " issued");
 
-        final String filename = format("%s on %s.pdf", documentTypeLabel, dateAdded.format(DATE_PATTERN));
+        final String filename = String.format("%s on %s.pdf", documentTypeLabel, dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
         DocumentLink previewFile = DocumentLink.builder()
                 .documentFilename(filename)
@@ -150,20 +146,21 @@ public class IssueDocumentHandler {
 
     protected String buildFullName(SscsCaseData caseData) {
         StringBuilder fullNameText = new StringBuilder();
-        if (isYes(caseData.getAppeal().getAppellant().getIsAppointee()) && caseData.getAppeal().getAppellant().getAppointee().getName() != null) {
-            fullNameText.append(capitalizeFully(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle(), ' ', '.'));
+        if (caseData.getAppeal().getAppellant().getIsAppointee() != null && caseData.getAppeal().getAppellant().getIsAppointee().equalsIgnoreCase("Yes") && caseData.getAppeal().getAppellant().getAppointee().getName() != null) {
+            fullNameText.append(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle(), ' ', '.'));
             fullNameText.append(", appointee for ");
         }
 
-        fullNameText.append(capitalizeFully(caseData.getAppeal().getAppellant().getName().getFullNameNoTitle(), ' ', '.'));
+        fullNameText.append(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getName().getFullNameNoTitle(), ' ', '.'));
 
         return fullNameText.toString();
     }
 
     protected Optional<String> buildAppointeeName(SscsCaseData caseData) {
-        if (isYes(caseData.getAppeal().getAppellant().getIsAppointee()) && caseData.getAppeal().getAppellant().getAppointee().getName() != null) {
-            return Optional.of(capitalizeFully(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle(), ' ', '.'));
+        if (caseData.getAppeal().getAppellant().getIsAppointee() != null && caseData.getAppeal().getAppellant().getIsAppointee().equalsIgnoreCase("Yes") && caseData.getAppeal().getAppellant().getAppointee().getName() != null) {
+            return Optional.of(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle(), ' ', '.'));
+        } else {
+            return Optional.empty();
         }
-        return empty();
     }
 }
