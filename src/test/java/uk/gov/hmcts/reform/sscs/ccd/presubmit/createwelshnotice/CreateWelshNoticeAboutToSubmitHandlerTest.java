@@ -95,7 +95,8 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
     @Parameters({"DIRECTION_NOTICE, DIRECTION_ISSUED_WELSH, DIRECTIONS NOTICE, HYSBYSIAD CYFARWYDDIADAU",
             "DECISION_NOTICE, DECISION_ISSUED_WELSH, DECISION NOTICE, HYSBYSIAD O BENDERFYNIAD",
             "ADJOURNMENT_NOTICE, ISSUE_ADJOURNMENT_NOTICE_WELSH, ADJOURNMENT NOTICE, ADJOURNMENT NOTICE",
-            "AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE, PROCESS_AUDIO_VIDEO_WELSH, DIRECTIONS NOTICE, HYSBYSIAD CYFARWYDDIADAU"
+            "AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE, PROCESS_AUDIO_VIDEO_WELSH, DIRECTIONS NOTICE, HYSBYSIAD CYFARWYDDIADAU",
+            "POSTPONEMENT_REQUEST_DIRECTION_NOTICE, ACTION_POSTPONEMENT_REQUEST_WELSH, DIRECTIONS NOTICE, HYSBYSIAD CYFARWYDDIADAU"
     })
     public void handleMethodCallsCorrectServicesAndSetsDataCorrectly(DocumentType documentType, EventType eventType, String expectedType, String expectedWelshType) {
         byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
@@ -141,7 +142,7 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
         sscsCaseData.setSscsDocument(sscsDocuments);
 
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-                State.VALID_APPEAL, sscsCaseData, LocalDateTime.now());
+                State.VALID_APPEAL, sscsCaseData, LocalDateTime.now(), "Benefit");
         return new Callback<>(caseDetails, Optional.empty(), EventType.CREATE_WELSH_NOTICE, false);
     }
 

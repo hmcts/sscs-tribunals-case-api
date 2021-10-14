@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
+import uk.gov.hmcts.reform.sscs.exception.BenefitMappingException;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
@@ -48,7 +49,8 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             addressName = appeal.getMrnDetails().getDwpIssuingOffice();
         }
 
-        String benefitCode = isDraft ? null : generateBenefitCode(appeal.getBenefitType().getCode(), addressName);
+        String benefitCode = isDraft ? null : generateBenefitCode(appeal.getBenefitType().getCode(), addressName)
+                .orElseThrow(() -> BenefitMappingException.createException(appeal.getBenefitType().getCode()));
 
         String issueCode = isDraft ? null : generateIssueCode();
         String caseCode = isDraft ? null : generateCaseCode(benefitCode, issueCode);
@@ -80,7 +82,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     private static String getDwpRegionalCenterGivenDwpIssuingOffice(String benefitTypeCode, String dwpIssuingOffice) {
         DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
 
-        if (dwpIssuingOffice == null && ! (CARERS_ALLOWANCE == Benefit.getBenefitByCode(benefitTypeCode))) {
+        if (dwpIssuingOffice == null && ! (CARERS_ALLOWANCE == Benefit.getBenefitOptionalByCode(benefitTypeCode).orElse(null))) {
             return null;
         }
         return dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(benefitTypeCode, dwpIssuingOffice);

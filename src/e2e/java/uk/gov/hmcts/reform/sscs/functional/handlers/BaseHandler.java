@@ -13,31 +13,41 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.functional.sya.SubmitHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 
 @Slf4j
 public class BaseHandler {
 
     protected static final String CREATED_BY_FUNCTIONAL_TEST = "created by functional test";
-
+    private static final List<String> DWP_DOCUMENT_TYPES = Arrays.stream(DwpDocumentType.values())
+            .map(DwpDocumentType::getValue)
+            .collect(Collectors.toList());
     @Autowired
     protected CcdService ccdService;
 
     @Autowired
     private IdamService idamService;
+
+    @Autowired
+    SubmitHelper submitHelper;
+
+    @Autowired
+    PdfStoreService pdfStoreService;
 
     protected IdamTokens idamTokens;
 
@@ -49,6 +59,57 @@ public class BaseHandler {
         baseURI = testUrl;
         useRelaxedHTTPSValidation();
         idamTokens = idamService.getIdamTokens();
+    }
+
+    protected SscsCaseDetails addDocumentsToCase(SscsCaseData sscsCaseData, List<UploadDocument> docs) {
+        final List<SscsDocument> sscsDocuments = docs.stream()
+                .flatMap(doc -> pdfStoreService.store(doc.getData(), doc.getFilename(), doc.getDocumentType())
+                        .stream()
+                        .peek(sscsDoc -> sscsDoc.getValue().setBundleAddition(doc.getBundleAddition()))
+                        .peek(sscsDoc -> updateEditedDocument(doc.isHasEditedDocumentLink(), sscsDoc)))
+                .collect(Collectors.toList());
+
+        sscsCaseData.setSscsDocument(sscsDocuments.stream()
+                .filter(doc -> !DWP_DOCUMENT_TYPES.contains(doc.getValue().getDocumentType()))
+                .collect(Collectors.toList()));
+
+        sscsCaseData.setDwpDocuments(sscsDocuments.stream()
+                .filter(doc -> DWP_DOCUMENT_TYPES.contains(doc.getValue().getDocumentType()))
+                .map(this::toDwpDocument)
+                .collect(Collectors.toList()));
+
+        return runEvent(sscsCaseData, EventType.UPDATE_CASE_ONLY);
+    }
+
+    private DwpDocument toDwpDocument(SscsDocument sscsDoc) {
+        return DwpDocument.builder().value(DwpDocumentDetails.builder()
+                .documentLink(sscsDoc.getValue().getDocumentLink())
+                .documentType(sscsDoc.getValue().getDocumentType())
+                .editedDocumentLink(sscsDoc.getValue().getEditedDocumentLink())
+                .bundleAddition(sscsDoc.getValue().getBundleAddition())
+                .documentDateTimeAdded(LocalDateTime.now())
+                .build()).build();
+    }
+
+    private void updateEditedDocument(boolean hasEditedDocumentLink, SscsDocument doc) {
+        if (hasEditedDocumentLink) {
+            doc.getValue().setEditedDocumentLink(doc.getValue().getDocumentLink());
+        }
+    }
+
+    public SscsCaseDetails runEvent(final SscsCaseData sscsCaseData, final EventType eventType) {
+        return ccdService.updateCase(sscsCaseData, Long.valueOf(sscsCaseData.getCcdCaseId()), eventType.getCcdType(), CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
+    }
+
+    protected SscsCaseDetails createCase() {
+        final SscsCaseData sscsCaseData = buildSscsCaseDataForTesting("Bowie", submitHelper.getRandomNino());
+        sscsCaseData.getAppeal().getMrnDetails().setMrnDate(submitHelper.getRandomMrnDate().toString());
+        return ccdService.createCase(sscsCaseData,
+                EventType.CREATE_WITH_DWP_TEST_CASE.getCcdType(), CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
+    }
+
+    protected SscsCaseDetails getByCaseId(Long id) {
+        return ccdService.getByCaseId(id, idamTokens);
     }
 
     protected SscsCaseDetails createCaseInResponseReceivedState(int retry) throws Exception {

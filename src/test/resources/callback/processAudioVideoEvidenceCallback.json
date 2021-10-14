@@ -155,6 +155,11 @@
           "id": "a147b6bb-127d-4fe0-bc8b-0891ab3494fb",
           "value": {
             "dateAdded": "2021-05-28",
+            "statementOfEvidencePdf" : {
+              "document_binary_url": "http://dm-store:5005/documents/fd6fb6d6-278c-48d4-9555-3d8344bb01f5/binary",
+              "document_filename": "statementOfEvidence.pdf",
+              "document_url": "http://dm-store:5005/documents/fd6fb6d6-278c-48d4-9555-3d8344bb01f5"
+            },
             "documentLink": {
               "document_binary_url": "http://dm-store:5005/documents/fd6fb6d6-278c-48d4-9555-3d8344bb01f4/binary",
               "document_filename": "evidence.mp3",
@@ -249,7 +254,11 @@
         "partyUploaded": "appellant",
         "processedAction": null,
         "rip1Document": null,
-        "statementOfEvidencePdf": null
+        "statementOfEvidencePdf" : {
+          "document_binary_url": "http://dm-store:5005/documents/fd6fb6d6-278c-48d4-9555-3d8344bb01f5/binary",
+          "document_filename": "statementOfEvidence.pdf",
+          "document_url": "http://dm-store:5005/documents/fd6fb6d6-278c-48d4-9555-3d8344bb01f5"
+        }
       },
       "showRip1DocPage": "No",
       "signedBy": "sdfsf",

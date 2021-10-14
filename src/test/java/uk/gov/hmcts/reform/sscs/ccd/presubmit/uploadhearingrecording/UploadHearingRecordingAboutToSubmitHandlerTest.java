@@ -84,7 +84,7 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenHearingRecordings_thenReturnSscsRecordings() {
+    public void givenUploadingHearingRecordingsToHearingWithRecodingAlreadyExisting_thenSscsRecordingsShouldBeOverridenWithNewDocuments() {
         List<HearingRecordingDetails> details = new ArrayList<>();
         details.add(
             HearingRecordingDetails.builder().value(
@@ -96,23 +96,30 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
 
         List<SscsHearingRecording> existingRecordings = new ArrayList<>();
         existingRecordings.add(SscsHearingRecording.builder()
-            .value(SscsHearingRecordingDetails.builder()
-                .hearingType(ADJOURNED.getKey())
-                .uploadDate("today")
-                .hearingDate("06-06-2021 05:00:00 PM")
-                .recordings(details).build()).build());
+                .value(SscsHearingRecordingDetails.builder()
+                    .hearingType(ADJOURNED.getKey())
+                    .uploadDate("today")
+                    .hearingDate("06-06-2021 05:00:00 PM")
+                    .hearingId("2222")
+                    .venue("good - value")
+                    .recordings(details).build())
+                .build());
         existingRecordings.add(SscsHearingRecording.builder()
             .value(SscsHearingRecordingDetails.builder()
-                .hearingType(ADJOURNED.getKey())
-                .uploadDate("today")
-                .hearingDate("08-06-2021 11:15:00 AM")
-                .recordings(new ArrayList<>()).build()).build());
+                    .hearingType(ADJOURNED.getKey())
+                    .uploadDate("today")
+                    .hearingDate("08-06-2021 11:15:00 AM")
+                    .hearingId("3333")
+                    .recordings(new ArrayList<>()).build())
+                .build());
         existingRecordings.add(SscsHearingRecording.builder()
             .value(SscsHearingRecordingDetails.builder()
-                .hearingType(FINAL.getKey())
-                .uploadDate("today")
-                .hearingDate("06-06-2021 05:00:00 PM")
-                .recordings(new ArrayList<>()).build()).build());
+                    .hearingType(FINAL.getKey())
+                    .uploadDate("today")
+                    .hearingDate("07-06-2021 05:00:00 PM")
+                    .hearingId("4444")
+                    .recordings(new ArrayList<>()).build())
+                .build());
 
         sscsCaseData.setSscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder()
             .selectHearingDetails(new DynamicList(
@@ -122,7 +129,7 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
             .build());
 
         sscsCaseData.setHearings(singletonList(Hearing.builder().value(
-                HearingDetails.builder().hearingId("2222").venue(Venue.builder().name("venue name").build())
+                HearingDetails.builder().hearingId("2222").venue(Venue.builder().name("good - value").build())
                         .hearingDate("2021-06-06")
                         .time("17:00").build()).build()));
 
@@ -138,18 +145,20 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
 
         assertEquals("adjourned", sscsHearingRecordings.get(0).getValue().getHearingType());
         assertEquals("06-06-2021 05:00:00 PM", sscsHearingRecordings.get(0).getValue().getHearingDate());
+        assertEquals("good - value", sscsHearingRecordings.get(0).getValue().getVenue());
+        assertEquals("2222", sscsHearingRecordings.get(0).getValue().getHearingId());
         assertNotNull(sscsHearingRecordings.get(0).getValue().getUploadDate());
-        assertEquals(4, sscsHearingRecordings.get(0).getValue().getRecordings().size());
+        assertEquals(3, sscsHearingRecordings.get(0).getValue().getRecordings().size());
 
-        assertEquals("Adjourned good - value 06 Jun 2021 (2).MP4",
+        assertEquals("Adjourned good - value 06 Jun 2021.MP4",
+            sscsHearingRecordings.get(0).getValue().getRecordings().get(0).getValue().getDocumentFilename());
+        assertEquals("Adjourned good - value 06 Jun 2021 (2).mp3",
             sscsHearingRecordings.get(0).getValue().getRecordings().get(1).getValue().getDocumentFilename());
-        assertEquals("Adjourned good - value 06 Jun 2021 (3).mp3",
+        assertEquals("Adjourned good - value 06 Jun 2021 (3).mp4",
             sscsHearingRecordings.get(0).getValue().getRecordings().get(2).getValue().getDocumentFilename());
-        assertEquals("Adjourned good - value 06 Jun 2021 (4).mp4",
-            sscsHearingRecordings.get(0).getValue().getRecordings().get(3).getValue().getDocumentFilename());
 
         assertEquals("final", sscsHearingRecordings.get(1).getValue().getHearingType());
-        assertEquals("06-06-2021 05:00:00 PM", sscsHearingRecordings.get(1).getValue().getHearingDate());
+        assertEquals("07-06-2021 05:00:00 PM", sscsHearingRecordings.get(1).getValue().getHearingDate());
         assertNotNull(sscsHearingRecordings.get(1).getValue().getUploadDate());
         assertEquals(0, sscsHearingRecordings.get(1).getValue().getRecordings().size());
 
@@ -161,7 +170,148 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenNoExistingHearingRecordings_thenReturnSscsRecordings() {
+    public void givenUploadingHearingRecordingsToHearingWithRequestedRequests_thenSscsRecordingsInRequestsShouldBeOverridenWithNewDocuments() {
+        List<HearingRecordingDetails> details = new ArrayList<>();
+        details.add(
+                HearingRecordingDetails.builder().value(
+                        DocumentLink.builder()
+                                .documentFilename("Adjourned good - value 06 Jun 2021.mp4")
+                                .documentUrl("/some-url")
+                                .documentBinaryUrl("/some-url/binary")
+                                .build()).build());
+
+        List<SscsHearingRecording> existingRecordings = new ArrayList<>();
+        existingRecordings.add(SscsHearingRecording.builder()
+                .value(SscsHearingRecordingDetails.builder()
+                        .hearingType(ADJOURNED.getKey())
+                        .uploadDate("today")
+                        .hearingDate("06-06-2021 05:00:00 PM")
+                        .hearingId("2222")
+                        .venue("good - value")
+                        .recordings(details).build())
+                .build());
+
+        List<HearingRecordingRequest> requested = new ArrayList<>();
+        requested.add(HearingRecordingRequest.builder()
+                .value(HearingRecordingRequestDetails.builder()
+                        .sscsHearingRecording(SscsHearingRecordingDetails.builder()
+                                .hearingType(ADJOURNED.getKey())
+                                .uploadDate("today")
+                                .hearingDate("06-06-2021 05:00:00 PM")
+                                .hearingId("2222")
+                                .venue("good - value")
+                                .recordings(details).build())
+                        .build())
+                .build());
+
+        sscsCaseData.setSscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder()
+                .selectHearingDetails(new DynamicList(
+                        new DynamicListItem("2222", "good - value 17:00:00 06 Jun 2021"), Collections.EMPTY_LIST))
+                .hearingRecording(createHearingRecording(ADJOURNED.getKey()))
+                .sscsHearingRecordings(existingRecordings)
+                .requestedHearings(requested)
+                .build());
+
+        sscsCaseData.setHearings(singletonList(Hearing.builder().value(
+                HearingDetails.builder().hearingId("2222").venue(Venue.builder().name("good - value").build())
+                        .hearingDate("2021-06-06")
+                        .time("17:00").build()).build()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+        SscsHearingRecordingDetails sscsHearingRecording =
+                response.getData().getSscsHearingRecordingCaseData().getRequestedHearings().get(0).getValue().getSscsHearingRecording();
+
+        assertEquals("adjourned", sscsHearingRecording.getHearingType());
+        assertEquals("06-06-2021 05:00:00 PM", sscsHearingRecording.getHearingDate());
+        assertEquals("good - value", sscsHearingRecording.getVenue());
+        assertEquals("2222", sscsHearingRecording.getHearingId());
+        assertNotNull(sscsHearingRecording.getUploadDate());
+        assertEquals(3, sscsHearingRecording.getRecordings().size());
+
+        assertEquals("Adjourned good - value 06 Jun 2021.MP4",
+                sscsHearingRecording.getRecordings().get(0).getValue().getDocumentFilename());
+        assertEquals("Adjourned good - value 06 Jun 2021 (2).mp3",
+                sscsHearingRecording.getRecordings().get(1).getValue().getDocumentFilename());
+        assertEquals("Adjourned good - value 06 Jun 2021 (3).mp4",
+                sscsHearingRecording.getRecordings().get(2).getValue().getDocumentFilename());
+    }
+
+
+    @Test
+    public void givenUploadingHearingRecordingsToHearingWithReleasedRequests_thenSscsRecordingsInRequestsShouldBeOverridenWithNewDocuments() {
+        List<HearingRecordingDetails> details = new ArrayList<>();
+        details.add(
+                HearingRecordingDetails.builder().value(
+                        DocumentLink.builder()
+                                .documentFilename("Adjourned good - value 06 Jun 2021.mp4")
+                                .documentUrl("/some-url")
+                                .documentBinaryUrl("/some-url/binary")
+                                .build()).build());
+
+        List<SscsHearingRecording> existingRecordings = new ArrayList<>();
+        existingRecordings.add(SscsHearingRecording.builder()
+                .value(SscsHearingRecordingDetails.builder()
+                        .hearingType(ADJOURNED.getKey())
+                        .uploadDate("today")
+                        .hearingDate("06-06-2021 05:00:00 PM")
+                        .hearingId("2222")
+                        .venue("good - value")
+                        .recordings(details).build())
+                .build());
+
+        List<HearingRecordingRequest> released = new ArrayList<>();
+        released.add(HearingRecordingRequest.builder()
+                .value(HearingRecordingRequestDetails.builder()
+                        .sscsHearingRecording(SscsHearingRecordingDetails.builder()
+                                .hearingType(ADJOURNED.getKey())
+                                .uploadDate("today")
+                                .hearingDate("06-06-2021 05:00:00 PM")
+                                .hearingId("2222")
+                                .venue("good - value")
+                                .recordings(details).build())
+                        .build())
+                .build());
+
+        sscsCaseData.setSscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder()
+                .selectHearingDetails(new DynamicList(
+                        new DynamicListItem("2222", "good - value 17:00:00 06 Jun 2021"), Collections.EMPTY_LIST))
+                .hearingRecording(createHearingRecording(ADJOURNED.getKey()))
+                .sscsHearingRecordings(existingRecordings)
+                .dwpReleasedHearings(released)
+                .build());
+
+        sscsCaseData.setHearings(singletonList(Hearing.builder().value(
+                HearingDetails.builder().hearingId("2222").venue(Venue.builder().name("good - value").build())
+                        .hearingDate("2021-06-06")
+                        .time("17:00").build()).build()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+        SscsHearingRecordingDetails sscsHearingRecording =
+                response.getData().getSscsHearingRecordingCaseData().getDwpReleasedHearings().get(0).getValue().getSscsHearingRecording();
+
+        assertEquals("adjourned", sscsHearingRecording.getHearingType());
+        assertEquals("06-06-2021 05:00:00 PM", sscsHearingRecording.getHearingDate());
+        assertEquals("good - value", sscsHearingRecording.getVenue());
+        assertEquals("2222", sscsHearingRecording.getHearingId());
+        assertNotNull(sscsHearingRecording.getUploadDate());
+        assertEquals(3, sscsHearingRecording.getRecordings().size());
+
+        assertEquals("Adjourned good - value 06 Jun 2021.MP4",
+                sscsHearingRecording.getRecordings().get(0).getValue().getDocumentFilename());
+        assertEquals("Adjourned good - value 06 Jun 2021 (2).mp3",
+                sscsHearingRecording.getRecordings().get(1).getValue().getDocumentFilename());
+        assertEquals("Adjourned good - value 06 Jun 2021 (3).mp4",
+                sscsHearingRecording.getRecordings().get(2).getValue().getDocumentFilename());
+    }
+
+    @Test
+    public void givenNoExistingHearingRecordings_thenCreateSscsRecordings() {
 
         sscsCaseData.setSscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder()
             .selectHearingDetails(new DynamicList(
@@ -171,7 +321,7 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
             .build());
 
         sscsCaseData.setHearings(singletonList(Hearing.builder().value(
-                HearingDetails.builder().hearingId("2222").venue(Venue.builder().name("venue name").build())
+                HearingDetails.builder().hearingId("2222").venue(Venue.builder().name("good - value").build())
                         .hearingDate("2021-06-06")
                         .time("17:00").build()).build()));
 
@@ -260,20 +410,6 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenSelectedHearingIsPresent_thenReturnVenueDate() {
-        DynamicList dynamicList = new DynamicList(
-            new DynamicListItem("2222", "good - value 09:00:15 06 Jun 2021"), Collections.EMPTY_LIST);
-        assertEquals("good - value 06 Jun 2021", handler.getHearingVenueDate(dynamicList));
-    }
-
-    @Test
-    public void givenSelectedHearingPresent_thenReturnDateTime() {
-        DynamicList dynamicList = new DynamicList(
-            new DynamicListItem("2222", "good - value 09:00:17 06 Jun 2021"), Collections.EMPTY_LIST);
-        assertEquals("09:00:17 06 Jun 2021", handler.getHearingDateTime(dynamicList));
-    }
-
-    @Test
     public void givenHearingRecordingPresent_thenReturnFileExtension() {
         DocumentLink documentLinks = DocumentLink.builder()
             .documentFilename("test-file.MP4").build();
@@ -283,14 +419,16 @@ public class UploadHearingRecordingAboutToSubmitHandlerTest {
 
     @Test
     public void givenSingleRecordingPresent_thenReturnFileName() {
-        String fileName = handler.createFileName("test 06 Jun 2021", 1, ADJOURNED.getValue());
-        assertEquals("Adjourned test 06 Jun 2021", fileName);
+        DocumentLink documentLinks = DocumentLink.builder().documentFilename("test-file.MP4").build();
+        String fileName = handler.createFileName("test", "06 Jun 2021", 1, ADJOURNED.getValue(), documentLinks);
+        assertEquals("Adjourned test 06 Jun 2021.MP4", fileName);
     }
 
     @Test
     public void givenMultipleRecordingsPresent_thenReturnFileName() {
-        String fileName = handler.createFileName("test 06 Jun 2021", 3, FINAL.getValue());
-        assertEquals("Final test 06 Jun 2021 (3)", fileName);
+        DocumentLink documentLinks = DocumentLink.builder().documentFilename("test-file.MP4").build();
+        String fileName = handler.createFileName("test", "06 Jun 2021", 3, FINAL.getValue(), documentLinks);
+        assertEquals("Final test 06 Jun 2021 (3).MP4", fileName);
     }
 
 }
