@@ -252,7 +252,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenAppealWithNoHearingRecordingRequestOutstanding_populateDirectionTypeDropdownWithRefuseHearingRecordingRequest() {
+    public void givenAppealWithNoHearingRecordingRequestOutstanding_doNotPopulateDirectionTypeDropdownWithRefuseHearingRecordingRequest() {
         handler = new DirectionIssuedAboutToStartHandler();
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
