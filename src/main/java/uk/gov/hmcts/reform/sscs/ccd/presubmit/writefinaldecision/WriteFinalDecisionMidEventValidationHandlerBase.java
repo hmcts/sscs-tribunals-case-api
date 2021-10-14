@@ -34,7 +34,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
     }
 
     protected abstract String getBenefitType();
-    
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.MID_EVENT
@@ -96,9 +96,9 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
     protected abstract void setDwpReassessAwardPage(SscsCaseData sscsCaseData, String pageId);
 
     private boolean isDecisionNoticeDatesInvalid(SscsCaseData sscsCaseData) {
-        if (isNotBlank(sscsCaseData.getWriteFinalDecisionStartDate()) && isNotBlank(sscsCaseData.getWriteFinalDecisionEndDate())) {
-            LocalDate decisionNoticeStartDate = LocalDate.parse(sscsCaseData.getWriteFinalDecisionStartDate());
-            LocalDate decisionNoticeEndDate = LocalDate.parse(sscsCaseData.getWriteFinalDecisionEndDate());
+        if (isNotBlank(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionStartDate()) && isNotBlank(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDate())) {
+            LocalDate decisionNoticeStartDate = LocalDate.parse(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionStartDate());
+            LocalDate decisionNoticeEndDate = LocalDate.parse(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDate());
             return !decisionNoticeStartDate.isBefore(decisionNoticeEndDate);
         }
         return false;
