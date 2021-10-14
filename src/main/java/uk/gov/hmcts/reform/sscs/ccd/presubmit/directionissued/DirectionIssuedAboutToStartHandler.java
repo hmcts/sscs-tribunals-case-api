@@ -19,13 +19,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Service
 public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final boolean hearingRecordingFeatureEnabled;
-
-    @Autowired
-    public DirectionIssuedAboutToStartHandler(@Value("${feature.hearing-recording.enabled}") boolean hearingRecordingFeatureEnabled) {
-        this.hearingRecordingFeatureEnabled = hearingRecordingFeatureEnabled;
-    }
-
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -57,7 +50,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
 
-        if (hearingRecordingFeatureEnabled) {
+        if (sscsCaseData.getSscsHearingRecordingCaseData() != null && YesNo.YES.equals(sscsCaseData.getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding())) {
             listOptions.add(new DynamicListItem(REFUSE_HEARING_RECORDING_REQUEST.toString(), REFUSE_HEARING_RECORDING_REQUEST.getLabel()));
         }
 

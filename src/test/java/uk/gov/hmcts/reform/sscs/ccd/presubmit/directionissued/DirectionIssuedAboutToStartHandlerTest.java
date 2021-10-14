@@ -38,7 +38,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new DirectionIssuedAboutToStartHandler(false);
+        handler = new DirectionIssuedAboutToStartHandler();
 
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
 
@@ -137,7 +137,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
     @Test
     public void givenAppealWithReinstatementRequest_populateDirectionTypeDropdown() {
 
-        handler = new DirectionIssuedAboutToStartHandler(false);
+        handler = new DirectionIssuedAboutToStartHandler();
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
@@ -232,11 +232,12 @@ public class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenAppealWithHearingRecordingFeatureFlagOn_populateDirectionTypeDropdown() {
-        handler = new DirectionIssuedAboutToStartHandler(true);
+    public void givenAppealWithHearingRecordingRequestOutstanding_populateDirectionTypeDropdownWithRefuseHearingRecordingRequest() {
+        handler = new DirectionIssuedAboutToStartHandler();
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
+        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YesNo.YES);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
@@ -246,7 +247,26 @@ public class DirectionIssuedAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
-        assertEquals(expected, response.getData().getDirectionTypeDl());
         assertEquals(3, listOptions.size());
+        assertEquals(expected, response.getData().getDirectionTypeDl());
+    }
+
+    @Test
+    public void givenAppealWithNoHearingRecordingRequestOutstanding_populateDirectionTypeDropdownWithRefuseHearingRecordingRequest() {
+        handler = new DirectionIssuedAboutToStartHandler();
+
+        when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
+        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
+        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YesNo.NO);
+
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
+        listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        assertEquals(2, listOptions.size());
+        assertEquals(expected, response.getData().getDirectionTypeDl());
     }
 }
