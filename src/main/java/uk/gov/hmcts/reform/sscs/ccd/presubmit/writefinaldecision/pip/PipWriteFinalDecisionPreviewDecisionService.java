@@ -58,7 +58,7 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData,
         WriteFinalDecisionTemplateBody payload) {
 
-        if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+        if ("Yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             Optional<PipAllowedOrRefusedCondition> condition = PipAllowedOrRefusedCondition.getPassingAllowedOrRefusedCondition(decisionNoticeQuestionService, caseData);
             if (condition.isPresent()) {
                 PipAllowedOrRefusedCondition allowedOrRefusedCondition = condition.get();
@@ -120,7 +120,7 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
 
     @Override
     protected void setDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
-        builder.isDescriptorFlow(caseData.isDailyLivingAndOrMobilityDecision());
+        builder.isDescriptorFlow(caseData.getSscsFinalDecisionCaseData().isDailyLivingAndOrMobilityDecision());
 
         List<String> dailyLivingAnswers = PipActivityType.DAILY_LIVING.getAnswersExtractor().apply(caseData);
         if (dailyLivingAnswers != null && !AwardType.NOT_CONSIDERED.getKey().equals(caseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion())) {
@@ -154,8 +154,8 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
 
     @Override
     protected boolean isSetAside(SscsCaseData sscsCaseData, Outcome outcome) {
-        if ("yes".equalsIgnoreCase((sscsCaseData.getWriteFinalDecisionIsDescriptorFlow()))
-            && "yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionGenerateNotice())) {
+        if ("yes".equalsIgnoreCase((sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow()))
+            && "yes".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             return getConsideredComparisonsWithDwp(sscsCaseData).stream().anyMatch(comparission -> !"same".equalsIgnoreCase(comparission));
         } else {
             return super.isSetAside(sscsCaseData, outcome);

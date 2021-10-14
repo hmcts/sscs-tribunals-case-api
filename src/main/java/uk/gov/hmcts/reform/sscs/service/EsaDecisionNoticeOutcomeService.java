@@ -20,7 +20,7 @@ public class EsaDecisionNoticeOutcomeService extends DecisionNoticeOutcomeServic
     public EsaDecisionNoticeOutcomeService(EsaDecisionNoticeQuestionService questionService) {
         super("ESA", questionService);
     }
-    
+
     public Outcome determineOutcome(SscsCaseData sscsCaseData) {
         return useExplicitySetOutcome(sscsCaseData);
     }
@@ -28,7 +28,7 @@ public class EsaDecisionNoticeOutcomeService extends DecisionNoticeOutcomeServic
     @Override
     public void performPreOutcomeIntegrityAdjustments(SscsCaseData sscsCaseData) {
 
-        if ("Yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionGenerateNotice())) {
+        if ("Yes".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
 
             SscsEsaCaseData esaCaseData = sscsCaseData.getSscsEsaCaseData();
 
@@ -64,7 +64,7 @@ public class EsaDecisionNoticeOutcomeService extends DecisionNoticeOutcomeServic
                         }
                     }
                 }
-                if ("refused".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionAllowedOrRefused())) {
+                if ("refused".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused())) {
                     sscsCaseData.setDwpReassessTheAward(null);
                 }
             } else {
@@ -83,7 +83,7 @@ public class EsaDecisionNoticeOutcomeService extends DecisionNoticeOutcomeServic
     @Override
     public Outcome determineOutcomeWithValidation(SscsCaseData sscsCaseData) {
         Outcome outcome = determineOutcome(sscsCaseData);
-        if ("Yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionGenerateNotice())) {
+        if ("Yes".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             Optional<EsaAllowedOrRefusedCondition> passingAllowedOrRefusedCondition = EsaPointsRegulationsAndSchedule3ActivitiesCondition.getPassingAllowedOrRefusedCondition(questionService, sscsCaseData);
             if (passingAllowedOrRefusedCondition.isEmpty()) {
                 throw new IllegalStateException("No matching allowed or refused condition");
