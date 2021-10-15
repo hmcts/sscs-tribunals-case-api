@@ -20,7 +20,7 @@ public class UcDecisionNoticeOutcomeService extends DecisionNoticeOutcomeService
     public UcDecisionNoticeOutcomeService(UcDecisionNoticeQuestionService questionService) {
         super("UC", questionService);
     }
-    
+
     public Outcome determineOutcome(SscsCaseData sscsCaseData) {
         return useExplicitySetOutcome(sscsCaseData);
     }
@@ -28,7 +28,7 @@ public class UcDecisionNoticeOutcomeService extends DecisionNoticeOutcomeService
     @Override
     public void performPreOutcomeIntegrityAdjustments(SscsCaseData sscsCaseData) {
 
-        if ("Yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionGenerateNotice())) {
+        if ("Yes".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
 
             SscsUcCaseData ucCaseData = sscsCaseData.getSscsUcCaseData();
 
@@ -64,7 +64,7 @@ public class UcDecisionNoticeOutcomeService extends DecisionNoticeOutcomeService
                         }
                     }
                 }
-                if ("refused".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionAllowedOrRefused())) {
+                if ("refused".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused())) {
                     sscsCaseData.setDwpReassessTheAward(null);
                 }
             } else {
@@ -83,7 +83,7 @@ public class UcDecisionNoticeOutcomeService extends DecisionNoticeOutcomeService
     @Override
     public Outcome determineOutcomeWithValidation(SscsCaseData sscsCaseData) {
         Outcome outcome = determineOutcome(sscsCaseData);
-        if ("Yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionGenerateNotice())) {
+        if ("Yes".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             Optional<UcAllowedOrRefusedCondition> passingAllowedOrRefusedCondition = UcPointsRegulationsAndSchedule7ActivitiesCondition
                 .getPassingAllowedOrRefusedCondition(questionService, sscsCaseData);
             if (passingAllowedOrRefusedCondition.isEmpty()) {

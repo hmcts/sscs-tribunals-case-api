@@ -254,7 +254,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
 
     @Override
     public boolean isApplicable(DecisionNoticeQuestionService questionService, SscsCaseData caseData) {
-        if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+        if ("Yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             int points = questionService.getTotalPoints(caseData, getAnswersExtractor().apply(caseData));
             if (primaryPointsCondition.isPresent()) {
                 if (!primaryPointsCondition.get().getPointsRequirementCondition().test(points)) {

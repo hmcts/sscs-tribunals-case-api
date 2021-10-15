@@ -29,7 +29,7 @@ public class GenWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Override
     protected void setValidPointsAndActivitiesScenario(SscsCaseData caseData, String descriptorFlowValue) {
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow(descriptorFlowValue);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow(descriptorFlowValue);
     }
 
     @Override

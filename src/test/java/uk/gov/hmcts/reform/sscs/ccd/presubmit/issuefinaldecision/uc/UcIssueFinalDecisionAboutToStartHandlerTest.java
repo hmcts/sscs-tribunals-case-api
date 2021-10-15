@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.IssueFinalDecisionAboutToStartHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcWriteFinalDecisionPreviewDecisionService;
@@ -116,8 +117,10 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
 
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
-            .writeFinalDecisionGeneratedDate("2018-01-01")
-            .writeFinalDecisionPreviewDocument(DocumentLink.builder().build())
+            .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
+                .writeFinalDecisionGeneratedDate("2018-01-01")
+                .writeFinalDecisionPreviewDocument(DocumentLink.builder().build())
+                .build())
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code("UC").build())
                 .appellant(Appellant.builder()
@@ -182,26 +185,26 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
 
         when(generateFile.assemble(any())).thenReturn(URL);
 
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         when(ucDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
 
         final PreSubmitCallbackResponse<SscsCaseData> previewResponse = previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
 
         // CHeck that the document has the correct (updated) issued date.
-        assertNotNull(previewResponse.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Final Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), previewResponse.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, false,
             true, true);
@@ -224,21 +227,21 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
 
         when(generateFile.assemble(any())).thenReturn(URL);
         sscsCaseData.setWcaAppeal(NO);
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         when(ucDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
 
         final PreSubmitCallbackResponse<SscsCaseData> previewResponse = previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
 
         // CHeck that the document has the correct (updated) issued date.
-        assertNotNull(previewResponse.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Final Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), previewResponse.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, false,
             false, true);
@@ -254,7 +257,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
 
         when(ucDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
 
-        sscsCaseData.setWriteFinalDecisionPreviewDocument(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(null);
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         String error = result.getErrors().stream().findFirst().orElse("");

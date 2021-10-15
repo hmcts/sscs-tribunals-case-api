@@ -191,7 +191,7 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
 
     static YesNoFieldCondition isDescriptorFlow(Predicate<YesNo> predicate, boolean displayIsSatisfiedMessage) {
         return new YesNoFieldCondition("Descriptor Flow", predicate,
-            s -> "Yes".equalsIgnoreCase(s.getWriteFinalDecisionIsDescriptorFlow()) ? YesNo.YES : YesNo.NO, displayIsSatisfiedMessage);
+            s -> "Yes".equalsIgnoreCase(s.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow()) ? YesNo.YES : YesNo.NO, displayIsSatisfiedMessage);
     }
 
     static Optional<AllowedOrRefusedCondition> isAllowedOrRefused(AllowedOrRefusedPredicate predicate) {
@@ -224,8 +224,8 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
             }
         }
         throw new IllegalStateException(
-            "No allowed/refused condition found for " + caseData.getWriteFinalDecisionIsDescriptorFlow()
-                + ":" + caseData.getWriteFinalDecisionAllowedOrRefused()
+            "No allowed/refused condition found for " + caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow()
+                + ":" + caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused()
                 + ":" + caseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion() + ":"
                 + caseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion() + ":"
                 + caseData.getSscsPipCaseData()
@@ -270,7 +270,7 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
 
     @Override
     public boolean isApplicable(DecisionNoticeQuestionService questionService, SscsCaseData caseData) {
-        if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+        if ("Yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             return primaryConditions.stream().allMatch(c -> c.isSatisified(caseData));
         } else {
             return false;

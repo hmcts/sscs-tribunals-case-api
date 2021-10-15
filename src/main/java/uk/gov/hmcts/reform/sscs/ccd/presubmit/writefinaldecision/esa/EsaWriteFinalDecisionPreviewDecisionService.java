@@ -50,7 +50,7 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         WriteFinalDecisionTemplateBody payload) {
 
 
-        if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+        if ("Yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
 
             // Validate here for ESA instead of only validating on submit.
             // This ensures that we know we can obtain a valid allowed or refused condition below
@@ -76,7 +76,7 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
     @Override
     protected void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
 
-        if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+        if ("Yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             builder.esaIsEntited(false);
             builder.esaAwardRate(null);
             Optional<AwardType> esaAwardTypeOptional = caseData.isWcaAppeal() ? EsaPointsRegulationsAndSchedule3ActivitiesCondition

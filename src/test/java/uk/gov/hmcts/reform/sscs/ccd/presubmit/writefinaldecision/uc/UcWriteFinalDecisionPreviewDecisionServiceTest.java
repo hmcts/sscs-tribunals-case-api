@@ -77,20 +77,20 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1c");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = false;
 
@@ -129,7 +129,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertFalse(body.isUcIsEntited());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -153,20 +153,20 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = false;
 
@@ -198,7 +198,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertFalse(body.isUcIsEntited());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -220,19 +220,19 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList());
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = false;
 
@@ -265,7 +265,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertFalse(body.isUcIsEntited());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -283,14 +283,14 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList());
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         assertEquals(1, response.getErrors().size());
         assertEquals("You have specified that the appeal is refused, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
@@ -307,8 +307,8 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
@@ -316,12 +316,12 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = false;
 
@@ -351,7 +351,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertTrue(body.isUcIsEntited());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -371,20 +371,20 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList());
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = false;
 
@@ -414,7 +414,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertTrue(body.isUcIsEntited());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -433,18 +433,18 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = false;
 
@@ -474,7 +474,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertTrue(body.isUcIsEntited());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -495,8 +495,8 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
@@ -504,12 +504,12 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = false;
 
@@ -539,7 +539,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertTrue(body.isUcIsEntited());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -556,19 +556,19 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         setCommonPreviewParams(sscsCaseData, endDate);
 
         sscsCaseData.setWcaAppeal(NO);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
 
         sscsCaseData.setDwpReassessTheAward("noRecommendation");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = false;
 
@@ -599,7 +599,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -616,17 +616,17 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         setCommonPreviewParams(sscsCaseData, endDate);
 
         sscsCaseData.setWcaAppeal(NO);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
 
@@ -657,7 +657,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -680,9 +680,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -692,12 +692,12 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
 
@@ -735,7 +735,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -757,9 +757,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -769,12 +769,12 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
 
@@ -812,7 +812,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -833,9 +833,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
 
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -845,7 +845,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         assertEquals(1, response.getErrors().size());
         assertEquals("You have awarded 15 points or more and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.",
@@ -866,9 +866,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -878,12 +878,12 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
 
@@ -921,7 +921,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -943,9 +943,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -955,12 +955,12 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
 
@@ -990,7 +990,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -1011,9 +1011,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
 
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -1023,7 +1023,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(1, response.getErrors().size());
         assertEquals("You have awarded 15 points or more and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
     }
@@ -1041,9 +1041,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -1053,12 +1053,12 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
 
@@ -1119,7 +1119,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
@@ -1141,9 +1141,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
 
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -1153,7 +1153,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         assertEquals(1, response.getErrors().size());
         assertEquals("You have awarded 15 points or more and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
@@ -1176,7 +1176,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
     protected void setHigherRateScenarioFields(SscsCaseData caseData) {
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
-        caseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
         caseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(new ArrayList<>());
@@ -1185,10 +1185,10 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
     @Override
     public void givenGeneratedDateIsAlreadySetGeneratedNonDescriptorFlow_thenSetNewGeneratedDate() {
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGeneratedDate("2018-10-10");
         setDescriptorFlowIndicator("no", sscsCaseData);
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
@@ -1202,10 +1202,10 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
     @Override
     public void givenGeneratedDateIsAlreadySetNonGeneratedDescriptorFlow_thenDoSetNewGeneratedDate() {
         setDescriptorFlowIndicator("yes", sscsCaseData);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("no");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("no");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGeneratedDate("2018-10-10");
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
@@ -1218,10 +1218,10 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
     @Override
     public void givenGeneratedDateIsAlreadySetNonGeneratedNonDescriptorFlow_thenDoSetNewGeneratedDate() {
         setDescriptorFlowIndicator("no", sscsCaseData);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("no");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("no");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGeneratedDate("2018-10-10");
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
@@ -1243,9 +1243,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -1255,12 +1255,12 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
 
@@ -1290,7 +1290,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -1312,9 +1312,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -1324,12 +1324,12 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
 
@@ -1359,7 +1359,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -1381,9 +1381,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -1392,12 +1392,12 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
 
@@ -1427,7 +1427,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -1449,9 +1449,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList());
 
@@ -1460,12 +1460,12 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
 
@@ -1495,7 +1495,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -1516,21 +1516,21 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         // 0 points awarded because no schedule 6 activities selected - low, which means schedule 8 paragraph 4 must apply
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
 
@@ -1560,7 +1560,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -1582,9 +1582,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -1593,12 +1593,12 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
 
@@ -1628,7 +1628,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -1650,9 +1650,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList());
 
@@ -1660,12 +1660,12 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
 
@@ -1695,7 +1695,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -1716,18 +1716,18 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
 
@@ -1757,7 +1757,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -1779,9 +1779,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -1790,12 +1790,12 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
 
@@ -1833,7 +1833,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -1854,9 +1854,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -1865,7 +1865,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(1, response.getErrors().size());
         assertEquals("You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
     }
@@ -1883,21 +1883,21 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList());
 
         // 0 points awarded as no schedule 6 apply - low, which means schedule 8 paragraph 4 must apply
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
 
@@ -1929,7 +1929,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -1950,16 +1950,16 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList());
 
         // 0 points awarded as no schedule 6 apply - low, which means schedule 8 paragraph 4 must apply
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         assertEquals(1, response.getErrors().size());
         assertEquals("You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
@@ -1978,9 +1978,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -1989,12 +1989,12 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
 
@@ -2032,7 +2032,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -2053,9 +2053,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -2064,7 +2064,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(1, response.getErrors().size());
         assertEquals("You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
     }
@@ -2081,9 +2081,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList());
 
@@ -2095,7 +2095,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         Assert.assertEquals("You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
 
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
     }
 
@@ -2112,9 +2112,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList());
 
@@ -2122,12 +2122,12 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
 
@@ -2159,7 +2159,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -2181,9 +2181,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -2192,12 +2192,12 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
 
@@ -2235,7 +2235,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
@@ -2256,9 +2256,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -2267,7 +2267,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(1, response.getErrors().size());
         assertEquals("You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.",
             response.getErrors().iterator().next());
