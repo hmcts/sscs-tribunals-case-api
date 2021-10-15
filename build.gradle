@@ -213,7 +213,7 @@ def versions = [
         sonarPitest: '0.5',
         pact: '4.1.7',
         junitJupiter: '5.7.2',
-        lombok: '1.18.20'
+        lombok: '1.18.22'
 ]
 
 ext["rest-assured.version"] = '4.2.0'
