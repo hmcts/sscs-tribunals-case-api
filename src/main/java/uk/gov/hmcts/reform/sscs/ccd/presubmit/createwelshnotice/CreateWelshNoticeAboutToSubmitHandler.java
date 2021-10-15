@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createwelshnotice;
 
-import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
-import static org.springframework.http.MediaType.APPLICATION_PDF;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
@@ -20,15 +18,13 @@ import org.apache.commons.text.WordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.FooterDetails;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.WelshFooterService;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
@@ -40,7 +36,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
     private static final String DM_STORE_USER_ID = "sscs";
     private final String directionTemplatePath;
     private final DocmosisPdfService docmosisPdfService;
-    private final EvidenceManagementService evidenceManagementService;
+    private final PdfStoreService pdfStoreService;
     private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
     private final WelshFooterService welshFooterService;
     private static final Map<String, String> NEXT_EVENT_MAP = new HashMap<>();
@@ -55,11 +51,11 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
 
     @Autowired
     public CreateWelshNoticeAboutToSubmitHandler(DocmosisPdfService docmosisPdfService,
-                                                 EvidenceManagementService evidenceManagementService,
+                                                 PdfStoreService pdfStoreService,
                                                  WelshFooterService welshFooterService,
                                                  @Value("${document.bilingual.notice.template}") String template) {
         this.docmosisPdfService = docmosisPdfService;
-        this.evidenceManagementService = evidenceManagementService;
+        this.pdfStoreService = pdfStoreService;
         this.welshFooterService = welshFooterService;
         this.directionTemplatePath  = template;
     }
@@ -91,17 +87,13 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
         byte[] content = docmosisPdfService.createPdf(placeholderMap, directionTemplatePath);
 
         DocumentLink newDocLink = null;
-        ByteArrayMultipartFile file = ByteArrayMultipartFile.builder()
-                .content(content)
-                .name(filename)
-                .contentType(APPLICATION_PDF).build();
 
-        UploadResponse uploadResponse = evidenceManagementService.upload(singletonList(file), DM_STORE_USER_ID);
+        SscsDocument sscsDocument = pdfStoreService.storeDocument(content, filename, null);
 
         markOriginalDocumentsAsTranslationComplete(caseData);
 
-        if (uploadResponse != null) {
-            String location = uploadResponse.getEmbedded().getDocuments().get(0).links.self.href;
+        if (sscsDocument != null) {
+            String location = sscsDocument.getValue().getDocumentLink().getDocumentUrl();
             newDocLink = DocumentLink.builder().documentFilename(filename).documentUrl(location).documentBinaryUrl(location + "/binary").build();
             final FooterDetails footerDetails = welshFooterService.addFooterToExistingToContentAndCreateNewUrl(newDocLink, caseData.getSscsWelshDocuments(), fromValue(caseData.getDocumentTypes().getValue().getCode()), null, LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 

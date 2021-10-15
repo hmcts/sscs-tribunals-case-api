@@ -1,9 +1,5 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static java.util.Collections.singletonList;
-import static org.springframework.http.MediaType.APPLICATION_PDF;
-
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,11 +10,10 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState;
 import uk.gov.hmcts.reform.sscs.pdf.PdfACompliance;
 import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
@@ -28,11 +23,11 @@ import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
 public abstract class AbstractFooterService<D extends AbstractDocument> {
 
     private static final String DM_STORE_USER_ID = "sscs";
-    private final EvidenceManagementService evidenceManagementService;
+    private final PdfStoreService pdfStoreService;
     private final PdfWatermarker alter;
 
-    public AbstractFooterService(EvidenceManagementService evidenceManagementService, PdfWatermarker alter) {
-        this.evidenceManagementService = evidenceManagementService;
+    public AbstractFooterService(PdfStoreService pdfStoreService, PdfWatermarker alter) {
+        this.pdfStoreService = pdfStoreService;
         this.alter = alter;
     }
 
@@ -69,16 +64,12 @@ public abstract class AbstractFooterService<D extends AbstractDocument> {
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        ByteArrayMultipartFile file = ByteArrayMultipartFile.builder()
-                .content(newContent)
-                .name(url.getDocumentFilename())
-                .contentType(APPLICATION_PDF).build();
+        SscsDocument sscsDocument = pdfStoreService.storeDocument(newContent, url.getDocumentFilename(), null);
 
-        UploadResponse uploadResponse = evidenceManagementService.upload(singletonList(file), DM_STORE_USER_ID);
-
-        if (uploadResponse != null) {
-            String location = uploadResponse.getEmbedded().getDocuments().get(0).links.self.href;
-            return url.toBuilder().documentUrl(location).documentBinaryUrl(location + "/binary").build();
+        if (sscsDocument != null) {
+            String location = sscsDocument.getValue().getDocumentLink().getDocumentUrl();
+            return url.toBuilder().documentUrl(location).documentBinaryUrl(location + "/binary")
+                    .documentHash(sscsDocument.getValue().getDocumentLink().getDocumentHash()).build();
         } else {
             return null;
         }
@@ -118,10 +109,7 @@ public abstract class AbstractFooterService<D extends AbstractDocument> {
     }
 
     private byte[] toBytes(String documentUrl) {
-        return evidenceManagementService.download(
-                URI.create(documentUrl),
-                DM_STORE_USER_ID
-        );
+        return pdfStoreService.download(documentUrl);
     }
 
     public PdfState isReadablePdf(String documentUrl) {
