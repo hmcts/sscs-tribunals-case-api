@@ -13,7 +13,10 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.isValidAudioVideoDocumentType;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.getOriginalSender;
+
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -78,7 +81,11 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             if (!equalsIgnoreCase(sscsCaseData.getInterlocReviewState(), REVIEW_BY_TCW.getId())
                     && !equalsIgnoreCase(sscsCaseData.getInterlocReviewState(), REVIEW_BY_JUDGE.getId())
                     && hasMp3OrMp4(sscsCaseData.getDraftFurtherEvidenceDocuments())) {
-                preSubmitCallbackResponse.addError("As you have uploaded an MP3 or MP4 file, please set interlocutory review state to 'Review by TCW'");
+                preSubmitCallbackResponse.addError("As you have an MP3 or MP4 file, please set interlocutory review state to 'Review by TCW'");
+            }
+
+            if (incorrectTypeSelectedForAudioVideoEvidence(sscsCaseData.getDraftFurtherEvidenceDocuments())) {
+                preSubmitCallbackResponse.addError("Select the party that originally submitted the audio/video evidence");
             }
 
             SscsCaseData beforeData = callback.getCaseDetailsBefore().map(CaseDetails::getCaseData).orElse(null);
@@ -97,6 +104,10 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
         setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
         return preSubmitCallbackResponse;
+    }
+
+    private boolean incorrectTypeSelectedForAudioVideoEvidence(List<DraftSscsDocument> draftSscsDocuments) {
+        return draftSscsDocuments.stream().anyMatch(doc -> DocumentUtil.isFileAMedia(doc.getValue().getDocumentLink()) && !isValidAudioVideoDocumentType(doc.getValue().getDocumentType()));
     }
 
     private void addToSscsDocuments(SscsCaseData sscsCaseData) {
@@ -126,6 +137,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                                 .fileName(doc.getValue().getDocumentFileName())
                                 .dateAdded(LocalDate.now())
                                 .partyUploaded(UploadParty.CTSC)
+                                .originalPartySender(getOriginalSender(doc.getValue().getDocumentType()))
                                 .build()).build()).collect(toList());
         if (!newAudioVideoEvidence.isEmpty()) {
             List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>(ofNullable(sscsCaseData.getAudioVideoEvidence()).orElse(emptyList()));

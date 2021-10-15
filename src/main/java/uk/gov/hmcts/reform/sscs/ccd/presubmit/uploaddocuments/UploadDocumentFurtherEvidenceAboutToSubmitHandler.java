@@ -7,6 +7,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVI
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.DocumentType.REQUEST_FOR_HEARING_RECORDING;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.isValidAudioVideoDocumentType;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.getOriginalSender;
+
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -69,6 +72,10 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
             response.addError("You need to upload PDF, MP3 or MP4 file only");
         }
 
+        if (incorrectTypeSelectedForAudioVideoEvidence(caseData.getDraftSscsFurtherEvidenceDocument())) {
+            response.addError("Select the party that originally submitted the audio/video evidence");
+        }
+
         PdfState pdfState = isPdfReadable(caseData.getDraftSscsFurtherEvidenceDocument());
         switch (pdfState) {
             case UNKNOWN:
@@ -94,6 +101,10 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
         setHasUnprocessedAudioVideoEvidenceFlag(caseData);
 
         return response;
+    }
+
+    private boolean incorrectTypeSelectedForAudioVideoEvidence(List<SscsFurtherEvidenceDoc> draftSscsFurtherEvidenceDocuments) {
+        return draftSscsFurtherEvidenceDocuments.stream().anyMatch(doc -> DocumentUtil.isFileAMedia(doc.getValue().getDocumentLink()) && !isValidAudioVideoDocumentType(doc.getValue().getDocumentType()));
     }
 
     private boolean validDraftFurtherEvidenceDocument(List<SscsFurtherEvidenceDoc> draftSscsFurtherEvidenceDocuments) {
@@ -208,6 +219,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
                         doc.getValue().getDocumentLink().getDocumentFilename())
                     .dateAdded(LocalDate.now())
                     .partyUploaded(UploadParty.CTSC)
+                    .originalPartySender(getOriginalSender(doc.getValue().getDocumentType()))
                     .build()).build()).collect(toList());
 
         if (!newAudioVideoEvidence.isEmpty()) {

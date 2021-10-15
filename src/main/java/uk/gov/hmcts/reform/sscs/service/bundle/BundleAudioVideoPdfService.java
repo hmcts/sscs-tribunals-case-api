@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service.bundle;
 
 import static java.util.Collections.singletonList;
+import static java.util.Objects.nonNull;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 
 import java.time.LocalDate;
@@ -100,9 +101,17 @@ public class BundleAudioVideoPdfService {
                     .documentUrl(document.getValue().getAvDocumentLink().getDocumentFilename() + "|" + docUrl)
                     .dateAdded(DATEFORMATTER.format(LocalDate.parse(document.getValue().getDocumentDateAdded())))
                     .dateApproved(DATEFORMATTER.format(LocalDate.parse(document.getValue().getDateApproved())))
-                    .uploadParty(document.getValue().getPartyUploaded().getLabel())
+                    .uploadParty(getSubmittedByField(document.getValue()))
                     .build();
         }
         return null;
+    }
+
+    private String getSubmittedByField(AbstractDocumentDetails documentDetails) {
+        if (nonNull(documentDetails.getOriginalPartySender())) {
+            return documentDetails.getOriginalPartySender();
+        } else {
+            return documentDetails.getPartyUploaded().getLabel();
+        }
     }
 }
