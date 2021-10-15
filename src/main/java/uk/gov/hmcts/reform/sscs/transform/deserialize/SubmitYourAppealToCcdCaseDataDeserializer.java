@@ -88,7 +88,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             Optional<OfficeMapping> defaultOfficeMapping = dwpAddressLookupService.getDefaultDwpMappingByBenefitType(benefitTypeCode);
             if (defaultOfficeMapping.isPresent()) {
                 String defaultDwpIssuingOffice = defaultOfficeMapping.get().getMapping().getCcd();
-                return defaultDwpIssuingOffice;
+                return dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(benefitTypeCode, defaultDwpIssuingOffice);
             } else {
                 return null;
             }
