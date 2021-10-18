@@ -75,7 +75,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                 return preSubmitCallbackResponse;
             }
 
-            if (sscsCaseData.getWriteFinalDecisionPreviewDocument() != null) {
+            if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument() != null) {
                 createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
                 clearTransientFields(preSubmitCallbackResponse);
             } else {
@@ -111,7 +111,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
 
-        DocumentLink docLink = sscsCaseData.getWriteFinalDecisionPreviewDocument();
+        DocumentLink docLink = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument();
 
         DocumentLink documentLink = DocumentLink.builder()
             .documentUrl(docLink.getDocumentUrl())
@@ -135,16 +135,16 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     private void clearTransientFields(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice(null);
-        sscsCaseData.setWriteFinalDecisionTypeOfHearing(null);
-        sscsCaseData.setWriteFinalDecisionPresentingOfficerAttendedQuestion(null);
-        sscsCaseData.setWriteFinalDecisionAppellantAttendedQuestion(null);
-        sscsCaseData.setWriteFinalDecisionDisabilityQualifiedPanelMemberName(null);
-        sscsCaseData.setWriteFinalDecisionMedicallyQualifiedPanelMemberName(null);
-        sscsCaseData.setWriteFinalDecisionStartDate(null);
-        sscsCaseData.setWriteFinalDecisionEndDateType(null);
-        sscsCaseData.setWriteFinalDecisionEndDate(null);
-        sscsCaseData.setWriteFinalDecisionDateOfDecision(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionTypeOfHearing(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPresentingOfficerAttendedQuestion(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAppellantAttendedQuestion(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDisabilityQualifiedPanelMemberName(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionMedicallyQualifiedPanelMemberName(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionStartDate(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(null);
         sscsCaseData.setWcaAppeal(null);
 
         //PIP
@@ -166,13 +166,13 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionBudgetingDecisionsQuestion(null);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionPlanningAndFollowingQuestion(null);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMovingAroundQuestion(null);
-        sscsCaseData.setWriteFinalDecisionReasons(null);
-        sscsCaseData.setWriteFinalDecisionPageSectionReference(null);
-        sscsCaseData.setWriteFinalDecisionPreviewDocument(null);
-        sscsCaseData.setWriteFinalDecisionGeneratedDate(null);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow(null);
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused(null);
-        sscsCaseData.setWriteFinalDecisionAnythingElse(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionReasons(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPageSectionReference(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGeneratedDate(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAnythingElse(null);
 
         //ESA
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(null);
@@ -200,7 +200,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.getSscsEsaCaseData().setShowRegulation29Page(null);
         sscsCaseData.getSscsEsaCaseData().setShowSchedule3ActivitiesPage(null);
         sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(null);
-        sscsCaseData.setWriteFinalDecisionDetailsOfDecision(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDetailsOfDecision(null);
         sscsCaseData.setSupportGroupOnlyAppeal(null);
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(null);
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(null);
@@ -231,7 +231,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.getSscsUcCaseData().setShowSchedule8Paragraph4Page(null);
         sscsCaseData.getSscsUcCaseData().setShowSchedule7ActivitiesPage(null);
         sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(null);
-        sscsCaseData.setWriteFinalDecisionDetailsOfDecision(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDetailsOfDecision(null);
         sscsCaseData.setSupportGroupOnlyAppeal(null);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(null);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(null);
