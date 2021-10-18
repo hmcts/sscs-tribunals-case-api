@@ -58,7 +58,7 @@ public class BundleAudioVideoPdfServiceTest {
         byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
 
         SscsDocument sscsDocument = createSscsDocument();
-        when(pdfStoreService.storeDocument(any(), anyString(), anyString())).thenReturn(sscsDocument);
+        when(pdfStoreService.storeDocument(any(), anyString(), any())).thenReturn(sscsDocument);
         when(docmosisPdfService.createPdf(capture.capture(),any())).thenReturn(expectedPdf);
 
         now = LocalDate.now();

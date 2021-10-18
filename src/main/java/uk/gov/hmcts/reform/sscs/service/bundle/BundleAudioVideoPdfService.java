@@ -53,7 +53,7 @@ public class BundleAudioVideoPdfService {
                     .name("Audio-video-bundle-document.pdf")
                     .contentType(APPLICATION_PDF).build();
 
-            SscsDocument sscsDocument = pdfStoreService.storeDocument(content);
+            SscsDocument sscsDocument = pdfStoreService.storeDocument(content, "Audio-video-bundle-document.pdf", null);
 
             if (sscsDocument != null) {
                 String location = sscsDocument.getValue().getDocumentLink().getDocumentUrl();
