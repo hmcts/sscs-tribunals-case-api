@@ -41,7 +41,7 @@ public class IssueDocumentHandler {
         caseData.setDirectionNoticeContent(null);
         caseData.setPreviewDocument(null);
         caseData.setGenerateNotice(null);
-        caseData.setWriteFinalDecisionGenerateNotice(null);
+        caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(null);
         caseData.setDateAdded(null);
         caseData.setSscsInterlocDirectionDocument(null);
         caseData.setSscsInterlocDecisionDocument(null);

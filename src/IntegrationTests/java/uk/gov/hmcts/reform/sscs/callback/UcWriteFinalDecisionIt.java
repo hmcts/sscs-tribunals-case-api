@@ -60,7 +60,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -137,7 +137,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -207,7 +207,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -285,7 +285,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -339,7 +339,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -401,7 +401,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         // Assert we get a user-friendly error message, as this combination is a possible (incorrect) combination selectable by the user
         assertEquals("You have awarded less than 15 points, specified that the appeal is allowed and specified that Support Group Only Appeal does not apply, "
             + "but have answered No for the Schedule 8 Paragraph 4 question. Please review your previous selection.", result.getErrors().iterator().next());
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -424,7 +424,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
 
         // This combination is not possible with the correctly configured ccd page flow - just assert that we defensively prevent document generation
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -447,7 +447,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
 
         // This combination is not possible with the correctly configured ccd page flow - just assert that we defensively prevent document generation
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -492,7 +492,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
 
         // This combination is not possible with the correctly configured ccd page flow - just assert that we defensively prevent document generation
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -516,7 +516,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
 
         // This combination is not possible with the correctly configured ccd page flow - just assert that we defensively prevent document generation
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -538,7 +538,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -592,7 +592,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
         assertEquals("You have specified that the appeal is allowed, specified that Support Group Only Appeal applies and made no selections for the Schedule 7 Activities question, but have answered No for the Schedule 9 Paragraph 4 question. Please review your previous selection.", result.getErrors().iterator().next());
 
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -615,7 +615,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
 
         // This combination is not possible with the correctly configured ccd page flow - just assert that we defensively prevent document generation
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -638,7 +638,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
 
         // This combination is not possible with the correctly configured ccd page flow - just assert that we defensively prevent document generation
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -661,7 +661,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -715,7 +715,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
         assertEquals("You have awarded less than 15 points, specified that the appeal is refused and specified that Support Group Only Appeal applies, but have answered Yes for the Schedule 9 Paragraph 4 question. Please review your previous selection.", result.getErrors().iterator().next());
 
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -738,7 +738,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
 
         // This combination is not possible with the correctly configured ccd page flow - just assert that we defensively prevent document generation
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -761,7 +761,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
 
         // This combination is not possible with the correctly configured ccd page flow - just assert that we defensively prevent document generation
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -783,7 +783,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -837,7 +837,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
         assertEquals("You have awarded less than 15 points, specified that the appeal is refused and specified that Support Group Only Appeal applies, but have made selections for the Schedule 7 Activities question and a missing answer for the Schedule 9 Paragraph 4 question. Please review your previous selection.", result.getErrors().iterator().next());
 
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -861,7 +861,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
 
         // This combination is not possible with the correctly configured ccd page flow - just assert that we defensively prevent document generation
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -883,7 +883,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -944,7 +944,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
         assertEquals("You have specified that the appeal is refused and specified that Support Group Only Appeal does not apply, but have not awarded less than 15 points, a missing answer for the Schedule 8 Paragraph 4 question, submitted an unexpected answer for the Schedule 7 Activities question and submitted an unexpected answer for the Schedule 9 Paragraph 4 question. Please review your previous selection.", result.getErrors().iterator().next());
 
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -967,7 +967,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
 
         // This combination is not possible with the correctly configured ccd page flow - just assert that we defensively prevent document generation
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -989,10 +989,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(1, result.getErrors().size());
 
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         // This combination is not possible with the correctly configured ccd page flow - just assert that we defensively prevent document generation
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -1014,7 +1014,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -1075,7 +1075,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
         assertEquals("You have specified that the appeal is refused and specified that Support Group Only Appeal does not apply, but have not awarded less than 15 points, a missing answer for the Schedule 8 Paragraph 4 question and submitted an unexpected answer for the Schedule 7 Activities question. Please review your previous selection.", result.getErrors().iterator().next());
 
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -1097,10 +1097,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(1, result.getErrors().size());
 
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         // This combination is not possible with the correctly configured ccd page flow - just assert that we defensively prevent document generation
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -1122,10 +1122,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(1, result.getErrors().size());
 
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         // This combination is not possible with the correctly configured ccd page flow - just assert that we defensively prevent document generation
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -1147,10 +1147,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(1, result.getErrors().size());
 
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         // This combination is not possible with the correctly configured ccd page flow - just assert that we defensively prevent document generation
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -1172,7 +1172,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -1233,7 +1233,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
         assertEquals("You have specified that the appeal is refused and specified that Support Group Only Appeal does not apply, but have answered Yes for the Schedule 8 Paragraph 4 question, submitted an unexpected answer for the Schedule 7 Activities question and submitted an unexpected answer for the Schedule 9 Paragraph 4 question. Please review your previous selection.", result.getErrors().iterator().next());
 
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -1255,10 +1255,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(1, result.getErrors().size());
 
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         // This combination is not possible with the correctly configured ccd page flow - just assert that we defensively prevent document generation
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -1280,10 +1280,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(1, result.getErrors().size());
 
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         // This combination is not possible with the correctly configured ccd page flow - just assert that we defensively prevent document generation
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -1306,10 +1306,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
         assertEquals("You have awarded less than 15 points, specified that the appeal is allowed and specified that Support Group Only Appeal does not apply, but have answered No for the Schedule 8 Paragraph 4 question. Please review your previous selection.", result.getErrors().iterator().next());
 
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         // This combination is not possible with the correctly configured ccd page flow - just assert that we defensively prevent document generation
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -1332,7 +1332,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -1393,7 +1393,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
         assertEquals("You have specified that the appeal is refused and specified that Support Group Only Appeal does not apply, but have answered Yes for the Schedule 8 Paragraph 4 question, submitted an unexpected answer for the Schedule 7 Activities question and submitted an unexpected answer for the Schedule 9 Paragraph 4 question. Please review your previous selection.", result.getErrors().iterator().next());
 
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -1415,7 +1415,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -1476,7 +1476,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
         assertEquals("You have specified that the appeal is refused and specified that Support Group Only Appeal does not apply, but have answered Yes for the Schedule 8 Paragraph 4 question and submitted an unexpected answer for the Schedule 7 Activities question. Please review your previous selection.", result.getErrors().iterator().next());
 
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -1498,7 +1498,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -1564,7 +1564,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -1631,7 +1631,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -1695,7 +1695,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -1756,7 +1756,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
         assertEquals("You have specified that the appeal is refused and specified that Support Group Only Appeal does not apply, but have not awarded less than 15 points, a missing answer for the Schedule 8 Paragraph 4 question, submitted an unexpected answer for the Schedule 7 Activities question and submitted an unexpected answer for the Schedule 9 Paragraph 4 question. Please review your previous selection.", result.getErrors().iterator().next());
 
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -1782,7 +1782,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
 
         // This combination is not possible with the correctly configured ccd page flow - just assert that we defensively prevent document generation
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 
@@ -1805,7 +1805,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
 
         // This combination is not possible with the correctly configured ccd page flow - just assert that we defensively prevent document generation
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
 }

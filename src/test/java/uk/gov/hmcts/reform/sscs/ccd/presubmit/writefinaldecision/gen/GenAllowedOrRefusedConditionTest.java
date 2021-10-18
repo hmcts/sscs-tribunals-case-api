@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -50,8 +51,10 @@ public class GenAllowedOrRefusedConditionTest {
             isValidAllowedOrRefusedCombinationExpected(allowedOrRefused);
 
         SscsCaseData caseData = SscsCaseData.builder()
-            .writeFinalDecisionGenerateNotice("Yes")
-            .writeFinalDecisionAllowedOrRefused(allowedOrRefused)
+            .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
+                .writeFinalDecisionGenerateNotice("Yes")
+                .writeFinalDecisionAllowedOrRefused(allowedOrRefused)
+                .build())
             .dwpReassessTheAward(null).build();
 
         GenAllowedOrRefusedCondition matchingCondition = null;
