@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.generatecoversheet;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -9,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
@@ -59,6 +61,19 @@ public class GenerateCoversheetAboutToStartHandlerTest {
     public void canHandleCorrectly() {
         boolean actualResult = handler.canHandle(ABOUT_TO_START, callback);
         assertTrue(actualResult);
+    }
+
+    @Test
+    public void canNotHandleCorrectly() {
+        boolean actualResult = handler.canHandle(ABOUT_TO_SUBMIT, callback);
+        assertFalse(actualResult);
+    }
+
+    @Test
+    public void errorWhenNullDocument() {
+        when(pdfStoreService.storeDocument(any(), anyString(), any())).thenReturn(null);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertEquals(1, response.getErrors().size());
     }
 
     @Test
