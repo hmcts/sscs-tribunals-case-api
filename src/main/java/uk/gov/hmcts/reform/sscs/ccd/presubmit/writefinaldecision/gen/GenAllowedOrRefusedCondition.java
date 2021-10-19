@@ -57,7 +57,7 @@ public enum GenAllowedOrRefusedCondition implements PointsCondition<GenAllowedOr
             }
         }
         throw new IllegalStateException(
-            "No allowed/refused condition found for " + caseData.getWriteFinalDecisionAllowedOrRefused());
+            "No allowed/refused condition found for " + caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused());
     }
 
     public static Function<SscsCaseData, List<String>> getAllAnswersExtractor() {
@@ -71,7 +71,7 @@ public enum GenAllowedOrRefusedCondition implements PointsCondition<GenAllowedOr
 
     @Override
     public boolean isApplicable(DecisionNoticeQuestionService questionService, SscsCaseData caseData) {
-        if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+        if ("Yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             return primaryConditions.stream().allMatch(c -> c.isSatisified(caseData));
         } else {
             return false;

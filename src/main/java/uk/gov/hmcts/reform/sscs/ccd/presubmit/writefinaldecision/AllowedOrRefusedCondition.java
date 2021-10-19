@@ -2,13 +2,12 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import java.util.Optional;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.FieldConditionBase;
 
 public class AllowedOrRefusedCondition extends FieldConditionBase<String> {
 
     public AllowedOrRefusedCondition(AllowedOrRefusedPredicate predicate) {
-        super("Allowed or Refused", predicate, SscsCaseData::getWriteFinalDecisionAllowedOrRefused);
+        super("Allowed or Refused", predicate,
+            (caseData -> caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused()));
     }
 
     @Override

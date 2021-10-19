@@ -46,7 +46,7 @@ public class GenWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData,
         WriteFinalDecisionTemplateBody payload) {
 
-        if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+        if ("Yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
 
             Optional<GenAllowedOrRefusedCondition> condition = GenAllowedOrRefusedCondition.getPassingAllowedOrRefusedCondition(decisionNoticeQuestionService, caseData);
             if (condition.isPresent()) {
