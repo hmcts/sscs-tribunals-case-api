@@ -208,10 +208,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             result = dwpLookup.getDwpMappingByOffice(benefitType, syaCaseWrapper.getMrn().getDwpIssuingOffice())
                     .map(office -> office.getMapping().getCcd())
                     .orElse(null);
-        } else {
-            result = dwpLookup.getDefaultDwpMappingByBenefitType(benefitType)
-                    .map(office -> office.getMapping().getCcd())
-                    .orElse(null);;
         }
 
         return result;
