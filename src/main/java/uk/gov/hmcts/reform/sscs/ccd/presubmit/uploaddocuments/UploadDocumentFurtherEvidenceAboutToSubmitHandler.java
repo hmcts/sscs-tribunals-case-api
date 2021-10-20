@@ -1,15 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.DocumentType.REQUEST_FOR_HEARING_RECORDING;
-import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
-import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.isValidAudioVideoDocumentType;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.getOriginalSender;
-
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.isValidAudioVideoDocumentType;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -72,7 +72,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
             response.addError("You need to upload PDF, MP3 or MP4 file only");
         }
 
-        if (incorrectTypeSelectedForAudioVideoEvidence(caseData.getDraftSscsFurtherEvidenceDocument())) {
+        if (nonNull(caseData.getDraftSscsFurtherEvidenceDocument()) && incorrectTypeSelectedForAudioVideoEvidence(caseData.getDraftSscsFurtherEvidenceDocument())) {
             response.addError("Select the party that originally submitted the audio/video evidence");
         }
 

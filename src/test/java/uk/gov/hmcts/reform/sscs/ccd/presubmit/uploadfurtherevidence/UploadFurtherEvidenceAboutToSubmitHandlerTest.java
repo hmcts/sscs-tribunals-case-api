@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
@@ -114,7 +115,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
     private List<DraftSscsDocument> getDraftSscsDocuments(String nullField, String fileName) {
         final DraftSscsDocument doc = DraftSscsDocument.builder().value(DraftSscsDocumentDetails.builder()
                 .documentFileName(nullField.contains("fileName") ? null : fileName)
-                .documentType(nullField.contains("documentType") ? null : "documentType")
+                .documentType(nullField.contains("documentType") ? null : "appellantEvidence")
                 .documentLink(nullField.contains("documentLink") ? null : DocumentLink.builder().documentUrl(
                         nullField.equals("documentUrl") ? null : "documentUrl").documentFilename(fileName).build())
                 .build()).build();
@@ -148,9 +149,32 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
             assertThat(response.getData().getSscsDocument(), is(nullValue()));
             assertThat(response.getData().getAudioVideoEvidence().size(), is(1));
             assertThat(response.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded(), is(UploadParty.CTSC));
+            assertThat(response.getData().getAudioVideoEvidence().get(0).getValue().getOriginalPartySender(), is("Appellant"));
             assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), response.getData().getInterlocReferralReason());
             assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
         }
+    }
+
+    @Test
+    @Parameters({"audio.mp3","video.mp4"})
+    public void shouldGiveErrorIfAudioVideoEvidenceHasIncorrectDocumentType(String filename) {
+        List<DraftSscsDocument> draftDocuments = Collections.singletonList(DraftSscsDocument.builder()
+                .value(DraftSscsDocumentDetails.builder()
+                        .documentFileName(filename)
+                        .documentType("incorrectType")
+                        .documentLink(DocumentLink.builder()
+                                .documentUrl("http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655")
+                                .documentFilename(filename).build())
+                        .build())
+                .build());
+        sscsCaseData.setDraftFurtherEvidenceDocuments(draftDocuments);
+        sscsCaseData.setSscsDocument(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getErrors().iterator().next(), is("Select the party that originally submitted the audio/video evidence"));
+
     }
 
     @Test
@@ -176,7 +200,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("As you have uploaded an MP3 or MP4 file, please set interlocutory review state to 'Review by TCW'"));
+        assertThat(response.getErrors().iterator().next(), is("As you have an MP3 or MP4 file, please set interlocutory review state to 'Review by TCW'"));
         assertThat(response.getData().getDraftFurtherEvidenceDocuments(), is(draftDocs));
         assertThat(response.getData().getSscsDocument(), is(nullValue()));
     }

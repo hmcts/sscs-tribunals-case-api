@@ -13,10 +13,9 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.getOriginalSender;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.isValidAudioVideoDocumentType;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
-import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.getOriginalSender;
-
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

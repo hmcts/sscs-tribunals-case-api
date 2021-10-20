@@ -106,11 +106,41 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
         assertEquals(1, actualCaseData.getData().getAudioVideoEvidence().size());
         assertEquals(fileName, actualCaseData.getData().getAudioVideoEvidence().get(0).getValue().getFileName());
         assertEquals(UploadParty.CTSC, actualCaseData.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded());
+        assertEquals("Representative", actualCaseData.getData().getAudioVideoEvidence().get(0).getValue().getOriginalPartySender());
         assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), actualCaseData.getData().getInterlocReviewState());
         assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), actualCaseData.getData().getInterlocReferralReason());
         assertNull(actualCaseData.getData().getDwpState());
         assertNull(actualCaseData.getData().getDraftSscsFurtherEvidenceDocument());
         assertEquals(YesNo.YES, actualCaseData.getData().getHasUnprocessedAudioVideoEvidence());
+    }
+
+    @Test
+    @Parameters({"audio.mp3","video.mp4"})
+    public void errorThrownWhenAudioVideoDocuemtnHasIncorrectDocuemntType(String fileName) throws IOException {
+        UploadDocumentFurtherEvidenceAboutToSubmitHandler handler = new UploadDocumentFurtherEvidenceAboutToSubmitHandler(false, footerService);
+        Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,
+                "withDwp",
+                "representativeEvidence", "appellantEvidence",
+                UPLOAD_DOCUMENT_FE_CALLBACK_JSON);
+        List<SscsFurtherEvidenceDoc> draftDocuments = Collections.singletonList(SscsFurtherEvidenceDoc.builder()
+                .value(SscsFurtherEvidenceDocDetails.builder()
+                        .documentFileName(fileName)
+                        .documentType("incorrectType")
+                        .documentLink(DocumentLink.builder()
+                                .documentUrl("http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655")
+                                .documentFilename(fileName).build())
+                        .build())
+                .build());
+
+        callback.getCaseDetails().getCaseData().setDraftSscsFurtherEvidenceDocument(draftDocuments);
+
+        PreSubmitCallbackResponse<SscsCaseData> actualResponse = handler.handle(ABOUT_TO_SUBMIT, callback,
+                USER_AUTHORISATION);
+
+        long numberOfExpectedError = actualResponse.getErrors().stream()
+                .filter(error -> error.equalsIgnoreCase("Select the party that originally submitted the audio/video evidence"))
+                .count();
+        assertEquals(1, numberOfExpectedError);
     }
 
     @Test
