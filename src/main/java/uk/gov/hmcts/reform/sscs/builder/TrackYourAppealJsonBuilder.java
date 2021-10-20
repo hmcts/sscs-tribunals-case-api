@@ -194,13 +194,13 @@ public class TrackYourAppealJsonBuilder {
 
     private Consumer<? super AbstractDocument> createAvDocumentNode(ArrayNode avEvidenceNode) {
         return (d) -> {
-            ObjectNode documentNode = JsonNodeFactory.instance.objectNode();
-            documentNode.put("name", d.getValue().getDocumentFileName());
-            documentNode.put("type", d.getValue().getDocumentType());
             if (d.getValue().getAvDocumentLink() != null) {
+                ObjectNode documentNode = JsonNodeFactory.instance.objectNode();
+                documentNode.put("name", d.getValue().getAvDocumentLink().getDocumentFilename());
                 documentNode.put("url", stripUrl(d.getValue().getAvDocumentLink().getDocumentBinaryUrl()));
+                documentNode.put("type", d.getValue().getDocumentType());
+                avEvidenceNode.add(documentNode);
             }
-            avEvidenceNode.add(documentNode);
         };
     }
 
