@@ -100,6 +100,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
                 .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
                 .processAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.ISSUE_DIRECTIONS_NOTICE.getCode()))
                 .selectedAudioVideoEvidence(new DynamicList(DOCUMENT_MANAGEMENT_URL + "/2124-12"))
+                .directionNoticeContent("Body Content")
                 .audioVideoEvidence(singletonList(AudioVideoEvidence.builder().value(
                         AudioVideoEvidenceDetails.builder()
                                 .documentLink(DOCUMENT_LINK)
@@ -329,6 +330,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         assertEquals(NoticeIssuedTemplateBody.ENGLISH_IMAGE, payload.getImage());
         assertEquals("DIRECTIONS NOTICE", payload.getNoticeType());
         assertEquals("Appellant Lastname", payload.getAppellantFullName());
+        assertEquals(sscsCaseData.getDirectionNoticeContent(), payload.getNoticeBody());
         assertEquals(templateId, value.getTemplateId());
     }
 

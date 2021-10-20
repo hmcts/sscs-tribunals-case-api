@@ -329,6 +329,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
 
     private void clearTransientFields(SscsCaseData caseData) {
         caseData.setBodyContent(null);
+        caseData.setDirectionNoticeContent(null);
         caseData.setPreviewDocument(null);
         caseData.setGenerateNotice(null);
         caseData.setReservedToJudge(null);
