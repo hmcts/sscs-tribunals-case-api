@@ -164,6 +164,38 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
         assertThat(response.getErrors().contains("You must upload an edited DWP response document"), is(true));
     }
 
+    @Test
+    public void givenADwpDocumentPmheEditedReasonInChildSupportCaseThenErrorAdded() {
+        addMandatoryDwpDocuments();
+        addEditedDwpDocuments();
+
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder()
+                .code(Benefit.CHILD_SUPPORT.getShortName())
+                .description(Benefit.CHILD_SUPPORT.getDescription()).build());
+
+        sscsCaseData.getDwpDocuments().get(0).getValue().setDwpEditedEvidenceReason("phme");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().iterator().next(),
+                is("Potential harmful evidence is not a valid selection for child support cases"));
+    }
+
+    @Test
+    public void givenADwpDocumentChildSupConfEditedReasonInNonChildSupportCaseThenErrorAdded() {
+        addMandatoryDwpDocuments();
+        addEditedDwpDocuments();
+
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder()
+                .code(Benefit.PENSION_CREDIT.getShortName())
+                .description(Benefit.PENSION_CREDIT.getDescription()).build());
+
+        sscsCaseData.getDwpDocuments().get(0).getValue().setDwpEditedEvidenceReason("childSupportConfidentiality");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().iterator().next(),
+                is("Child support - Confidentiality is not a valid selection for this case"));
+    }
+
     private void addEditedDwpDocuments() {
         editedDwpDocuments(sscsCaseData.getDwpDocuments(), DWP_RESPONSE);
         editedDwpDocuments(sscsCaseData.getDwpDocuments(), DWP_EVIDENCE_BUNDLE);
