@@ -69,9 +69,9 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         assertJsonEquals(APPELLANT_NO_CONTACT_DETAILS_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
-    @Parameters({"DWP PIP ( 9),PIP,DWP PIP (9)", "null,carersAllowance,Carer’s Allowance Dispute Resolution Team",
-            "null,bereavementBenefit,Pensions Dispute Resolution Team","null,maternityAllowance,Walsall Benefit Centre",
-            "null,bereavementSupportPaymentScheme,Pensions Dispute Resolution Team"})
+    @Parameters({"DWP PIP ( 9),PIP,DWP PIP (9)", "null,carersAllowance,null",
+            "null,bereavementBenefit,null","null,maternityAllowance,null",
+            "null,bereavementSupportPaymentScheme,null"})
     @Test
     public void syaDwpIssuingOfficeTest(String issuingOffice, String beneiftCode, String expectedIssuing) {
 
@@ -82,18 +82,18 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         syaCaseWrapper.getMrn().setDwpIssuingOffice(actIssuingOffice);
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
             regionalProcessingCenter.getName(), regionalProcessingCenter);
-        assertEquals(expectedIssuing, caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+        assertEquals(expectedIssuing, String.valueOf(caseData.getAppeal().getMrnDetails().getDwpIssuingOffice()));
     }
 
     @Test
-    public void givenAUniversalCreditCaseFromSya_thenDefaultIssuingOfficeToUniversalCredit() {
+    public void givenAUniversalCreditCaseFromSya_thenDefaultIssuingOfficeToNull() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         SyaBenefitType uc = new SyaBenefitType("Universal Credit Description", "UC");
         syaCaseWrapper.setBenefitType(uc);
         syaCaseWrapper.setMrn(null);
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
                 regionalProcessingCenter.getName(), regionalProcessingCenter);
-        assertEquals("Universal Credit", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+        assertNull(caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
     }
 
     @Test
@@ -113,8 +113,8 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     @Parameters({
         "DWP PIP (1),PIP,Newcastle", "DWP PIP (2),PIP,Glasgow", "DWP PIP (3),PIP,Bellevale", "DWP PIP (4),PIP,Glasgow",
         "DWP PIP (5),PIP,Springburn", "DWP PIP (6),PIP,Blackpool", "DWP PIP (7),PIP,Blackpool", "DWP PIP (8),PIP,Blackpool",
-        "DWP PIP (9),PIP,Blackpool", "Inverness DRT,ESA,Inverness DRT","DWP PIP (),PIP,null",
-        "DWP PIP (11),PIP,null", "null,UC,Universal Credit", ",UC,Universal Credit", "null,PIP,Newcastle",
+        "DWP PIP (9),PIP,Blackpool", "Inverness DRT,ESA,Inverness DRT","DWP PIP (),PIP,Bellevale",
+        "DWP PIP (11),PIP,Bellevale", "null,UC,Universal Credit", ",UC,Universal Credit", "null,PIP,Bellevale",
         "null,carersAllowance,Carers Allowance", "DWP PIP (5),carersAllowance,Carers Allowance",
         "null,bereavementBenefit,Bereavement Benefit", ",bereavementBenefit,Bereavement Benefit",
         "null,bereavementSupportPaymentScheme,Bereavement Support Payment", ",bereavementSupportPaymentScheme,Bereavement Support Payment"
@@ -151,12 +151,12 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     }
 
     @Test
-    public void syaMissingMrnTest() {
+    public void syaMissingMrnThenShouldDoNotSetDefaultDwpIssuingOfficeTest() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         syaCaseWrapper.setMrn(null);
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
             regionalProcessingCenter.getName(), regionalProcessingCenter);
-        assertEquals("DWP PIP (1)", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+        assertNull(caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
         assertNull(caseData.getAppeal().getMrnDetails().getMrnDate());
         assertNull(caseData.getAppeal().getMrnDetails().getMrnLateReason());
         assertNull(caseData.getAppeal().getMrnDetails().getMrnMissingReason());
@@ -169,7 +169,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         syaCaseWrapper.getBenefitType().setCode("UC");
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
                 regionalProcessingCenter.getName(), regionalProcessingCenter);
-        assertEquals("Universal Credit", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+        assertNull(caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
         assertNull(caseData.getAppeal().getMrnDetails().getMrnDate());
         assertNull(caseData.getAppeal().getMrnDetails().getMrnLateReason());
         assertNull(caseData.getAppeal().getMrnDetails().getMrnMissingReason());
