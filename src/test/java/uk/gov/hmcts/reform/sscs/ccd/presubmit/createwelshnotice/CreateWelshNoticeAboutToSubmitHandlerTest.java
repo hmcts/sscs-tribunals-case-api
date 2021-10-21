@@ -99,7 +99,7 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
         byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
 
         SscsDocument sscsDocument = createSscsDocument();
-        when(pdfStoreService.storeDocument(any(), anyString(), anyString())).thenReturn(sscsDocument);
+        when(pdfStoreService.storeDocument(any(), anyString())).thenReturn(sscsDocument);
         ArgumentCaptor<Object> capture = ArgumentCaptor.forClass(Object.class);
         when(docmosisPdfService.createPdf(capture.capture(),any())).thenReturn(expectedPdf);
         FooterDetails footerDetails = new FooterDetails(DocumentLink.builder().build(), "bundleAddition", "bundleFilename");

@@ -64,7 +64,7 @@ public abstract class AbstractFooterService<D extends AbstractDocument> {
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        SscsDocument sscsDocument = pdfStoreService.storeDocument(newContent, url.getDocumentFilename(), null);
+        SscsDocument sscsDocument = pdfStoreService.storeDocument(newContent, url.getDocumentFilename());
 
         if (sscsDocument != null) {
             String location = sscsDocument.getValue().getDocumentLink().getDocumentUrl();

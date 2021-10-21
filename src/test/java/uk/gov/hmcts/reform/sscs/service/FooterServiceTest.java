@@ -109,13 +109,13 @@ public class FooterServiceTest {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
         when(pdfStoreService.download(any())).thenReturn(pdfBytes);
 
-        when(pdfStoreService.storeDocument(any(), anyString(), anyString())).thenReturn(sscsDocument);
+        when(pdfStoreService.storeDocument(any(), anyString())).thenReturn(sscsDocument);
 
         when(pdfWatermarker.shrinkAndWatermarkPdf(any(), stringCaptor.capture(), stringCaptor.capture())).thenReturn(new byte[]{});
 
         String now = LocalDate.now().toString();
 
-        footerService.createFooterAndAddDocToCase(DocumentLink.builder().documentUrl("MyUrl").build(),
+        footerService.createFooterAndAddDocToCase(DocumentLink.builder().documentUrl("MyUrl").documentFilename("afilename").build(),
                 sscsCaseData, DocumentType.DIRECTION_NOTICE, now, null, null, null);
 
         assertEquals(2, sscsCaseData.getSscsDocument().size());
@@ -124,7 +124,7 @@ public class FooterServiceTest {
         assertEquals("Addition A - Directions Notice issued on " + now + ".pdf", footerDoc.getDocumentFileName());
         assertEquals(now, footerDoc.getDocumentDateAdded());
         assertEquals(expectedDocumentUrl, footerDoc.getDocumentLink().getDocumentUrl());
-        verify(pdfStoreService).storeDocument(any(), anyString(), anyString());
+        verify(pdfStoreService).storeDocument(any(), anyString());
         assertEquals("Directions Notice", stringCaptor.getAllValues().get(0));
         assertEquals("Addition A", stringCaptor.getAllValues().get(1));
     }
@@ -134,11 +134,11 @@ public class FooterServiceTest {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
         when(pdfStoreService.download(any())).thenReturn(pdfBytes);
 
-        when(pdfStoreService.storeDocument(any(), anyString(), anyString())).thenReturn(sscsDocument);
+        when(pdfStoreService.storeDocument(any(), anyString())).thenReturn(sscsDocument);
 
         when(pdfWatermarker.shrinkAndWatermarkPdf(any(), stringCaptor.capture(), stringCaptor.capture())).thenReturn(new byte[]{});
 
-        footerService.createFooterAndAddDocToCase(DocumentLink.builder().documentUrl("MyUrl").build(),
+        footerService.createFooterAndAddDocToCase(DocumentLink.builder().documentUrl("MyUrl").documentFilename("afilename").build(),
                 sscsCaseData, DocumentType.DIRECTION_NOTICE, LocalDate.now().toString(), LocalDate.now().minusDays(1), "overriden.pdf", null);
 
         assertEquals(2, sscsCaseData.getSscsDocument().size());
@@ -147,7 +147,7 @@ public class FooterServiceTest {
         assertEquals("overriden.pdf", footerDoc.getDocumentFileName());
         assertEquals(LocalDate.now().minusDays(1).toString(), footerDoc.getDocumentDateAdded());
         assertEquals(expectedDocumentUrl, footerDoc.getDocumentLink().getDocumentUrl());
-        verify(pdfStoreService).storeDocument(any(), anyString(), anyString());
+        verify(pdfStoreService).storeDocument(any(), anyString());
         assertEquals("Directions Notice", stringCaptor.getAllValues().get(0));
         assertEquals("Addition A", stringCaptor.getAllValues().get(1));
     }
@@ -158,13 +158,13 @@ public class FooterServiceTest {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
         when(pdfStoreService.download(any())).thenReturn(pdfBytes);
 
-        when(pdfStoreService.storeDocument(any(), anyString(), anyString())).thenReturn(sscsDocument);
+        when(pdfStoreService.storeDocument(any(), anyString())).thenReturn(sscsDocument);
 
         when(pdfWatermarker.shrinkAndWatermarkPdf(any(), stringCaptor.capture(), stringCaptor.capture())).thenReturn(new byte[]{});
 
         String now = LocalDate.now().toString();
 
-        footerService.createFooterAndAddDocToCase(DocumentLink.builder().documentUrl("MyUrl").build(),
+        footerService.createFooterAndAddDocToCase(DocumentLink.builder().documentUrl("MyUrl").documentFilename("afilename").build(),
                 sscsCaseData, DocumentType.DIRECTION_NOTICE, now, null, null, SscsDocumentTranslationStatus.TRANSLATION_REQUIRED);
 
         assertEquals(2, sscsCaseData.getSscsDocument().size());
@@ -174,7 +174,7 @@ public class FooterServiceTest {
         assertEquals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED, footerDoc.getDocumentTranslationStatus());
         assertEquals(now, footerDoc.getDocumentDateAdded());
         assertEquals(expectedDocumentUrl, footerDoc.getDocumentLink().getDocumentUrl());
-        verify(pdfStoreService).storeDocument(any(), anyString(), anyString());
+        verify(pdfStoreService).storeDocument(any(), anyString());
         assertEquals("Directions Notice", stringCaptor.getAllValues().get(0));
         assertEquals("Addition A", stringCaptor.getAllValues().get(1));
     }
@@ -184,9 +184,9 @@ public class FooterServiceTest {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
         when(pdfStoreService.download(any())).thenReturn(pdfBytes);
 
-        when(pdfStoreService.storeDocument(any(), anyString(), anyString())).thenReturn(sscsDocument);
+        when(pdfStoreService.storeDocument(any(), anyString())).thenReturn(sscsDocument);
 
-        DocumentLink result = footerService.addFooter(DocumentLink.builder().documentUrl("oldLink").build(), "leftText", "rightText");
+        DocumentLink result = footerService.addFooter(DocumentLink.builder().documentUrl("oldLink").documentFilename("afilename").build(), "leftText", "rightText");
 
         assertEquals(expectedDocumentUrl, result.getDocumentUrl());
     }

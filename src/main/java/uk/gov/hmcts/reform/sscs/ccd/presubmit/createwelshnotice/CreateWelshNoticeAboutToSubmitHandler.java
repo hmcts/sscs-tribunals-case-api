@@ -88,7 +88,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
 
         DocumentLink newDocLink = null;
 
-        SscsDocument sscsDocument = pdfStoreService.storeDocument(content, filename, null);
+        SscsDocument sscsDocument = pdfStoreService.storeDocument(content, filename);
 
         markOriginalDocumentsAsTranslationComplete(caseData);
 

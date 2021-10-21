@@ -45,7 +45,7 @@ public class WelshFooterServiceTest {
     private UploadResponse uploadResponse;
     @Mock
     private UploadResponse.Embedded uploadResponseEmbedded;
-    @Mock
+
     private SscsDocument sscsDocument;
     //private List<uk.gov.hmcts.reform.document.domain.Document> uploadedDocuments;
     //private uk.gov.hmcts.reform.document.domain.Document uploadedDocument = new uk.gov.hmcts.reform.document.domain.Document();
@@ -60,9 +60,8 @@ public class WelshFooterServiceTest {
     public void setup() {
         footerService = new WelshFooterService(pdfStoreService, pdfWatermarker);
 
-        sscsDocument.getValue().setDocumentFileName(fileName);
-        sscsDocument.getValue().setDocumentLink(DocumentLink.builder()
-                .documentUrl(expectedDocumentUrl).documentBinaryUrl(expectedBinaryUrl).build());;
+        sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName(fileName)
+                .documentLink(DocumentLink.builder().documentUrl(expectedDocumentUrl).documentBinaryUrl(expectedBinaryUrl).build()).build()).build();
 
         SscsWelshDocument document = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder().documentFileName("myTest.doc").build()).build();
         List<SscsWelshDocument> docs = new ArrayList<>();
@@ -118,7 +117,7 @@ public class WelshFooterServiceTest {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
         when(pdfStoreService.download(any())).thenReturn(pdfBytes);
 
-        when(pdfStoreService.storeDocument(any())).thenReturn(sscsDocument);
+        when(pdfStoreService.storeDocument(any(), any())).thenReturn(sscsDocument);
 
         when(pdfWatermarker.shrinkAndWatermarkPdf(any(), stringCaptor.capture(), stringCaptor.capture())).thenReturn(new byte[]{});
     }
