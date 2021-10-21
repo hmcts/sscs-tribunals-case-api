@@ -90,7 +90,7 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
 
@@ -98,7 +98,7 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
 
         assertEquals(0, response.getErrors().size());
 
-        assertEquals(LocalDate.now().toString(), sscsCaseData.getWriteFinalDecisionGeneratedDate());
+        assertEquals(LocalDate.now().toString(), sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGeneratedDate());
 
     }
 
@@ -114,9 +114,9 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-01-01");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGeneratedDate("2018-01-01");
 
         setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
 
@@ -124,7 +124,7 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
 
         assertEquals(0, response.getErrors().size());
 
-        assertEquals(LocalDate.now().toString(), sscsCaseData.getWriteFinalDecisionGeneratedDate());
+        assertEquals(LocalDate.now().toString(), sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGeneratedDate());
     }
 
     @Test
@@ -133,13 +133,13 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.setGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionEndDateType("indefinite");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("indefinite");
         setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
-        assertEquals("indefinite", sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertEquals("indefinite", sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
     }
 
     @Test
@@ -147,15 +147,15 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionEndDateType("setEndDate");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("setEndDate");
 
         setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
-        assertEquals("setEndDate", sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertEquals("setEndDate", sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 
@@ -166,8 +166,8 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionEndDateType("na");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("na");
 
         setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
 
@@ -175,7 +175,7 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
 
         assertEquals(0, response.getErrors().size());
 
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 

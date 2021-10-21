@@ -74,7 +74,7 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
         HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(getJsonCallbackForTest("handlers/writefinaldecision/writeFinalDecisionCallback.json")), "PreviewFinalDecision");
         CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
-        assertThat(ccdEventResponse.getData().getWriteFinalDecisionPreviewDocument(), is(not(nullValue())));
+        assertThat(ccdEventResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument(), is(not(nullValue())));
     }
 
     @Test
