@@ -927,13 +927,14 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenADwpUploadResponseEventNonChildSupportAndContainsFurtherInformationIsYesThenResponseReceived() {
+    public void givenADwpUploadResponseEventNonChildSupportAndContainsFurtherInformationIsYesThenStateNotChanged() {
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.PENSION_CREDIT.getShortName())
                 .description(Benefit.PENSION_CREDIT.getDescription()).build());
         sscsCaseData.setDwpFurtherInfo("Yes");
+        sscsCaseData.setState(State.RESPONSE_RECEIVED);
         sscsCaseData.setDwpEditedResponseDocument(getPdfDocument());
         sscsCaseData.setDwpEditedEvidenceBundleDocument(getPdfDocument());
 
@@ -944,19 +945,20 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenADwpUploadResponseEventNonChildSupportAndContainsFurtherInformationIsNoThenReadyToList() {
+    public void givenADwpUploadResponseEventNonChildSupportAndContainsFurtherInformationIsNoThenStateNotChanged() {
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.PENSION_CREDIT.getShortName())
                 .description(Benefit.PENSION_CREDIT.getDescription()).build());
         sscsCaseData.setDwpFurtherInfo("No");
+        sscsCaseData.setState(State.RESPONSE_RECEIVED);
         sscsCaseData.setDwpEditedResponseDocument(getPdfDocument());
         sscsCaseData.setDwpEditedEvidenceBundleDocument(getPdfDocument());
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler
                 .handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getState(), is(State.READY_TO_LIST));
+        assertThat(response.getData().getState(), is(State.RESPONSE_RECEIVED));
     }
 }
