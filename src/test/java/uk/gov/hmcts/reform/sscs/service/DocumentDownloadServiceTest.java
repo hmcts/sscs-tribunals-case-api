@@ -27,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.exception.DocumentNotFoundException;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.UploadedEvidence;
 
 @RunWith(JUnitParamsRunner.class)
@@ -36,6 +37,10 @@ public class DocumentDownloadServiceTest {
     private DocumentDownloadClientApi documentDownloadClientApi;
     @Mock
     private AuthTokenGenerator authTokenGenerator;
+    @Mock
+    EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService;
+    @Mock
+    IdamService idamService;
     private DocumentDownloadService documentDownloadService;
 
     @Rule
@@ -46,7 +51,8 @@ public class DocumentDownloadServiceTest {
     @Before
     public void setUp() {
         documentDownloadService = new DocumentDownloadService(documentDownloadClientApi,
-            authTokenGenerator, "http://dm-store:4506");
+            authTokenGenerator, "http://dm-store:4506", false,
+                evidenceManagementSecureDocStoreService, idamService);
         urlString = "http://dm-store:4506/documents/someDocId/binary";
     }
 
