@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,9 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
+import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -65,7 +68,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     public void setUp() {
         openMocks(this);
         associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService);
-        handler = new CaseUpdatedAboutToSubmitHandler(regionalProcessingCenterService, associatedCaseLinkHelper, airLookupService);
+        handler = new CaseUpdatedAboutToSubmitHandler(regionalProcessingCenterService, associatedCaseLinkHelper, airLookupService, new DwpAddressLookupService(), idamService);
 
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -83,6 +86,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
         when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
+        when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(SUPER_USER.getValue())).build());
     }
 
     @Test
