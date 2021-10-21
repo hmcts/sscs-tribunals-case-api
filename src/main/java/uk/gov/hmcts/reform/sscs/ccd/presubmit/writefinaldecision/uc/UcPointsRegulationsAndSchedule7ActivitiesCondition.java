@@ -149,7 +149,7 @@ public enum UcPointsRegulationsAndSchedule7ActivitiesCondition implements Points
     @Override
     public boolean isApplicable(DecisionNoticeQuestionService questionService, SscsCaseData caseData) {
         int points = questionService.getTotalPoints(caseData, getAnswersExtractor().apply(caseData));
-        return "Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice()) && pointsCondition.getPointsRequirementCondition().test(points) && primaryConditions.stream().allMatch(c -> c.isSatisified(caseData));
+        return "Yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice()) && pointsCondition.getPointsRequirementCondition().test(points) && primaryConditions.stream().allMatch(c -> c.isSatisified(caseData));
     }
 
     @Override

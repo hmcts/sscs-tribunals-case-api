@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConvert
 public class IssueDocumentHandler {
 
     private static final String GLASGOW = "GLASGOW";
+    private static final DateTimeFormatter DATE_PATTERN = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     // Fields used for a short period in case progression are transient,
     // relevant for a short period of the case lifecycle.
@@ -37,9 +38,10 @@ public class IssueDocumentHandler {
 
     protected void clearBasicTransientFields(SscsCaseData caseData) {
         caseData.setBodyContent(null);
+        caseData.setDirectionNoticeContent(null);
         caseData.setPreviewDocument(null);
         caseData.setGenerateNotice(null);
-        caseData.setWriteFinalDecisionGenerateNotice(null);
+        caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(null);
         caseData.setDateAdded(null);
         caseData.setSscsInterlocDirectionDocument(null);
         caseData.setSscsInterlocDecisionDocument(null);
@@ -52,7 +54,8 @@ public class IssueDocumentHandler {
                 .appointeeFullName(buildAppointeeName(caseData).orElse(null))
                 .caseId(caseData.getCcdCaseId())
                 .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
-                .noticeBody(caseData.getBodyContent())
+                .noticeBody(Optional.ofNullable(caseData.getBodyContent())
+                        .orElse(caseData.getDirectionNoticeContent()))
                 .userName(caseData.getSignedBy())
                 .noticeType(documentTypeLabel.toUpperCase())
                 .userRole(caseData.getSignedRole())

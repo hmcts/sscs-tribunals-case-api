@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -108,6 +109,17 @@ public class TrackYourAppealJsonBuilderTest {
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter(), 1L, true, "appealCreated");
         assertJsonEquals(AUDIO_VIDEO_EVIDENCE_MYA.getSerializedMessage(), objectNode);
+    }
+
+    @Test
+    public void shouldReturnCorrectFileNameInMyaResponse() {
+        SscsCaseData caseData = AUDIO_VIDEO_EVIDENCE_CCD.getDeserializeMessage();
+        DocumentLink changedAvDocumentLink = caseData.getSscsDocument().get(0).getValue().getAvDocumentLink()
+                .toBuilder().documentFilename("file.mp3").build();
+        caseData.getSscsDocument().get(0).getValue().setAvDocumentLink(changedAvDocumentLink);
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter(), 1L, true, "appealCreated");
+        assertJsonEquals("file.mp3", objectNode.get("appeal").get("audioVideoEvidence").get(0).get("name"));
     }
 
     @Test

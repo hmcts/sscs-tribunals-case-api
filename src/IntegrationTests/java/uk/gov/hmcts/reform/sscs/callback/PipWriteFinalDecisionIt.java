@@ -75,7 +75,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -144,7 +144,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -451,7 +451,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -513,7 +513,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -642,7 +642,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -709,7 +709,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -772,7 +772,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -837,7 +837,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -900,7 +900,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -963,7 +963,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -1027,7 +1027,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -1100,7 +1100,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -1167,7 +1167,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -1241,7 +1241,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -1315,7 +1315,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -1391,7 +1391,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -1458,7 +1458,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -1529,7 +1529,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -1604,7 +1604,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());

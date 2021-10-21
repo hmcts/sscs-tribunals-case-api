@@ -44,10 +44,10 @@ public abstract class DecisionNoticeOutcomeService {
     public abstract Outcome determineOutcomeWithValidation(SscsCaseData sscsCaseData);
 
     protected Outcome useExplicitySetOutcome(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getWriteFinalDecisionAllowedOrRefused() == null) {
+        if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused() == null) {
             return null;
         } else {
-            if ("allowed".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionAllowedOrRefused())) {
+            if ("allowed".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused())) {
                 return DECISION_IN_FAVOUR_OF_APPELLANT;
             } else {
                 return DECISION_UPHELD;
