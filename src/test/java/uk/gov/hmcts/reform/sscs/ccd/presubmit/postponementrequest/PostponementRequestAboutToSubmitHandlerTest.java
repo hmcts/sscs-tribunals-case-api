@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
+import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
 
 @RunWith(JUnitParamsRunner.class)
 public class PostponementRequestAboutToSubmitHandlerTest {
@@ -55,7 +56,7 @@ public class PostponementRequestAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new PostponementRequestAboutToSubmitHandler();
+        handler = new PostponementRequestAboutToSubmitHandler(new PostponementRequestService());
 
         Hearing hearing = getHearing(1);
         List<Hearing> hearings  = List.of(hearing);
