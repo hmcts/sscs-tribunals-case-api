@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
 import static junit.framework.TestCase.assertNull;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
@@ -26,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
+import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
 
 @RunWith(JUnitParamsRunner.class)
 public class ValidSendToInterlocAboutToSubmitHandlerTest {
@@ -43,7 +46,8 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new ValidSendToInterlocAboutToSubmitHandler();
+
+        handler = new ValidSendToInterlocAboutToSubmitHandler(new PostponementRequestService());
 
         when(callback.getEvent()).thenReturn(EventType.VALID_SEND_TO_INTERLOC);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -92,10 +96,44 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
         assertNull(response.getData().getDirectionDueDate());
     }
 
+
+    @Test
+    public void givenPostponementRequestInterlocSendToTcw_thenReturnWarningMessageAboutPostponingHearing() {
+        setupDataForPostponementRequestInterlocSendToTcw(PartyItemList.APPELLANT);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getWarnings().size(), is(1));
+        assertThat(response.getWarnings().iterator().next(), is("Are you sure you want to postpone the hearing?"));
+    }
+
     @Test
     @Parameters({"APPELLANT, APPELLANT", "REPRESENTATIVE, REP", "JOINT_PARTY, JOINT_PARTY"})
     public void givenPostponementRequestInterlocSendToTcw_setsEvidenceHandledFlagToNoForDocumentSelected(PartyItemList originalSenderParty, UploadParty uploadParty) {
 
+        setupDataForPostponementRequestInterlocSendToTcw(originalSenderParty);
+        when(callback.isIgnoreWarnings()).thenReturn(true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(Collections.EMPTY_SET, response.getErrors());
+
+        assertEquals(REVIEW_BY_TCW.getId(), response.getData().getInterlocReviewState());
+        assertEquals(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId(), response.getData().getInterlocReferralReason());
+        assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
+        assertEquals(YES, sscsCaseData.getPostponementRequest().getUnprocessedPostponementRequest());
+        assertNull(response.getData().getSelectWhoReviewsCase());
+        assertNull(response.getData().getDirectionDueDate());
+        assertNull(response.getData().getPostponementRequest().getPostponementRequestDetails());
+        assertNull(response.getData().getPostponementRequest().getPostponementPreviewDocument());
+
+        assertEquals(1, sscsCaseData.getSscsDocument().size());
+        final SscsDocument document = sscsCaseData.getSscsDocument().get(0);
+        assertEquals(DocumentType.POSTPONEMENT_REQUEST.getValue(), document.getValue().getDocumentType());
+        assertEquals("example.pdf", document.getValue().getDocumentLink().getDocumentFilename());
+        assertEquals(uploadParty.getValue(), document.getValue().getOriginalPartySender());
+    }
+
+    private void setupDataForPostponementRequestInterlocSendToTcw(PartyItemList originalSenderParty) {
         DynamicListItem value = new DynamicListItem(originalSenderParty.getCode(), originalSenderParty.getLabel());
         DynamicList originalSender = new DynamicList(value, Collections.singletonList(value));
 
@@ -116,25 +154,6 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
                 .originalSender(originalSender).build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(Collections.EMPTY_SET, response.getErrors());
-
-        assertEquals(REVIEW_BY_TCW.getId(), response.getData().getInterlocReviewState());
-        assertEquals(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId(), response.getData().getInterlocReferralReason());
-        assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
-        assertEquals(YES, sscsCaseData.getPostponementRequest().getUnprocessedPostponementRequest());
-        assertNull(response.getData().getSelectWhoReviewsCase());
-        assertNull(response.getData().getDirectionDueDate());
-        assertNull(response.getData().getPostponementRequest().getPostponementRequestDetails());
-        assertNull(response.getData().getPostponementRequest().getPostponementPreviewDocument());
-
-        assertEquals(1, sscsCaseData.getSscsDocument().size());
-        final SscsDocument document = sscsCaseData.getSscsDocument().get(0);
-        assertEquals(DocumentType.POSTPONEMENT_REQUEST.getValue(), document.getValue().getDocumentType());
-        assertEquals("example.pdf", document.getValue().getDocumentLink().getDocumentFilename());
-        assertEquals(uploadParty.getValue(), document.getValue().getOriginalPartySender());
     }
 
     @Test
