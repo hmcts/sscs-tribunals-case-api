@@ -23,7 +23,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
@@ -79,21 +78,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
 
-        processCaseStatus(sscsCaseData);
-
         return preSubmitCallbackResponse;
-    }
-
-    private void processCaseStatus(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.isBenefitType(CHILD_SUPPORT)) {
-            if (sscsCaseData.getDwpFurtherInfo().equals("Yes")) {
-                sscsCaseData.setState(State.RESPONSE_RECEIVED);
-                sscsCaseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION.getId());
-            } else if (sscsCaseData.getDwpFurtherInfo().equals("No")) {
-                sscsCaseData.setState(State.NOT_LISTABLE);
-                sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
-            }
-        }
     }
 
     protected void handleAudioVideoDocuments(SscsCaseData sscsCaseData) {
