@@ -167,9 +167,6 @@ public class SubmitAppealServiceTest {
 
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().roles(Arrays.asList("citizen")).build());
         given(emailHelper.generateUniqueEmailId(any(Appellant.class))).willReturn("Bloggs_33C");
-
-        given(secureDocStoreService.getDocumentExists(any(), any())).willReturn(false);
-
     }
 
     @Test
