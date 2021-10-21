@@ -138,7 +138,7 @@ public class TrackYourAppealJsonBuilder {
                 caseNode.putArray("hearingOutcome").addAll(outcomeNode);
             }
 
-            ArrayNode avEvidence = buildEvidenceLinks(caseData.getSscsDocument(), caseData.getDwpDocuments());
+            ArrayNode avEvidence = buildAvEvidenceLinks(caseData.getSscsDocument(), caseData.getDwpDocuments());
             if (!avEvidence.isEmpty()) {
                 caseNode.putArray("audioVideoEvidence").addAll(avEvidence);
             }
@@ -178,27 +178,29 @@ public class TrackYourAppealJsonBuilder {
         return root;
     }
 
-    private ArrayNode buildEvidenceLinks(List<SscsDocument> sscsDocuments, List<DwpDocument> dwpDocuments) {
+    private ArrayNode buildAvEvidenceLinks(List<SscsDocument> sscsDocuments, List<DwpDocument> dwpDocuments) {
         ArrayNode avEvidenceNode = JsonNodeFactory.instance.arrayNode();
 
         if (sscsDocuments != null) {
-            sscsDocuments.stream().filter(filterEvidence()).forEach(createDocumentNode(avEvidenceNode));
+            sscsDocuments.stream().filter(filterEvidence()).forEach(createAvDocumentNode(avEvidenceNode));
         }
 
         if (dwpDocuments != null) {
-            dwpDocuments.stream().filter(filterEvidence()).forEach(createDocumentNode(avEvidenceNode));
+            dwpDocuments.stream().filter(filterEvidence()).forEach(createAvDocumentNode(avEvidenceNode));
         }
 
         return avEvidenceNode;
     }
 
-    private Consumer<? super AbstractDocument> createDocumentNode(ArrayNode avEvidenceNode) {
+    private Consumer<? super AbstractDocument> createAvDocumentNode(ArrayNode avEvidenceNode) {
         return (d) -> {
-            ObjectNode documentNode = JsonNodeFactory.instance.objectNode();
-            documentNode.put("name", d.getValue().getDocumentFileName());
-            documentNode.put("type", d.getValue().getDocumentType());
-            documentNode.put("url", stripUrl(d.getValue().getDocumentLink().getDocumentBinaryUrl()));
-            avEvidenceNode.add(documentNode);
+            if (d.getValue().getAvDocumentLink() != null) {
+                ObjectNode documentNode = JsonNodeFactory.instance.objectNode();
+                documentNode.put("name", d.getValue().getAvDocumentLink().getDocumentFilename());
+                documentNode.put("url", stripUrl(d.getValue().getAvDocumentLink().getDocumentBinaryUrl()));
+                documentNode.put("type", d.getValue().getDocumentType());
+                avEvidenceNode.add(documentNode);
+            }
         };
     }
 

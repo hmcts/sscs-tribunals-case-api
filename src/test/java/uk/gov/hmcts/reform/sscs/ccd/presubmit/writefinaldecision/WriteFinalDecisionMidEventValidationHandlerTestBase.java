@@ -125,8 +125,8 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     @Test
     @Parameters(named = "descriptorFlowValues")
     public void givenAnEndDateIsBeforeStartDate_thenDisplayAnError(String descriptorFlowValue) {
-        sscsCaseData.setWriteFinalDecisionStartDate("2020-01-01");
-        sscsCaseData.setWriteFinalDecisionEndDate("2019-01-01");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionStartDate("2020-01-01");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate("2019-01-01");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -141,8 +141,8 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     public void givenADecisionDateIsInFuture_thenDisplayAnError(String descriptorFlowValue) {
 
         LocalDate tomorrow = LocalDate.now().plusDays(1);
-        sscsCaseData.setWriteFinalDecisionDateOfDecision(tomorrow.toString());
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow(descriptorFlowValue);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(tomorrow.toString());
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow(descriptorFlowValue);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -159,7 +159,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
         setValidPointsAndActivitiesScenario(sscsCaseData, descriptorFlowValue);
 
         LocalDate today = LocalDate.now();
-        sscsCaseData.setWriteFinalDecisionDateOfDecision(today.toString());
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(today.toString());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -176,7 +176,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
         setValidPointsAndActivitiesScenario(sscsCaseData, descriptorFlowValue);
 
         LocalDate yesterday = LocalDate.now().plusDays(-1);
-        sscsCaseData.setWriteFinalDecisionDateOfDecision(yesterday.toString());
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(yesterday.toString());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -191,7 +191,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
         setValidPointsAndActivitiesScenario(sscsCaseData, null);
 
-        sscsCaseData.setWriteFinalDecisionDateOfDecision(endDate);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(endDate);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -206,7 +206,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
         setValidPointsAndActivitiesScenario(sscsCaseData, null);
 
-        sscsCaseData.setWriteFinalDecisionDateOfDecision(endDate);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(endDate);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -218,9 +218,9 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     @Test
     @Parameters(named = "descriptorFlowValues")
     public void givenAnEndDateIsSameAsStartDate_thenDisplayAnError(String descriptorFlowValue) {
-        sscsCaseData.setWriteFinalDecisionStartDate("2020-01-01");
-        sscsCaseData.setWriteFinalDecisionEndDate("2020-01-01");
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow(descriptorFlowValue);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionStartDate("2020-01-01");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate("2020-01-01");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow(descriptorFlowValue);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -236,8 +236,8 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
         setValidPointsAndActivitiesScenario(sscsCaseData, descriptorFlowValue);
 
-        sscsCaseData.setWriteFinalDecisionStartDate("2019-01-01");
-        sscsCaseData.setWriteFinalDecisionEndDate("2020-01-01");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionStartDate("2019-01-01");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate("2020-01-01");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -253,7 +253,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
         setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
 
         DocumentLink docLink = DocumentLink.builder().documentUrl("test.doc").build();
-        sscsCaseData.setWriteFinalDecisionPreviewDocument(docLink);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -333,15 +333,15 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
         setNoAwardsScenario(sscsCaseData);
         setEmptyActivitiesListScenario(sscsCaseData);
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
-        sscsCaseData.setWriteFinalDecisionEndDateType("na");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("na");
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getWarnings().size());
 
         assertEquals(0, response.getErrors().size());
 
-        assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("na", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 

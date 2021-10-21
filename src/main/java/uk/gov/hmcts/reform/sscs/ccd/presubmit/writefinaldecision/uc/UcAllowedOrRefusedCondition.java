@@ -141,7 +141,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     List<FieldCondition> validationConditions;
     Optional<UcPointsCondition> validationPointsCondition;
 
-    
+
     UcAllowedOrRefusedCondition(
         AllowedOrRefusedCondition allowedOrRefusedCondition, YesNoFieldCondition wcaAppealCondition, Optional<YesNoFieldCondition> supportGroupOnlyCondition, Optional<UcPointsCondition> primaryPointsCondition, Optional<StringListPredicate> schedule7ActivitiesSelected,
         FieldCondition...validationConditions) {
@@ -256,7 +256,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
 
     @Override
     public boolean isApplicable(DecisionNoticeQuestionService questionService, SscsCaseData caseData) {
-        if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+        if ("Yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             int points = questionService.getTotalPoints(caseData, getAnswersExtractor().apply(caseData));
             if (primaryPointsCondition.isPresent()) {
                 if (!primaryPointsCondition.get().getPointsRequirementCondition().test(points)) {
