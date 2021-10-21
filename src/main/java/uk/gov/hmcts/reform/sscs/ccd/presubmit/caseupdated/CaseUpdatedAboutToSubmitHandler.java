@@ -94,7 +94,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
         final boolean hasSystemUserRole = userDetails.hasRole(SYSTEM_USER);
 
-        //validate benefit type and dwp issuing office for updateCaseData even triggered by user, which is not by CaseLoader
+        //validate benefit type and dwp issuing office for updateCaseData event triggered by user, which is not by CaseLoader
         if (!hasSystemUserRole) {
             validateAndUpdateDwpHandlingOffice(sscsCaseData,preSubmitCallbackResponse);
         }
