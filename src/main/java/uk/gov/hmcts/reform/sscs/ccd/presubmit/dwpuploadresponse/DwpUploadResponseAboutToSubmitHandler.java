@@ -93,7 +93,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 sscsCaseData.setState(State.NOT_LISTABLE);
                 sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
             }
-        } else {
+        } else if (StringUtils.isNotBlank(sscsCaseData.getDwpFurtherInfo())){
             if (sscsCaseData.getDwpFurtherInfo().equals("Yes")) {
                 sscsCaseData.setState(State.RESPONSE_RECEIVED);
             } else if (sscsCaseData.getDwpFurtherInfo().equals("No")) {
