@@ -67,9 +67,37 @@ public class DocumentDownloadServiceTest {
     }
 
     @Test
+    public void givenDocumentId_shouldReturnFileSizeSecure() {
+        documentDownloadService = new DocumentDownloadService(documentDownloadClientApi,
+                authTokenGenerator, "http://dm-store:4506", true,
+                evidenceManagementSecureDocStoreService, idamService);
+
+        ResponseEntity<Resource> response = ResponseEntity.ok(new ByteArrayResource("test".getBytes()));
+        given(evidenceManagementSecureDocStoreService.downloadResource(any(), any()))
+                .willReturn(response);
+        long size = documentDownloadService
+                .getFileSize("19cd94a8-4280-406b-92c7-090b735159ca");
+        assertEquals(4L, size);
+    }
+
+    @Test
     public void givenFullDocumentUrl_shouldReturnFileSize() {
         ResponseEntity<Resource> response = ResponseEntity.ok(new ByteArrayResource("test".getBytes()));
         given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
+                .willReturn(response);
+        long size = documentDownloadService
+                .getFileSize("http://dm-store:4506/documents/19cd94a8-4280-406b-92c7-090b735159ca");
+        assertEquals(4L, size);
+    }
+
+    @Test
+    public void givenFullDocumentUrl_shouldReturnFileSizeSecure() {
+        documentDownloadService = new DocumentDownloadService(documentDownloadClientApi,
+                authTokenGenerator, "http://dm-store:4506", true,
+                evidenceManagementSecureDocStoreService, idamService);
+
+        ResponseEntity<Resource> response = ResponseEntity.ok(new ByteArrayResource("test".getBytes()));
+        given(evidenceManagementSecureDocStoreService.downloadResource(any(), any()))
                 .willReturn(response);
         long size = documentDownloadService
                 .getFileSize("http://dm-store:4506/documents/19cd94a8-4280-406b-92c7-090b735159ca");
@@ -95,6 +123,19 @@ public class DocumentDownloadServiceTest {
             .willThrow(RuntimeException.class);
         long size = documentDownloadService
             .getFileSize("19cd94a8-4280-406b-92c7-090b735159ca");
+        assertEquals(0L, size);
+    }
+
+    @Test
+    public void givenErrorWhenDownloadingBinaryFile_shouldReturnZeroSizeByDefaultSecure() {
+        documentDownloadService = new DocumentDownloadService(documentDownloadClientApi,
+                authTokenGenerator, "http://dm-store:4506", true,
+                evidenceManagementSecureDocStoreService, idamService);
+
+        given(evidenceManagementSecureDocStoreService.downloadResource(any(), any()))
+                .willThrow(RuntimeException.class);
+        long size = documentDownloadService
+                .getFileSize("19cd94a8-4280-406b-92c7-090b735159ca");
         assertEquals(0L, size);
     }
 
@@ -151,6 +192,32 @@ public class DocumentDownloadServiceTest {
         assertTrue(downloadFile.getHeaders().get(HttpHeaders.CONTENT_TYPE).contains(contentType));
     }
 
+    @Test
+    public void canDownloadFileSecure() {
+        documentDownloadService = new DocumentDownloadService(documentDownloadClientApi,
+                authTokenGenerator, "http://dm-store:4506", true,
+                evidenceManagementSecureDocStoreService, idamService);
+
+        Resource expectedResource = mock(Resource.class);
+
+        HttpHeaders headers = new HttpHeaders();
+        String filename = "filename";
+        headers.add("originalfilename", filename);
+        String contentType = "application/pdf";
+        headers.add(HttpHeaders.CONTENT_TYPE, contentType);
+        ResponseEntity<Resource> expectedResponse = new ResponseEntity<>(expectedResource, headers, HttpStatus.OK);
+
+        given(evidenceManagementSecureDocStoreService.downloadResource(any(), any()))
+                .willReturn(expectedResponse);
+
+        String urlString = "http://somedomain/documents/someDocId/binary";
+        ResponseEntity<Resource> downloadFile = documentDownloadService.downloadFile(urlString);
+
+        assertThat(downloadFile.getStatusCode(), is(HttpStatus.OK));
+        assertThat(downloadFile.getBody(), equalTo(expectedResource));
+        assertTrue(downloadFile.getHeaders().get(HttpHeaders.CONTENT_TYPE).contains(contentType));
+    }
+
     @Test(expected = DocumentNotFoundException.class)
     public void expectedExceptionForNullDownloadFile() {
         given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
@@ -161,8 +228,35 @@ public class DocumentDownloadServiceTest {
     }
 
     @Test(expected = DocumentNotFoundException.class)
+    public void expectedExceptionForNullDownloadFileSecure() {
+        documentDownloadService = new DocumentDownloadService(documentDownloadClientApi,
+            authTokenGenerator, "http://dm-store:4506", true,
+            evidenceManagementSecureDocStoreService, idamService);
+
+        given(evidenceManagementSecureDocStoreService.downloadResource(any(), any()))
+                .willReturn(null);
+
+        String urlString = "http://somedomain/documents/someDocId/binary";
+        documentDownloadService.downloadFile(urlString);
+    }
+
+
+    @Test(expected = DocumentNotFoundException.class)
     public void expectedExceptionForError() {
         given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
+                .willThrow();
+
+        String urlString = "http://somedomain/documents/someDocId/binary";
+        documentDownloadService.downloadFile(urlString);
+    }
+
+    @Test(expected = DocumentNotFoundException.class)
+    public void expectedExceptionForErrorSecure() {
+        documentDownloadService = new DocumentDownloadService(documentDownloadClientApi,
+                authTokenGenerator, "http://dm-store:4506", true,
+                evidenceManagementSecureDocStoreService, idamService);
+
+        given(evidenceManagementSecureDocStoreService.downloadResource(any(), any()))
                 .willThrow();
 
         String urlString = "http://somedomain/documents/someDocId/binary";

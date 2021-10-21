@@ -45,13 +45,18 @@ public class DocumentDownloadService {
     public Long getFileSize(String urlString) {
         ResponseEntity<Resource> response;
         try {
-            response = documentDownloadClientApi.downloadBinary(
-                OAUTH2_TOKEN,
-                authTokenGenerator.generate(),
-                "caseworker",
-                USER_ID,
-                getDownloadUrl(urlString)
-            );
+            if (secureDocStoreEnabled) {
+                IdamTokens idamTokens = idamService.getIdamTokens();
+                response = evidenceManagementSecureDocStoreService.downloadResource(urlString, idamTokens);
+            } else {
+                response = documentDownloadClientApi.downloadBinary(
+                        OAUTH2_TOKEN,
+                        authTokenGenerator.generate(),
+                        "caseworker",
+                        USER_ID,
+                        getDownloadUrl(urlString)
+                );
+            }
             if (response != null && response.getStatusCode() == HttpStatus.OK) {
                 Resource responseBody = response.getBody();
                 if (responseBody != null) {
@@ -69,7 +74,7 @@ public class DocumentDownloadService {
         try {
             if (secureDocStoreEnabled) {
                 IdamTokens idamTokens = idamService.getIdamTokens();
-                return evidenceManagementSecureDocStoreService.downloadResource(urlString, idamTokens);
+                response = evidenceManagementSecureDocStoreService.downloadResource(urlString, idamTokens);
             } else {
                 response = documentDownloadClientApi.downloadBinary(
                         OAUTH2_TOKEN,
