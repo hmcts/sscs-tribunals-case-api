@@ -11,12 +11,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
 import uk.gov.hmcts.reform.sscs.exception.BenefitMappingException;
+import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
@@ -83,7 +85,13 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
 
         if (dwpIssuingOffice == null && ! (CARERS_ALLOWANCE == Benefit.getBenefitOptionalByCode(benefitTypeCode).orElse(null))) {
-            return null;
+            Optional<OfficeMapping> defaultOfficeMapping = dwpAddressLookupService.getDefaultDwpMappingByBenefitType(benefitTypeCode);
+            if (defaultOfficeMapping.isPresent()) {
+                String defaultDwpIssuingOffice = defaultOfficeMapping.get().getMapping().getCcd();
+                return dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(benefitTypeCode, defaultDwpIssuingOffice);
+            } else {
+                return null;
+            }
         }
         return dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(benefitTypeCode, dwpIssuingOffice);
     }
@@ -200,10 +208,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             result = dwpLookup.getDwpMappingByOffice(benefitType, syaCaseWrapper.getMrn().getDwpIssuingOffice())
                     .map(office -> office.getMapping().getCcd())
                     .orElse(null);
-        } else {
-            result = dwpLookup.getDefaultDwpMappingByBenefitType(benefitType)
-                    .map(office -> office.getMapping().getCcd())
-                    .orElse(null);;
         }
 
         return result;
