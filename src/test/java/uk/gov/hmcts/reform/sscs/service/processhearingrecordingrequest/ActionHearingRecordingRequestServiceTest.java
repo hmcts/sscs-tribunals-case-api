@@ -98,6 +98,19 @@ public class ActionHearingRecordingRequestServiceTest {
         assertThat(changedRequestStatus.get(), is(status));
     }
 
+    @Test
+    public void whenHearingRecordingRequestHasNoHearingRecordings_thenDoNotThrowAnError() {
+        final HearingRecordingRequest hearingRecordingRequest = getHearingRecordingRequest(PartyItemList.APPELLANT, REQUESTED);
+
+        hearingRecordingRequest.getValue().setSscsHearingRecording(null);
+        final SscsHearingRecordingCaseData sscsHearingRecordingCaseData = SscsHearingRecordingCaseData.builder()
+                .requestedHearings(newArrayList(hearingRecordingRequest))
+                .build();
+        SscsCaseData sscsCaseData = SscsCaseData.builder().sscsHearingRecordingCaseData(sscsHearingRecordingCaseData).hearings(newArrayList(HEARING)).build();
+        final Optional<RequestStatus> requestStatus = service.getRequestStatus(PartyItemList.APPELLANT, HEARING, sscsCaseData);
+        assertThat(requestStatus, is(Optional.empty()));
+    }
+
     private ProcessHearingRecordingRequest processHearingRecordingRequests(RequestStatus status) {
         return ProcessHearingRecordingRequest.builder()
                 .value(ProcessHearingRecordingRequestDetails.builder()
