@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_EVIDENCE_
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX;
 import static uk.gov.hmcts.reform.sscs.util.ConfidentialityRequestUtil.isAtLeastOneRequestInProgress;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -93,7 +94,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
             return response;
         }
 
-        clearExistingBundles(callback);
+        moveExistingBundlesToHistoricalBundlesThenClearExistingBundles(sscsCaseData);
 
         createPdfsForAnyAudioVideoEvidence(sscsCaseData);
 
@@ -119,8 +120,16 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         bundleAudioVideoPdfService.createAudioVideoPdf(sscsCaseData);
     }
 
-    private void clearExistingBundles(Callback<SscsCaseData> callback) {
-        callback.getCaseDetails().getCaseData().setCaseBundles(null);
+    private void moveExistingBundlesToHistoricalBundlesThenClearExistingBundles(SscsCaseData sscsCaseData) {
+        List<Bundle> historicalBundles = new ArrayList<>();
+        if (nonNull(sscsCaseData.getHistoricalBundles())) {
+            historicalBundles.addAll(sscsCaseData.getHistoricalBundles());
+        }
+        if (nonNull(sscsCaseData.getCaseBundles())) {
+            historicalBundles.addAll(sscsCaseData.getCaseBundles());
+        }
+        sscsCaseData.setHistoricalBundles(historicalBundles);
+        sscsCaseData.setCaseBundles(null);
     }
 
     private void setDocumentFileNameIfNotSet(SscsCaseData sscsCaseData) {

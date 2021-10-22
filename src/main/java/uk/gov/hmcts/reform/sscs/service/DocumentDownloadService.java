@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.exception.DocumentNotFoundException;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.UploadedEvidence;
 
 @Service
@@ -18,29 +20,43 @@ import uk.gov.hmcts.reform.sscs.service.pdf.data.UploadedEvidence;
 public class DocumentDownloadService {
     private final DocumentDownloadClientApi documentDownloadClientApi;
     private final AuthTokenGenerator authTokenGenerator;
+    private final EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService;
+    private final IdamService idamService;
 
     private static final String OAUTH2_TOKEN = "oauth2Token";
     private static final String USER_ID = "sscs";
     private final String documentManagementUrl;
+    private final boolean secureDocStoreEnabled;
 
     DocumentDownloadService(DocumentDownloadClientApi documentDownloadClientApi,
                             AuthTokenGenerator authTokenGenerator,
-                            @Value("${document_management.url}") String documentManagementUrl) {
+                            @Value("${document_management.url}") String documentManagementUrl,
+                            @Value("${feature.secure-doc-store.enabled:false}") boolean secureDocStoreEnabled,
+                            EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService,
+                            IdamService idamService) {
         this.documentDownloadClientApi = documentDownloadClientApi;
         this.authTokenGenerator = authTokenGenerator;
         this.documentManagementUrl = documentManagementUrl;
+        this.secureDocStoreEnabled = secureDocStoreEnabled;
+        this.evidenceManagementSecureDocStoreService = evidenceManagementSecureDocStoreService;
+        this.idamService = idamService;
     }
 
     public Long getFileSize(String urlString) {
         ResponseEntity<Resource> response;
         try {
-            response = documentDownloadClientApi.downloadBinary(
-                OAUTH2_TOKEN,
-                authTokenGenerator.generate(),
-                "caseworker",
-                USER_ID,
-                getDownloadUrl(urlString)
-            );
+            if (secureDocStoreEnabled) {
+                IdamTokens idamTokens = idamService.getIdamTokens();
+                response = evidenceManagementSecureDocStoreService.downloadResource(urlString, idamTokens);
+            } else {
+                response = documentDownloadClientApi.downloadBinary(
+                        OAUTH2_TOKEN,
+                        authTokenGenerator.generate(),
+                        "caseworker",
+                        USER_ID,
+                        getDownloadUrl(urlString)
+                );
+            }
             if (response != null && response.getStatusCode() == HttpStatus.OK) {
                 Resource responseBody = response.getBody();
                 if (responseBody != null) {
@@ -56,13 +72,18 @@ public class DocumentDownloadService {
     public ResponseEntity<Resource> downloadFile(String urlString) {
         ResponseEntity<Resource> response = null;
         try {
-            response = documentDownloadClientApi.downloadBinary(
-                    OAUTH2_TOKEN,
-                    authTokenGenerator.generate(),
-                    "caseworker,citizen",
-                    USER_ID,
-                    getDownloadUrl(urlString)
-            );
+            if (secureDocStoreEnabled) {
+                IdamTokens idamTokens = idamService.getIdamTokens();
+                response = evidenceManagementSecureDocStoreService.downloadResource(urlString, idamTokens);
+            } else {
+                response = documentDownloadClientApi.downloadBinary(
+                        OAUTH2_TOKEN,
+                        authTokenGenerator.generate(),
+                        "caseworker,citizen",
+                        USER_ID,
+                        getDownloadUrl(urlString)
+                );
+            }
         } catch (Exception e) {
             log.error("Error when downloading the following Binary file from the Document Management: {} ", urlString, e);
         }
