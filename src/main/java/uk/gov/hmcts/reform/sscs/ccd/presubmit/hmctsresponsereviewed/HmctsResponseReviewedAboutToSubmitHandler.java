@@ -45,7 +45,7 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        setCaseCode(sscsCaseData, callback.getEvent());
+        setCaseCode(preSubmitCallbackResponse, callback);
         checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
         setDwpDocuments(sscsCaseData);
 

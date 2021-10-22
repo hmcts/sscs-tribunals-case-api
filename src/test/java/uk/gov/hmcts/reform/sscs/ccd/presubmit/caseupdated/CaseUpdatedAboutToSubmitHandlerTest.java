@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -7,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -38,11 +41,16 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     @Mock
+    private CaseDetails<SscsCaseData> caseDetailsBefore;
+
+    @Mock
     private CcdService ccdService;
     @Mock
     private IdamService idamService;
 
     private SscsCaseData sscsCaseData;
+
+    private SscsCaseData sscsCaseDataBefore;
 
     @Mock
     private RegionalProcessingCenterService regionalProcessingCenterService;
@@ -66,8 +74,14 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                 .benefitCode("002")
                 .issueCode("DD")
                 .build();
+
+        sscsCaseDataBefore = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder()
+                .appellant(Appellant.builder().address(Address.builder().postcode("CM120NS").build()).build()).build())
+                .build();
+
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+        when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
     }
 
     @Test
@@ -347,6 +361,70 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         numberOfExpectedError = getNumberOfExpectedError(response);
         assertEquals(0, numberOfExpectedError);
+    }
+
+    @Test
+    public void givenChildSupportCaseAndCaseCodeIsChangedToNonChildSupportCodeAndCaseHasOtherParty_thenShowError() {
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setBenefitCode("001");
+        sscsCaseDataBefore.setBenefitCode("022");
+
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().build()).build();
+        otherPartyList.add(ccdValue);
+        sscsCaseData.setOtherParties(otherPartyList);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getWarnings().size(), is(0));
+        assertThat(response.getErrors().iterator().next(), is("Benefit code cannot be changed on cases with registered 'Other Party'"));
+    }
+
+    @Test
+    public void givenChildSupportCaseAndCaseCodeIsChangedToNonChildSupportCodeAndCaseHasNoOtherParty_thenShowWarning() {
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setBenefitCode("001");
+        sscsCaseDataBefore.setBenefitCode("022");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(1));
+        assertThat(response.getWarnings().iterator().next(), is("The benefit code will be changed to a non-child support benefit code"));
+    }
+
+    @Test
+    @Parameters({"022", "023", "024", "025", "026", "028"})
+    public void givenChildSupportCaseAndCaseCodeIsSetToChildSupportCode_thenNoWarningOrErrorIsShown(String childSupportBenefitCode) {
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setBenefitCode(childSupportBenefitCode);
+        sscsCaseDataBefore.setBenefitCode("022");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(0));
+    }
+
+    @Test
+    public void givenChildSupportCaseAndCaseCodeIsAlreadyANonChildSupportCase_thenShowErrorOrWarning() {
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setBenefitCode("001");
+        sscsCaseDataBefore.setBenefitCode("001");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(0));
     }
 
     private long getNumberOfExpectedError(PreSubmitCallbackResponse<SscsCaseData> response) {

@@ -10,3 +10,5 @@ java:
     IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
     IDAM_API_JWK_URL: https://idam-api.aat.platform.hmcts.net/jwks
     CREATE_CCD_ENDPOINT: true
+    SECURE_DOC_STORE_FEATURE: true
+    CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
