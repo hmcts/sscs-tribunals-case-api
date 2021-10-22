@@ -5,7 +5,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.*;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +14,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.PdfData;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.OldPdfService;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.PdfService;
@@ -35,7 +34,7 @@ public class StorePdfServiceTest {
     private StorePdfService<?, PdfData> storePdfService;
     private IdamTokens idamTokens;
     private String someOnlineHearingId;
-    private EvidenceManagementService evidenceManagementService;
+    private PdfStoreService pdfStoreService;
 
     @Before
     public void setUp() {
@@ -47,9 +46,9 @@ public class StorePdfServiceTest {
         caseId = 123L;
         pdfContent = new Object();
         fileNamePrefix = "test name";
-        evidenceManagementService = mock(EvidenceManagementService.class);
+        pdfStoreService = mock(PdfStoreService.class);
         storePdfService = new StorePdfService<Object, PdfData>(
-            pdfService, "sometemplate","sometemplate", sscsPdfService, idamService, evidenceManagementService) {
+            pdfService, "sometemplate","sometemplate", sscsPdfService, idamService, pdfStoreService) {
 
             @Override
             protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId, PdfData data) {
@@ -136,7 +135,7 @@ public class StorePdfServiceTest {
                 ).build()).build()).build();
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         byte[] expectedPdfBytes = {2, 4, 6, 0, 1};
-        when(evidenceManagementService.download(new URI(documentUrl), "sscs")).thenReturn(expectedPdfBytes);
+        when(pdfStoreService.download(documentUrl)).thenReturn(expectedPdfBytes);
 
         MyaEventActionContext myaEventActionContext = storePdfService.storePdf(caseId, someOnlineHearingId, new PdfData(sscsCaseDetails));
 

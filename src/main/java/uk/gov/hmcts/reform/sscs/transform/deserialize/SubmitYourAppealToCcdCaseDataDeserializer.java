@@ -697,7 +697,11 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         if (null != evidences && !evidences.isEmpty()) {
             return evidences.stream()
                     .map(syaEvidence -> {
-                        DocumentLink documentLink = DocumentLink.builder().documentUrl(syaEvidence.getUrl()).build();
+                        DocumentLink documentLink = DocumentLink.builder().documentUrl(syaEvidence.getUrl())
+                                    .documentBinaryUrl(syaEvidence.getUrl() + "/binary")
+                                    .documentFilename(syaEvidence.getFileName())
+                                    .documentHash(syaEvidence.getHashToken()).build();
+
                         SscsDocumentDetails sscsDocumentDetails = SscsDocumentDetails.builder()
                                 .documentFileName(syaEvidence.getFileName())
                                 .documentDateAdded(syaEvidence.getUploadedDate().format(DateTimeFormatter.ISO_DATE))

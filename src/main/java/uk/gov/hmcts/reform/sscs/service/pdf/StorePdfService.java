@@ -4,8 +4,6 @@ import static java.time.LocalDate.now;
 import static uk.gov.hmcts.reform.sscs.service.pdf.data.UploadedEvidence.pdf;
 import static uk.gov.hmcts.reform.sscs.service.pdf.util.PdfDateUtil.reformatDate;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +17,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.PdfData;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.UploadedEvidence;
@@ -32,20 +30,20 @@ public abstract class StorePdfService<E, D extends PdfData> {
     private final String welshPdfTemplatePath;
     private final CcdPdfService ccdPdfService;
     private final IdamService idamService;
-    private final EvidenceManagementService evidenceManagementService;
+    private final PdfStoreService pdfStoreService;
 
     StorePdfService(PdfService pdfService,
                     String pdfTemplatePath,
                     String welshPdfTemplatePath,
                     CcdPdfService ccdPdfService,
                     IdamService idamService,
-                    EvidenceManagementService evidenceManagementService) {
+                    PdfStoreService pdfStoreService) {
         this.pdfService = pdfService;
         this.pdfTemplatePath = pdfTemplatePath;
         this.welshPdfTemplatePath = welshPdfTemplatePath;
         this.ccdPdfService = ccdPdfService;
         this.idamService = idamService;
-        this.evidenceManagementService = evidenceManagementService;
+        this.pdfStoreService = pdfStoreService;
     }
 
     public MyaEventActionContext storePdfAndUpdate(Long caseId, String onlineHearingId, D data) {
@@ -123,12 +121,9 @@ public abstract class StorePdfService<E, D extends PdfData> {
             SscsDocument document = getSscsDocument(caseDetails, documentNamePrefix);
             documentUrl = document.getValue().getDocumentLink().getDocumentUrl();
         }
-        try {
-            return pdf(evidenceManagementService.download(new URI(documentUrl), "sscs"),
-                getPdfName(documentNamePrefix, caseDetails.getData().getCcdCaseId()));
-        } catch (URISyntaxException e) {
-            throw new IllegalStateException("Document uri invalid [" + documentUrl + "]");
-        }
+        return pdf(pdfStoreService.download(documentUrl),
+            getPdfName(documentNamePrefix, caseDetails.getData().getCcdCaseId()));
+
     }
 
     private SscsDocument getSscsDocument(SscsCaseDetails caseDetails, String documentNamePrefix) {

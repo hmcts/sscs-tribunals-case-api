@@ -242,7 +242,7 @@ dependencyManagement {
             entry 'kotlin-reflect'
         }
         // CVE-2020-13934, CVE-2020-13935, CVE-2020-17527, CVE-2020-17527,
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.50') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.54') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-annotations-api'
@@ -363,10 +363,12 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
     compile group: 'com.github.hmcts', name: 'java-logging', version: versions.reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.07'
+    compile("com.github.hmcts:ccd-case-document-am-client:1.7.2")
+    //remove when secure doc store is live
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.5.8'
-    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.44'
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.5.10'
+    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.45'
 
     compile group:'org.overviewproject', name: 'mime-types', version: '1.0.2'
 
