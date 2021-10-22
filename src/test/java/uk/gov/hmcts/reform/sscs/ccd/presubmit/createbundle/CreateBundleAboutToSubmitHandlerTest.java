@@ -404,16 +404,35 @@ public class CreateBundleAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setPhmeGranted(YES);
 
         List<Bundle> bundles = new ArrayList<>();
-        bundles.add(Bundle.builder().value(BundleDetails.builder().build()).build());
+        bundles.add(Bundle.builder().value(BundleDetails.builder().id("1").build()).build());
         callback.getCaseDetails().getCaseData().setCaseBundles(bundles);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
         assertNull(response.getData().getCaseBundles());
+        assertEquals("1", response.getData().getHistoricalBundles().get(0).getValue().getId());
         assertEquals("Benefit", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
         assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
+    }
+
+    @Test
+    public void givenCaseWithHistoricalBundles_addExistingBundleToHistoricalBundles() {
+
+        List<Bundle> existingBundles = new ArrayList<>();
+        existingBundles.add(Bundle.builder().value(BundleDetails.builder().description("3").build()).build());
+        callback.getCaseDetails().getCaseData().setCaseBundles(existingBundles);
+
+        List<Bundle> historicalBundles = new ArrayList<>();
+        historicalBundles.add(Bundle.builder().value(BundleDetails.builder().description("2").build()).build());
+        historicalBundles.add(Bundle.builder().value(BundleDetails.builder().description("1").build()).build());
+        callback.getCaseDetails().getCaseData().setHistoricalBundles(historicalBundles);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
+        assertEquals(3, response.getData().getHistoricalBundles().size());
     }
 
 
