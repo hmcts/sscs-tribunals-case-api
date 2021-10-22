@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfEvidenceDescription;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.EvidenceDescriptionPdfData;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.OldPdfService;
 
@@ -30,7 +30,7 @@ public class StoreEvidenceDescriptionServiceTest {
                 "template_path",
                 mock(CcdPdfService.class),
                 mock(IdamService.class),
-                mock(EvidenceManagementService.class)
+                mock(PdfStoreService.class)
         );
     }
 

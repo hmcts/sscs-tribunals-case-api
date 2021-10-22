@@ -48,6 +48,7 @@ public class SubmitAppealService {
     private final IdamService idamService;
     private final ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
     private final AirLookupService airLookupService;
+    private final EvidenceManagementSecureDocStoreService secureDocStoreService;
 
     @SuppressWarnings("squid:S107")
     @Autowired
@@ -56,7 +57,8 @@ public class SubmitAppealService {
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
                         ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
-                        AirLookupService airLookupService) {
+                        AirLookupService airLookupService,
+                        EvidenceManagementSecureDocStoreService secureDocStoreService) {
 
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
@@ -64,6 +66,7 @@ public class SubmitAppealService {
         this.idamService = idamService;
         this.convertAIntoBService = convertAIntoBService;
         this.airLookupService = airLookupService;
+        this.secureDocStoreService = secureDocStoreService;
     }
 
     public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
@@ -115,7 +118,7 @@ public class SubmitAppealService {
 
         try {
             SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal);
-
+            
             CaseDetails caseDetails = citizenCcdService.updateCase(sscsCaseData, EventType.UPDATE_DRAFT.getCcdType(), "Update draft",
                     "Update draft in CCD", idamTokens, appeal.getCcdCaseId());
 
