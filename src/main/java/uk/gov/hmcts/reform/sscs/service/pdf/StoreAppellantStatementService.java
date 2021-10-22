@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfAppellantStatement;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.AppellantStatementPdfData;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.PdfService;
 
@@ -34,8 +34,8 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
         @Value("${personalStatement.html.welsh.template.path}") String welshPdfTemplatePath,
         CcdPdfService ccdPdfService,
         IdamService idamService,
-        EvidenceManagementService evidenceManagementService) {
-        super(pdfService, pdfTemplatePath, welshPdfTemplatePath, ccdPdfService, idamService, evidenceManagementService);
+        PdfStoreService pdfStoreService) {
+        super(pdfService, pdfTemplatePath, welshPdfTemplatePath, ccdPdfService, idamService, pdfStoreService);
     }
 
     @Override
