@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.managedwpdocuments;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -63,17 +62,8 @@ public class ManageDwpDocumentsAboutToSubmitHandler extends ResponseEventsAboutT
 
         sscsCaseData.getDwpDocuments().stream().forEach(dwpDocument -> {
 
-            if (sscsCaseData.isBenefitType(CHILD_SUPPORT) && dwpDocument.getValue().getDwpEditedEvidenceReason() != null
-                    && dwpDocument.getValue().getDwpEditedEvidenceReason().equals("phme")) {
-                preSubmitCallbackResponse
-                        .addError("Potential harmful evidence is not a valid selection for child support cases");
-            }
-
-            if (!sscsCaseData.isBenefitType(CHILD_SUPPORT) && dwpDocument.getValue().getDwpEditedEvidenceReason() != null
-                    && dwpDocument.getValue().getDwpEditedEvidenceReason().equals("childSupportConfidentiality")) {
-                preSubmitCallbackResponse
-                        .addError("Child support - Confidentiality is not a valid selection for this case");
-            }
+            dwpDocumentService.validateEditedEvidenceReason(sscsCaseData, preSubmitCallbackResponse,
+                    dwpDocument.getValue().getDwpEditedEvidenceReason());
         });
 
     }

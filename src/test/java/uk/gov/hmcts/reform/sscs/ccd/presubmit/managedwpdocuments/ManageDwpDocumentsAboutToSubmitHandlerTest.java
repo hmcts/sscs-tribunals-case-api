@@ -20,7 +20,9 @@ import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
@@ -31,6 +33,8 @@ import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 @RunWith(JUnitParamsRunner.class)
 public class ManageDwpDocumentsAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
+
+    @InjectMocks
     private ManageDwpDocumentsAboutToSubmitHandler handler;
 
     @Mock
@@ -39,13 +43,13 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
     private SscsCaseData sscsCaseData;
-    @Mock
+
+    @Spy
     private DwpDocumentService dwpDocumentService;
 
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new ManageDwpDocumentsAboutToSubmitHandler(dwpDocumentService);
 
         when(callback.getEvent()).thenReturn(EventType.MANAGE_DWP_DOCUMENTS);
         when(callback.getCaseDetails()).thenReturn(caseDetails);

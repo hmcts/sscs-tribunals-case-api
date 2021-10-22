@@ -5,7 +5,6 @@ import static java.util.Collections.*;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.*;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
@@ -118,28 +117,13 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     private PreSubmitCallbackResponse<SscsCaseData> checkErrors(SscsCaseData sscsCaseData) {
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        validateEditedEvidenceReason(sscsCaseData, preSubmitCallbackResponse);
+        dwpDocumentService.validateEditedEvidenceReason(sscsCaseData, preSubmitCallbackResponse,
+                sscsCaseData.getDwpEditedEvidenceReason());
 
         validateDwpResponseDocuments(sscsCaseData, preSubmitCallbackResponse);
 
         validateDwpAudioVideoEvidence(sscsCaseData, preSubmitCallbackResponse);
         return preSubmitCallbackResponse;
-    }
-
-    private void validateEditedEvidenceReason(SscsCaseData sscsCaseData,
-                                              PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-
-        if (sscsCaseData.isBenefitType(CHILD_SUPPORT) && sscsCaseData.getDwpEditedEvidenceReason() != null
-                && sscsCaseData.getDwpEditedEvidenceReason().equals("phme")) {
-            preSubmitCallbackResponse
-                    .addError("Potential harmful evidence is not a valid selection for child support cases");
-        }
-
-        if (!sscsCaseData.isBenefitType(CHILD_SUPPORT) && sscsCaseData.getDwpEditedEvidenceReason() != null
-                && sscsCaseData.getDwpEditedEvidenceReason().equals("childSupportConfidentiality")) {
-            preSubmitCallbackResponse
-                    .addError("Child support - Confidentiality is not a valid selection for this case");
-        }
     }
 
     private void validateDwpAudioVideoEvidence(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
