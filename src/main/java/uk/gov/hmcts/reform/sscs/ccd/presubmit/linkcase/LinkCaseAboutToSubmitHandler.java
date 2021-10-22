@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.linkcase;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.Lists;
@@ -47,8 +48,6 @@ public class LinkCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        addErrorIfLinkingCaseToItself(preSubmitCallbackResponse.getData().getLinkedCase(), preSubmitCallbackResponse, sscsCaseData.getCcdCaseId());
-
         Map<CaseLink, SscsCaseData> linkedCaseMap = new HashMap<>();
 
         linkedCaseMap.put(CaseLink.builder().value(CaseLinkDetails.builder().caseReference(sscsCaseData.getCcdCaseId()).build()).build(), caseDetails.getCaseData());
@@ -57,21 +56,27 @@ public class LinkCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
 
         if (linkedCaseMap.keySet().size() > 10) {
             preSubmitCallbackResponse.addError("Case cannot be linked as number of linked cases exceeds the limit");
-        } else {
+        }
+
+        if (isCaseBeingLinkedToItself(preSubmitCallbackResponse.getData().getLinkedCase(), sscsCaseData.getCcdCaseId())) {
+            preSubmitCallbackResponse.addError("You can’t link the case to itself, please correct");
+        }
+
+        if (isNull(preSubmitCallbackResponse.getErrors()) || preSubmitCallbackResponse.getErrors().isEmpty()) {
             updateLinkedCases(linkedCaseMap, sscsCaseData.getCcdCaseId());
         }
         return preSubmitCallbackResponse;
     }
 
-    private void addErrorIfLinkingCaseToItself(List<CaseLink> caseLinks, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, String caseId) {
+    private boolean isCaseBeingLinkedToItself(List<CaseLink> caseLinks, String caseId) {
         if (caseLinks != null) {
             for (CaseLink caseLink : caseLinks) {
                 if (caseId.equals(caseLink.getValue().getCaseReference())) {
-                    preSubmitCallbackResponse.addError("You can’t link the case to itself, please correct");
-                    break;
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     private Map<CaseLink, SscsCaseData> buildUniqueSetOfLinkedCases(List<CaseLink> caseLinks, Map<CaseLink, SscsCaseData> linkedCaseMap) {
