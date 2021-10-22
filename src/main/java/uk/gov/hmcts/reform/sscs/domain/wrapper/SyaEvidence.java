@@ -25,12 +25,15 @@ public class SyaEvidence {
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate uploadedDate;
+    private String hashToken;
 
     public SyaEvidence(@JsonProperty("url") String url,
                        @JsonProperty("fileName") String fileName,
-                       @JsonProperty("uploadedDate") LocalDate uploadedDate) {
+                       @JsonProperty("uploadedDate") LocalDate uploadedDate,
+                       @JsonProperty("hashToken") String hashToken) {
         this.url = url;
         this.fileName = fileName;
         this.uploadedDate = uploadedDate;
+        this.hashToken = hashToken;
     }
 }

@@ -78,6 +78,9 @@ public class SubmitAppealServiceTest {
     private IdamService idamService;
 
     @Mock
+    private EvidenceManagementSecureDocStoreService secureDocStoreService;
+
+    @Mock
     private ResourceManager resourceManager;
 
     private SubmitAppealService submitAppealService;
@@ -152,7 +155,7 @@ public class SubmitAppealServiceTest {
 
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, regionalProcessingCenterService,
-            idamService, convertAIntoBService, airLookupService);
+            idamService, convertAIntoBService, airLookupService, secureDocStoreService);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
@@ -164,7 +167,6 @@ public class SubmitAppealServiceTest {
 
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().roles(Arrays.asList("citizen")).build());
         given(emailHelper.generateUniqueEmailId(any(Appellant.class))).willReturn("Bloggs_33C");
-
     }
 
     @Test
