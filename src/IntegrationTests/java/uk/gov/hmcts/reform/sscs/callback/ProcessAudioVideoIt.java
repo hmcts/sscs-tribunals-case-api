@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @SpringBootTest
@@ -50,7 +51,7 @@ public class ProcessAudioVideoIt extends AbstractEventIt {
     private IdamService idamService;
 
     @MockBean
-    private EvidenceManagementService evidenceManagementService;
+    private PdfStoreService pdfStoreService;
 
     @MockBean
     private GenerateFile generateFile;
@@ -63,7 +64,7 @@ public class ProcessAudioVideoIt extends AbstractEventIt {
         when(generateFile.assemble(any())).thenReturn("document.url");
 
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
-        when(evidenceManagementService.download(any(), anyString())).thenReturn(pdfBytes);
+        when(pdfStoreService.download(anyString())).thenReturn(pdfBytes);
 
         when(userDetailsService.buildLoggedInUserName(any())).thenReturn("Logged in user");
 
