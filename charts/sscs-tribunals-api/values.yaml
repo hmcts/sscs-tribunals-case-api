@@ -52,6 +52,9 @@ java:
     IDAM_API_JWK_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net/jwks
     BUNDLE_URL: http://em-ccd-orchestrator-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     DM_GATEWAY_URL: https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net
+    CASE_DOCUMENT_AM_URL: "http://ccd-case-document-am-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    SECURE_DOC_STORE_FEATURE: false
+
 
 idam-pr:
   enabled: false

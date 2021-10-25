@@ -177,9 +177,9 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     public void givenEsaCaseWithWcaAppealFlowAndAllowedFlow_thenSetShowDwpReassessAwardPage(
             @Nullable YesNo wcaFlow, @Nullable String allowedFlow, YesNo expectedShowResult) {
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("Yes");
         sscsCaseData.setWcaAppeal(wcaFlow);
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused(allowedFlow);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused(allowedFlow);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getPageId()).thenReturn("workCapabilityAssessment");
@@ -248,14 +248,14 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         setNoAwardsScenario(sscsCaseData);
         setEmptyActivitiesListScenario(sscsCaseData);
 
-        sscsCaseData.setWriteFinalDecisionEndDateType("setEndDate");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("setEndDate");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
         assertEquals(0, response.getWarnings().size());
 
-        assertEquals("setEndDate", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("setEndDate", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 
@@ -265,21 +265,21 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
         setEmptyActivitiesListScenario(sscsCaseData);
 
-        sscsCaseData.setWriteFinalDecisionEndDateType("indefinite");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("indefinite");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getWarnings().size());
         assertEquals(0, response.getErrors().size());
 
-        assertEquals("indefinite", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("indefinite", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 
     @Test
     @Parameters({"Yes, YES", "No, NO"})
     public void givenGenerateNoticeValueAndCaseIsEsa_thenShouldSetShowWorkCapabilityAssessment(String isGenerateNotice, @Nullable YesNo showWorkCapabilityPage) {
-        sscsCaseData.setWriteFinalDecisionGenerateNotice(isGenerateNotice);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(isGenerateNotice);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 

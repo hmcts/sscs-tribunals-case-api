@@ -16,7 +16,8 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 @Component
 public class PipWriteFinalDecisionMidEventValidationHandler extends WriteFinalDecisionMidEventValidationHandlerBase {
 
-    public PipWriteFinalDecisionMidEventValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService) {
+    public PipWriteFinalDecisionMidEventValidationHandler(Validator validator,
+                                                          DecisionNoticeService decisionNoticeService) {
         super(validator, decisionNoticeService);
     }
 
@@ -27,10 +28,12 @@ public class PipWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setDefaultFields(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getWriteFinalDecisionEndDateType() == null && "yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow())) {
-            if (bothDailyLivingAndMobilityQuestionsAnswered(sscsCaseData) && isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
+        if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType() == null && "yes"
+            .equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow())) {
+            if (bothDailyLivingAndMobilityQuestionsAnswered(sscsCaseData)
+                && isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
                 && isNoAwardOrNotConsideredForMobility(sscsCaseData)) {
-                sscsCaseData.setWriteFinalDecisionEndDateType("na");
+                sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("na");
             }
         }
     }
@@ -41,51 +44,71 @@ public class PipWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     }
 
     @Override
-    protected void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (((!equalsIgnoreCase(AwardType.NO_AWARD.getKey(), sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion())
-            && !equalsIgnoreCase(AwardType.NOT_CONSIDERED.getKey(), sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion()))
-            || ((!equalsIgnoreCase(AwardType.NO_AWARD.getKey(), sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion())
-            && !equalsIgnoreCase(AwardType.NOT_CONSIDERED.getKey(), sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion()))))
-            &&  sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingActivitiesQuestion() != null
-            &&  sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityActivitiesQuestion() != null
-            &&  sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingActivitiesQuestion().isEmpty()
-            &&  sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityActivitiesQuestion().isEmpty()) {
+    protected void validateAwardTypes(SscsCaseData sscsCaseData,
+                                      PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (((!equalsIgnoreCase(AwardType.NO_AWARD.getKey(),
+            sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion())
+            && !equalsIgnoreCase(AwardType.NOT_CONSIDERED.getKey(),
+            sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion()))
+            || ((!equalsIgnoreCase(AwardType.NO_AWARD.getKey(),
+            sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion())
+            && !equalsIgnoreCase(AwardType.NOT_CONSIDERED.getKey(),
+            sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion()))))
+            && sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingActivitiesQuestion() != null
+            && sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityActivitiesQuestion() != null
+            && sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingActivitiesQuestion().isEmpty()
+            && sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityActivitiesQuestion().isEmpty()) {
             preSubmitCallbackResponse.addError("At least one activity must be selected unless there is no award");
         }
 
-        if (AwardType.NO_AWARD.getKey().equals(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion())
-            && "higher".equals(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion())) {
+        if (AwardType.NO_AWARD.getKey()
+            .equals(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion())
+            && "higher"
+            .equals(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion())) {
             preSubmitCallbackResponse.addError("Daily living decision of No Award cannot be higher than DWP decision");
         }
 
-        if (AwardType.NO_AWARD.getKey().equals(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion())
-            && "higher".equals(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpMobilityQuestion())) {
+        if (AwardType.NO_AWARD.getKey()
+            .equals(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion())
+            && "higher"
+            .equals(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpMobilityQuestion())) {
             preSubmitCallbackResponse.addError("Mobility decision of No Award cannot be higher than DWP decision");
 
         }
-        if (AwardType.ENHANCED_RATE.getKey().equals(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion())
-            && "lower".equals(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion())) {
+        if (AwardType.ENHANCED_RATE.getKey()
+            .equals(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion())
+            && "lower"
+            .equals(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion())) {
             preSubmitCallbackResponse.addError("Daily living award at Enhanced Rate cannot be lower than DWP decision");
         }
-        if (AwardType.ENHANCED_RATE.getKey().equals(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion())
-            && "lower".equals(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpMobilityQuestion())) {
+        if (AwardType.ENHANCED_RATE.getKey()
+            .equals(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion())
+            &&
+            "lower".equals(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionComparedToDwpMobilityQuestion())) {
             preSubmitCallbackResponse.addError("Mobility award at Enhanced Rate cannot be lower than DWP decision");
         }
 
-        if (AwardType.NOT_CONSIDERED.getKey().equals(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion())
-            && AwardType.NOT_CONSIDERED.getKey().equals(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion())) {
+        if (AwardType.NOT_CONSIDERED.getKey()
+            .equals(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionDailyLivingQuestion())
+            && AwardType.NOT_CONSIDERED.getKey()
+            .equals(sscsCaseData.getSscsPipCaseData().getPipWriteFinalDecisionMobilityQuestion())) {
             preSubmitCallbackResponse.addError("At least one of Mobility or Daily Living must be considered");
         }
 
-        if ("yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow()) && bothDailyLivingAndMobilityQuestionsAnswered(sscsCaseData)) {
+        if ("yes"
+            .equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow())
+            && bothDailyLivingAndMobilityQuestionsAnswered(sscsCaseData)) {
             if (isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
                 && isNoAwardOrNotConsideredForMobility(sscsCaseData)) {
-                if (sscsCaseData.getWriteFinalDecisionEndDateType() != null && !"na".equals(sscsCaseData.getWriteFinalDecisionEndDateType())) {
-                    preSubmitCallbackResponse.addError("End date is not applicable for this decision - please specify 'N/A - No Award'.");
+                if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType() != null
+                    && !"na".equals(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType())) {
+                    preSubmitCallbackResponse
+                        .addError("End date is not applicable for this decision - please specify 'N/A - No Award'.");
                 }
             } else {
-                if ("na".equals(sscsCaseData.getWriteFinalDecisionEndDateType())) {
-                    preSubmitCallbackResponse.addError("An end date must be provided or set to Indefinite for this decision.");
+                if ("na".equals(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType())) {
+                    preSubmitCallbackResponse
+                        .addError("An end date must be provided or set to Indefinite for this decision.");
                 }
             }
         }
@@ -93,8 +116,12 @@ public class PipWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData, String pageId) {
-        if (sscsCaseData.getWriteFinalDecisionIsDescriptorFlow() != null && sscsCaseData.getWriteFinalDecisionIsDescriptorFlow().equalsIgnoreCase(YesNo.NO.getValue())
-            && sscsCaseData.getWriteFinalDecisionGenerateNotice() != null && sscsCaseData.getWriteFinalDecisionGenerateNotice().equalsIgnoreCase(YesNo.YES.getValue())) {
+        if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow() != null
+            && sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow()
+                .equalsIgnoreCase(YesNo.NO.getValue())
+            && sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice() != null
+            && sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice()
+                .equalsIgnoreCase(YesNo.YES.getValue())) {
             sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES);
             return;
         }

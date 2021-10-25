@@ -28,7 +28,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("noAward");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -48,7 +48,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("noAward");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -63,7 +63,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("enhancedRate");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("lower");
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -78,7 +78,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("enhancedRate");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("lower");
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -106,7 +106,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("noAward");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -115,9 +115,9 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         assertEquals(0, response.getErrors().size());
 
         if ("noAward".equals(award) || "notConsidered".equals(award)) {
-            assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+            assertEquals("na", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
         } else {
-            assertNull(caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+            assertNull(caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
         }
     }
 
@@ -134,8 +134,8 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("noAward");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
-        sscsCaseData.setWriteFinalDecisionEndDateType("na");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("na");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -145,7 +145,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("An end date must be provided or set to Indefinite for this decision.", error);
 
-        assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("na", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 
@@ -162,8 +162,8 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("noAward");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
-        sscsCaseData.setWriteFinalDecisionEndDateType("na");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("na");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -173,7 +173,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("An end date must be provided or set to Indefinite for this decision.", error);
 
-        assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("na", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 
@@ -189,8 +189,8 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
-        sscsCaseData.setWriteFinalDecisionEndDateType("na");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("na");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -199,7 +199,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         assertEquals(0, response.getErrors().size());
 
 
-        assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("na", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 
@@ -215,8 +215,8 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
-        sscsCaseData.setWriteFinalDecisionEndDateType("na");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("na");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -225,7 +225,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         assertEquals(0, response.getErrors().size());
 
 
-        assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("na", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 
@@ -241,8 +241,8 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
-        sscsCaseData.setWriteFinalDecisionEndDateType("indefinite");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("indefinite");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -250,7 +250,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         assertEquals(0, response.getErrors().size());
 
-        assertEquals("indefinite", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("indefinite", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
     }
 
     @Test
@@ -265,8 +265,8 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
-        sscsCaseData.setWriteFinalDecisionEndDateType("indefinite");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("indefinite");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -274,7 +274,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         assertEquals(0, response.getErrors().size());
 
-        assertEquals("indefinite", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("indefinite", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 
@@ -291,8 +291,8 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("noAward");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
-        sscsCaseData.setWriteFinalDecisionEndDateType("indefinite");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("indefinite");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -302,7 +302,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("End date is not applicable for this decision - please specify 'N/A - No Award'.", error);
 
-        assertEquals("indefinite", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("indefinite", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 
@@ -319,8 +319,8 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("noAward");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
-        sscsCaseData.setWriteFinalDecisionEndDateType("indefinite");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("indefinite");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -330,7 +330,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("End date is not applicable for this decision - please specify 'N/A - No Award'.", error);
 
-        assertEquals("indefinite", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("indefinite", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 
@@ -346,8 +346,8 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
-        sscsCaseData.setWriteFinalDecisionEndDateType("setEndDate");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("setEndDate");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -355,7 +355,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         assertEquals(0, response.getErrors().size());
 
-        assertEquals("setEndDate", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("setEndDate", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 
@@ -371,8 +371,8 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
-        sscsCaseData.setWriteFinalDecisionEndDateType("setEndDate");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("setEndDate");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -380,7 +380,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         assertEquals(0, response.getErrors().size());
 
-        assertEquals("setEndDate", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("setEndDate", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 
@@ -397,8 +397,8 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("noAward");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
-        sscsCaseData.setWriteFinalDecisionEndDateType("setEndDate");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("setEndDate");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -408,7 +408,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("End date is not applicable for this decision - please specify 'N/A - No Award'.", error);
 
-        assertEquals("setEndDate", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("setEndDate", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 
@@ -425,8 +425,8 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("noAward");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
-        sscsCaseData.setWriteFinalDecisionEndDateType("setEndDate");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("setEndDate");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -436,7 +436,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("End date is not applicable for this decision - please specify 'N/A - No Award'.", error);
 
-        assertEquals("setEndDate", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("setEndDate", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 
@@ -456,7 +456,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("notConsidered");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -465,9 +465,9 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         assertEquals(0, response.getErrors().size());
 
         if ("noAward".equals(award) || "notConsidered".equals(award)) {
-            assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+            assertEquals("na", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
         } else {
-            assertNull(caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+            assertNull(caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
         }
 
     }
@@ -486,8 +486,8 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("notConsidered");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
-        sscsCaseData.setWriteFinalDecisionEndDateType("na");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("na");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -497,7 +497,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("An end date must be provided or set to Indefinite for this decision.", error);
 
-        assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("na", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
 
     }
@@ -516,8 +516,8 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("notConsidered");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
-        sscsCaseData.setWriteFinalDecisionEndDateType("na");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("na");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -527,7 +527,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("An end date must be provided or set to Indefinite for this decision.", error);
 
-        assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("na", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
 
     }
@@ -542,8 +542,8 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("notConsidered");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
-        sscsCaseData.setWriteFinalDecisionEndDateType("na");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("na");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -552,9 +552,9 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         assertEquals(0, response.getErrors().size());
 
         if ("noAward".equals(award) || "notConsidered".equals(award)) {
-            assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+            assertEquals("na", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
         } else {
-            assertNull(caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+            assertNull(caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
         }
 
     }
@@ -569,8 +569,8 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("notConsidered");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
-        sscsCaseData.setWriteFinalDecisionEndDateType("na");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("na");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -579,9 +579,9 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         assertEquals(0, response.getErrors().size());
 
         if ("noAward".equals(award) || "notConsidered".equals(award)) {
-            assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+            assertEquals("na", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
         } else {
-            assertNull(caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+            assertNull(caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
         }
 
     }
@@ -597,7 +597,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("notConsidered");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -627,7 +627,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("noAward");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -636,9 +636,9 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         assertEquals(0, response.getErrors().size());
 
         if ("noAward".equals(award) || "notConsidered".equals(award)) {
-            assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+            assertEquals("na", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
         } else {
-            assertNull(caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+            assertNull(caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
         }
     }
 
@@ -658,7 +658,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("notConsidered");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -667,9 +667,9 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         assertEquals(0, response.getErrors().size());
 
         if ("noAward".equals(award) || "notConsidered".equals(award)) {
-            assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+            assertEquals("na", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
         } else {
-            assertNull(caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+            assertNull(caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
         }
     }
 
@@ -685,7 +685,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("notConsidered");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparison);
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -708,8 +708,8 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     public void givenPipCaseWithDescriptorFlowAndGenerateNoticeFlow_thenSetShowSummaryOfOutcomePage(
             @Nullable String descriptorFlow, @Nullable String generateNoticeFlow, YesNo expectedShowResult) {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow(descriptorFlow);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice(generateNoticeFlow);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow(descriptorFlow);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(generateNoticeFlow);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -721,8 +721,8 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     @Test
     public void givenPipCase_thenDoNotShowDwpReassessAwardPage() {
 
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("Yes");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -767,7 +767,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         assertEquals(0, response.getWarnings().size());
         assertEquals(0, response.getErrors().size());
-        assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("na", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
     }
 
     @Test
@@ -782,7 +782,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         assertEquals(0, response.getWarnings().size());
         assertEquals(0, response.getErrors().size());
-        assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("na", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
     }
 
     @Test
@@ -797,7 +797,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         assertEquals(0, response.getWarnings().size());
         assertEquals(0, response.getErrors().size());
-        assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("na", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
     }
 
     @Test
@@ -814,7 +814,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         assertEquals(0, response.getErrors().size());
         assertEquals(0, response.getWarnings().size());
 
-        assertNull(caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertNull(caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 
@@ -825,14 +825,14 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         setNoAwardsScenario(sscsCaseData);
         setEmptyActivitiesListScenario(sscsCaseData);
 
-        sscsCaseData.setWriteFinalDecisionEndDateType("setEndDate");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("setEndDate");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
         assertEquals("End date is not applicable for this decision - please specify 'N/A - No Award'.", response.getErrors().iterator().next());
         assertEquals(0, response.getWarnings().size());
-        assertEquals("setEndDate", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("setEndDate", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 
@@ -844,7 +844,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(AwardType.NO_AWARD.getKey());
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(AwardType.NO_AWARD.getKey());
-        sscsCaseData.setWriteFinalDecisionEndDateType("indefinite");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("indefinite");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -852,7 +852,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         assertEquals(1, response.getErrors().size());
         assertEquals("End date is not applicable for this decision - please specify 'N/A - No Award'.", response.getErrors().iterator().next());
 
-        assertEquals("indefinite", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals("indefinite", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
     }
 
     @Test
@@ -869,7 +869,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Override
     protected void setValidPointsAndActivitiesScenario(SscsCaseData caseData, String descriptorFlowValue) {
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow(descriptorFlowValue);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow(descriptorFlowValue);
     }
 
     @Override

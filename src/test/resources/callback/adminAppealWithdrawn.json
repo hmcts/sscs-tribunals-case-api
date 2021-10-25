@@ -1,5 +1,4 @@
 {
-  "ignore_warning": true,
   "case_details": {
     "id": 12345656789,
     "jurisdiction": "SSCS",
@@ -25,26 +24,6 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
-      "selectWhoReviewsCase": {
-        "value": {
-          "code": "reviewByTcw",
-          "label": "Review by TCW"
-        },
-        "list_items": [
-          {
-            "code": "reviewByTcw",
-            "label": "Review by TCW"
-          },
-          {
-            "code": "reviewByJudge",
-            "label": "Review by Judge"
-          },
-          {
-            "code": "postponementRequestInterlocSendToTcw",
-            "label": "Postponement request for interloc - send to TCW"
-          }
-        ]
-      },
       "dwpTimeExtension": [
       ],
       "hearings": [
@@ -87,6 +66,11 @@
           "subscribeSms": "No",
           "tya": ""
         }
+      },
+      "previewDocument": {
+        "document_url" : "http://www.withdrwal.com",
+        "document_binary_url" : "http://www.withdrwal.com/binary",
+        "document_filename" : "withdrwal doc1"
       },
       "sscsDocument" : [ {
         "value" : {
@@ -148,6 +132,7 @@
         "postcode": "B16 6FR",
         "city": "BIRMINGHAM"
       },
+      "tempNoteDetail": "withdrawal note added",
       "appeal": {
         "mrnDetails": {},
         "appellant": {
@@ -660,5 +645,5 @@
       }
     }
   },
-  "event_id": "validSendToInterloc"
+  "event_id": "adminAppealWithdrawn"
 }
