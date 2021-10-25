@@ -73,7 +73,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
         }
 
         if (nonNull(caseData.getDraftSscsFurtherEvidenceDocument()) && incorrectTypeSelectedForAudioVideoEvidence(caseData.getDraftSscsFurtherEvidenceDocument())) {
-            response.addError("Select the party that originally submitted the audio/video evidence");
+            response.addError("Type not accepted for AV evidence. Select a Type for the party that originally submitted the audio/video evidence");
         }
 
         PdfState pdfState = isPdfReadable(caseData.getDraftSscsFurtherEvidenceDocument());

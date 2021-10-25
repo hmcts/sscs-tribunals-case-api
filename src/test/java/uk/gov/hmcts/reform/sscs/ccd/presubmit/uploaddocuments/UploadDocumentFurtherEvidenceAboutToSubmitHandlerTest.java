@@ -138,7 +138,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
                 USER_AUTHORISATION);
 
         long numberOfExpectedError = actualResponse.getErrors().stream()
-                .filter(error -> error.equalsIgnoreCase("Select the party that originally submitted the audio/video evidence"))
+                .filter(error -> error.equalsIgnoreCase("Type not accepted for AV evidence. Select a Type for the party that originally submitted the audio/video evidence"))
                 .count();
         assertEquals(1, numberOfExpectedError);
     }

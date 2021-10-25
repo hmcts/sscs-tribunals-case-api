@@ -84,7 +84,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             }
 
             if (incorrectTypeSelectedForAudioVideoEvidence(sscsCaseData.getDraftFurtherEvidenceDocuments())) {
-                preSubmitCallbackResponse.addError("Select the party that originally submitted the audio/video evidence");
+                preSubmitCallbackResponse.addError("Type not accepted for AV evidence. Select a Type for the party that originally submitted the audio/video evidence");
             }
 
             SscsCaseData beforeData = callback.getCaseDetailsBefore().map(CaseDetails::getCaseData).orElse(null);

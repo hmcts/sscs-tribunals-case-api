@@ -173,7 +173,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("Select the party that originally submitted the audio/video evidence"));
+        assertThat(response.getErrors().iterator().next(), is("Type not accepted for AV evidence. Select a Type for the party that originally submitted the audio/video evidence"));
 
     }
 
