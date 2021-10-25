@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.service.bundle;
 
-import static java.util.Collections.singletonList;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 
