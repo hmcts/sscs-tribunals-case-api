@@ -142,7 +142,7 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         sscsWelshPreviewDocument.getValue().setBundleAddition(bundleAddition);
     }
 
-    public String buildWelshFileNameFromOriginal(String documentFileName) {
+    private String buildWelshFileNameFromOriginal(String documentFileName) {
         documentFileName.split("Addition ");
         String[] originalFileNameSplit = documentFileName.split("Addition ");
         if (originalFileNameSplit.length == 2) {
