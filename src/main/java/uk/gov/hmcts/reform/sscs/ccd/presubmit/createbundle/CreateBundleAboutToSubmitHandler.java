@@ -189,7 +189,8 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     }
 
     private boolean hasPhmeRequestOrConfidentialityUnderReview(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response, boolean hasEditedDwpResponseDocument, boolean hasEditedDwpEvidenceBundleDocument) {
-        if (isPhmeStatusUnderReview(sscsCaseData) && (hasEditedDwpResponseDocument || hasEditedDwpEvidenceBundleDocument)) {
+        if (!sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) && isPhmeStatusUnderReview(sscsCaseData)
+                && (hasEditedDwpResponseDocument || hasEditedDwpEvidenceBundleDocument)) {
             response.addError("There is a pending PHME request on this case");
         }
 
