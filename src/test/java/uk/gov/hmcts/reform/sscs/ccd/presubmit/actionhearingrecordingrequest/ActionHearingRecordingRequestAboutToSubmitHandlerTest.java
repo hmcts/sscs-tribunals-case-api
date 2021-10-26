@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest;
 
+import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -205,9 +207,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
     @Test
     @Parameters({"appellant", "representative", "jointParty"})
     public void givenAGrantedFromVoidCitizenHearingRecording_thenAddToReleasedList(String party) {
-        SscsHearingRecording recording1 = SscsHearingRecording.builder()
-                .value(SscsHearingRecordingDetails.builder().hearingId("an_id1").build())
-                .build();
+        SscsHearingRecording recording1 = getHearingRecording();
 
         sscsCaseData.getSscsHearingRecordingCaseData().setSscsHearingRecordings(Arrays.asList(recording1));
         sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequests(Arrays
@@ -355,5 +355,28 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
         assertThat("Check RequestedHearings has the correct Hearing",
                 sscsHearingRecordingCaseDataResponse.getRequestedHearings().get(0).getValue()
                         .getSscsHearingRecording().getHearingId(), is("an_id1"));
+    }
+
+    @Test
+    public void whenHearingRecordingRequestWithNoHearingRecordingsIsActioned_thenDoNotThrowAnError() {
+        SscsHearingRecording recording1 = getHearingRecording();
+        HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails
+                .builder().sscsHearingRecording(null)
+                .requestingParty(PartyItemList.APPELLANT.getCode()).build()).build();
+
+        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequests(
+                singletonList(getProcessHearingRecordingRequest(
+                        RequestStatus.GRANTED, "an_id1", PartyItemList.APPELLANT.getCode())));
+        sscsCaseData.getSscsHearingRecordingCaseData().setSscsHearingRecordings(singletonList(recording1));
+        sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(singletonList(hearingRecordingRequest));
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+    }
+
+    private SscsHearingRecording getHearingRecording() {
+        return SscsHearingRecording.builder()
+                .value(SscsHearingRecordingDetails.builder().hearingId("an_id1").build())
+                .build();
     }
 }
