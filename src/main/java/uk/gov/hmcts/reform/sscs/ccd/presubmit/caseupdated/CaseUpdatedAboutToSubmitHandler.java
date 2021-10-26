@@ -54,7 +54,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         final Optional<CaseDetails<SscsCaseData>> caseDetailsBefore = callback.getCaseDetailsBefore();
         final SscsCaseData sscsCaseData = associatedCaseLinkHelper.linkCaseByNino(caseDetails.getCaseData(), caseDetailsBefore);
 
-        setCaseCode(sscsCaseData, callback.getEvent());
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+
+        setCaseCode(preSubmitCallbackResponse, callback);
 
         if (sscsCaseData.getAppeal().getAppellant() != null
                 && sscsCaseData.getAppeal().getAppellant().getAddress() != null
@@ -75,7 +77,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         }
 
-        return new PreSubmitCallbackResponse<>(sscsCaseData);
+        return preSubmitCallbackResponse;
     }
 
     public void maybeChangeIsScottish(RegionalProcessingCenter oldRpc, RegionalProcessingCenter newRpc, SscsCaseData caseData) {
