@@ -189,7 +189,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     }
 
     private boolean hasPhmeRequestOrConfidentialityUnderReview(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response, boolean hasEditedDwpResponseDocument, boolean hasEditedDwpEvidenceBundleDocument) {
-        if (!sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) && isPhmeStatusUnderReview(sscsCaseData)
+        if (isPhmeAbleBenefitTypeCase(sscsCaseData) && isPhmeStatusUnderReview(sscsCaseData)
                 && (hasEditedDwpResponseDocument || hasEditedDwpEvidenceBundleDocument)) {
             response.addError("There is a pending PHME request on this case");
         }
@@ -198,6 +198,10 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
             response.addError("There is a pending enhanced confidentiality request on this case");
         }
         return !response.getErrors().isEmpty();
+    }
+
+    private boolean isPhmeAbleBenefitTypeCase(SscsCaseData sscsCaseData) {
+        return !sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT);
     }
 
     private boolean isHasEditedDwpEvidenceBundleDocument(SscsCaseData sscsCaseData) {

@@ -243,6 +243,19 @@ public class CreateBundleAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenCaseWithEditedDwpDocsAndChildSupport_thenReturnNoError() {
+        addMandatoryDwpDocuments();
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        sscsCaseData.setLanguagePreferenceWelsh(NO.getValue());
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setBenefitCode("022");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
     @Parameters({"appellant, YES", "appellant, NO", "jointParty, YES", "jointParty, NO"})
     public void givenCaseWithPendingEnhancedConfidentiality_thenReturnErrorMessage(String party, YesNo phmeGranted) {
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(NO.getValue());
