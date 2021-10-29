@@ -143,7 +143,6 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
     }
 
     private String buildWelshFileNameFromOriginal(String documentFileName) {
-        documentFileName.split("Addition ");
         String[] originalFileNameSplit = documentFileName.split("Addition ");
         if (originalFileNameSplit.length == 2) {
             return "Addition " + WELSH_ADDITION_PREFIX + originalFileNameSplit[1];
