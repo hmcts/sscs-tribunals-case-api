@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service.actionhearingrecordingrequest;
 
+import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.model.RequestStatus.GRANTED;
 import static uk.gov.hmcts.reform.sscs.model.RequestStatus.REFUSED;
@@ -47,6 +48,8 @@ public class ActionHearingRecordingRequestService {
     private boolean hasHearingRequestInCollection(PartyItemList party, Hearing hearing, List<HearingRecordingRequest> hearingRecordingCollection) {
         return emptyIfNull(hearingRecordingCollection).stream()
                 .filter(r -> r.getValue().getRequestingParty().equals(party.getCode()))
+                .filter(hr -> nonNull(hr.getValue().getSscsHearingRecording()))
+                .filter(hr -> nonNull(hr.getValue().getSscsHearingRecording().getHearingId()))
                 .anyMatch(hr -> hr.getValue().getSscsHearingRecording().getHearingId().equals(hearing.getValue().getHearingId()));
     }
 
