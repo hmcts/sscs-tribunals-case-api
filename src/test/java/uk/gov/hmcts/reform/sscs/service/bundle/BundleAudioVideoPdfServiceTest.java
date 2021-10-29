@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.service.bundle;
 
-import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -22,11 +21,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import uk.gov.hmcts.reform.document.domain.Document;
-import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.docassembly.PdfTemplateContent;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -39,7 +36,7 @@ public class BundleAudioVideoPdfServiceTest {
     @Mock
     private DocmosisPdfService docmosisPdfService;
     @Mock
-    private EvidenceManagementService evidenceManagementService;
+    private PdfStoreService pdfStoreService;
 
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
@@ -54,14 +51,14 @@ public class BundleAudioVideoPdfServiceTest {
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        service = new BundleAudioVideoPdfService(docmosisPdfService, evidenceManagementService, "gateway-link", "dm-store-url");
+        service = new BundleAudioVideoPdfService(docmosisPdfService, pdfStoreService, "gateway-link", "dm-store-url");
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
 
-        UploadResponse uploadResponse = createUploadResponse();
-        when(evidenceManagementService.upload(any(), anyString())).thenReturn(uploadResponse);
+        SscsDocument sscsDocument = createSscsDocument();
+        when(pdfStoreService.storeDocument(any(), anyString(), any())).thenReturn(sscsDocument);
         when(docmosisPdfService.createPdf(capture.capture(),any())).thenReturn(expectedPdf);
 
         now = LocalDate.now();
@@ -224,22 +221,8 @@ public class BundleAudioVideoPdfServiceTest {
 
     }
 
-    private UploadResponse createUploadResponse() {
-        UploadResponse response = mock(UploadResponse.class);
-        UploadResponse.Embedded embedded = mock(UploadResponse.Embedded.class);
-        when(response.getEmbedded()).thenReturn(embedded);
-        Document document = createDocument();
-        when(embedded.getDocuments()).thenReturn(singletonList(document));
-        return response;
-    }
-
-    private static Document createDocument() {
-        Document document = new Document();
-        Document.Links links = new Document.Links();
-        Document.Link link = new Document.Link();
-        link.href = "some location";
-        links.self = link;
-        document.links = links;
-        return document;
+    private SscsDocument createSscsDocument() {
+        DocumentLink documentLink = DocumentLink.builder().documentUrl("some location").build();
+        return SscsDocument.builder().value(SscsDocumentDetails.builder().documentLink(documentLink).build()).build();
     }
 }

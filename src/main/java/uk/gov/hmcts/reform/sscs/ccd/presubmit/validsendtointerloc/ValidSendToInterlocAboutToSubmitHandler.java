@@ -2,28 +2,30 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty.REP;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.REPRESENTATIVE;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase;
+import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
 
 @Component
 @Slf4j
 public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private final PostponementRequestService postponementRequestService;
+
+    @Autowired
+    public ValidSendToInterlocAboutToSubmitHandler(PostponementRequestService postponementRequestService) {
+        this.postponementRequestService = postponementRequestService;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -44,21 +46,28 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-
-        if (sscsCaseData.getSelectWhoReviewsCase() == null || sscsCaseData.getSelectWhoReviewsCase().getValue() == null
-                || sscsCaseData.getSelectWhoReviewsCase().getValue().getCode() == null) {
+        if (isDynamicListEmpty(sscsCaseData.getSelectWhoReviewsCase())) {
+            PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
             preSubmitCallbackResponse.addError("Must select who reviews the appeal.");
             return preSubmitCallbackResponse;
         }
 
-        if (SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId().equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode())) {
-            if (sscsCaseData.getOriginalSender() == null || sscsCaseData.getOriginalSender().getValue() == null
-                    || sscsCaseData.getOriginalSender().getValue().getCode() == null) {
+        return processSendToInterloc(callback, sscsCaseData);
+    }
+
+    private PreSubmitCallbackResponse<SscsCaseData> processSendToInterloc(Callback<SscsCaseData> callback, SscsCaseData sscsCaseData) {
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+        if (isPostponementRequestInterlocSendToTcw(sscsCaseData)) {
+            if (isDynamicListEmpty(sscsCaseData.getOriginalSender())) {
                 preSubmitCallbackResponse.addError("Must select original sender");
                 return preSubmitCallbackResponse;
             }
-            processPostponementRequest(sscsCaseData);
+            if (!callback.isIgnoreWarnings()) {
+                preSubmitCallbackResponse.addWarning("Are you sure you want to postpone the hearing?");
+                return preSubmitCallbackResponse;
+            }
+            UploadParty uploadParty = getUploadParty(sscsCaseData.getOriginalSender());
+            postponementRequestService.processPostponementRequest(sscsCaseData, uploadParty);
         } else {
             final String code = sscsCaseData.getSelectWhoReviewsCase().getValue().getCode();
             sscsCaseData.setInterlocReviewState(code);
@@ -70,42 +79,19 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
         return preSubmitCallbackResponse;
     }
 
-    private void processPostponementRequest(SscsCaseData sscsCaseData) {
-        ensureSscsDocumentsIsNotNull(sscsCaseData);
-        final SscsDocument sscsDocument = buildNewSscsDocumentFromPostponementRequest(sscsCaseData);
-        addToSscsDocuments(sscsCaseData, sscsDocument);
-        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId());
-        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId());
-        sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(YES);
-        clearTransientFields(sscsCaseData);
+    private boolean isPostponementRequestInterlocSendToTcw(SscsCaseData sscsCaseData) {
+        return SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId().equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode());
     }
 
-    private void clearTransientFields(SscsCaseData sscsCaseData) {
-        sscsCaseData.getPostponementRequest().setPostponementRequestDetails(null);
-        sscsCaseData.getPostponementRequest().setPostponementPreviewDocument(null);
+    private UploadParty getUploadParty(DynamicList originalSender) {
+        return REPRESENTATIVE.getCode().equals(originalSender.getValue().getCode())
+                ? REP : UploadParty.fromValue(originalSender.getValue().getCode());
     }
 
-    private void addToSscsDocuments(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
-        sscsCaseData.getSscsDocument().add(sscsDocument);
-    }
-
-    private SscsDocument buildNewSscsDocumentFromPostponementRequest(SscsCaseData sscsCaseData) {
-
-        UploadParty uploadParty = REPRESENTATIVE.getCode().equals(sscsCaseData.getOriginalSender().getValue().getCode())
-                ? REP : UploadParty.fromValue(sscsCaseData.getOriginalSender().getValue().getCode());
-
-        return SscsDocument.builder().value(SscsDocumentDetails.builder()
-                .documentLink(sscsCaseData.getPostponementRequest().getPostponementPreviewDocument())
-                .documentFileName(sscsCaseData.getPostponementRequest().getPostponementPreviewDocument().getDocumentFilename())
-                .documentType(DocumentType.POSTPONEMENT_REQUEST.getValue())
-                .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
-                .originalPartySender(uploadParty.getValue())
-                .build()).build();
-    }
-
-    private void ensureSscsDocumentsIsNotNull(SscsCaseData sscsCaseData) {
-        final List<SscsDocument> sscsDocuments = (sscsCaseData.getSscsDocument() == null) ? new ArrayList<>() : sscsCaseData.getSscsDocument();
-        sscsCaseData.setSscsDocument(sscsDocuments);
+    private boolean isDynamicListEmpty(DynamicList originalSender) {
+        return originalSender == null
+                || originalSender.getValue() == null
+                || originalSender.getValue().getCode() == null;
     }
 
 }

@@ -11,8 +11,8 @@ import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
 public class WelshFooterService extends AbstractFooterService<SscsWelshDocument> {
 
     @Autowired
-    public WelshFooterService(EvidenceManagementService evidenceManagementService, PdfWatermarker alter) {
-        super(evidenceManagementService, alter);
+    public WelshFooterService(PdfStoreService pdfStoreService, PdfWatermarker alter) {
+        super(pdfStoreService, alter);
     }
 
 }

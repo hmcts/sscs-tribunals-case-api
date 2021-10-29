@@ -50,7 +50,7 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
         WriteFinalDecisionTemplateBody payload) {
 
 
-        if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+        if ("Yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
 
             // Validate here for UC instead of only validating on submit.
             // This ensures that we know we can obtain a valid allowed or refused condition below
@@ -76,7 +76,7 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
     @Override
     protected void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
 
-        if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+        if ("Yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             builder.ucIsEntited(false);
             builder.ucAwardRate(null);
             Optional<AwardType> ucAwardTypeOptional = caseData.isWcaAppeal() ? UcPointsRegulationsAndSchedule7ActivitiesCondition

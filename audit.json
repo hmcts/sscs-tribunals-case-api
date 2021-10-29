@@ -367,7 +367,25 @@
   "90033_Loosely Scoped Cookie_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/appeals_POST" : "ignore",
   "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/request/identifier/hearingrecording_GET" : "ignore",
   "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/appeals_POST" : "ignore",
-  "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/statement_POST" : "ignore"
+  "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/statement_POST" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/appeals/appealNumber/subscriptions/subscriptionId_POST" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/ccdAboutToStart_POST" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/ccdMidEventAdminRestoreCases_POST" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/appeals/appealNumber/subscriptions/subscriptionId_POST" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/ccdAboutToStart_POST" : "ignore",
+  "10010_Cookie No HttpOnly Flag_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/request/identifier/recordingrequest?hearingIds=hearingIds_POST" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/request/identifier/recordingrequest?hearingIds=hearingIds_POST" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/singleevidence?body=body&idamEmail=idamEmail_POST" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/appeals_POST" : "ignore",
+  "90033_Loosely Scoped Cookie_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/request/identifier/recordingrequest?hearingIds=hearingIds_POST" : "ignore",
+  "10010_Cookie No HttpOnly Flag_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/drafts_POST" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/ccdMidEventAdjournCasePopulateVenueDropdown_POST" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/ccdSubmittedEvent_POST" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/drafts_POST" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/ccdMidEventAdjournCasePopulateVenueDropdown_POST" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/ccdSubmittedEvent_POST" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/drafts_POST" : "ignore",
+  "90033_Loosely Scoped Cookie_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/drafts_POST" : "ignore"
 
 
 }

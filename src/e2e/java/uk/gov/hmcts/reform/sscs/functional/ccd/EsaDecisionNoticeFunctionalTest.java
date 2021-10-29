@@ -371,8 +371,8 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
         HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(json), "PreviewFinalDecision");
         CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
-        assertThat(ccdEventResponse.getData().getWriteFinalDecisionPreviewDocument(), is(not(nullValue())));
-        return sscsMyaBackendRequests.toBytes(ccdEventResponse.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertThat(ccdEventResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument(), is(not(nullValue())));
+        return sscsMyaBackendRequests.toBytes(ccdEventResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
     }
 
     private CcdEventResponse getCcdEventResponse(HttpResponse httpResponse) throws IOException {

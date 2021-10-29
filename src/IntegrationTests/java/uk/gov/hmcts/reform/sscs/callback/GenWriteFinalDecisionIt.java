@@ -59,7 +59,7 @@ public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForDescriptorRoute() throws Exception {
         // N/A for GEN
     }
-    
+
     @Test
     public void callToAboutToSubmitHandler_willWriteManuallyUploadedFinalDecisionToCase() throws Exception {
         setup("callback/writeFinalDecisionManualUploadDescriptorDLA.json");
@@ -315,7 +315,7 @@ public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -377,7 +377,7 @@ public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());

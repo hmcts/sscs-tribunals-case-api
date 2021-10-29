@@ -65,7 +65,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             return preSubmitCallbackResponse;
         }
 
-        setCaseCode(sscsCaseData, callback.getEvent());
+        setCaseCode(preSubmitCallbackResponse, callback);
 
         sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
 

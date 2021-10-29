@@ -1,17 +1,16 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.generatecoversheet;
 
-import static java.util.Collections.singletonList;
 import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
@@ -20,14 +19,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.document.domain.Document;
-import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.coversheet.CoversheetService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -37,7 +32,7 @@ public class GenerateCoversheetAboutToStartHandlerTest {
 
     private GenerateCoversheetAboutToStartHandler handler;
     @Mock
-    private EvidenceManagementService evidenceManagementService;
+    private PdfStoreService pdfStoreService;
 
     @Mock
     private CoversheetService coversheetService;
@@ -52,14 +47,14 @@ public class GenerateCoversheetAboutToStartHandlerTest {
     public void setUp() {
         openMocks(this);
         byte[] coversheetPdf = {2, 4, 6, 0, 1};
-        UploadResponse uploadResponse = createUploadResponse();
+        SscsDocument sscsDocument = createSscsDocument();
         when(callback.getEvent()).thenReturn(EventType.GENERATE_COVERSHEET);
         SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdCaseId").build();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(evidenceManagementService.upload(any(), anyString())).thenReturn(uploadResponse);
+        when(pdfStoreService.storeDocument(any(), anyString(), any())).thenReturn(sscsDocument);
         when(coversheetService.createCoverSheet("ccdCaseId")).thenReturn(Optional.of(coversheetPdf));
-        handler = new GenerateCoversheetAboutToStartHandler(coversheetService, evidenceManagementService);
+        handler = new GenerateCoversheetAboutToStartHandler(coversheetService, pdfStoreService);
     }
 
     @Test
@@ -69,12 +64,25 @@ public class GenerateCoversheetAboutToStartHandlerTest {
     }
 
     @Test
+    public void canNotHandleCorrectly() {
+        boolean actualResult = handler.canHandle(ABOUT_TO_SUBMIT, callback);
+        assertFalse(actualResult);
+    }
+
+    @Test
+    public void errorWhenNullDocument() {
+        when(pdfStoreService.storeDocument(any(), anyString(), any())).thenReturn(null);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertEquals(1, response.getErrors().size());
+    }
+
+    @Test
     public void setsThePreviewDocumentField() {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         DocumentLink documentLink = DocumentLink.builder().documentFilename("coversheet.pdf").documentBinaryUrl("urlLocation/binary").documentUrl("urlLocation").build();
         assertEquals(response.getData().getPreviewDocument(), documentLink);
         verify(coversheetService).createCoverSheet(eq("ccdCaseId"));
-        verify(evidenceManagementService).upload(anyList(), anyString());
+        verify(pdfStoreService).storeDocument(any(), anyString(), any());
     }
 
     @Test
@@ -84,13 +92,11 @@ public class GenerateCoversheetAboutToStartHandlerTest {
         assertEquals(response.getErrors().size(), 1);
     }
 
-    private UploadResponse createUploadResponse() {
-        UploadResponse response = mock(UploadResponse.class);
-        UploadResponse.Embedded embedded = mock(UploadResponse.Embedded.class);
-        when(response.getEmbedded()).thenReturn(embedded);
-        Document document = createDocument();
-        when(embedded.getDocuments()).thenReturn(singletonList(document));
-        return response;
+    private SscsDocument createSscsDocument() {
+        SscsDocument sscsDocument = SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentUrl("urlLocation").build()).build()).build();
+        return sscsDocument;
     }
 
     private static Document createDocument() {

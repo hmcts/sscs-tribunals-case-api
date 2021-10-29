@@ -18,8 +18,8 @@ import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
 public class FooterService extends AbstractFooterService<SscsDocument> {
 
     @Autowired
-    public FooterService(EvidenceManagementService evidenceManagementService, PdfWatermarker alter) {
-        super(evidenceManagementService, alter);
+    public FooterService(PdfStoreService pdfStoreService, PdfWatermarker alter) {
+        super(pdfStoreService, alter);
     }
 
     public void createFooterAndAddDocToCase(DocumentLink url, SscsCaseData caseData, DocumentType documentType, String dateIssued, LocalDate dateAdded, String overrideFileName, SscsDocumentTranslationStatus documentTranslationStatus) {
