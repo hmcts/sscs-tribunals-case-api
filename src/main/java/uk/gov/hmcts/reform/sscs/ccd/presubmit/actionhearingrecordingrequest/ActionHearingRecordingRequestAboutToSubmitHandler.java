@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 
-
 @Service
 @Slf4j
 public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -113,6 +112,8 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
 
             Set<HearingRecordingRequest> partyHearingRecordingsRequests = allHearingRecordingsRequests.stream()
                     .filter(isFromRequestingParty(partyItemList))
+                    .filter(hr -> nonNull(hr.getValue().getSscsHearingRecording()))
+                    .filter(hr -> nonNull(hr.getValue().getSscsHearingRecording().getHearingId()))
                     .filter(hasHearingId(hearingId))
                     .collect(Collectors.toSet());
 

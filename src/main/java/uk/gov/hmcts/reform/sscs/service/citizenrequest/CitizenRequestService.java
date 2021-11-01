@@ -126,6 +126,8 @@ public class CitizenRequestService {
         hearingRecordingRequests.addAll(newHearingRequests);
 
         sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(hearingRecordingRequests);
+        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YesNo.YES);
+
         ccdService.updateCase(sscsCaseData, ccdCaseId, CITIZEN_REQUEST_HEARING_RECORDING.getCcdType(),
                 "SSCS - hearing recording request from MYA",
                 "Requested hearing recordings", idamService.getIdamTokens());
