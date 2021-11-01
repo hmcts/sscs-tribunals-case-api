@@ -7,7 +7,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
@@ -27,8 +26,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import uk.gov.hmcts.reform.document.domain.Document;
-import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -46,8 +43,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.FooterDetails;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.WelshFooterService;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 
@@ -64,7 +61,7 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
     @Mock
     private DocmosisPdfService docmosisPdfService;
     @Mock
-    private EvidenceManagementService evidenceManagementService;
+    private PdfStoreService pdfStoreService;
     @Mock
     private WelshFooterService welshFooterService;
 
@@ -78,7 +75,7 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        handler = new CreateWelshNoticeAboutToSubmitHandler(docmosisPdfService, evidenceManagementService, welshFooterService, template);
+        handler = new CreateWelshNoticeAboutToSubmitHandler(docmosisPdfService, pdfStoreService, welshFooterService, template);
         when(callback.getEvent()).thenReturn(EventType.CREATE_WELSH_NOTICE);
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -101,8 +98,8 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
     public void handleMethodCallsCorrectServicesAndSetsDataCorrectly(DocumentType documentType, EventType eventType, String expectedType, String expectedWelshType) {
         byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
 
-        UploadResponse uploadResponse = createUploadResponse();
-        when(evidenceManagementService.upload(any(), anyString())).thenReturn(uploadResponse);
+        SscsDocument sscsDocument = createSscsDocument();
+        when(pdfStoreService.storeDocument(any(), anyString())).thenReturn(sscsDocument);
         ArgumentCaptor<Object> capture = ArgumentCaptor.forClass(Object.class);
         when(docmosisPdfService.createPdf(capture.capture(),any())).thenReturn(expectedPdf);
         FooterDetails footerDetails = new FooterDetails(DocumentLink.builder().build(), "bundleAddition", "bundleFilename");
@@ -179,22 +176,8 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
                 .build();
     }
 
-    private UploadResponse createUploadResponse() {
-        UploadResponse response = mock(UploadResponse.class);
-        UploadResponse.Embedded embedded = mock(UploadResponse.Embedded.class);
-        when(response.getEmbedded()).thenReturn(embedded);
-        Document document = createDocument();
-        when(embedded.getDocuments()).thenReturn(singletonList(document));
-        return response;
-    }
-
-    private static Document createDocument() {
-        Document document = new Document();
-        Document.Links links = new Document.Links();
-        Document.Link link = new Document.Link();
-        link.href = "some location";
-        links.self = link;
-        document.links = links;
-        return document;
+    private SscsDocument createSscsDocument() {
+        return SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentUrl("some location").build()).build()).build();
     }
 }

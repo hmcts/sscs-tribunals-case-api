@@ -65,11 +65,12 @@ public class UploadWelshDocumentsAboutToStartHandlerTest {
     }
 
     @Test
-    public void originalDocumentDropDownWhenNoDocumentWithSscsDocumentTranslationStatus() {
+    public void givenNoDocumentWithSscsDocumentTranslationStatus_thenDisplayError() {
         sscsCaseData = CaseDataUtils.buildMinimalCaseData();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertEquals(response.getData().getOriginalDocuments().getValue().getCode(),"-");
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Event cannot be triggered - no documents awaiting translation on this case", error);
     }
 
     @Test
@@ -85,23 +86,6 @@ public class UploadWelshDocumentsAboutToStartHandlerTest {
         assertEquals("test.pdf", response.getData().getOriginalDocuments().getValue().getCode());
         assertEquals("test.pdf", response.getData().getOriginalDocuments().getListItems().get(0).getCode());
     }
-
-    @Test
-    @Parameters(method = "generateDwpDocuments")
-    public void setOriginalDocumentDropDownWhenDwpDocumentTranslationStatusIsSet(List<DwpDocument> dwpDocuments) {
-
-        sscsCaseData = SscsCaseData.builder()
-                .dwpDocuments(dwpDocuments)
-                .appeal(Appeal.builder().build())
-                .build();
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertEquals(1, response.getData().getOriginalDocuments().getListItems().size());
-        assertEquals("rip1.pdf", response.getData().getOriginalDocuments().getValue().getCode());
-        assertEquals("rip1.pdf", response.getData().getOriginalDocuments().getListItems().get(0).getCode());
-    }
-
 
     public Object[] generateSscsDocuments() {
         SscsDocument sscs1Doc = SscsDocument.builder()
@@ -133,37 +117,4 @@ public class UploadWelshDocumentsAboutToStartHandlerTest {
         };
     }
 
-    public Object[] generateDwpDocuments() {
-        DwpDocument dwpDocument = DwpDocument.builder()
-                .value(DwpDocumentDetails.builder()
-                        .avDocumentLink(DocumentLink.builder()
-                                .documentUrl("/anotherUrl")
-                                .documentFilename("test.mp3")
-                                .build())
-                        .documentLink(DocumentLink.builder()
-                                .documentUrl("/rip1Url")
-                                .documentFilename("rip1.pdf")
-                                .build())
-                        .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)
-                        .documentType(DocumentType.AUDIO_DOCUMENT.getValue())
-                        .build())
-                .build();
-
-        DwpDocument dwpDocument2 = DwpDocument.builder()
-                .value(DwpDocumentDetails.builder()
-                        .documentLink(DocumentLink.builder()
-                                .documentUrl("/anotherUrl")
-                                .documentFilename("directionNotice.pdf")
-                                .build())
-                        .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)
-                        .documentType(DocumentType.AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE.getValue())
-                        .build())
-                .build();
-
-        List<DwpDocument> docs = Arrays.asList(dwpDocument,dwpDocument2);
-
-        return new Object[] {
-            new Object[]{docs}
-        };
-    }
 }

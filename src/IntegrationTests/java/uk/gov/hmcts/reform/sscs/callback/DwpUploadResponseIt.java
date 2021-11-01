@@ -59,6 +59,7 @@ public class DwpUploadResponseIt extends AbstractEventIt {
         assertEquals(2, result.getData().getSscsDocument().size());
         assertEquals("sscs1", result.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("appellantEvidence", result.getData().getSscsDocument().get(1).getValue().getDocumentType());
+        assertNull(result.getData().getSscsDocument().get(1).getValue().getPartyUploaded());
         assertEquals(DwpState.RESPONSE_SUBMITTED_DWP.getId(), result.getData().getDwpState());
         assertEquals(1, result.getData().getAudioVideoEvidence().size());
         assertNull(result.getData().getAudioVideoEvidence().get(0).getValue().getRip1Document());
