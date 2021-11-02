@@ -51,7 +51,7 @@ em-ccdorc:
       EM_STITCHING_API_URL: http://em-stitching-aat.service.core-compute-aat.internal
       DM_STORE_APP_URL: http://dm-store-aat.service.core-compute-aat.internal
       CCD_DATA_API_URL: http://ccd-data-store-api-${SERVICE_FQDN}
-      CALLBACK_DOMAIN: http://em-ccdorc-${SERVICE_FQDN}
+      CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
 
 xui-webapp:
   enabled: true
