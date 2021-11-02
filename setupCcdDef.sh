@@ -7,4 +7,4 @@ echo "Setting up ccd definition parameters...."
 # CCD_DEF_PIP_DECISION_NOTICE_QUESTIONS,
 # CCD_DEF_ESA_DECISION_NOTICE_QUESTIONS,
 # CCD_DEF_UC_DECISION_NOTICE_QUESTIONS,
-CCD_DEF_LANGUAGES='{"LiveFrom": "01/01/2018", "ID": "FL_languages", "ListElementCode": "zulu", "ListElement": "Zulu"},{"LiveFrom": "01/01/2018", "ID": "FL_languages", "ListElementCode": "bajuni", "ListElement": "Bajuni"}'
+export CCD_DEF_LANGUAGES='{"LiveFrom": "01/01/2018", "ID": "FL_languages", "ListElementCode": "zulu", "ListElement": "Zulu"},{"LiveFrom": "01/01/2018", "ID": "FL_languages", "ListElementCode": "bajuni", "ListElement": "Bajuni"}'
