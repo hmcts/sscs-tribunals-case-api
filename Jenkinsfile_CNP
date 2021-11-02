@@ -97,7 +97,8 @@ withPipeline(type, product, component) {
     syncBranchesWithMaster(branchesToSync)
 
     before('akschartsinstall'){
-        gradleBuilder.gradle('setupCcdDef')
+        // gradleBuilder.gradle('setupCcdDef')
+        env.CCD_DEF_LANGUAGES = sh(script: 'curl https://raw.githubusercontent.com/hmcts/sscs-common/4.5.11/src/main/resources/reference-data/languages.txt', returnStdout: true)
     }
 
     after('akschartsinstall'){
