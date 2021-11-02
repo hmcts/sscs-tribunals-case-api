@@ -236,19 +236,6 @@ ccd:
       CCD_DEF_BULK_SCAN_API_URL: http://${SERVICE_NAME}-bulk-scan-api
       CCD_DEF_BULK_SCAN_ORCHESTRATOR_URL: http://${SERVICE_NAME}-bulk-scan-orchestrator
       CCD_DEF_COR_BACKEND_URL: http://${SERVICE_NAME}-ccd-definition-store
-      CCD_DEF_FIXED_LIST_USERS: '{"LiveFrom": "01/01/2018", "ID": "FL_AssignToJudge", "ListElementCode": "unassigned", "ListElement": "Unassigned"},
-                                  {"LiveFrom": "01/01/2018", "ID": "FL_AssignToJudge", "ListElementCode": "judgetestersscs@mailnesia.com", "ListElement": "SSCS Test Judge"},
-                                  {"LiveFrom": "01/01/2018", "ID": "FL_AssignToJudge", "ListElementCode": "juitestjudgesscs@mailnesia.com", "ListElement": "JUI Test Judge"},
-                                  {"LiveFrom": "01/01/2018", "ID": "FL_AssignToJudge", "ListElementCode": "sscs4jui@mailnesia.com", "ListElement": "SSCS 4 JUI"},
-                                  {"LiveFrom": "01/01/2018", "ID": "FL_AssignToJudge", "ListElementCode": "juitestuser2@gmail.com", "ListElement": "JUI Test User2"},
-                                  {"LiveFrom": "01/01/2018", "ID": "FL_AssignToMedicalMember", "ListElementCode": "Do not select", "ListElement": "Do not select" },
-                                  { "LiveFrom": "01/01/2018", "ID": "FL_AssignToMedicalMember", "ListElementCode": "510604|Medical 1", "ListElement": "Medical 1" },
-                                  { "LiveFrom": "01/01/2018", "ID": "FL_AssignToMedicalMember", "ListElementCode": "512530|Medical 2", "ListElement": "Medical 2" },
-                                  { "LiveFrom": "01/01/2018", "ID": "FL_AssignToMedicalMember", "ListElementCode": "unassigned", "ListElement": "Unassigned" },
-                                  { "LiveFrom": "01/01/2018", "ID": "FL_AssignToDisabilityMember", "ListElementCode": "Do not select", "ListElement": "Do not select" },
-                                  { "LiveFrom": "01/01/2018", "ID": "FL_AssignToDisabilityMember", "ListElementCode": "511043|Disability 1", "ListElement": "Disability 1" },
-                                  { "LiveFrom": "01/01/2018", "ID": "FL_AssignToDisabilityMember", "ListElementCode": "512531|Disability 2", "ListElement": "Disability 2" },
-                                  { "LiveFrom": "01/01/2018", "ID": "FL_AssignToDisabilityMember", "ListElementCode": "unassigned", "ListElement": "Unassigned" }'
       CCD_DEF_PIP_DECISION_NOTICE_QUESTIONS: ${PIP_DECISION_NOTICE_QUESTIONS}
       CCD_DEF_ESA_DECISION_NOTICE_QUESTIONS: ${ESA_DECISION_NOTICE_QUESTIONS}
       CCD_DEF_UC_DECISION_NOTICE_QUESTIONS: ${UC_DECISION_NOTICE_QUESTIONS}

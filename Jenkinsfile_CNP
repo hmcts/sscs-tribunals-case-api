@@ -97,14 +97,15 @@ withPipeline(type, product, component) {
     syncBranchesWithMaster(branchesToSync)
 
     before('akschartsinstall'){
-        // gradleBuilder.gradle('setupCcdDef')
-        def languages = sh(script: 'curl https://raw.githubusercontent.com/hmcts/sscs-common/4.5.11/src/main/resources/reference-data/languages.txt', returnStdout: true)
+        def sscsCommonVersion = sh(script: './gradlew -q getSscsCommonVersion', returnStdout: true).trim()
+        def languages = sh(script: 'curl https://raw.githubusercontent.com/hmcts/sscs-common/${sscsCommonVersion}/src/main/resources/reference-data/languages.txt', returnStdout: true)
+        println """Languages : ${languages}"""
         env.CCD_DEF_LANGUAGES = "'${languages}'"
-        def pipQues = sh(script: 'curl https://raw.githubusercontent.com/hmcts/sscs-common/4.5.11/src/main/resources/reference-data/pip-decision-notice-questions.txt', returnStdout: true)
+        def pipQues = sh(script: 'curl https://raw.githubusercontent.com/hmcts/sscs-common/${sscsCommonVersion}/src/main/resources/reference-data/pip-decision-notice-questions.txt', returnStdout: true)
         env.PIP_DECISION_NOTICE_QUESTIONS = "'${pipQues}'"
-        def esaQues = sh(script:  'curl https://raw.githubusercontent.com/hmcts/sscs-common/$COMMON_VERSION/src/main/resources/reference-data/esa-decision-notice-questions.txt', returnStdout: true)
+        def esaQues = sh(script:  'curl https://raw.githubusercontent.com/hmcts/sscs-common/${sscsCommonVersion}/src/main/resources/reference-data/esa-decision-notice-questions.txt', returnStdout: true)
         env.ESA_DECISION_NOTICE_QUESTIONS = "'${esaQues}'"
-        def ucQues = sh(script: '(curl https://raw.githubusercontent.com/hmcts/sscs-common/$COMMON_VERSION/src/main/resources/reference-data/uc-decision-notice-questions.txt)', returnStdout: true)
+        def ucQues = sh(script: '(curl https://raw.githubusercontent.com/hmcts/sscs-common/${sscsCommonVersion}/src/main/resources/reference-data/uc-decision-notice-questions.txt)', returnStdout: true)
         env.UC_DECISION_NOTICE_QUESTIONS = "'${ucQues}'"
     }
 
