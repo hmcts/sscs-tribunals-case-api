@@ -98,7 +98,9 @@ withPipeline(type, product, component) {
 
     before('akschartsinstall'){
         // gradleBuilder.gradle('setupCcdDef')
-        env.CCD_DEF_LANGUAGES = sh(script: 'curl https://raw.githubusercontent.com/hmcts/sscs-common/4.5.11/src/main/resources/reference-data/languages.txt', returnStdout: true)
+        def languages = sh(script: 'curl https://raw.githubusercontent.com/hmcts/sscs-common/4.5.11/src/main/resources/reference-data/languages.txt', returnStdout: true)
+        env.CCD_DEF_LANGUAGES = "'${languages}'"
+        println """Languages from common ${env.CCD_DEF_LANGUAGES}"""
     }
 
     after('akschartsinstall'){
