@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
@@ -21,9 +22,13 @@ import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 public class AdminSendToWithDwpAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final int dwpResponseDueDays;
+    private final int dwpResponseDueDaysChildSupport;
 
-    public AdminSendToWithDwpAboutToSubmitHandler(@Value("${dwp.response.due.days}") int dwpResponseDueDays) {
+
+    public AdminSendToWithDwpAboutToSubmitHandler(@Value("${dwp.response.due.days}") int dwpResponseDueDays,
+                                                  @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport) {
         this.dwpResponseDueDays = dwpResponseDueDays;
+        this.dwpResponseDueDaysChildSupport = dwpResponseDueDaysChildSupport;
     }
 
     @Override
@@ -45,7 +50,7 @@ public class AdminSendToWithDwpAboutToSubmitHandler implements PreSubmitCallback
 
         log.info("Setting date sent to dwp for case id {} for AdminSendToWithDwpHandler" + callback.getCaseDetails().getId());
         caseData.setDateSentToDwp(LocalDate.now().toString());
-        caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate(dwpResponseDueDays));
+        caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate(getResponseDueDays(caseData)));
 
         if (InterlocReferralReason.PHME_REQUEST.getId().equals(caseData.getInterlocReferralReason())) {
             caseData.setInterlocReviewState(InterlocReviewState.NONE.getId());
@@ -55,5 +60,11 @@ public class AdminSendToWithDwpAboutToSubmitHandler implements PreSubmitCallback
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
         return sscsCaseDataPreSubmitCallbackResponse;
+    }
+
+    private int getResponseDueDays(SscsCaseData caseData) {
+        return caseData.getAppeal().getBenefitType() != null
+                && caseData.getAppeal().getBenefitType().getCode().equalsIgnoreCase(Benefit.CHILD_SUPPORT.getShortName())
+                ? dwpResponseDueDaysChildSupport : dwpResponseDueDays;
     }
 }

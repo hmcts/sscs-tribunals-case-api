@@ -105,6 +105,21 @@ public class LinkCaseAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenCaseAWithLinkedCaseAandBandC_thenErrorThrown() {
+        List<CaseLink> linkedCase = new ArrayList<>();
+        linkedCase.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("1").build()).build());
+        linkedCase.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("2").build()).build());
+        linkedCase.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("3").build()).build());
+
+        sscsCaseDataA.setLinkedCase(linkedCase);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("You can’t link the case to itself, please correct", error);
+    }
+
+    @Test
     public void givenCaseBAlreadyLinkedToCaseA_thenDoNotUpdateCaseB() {
         List<CaseLink> linkedCaseA = new ArrayList<>();
         linkedCaseA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("2").build()).build());
