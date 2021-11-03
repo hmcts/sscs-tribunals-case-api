@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.attachscanneddocs;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -29,7 +30,7 @@ public class AttachScannedDocsAboutToSubmitHandler implements PreSubmitCallbackH
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         sscsCaseData.setEvidenceHandled(NO.getValue());
-        sscsCaseData.setHasUnprocessedAudioVideoEvidence(NO);
+        setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }

@@ -6,6 +6,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
+import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -51,10 +52,19 @@ public class AttachScannedDocsAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAnAttachScannedDocsEvent_thenSetEvidenceFlagsToNo() {
+    public void givenAnAttachScannedDocsEvent_thenSetEvidenceAndAvFlagsToNo() {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(YesNo.NO.getValue(), response.getData().getEvidenceHandled());
         assertEquals(YesNo.NO, response.getData().getHasUnprocessedAudioVideoEvidence());
+    }
+
+    @Test
+    public void givenAnAttachScannedDocsEventAndAvEvidenceAlreadyOnCase_thenSetEvidenceFlagToNoAndAvFlagToYes() {
+        sscsCaseData.setAudioVideoEvidence(Collections.singletonList(AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder().build()).build()));
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(YesNo.NO.getValue(), response.getData().getEvidenceHandled());
+        assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
     }
 }
