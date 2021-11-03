@@ -87,7 +87,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                     if (venueDetails == null) {
                         throw new IllegalStateException("Unable to load venue details for id:" + caseData.getAdjournCaseNextHearingVenueSelected().getValue().getCode());
                     }
-                    adjournCaseBuilder.nextHearingVenue(venueDetails.getVenName());
+                    adjournCaseBuilder.nextHearingVenue(venueDetails.getGapsVenName());
                     adjournCaseBuilder.nextHearingAtVenue(true);
                 } else {
                     throw new IllegalStateException("A next hearing venue of somewhere else has been specified but no venue has been selected");
@@ -247,8 +247,12 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                     adjournCaseBuilder.heldOn(LocalDate.parse(finalHearing.getValue().getHearingDate()));
                 }
                 if (finalHearing.getValue().getVenue() != null) {
-                    adjournCaseBuilder.heldAt(finalHearing.getValue().getVenue().getName());
-                    venue = finalHearing.getValue().getVenue().getName();
+                    String venueName = venueDataLoader.getGapVenueName(finalHearing.getValue().getVenue().getName(),
+                            finalHearing.getValue().getVenueId());
+                    if (venueName != null) {
+                        adjournCaseBuilder.heldAt(venueName);
+                        venue = venueName;
+                    }
                 }
             }
         } else {
