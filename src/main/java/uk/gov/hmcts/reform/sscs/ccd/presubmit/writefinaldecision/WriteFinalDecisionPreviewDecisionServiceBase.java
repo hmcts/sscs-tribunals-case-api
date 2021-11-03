@@ -164,7 +164,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
                 if (finalHearing.getValue().getHearingDate() != null) {
                     writeFinalDecisionBuilder.heldOn(LocalDate.parse(finalHearing.getValue().getHearingDate()));
                 }
-                if (finalHearing.getValue() != null) {
+                if (finalHearing.getValue().getVenue() != null) {
                     String venueName = venueDataLoader.getGapVenueName(finalHearing.getValue().getVenue().getName(),
                             finalHearing.getValue().getVenueId());
                     writeFinalDecisionBuilder.heldAt(venueName);
