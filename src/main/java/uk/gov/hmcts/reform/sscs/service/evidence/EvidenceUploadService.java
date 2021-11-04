@@ -46,7 +46,6 @@ import uk.gov.hmcts.reform.sscs.service.exceptions.EvidenceUploadException;
 import uk.gov.hmcts.reform.sscs.service.pdf.MyaEventActionContext;
 import uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.EvidenceDescriptionPdfData;
-import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
 
 @Slf4j
 @Service
@@ -327,6 +326,7 @@ public class EvidenceUploadService {
         } else {
             updateCaseDataWithNewPdfUpload(sscsCaseData, ldt, draftSscsDocument);
         }
+        setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
     }
 
     private void updateCaseDataWithNewPdfUpload(SscsCaseData sscsCaseData, LocalDateTime ldt, SscsDocument draftSscsDocument) {
@@ -344,7 +344,6 @@ public class EvidenceUploadService {
         List<ScannedDocument> newScannedDocumentsList = union(emptyIfNull(sscsCaseData.getScannedDocuments()),
                 emptyIfNull(scannedDocuments));
         sscsCaseData.setScannedDocuments(newScannedDocumentsList);
-        sscsCaseData.setHasUnprocessedAudioVideoEvidence(YesNo.NO);
     }
 
     private void updateCaseDataWithNewAudioVideoUpload(List<SscsDocument> audioVideoMedia, SscsCaseData sscsCaseData, String idamEmail, LocalDateTime ldt, SscsDocument draftSscsDocument) {
@@ -368,7 +367,6 @@ public class EvidenceUploadService {
                     emptyIfNull(audioVideoEvidence));
             sscsCaseData.setAudioVideoEvidence(newAudioVideoEvidenceList);
         }
-        setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
     }
 
     @NotNull
