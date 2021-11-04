@@ -107,6 +107,7 @@ public class CitizenCcdService {
         return caseDetails;
     }
 
+    @Retryable
     public CaseDetails updateCase(SscsCaseData caseData, String eventType, String summary, String description, IdamTokens idamTokens, String caseId) {
         log.info("Updating a draft with caseId {}.", caseId);
         CaseDetails caseDetails;
@@ -116,6 +117,7 @@ public class CitizenCcdService {
         return caseDetails;
     }
 
+    @Retryable
     public void associateCaseToCitizen(IdamTokens citizenIdamTokens, Long caseId, IdamTokens idamTokens) {
         SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(caseId, idamTokens);
         if (sscsCaseDetails != null && sscsCaseDetails.getData() != null) {
