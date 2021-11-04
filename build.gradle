@@ -213,7 +213,8 @@ def versions = [
         sonarPitest: '0.5',
         pact: '4.1.7',
         junitJupiter: '5.7.2',
-        lombok: '1.18.22'
+        lombok: '1.18.22',
+        sscsCommon: '4.5.13'
 ]
 
 ext["rest-assured.version"] = '4.2.0'
@@ -367,7 +368,7 @@ dependencies {
     //remove when secure doc store is live
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.5.11'
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: versions.sscsCommon
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.46'
 
     compile group:'org.overviewproject', name: 'mime-types', version: '1.0.2'
@@ -497,6 +498,12 @@ task runAndPublishConsumerPactTests(type: Test){
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
 
+}
+
+task getSscsCommonVersion{
+    doLast {
+        print versions.sscsCommon
+    }
 }
 
 runAndPublishConsumerPactTests.dependsOn contract
