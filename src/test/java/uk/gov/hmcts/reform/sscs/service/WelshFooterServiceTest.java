@@ -2,10 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.service.SubmitAppealService.DM_STORE_USER_ID;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -31,7 +28,7 @@ import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
 public class WelshFooterServiceTest {
 
     @Mock
-    private EvidenceManagementService evidenceManagementService;
+    private PdfStoreService pdfStoreService;
 
     @Mock
     private PdfWatermarker pdfWatermarker;
@@ -48,9 +45,10 @@ public class WelshFooterServiceTest {
     private UploadResponse uploadResponse;
     @Mock
     private UploadResponse.Embedded uploadResponseEmbedded;
-    @Mock
-    private List<uk.gov.hmcts.reform.document.domain.Document> uploadedDocuments;
-    private uk.gov.hmcts.reform.document.domain.Document uploadedDocument = new uk.gov.hmcts.reform.document.domain.Document();
+
+    private SscsDocument sscsDocument;
+    //private List<uk.gov.hmcts.reform.document.domain.Document> uploadedDocuments;
+    //private uk.gov.hmcts.reform.document.domain.Document uploadedDocument = new uk.gov.hmcts.reform.document.domain.Document();
 
     private SscsCaseData sscsCaseData;
 
@@ -60,18 +58,10 @@ public class WelshFooterServiceTest {
 
     @Before
     public void setup() {
-        footerService = new WelshFooterService(evidenceManagementService, pdfWatermarker);
+        footerService = new WelshFooterService(pdfStoreService, pdfWatermarker);
 
-        uploadedDocument.originalDocumentName = fileName;
-        uploadedDocument.links = new uk.gov.hmcts.reform.document.domain.Document.Links();
-        uploadedDocument.links.self = new uk.gov.hmcts.reform.document.domain.Document.Link();
-        uploadedDocument.links.self.href = expectedDocumentUrl;
-        uploadedDocument.links.binary = new uk.gov.hmcts.reform.document.domain.Document.Link();
-        uploadedDocument.links.binary.href = expectedBinaryUrl;
-
-        when(uploadResponse.getEmbedded()).thenReturn(uploadResponseEmbedded);
-        when(uploadResponseEmbedded.getDocuments()).thenReturn(uploadedDocuments);
-        when(uploadedDocuments.get(0)).thenReturn(uploadedDocument);
+        sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName(fileName)
+                .documentLink(DocumentLink.builder().documentUrl(expectedDocumentUrl).documentBinaryUrl(expectedBinaryUrl).build()).build()).build();
 
         SscsWelshDocument document = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder().documentFileName("myTest.doc").build()).build();
         List<SscsWelshDocument> docs = new ArrayList<>();
@@ -125,9 +115,9 @@ public class WelshFooterServiceTest {
 
     private void setupMockCalls() throws Exception {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
-        when(evidenceManagementService.download(any(), anyString())).thenReturn(pdfBytes);
+        when(pdfStoreService.download(any())).thenReturn(pdfBytes);
 
-        when(evidenceManagementService.upload(any(), eq(DM_STORE_USER_ID))).thenReturn(uploadResponse);
+        when(pdfStoreService.storeDocument(any(), any())).thenReturn(sscsDocument);
 
         when(pdfWatermarker.shrinkAndWatermarkPdf(any(), stringCaptor.capture(), stringCaptor.capture())).thenReturn(new byte[]{});
     }

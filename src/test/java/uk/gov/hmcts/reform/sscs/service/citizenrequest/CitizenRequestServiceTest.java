@@ -515,6 +515,7 @@ public class CitizenRequestServiceTest {
         boolean response = citizenRequestService.requestHearingRecordings(IDENTIFIER, List.of("id_1"), AUTHORISATION);
         assertThat(response, is(true));
         assertThat(caseData.getSscsHearingRecordingCaseData().getRequestedHearings().size(), is(1));
+        assertThat(caseData.getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding(), is(YesNo.YES));
         HearingRecordingRequest hearingRecordingRequest = caseData.getSscsHearingRecordingCaseData().getRequestedHearings().get(0);
         assertThat(hearingRecordingRequest.getValue().getRequestingParty(), is(PartyItemList.JOINT_PARTY.getCode()));
         assertThat(hearingRecordingRequest.getValue().getDateRequested(), is(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))));
@@ -556,6 +557,8 @@ public class CitizenRequestServiceTest {
         boolean response = citizenRequestService.requestHearingRecordings(IDENTIFIER, List.of("id_1"), AUTHORISATION);
         assertThat(response, is(true));
         assertThat(caseData.getSscsHearingRecordingCaseData().getRequestedHearings().size(), is(1));
+        assertThat(caseData.getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding(), is(YesNo.YES));
+
         verify(ccdService).updateCase(
                 argThat(argument -> argument.getSscsHearingRecordingCaseData().getRequestedHearings().size() == 1),
                 eq(1L),

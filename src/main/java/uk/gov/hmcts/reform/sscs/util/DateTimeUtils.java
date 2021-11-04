@@ -7,7 +7,6 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
-
 public final class DateTimeUtils {
 
     private static final String EUROPE_LONDON = "Europe/London";
