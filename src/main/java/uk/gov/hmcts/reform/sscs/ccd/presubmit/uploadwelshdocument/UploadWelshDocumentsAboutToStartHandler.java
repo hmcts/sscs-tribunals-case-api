@@ -37,37 +37,26 @@ public class UploadWelshDocumentsAboutToStartHandler implements PreSubmitCallbac
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
+        PreSubmitCallbackResponse response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        setOriginalDocumentDropdown(sscsCaseData);
+        setOriginalDocumentDropdown(sscsCaseData, response);
 
-        return new PreSubmitCallbackResponse<>(sscsCaseData);
+        return response;
     }
 
-    private void setOriginalDocumentDropdown(SscsCaseData sscsCaseData) {
+    private void setOriginalDocumentDropdown(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
         listOptions = new ArrayList<>();
 
         List<SscsDocument> sscsDocuments = buildSscsDocumentsForTranslation(sscsCaseData);
 
         sscsDocuments.forEach(sscsDocument ->
-                listOptions.add(new DynamicListItem(sscsDocument.getValue().getDocumentLink().getDocumentFilename(), sscsDocument.getValue().getDocumentLink().getDocumentFilename())));
-
-        List<DwpDocument> dwpDocuments = buildDwpDocumentsForTranslation(sscsCaseData);
-
-        dwpDocuments.forEach(dwpDocument -> {
-            if ((dwpDocument.getValue().getDocumentType().equals(DocumentType.AUDIO_DOCUMENT.getValue())
-                    || dwpDocument.getValue().getDocumentType().equals(DocumentType.VIDEO_DOCUMENT.getValue()))
-                    && dwpDocument.getValue().getDocumentLink() != null) {
-                // RIP 1 doc is stored in this field when AV document is present
-                listOptions.add(new DynamicListItem(dwpDocument.getValue().getDocumentLink().getDocumentFilename(),
-                        dwpDocument.getValue().getDocumentLink().getDocumentFilename()));
-            }
-        });
+                listOptions.add(new DynamicListItem(sscsDocument.getValue().getDocumentLink().getDocumentFilename(),
+                        sscsDocument.getValue().getDocumentLink().getDocumentFilename())));
 
         if (listOptions.size() > 0) {
             sscsCaseData.setOriginalDocuments(new DynamicList(listOptions.get(0), listOptions));
         } else {
-            listOptions.add(new DynamicListItem("-", "No original file"));
-            sscsCaseData.setOriginalDocuments(new DynamicList(listOptions.get(0), listOptions));
+            response.addError("Event cannot be triggered - no documents awaiting translation on this case");
         }
     }
 
@@ -83,13 +72,4 @@ public class UploadWelshDocumentsAboutToStartHandler implements PreSubmitCallbac
                 .collect(Collectors.toList());
     }
 
-    private List<DwpDocument> buildDwpDocumentsForTranslation(SscsCaseData sscsCaseData) {
-        return Optional.ofNullable(sscsCaseData).map(SscsCaseData::getDwpDocuments)
-                .orElse(Collections.emptyList())
-                .stream()
-                .filter(Objects::nonNull)
-                .filter(a -> Objects.nonNull(a.getValue().getDocumentTranslationStatus())
-                        && a.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED))
-                .collect(Collectors.toList());
-    }
 }

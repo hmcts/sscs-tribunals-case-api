@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
 import uk.gov.hmcts.reform.sscs.service.WelshFooterService;
 
 @Service
@@ -23,23 +22,20 @@ import uk.gov.hmcts.reform.sscs.service.WelshFooterService;
 public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final WelshFooterService welshFooterService;
-    private final BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder;
 
     private static final Map<String, String> nextEventMap = new HashMap<>();
+    private static final String WELSH_ADDITION_PREFIX = "WEL-";
 
     static {
         nextEventMap.put(DocumentType.SSCS1.getValue(), EventType.SEND_TO_DWP.getCcdType());
-        nextEventMap.put(DocumentType.URGENT_HEARING_REQUEST.getValue(), EventType.UPDATE_CASE_ONLY.getCcdType());
         nextEventMap.put(DocumentType.DECISION_NOTICE.getValue(), EventType.DECISION_ISSUED_WELSH.getCcdType());
         nextEventMap.put(DocumentType.DIRECTION_NOTICE.getValue(), EventType.DIRECTION_ISSUED_WELSH.getCcdType());
         nextEventMap.put(DocumentType.FINAL_DECISION_NOTICE.getValue(), EventType.ISSUE_FINAL_DECISION_WELSH.getCcdType());
-        nextEventMap.put(DocumentType.REINSTATEMENT_REQUEST.getValue(), EventType.UPDATE_CASE_ONLY.getCcdType());
     }
 
     @Autowired
-    public UploadWelshDocumentsAboutToSubmitHandler(WelshFooterService welshFooterService, BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder) {
+    public UploadWelshDocumentsAboutToSubmitHandler(WelshFooterService welshFooterService) {
         this.welshFooterService = welshFooterService;
-        this.bundleAdditionFilenameBuilder = bundleAdditionFilenameBuilder;
     }
 
     @Override
@@ -67,31 +63,26 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
     }
 
     private void updateCase(Callback<SscsCaseData> callback, SscsCaseData caseData) {
-        String previewDocumentType = null;
 
-        log.info("Set the Translation Status to complete for originalDocs for caseID:  {}", caseData.getCcdCaseId());
+        log.info("Set the Translation Status to complete for originalDocs for caseId: {}", caseData.getCcdCaseId());
         updateTranslationStatusOfSscsDocument(caseData);
         updateTranslationStatusOfDwpDocument(caseData);
 
         log.info("Set up welsh document for caseId:  {}", caseData.getCcdCaseId());
         for (SscsWelshDocument sscsWelshPreviewDocument : caseData.getSscsWelshPreviewDocuments()) {
             sscsWelshPreviewDocument.getValue().setOriginalDocumentFileName(caseData.getOriginalDocuments().getValue().getCode());
-            previewDocumentType = sscsWelshPreviewDocument.getValue().getDocumentType();
-            log.info("previewDocumentType  {}", previewDocumentType);
             if (sscsWelshPreviewDocument.getValue().getDocumentDateAdded() == null) {
                 sscsWelshPreviewDocument.getValue().setDocumentDateAdded(
                     LocalDateTime.now().format(DateTimeFormatter.ISO_DATE));
             }
-            if (DocumentType.APPELLANT_EVIDENCE.getValue().equals(previewDocumentType)) {
-                log.info("Set up Appellant Evidence welsh document for caseId:  {}", caseData.getCcdCaseId());
-                Optional<SscsDocument> sscsDocumentByTypeAndName = getSscsDocumentByFilename(sscsWelshPreviewDocument.getValue().getOriginalDocumentFileName(), caseData);
-                sscsDocumentByTypeAndName.ifPresent(sscsDocument -> {
-                    if (StringUtils.isNotEmpty(sscsDocument.getValue().getBundleAddition())) {
-                        log.info("Adding bundle addition for  appelant evidence for caseId:  {}", caseData.getCcdCaseId());
-                        setBundleAdditionDetails(caseData, sscsWelshPreviewDocument);
-                    }
-                });
-            }
+            log.info("Set up welsh document for caseId:  {}", caseData.getCcdCaseId());
+            Optional<SscsDocument> sscsDocumentByTypeAndName = getSscsDocumentByFilename(sscsWelshPreviewDocument.getValue().getOriginalDocumentFileName(), caseData);
+            sscsDocumentByTypeAndName.ifPresent(sscsDocument -> {
+                if (StringUtils.isNotEmpty(sscsDocument.getValue().getBundleAddition())) {
+                    log.info("Adding bundle addition for appellant evidence for caseId:  {}", caseData.getCcdCaseId());
+                    setBundleAdditionDetails(sscsWelshPreviewDocument, sscsDocument);
+                }
+            });
             if (caseData.getSscsWelshDocuments() != null) {
                 caseData.getSscsWelshDocuments().add(sscsWelshPreviewDocument);
             } else {
@@ -99,20 +90,21 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
                 sscsWelshDocumentsList.add(sscsWelshPreviewDocument);
                 caseData.setSscsWelshDocuments(sscsWelshDocumentsList);
             }
+            if (!callback.getCaseDetails().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)) {
+                String nextEvent = getNextEvent(sscsWelshPreviewDocument.getValue().getDocumentType());
+                log.info("Setting next event to {}", nextEvent);
+                caseData.setSscsWelshPreviewNextEvent(nextEvent);
+            } else if (!caseData.isTranslationWorkOutstanding()) {
+                caseData.setInterlocReviewState(caseData.getWelshInterlocNextReviewState());
+                caseData.setWelshInterlocNextReviewState(null);
+            }
         }
 
 
         //clear the Preview collection
         caseData.setSscsWelshPreviewDocuments(new ArrayList<>());
         caseData.updateTranslationWorkOutstandingFlag();
-        if (!callback.getCaseDetails().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)) {
-            String nextEvent = getNextEvent(previewDocumentType);
-            log.info("Setting next event to {}", nextEvent);
-            caseData.setSscsWelshPreviewNextEvent(nextEvent);
-        } else if (!caseData.isTranslationWorkOutstanding()) {
-            caseData.setInterlocReviewState(caseData.getWelshInterlocNextReviewState());
-            caseData.setWelshInterlocNextReviewState(null);
-        }
+
     }
 
     private void updateTranslationStatusOfSscsDocument(SscsCaseData caseData) {
@@ -139,24 +131,30 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         }
     }
 
-    private void setBundleAdditionDetails(SscsCaseData caseData, SscsWelshDocument sscsWelshPreviewDocument) {
-        String documentFooterText = "Appellant evidence";
-        String bundleAddition = welshFooterService.getNextBundleAddition(caseData.getSscsWelshDocuments());
-        DocumentLink newUrl = welshFooterService.addFooter(sscsWelshPreviewDocument.getValue().getDocumentLink(), documentFooterText, bundleAddition);
+    private void setBundleAdditionDetails(SscsWelshDocument sscsWelshPreviewDocument, SscsDocument sscsDocument) {
+        String bundleAddition = WELSH_ADDITION_PREFIX + sscsDocument.getValue().getBundleAddition();
+        DocumentLink newUrl = welshFooterService.addFooter(sscsWelshPreviewDocument.getValue().getDocumentLink(), DocumentType.fromValue(sscsDocument.getValue().getDocumentType()).getLabel(), bundleAddition);
 
-        String fileName = bundleAdditionFilenameBuilder.build(DocumentType.APPELLANT_EVIDENCE, bundleAddition, sscsWelshPreviewDocument.getValue().getDocumentDateAdded(), DateTimeFormatter.ISO_LOCAL_DATE);
+        String fileName = buildWelshFileNameFromOriginal(sscsDocument.getValue().getDocumentFileName());
         sscsWelshPreviewDocument.getValue().setDocumentFileName(fileName);
         sscsWelshPreviewDocument.getValue().setDocumentLink(newUrl);
         sscsWelshPreviewDocument.getValue().setEvidenceIssued("No");
         sscsWelshPreviewDocument.getValue().setBundleAddition(bundleAddition);
     }
 
+    private String buildWelshFileNameFromOriginal(String documentFileName) {
+        String[] originalFileNameSplit = documentFileName.split("Addition ");
+        if (originalFileNameSplit.length == 2) {
+            return "Addition " + WELSH_ADDITION_PREFIX + originalFileNameSplit[1];
+        } else {
+            return documentFileName;
+        }
+    }
+
 
     private Optional<SscsDocument> getSscsDocumentByFilename(String filename, SscsCaseData caseData) {
         return Optional.ofNullable(caseData.getSscsDocument()).stream().flatMap(Collection::stream)
-            .filter(doc -> (doc.getValue().getDocumentType().equals(DocumentType.APPELLANT_EVIDENCE.getValue())
-                    || doc.getValue().getDocumentType().equals(DocumentType.OTHER_DOCUMENT.getValue()))
-                    && doc.getValue().getDocumentLink().getDocumentFilename().equals(filename))
+            .filter(doc -> doc.getValue().getDocumentLink().getDocumentFilename().equals(filename))
             .sorted()
             .findFirst();
     }
