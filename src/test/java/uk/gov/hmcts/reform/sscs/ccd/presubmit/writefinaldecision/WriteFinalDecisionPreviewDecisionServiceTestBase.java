@@ -132,7 +132,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAppellantAttendedQuestion("Yes");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPresentingOfficerAttendedQuestion("No");
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").address(Address.builder().postcode("postcode").build()).build()).build()).build()));
 
     }
 
@@ -145,7 +145,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAppellantAttendedQuestion("Yes");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPresentingOfficerAttendedQuestion("No");
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").address(Address.builder().postcode("postcode").build()).build()).build()).build()));
 
     }
 
@@ -208,7 +208,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(null);
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").address(Address.builder().postcode("postcode").build()).build()).build()).build()));
 
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
@@ -229,7 +229,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenThrow(new IllegalStateException("Unable to obtain signed in user details"));
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").address(Address.builder().postcode("postcode").build()).build()).build()).build()));
 
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
@@ -249,7 +249,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenThrow(new IllegalStateException("Unable to obtain signed in user details"));
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").address(Address.builder().postcode("postcode").build()).build()).build()).build()));
 
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
@@ -268,7 +268,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").address(Address.builder().postcode("postcode").build()).build()).build()).build()));
 
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
@@ -289,7 +289,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").address(Address.builder().postcode("postcode").build()).build()).build()).build()));
 
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
@@ -309,7 +309,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").address(Address.builder().postcode("postcode").build()).build()).build()).build()));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
@@ -336,10 +336,10 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("venue 1 name").build()).build()).build();
+            .hearingDate("2019-01-01").venue(Venue.builder().name("venue 1 name").address(Address.builder().postcode("postcode").build()).build()).build()).build();
 
         Hearing hearing2 = Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-02").venue(Venue.builder().name("venue 2 name").build()).build()).build();
+            .hearingDate("2019-01-02").venue(Venue.builder().name("venue 2 name").address(Address.builder().postcode("postcode").build()).build()).build()).build();
 
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
@@ -372,10 +372,10 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("venue 1 name").build()).build()).build();
+            .hearingDate("2019-01-01").venue(Venue.builder().name("venue 1 name").address(Address.builder().postcode("postcode").build()).build()).build()).build();
 
         Hearing hearing2 = Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-02").venue(Venue.builder().build()).build()).build();
+            .hearingDate("2019-01-02").venue(Venue.builder().address(Address.builder().postcode("postcode").build()).build()).build()).build();
 
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
@@ -397,7 +397,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("venue 1 name").build()).build()).build();
+            .hearingDate("2019-01-01").venue(Venue.builder().name("venue 1 name").address(Address.builder().postcode("postcode").build()).build()).build()).build();
 
         Hearing hearing2 = Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").build()).build();
@@ -582,7 +582,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01")
-            .venue(Venue.builder().name("Venue Name").build()).build()).build();
+            .venue(Venue.builder().name("Venue Name").address(Address.builder().postcode("postcode").build()).build()).build()).build();
 
         Hearing hearing2 = null;
 
@@ -786,7 +786,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().name("Glasgow").build());
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").address(Address.builder().postcode("postcode").build()).build()).build()).build()));
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
@@ -816,7 +816,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             .build());
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").address(Address.builder().postcode("postcode").build()).build()).build()).build()));
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
