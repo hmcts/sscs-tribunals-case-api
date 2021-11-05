@@ -12,7 +12,7 @@ plugins {
     id 'pmd'
     id 'org.sonarqube' version '3.3'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.5.4'
+    id 'org.springframework.boot' version '2.5.6'
     id 'uk.gov.hmcts.java' version '0.12.13'
     id 'com.gorylenko.gradle-git-properties' version '2.3.1'
     id 'com.github.ben-manes.versions' version '0.39.0'
@@ -257,7 +257,7 @@ dependencyManagement {
         }
 
         //CVE-2021-22112
-        dependencySet(group: 'org.springframework.security', version: '5.5.2') {
+        dependencySet(group: 'org.springframework.security', version: '5.5.3') {
             entry 'spring-security-crypto'
             entry 'spring-security-config'
             entry 'spring-security-core'
@@ -316,6 +316,12 @@ dependencyManagement {
         //CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
         dependencySet(group: 'org.apache.commons', version: '1.21') {
             entry 'commons-compress'
+        }
+
+        //CVE-2021-22044
+        dependencySet(group: 'org.springframework.cloud', version: '3.0.5') {
+            entry 'spring-cloud-openfeign-core'
+            entry 'spring-cloud-starter-openfeign'
         }
 
         imports {

@@ -21,7 +21,7 @@
         <packageUrl regex="true">^pkg:maven/org\.jdom/jdom2@.*$</packageUrl>
         <cve>CVE-2021-33813</cve>
     </suppress>
-    <suppress until="2021-08-01">
+    <suppress until="2021-12-01">
         <notes><![CDATA[
    file name: jquery-1.11.3.js
    ]]></notes>
@@ -44,12 +44,5 @@
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.apache\.santuario/xmlsec@.*$</packageUrl>
         <cve>CVE-2021-40690</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-core-5.2.15.RELEASE.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-core@.*$</packageUrl>
-        <cve>CVE-2021-22096</cve>
     </suppress>
 </suppressions>
