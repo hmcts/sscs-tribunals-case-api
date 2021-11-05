@@ -59,15 +59,11 @@ public class HearingRecordingRequestService {
 
         sscsCaseData.getSscsHearingRecordingCaseData().setRequestableHearingDetails(new DynamicList(new DynamicListItem("", ""), validHearings));
         if (isNotEmpty(filteredRequestedHearingsCollection)) {
-            sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(requestedHearingsCollection);
             sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearingsTextList(requestedHearingText.substring(0, requestedHearingText.length() - 2));
         } else {
             sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearingsTextList("There are no outstanding " + selectedPartyItem.getLabel() + " hearing recording requests on this case");
         }
         if (isNotEmpty(filteredReleasedHearingsCollection)) {
-            if (PartyItemList.DWP.getCode().equals(selectedPartyItem)) {
-                sscsCaseData.getSscsHearingRecordingCaseData().setDwpReleasedHearings(releasedHearingsCollection);
-            }
             sscsCaseData.getSscsHearingRecordingCaseData().setReleasedHearingsTextList(releasedHearingText.substring(0, releasedHearingText.length() - 2));
         } else {
             sscsCaseData.getSscsHearingRecordingCaseData().setReleasedHearingsTextList("No hearing recordings have been released to " + selectedPartyItem.getLabel() + " on this case");

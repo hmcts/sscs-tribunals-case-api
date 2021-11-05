@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -187,6 +188,23 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
         assertEquals("an_id11", hearingRecordingRequest.getValue().getSscsHearingRecording().getHearingId());
 
         assertEquals(YesNo.YES, actualCaseData.getData().getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding());
+    }
+
+    @Test
+    public void givenHearingRecordingRequestAndEmptySscsHearingRecordingsList_thenThrowError() throws IOException {
+
+        Callback<SscsCaseData> actualCallback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE, "withDwp",
+                REQUEST_FOR_HEARING_RECORDING.getId(), APPELLANT_EVIDENCE.getId(), UPLOAD_DOCUMENT_FE_CALLBACK_JSON);
+
+        actualCallback.getCaseDetails().getCaseData().getSscsHearingRecordingCaseData().setRequestingParty(new DynamicList("appellant"));
+        actualCallback.getCaseDetails().getCaseData().getSscsHearingRecordingCaseData().setSscsHearingRecordings(Collections.emptyList());
+
+        actualCallback.getCaseDetails().getCaseData().getSscsHearingRecordingCaseData().setRequestableHearingDetails(new DynamicList("an_id11"));
+
+        PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(ABOUT_TO_SUBMIT, actualCallback, USER_AUTHORISATION);
+
+        assertEquals(1, actualCaseData.getErrors().size());
+        assertEquals("Hearing record not found", actualCaseData.getErrors().toArray()[0]);
     }
 
     @Test(expected = IllegalStateException.class)
