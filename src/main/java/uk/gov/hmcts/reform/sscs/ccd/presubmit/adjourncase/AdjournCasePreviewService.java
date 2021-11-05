@@ -247,7 +247,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                     adjournCaseBuilder.heldOn(LocalDate.parse(finalHearing.getValue().getHearingDate()));
                 }
                 if (finalHearing.getValue().getVenue() != null) {
-                    String venueName = venueDataLoader.getGapVenueName(finalHearing.getValue().getVenue().getName(),
+                    String venueName = venueDataLoader.getGapVenueName(finalHearing.getValue().getVenue(),
                             finalHearing.getValue().getVenueId());
                     if (venueName != null) {
                         adjournCaseBuilder.heldAt(venueName);
