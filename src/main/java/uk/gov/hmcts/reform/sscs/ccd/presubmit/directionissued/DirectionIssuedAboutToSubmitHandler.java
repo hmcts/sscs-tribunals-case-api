@@ -45,18 +45,21 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private final String bulkScanEndpoint;
     private final DwpAddressLookupService dwpAddressLookupService;
     private final int dwpResponseDueDays;
+    private final int dwpResponseDueDaysChildSupport;
 
     @Autowired
     public DirectionIssuedAboutToSubmitHandler(FooterService footerService, ServiceRequestExecutor serviceRequestExecutor,
                                                @Value("${bulk_scan.url}") String bulkScanUrl,
                                                @Value("${bulk_scan.validateEndpoint}") String validateEndpoint,
                                                DwpAddressLookupService dwpAddressLookupService,
-                                               @Value("${dwp.response.due.days}") int dwpResponseDueDays) {
+                                               @Value("${dwp.response.due.days}") int dwpResponseDueDays,
+                                               @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport) {
         this.footerService = footerService;
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bulkScanEndpoint = String.format("%s%s", trimToEmpty(bulkScanUrl), trimToEmpty(validateEndpoint));
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.dwpResponseDueDays = dwpResponseDueDays;
+        this.dwpResponseDueDaysChildSupport = dwpResponseDueDaysChildSupport;
     }
 
     @Override
@@ -128,7 +131,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private SscsCaseData updateCaseAfterExtensionRefused(SscsCaseData caseData, String interlocReviewState, State state) {
         caseData.setHmctsDwpState("sentToDwp");
         caseData.setDateSentToDwp(LocalDate.now().toString());
-        caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate(dwpResponseDueDays));
+        caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate(getResponseDueDays(caseData)));
         caseData.setInterlocReviewState(interlocReviewState);
         caseData.setState(state);
 
@@ -145,7 +148,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         } else if (getPreValidStates().contains(caseDetails.getState())
                 && DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setDateSentToDwp(LocalDate.now().toString());
-            caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate(dwpResponseDueDays));
+            caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate(getResponseDueDays(caseData)));
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
             updateDwpRegionalCentre(caseData);
 
@@ -183,6 +186,12 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             caseData.setInterlocReviewState(null);
         }
         return caseData;
+    }
+
+    private int getResponseDueDays(SscsCaseData caseData) {
+        return caseData.getAppeal().getBenefitType() != null
+                && Benefit.CHILD_SUPPORT.getShortName().equalsIgnoreCase(caseData.getAppeal().getBenefitType().getCode())
+                ? dwpResponseDueDaysChildSupport : dwpResponseDueDays;
     }
 
     private SscsCaseData updateCaseAfterReinstatementGranted(SscsCaseData caseData, SscsDocumentTranslationStatus documentTranslationStatus) {
@@ -270,29 +279,6 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             return sscsCaseDataPreSubmitCallbackResponse;
         }
 
-        if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
-
-            if (DirectionType.PROVIDE_INFORMATION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
-                caseData.setInterlocReviewState(AWAITING_INFORMATION.getId());
-
-            } else if (getPreValidStates().contains(caseDetails.getState()) && DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
-                caseData.setDateSentToDwp(LocalDate.now().toString());
-                caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate(dwpResponseDueDays));
-                caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
-
-            } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
-                    && ExtensionNextEvent.SEND_TO_LISTING.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
-                updateCaseAfterExtensionRefused(caseData, AWAITING_ADMIN_ACTION.getId(), State.RESPONSE_RECEIVED);
-
-            } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
-                    && ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
-                updateCaseAfterExtensionRefused(caseData, null, State.WITH_DWP);
-
-            } else {
-                caseData.setInterlocReviewState(null);
-            }
-
-        }
         return buildResponse(callback, caseDetails, caseData, sscsCaseDataPreSubmitCallbackResponse, url, documentTranslationStatus);
     }
 

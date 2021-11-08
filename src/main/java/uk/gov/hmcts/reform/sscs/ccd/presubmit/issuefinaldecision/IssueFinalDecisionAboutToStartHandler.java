@@ -46,7 +46,7 @@ public class IssueFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (sscsCaseData.getWriteFinalDecisionPreviewDocument() != null) {
+        if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument() != null) {
 
             String benefitType = WriteFinalDecisionBenefitTypeHelper.getBenefitType(sscsCaseData);
 

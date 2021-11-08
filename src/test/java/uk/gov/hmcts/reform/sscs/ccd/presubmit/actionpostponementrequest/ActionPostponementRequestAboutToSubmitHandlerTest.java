@@ -64,6 +64,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
+                .directionNoticeContent("Body Content")
                 .sscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder().build()).build();
         sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
 
@@ -133,6 +134,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getSscsDocument(), is(not(empty())));
         assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.NO));
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
+        assertThat(response.getData().getDirectionNoticeContent(), is(nullValue()));
     }
 
     @Test
@@ -152,6 +154,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getState(), is(State.NOT_LISTABLE));
         assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.NO));
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
+        assertThat(response.getData().getDirectionNoticeContent(), is(nullValue()));
     }
 
     @Test
@@ -171,6 +174,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getInterlocReviewState(), is(WELSH_TRANSLATION.getId()));
         assertThat(response.getData().getTranslationWorkOutstanding(), is(YES.getValue()));
         assertThat(response.getData().getSscsDocument(), is(not(empty())));
+        assertThat(response.getData().getDirectionNoticeContent(), is(nullValue()));
     }
 
     private void populatePostponementSscsCaseData() {

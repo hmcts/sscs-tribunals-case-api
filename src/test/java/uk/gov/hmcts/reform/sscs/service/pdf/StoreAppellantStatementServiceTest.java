@@ -8,7 +8,6 @@ import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.spy;
 
-import java.net.URI;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +29,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.Statement;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.AppellantStatementPdfData;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.PdfService;
 
@@ -59,14 +58,14 @@ public class StoreAppellantStatementServiceTest {
     @Mock
     private IdamService idamService;
     @Mock
-    private EvidenceManagementService evidenceManagementService;
+    private PdfStoreService pdfStoreService;
 
     private StoreAppellantStatementService storeAppellantStatementService;
 
     @Before
     public void setUp() {
         storeAppellantStatementService = spy(new StoreAppellantStatementService(pdfService,
-            "templatePath","templatePath", ccdPdfService, idamService, evidenceManagementService));
+            "templatePath","templatePath", ccdPdfService, idamService, pdfStoreService));
     }
 
     @Test
@@ -212,7 +211,7 @@ public class StoreAppellantStatementServiceTest {
         verify(ccdPdfService, times(1)).mergeDocIntoCcd(acForPdfName.capture(), any(),
             eq(1234567890L), any(SscsCaseData.class), any(IdamTokens.class), eq(OTHER_EVIDENCE));
         assertThat(acForPdfName.getValue(), is(expectedFilename));
-        verify(evidenceManagementService, never()).upload(anyList(), anyString());
+        verify(pdfStoreService, never()).storeDocument(any(), anyString(), anyString());
     }
 
     @Test
@@ -224,7 +223,7 @@ public class StoreAppellantStatementServiceTest {
         doReturn(false).when(storeAppellantStatementService,
             "pdfHasNotAlreadyBeenCreated", any(SscsCaseDetails.class), anyString());
 
-        when(evidenceManagementService.download(eq(new URI("http://dm-store/scannedDoc")), anyString()))
+        when(pdfStoreService.download(eq("http://dm-store/scannedDoc")))
             .thenReturn(new byte[0]);
 
 
@@ -234,8 +233,8 @@ public class StoreAppellantStatementServiceTest {
 
         storeAppellantStatementService.storePdfAndUpdate(1L, "onlineHearingId", data);
 
-        verify(evidenceManagementService, times(1))
-            .download(eq(new URI("http://dm-store/scannedDoc")), anyString());
+        verify(pdfStoreService, times(1))
+            .download(eq("http://dm-store/scannedDoc"));
         verify(ccdPdfService, never()).mergeDocIntoCcd(anyString(), any(), anyLong(), any(), any());
         verify(idamService, never()).getIdamTokens();
         verify(pdfService, never()).createPdf(any(), anyString());

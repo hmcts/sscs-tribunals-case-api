@@ -112,7 +112,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
     @Override
     protected void setDescriptorFlowIndicator(String value, SscsCaseData sscsCaseData) {
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow(value);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow(value);
     }
 
     @Override
@@ -126,15 +126,15 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("enhancedRate");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setWriteFinalDecisionStartDate("2018-10-11");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionStartDate("2018-10-11");
     }
 
     @Override
     public void givenGeneratedDateIsAlreadySetGeneratedNonDescriptorFlow_thenSetNewGeneratedDate() {
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGeneratedDate("2018-10-10");
         setDescriptorFlowIndicator("no", sscsCaseData);
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
@@ -148,11 +148,11 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     @Override
     public void givenGeneratedDateIsAlreadySetNonGeneratedDescriptorFlow_thenDoSetNewGeneratedDate() {
         setDescriptorFlowIndicator("yes", sscsCaseData);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("no");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("no");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
         setHigherRateScenarioFields(sscsCaseData);
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGeneratedDate("2018-10-10");
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
@@ -166,10 +166,10 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     public void givenGeneratedDateIsAlreadySetNonGeneratedNonDescriptorFlow_thenDoSetNewGeneratedDate() {
         setDescriptorFlowIndicator("no", sscsCaseData);
         setHigherRateScenarioFields(sscsCaseData);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("no");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("no");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGeneratedDate("2018-10-10");
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
@@ -190,17 +190,17 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         setCommonPreviewParams(sscsCaseData, null);
 
         setDescriptorFlowIndicator("yes", sscsCaseData);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("no");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("no");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
         boolean setAsideExpectation = appealAllowedExpectation;
@@ -240,17 +240,17 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         setCommonPreviewParams(sscsCaseData, null);
 
         setDescriptorFlowIndicator("no", sscsCaseData);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("no");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("no");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
         boolean setAsideExpectation = appealAllowedExpectation;
@@ -292,12 +292,12 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         setCommonPreviewParams(sscsCaseData, endDate);
 
         setDescriptorFlowIndicator("yes", sscsCaseData);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(descriptorsComparedToDwp);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(nonDescriptorsComparedWithDwp);
 
         if ("noAward".equals(rate) || "notConsidered".equals(rate)) {
-            sscsCaseData.setWriteFinalDecisionEndDateType("na");
+            sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("na");
         }
 
         // Mobility specific parameters
@@ -309,16 +309,16 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         if ("notConsidered".equals(rate)) {
-            assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+            assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
             Assert.assertEquals(1, response.getErrors().size());
         } else {
 
-            assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+            assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
             assertEquals(DocumentLink.builder()
                 .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
                 .documentBinaryUrl(URL + "/binary")
                 .documentUrl(URL)
-                .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+                .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
             boolean appealAllowedExpectation = !"notConsidered".equalsIgnoreCase(rate) && "higher".equals(descriptorsComparedToDwp);
 
@@ -370,7 +370,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
             assertNull(body.getDailyLivingDescriptors());
             assertNull(payload.getDateIssued());
             assertEquals(LocalDate.now(), payload.getGeneratedDate());
-            assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+            assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
         }
     }
@@ -386,7 +386,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(nonDescriptorsComparedWithDwp);
 
         setDescriptorFlowIndicator("yes", sscsCaseData);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         // Daily living specific params
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(rate);
@@ -398,16 +398,16 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         if ("notConsidered".equals(rate)) {
-            assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+            assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
             Assert.assertEquals(1, response.getErrors().size());
         } else {
 
-            assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+            assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
             assertEquals(DocumentLink.builder()
                 .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
                 .documentBinaryUrl(URL + "/binary")
                 .documentUrl(URL)
-                .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+                .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
             boolean appealAllowedExpectation = !"notConsidered".equalsIgnoreCase(rate) && "higher".equals(descriptorsComparedToDwp);
 
@@ -475,7 +475,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         setCommonPreviewParams(sscsCaseData, endDate);
 
         setDescriptorFlowIndicator("yes", sscsCaseData);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(descriptorsComparedToDwp);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(nonDescriptorsComparedWithDwp);
@@ -489,16 +489,16 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         if ("notConsidered".equals(rate)) {
-            assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+            assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
             Assert.assertEquals(1, response.getErrors().size());
         } else {
 
-            assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+            assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
             assertEquals(DocumentLink.builder()
                 .documentFilename(String.format("Final Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
                 .documentBinaryUrl(URL + "/binary")
                 .documentUrl(URL)
-                .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+                .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
             boolean appealAllowedExpectation = !"notConsidered".equalsIgnoreCase(rate) && "higher".equals(descriptorsComparedToDwp);
 
@@ -567,10 +567,10 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         final String rate = "standardRate";
 
         setCommonPreviewParams(sscsCaseData, endDate);
-        sscsCaseData.setWriteFinalDecisionReasons(new ArrayList<>());
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionReasons(new ArrayList<>());
 
         setDescriptorFlowIndicator("yes", sscsCaseData);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(null);
@@ -583,12 +583,12 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
             .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
 

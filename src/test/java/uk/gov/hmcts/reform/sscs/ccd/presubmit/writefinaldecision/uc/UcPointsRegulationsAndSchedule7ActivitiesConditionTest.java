@@ -17,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsUcCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
@@ -240,9 +241,11 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
                     if (wcaAppeal.booleanValue()) {
 
                         caseData = SscsCaseData.builder()
-                            .writeFinalDecisionGenerateNotice("Yes")
+                            .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
+                                .writeFinalDecisionGenerateNotice("Yes")
+                                .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
+                                .build())
                             .supportGroupOnlyAppeal(supportGroupOnly == null ? null : supportGroupOnly ? "Yes" : "No")
-                            .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
                             .dwpReassessTheAward(null)
                             .wcaAppeal(YES)
                             .sscsUcCaseData(
@@ -252,9 +255,11 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
                                     .doesSchedule9Paragraph4Apply(getYesNoFieldValue(doesSchedule9Paragraph4Apply)).build()).build();
                     } else {
                         caseData = SscsCaseData.builder()
-                            .writeFinalDecisionGenerateNotice("Yes")
+                            .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
+                                .writeFinalDecisionGenerateNotice("Yes")
+                                .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
+                                .build())
                             .supportGroupOnlyAppeal(supportGroupOnly == null ? null : supportGroupOnly ? "Yes" : "No")
-                            .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
                             .wcaAppeal(NO)
                             .sscsUcCaseData(
                                 SscsUcCaseData.builder().ucWriteFinalDecisionSchedule7ActivitiesApply(schedule7ActivitesApply)

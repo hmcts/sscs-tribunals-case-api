@@ -2,7 +2,7 @@
   "case_details": {
     "id": 12345656789,
     "jurisdiction": "SSCS",
-    "state": "withDwp",
+    "state": "appealCreated",
     "case_type_id": "Benefit",
     "created_date": [
       2018,
@@ -24,35 +24,6 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
-      "elementsDisputedList": [
-        "testElement"
-      ],
-      "issueCode": "CC",
-      "benefitCode": "003",
-      "dwpResponseDocument": {
-        "documentLink": {
-          "document_url": "http://dm-store:5005/documents/6a7cc2b4-2a32-468d-a3e9-d394b0503a26",
-          "document_binary_url": "http://dm-store:5005/documents/6a7cc2b4-2a32-468d-a3e9-d394b0503a26/binary",
-          "document_filename": "Screenshot 2019-10-22 at 16.13.26.pdf"
-        }
-      },
-      "dwpEvidenceBundleDocument": {
-        "documentLink": {
-          "document_url": "http://dm-store:5005/documents/6a7cc2b4-2a32-468d-a3e9-d394b0503a23",
-          "document_binary_url": "http://dm-store:5005/documents/6a7cc2b4-2a32-468d-a3e9-d394b0503a23/binary",
-          "document_filename": "Screenshot 2019-10-22 at 16.13.23.pdf"
-        }
-      },
-      "dwpUploadAudioVideoEvidence": [
-        {
-          "value": {
-            "fileName": "file.mp3",
-            "documentLink": {
-              "document_url": "url"
-            }
-          }
-        }
-      ],
       "dwpTimeExtension": [
       ],
       "hearings": [
@@ -96,13 +67,17 @@
           "tya": ""
         }
       },
+      "previewDocument": {
+        "document_url" : "http://www.withdrwal.com",
+        "document_binary_url" : "http://www.withdrwal.com/binary",
+        "document_filename" : "withdrwal doc1"
+      },
       "sscsDocument" : [ {
         "value" : {
           "documentType" : "appellantEvidence",
           "documentFileName" : "11111.pdf",
           "documentDateAdded" : "2018-10-10",
-          "documentTranslationStatus" : "translationRequired",
-          "partyUploaded" : "",
+          "evidenceIssued": "Yes",
           "documentLink" : {
             "document_url" : "http://www.bbc.com",
             "document_binary_url" : "http://www.bbc.com/binary",
@@ -112,14 +87,28 @@
       },
         {
           "value" : {
-            "documentType" : "sscs1",
+            "documentType" : "representativeEvidence",
             "documentFileName" : "22222.pdf",
             "documentDateAdded" : "2018-10-11",
-            "documentTranslationStatus" : "translationRequired",
+            "evidenceIssued": "Yes",
             "documentLink" : {
               "document_url" : "http://www.itv.com",
               "document_binary_url" : "http://www.itv.com/binary",
               "document_filename" : "myfile2.jpg"
+            }
+          }
+        },
+        {
+          "value" : {
+            "documentType" : "decisionIssued",
+            "documentFileName" : "oldDecisionIssued.pdf",
+            "documentDateAdded" : "2018-10-12",
+            "evidenceIssued": "Yes",
+            "bundleAddition": "A",
+            "documentLink" : {
+              "document_url" : "http://www.itv3.com",
+              "document_binary_url" : "http://www.itv3.com/binary",
+              "document_filename" : "myfile3.jpg"
             }
           }
         }],
@@ -143,6 +132,7 @@
         "postcode": "B16 6FR",
         "city": "BIRMINGHAM"
       },
+      "tempNoteDetail": "withdrawal note added",
       "appeal": {
         "mrnDetails": {},
         "appellant": {
@@ -171,8 +161,8 @@
           "isAddressSameAsAppointee": null
         },
         "benefitType": {
-          "code": "BENEFIT_CODE_PLACEHOLDER",
-          "description": "BENEFIT_DESCRIPTION_PLACEHOLDER"
+          "code": "ESA",
+          "description": "Employment Support Allowance"
         },
         "receivedVia": "PAPER",
         "hearingOptions": {
@@ -241,8 +231,7 @@
         }
       ],
       "originalSender": {},
-      "furtherEvidenceAction": {},
-      "languagePreferenceWelsh" : "Yes"
+      "furtherEvidenceAction": {}
     },
     "data_classification": {
       "dwpTimeExtension": {
@@ -656,5 +645,5 @@
       }
     }
   },
-  "event_id": "dwpUploadResponse"
+  "event_id": "adminAppealWithdrawn"
 }
