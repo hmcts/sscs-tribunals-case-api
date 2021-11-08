@@ -18,7 +18,7 @@ public class DataFixtures {
     }
 
     public static AppealDetails someAppealDetails() {
-        return new AppealDetails("12-12-2019", "11-11-2019", "PIP");
+        return new AppealDetails("12-12-2019", "11-11-2019", "PIP", "hearing");
     }
 
 

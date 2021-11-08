@@ -72,6 +72,34 @@ public class CitizenLoginService {
         return convert;
     }
 
+    public List<OnlineHearing> findActiveCasesForCitizen(IdamTokens idamTokens) {
+        log.info(format("Find case: Searching for active case with for user [%s]", idamTokens.getUserId()));
+        List<CaseDetails> caseDetails = citizenCcdService.searchForCitizenAllCases(idamTokens);
+        List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
+                .map(sscsCcdConvertService::getCaseDetails)
+                .filter(AppealNumberGenerator::filterActiveCasesForCitizen)
+                .collect(toList());
+
+        log.info(format("Searching for active case without for user [%s]", idamTokens.getUserId()));
+        List<OnlineHearing> convert = convert(sscsCaseDetails);
+        log.info(format("Found [%s] active cases for user [%s]", convert.size(), idamTokens.getUserId()));
+        return convert;
+    }
+
+    public List<OnlineHearing> findDormantCasesForCitizen(IdamTokens idamTokens) {
+        log.info(format("Find case: Searching for dormant case with for user [%s]", idamTokens.getUserId()));
+        List<CaseDetails> caseDetails = citizenCcdService.searchForCitizenAllCases(idamTokens);
+        List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
+                .map(sscsCcdConvertService::getCaseDetails)
+                .filter(AppealNumberGenerator::filterDormantCasesForCitizen)
+                .collect(toList());
+
+        log.info(format("Searching for dormant case without for user [%s]", idamTokens.getUserId()));
+        List<OnlineHearing> convert = convert(sscsCaseDetails);
+        log.info(format("Found [%s] dormant cases for user [%s]", convert.size(), idamTokens.getUserId()));
+        return convert;
+    }
+
     private List<OnlineHearing> convert(List<SscsCaseDetails> sscsCaseDetails) {
         return sscsCaseDetails.stream()
                 .map(onlineHearingService::loadHearing)
