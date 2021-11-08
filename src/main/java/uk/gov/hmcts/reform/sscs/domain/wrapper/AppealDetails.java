@@ -12,11 +12,13 @@ public class AppealDetails {
     private final String submittedDate;
     private final String mrnDate;
     private final String benefitType;
+    private final String state;
 
-    public AppealDetails(String submittedDate, String mrnDate, String benefitType) {
+    public AppealDetails(String submittedDate, String mrnDate, String benefitType, String state) {
         this.submittedDate = submittedDate;
         this.mrnDate = mrnDate;
         this.benefitType = benefitType;
+        this.state = state;
     }
 
     @ApiModelProperty(example = "some date format to do", required = true)
@@ -37,6 +39,12 @@ public class AppealDetails {
         return benefitType;
     }
 
+    @ApiModelProperty(example = "withDwp", required = true)
+    @JsonProperty(value = "state")
+    public String getState() {
+        return state;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -48,12 +56,13 @@ public class AppealDetails {
         AppealDetails that = (AppealDetails) o;
         return Objects.equals(submittedDate, that.submittedDate)
                 && Objects.equals(mrnDate, that.mrnDate)
-                && Objects.equals(benefitType, that.benefitType);
+                && Objects.equals(benefitType, that.benefitType)
+                && Objects.equals(state, that.state);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(submittedDate, mrnDate, benefitType);
+        return Objects.hash(submittedDate, mrnDate, benefitType, state);
     }
 
     @Override
@@ -62,6 +71,7 @@ public class AppealDetails {
                 + "submittedDate='" + submittedDate + '\''
                 + ", mrnDate='" + mrnDate + '\''
                 + ", benefitType='" + benefitType + '\''
+                + ", state='" + state + '\''
                 + '}';
     }
 }
