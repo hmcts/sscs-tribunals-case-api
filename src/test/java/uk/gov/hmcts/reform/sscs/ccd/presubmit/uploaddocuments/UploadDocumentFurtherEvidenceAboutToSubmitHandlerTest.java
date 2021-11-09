@@ -105,7 +105,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
 
     @Test
     @Parameters({"audio.mp3","video.mp4"})
-    public void errorThrownWhenAudioVideoDocuemtnHasIncorrectDocuemntType(String fileName) throws IOException {
+    public void errorThrownWhenAudioVideoDocumentHasIncorrectDocumentType(String fileName) throws IOException {
         Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,
                 "withDwp",
                 "representativeEvidence", "appellantEvidence",

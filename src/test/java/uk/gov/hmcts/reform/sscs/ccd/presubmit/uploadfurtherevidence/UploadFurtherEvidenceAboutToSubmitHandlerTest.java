@@ -200,7 +200,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("As you have an MP3 or MP4 file, please set interlocutory review state to 'Review by TCW'"));
+        assertThat(response.getErrors().iterator().next(), is("As you have uploaded an MP3 or MP4 file, please set interlocutory review state to 'Review by TCW'"));
         assertThat(response.getData().getDraftFurtherEvidenceDocuments(), is(draftDocs));
         assertThat(response.getData().getSscsDocument(), is(nullValue()));
     }
