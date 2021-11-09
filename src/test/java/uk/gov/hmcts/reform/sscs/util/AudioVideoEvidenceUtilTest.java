@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
 import java.util.List;
-
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Test;
