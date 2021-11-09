@@ -214,7 +214,7 @@ def versions = [
         pact: '4.1.7',
         junitJupiter: '5.7.2',
         lombok: '1.18.22',
-        sscsCommon: '4.5.16'
+        sscsCommon: '4.5.17-RC-SSCS-9755'
 ]
 
 ext["rest-assured.version"] = '4.2.0'
