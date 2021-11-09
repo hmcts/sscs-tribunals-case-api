@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 
 public class IssueNoticeHandlerTest extends IssueNoticeHandlerTestBase {
     @Mock
@@ -23,6 +24,8 @@ public class IssueNoticeHandlerTest extends IssueNoticeHandlerTestBase {
     public PipDecisionNoticeOutcomeService decisionNoticeOutcomeService;
     @Mock
     public DocumentConfiguration documentConfiguration;
+    @Mock
+    private VenueDataLoader venueDataLoader;
 
     public IssueNoticeHandlerTest() {
         super("PIP");
@@ -30,6 +33,6 @@ public class IssueNoticeHandlerTest extends IssueNoticeHandlerTestBase {
 
     @Override
     protected IssueNoticeHandler createIssueNoticeHandler(GenerateFile generateFile, UserDetailsService userDetailsService, Function<LanguagePreference, String> templateId) {
-        return new PipWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, decisionNoticeQuestionService, decisionNoticeOutcomeService, documentConfiguration);
+        return new PipWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, decisionNoticeQuestionService, decisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
     }
 }

@@ -27,23 +27,26 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody
 import uk.gov.hmcts.reform.sscs.service.GenDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.GenDecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 
 public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDecisionPreviewDecisionServiceTestBase {
 
     protected GenDecisionNoticeOutcomeService genDecisionNoticeOutcomeService;
     protected GenDecisionNoticeQuestionService genDecisionNoticeQuestionService;
+    protected VenueDataLoader venueDataLoader;
 
     public GenWriteFinalDecisionPreviewDecisionServiceTest() throws IOException {
         super("GEN");
         this.genDecisionNoticeQuestionService = new GenDecisionNoticeQuestionService();
         this.genDecisionNoticeOutcomeService = new GenDecisionNoticeOutcomeService(genDecisionNoticeQuestionService);
+        this.venueDataLoader = new VenueDataLoader();
     }
 
     @Override
     protected WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
         DocumentConfiguration documentConfiguration) {
         return new GenWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, genDecisionNoticeQuestionService,
-            genDecisionNoticeOutcomeService, documentConfiguration);
+            genDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
     }
 
     @NamedParameters("previewEndDateAndRateCombinations")
