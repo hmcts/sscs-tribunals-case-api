@@ -1,9 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.DocumentType.REQUEST_FOR_HEARING_RECORDING;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.getOriginalSender;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.isValidAudioVideoDocumentType;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
 import java.time.LocalDate;
@@ -48,6 +51,11 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
         caseData.setEvidenceHandled("No");
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+
+        if (nonNull(caseData.getDraftSscsFurtherEvidenceDocument()) && incorrectTypeSelectedForAudioVideoEvidence(caseData.getDraftSscsFurtherEvidenceDocument())) {
+            response.addError("Type not accepted for AV evidence. Select a Type for the party that originally submitted the audio/video evidence");
+        }
+
         uploadHearingRecordingRequest(caseData, response);
 
         initDraftSscsFurtherEvidenceDocument(caseData);
@@ -74,6 +82,10 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
         } else {
             caseData.getScannedDocuments().addAll(newScannedDocs);
         }
+    }
+
+    private boolean incorrectTypeSelectedForAudioVideoEvidence(List<SscsFurtherEvidenceDoc> draftSscsFurtherEvidenceDocuments) {
+        return draftSscsFurtherEvidenceDocuments.stream().anyMatch(doc -> DocumentUtil.isFileAMedia(doc.getValue().getDocumentLink()) && !isValidAudioVideoDocumentType(doc.getValue().getDocumentType()));
     }
 
     @NotNull
@@ -110,6 +122,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
                         doc.getValue().getDocumentLink().getDocumentFilename())
                     .dateAdded(LocalDate.now())
                     .partyUploaded(UploadParty.CTSC)
+                    .originalPartySender(getOriginalSender(doc.getValue().getDocumentType()))
                     .build()).build()).collect(toList());
 
         if (!newAudioVideoEvidence.isEmpty()) {
