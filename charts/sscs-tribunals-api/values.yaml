@@ -34,7 +34,8 @@ java:
         - appeal-email-to
         - appeal-email-from
         - docmosis-endpoint
-        - docmosis-api-key
+        - name: docmosis-api-key
+          alias: PDF_SERVICE_ACCESS_KEY
         - name: AppInsightsInstrumentationKey
           alias: azure.application-insights.instrumentation-key
   environment:
