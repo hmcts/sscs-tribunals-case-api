@@ -73,7 +73,6 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
     @Test
     @Parameters({"audio.mp3","video.mp4"})
     public void handleHappyPathWhenAudioVideoFileUploaded(String fileName) throws IOException {
-        UploadDocumentFurtherEvidenceAboutToSubmitHandler handler = new UploadDocumentFurtherEvidenceAboutToSubmitHandler(false, footerService);
         Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,
                 "withDwp",
                 "representativeEvidence", "appellantEvidence",
@@ -107,7 +106,6 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
     @Test
     @Parameters({"audio.mp3","video.mp4"})
     public void errorThrownWhenAudioVideoDocuemtnHasIncorrectDocuemntType(String fileName) throws IOException {
-        UploadDocumentFurtherEvidenceAboutToSubmitHandler handler = new UploadDocumentFurtherEvidenceAboutToSubmitHandler(false, footerService);
         Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,
                 "withDwp",
                 "representativeEvidence", "appellantEvidence",
