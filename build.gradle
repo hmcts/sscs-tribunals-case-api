@@ -213,7 +213,8 @@ def versions = [
         sonarPitest: '0.5',
         pact: '4.1.7',
         junitJupiter: '5.7.2',
-        lombok: '1.18.22'
+        lombok: '1.18.22',
+        sscsCommon: '4.5.15'
 ]
 
 ext["rest-assured.version"] = '4.2.0'
@@ -231,7 +232,7 @@ dependencyManagement {
         // resolves: CVE-2020-28052
         dependency group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.69'
         //CVE-2021-40690
-        dependency group: 'org.apache.santuario', name: 'xmlsec', version: '2.2.3'
+        dependency group: 'org.apache.santuario', name: 'xmlsec', version: '2.3.0'
 
         // resolves: CVE-2019-10101, CVE-2019-10102, CVE-2019-10103, CVE-2020-15824
         dependencySet(group: 'org.jetbrains.kotlin', version: '1.5.31') {
@@ -356,7 +357,7 @@ dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
-    compile group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.6'
+    compile group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.7'
     compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.2'
 
     compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.4'
@@ -368,7 +369,8 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.5.12-RC-9677'
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: versions.sscsCommon
+
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.46'
 
     compile group:'org.overviewproject', name: 'mime-types', version: '1.0.2'
@@ -498,6 +500,12 @@ task runAndPublishConsumerPactTests(type: Test){
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
 
+}
+
+task getSscsCommonVersion{
+    doLast {
+        print versions.sscsCommon
+    }
 }
 
 runAndPublishConsumerPactTests.dependsOn contract

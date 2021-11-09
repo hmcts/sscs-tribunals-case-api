@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.DocumentType.REQUEST_FOR_HEARING_RECORDING;
@@ -16,9 +14,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -26,24 +23,12 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState;
-import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
 
 @Service
 public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private static final String UPLOAD_DATE_FORMATTER = "yyyy-MM-dd";
-    private final boolean uploadAudioVideoEvidenceEnabled;
-    private final FooterService footerService;
-
-    @Autowired
-    public UploadDocumentFurtherEvidenceAboutToSubmitHandler(
-        @Value("${feature.upload-audio-video-evidence.enabled}") boolean uploadAudioVideoEvidenceEnabled,
-        FooterService footerService) {
-        this.uploadAudioVideoEvidenceEnabled = uploadAudioVideoEvidenceEnabled;
-        this.footerService = footerService;
-    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -95,13 +80,17 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
         moveDraftsToSscsDocs(caseData);
         moveDraftsToAudioVideoEvidence(caseData);
         caseData.setEvidenceHandled("No");
-        uploadHearingRecordingRequest(caseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+        uploadHearingRecordingRequest(caseData, response);
 
         initDraftSscsFurtherEvidenceDocument(caseData);
         setHasUnprocessedAudioVideoEvidenceFlag(caseData);
+        clearTransientFields(caseData);
 
         return response;
     }
+
 
     private boolean incorrectTypeSelectedForAudioVideoEvidence(List<SscsFurtherEvidenceDoc> draftSscsFurtherEvidenceDocuments) {
         return draftSscsFurtherEvidenceDocuments.stream().anyMatch(doc -> DocumentUtil.isFileAMedia(doc.getValue().getDocumentLink()) && !isValidAudioVideoDocumentType(doc.getValue().getDocumentType()));
@@ -234,7 +223,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
         }
     }
 
-    private void uploadHearingRecordingRequest(SscsCaseData sscsCaseData) {
+    private void uploadHearingRecordingRequest(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
 
         if (sscsCaseData.getDraftSscsFurtherEvidenceDocument() != null) {
             List<SscsFurtherEvidenceDoc> sscsFurtherEvidenceDocList = sscsCaseData.getDraftSscsFurtherEvidenceDocument().stream()
@@ -244,22 +233,38 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
                 && sscsCaseData.getSscsHearingRecordingCaseData().getRequestingParty() != null
                 && sscsCaseData.getSscsHearingRecordingCaseData().getRequestingParty().getValue() != null
                 && sscsCaseData.getSscsHearingRecordingCaseData().getRequestingParty().getValue().getCode() != null
+                && sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings() != null
                 && sscsFurtherEvidenceDocList != null && sscsFurtherEvidenceDocList.size() >= 1) {
 
-                HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
-                    .requestingParty(sscsCaseData.getSscsHearingRecordingCaseData().getRequestingParty().getValue().getCode())
-                    .requestDocument(sscsFurtherEvidenceDocList.get(0).getValue().getDocumentLink())
-                    .dateRequested(LocalDateTime.now().format(DateTimeFormatter.ofPattern(UPLOAD_DATE_FORMATTER))).build()).build();
+                DynamicListItem selectedRequestable = sscsCaseData.getSscsHearingRecordingCaseData().getRequestableHearingDetails().getValue();
+                String hearingId = selectedRequestable.getCode();
 
-                List<HearingRecordingRequest> hearingRecordingRequests = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();
-                if (hearingRecordingRequests == null) {
-                    hearingRecordingRequests = new ArrayList<>();
+                Optional<SscsHearingRecording> sscsHearingRecording = sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings()
+                        .stream().filter(r -> r.getValue().getHearingId().equals(hearingId)).findAny();
+
+                if (sscsHearingRecording.isPresent()) {
+                    HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
+                            .requestingParty(sscsCaseData.getSscsHearingRecordingCaseData().getRequestingParty().getValue().getCode())
+                            .requestDocument(sscsFurtherEvidenceDocList.get(0).getValue().getDocumentLink())
+                            .sscsHearingRecording(sscsHearingRecording.get().getValue())
+                            .dateRequested(LocalDateTime.now().format(DateTimeFormatter.ofPattern(UPLOAD_DATE_FORMATTER))).build()).build();
+
+                    List<HearingRecordingRequest> hearingRecordingRequests = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();
+                    if (hearingRecordingRequests == null) {
+                        hearingRecordingRequests = new ArrayList<>();
+                    }
+                    hearingRecordingRequests.add(hearingRecordingRequest);
+
+                    sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(hearingRecordingRequests);
+                    sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YesNo.YES);
+                } else {
+                    response.addError("Hearing record not found");
                 }
-                hearingRecordingRequests.add(hearingRecordingRequest);
-
-                sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(hearingRecordingRequests);
-                sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YesNo.YES);
             }
         }
+    }
+
+    private void clearTransientFields(SscsCaseData sscsCaseData) {
+        sscsCaseData.getSscsHearingRecordingCaseData().setRequestingParty(null);
     }
 }

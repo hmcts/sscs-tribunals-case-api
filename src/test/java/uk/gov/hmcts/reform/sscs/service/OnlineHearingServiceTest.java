@@ -80,7 +80,7 @@ public class OnlineHearingServiceTest {
                         "other arrangements"
                 ),
                 new AppellantDetails(new AddressDetails("line1","line2","town", "county","postcode"), "email", "012", "120"),
-                new AppealDetails(sscsCaseDetails.getData().getCaseCreated(), "12-12-2019", "PIP")
+                new AppealDetails(sscsCaseDetails.getData().getCaseCreated(), "12-12-2019", "PIP", State.HEARING.getId())
         )));
     }
 
@@ -92,6 +92,7 @@ public class OnlineHearingServiceTest {
         return SscsCaseDetails.builder()
                 .id(caseId)
                 .createdDate(LocalDateTime.now())
+                .state(State.HEARING.getId())
                 .data(SscsCaseData.builder()
                         .caseReference(expectedCaseReference)
                         .caseCreated(LocalDateTime.now().toString())
