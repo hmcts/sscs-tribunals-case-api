@@ -9,7 +9,6 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-
 public class CitizenLoginTest extends BaseFunctionTest {
 
     CreatedCcdCase ccdCase;
