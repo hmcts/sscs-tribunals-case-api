@@ -35,10 +35,7 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
-import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
-import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.service.*;
 
 @RunWith(JUnitParamsRunner.class)
 public class PipIssueFinalDecisionAboutToStartHandlerTest {
@@ -68,6 +65,9 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
 
     @Mock
     private GenerateFile generateFile;
+
+    @Mock
+    private VenueDataLoader venueDataLoader;
 
     private SscsCaseData sscsCaseData;
 
@@ -161,7 +161,7 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
         PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
 
         final PipWriteFinalDecisionPreviewDecisionService previewDecisionService = new PipWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
-            pipDecisionNoticeQuestionService, pipDecisionNoticeOutcomeService, documentConfiguration);
+            pipDecisionNoticeQuestionService, pipDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
 
         when(generateFile.assemble(any())).thenReturn(URL);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("preparingFood1a");
@@ -204,7 +204,7 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
         when(pipDecisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
 
         final PipWriteFinalDecisionPreviewDecisionService previewDecisionService = new PipWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
-            pipDecisionNoticeQuestionService, pipDecisionNoticeOutcomeService, documentConfiguration);
+            pipDecisionNoticeQuestionService, pipDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
 
         when(generateFile.assemble(any())).thenReturn(URL);
 

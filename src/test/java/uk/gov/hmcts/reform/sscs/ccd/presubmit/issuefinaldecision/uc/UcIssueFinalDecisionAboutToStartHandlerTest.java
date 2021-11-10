@@ -53,10 +53,7 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
-import uk.gov.hmcts.reform.sscs.service.UcDecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.UcDecisionNoticeQuestionService;
-import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.service.*;
 
 @RunWith(JUnitParamsRunner.class)
 public class UcIssueFinalDecisionAboutToStartHandlerTest {
@@ -87,6 +84,9 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
 
     @Mock
     private GenerateFile generateFile;
+
+    @Mock
+    private VenueDataLoader venueDataLoader;
 
     private SscsCaseData sscsCaseData;
 
@@ -181,7 +181,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
         UcDecisionNoticeQuestionService esaDecisionNoticeQuestionService = new UcDecisionNoticeQuestionService();
 
         final UcWriteFinalDecisionPreviewDecisionService previewDecisionService = new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
-            esaDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration);
+            esaDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
 
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -223,7 +223,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
         when(ucDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
 
         final UcWriteFinalDecisionPreviewDecisionService previewDecisionService = new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
-            esaDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration);
+            esaDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
 
         when(generateFile.assemble(any())).thenReturn(URL);
         sscsCaseData.setWcaAppeal(NO);

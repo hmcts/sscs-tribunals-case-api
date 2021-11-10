@@ -2,10 +2,12 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,9 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
+import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -64,7 +68,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     public void setUp() {
         openMocks(this);
         associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService);
-        handler = new CaseUpdatedAboutToSubmitHandler(regionalProcessingCenterService, associatedCaseLinkHelper, airLookupService);
+        handler = new CaseUpdatedAboutToSubmitHandler(regionalProcessingCenterService, associatedCaseLinkHelper, airLookupService, new DwpAddressLookupService(), idamService);
 
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -82,6 +86,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
         when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
+        when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(SUPER_USER.getValue())).build());
     }
 
     @Test
@@ -425,6 +430,89 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getWarnings().size(), is(0));
+    }
+
+    @Test
+    public void givenBenefitTypeAndDwpIssuingOfficeEmpty_thenAddWarningMessages() {
+        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(null);
+        callback.getCaseDetails().getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(2, response.getWarnings().size());
+        assertThat(response.getWarnings(), hasItems("Benefit type code is empty", "DWP issuing office is empty"));
+    }
+
+    @Test
+    public void givenInvalidBenefitTypeAndDwpIssuingOfficeEmpty_thenAddWarningMessages() {
+        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("INVALID").build());
+        callback.getCaseDetails().getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(2, response.getWarnings().size());
+        assertThat(response.getWarnings(), hasItems("Benefit type code is invalid, should be one of: ESA, JSA, PIP, DLA, UC, carersAllowance, attendanceAllowance, bereavementBenefit, industrialInjuriesDisablement, maternityAllowance, socialFund, incomeSupport, bereavementSupportPaymentScheme, industrialDeathBenefit, pensionCredit, retirementPension, childSupport",
+                "DWP issuing office is empty"));
+    }
+
+    @Test
+    public void givenInvalidBenefitTypeAndInvalidDwpIssuingOffice_thenAddWarningMessages() {
+        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("INVALID").build());
+        callback.getCaseDetails().getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().dwpIssuingOffice("Test").build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getWarnings().size());
+        assertThat(response.getWarnings(), hasItems("Benefit type code is invalid, should be one of: ESA, JSA, PIP, DLA, UC, carersAllowance, attendanceAllowance, bereavementBenefit, industrialInjuriesDisablement, maternityAllowance, socialFund, incomeSupport, bereavementSupportPaymentScheme, industrialDeathBenefit, pensionCredit, retirementPension, childSupport"));
+    }
+
+    @Test
+    @Parameters({
+            "ESA,DWP issuing office is invalid\\, should one of: Balham DRT\\, Birkenhead LM DRT\\, Chesterfield DRT\\, Coatbridge Benefit Centre\\, Inverness DRT\\, Lowestoft DRT\\, Milton Keynes DRT\\, Norwich DRT\\, Sheffield DRT\\, Springburn DRT\\, Watford DRT\\, Wellingborough DRT\\, Worthing DRT\\, Recovery from Estates",
+            "PIP,DWP issuing office is invalid\\, should one of: 1\\, 2\\, 3\\, 4\\, 5\\, 6\\, 7\\, 8\\, 9\\, AE\\, Recovery from Estates",
+            "DLA,DWP issuing office is invalid\\, should one of: Disability Benefit Centre 4\\, The Pension Service 11\\, Recovery from Estates",
+            "UC,DWP issuing office is invalid\\, should one of: Universal Credit\\, Recovery from Estates",
+            "carersAllowance,DWP issuing office is invalid\\, should one of: Carer’s Allowance Dispute Resolution Team",
+            "bereavementBenefit,DWP issuing office is invalid\\, should one of: Pensions Dispute Resolution Team",
+            "attendanceAllowance,DWP issuing office is invalid\\, should one of: The Pension Service 11\\, Recovery from Estates",
+            "industrialInjuriesDisablement,DWP issuing office is invalid\\, should one of: Barrow IIDB Centre\\, Barnsley Benefit Centre",
+            "maternityAllowance,DWP issuing office is invalid\\, should one of: Walsall Benefit Centre",
+            "JSA,DWP issuing office is invalid\\, should one of: Worthing DRT\\, Birkenhead DRT\\, Inverness DRT\\, Recovery from Estates",
+            "socialFund,DWP issuing office is invalid\\, should one of: St Helens Sure Start Maternity Grant\\, Funeral Payment Dispute Resolution Team\\, Pensions Dispute Resolution Team",
+            "incomeSupport,DWP issuing office is invalid\\, should one of: Worthing DRT\\, Birkenhead DRT\\, Inverness DRT\\, Recovery from Estates",
+            "bereavementSupportPaymentScheme,DWP issuing office is invalid\\, should one of: Pensions Dispute Resolution Team",
+            "industrialDeathBenefit,DWP issuing office is invalid\\, should one of: Barrow IIDB Centre\\, Barnsley Benefit Centre",
+            "pensionCredit,DWP issuing office is invalid\\, should one of: Pensions Dispute Resolution Team\\, Recovery from Estates",
+            "retirementPension,DWP issuing office is invalid\\, should one of: Pensions Dispute Resolution Team\\, Recovery from Estates",
+            "childSupport,DWP issuing office is invalid\\, should one of: Child Maintenance Service Group",
+    })
+    public void givenValidBenefitTypeAndInvalidDwpIssuingOffice_thenAddWarningMessages(String benefitCode, String warning) {
+        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefitCode).build());
+        callback.getCaseDetails().getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().dwpIssuingOffice("Test").build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getWarnings().size());
+        assertThat(response.getWarnings(), hasItems(warning));
+    }
+
+    @Test
+    @Parameters({"PIP,1,Newcastle", "ESA,Balham DRT,Balham DRT", "DLA,Disability Benefit Centre 4,DLA Child/Adult", "UC,Universal Credit,Universal Credit",
+            "carersAllowance, Carer’s Allowance Dispute Resolution Team,Carers Allowance", "bereavementBenefit,Pensions Dispute Resolution Team,Bereavement Benefit",
+            "attendanceAllowance,The Pension Service 11,Attendance Allowance", "industrialInjuriesDisablement,Barrow IIDB Centre,IIDB Barrow", "maternityAllowance,Walsall Benefit Centre,Maternity Allowance",
+            "JSA,Worthing DRT,JSA Worthing", "socialFund,St Helens Sure Start Maternity Grant,SSMG","incomeSupport,Worthing DRT,IS Worthing",
+            "bereavementSupportPaymentScheme,Pensions Dispute Resolution Team,Bereavement Support Payment", "industrialDeathBenefit,Barrow IIDB Centre,IDB Barrow",
+            "pensionCredit,Pensions Dispute Resolution Team,Pension Credit", "retirementPension,Pensions Dispute Resolution Team,Retirement Pension",
+            "childSupport,Child Maintenance Service Group,Child Support"
+    })
+    public void givenValidBenefitTypeAndValidDwpIssuingOffice_thenThereIsNoWarningMessagesAndSetRegionalCenter(String benefitCode, String dwpIssuingOffice, String regionalCenter) {
+        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefitCode).build());
+        callback.getCaseDetails().getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().dwpIssuingOffice(dwpIssuingOffice).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(regionalCenter, response.getData().getDwpRegionalCentre());
     }
 
     private long getNumberOfExpectedError(PreSubmitCallbackResponse<SscsCaseData> response) {

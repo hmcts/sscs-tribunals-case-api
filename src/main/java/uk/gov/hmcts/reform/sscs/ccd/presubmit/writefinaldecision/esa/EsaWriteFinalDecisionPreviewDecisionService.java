@@ -21,22 +21,21 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody.WriteFinalDecisionTemplateBodyBuilder;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
-import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.service.*;
 
 @Slf4j
 @Component
 public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisionPreviewDecisionServiceBase {
 
     private EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService;
+    private VenueDataLoader venueDataLoader;
 
     @Autowired
     public EsaWriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
-        EsaDecisionNoticeQuestionService decisionNoticeQuestionService, EsaDecisionNoticeOutcomeService outcomeService, DocumentConfiguration documentConfiguration) {
-        super(generateFile, userDetailsService, decisionNoticeQuestionService, outcomeService, documentConfiguration);
+        EsaDecisionNoticeQuestionService decisionNoticeQuestionService, EsaDecisionNoticeOutcomeService outcomeService, DocumentConfiguration documentConfiguration, VenueDataLoader venueDataLoader) {
+        super(generateFile, userDetailsService, decisionNoticeQuestionService, outcomeService, documentConfiguration, venueDataLoader);
         this.esaDecisionNoticeQuestionService = decisionNoticeQuestionService;
+        this.venueDataLoader = venueDataLoader;
     }
 
     @Override

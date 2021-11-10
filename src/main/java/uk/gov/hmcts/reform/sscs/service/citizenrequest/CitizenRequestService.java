@@ -91,13 +91,13 @@ public class CitizenRequestService {
                     .map(CitizenHearingRecording::getHearingId)
                     .collect(Collectors.toList());
 
-            List<CitizenHearingRecording> requestabledRecordings = sscsCaseData.getHearings().stream()
+            List<CitizenHearingRecording> requestableRecordings = sscsCaseData.getHearings().stream()
                     .filter(hearing -> isHearingWithRecording(hearing, sscsCaseData.getSscsHearingRecordingCaseData()))
                     .filter(hearing -> !allRequestedHearingIds.contains(hearing.getValue().getHearingId()))
                     .map(this::populateCitizenHearingRecordings)
                     .collect(Collectors.toList());
 
-            return new HearingRecordingResponse(releasedRecordings, requestedRecordings, requestabledRecordings);
+            return new HearingRecordingResponse(releasedRecordings, requestedRecordings, requestableRecordings);
         }
     }
 
