@@ -224,9 +224,10 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     private List<MultiBundleConfig> getMultiBundleConfigs(SscsCaseData sscsCaseData) {
         boolean requiresMultiBundleForPhme = isPhmeReviewGranted(sscsCaseData) && (isHasEditedDwpResponseDocument(sscsCaseData) || isHasEditedDwpEvidenceBundleDocument(sscsCaseData));
         boolean requiresMultiBundleForConfidentiality = isConfidentialCase(sscsCaseData) && hasEditedSscsDocuments(sscsCaseData);
+        boolean requiresMultiBundleForNonPhme = !isPhmeAbleBenefitTypeCase(sscsCaseData)
+                && hasEditedSscsDocuments(sscsCaseData);
 
-        if (requiresMultiBundleForPhme || requiresMultiBundleForConfidentiality
-                || !isPhmeAbleBenefitTypeCase(sscsCaseData))  {
+        if (requiresMultiBundleForPhme || requiresMultiBundleForConfidentiality || requiresMultiBundleForNonPhme) {
             return getEditedAndUneditedConfigs(sscsCaseData);
         }
         return getUneditedConfigs(sscsCaseData);
