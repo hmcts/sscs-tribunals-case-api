@@ -226,7 +226,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         boolean requiresMultiBundleForConfidentiality = isConfidentialCase(sscsCaseData) && hasEditedSscsDocuments(sscsCaseData);
 
         if (requiresMultiBundleForPhme || requiresMultiBundleForConfidentiality
-                || sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT))  {
+                || (sscsCaseData.getBenefitType().isPresent() && sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT)))  {
             return getEditedAndUneditedConfigs(sscsCaseData);
         }
 
