@@ -105,7 +105,8 @@
         "time": "11:40:00",
         "adjourned": "No",
         "eventDate": null,
-        "hearingId": "3698764"
+        "hearingId": "3698764",
+        "venueId": null
       }
     }
   ],
