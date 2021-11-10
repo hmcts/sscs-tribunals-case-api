@@ -201,7 +201,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     }
 
     private boolean isPhmeAbleBenefitTypeCase(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getBenefitType().isPresent() && !sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT);
+        return !sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT);
     }
 
     private boolean isHasEditedDwpEvidenceBundleDocument(SscsCaseData sscsCaseData) {
