@@ -201,7 +201,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     }
 
     private boolean isPhmeAbleBenefitTypeCase(SscsCaseData sscsCaseData) {
-        return !sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT);
+        return sscsCaseData.getBenefitType().isPresent() && !sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT);
     }
 
     private boolean isHasEditedDwpEvidenceBundleDocument(SscsCaseData sscsCaseData) {
@@ -226,10 +226,9 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         boolean requiresMultiBundleForConfidentiality = isConfidentialCase(sscsCaseData) && hasEditedSscsDocuments(sscsCaseData);
 
         if (requiresMultiBundleForPhme || requiresMultiBundleForConfidentiality
-                || (sscsCaseData.getBenefitType().isPresent() && sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT)))  {
+                || !isPhmeAbleBenefitTypeCase(sscsCaseData))  {
             return getEditedAndUneditedConfigs(sscsCaseData);
         }
-
         return getUneditedConfigs(sscsCaseData);
     }
 
