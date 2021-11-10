@@ -74,7 +74,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             .dwpFurtherInfo("Yes")
             .dwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("a.pdf").documentFilename("a.pdf").build()).build())
             .dwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("b.pdf").documentFilename("b.pdf").build()).build())
-            .appeal(Appeal.builder().build())
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().build()).build())
             .build();
 
         sscsCaseDataBefore = SscsCaseData.builder().build();
@@ -834,7 +834,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler
                 .handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors().iterator().next(), 
+        assertThat(response.getErrors().iterator().next(),
                 is("Potential harmful evidence is not a valid selection for child support cases"));
     }
 
@@ -945,4 +945,31 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getWarnings().size(), is(0));
     }
+
+    @Test
+    public void givenNewOtherPartyAdded_thenAssignAnId() {
+        sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty(null)));
+        sscsCaseData.getAppeal().getBenefitType().setCode("childSupport");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(1, response.getData().getOtherParties().size());
+        assertEquals("1", response.getData().getOtherParties().get(0).getValue().getId());
+    }
+
+    @Test
+    public void givenExistingOtherParties_thenNewOtherPartyAssignedNextId() {
+        sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty("2"), buildOtherParty("1"), buildOtherParty(null)));
+        sscsCaseData.getAppeal().getBenefitType().setCode("childSupport");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(3, response.getData().getOtherParties().size());
+        assertEquals("3", response.getData().getOtherParties().get(2).getValue().getId());
+    }
+
+    private CcdValue<OtherParty> buildOtherParty(String id) {
+        return CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder().id(id).build())
+                .build();
+    }
+
 }
