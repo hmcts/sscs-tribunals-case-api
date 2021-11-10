@@ -189,7 +189,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     }
 
     private boolean hasPhmeRequestOrConfidentialityUnderReview(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response, boolean hasEditedDwpResponseDocument, boolean hasEditedDwpEvidenceBundleDocument) {
-        if (isPhmeAbleBenefitTypeCase(sscsCaseData) && isPhmeStatusUnderReview(sscsCaseData)
+        if (!sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) && isPhmeStatusUnderReview(sscsCaseData)
                 && (hasEditedDwpResponseDocument || hasEditedDwpEvidenceBundleDocument)) {
             response.addError("There is a pending PHME request on this case");
         }
@@ -198,10 +198,6 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
             response.addError("There is a pending enhanced confidentiality request on this case");
         }
         return !response.getErrors().isEmpty();
-    }
-
-    private boolean isPhmeAbleBenefitTypeCase(SscsCaseData sscsCaseData) {
-        return !sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT);
     }
 
     private boolean isHasEditedDwpEvidenceBundleDocument(SscsCaseData sscsCaseData) {
@@ -224,7 +220,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     private List<MultiBundleConfig> getMultiBundleConfigs(SscsCaseData sscsCaseData) {
         boolean requiresMultiBundleForPhme = isPhmeReviewGranted(sscsCaseData) && (isHasEditedDwpResponseDocument(sscsCaseData) || isHasEditedDwpEvidenceBundleDocument(sscsCaseData));
         boolean requiresMultiBundleForConfidentiality = isConfidentialCase(sscsCaseData) && hasEditedSscsDocuments(sscsCaseData);
-        boolean requiresMultiBundleForNonPhme = !isPhmeAbleBenefitTypeCase(sscsCaseData)
+        boolean requiresMultiBundleForNonPhme = sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT)
                 && hasEditedSscsDocuments(sscsCaseData);
 
         if (requiresMultiBundleForPhme || requiresMultiBundleForConfidentiality || requiresMultiBundleForNonPhme) {
