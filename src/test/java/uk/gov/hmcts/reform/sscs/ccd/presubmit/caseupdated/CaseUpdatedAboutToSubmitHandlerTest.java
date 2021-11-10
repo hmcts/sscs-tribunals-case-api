@@ -7,6 +7,8 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 
 import java.util.ArrayList;
@@ -523,5 +525,74 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     private Address buildAddress(String line1, String line2, String county, String town) {
         return Address.builder().line1(line1).line2(line2).county(county).town(town).build();
+    }
+
+    @Test
+    public void givenACaseAppellantConfidentialityYes_thenCaseConfidentialYes() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(YesNo.YES);
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(YesNo.YES, response.getData().getIsConfidentialCase());
+    }
+
+    @Test
+    public void givenACaseAppellantConfidentialityNo_thenCaseConfidentialNull() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(null, response.getData().getIsConfidentialCase());
+    }
+
+    @Test
+    public void givenACaseAppellantConfidentialityNoOtherPartyYes_thenCaseConfidentialYes() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequired(YES).build()).build();
+        otherPartyList.add(ccdValue);
+        callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(YES, response.getData().getIsConfidentialCase());
+    }
+
+    @Test
+    public void givenACaseOtherPartyConfidentialityYes_thenCaseConfidentialYes() {
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequired(YES).build()).build();
+        otherPartyList.add(ccdValue);
+        callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(YES, response.getData().getIsConfidentialCase());
+    }
+
+    @Test
+    public void givenACaseOtherPartyConfidentialityNo_thenCaseConfidentialNull() {
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequired(NO).build()).build();
+        otherPartyList.add(ccdValue);
+        callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(null, response.getData().getIsConfidentialCase());
+    }
+
+    @Test
+    public void givenACaseOtherPartyConfidentialityNoAndYes_thenCaseConfidentialYes() {
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequired(NO).build()).build();
+        otherPartyList.add(ccdValue);
+        CcdValue<OtherParty> ccdValue1 = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequired(YES).build()).build();
+        otherPartyList.add(ccdValue1);
+        callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(YES, response.getData().getIsConfidentialCase());
     }
 }

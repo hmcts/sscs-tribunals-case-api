@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,9 +76,38 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
 
+        checkSscs2Confidentiality(preSubmitCallbackResponse, sscsCaseData);
+
         setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
 
         return preSubmitCallbackResponse;
+    }
+
+    private void checkSscs2Confidentiality(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, SscsCaseData sscsCaseData) {
+        if (Benefit.CHILD_SUPPORT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode()) && sscsCaseData.getIsConfidentialCase() != null && YesNo.isYes(sscsCaseData.getIsConfidentialCase())) {
+            if (sscsCaseData.getDwpEditedEvidenceReason() == null) {
+                if (!otherPartyHasConfidentiality(sscsCaseData)) {
+                    sscsCaseData.setIsConfidentialCase(null);
+                }
+                if (sscsCaseData.getAppeal().getAppellant() != null && YesNo.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired())) {
+                    sscsCaseData.getAppeal().getAppellant().setConfidentialityRequired(YesNo.NO);
+                }
+                preSubmitCallbackResponse.addWarning("Are you sure you want change the Appellant confidentiality requirement?");
+            }
+        }
+        if (otherPartyHasConfidentiality(sscsCaseData)) {
+            sscsCaseData.setIsConfidentialCase(YesNo.YES);
+        }
+    }
+
+    private boolean otherPartyHasConfidentiality(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getOtherParties() != null) {
+            Optional otherParty = sscsCaseData.getOtherParties().stream().filter(op -> YesNo.isYes(op.getValue().getConfidentialityRequired())).findAny();
+            if (otherParty.isPresent()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected void handleAudioVideoDocuments(SscsCaseData sscsCaseData) {
