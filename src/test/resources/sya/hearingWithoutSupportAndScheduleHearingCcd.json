@@ -84,6 +84,7 @@
       "otherReasons": "Another reason"
     },
     "rep": {
+      "id": null,
       "hasRepresentative": "Yes",
       "name": {
         "title": "Mr",

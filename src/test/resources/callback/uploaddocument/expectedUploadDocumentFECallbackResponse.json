@@ -35,6 +35,7 @@
         "confidentialityRequired": null,
         "role": null,
         "appointee": {
+          "id": null,
           "name": null,
           "address": null,
           "contact": null,
@@ -52,6 +53,7 @@
       },
       "appealReasons": {},
       "rep": {
+        "id": null,
         "hasRepresentative": "Yes",
         "organisation": "HP Ltd",
         "name": {
