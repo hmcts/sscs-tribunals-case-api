@@ -821,7 +821,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenADwpUploadResponseEventPmheChildSupportThenErrorAdded() {
+    public void givenADwpUploadResponseEventPhmeChildSupportThenErrorAdded() {
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
@@ -858,7 +858,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenADwpUploadResponseEventPmheNonChildSupportThenNoErrorAdded() {
+    public void givenADwpUploadResponseEventPhmeNonChildSupportThenNoErrorAdded() {
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
