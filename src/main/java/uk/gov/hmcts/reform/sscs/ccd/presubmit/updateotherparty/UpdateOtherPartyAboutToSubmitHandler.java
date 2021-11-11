@@ -3,12 +3,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updateotherparty;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.assignOtherPartyId;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getIdComparator;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateOtherPartyUcb;
 
-import java.util.Comparator;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -38,9 +36,8 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
         }
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-
         List<CcdValue<OtherParty>> otherParties = sscsCaseData.getOtherParties();
-        otherParties.sort(getIdComparator());
+        updateOtherPartyUcb(sscsCaseData);
         assignOtherPartyId(otherParties);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);

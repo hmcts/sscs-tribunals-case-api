@@ -1,37 +1,59 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
-
-import java.util.Comparator;
-import java.util.List;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 public class OtherPartyDataUtil {
+
+    private OtherPartyDataUtil() {
+    }
+
+    public static void updateOtherPartyUcb(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getOtherParties() != null) {
+            sscsCaseData.setOtherPartyUcb(sscsCaseData.getOtherParties().stream()
+                    .filter(o -> YesNo.isYes(o.getValue().getUnacceptableCustomerBehaviour()))
+                    .map(o -> o.getValue().getUnacceptableCustomerBehaviour().getValue())
+                    .findAny().orElse(YesNo.NO.getValue()));
+        }
+    }
+
     public static void assignOtherPartyId(List<CcdValue<OtherParty>> otherParties) {
-        int maxId = 0;
-        for (CcdValue<OtherParty> otherParty : otherParties) {
-            if (otherParty.getValue().getId() != null) {
-                maxId = Integer.parseInt(otherParty.getValue().getId());
-            } else {
-                otherParty.getValue().setId(Integer.toString(++maxId));
+        int maxId = getMaxId(otherParties);
+        for (CcdValue<OtherParty> ccdOtherParty : otherParties) {
+            OtherParty otherParty = ccdOtherParty.getValue();
+            if (otherParty.getId() == null) {
+                otherParty.setId(Integer.toString(++maxId));
+            }
+            if (otherParty.getAppointee() != null && YesNo.isYes(otherParty.getIsAppointee()) && otherParty.getAppointee().getId() == null) {
+                otherParty.getAppointee().setId(Integer.toString(++maxId));
+            }
+            if (otherParty.getRep() != null && YesNo.isYes(otherParty.getRep().getHasRepresentative()) && otherParty.getRep().getId() == null) {
+                otherParty.getRep().setId(Integer.toString(++maxId));
             }
         }
     }
 
     @NotNull
-    public static Comparator<CcdValue<OtherParty>> getIdComparator() {
-        return new Comparator<CcdValue<OtherParty>>() {
-            @Override
-            public int compare(CcdValue<OtherParty> a, CcdValue<OtherParty> b) {
-                if (a.getValue().getId() == null) {
-                    return b.getValue().getId() == null ? 0 : 1;
-                } else if (b.getValue().getId() == null) {
-                    return -1;
-                } else {
-                    return a.getValue().getId().compareTo(b.getValue().getId());
-                }
+    private static int getMaxId(List<CcdValue<OtherParty>> otherParties) {
+        List<Integer> currentIds = new ArrayList<>();
+        otherParties.stream().forEach(o -> {
+            OtherParty otherParty = o.getValue();
+            if (otherParty.getId() != null) {
+                currentIds.add(Integer.parseInt(otherParty.getId()));
             }
-        };
+            if (otherParty.getAppointee() != null && otherParty.getAppointee().getId() != null) {
+                currentIds.add(Integer.parseInt(otherParty.getAppointee().getId()));
+            }
+            if (otherParty.getRep() != null && otherParty.getRep().getId() != null) {
+                currentIds.add(Integer.parseInt(otherParty.getRep().getId()));
+            }
+        });
+        return currentIds.stream().max(Comparator.naturalOrder()).orElse(0);
     }
 }
