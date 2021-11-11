@@ -197,36 +197,40 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
     private String buildSpecificTimeText(AdjournCaseTime adjournCaseNextHearingSpecificTime, boolean fixDate) {
         StringBuilder stringBuilder = new StringBuilder("");
+
+        stringBuilder.append("It will be ");
+
         if (adjournCaseNextHearingSpecificTime != null) {
-
-            stringBuilder.append("It will be ");
-
             if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession() != null
                     && adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession().size() > 0) {
                 stringBuilder.append("first ");
             }
 
             if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime() != null
-                || (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession() != null
-                        && adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession().size() > 0)) {
+                    || (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession() != null
+                    && adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession().size() > 0)) {
                 String session = "";
                 if ("am".equalsIgnoreCase(adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime())) {
                     session = "morning ";
                 } else if ("pm".equalsIgnoreCase(adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime())) {
                     session = "afternoon ";
                 }
-                stringBuilder.append("in the " + session + "session ");
+                stringBuilder.append("in the ").append(session).append("session ");
             }
+        } else {
+            stringBuilder.append("re-scheduled ");
+        }
 
-            if (fixDate) {
-                stringBuilder.append("on a date to be fixed");
-            } else {
-                stringBuilder.append("on the first available date");
-            }
+
+        if (fixDate) {
+            stringBuilder.append("on a date to be fixed");
+        } else {
+            stringBuilder.append("on the first available date");
         }
 
         return stringBuilder.toString();
     }
+
 
     protected void validateRequiredProperties(AdjournCaseTemplateBody payload) {
         if (payload.getHeldAt() == null && payload.getHeldOn() == null) {
