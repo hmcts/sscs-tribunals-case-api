@@ -1,0 +1,20 @@
+spring:
+  cloud:
+    propertiesvolume:
+      paths: /mnt/secrets/sscs
+      prefixed: false
+      aliases:
+        sscs-email-mac-secret-text: SUBSCRIPTIONS_MAC_SECRET
+        idam-oauth-user: IDAM_OAUTH2_CLIENT_ID
+        ccd-jid: CORE_CASE_DATA_JURISDICTION_ID
+        ccd-tid: CORE_CASE_DATA_CASE_TYPE_ID
+        idam-redirect: IDAM_OAUTH2_REDIRECT_URL
+        idam-sscs-systemupdate-user: IDAM_SSCS_SYSTEMUPDATE_USER
+        idam-sscs-systemupdate-password: IDAM_SSCS_SYSTEMUPDATE_PASSWORD
+        idam-sscs-oauth2-client-secret: IDAM_OAUTH2_CLIENT_SECRET
+        sscs-s2s-secret: IDAM_S2S_AUTH_TOTP_SECRET
+        s2s-micro: IDAM_S2S_AUTH_MICROSERVICE
+        docmosis-api-key: PDF_SERVICE_ACCESS_KEY
+        AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
+        bundle-url: BUNDLE_URL
+        dm-gateway-url: DM_GATEWAY_URL
