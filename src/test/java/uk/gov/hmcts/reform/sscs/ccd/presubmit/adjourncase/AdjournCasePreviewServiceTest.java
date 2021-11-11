@@ -69,10 +69,11 @@ public class AdjournCasePreviewServiceTest {
         when(userDetailsService.buildLoggedInUserName("Bearer token")).thenReturn("Judge Full Name");
 
         Map<String, VenueDetails> venueDetailsMap = new HashMap<>();
-        VenueDetails venueDetails = VenueDetails.builder().venName("New Venue Name").build();
+        VenueDetails venueDetails = VenueDetails.builder().venName("Venue Name").gapsVenName("Gap venue name").build();
         venueDetailsMap.put("someVenueId", venueDetails);
 
         when(venueDataLoader.getVenueDetailsMap()).thenReturn(venueDetailsMap);
+        when(venueDataLoader.getGapVenueName(any(), any())).thenReturn("Gap venue name");
 
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
@@ -148,7 +149,7 @@ public class AdjournCasePreviewServiceTest {
         sscsCaseData.setAdjournCaseAdditionalDirections(Arrays.asList(new CollectionItem<>(null, "Something else.")));
         sscsCaseData.setAdjournCaseTypeOfHearing("faceToFace");
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).venueId("someVenueId").build()).build()));
 
     }
 
@@ -458,7 +459,7 @@ public class AdjournCasePreviewServiceTest {
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
         assertNotNull(body);
 
-        assertEquals("venue 2 name", body.getHeldAt());
+        assertEquals("Gap venue name", body.getHeldAt());
 
     }
 
@@ -469,7 +470,7 @@ public class AdjournCasePreviewServiceTest {
         sscsCaseData.setAdjournCaseGenerateNotice("yes");
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
-
+        when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(null);;
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("venue 1 name").build()).build()).build();
 
@@ -1101,7 +1102,7 @@ public class AdjournCasePreviewServiceTest {
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
-        assertEquals("Venue Name", templateBody.getAdjournCaseTemplateBody().getNextHearingVenue());
+        assertEquals("Gap venue name", templateBody.getAdjournCaseTemplateBody().getNextHearingVenue());
     }
 
     @Test
@@ -1690,7 +1691,7 @@ public class AdjournCasePreviewServiceTest {
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
-        assertEquals("Venue Name", templateBody.getAdjournCaseTemplateBody().getNextHearingVenue());
+        assertEquals("Gap venue name", templateBody.getAdjournCaseTemplateBody().getNextHearingVenue());
     }
 
     @Test
@@ -1712,7 +1713,7 @@ public class AdjournCasePreviewServiceTest {
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
-        assertEquals("New Venue Name", templateBody.getAdjournCaseTemplateBody().getNextHearingVenue());
+        assertEquals("Gap venue name", templateBody.getAdjournCaseTemplateBody().getNextHearingVenue());
     }
 
     @Test

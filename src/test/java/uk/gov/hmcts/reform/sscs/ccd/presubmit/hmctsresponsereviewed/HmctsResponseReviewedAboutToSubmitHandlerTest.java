@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -35,7 +36,13 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
+
+    @Mock
+    private CaseDetails<SscsCaseData> caseDetailsBefore;
+
     private SscsCaseData sscsCaseData;
+
+    private SscsCaseData sscsCaseDataBefore;
 
     @Before
     public void setUp() {
@@ -50,7 +57,12 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
                 .benefitCode("002")
                 .issueCode("CC")
                 .build();
+
+        sscsCaseDataBefore = SscsCaseData.builder().build();
+
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+        when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
     }
 
     @Test
@@ -167,7 +179,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     @Test
     public void givenUcbSelectedIsNo_thenTheFieldsAreCleared() {
         sscsCaseData.setDwpUcb(NO.getValue());
-        sscsCaseData.setDwpUcbEvidenceDocument(DocumentLink.builder().build());
+        sscsCaseData.setDwpUcbEvidenceDocument(DocumentLink.builder().documentUrl("121").documentFilename("1.pdf").build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
@@ -179,7 +191,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     @Test
     public void givenUcbSelectedAndUploadedUcbDoc_thenNoErrors() {
         sscsCaseData.setDwpUcb(YES.getValue());
-        sscsCaseData.setDwpUcbEvidenceDocument(DocumentLink.builder().build());
+        sscsCaseData.setDwpUcbEvidenceDocument(DocumentLink.builder().documentUrl("11").documentFilename("file.pdf").build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
@@ -265,5 +277,59 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
         assertNull(response.getData().getDwpEvidenceBundleDocument());
     }
 
+    @Test
+    public void givenChildSupportCaseAndCaseCodeIsChangedToNonChildSupportCodeAndCaseHasOtherParty_thenShowError() {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setBenefitCode("001");
+        sscsCaseDataBefore.setBenefitCode("022");
 
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().build()).build();
+        otherPartyList.add(ccdValue);
+        sscsCaseData.setOtherParties(otherPartyList);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getWarnings().size(), is(0));
+        assertThat(response.getErrors().iterator().next(), is("Benefit code cannot be changed on cases with registered 'Other Party'"));
+    }
+
+    @Test
+    public void givenChildSupportCaseAndCaseCodeIsChangedToNonChildSupportCodeAndCaseHasNoOtherParty_thenShowWarning() {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setBenefitCode("001");
+        sscsCaseDataBefore.setBenefitCode("022");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(1));
+        assertThat(response.getWarnings().iterator().next(), is("The benefit code will be changed to a non-child support benefit code"));
+    }
+
+    @Test
+    @Parameters({"022", "023", "024", "025", "026", "028"})
+    public void givenChildSupportCaseAndCaseCodeIsSetToChildSupportCode_thenNoWarningOrErrorIsShown(String childSupportBenefitCode) {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setBenefitCode(childSupportBenefitCode);
+        sscsCaseDataBefore.setBenefitCode("022");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(0));
+    }
+
+    @Test
+    public void givenChildSupportCaseAndCaseCodeIsAlreadyANonChildSupportCase_thenShowErrorOrWarning() {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setBenefitCode("001");
+        sscsCaseDataBefore.setBenefitCode("001");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(0));
+    }
 }

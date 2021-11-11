@@ -32,6 +32,8 @@
           "nino": "JT 12 34 56 D"
         },
         "isAppointee": null,
+        "confidentialityRequired": null,
+        "role": null,
         "appointee": {
           "name": null,
           "address": null,
@@ -93,7 +95,8 @@
           "time": "11:40:00",
           "adjourned": "No",
           "eventDate": null,
-          "hearingId": "3698764"
+          "hearingId": "3698764",
+          "venueId": null
         }
       }
     ],

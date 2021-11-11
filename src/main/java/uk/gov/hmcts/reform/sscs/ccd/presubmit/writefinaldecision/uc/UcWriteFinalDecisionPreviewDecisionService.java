@@ -21,22 +21,21 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody.WriteFinalDecisionTemplateBodyBuilder;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.UcDecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.UcDecisionNoticeQuestionService;
-import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.service.*;
 
 @Slf4j
 @Component
 public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisionPreviewDecisionServiceBase {
 
     private UcDecisionNoticeQuestionService ucDecisionNoticeQuestionService;
+    private VenueDataLoader venueDataLoader;
 
     @Autowired
     public UcWriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
-        UcDecisionNoticeQuestionService decisionNoticeQuestionService, UcDecisionNoticeOutcomeService outcomeService, DocumentConfiguration documentConfiguration) {
-        super(generateFile, userDetailsService, decisionNoticeQuestionService, outcomeService, documentConfiguration);
+        UcDecisionNoticeQuestionService decisionNoticeQuestionService, UcDecisionNoticeOutcomeService outcomeService, DocumentConfiguration documentConfiguration, VenueDataLoader venueDataLoader) {
+        super(generateFile, userDetailsService, decisionNoticeQuestionService, outcomeService, documentConfiguration, venueDataLoader);
         this.ucDecisionNoticeQuestionService = decisionNoticeQuestionService;
+        this.venueDataLoader = venueDataLoader;
     }
 
     @Override
@@ -50,7 +49,7 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
         WriteFinalDecisionTemplateBody payload) {
 
 
-        if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+        if ("Yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
 
             // Validate here for UC instead of only validating on submit.
             // This ensures that we know we can obtain a valid allowed or refused condition below
@@ -76,7 +75,7 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
     @Override
     protected void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
 
-        if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+        if ("Yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             builder.ucIsEntited(false);
             builder.ucAwardRate(null);
             Optional<AwardType> ucAwardTypeOptional = caseData.isWcaAppeal() ? UcPointsRegulationsAndSchedule7ActivitiesCondition

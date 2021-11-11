@@ -46,6 +46,8 @@
         "nino": "AB877533C"
       },
       "isAppointee": "No",
+      "confidentialityRequired": null,
+      "role": null,
       "isAddressSameAsAppointee": "No",
       "appointee": null
     },
@@ -164,6 +166,8 @@
     {
       "value" : {
         "documentLink" : {
+          "document_binary_url":"http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49/binary",
+          "document_filename":"filename1",
           "document_url": "http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49"
         },
         "documentDateAdded" : "2010-10-25",
@@ -174,6 +178,8 @@
     {
       "value" : {
         "documentLink" : {
+          "document_binary_url": "http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49/binary",
+          "document_filename":"filename2",
           "document_url": "http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49"
         },
         "documentDateAdded" : "2010-10-25",

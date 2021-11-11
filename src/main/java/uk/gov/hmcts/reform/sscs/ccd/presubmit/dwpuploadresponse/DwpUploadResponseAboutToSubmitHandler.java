@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
+import static java.lang.String.format;
 import static java.util.Collections.*;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.*;
@@ -8,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVI
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
+import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -31,8 +33,8 @@ import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private static final DateTimeFormatter DD_MM_YYYY_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-    private DwpDocumentService dwpDocumentService;
-    private AddNoteService addNoteService;
+    private final DwpDocumentService dwpDocumentService;
+    private final AddNoteService addNoteService;
 
     @Autowired
     public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService, AddNoteService addNoteService) {
@@ -63,7 +65,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             return preSubmitCallbackResponse;
         }
 
-        setCaseCode(sscsCaseData, callback.getEvent());
+        setCaseCode(preSubmitCallbackResponse, callback);
 
         sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
 
@@ -115,23 +117,13 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     private PreSubmitCallbackResponse<SscsCaseData> checkErrors(SscsCaseData sscsCaseData) {
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (sscsCaseData.getDwpResponseDocument() == null) {
-            preSubmitCallbackResponse.addError("DWP response document cannot be empty.");
-        }
+        validateDwpResponseDocuments(sscsCaseData, preSubmitCallbackResponse);
 
-        if (sscsCaseData.getDwpEvidenceBundleDocument() == null) {
-            preSubmitCallbackResponse.addError("DWP evidence bundle cannot be empty.");
-        }
+        validateDwpAudioVideoEvidence(sscsCaseData, preSubmitCallbackResponse);
+        return preSubmitCallbackResponse;
+    }
 
-        if (sscsCaseData.getDwpEditedEvidenceReason() != null) {
-            if (sscsCaseData.getDwpEditedResponseDocument() == null || sscsCaseData.getDwpEditedResponseDocument().getDocumentLink() == null) {
-                preSubmitCallbackResponse.addError("You must upload an edited DWP response document");
-            }
-
-            if (sscsCaseData.getDwpEditedEvidenceBundleDocument() == null || sscsCaseData.getDwpEditedEvidenceBundleDocument().getDocumentLink() == null) {
-                preSubmitCallbackResponse.addError("You must upload an edited DWP evidence bundle");
-            }
-        }
+    private void validateDwpAudioVideoEvidence(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (sscsCaseData.getDwpUploadAudioVideoEvidence() != null) {
             for (AudioVideoEvidence audioVideoEvidence : sscsCaseData.getDwpUploadAudioVideoEvidence()) {
                 if (audioVideoEvidence.getValue().getRip1Document() != null && audioVideoEvidence.getValue().getDocumentLink() == null) {
@@ -139,7 +131,72 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 }
             }
         }
-        return preSubmitCallbackResponse;
+    }
+
+    private void validateDwpResponseDocuments(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        validateDwpResponseDocument(sscsCaseData.getDwpResponseDocument(), preSubmitCallbackResponse);
+
+        validateDwpAt38Document(sscsCaseData.getDwpAT38Document(), preSubmitCallbackResponse);
+
+        validateDwpEvidenceBundle(sscsCaseData, preSubmitCallbackResponse);
+
+        if (sscsCaseData.getDwpEditedEvidenceReason() != null) {
+            validateEditedDwpResponseDocument(sscsCaseData.getDwpEditedResponseDocument(), preSubmitCallbackResponse);
+
+            validateEditedDwpEvidenceBundle(sscsCaseData.getDwpEditedEvidenceBundleDocument(), preSubmitCallbackResponse);
+
+            validateAppendix12(sscsCaseData.getAppendix12Doc(), preSubmitCallbackResponse);
+        }
+    }
+
+    private void validateAppendix12(DwpResponseDocument appendix12Document, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (appendix12Document != null && appendix12Document.getDocumentLink() != null) {
+            validateDocumentIsAPdf("Appendix 12 document", appendix12Document.getDocumentLink(), preSubmitCallbackResponse);
+        }
+    }
+
+    private void validateEditedDwpEvidenceBundle(DwpResponseDocument dwpResponseDocument, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (dwpResponseDocument == null || dwpResponseDocument.getDocumentLink() == null) {
+            preSubmitCallbackResponse.addError("You must upload an edited DWP evidence bundle");
+        } else {
+            validateDocumentIsAPdf("DWP edited evidence bundle", dwpResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
+        }
+    }
+
+    private void validateEditedDwpResponseDocument(DwpResponseDocument dwpEditedResponseDocument, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (dwpEditedResponseDocument == null || dwpEditedResponseDocument.getDocumentLink() == null) {
+            preSubmitCallbackResponse.addError("You must upload an edited DWP response document");
+        } else {
+            validateDocumentIsAPdf("DWP edited response document", dwpEditedResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
+        }
+    }
+
+    private void validateDwpEvidenceBundle(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (sscsCaseData.getDwpEvidenceBundleDocument() == null || sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink() == null) {
+            preSubmitCallbackResponse.addError("DWP evidence bundle cannot be empty.");
+        } else {
+            validateDocumentIsAPdf("DWP evidence bundle", sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink(), preSubmitCallbackResponse);
+        }
+    }
+
+    private void validateDwpAt38Document(DwpResponseDocument dwpResponseDocument, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (dwpResponseDocument != null && dwpResponseDocument.getDocumentLink() != null) {
+            validateDocumentIsAPdf("DWP AT38 document", dwpResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
+        }
+    }
+
+    private void validateDwpResponseDocument(DwpResponseDocument dwpResponseDocument, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (dwpResponseDocument == null || dwpResponseDocument.getDocumentLink() == null) {
+            preSubmitCallbackResponse.addError("DWP response document cannot be empty.");
+        } else {
+            validateDocumentIsAPdf("DWP response document", dwpResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
+        }
+    }
+
+    private void validateDocumentIsAPdf(String documentMessage, DocumentLink documentLink, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (!isFileAPdf(documentLink)) {
+            preSubmitCallbackResponse.addError(format("%s must be a PDF.", documentMessage));
+        }
     }
 
     private void handleEditedDocuments(SscsCaseData sscsCaseData, String userAuthorisation) {

@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsEsaCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
@@ -240,9 +241,11 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                     if (wcaAppeal.booleanValue()) {
 
                         caseData = SscsCaseData.builder()
-                            .writeFinalDecisionGenerateNotice("Yes")
+                            .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
+                                .writeFinalDecisionGenerateNotice("Yes")
+                                .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
+                                .build())
                             .supportGroupOnlyAppeal(supportGroupOnly == null ? null : supportGroupOnly ? "Yes" : "No")
-                            .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
                             .dwpReassessTheAward(null)
                             .wcaAppeal(YES)
                             .sscsEsaCaseData(
@@ -252,9 +255,11 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                                     .doesRegulation35Apply(getYesNoFieldValue(doesRegulation35Apply)).build()).build();
                     } else {
                         caseData = SscsCaseData.builder()
-                            .writeFinalDecisionGenerateNotice("Yes")
+                            .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
+                                .writeFinalDecisionGenerateNotice("Yes")
+                                .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
+                                .build())
                             .supportGroupOnlyAppeal(supportGroupOnly == null ? null : supportGroupOnly ? "Yes" : "No")
-                            .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
                             .wcaAppeal(NO)
                             .sscsEsaCaseData(
                                 SscsEsaCaseData.builder().esaWriteFinalDecisionSchedule3ActivitiesApply(schedule3ActivitesApply)

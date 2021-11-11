@@ -21,22 +21,21 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody.WriteFinalDecisionTemplateBodyBuilder;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
-import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.service.*;
 
 @Slf4j
 @Component
 public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisionPreviewDecisionServiceBase {
 
     private EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService;
+    private VenueDataLoader venueDataLoader;
 
     @Autowired
     public EsaWriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
-        EsaDecisionNoticeQuestionService decisionNoticeQuestionService, EsaDecisionNoticeOutcomeService outcomeService, DocumentConfiguration documentConfiguration) {
-        super(generateFile, userDetailsService, decisionNoticeQuestionService, outcomeService, documentConfiguration);
+        EsaDecisionNoticeQuestionService decisionNoticeQuestionService, EsaDecisionNoticeOutcomeService outcomeService, DocumentConfiguration documentConfiguration, VenueDataLoader venueDataLoader) {
+        super(generateFile, userDetailsService, decisionNoticeQuestionService, outcomeService, documentConfiguration, venueDataLoader);
         this.esaDecisionNoticeQuestionService = decisionNoticeQuestionService;
+        this.venueDataLoader = venueDataLoader;
     }
 
     @Override
@@ -50,7 +49,7 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         WriteFinalDecisionTemplateBody payload) {
 
 
-        if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+        if ("Yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
 
             // Validate here for ESA instead of only validating on submit.
             // This ensures that we know we can obtain a valid allowed or refused condition below
@@ -76,7 +75,7 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
     @Override
     protected void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
 
-        if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+        if ("Yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             builder.esaIsEntited(false);
             builder.esaAwardRate(null);
             Optional<AwardType> esaAwardTypeOptional = caseData.isWcaAppeal() ? EsaPointsRegulationsAndSchedule3ActivitiesCondition

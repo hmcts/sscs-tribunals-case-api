@@ -91,13 +91,13 @@ public class CitizenRequestService {
                     .map(CitizenHearingRecording::getHearingId)
                     .collect(Collectors.toList());
 
-            List<CitizenHearingRecording> requestabledRecordings = sscsCaseData.getHearings().stream()
+            List<CitizenHearingRecording> requestableRecordings = sscsCaseData.getHearings().stream()
                     .filter(hearing -> isHearingWithRecording(hearing, sscsCaseData.getSscsHearingRecordingCaseData()))
                     .filter(hearing -> !allRequestedHearingIds.contains(hearing.getValue().getHearingId()))
                     .map(this::populateCitizenHearingRecordings)
                     .collect(Collectors.toList());
 
-            return new HearingRecordingResponse(releasedRecordings, requestedRecordings, requestabledRecordings);
+            return new HearingRecordingResponse(releasedRecordings, requestedRecordings, requestableRecordings);
         }
     }
 
@@ -126,6 +126,8 @@ public class CitizenRequestService {
         hearingRecordingRequests.addAll(newHearingRequests);
 
         sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(hearingRecordingRequests);
+        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YesNo.YES);
+
         ccdService.updateCase(sscsCaseData, ccdCaseId, CITIZEN_REQUEST_HEARING_RECORDING.getCcdType(),
                 "SSCS - hearing recording request from MYA",
                 "Requested hearing recordings", idamService.getIdamTokens());

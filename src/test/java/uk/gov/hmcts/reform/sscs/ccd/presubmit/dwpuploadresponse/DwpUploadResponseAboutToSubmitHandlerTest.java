@@ -14,10 +14,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -42,12 +39,16 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     private DwpUploadResponseAboutToSubmitHandler dwpUploadResponseAboutToSubmitHandler;
     private SscsCaseData sscsCaseData;
+    private SscsCaseData sscsCaseDataBefore;
 
     @Mock
     private Callback<SscsCaseData> callback;
 
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
+
+    @Mock
+    private CaseDetails<SscsCaseData> caseDetailsBefore;
 
     @Mock
     private UserDetailsService userDetailsService;
@@ -71,14 +72,18 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             .benefitCode("002")
             .issueCode("CC")
             .dwpFurtherInfo("Yes")
-            .dwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().build()).build())
-            .dwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().build()).build())
+            .dwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("a.pdf").documentFilename("a.pdf").build()).build())
+            .dwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("b.pdf").documentFilename("b.pdf").build()).build())
             .appeal(Appeal.builder().build())
             .build();
 
+        sscsCaseDataBefore = SscsCaseData.builder().build();
+
         when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         when(caseDetails.getId()).thenReturn(Long.valueOf(sscsCaseData.getCcdCaseId()));
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
     }
 
     @Test
@@ -450,20 +455,22 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(2, response.getData().getDwpDocuments().size());
+        assertEquals(4, response.getData().getDwpDocuments().size());
 
         String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
 
         assertEquals("Appendix 12 received on " + todayDate, response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
         assertEquals("Appendix 12 received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentFilename());
         assertEquals(DwpDocumentType.APPENDIX_12.getValue(), response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
-        assertEquals("existingDoc", response.getData().getDwpDocuments().get(1).getValue().getDocumentFileName());
+        assertEquals("existingDoc", response.getData().getDwpDocuments().get(3).getValue().getDocumentFileName());
     }
 
     @Test
     @Parameters(method = "emptyAppendix12Documents")
     public void givenEmptyAppendix12Document_thenDoNotMoveDocumentToDwpDocumentsCollection(@Nullable DwpResponseDocument dwpResponseDocument) {
         callback.getCaseDetails().getCaseData().setAppendix12Doc(dwpResponseDocument);
+        callback.getCaseDetails().getCaseData().setDwpResponseDocument(dwpResponseDocument);
+        callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(dwpResponseDocument);
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -490,25 +497,25 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenUcbSelectedIsNo_thenTheFieldsAreCleared() {
         sscsCaseData.setDwpUcb(NO.getValue());
-        sscsCaseData.setDwpUcbEvidenceDocument(DocumentLink.builder().build());
+        sscsCaseData.setDwpUcbEvidenceDocument(getPdfDocument().getDocumentLink());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(sscsCaseData.getDwpUcb(), is(nullValue()));
         assertThat(sscsCaseData.getDwpUcbEvidenceDocument(), is(nullValue()));
-        assertThat(sscsCaseData.getDwpDocuments(), is(nullValue()));
+        assertThat(sscsCaseData.getDwpDocuments().size(), is(2));
     }
 
     @Test
     public void givenUcbSelectedAndUploadedUcbDoc_thenNoErrors() {
         sscsCaseData.setDwpUcb(YES.getValue());
-        sscsCaseData.setDwpUcbEvidenceDocument(DocumentLink.builder().build());
+        sscsCaseData.setDwpUcbEvidenceDocument(getPdfDocument().getDocumentLink());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(sscsCaseData.getDwpUcb(), is(YES.getValue()));
         assertThat(sscsCaseData.getDwpUcbEvidenceDocument(), is(nullValue()));
-        assertThat(sscsCaseData.getDwpDocuments().size(), is(1));
+        assertThat(sscsCaseData.getDwpDocuments().size(), is(3));
     }
 
     @Test
@@ -738,6 +745,135 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(2, response.getData().getDwpDocuments().size());
+    }
+
+    private DwpResponseDocument getMovieDocument() {
+        return DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("0101").documentFilename("movie.mov").build()).build();
+    }
+
+    private DwpResponseDocument getPdfDocument() {
+        return DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("0101").documentFilename("a.pdf").build()).build();
+    }
+
+    @Test
+    public void dwpResponseDocument_mustBeAPdf() {
+        callback.getCaseDetails().getCaseData().setDwpResponseDocument(getMovieDocument());
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getErrors().iterator().next(), is("DWP response document must be a PDF."));
+    }
+
+    @Test
+    public void dwpEvidenceBundleDocument_mustBeAPdf() {
+        callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(getMovieDocument());
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getErrors().iterator().next(), is("DWP evidence bundle must be a PDF."));
+    }
+
+    @Test
+    public void at38_mustBeAPdf() {
+        callback.getCaseDetails().getCaseData().setDwpAT38Document(getMovieDocument());
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getErrors().iterator().next(), is("DWP AT38 document must be a PDF."));
+    }
+
+    @Test
+    public void dwpEditedEvidenceDocument_mustBeAPdf() {
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(getPdfDocument());
+        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(getMovieDocument());
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getErrors().iterator().next(), is("DWP edited response document must be a PDF."));
+    }
+
+    @Test
+    public void dwpEditedEvidenceBundle_mustBeAPdf() {
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
+        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(getPdfDocument());
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(getMovieDocument());
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getErrors().iterator().next(), is("DWP edited evidence bundle must be a PDF."));
+    }
+
+    @Test
+    public void appendix12_mustBeAPdf() {
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
+        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(getPdfDocument());
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(getPdfDocument());
+        callback.getCaseDetails().getCaseData().setAppendix12Doc(getMovieDocument());
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getErrors().iterator().next(), is("Appendix 12 document must be a PDF."));
+    }
+
+    @Test
+    public void ucbEvidenceDocument_mustBeAPdf() {
+        sscsCaseData.setDwpUcb(YES.getValue());
+        sscsCaseData.setDwpUcbEvidenceDocument(getMovieDocument().getDocumentLink());
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getErrors().iterator().next(), is("UCB document must be a PDF."));
+    }
+
+    @Test
+    public void givenChildSupportCaseAndCaseCodeIsChangedToNonChildSupportCodeAndCaseHasOtherParty_thenShowError() {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setBenefitCode("001");
+        sscsCaseDataBefore.setBenefitCode("022");
+
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().build()).build();
+        otherPartyList.add(ccdValue);
+        sscsCaseData.setOtherParties(otherPartyList);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getWarnings().size(), is(0));
+        assertThat(response.getErrors().iterator().next(), is("Benefit code cannot be changed on cases with registered 'Other Party'"));
+    }
+
+    @Test
+    public void givenChildSupportCaseAndCaseCodeIsChangedToNonChildSupportCodeAndCaseHasNoOtherParty_thenShowWarning() {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setBenefitCode("001");
+        sscsCaseDataBefore.setBenefitCode("022");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(1));
+        assertThat(response.getWarnings().iterator().next(), is("The benefit code will be changed to a non-child support benefit code"));
+    }
+
+    @Test
+    @Parameters({"022", "023", "024", "025", "026", "028"})
+    public void givenChildSupportCaseAndCaseCodeIsSetToChildSupportCode_thenNoWarningOrErrorIsShown(String childSupportBenefitCode) {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setBenefitCode(childSupportBenefitCode);
+        sscsCaseDataBefore.setBenefitCode("022");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(0));
+    }
+
+    @Test
+    public void givenChildSupportCaseAndCaseCodeIsAlreadyANonChildSupportCase_thenShowErrorOrWarning() {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setBenefitCode("001");
+        sscsCaseDataBefore.setBenefitCode("001");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(0));
     }
 
 }

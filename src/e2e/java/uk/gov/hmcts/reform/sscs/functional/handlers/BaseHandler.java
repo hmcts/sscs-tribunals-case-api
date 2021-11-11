@@ -88,7 +88,6 @@ public class BaseHandler {
                 .editedDocumentLink(sscsDoc.getValue().getEditedDocumentLink())
                 .bundleAddition(sscsDoc.getValue().getBundleAddition())
                 .documentDateTimeAdded(LocalDateTime.now())
-                .shouldBundleIncludeDocLink(YesNo.YES)
                 .build()).build();
     }
 
