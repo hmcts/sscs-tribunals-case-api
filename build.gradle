@@ -368,7 +368,6 @@ dependencies {
     //remove when secure doc store is live
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile files('/Users/Rasika.Abeyrathna/Workspce/dev/hmcts/SSCS_Common/sscs-common/build/libs/sscs-common-DEV-SNAPSHOT.jar')
     compile group: 'com.github.hmcts', name: 'sscs-common', version: versions.sscsCommon
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.51'
 
