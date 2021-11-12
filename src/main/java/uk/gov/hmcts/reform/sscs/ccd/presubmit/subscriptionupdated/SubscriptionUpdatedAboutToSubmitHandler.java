@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
+import java.util.List;
+
 @Component
 @Slf4j
 public class SubscriptionUpdatedAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -58,6 +60,22 @@ public class SubscriptionUpdatedAboutToSubmitHandler implements PreSubmitCallbac
 
         if (jointPartySubscription != null && !jointPartySubscription.isEmpty()) {
             jointPartySubscription.setTya(getTyaNumber(jointPartySubscription));
+        }
+
+        List<CcdValue<OtherParty>> otherParties = sscsCaseData.getOtherParties();
+        for(CcdValue<OtherParty> otherParty: otherParties) {
+            Subscription opAppellantSubscription = otherParty.getValue().getAppellantSubscription();
+            if (opAppellantSubscription != null && !opAppellantSubscription.isEmpty()) {
+                opAppellantSubscription.setTya(getTyaNumber(opAppellantSubscription));
+            }
+            Subscription opAppointeeSubscription = otherParty.getValue().getAppointeeSubscription();
+            if (opAppointeeSubscription != null && !opAppointeeSubscription.isEmpty()) {
+                opAppointeeSubscription.setTya(getTyaNumber(opAppointeeSubscription));
+            }
+            Subscription opRepSubscription = otherParty.getValue().getRepresentativeSubscription();
+            if (opRepSubscription != null && !opRepSubscription.isEmpty()) {
+                opRepSubscription.setTya(getTyaNumber(opRepSubscription));
+            }
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
