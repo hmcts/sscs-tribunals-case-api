@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 
 import java.time.format.DateTimeFormatter;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +54,17 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
             sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
         }
 
+        validateInterlocReferralReason(sscsCaseData, preSubmitCallbackResponse);
+
         return preSubmitCallbackResponse;
+    }
+
+    private void validateInterlocReferralReason(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (sscsCaseData.isBenefitType(CHILD_SUPPORT) && sscsCaseData.getInterlocReferralReason() != null
+                && sscsCaseData.getInterlocReferralReason().equals("phmeRequest")) {
+            preSubmitCallbackResponse
+                    .addError("PHME request' is not a valid selection for child support cases");
+        }
     }
 
     protected void setDwpDocuments(SscsCaseData sscsCaseData) {

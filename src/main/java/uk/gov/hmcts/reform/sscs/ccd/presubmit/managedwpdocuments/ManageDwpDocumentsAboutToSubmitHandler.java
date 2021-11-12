@@ -57,9 +57,21 @@ public class ManageDwpDocumentsAboutToSubmitHandler extends ResponseEventsAboutT
         dwpDocumentService.removeOldDwpDocuments(sscsCaseData);
     }
 
+    private void validateEditedEvidenceReason(SscsCaseData sscsCaseData,
+                                              PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+
+        sscsCaseData.getDwpDocuments().stream().forEach(dwpDocument -> {
+
+            dwpDocumentService.validateEditedEvidenceReason(sscsCaseData, preSubmitCallbackResponse,
+                    dwpDocument.getValue().getDwpEditedEvidenceReason());
+        });
+
+    }
+
     private PreSubmitCallbackResponse<SscsCaseData> validateDwpDocuments(SscsCaseData sscsCaseData) {
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        validateEditedEvidenceReason(sscsCaseData, preSubmitCallbackResponse);
         validateOneDwpResponseDocument(sscsCaseData, preSubmitCallbackResponse);
         validateOneDwpEvidenceBundle(sscsCaseData, preSubmitCallbackResponse);
 
