@@ -6,8 +6,6 @@ import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.artsok.RepeatedIfExceptionsTest;
-import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
