@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.isNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -8,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
 
@@ -18,6 +20,23 @@ public class DwpDocumentService {
     public void addToDwpDocuments(SscsCaseData sscsCaseData, DwpResponseDocument dwpDocument, DwpDocumentType docType) {
 
         addToDwpDocumentsWithEditedDoc(sscsCaseData, dwpDocument, docType, null, null);
+    }
+
+    public void validateEditedEvidenceReason(SscsCaseData sscsCaseData,
+                                              PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
+                                              String editedEvidenceReason) {
+
+        if (sscsCaseData.isBenefitType(CHILD_SUPPORT) && editedEvidenceReason != null
+                && editedEvidenceReason.equals("phme")) {
+            preSubmitCallbackResponse
+                    .addError("Potential harmful evidence is not a valid selection for child support cases");
+        }
+
+        if (!sscsCaseData.isBenefitType(CHILD_SUPPORT) && editedEvidenceReason != null
+                && editedEvidenceReason.equals("childSupportConfidentiality")) {
+            preSubmitCallbackResponse
+                    .addError("Child support - Confidentiality is not a valid selection for this case");
+        }
     }
 
     public void addToDwpDocumentsWithEditedDoc(SscsCaseData sscsCaseData, DwpResponseDocument dwpDocument, DwpDocumentType docType, DocumentLink editedDocumentLink, String editedReason) {
