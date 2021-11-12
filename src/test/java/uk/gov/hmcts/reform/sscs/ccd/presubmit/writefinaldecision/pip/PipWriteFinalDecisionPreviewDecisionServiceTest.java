@@ -32,23 +32,26 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 
 public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDecisionPreviewDecisionServiceTestBase {
 
     protected PipDecisionNoticeOutcomeService pipDecisionNoticeOutcomeService;
     protected PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService;
+    protected VenueDataLoader venueDataLoader;
 
     public PipWriteFinalDecisionPreviewDecisionServiceTest() throws IOException {
         super("PIP");
         this.pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
         this.pipDecisionNoticeOutcomeService = new PipDecisionNoticeOutcomeService(pipDecisionNoticeQuestionService);
+        this.venueDataLoader = new VenueDataLoader();
     }
 
     @Override
     protected WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
         DocumentConfiguration documentConfiguration) {
         return new PipWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, pipDecisionNoticeQuestionService,
-            pipDecisionNoticeOutcomeService, documentConfiguration);
+            pipDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
     }
 
     @NamedParameters("previewEndDateAndRateCombinations")
