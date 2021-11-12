@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,7 @@ public class EvidenceDocumentUploadTest {
         uploadAndVerifyEvidenceDocumentUpload();
     }
 
+    @Ignore
     @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
     public void shouldCreateAppealCaseWithEvidenceDocumentLinkIntoCcd() throws IOException {
         Response response = uploadAndVerifyEvidenceDocumentUpload();
