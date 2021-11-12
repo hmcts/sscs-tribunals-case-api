@@ -55,27 +55,6 @@ public class EvidenceDocumentUploadTest {
         uploadAndVerifyEvidenceDocumentUpload();
     }
 
-    @Ignore
-    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
-    public void shouldCreateAppealCaseWithEvidenceDocumentLinkIntoCcd() throws IOException {
-        Response response = uploadAndVerifyEvidenceDocumentUpload();
-
-        String documentUrl = response.path("documents[0]._links.self.href");
-        String fileName = response.path("documents[0].originalDocumentName");
-        LocalDate localDate = LocalDate.now();
-
-        String syaJsonWithEvidence = getSyaInputJsonWithEvidenceDocumentDetails(documentUrl, fileName, localDate);
-
-        given()
-            .contentType(ContentType.JSON)
-            .body(syaJsonWithEvidence)
-            .expect()
-            .statusCode(201)
-            .when()
-            .post("/appeals");
-
-    }
-
     private Response uploadAndVerifyEvidenceDocumentUpload() {
         URL resource = getClass().getClassLoader().getResource("evidence/evidence-document.pdf");
 
