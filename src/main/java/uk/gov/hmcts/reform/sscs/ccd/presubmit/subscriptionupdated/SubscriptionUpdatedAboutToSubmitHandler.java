@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
 
 import java.util.List;
 
@@ -62,6 +63,13 @@ public class SubscriptionUpdatedAboutToSubmitHandler implements PreSubmitCallbac
             jointPartySubscription.setTya(getTyaNumber(jointPartySubscription));
         }
 
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
+
+        if (OtherPartyDataUtil.haveOtherPartiesChanged(callback.getCaseDetailsBefore().get().getCaseData().getOtherParties(),
+                sscsCaseData.getOtherParties())) {
+            response.addError("The other parties have changed, they cannot be changed within this event");
+        }
+
         List<CcdValue<OtherParty>> otherParties = sscsCaseData.getOtherParties();
         for(CcdValue<OtherParty> otherParty: otherParties) {
             Subscription opAppellantSubscription = otherParty.getValue().getAppellantSubscription();
@@ -78,7 +86,7 @@ public class SubscriptionUpdatedAboutToSubmitHandler implements PreSubmitCallbac
             }
         }
 
-        return new PreSubmitCallbackResponse<>(sscsCaseData);
+        return response;
     }
 
     private String getTyaNumber(Subscription existingSubscription) {
