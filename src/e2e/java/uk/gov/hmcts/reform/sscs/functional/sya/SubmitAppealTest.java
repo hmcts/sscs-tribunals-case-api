@@ -103,12 +103,11 @@ public class SubmitAppealTest {
                 expectedState.equals("incompleteApplication") ? null : now;
         String nino = submitHelper.getRandomNino();
 
-        String body = expectedBody;
-        body = submitHelper.setNino(body, nino);
-        body = submitHelper.setLatestMrnDate(body, mrnDate);
+        expectedBody = submitHelper.setNino(expectedBody, nino);
+        expectedBody = submitHelper.setLatestMrnDate(expectedBody, mrnDate);
 
         Response response = RestAssured.given()
-                .body(body)
+                .body(expectedBody)
                 .header("Content-Type", "application/json")
                 .post("/appeals");
 
@@ -123,13 +122,6 @@ public class SubmitAppealTest {
         assertJsonEquals(changeExpectedFields(expectedResponse, nino, mrnDate), sscsCaseDetails.getData(), whenIgnoringPaths("sscsDocument"));
 
         assertEquals(expectedState, sscsCaseDetails.getState());
-    }
-
-    private String updateCaseJsonWithMrnDateAndNino(LocalDate mrnDate, String nino) {
-        String body = ALL_DETAILS_NON_SAVE_AND_RETURN.getSerializedMessage();
-        body = submitHelper.setNino(body, nino);
-        body = submitHelper.setLatestMrnDate(body, mrnDate);
-        return body;
     }
 
     private String changeExpectedFields(String serializedMessage, String nino, LocalDate mrnDate) {
