@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.subscriptionupdated;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator.generateAppealNumber;
 
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -12,8 +13,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
-
-import java.util.List;
 
 @Component
 @Slf4j
@@ -71,7 +70,7 @@ public class SubscriptionUpdatedAboutToSubmitHandler implements PreSubmitCallbac
         }
 
         List<CcdValue<OtherParty>> otherParties = sscsCaseData.getOtherParties();
-        for(CcdValue<OtherParty> otherParty: otherParties) {
+        for (CcdValue<OtherParty> otherParty: otherParties) {
             Subscription opAppellantSubscription = otherParty.getValue().getAppellantSubscription();
             if (opAppellantSubscription != null && !opAppellantSubscription.isEmpty()) {
                 opAppellantSubscription.setTya(getTyaNumber(opAppellantSubscription));

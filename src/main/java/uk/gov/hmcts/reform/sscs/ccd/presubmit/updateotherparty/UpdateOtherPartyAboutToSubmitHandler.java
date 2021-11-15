@@ -5,10 +5,8 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.assignOtherPartyId;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getIdComparator;
 
-import java.util.Comparator;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
