@@ -60,6 +60,26 @@ public class OtherPartyDataUtil {
         return currentIds.stream().max(Comparator.naturalOrder()).orElse(0);
     }
 
+    public static boolean haveOtherPartiesChanged(List<CcdValue<OtherParty>> before, List<CcdValue<OtherParty>> after) {
+        if (before == null && after == null) {
+            return false;
+        }
+        if (before == null ^ after == null) {
+            return true;
+        }
+        if (before.size() != after.size()) {
+            return true;
+        }
+        before.sort(getIdComparator());
+        after.sort(getIdComparator());
+        for (int i = 0; i < before.size(); i++) {
+            if (!before.get(i).getValue().getId().equals(after.get(i).getValue().getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static void checkConfidentiality(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getAppeal().getBenefitType() != null
                 && Benefit.CHILD_SUPPORT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())) {
