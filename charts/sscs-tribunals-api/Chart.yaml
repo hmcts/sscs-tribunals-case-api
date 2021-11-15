@@ -48,6 +48,6 @@ dependencies:
     repository: "https://charts.bitnami.com/bitnami"
     condition: redis.enabled
   - name: em-ccdorc
-    version: 1.0.5
+    version: 1.0.6
     repository: '@hmctspublic'
     condition: em-ccdorc.enabled
