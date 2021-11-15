@@ -71,15 +71,15 @@ public class SubscriptionUpdatedAboutToSubmitHandler implements PreSubmitCallbac
 
         List<CcdValue<OtherParty>> otherParties = sscsCaseData.getOtherParties();
         for (CcdValue<OtherParty> otherParty: otherParties) {
-            Subscription opAppellantSubscription = otherParty.getValue().getAppellantSubscription();
+            Subscription opAppellantSubscription = otherParty.getValue().getOtherPartySubscription();
             if (opAppellantSubscription != null && !opAppellantSubscription.isEmpty()) {
                 opAppellantSubscription.setTya(getTyaNumber(opAppellantSubscription));
             }
-            Subscription opAppointeeSubscription = otherParty.getValue().getAppointeeSubscription();
+            Subscription opAppointeeSubscription = otherParty.getValue().getOtherPartyAppointeeSubscription();
             if (opAppointeeSubscription != null && !opAppointeeSubscription.isEmpty()) {
                 opAppointeeSubscription.setTya(getTyaNumber(opAppointeeSubscription));
             }
-            Subscription opRepSubscription = otherParty.getValue().getRepresentativeSubscription();
+            Subscription opRepSubscription = otherParty.getValue().getOtherPartyRepresentativeSubscription();
             if (opRepSubscription != null && !opRepSubscription.isEmpty()) {
                 opRepSubscription.setTya(getTyaNumber(opRepSubscription));
             }
