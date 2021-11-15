@@ -2,6 +2,11 @@ package uk.gov.hmcts.reform.sscs.util;
 
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DWP_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.HMCTS_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.JOINT_PARTY_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -40,5 +45,27 @@ public class AudioVideoEvidenceUtil {
         }
         log.info("HasUnprocessedAudioVideoEvidence flag has been set to {} for case id: {}",
             caseData.getHasUnprocessedAudioVideoEvidence(), caseData.getCcdCaseId());
+    }
+
+    public static boolean isValidAudioVideoDocumentType(String documentType) {
+        return APPELLANT_EVIDENCE.getValue().equals(documentType)
+                || JOINT_PARTY_EVIDENCE.getValue().equals(documentType)
+                || REPRESENTATIVE_EVIDENCE.getValue().equals(documentType)
+                || DWP_EVIDENCE.getValue().equals(documentType)
+                || HMCTS_EVIDENCE.getValue().equals(documentType);
+    }
+
+    public static String getOriginalSender(String documentType) {
+        switch (documentType) {
+            case "jointPartyEvidence":
+                return "Joint party";
+            case "representativeEvidence":
+                return "Representative";
+            case "dwpEvidence":
+                return "DWP";
+            case "hmctsEvidence":
+                return "HMCTS";
+            default: return "Appellant";
+        }
     }
 }

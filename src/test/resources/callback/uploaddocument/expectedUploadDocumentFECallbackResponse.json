@@ -35,6 +35,7 @@
         "confidentialityRequired": null,
         "role": null,
         "appointee": {
+          "id": null,
           "name": null,
           "address": null,
           "contact": null,
@@ -52,6 +53,7 @@
       },
       "appealReasons": {},
       "rep": {
+        "id": null,
         "hasRepresentative": "Yes",
         "organisation": "HP Ltd",
         "name": {
@@ -95,7 +97,8 @@
           "time": "11:40:00",
           "adjourned": "No",
           "eventDate": null,
-          "hearingId": "3698764"
+          "hearingId": "3698764",
+          "venueId": null
         }
       }
     ],

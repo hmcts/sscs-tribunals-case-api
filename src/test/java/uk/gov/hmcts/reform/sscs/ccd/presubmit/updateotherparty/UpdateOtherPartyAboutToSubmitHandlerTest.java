@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.Arrays;
 import junitparams.JUnitParamsRunner;
@@ -71,27 +72,76 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenOtherPartiesUcbIsYes_thenUpdateCasedataOtherPartyUcb() {
+        when(sscsCaseData.getOtherParties()).thenReturn(Arrays.asList(buildOtherParty("2"), buildOtherParty("1")));
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        verify(sscsCaseData).setOtherPartyUcb(YesNo.YES.getValue());
+    }
+
+    @Test
     public void givenNewOtherPartyAdded_thenAssignAnId() {
-        when(sscsCaseData.getOtherParties()).thenReturn(Arrays.asList(buildOtherParty(null)));
+        when(sscsCaseData.getOtherParties()).thenReturn(Arrays.asList(buildOtherPartyWithAppointeeAndRep(null, null, null)));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getData().getOtherParties().size());
         assertEquals("1", response.getData().getOtherParties().get(0).getValue().getId());
+        assertEquals("2", response.getData().getOtherParties().get(0).getValue().getAppointee().getId());
+        assertEquals("3", response.getData().getOtherParties().get(0).getValue().getRep().getId());
     }
 
     @Test
     public void givenExistingOtherParties_thenNewOtherPartyAssignedNextId() {
-        when(sscsCaseData.getOtherParties()).thenReturn(Arrays.asList(buildOtherParty("2"), buildOtherParty("1"), buildOtherParty(null)));
+        when(sscsCaseData.getOtherParties()).thenReturn(Arrays.asList(buildOtherParty("2"), buildOtherParty("1"), buildOtherPartyWithAppointeeAndRep(null, null, null)));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(3, response.getData().getOtherParties().size());
         assertEquals("3", response.getData().getOtherParties().get(2).getValue().getId());
+        assertEquals("4", response.getData().getOtherParties().get(2).getValue().getAppointee().getId());
+        assertEquals("5", response.getData().getOtherParties().get(2).getValue().getRep().getId());
+    }
+
+    @Test
+    public void givenExistingOtherPartiesWithAppointeeAndRep_thenNewOtherPartyAssignedNextId() {
+        when(sscsCaseData.getOtherParties()).thenReturn(Arrays.asList(buildOtherParty("2"), buildOtherPartyWithAppointeeAndRep("1", "3", "4"), buildOtherPartyWithAppointeeAndRep(null, null, null)));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(3, response.getData().getOtherParties().size());
+        assertEquals("5", response.getData().getOtherParties().get(2).getValue().getId());
+        assertEquals("6", response.getData().getOtherParties().get(2).getValue().getAppointee().getId());
+        assertEquals("7", response.getData().getOtherParties().get(2).getValue().getRep().getId());
+    }
+
+    @Test
+    public void givenExistingOtherParties_thenNewOtherPartyAppointeeAndRepAssignedNextId() {
+        when(sscsCaseData.getOtherParties()).thenReturn(Arrays.asList(buildOtherPartyWithAppointeeAndRep("2", null, null), buildOtherPartyWithAppointeeAndRep("1", "3", "4"), buildOtherParty(null)));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(3, response.getData().getOtherParties().size());
+        assertEquals("5", response.getData().getOtherParties().get(0).getValue().getAppointee().getId());
+        assertEquals("6", response.getData().getOtherParties().get(0).getValue().getRep().getId());
+        assertEquals("7", response.getData().getOtherParties().get(2).getValue().getId());
     }
 
     private CcdValue<OtherParty> buildOtherParty(String id) {
         return CcdValue.<OtherParty>builder()
-                .value(OtherParty.builder().id(id).build())
+                .value(OtherParty.builder()
+                        .id(id)
+                        .unacceptableCustomerBehaviour(YesNo.YES)
+                        .build())
                 .build();
     }
+
+    private CcdValue<OtherParty> buildOtherPartyWithAppointeeAndRep(String id, String appointeeId, String repId) {
+        return CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder()
+                        .id(id)
+                        .isAppointee(YES.getValue())
+                        .appointee(Appointee.builder().id(appointeeId).build())
+                        .rep(Representative.builder().id(repId).hasRepresentative(YES.getValue()).build())
+                        .build())
+                .build();
+    }
+
 
 }

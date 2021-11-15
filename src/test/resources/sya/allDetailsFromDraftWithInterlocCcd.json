@@ -50,6 +50,7 @@
       "role": {},
       "isAddressSameAsAppointee": "No",
       "appointee": {
+        "id": null,
         "name": {
           "title": "Mrs",
           "firstName": "Mary",
@@ -133,6 +134,7 @@
       "otherReasons": "Another reason"
     },
     "rep": {
+      "id": null,
       "hasRepresentative": "Yes",
       "name": {
         "title": "Mr",

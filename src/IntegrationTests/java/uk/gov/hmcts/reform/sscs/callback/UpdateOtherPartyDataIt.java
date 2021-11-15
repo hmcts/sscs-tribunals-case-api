@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -32,7 +33,11 @@ public class UpdateOtherPartyDataIt extends AbstractEventIt {
 
         assertEquals(2, result.getData().getOtherParties().size());
         assertEquals("1", result.getData().getOtherParties().get(0).getValue().getId());
-        assertEquals("2", result.getData().getOtherParties().get(1).getValue().getId());
+        assertEquals("2", result.getData().getOtherParties().get(0).getValue().getAppointee().getId());
+        assertEquals("3", result.getData().getOtherParties().get(0).getValue().getRep().getId());
+        assertEquals("4", result.getData().getOtherParties().get(1).getValue().getId());
+        assertNull(result.getData().getOtherParties().get(1).getValue().getAppointee().getId());
+        assertNull(result.getData().getOtherParties().get(1).getValue().getRep().getId());
     }
 
 }
