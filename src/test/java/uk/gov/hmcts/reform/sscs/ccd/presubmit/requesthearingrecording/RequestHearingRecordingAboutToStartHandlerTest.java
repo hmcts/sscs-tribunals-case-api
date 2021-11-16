@@ -1,21 +1,27 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.requesthearingrecording;
 
-import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
-import java.util.Arrays;
 import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.model.PartyItemList;
+import uk.gov.hmcts.reform.sscs.service.HearingRecordingRequestService;
 
 @RunWith(JUnitParamsRunner.class)
 public class RequestHearingRecordingAboutToStartHandlerTest {
@@ -30,36 +36,20 @@ public class RequestHearingRecordingAboutToStartHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
+    @Mock
+    private HearingRecordingRequestService hearingRecordingRequestService;
+
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new RequestHearingRecordingAboutToStartHandler();
+        handler = new RequestHearingRecordingAboutToStartHandler(hearingRecordingRequestService);
 
         when(callback.getEvent()).thenReturn(EventType.DWP_REQUEST_HEARING_RECORDING);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
-        Hearing hearing1 = Hearing.builder().value(
-                HearingDetails.builder().hearingId("an_id1").venue(Venue.builder().name("venue 1 name").build())
-                        .hearingDate("2021-01-20")
-                        .time("15:15").build()).build();
-        Hearing hearing2 = Hearing.builder().value(
-                HearingDetails.builder().hearingId("an_id2").venue(Venue.builder().name("venue 2 name").build())
-                        .hearingDate("2021-02-20")
-                        .time("15:15").build()).build();
-        Hearing hearing3 = Hearing.builder().value(
-                HearingDetails.builder().hearingId("an_id3").venue(Venue.builder().name("venue 3 name").build())
-                        .hearingDate("2021-03-20")
-                        .time("15:15").build()).build();
-
-        SscsHearingRecording recording1 = SscsHearingRecording.builder().value(SscsHearingRecordingDetails.builder().hearingId("an_id1").build()).build();
-        SscsHearingRecording recording2 = SscsHearingRecording.builder().value(SscsHearingRecordingDetails.builder().hearingId("an_id2").build()).build();
-        SscsHearingRecording recording3 = SscsHearingRecording.builder().value(SscsHearingRecordingDetails.builder().hearingId("an_id3").build()).build();
-
-        sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").hearings(Arrays.asList(hearing1, hearing2, hearing3)).build();
-        sscsCaseData.getSscsHearingRecordingCaseData().setSscsHearingRecordings(Arrays.asList(recording1, recording2, recording3));
+        sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
     }
 
     @Test
@@ -69,47 +59,27 @@ public class RequestHearingRecordingAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenAHearingWithRecording_thenHearingInRequestableListAndMessagesInPlace() {
-        sscsCaseData.setHearings(singletonList(Hearing.builder().value(
-                HearingDetails.builder().hearingId("an_id1").venue(Venue.builder().name("venue name").build())
-                        .hearingDate("2021-03-20")
-                        .time("15:15").build()).build()));
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertEquals(1, response.getData().getSscsHearingRecordingCaseData().getRequestableHearingDetails().getListItems().size());
-        assertEquals("There are no outstanding DWP hearing recording requests on this case", response.getData().getSscsHearingRecordingCaseData().getRequestedHearingsTextList());
-        assertEquals("No hearing recordings have been released to DWP on this case", response.getData().getSscsHearingRecordingCaseData().getReleasedHearingsTextList());
+    @Parameters({"ABOUT_TO_SUBMIT", "MID_EVENT", "SUBMITTED"})
+    public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
+        assertFalse(handler.canHandle(callbackType, callback));
     }
 
     @Test
-    public void givenThreeHearingsWithRecording_thenThreeHearingInRequestableList() {
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertEquals(3, response.getData().getSscsHearingRecordingCaseData().getRequestableHearingDetails().getListItems().size());
+    public void givenARequestHearingRecordingEvent_thenBuildTheUi() {
+        PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(callback.getCaseDetails().getCaseData());
+
+        when(hearingRecordingRequestService.buildHearingRecordingUi(any(PreSubmitCallbackResponse.class), eq(PartyItemList.DWP)))
+                .thenReturn(response);
+
+        PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        verify(hearingRecordingRequestService).buildHearingRecordingUi(any(PreSubmitCallbackResponse.class), eq(PartyItemList.DWP));
+        assertEquals(response, result);
     }
 
-    @Test
-    public void givenAHearingsRequested_thenHearingInRequestedList() {
-        SscsHearingRecording sscsHearingRecording = SscsHearingRecording.builder().value(SscsHearingRecordingDetails.builder().hearingId("an_id2").build()).build();
-        HearingRecordingRequest recordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
-                .requestingParty("dwp").sscsHearingRecording(sscsHearingRecording.getValue()).build()).build();
-        sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(singletonList(recordingRequest));
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertEquals(2, response.getData().getSscsHearingRecordingCaseData().getRequestableHearingDetails().getListItems().size());
-        assertEquals(1, response.getData().getSscsHearingRecordingCaseData().getRequestedHearings().size());
+    @Test(expected = IllegalStateException.class)
+    public void throwsExceptionIfItCannotHandleTheAppeal() {
+        when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
+        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
     }
-
-    @Test
-    public void givenAHearingsReleased_thenHearingInReleasedList() {
-        SscsHearingRecording sscsHearingRecording = SscsHearingRecording.builder().value(SscsHearingRecordingDetails.builder().hearingId("an_id2").build()).build();
-        HearingRecordingRequest recordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
-                .requestingParty("dwp").sscsHearingRecording(sscsHearingRecording.getValue()).build()).build();
-        sscsCaseData.getSscsHearingRecordingCaseData().setDwpReleasedHearings(singletonList(recordingRequest));
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertEquals(2, response.getData().getSscsHearingRecordingCaseData().getRequestableHearingDetails().getListItems().size());
-        assertEquals(1, response.getData().getSscsHearingRecordingCaseData().getDwpReleasedHearings().size());
-    }
-
 }

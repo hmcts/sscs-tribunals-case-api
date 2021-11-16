@@ -53,10 +53,7 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
-import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
-import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.service.*;
 
 @RunWith(JUnitParamsRunner.class)
 public class EsaIssueFinalDecisionAboutToStartHandlerTest {
@@ -86,6 +83,9 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
 
     @Mock
     private GenerateFile generateFile;
+
+    @Mock
+    private VenueDataLoader venueDataLoader;
 
     private SscsCaseData sscsCaseData;
 
@@ -180,7 +180,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
 
         final EsaWriteFinalDecisionPreviewDecisionService previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
-            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration);
+            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
 
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -222,7 +222,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("ESA");
 
         final EsaWriteFinalDecisionPreviewDecisionService previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
-            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration);
+            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
 
         when(generateFile.assemble(any())).thenReturn(URL);
         sscsCaseData.setWcaAppeal(NO);
