@@ -371,6 +371,7 @@ dependencies {
     compile group: 'com.github.hmcts', name: 'sscs-common', version: versions.sscsCommon
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.49-RC-SSCS-error'
 
+
     compile group:'org.overviewproject', name: 'mime-types', version: '1.0.2'
 
     compile 'javax.xml.bind:jaxb-api:2.3.1'
