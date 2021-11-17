@@ -162,7 +162,7 @@ public class CitizenRequestServiceTest {
                                                 .value(DocumentLink.builder()
                                                         .documentFilename("Test file.mp3")
                                                         .documentUrl("http://dm-store:5005")
-                                                        .documentBinaryUrl("http://dm-store:5005/binary")
+                                                        .documentBinaryUrl("http://dm-store:5005/documents/documet-id/binary")
                                                         .build())
                                                 .build()))
                                         .build())
@@ -179,8 +179,7 @@ public class CitizenRequestServiceTest {
         assertThat(response.get().getReleasedHearingRecordings().get(0).getHearingId(), is("id_1"));
         assertThat(response.get().getReleasedHearingRecordings().get(0).getHearingDate(), is("2021-01-03"));
         assertThat(response.get().getReleasedHearingRecordings().get(0).getVenue(), is("Town house"));
-        assertThat(response.get().getReleasedHearingRecordings().get(0).getHearingRecordings().get(0).getDocumentBinaryUrl(), is("http://dm-store:5005/binary"));
-        assertThat(response.get().getReleasedHearingRecordings().get(0).getHearingRecordings().get(0).getDocumentUrl(), is("http://dm-store:5005"));
+        assertThat(response.get().getReleasedHearingRecordings().get(0).getHearingRecordings().get(0).getDocumentUrl(), is("documet-id"));
         assertThat(response.get().getReleasedHearingRecordings().get(0).getHearingRecordings().get(0).getFileName(), is("Test file.mp3"));
         assertThat(response.get().getReleasedHearingRecordings().get(0).getHearingRecordings().get(0).getFileType(), is("mp3"));
     }
@@ -206,7 +205,7 @@ public class CitizenRequestServiceTest {
                                                 .value(DocumentLink.builder()
                                                         .documentFilename("Test file.mp3")
                                                         .documentUrl("http://dm-store:5005")
-                                                        .documentBinaryUrl("http://dm-store:5005/binary")
+                                                        .documentBinaryUrl("http://dm-store:5005/documents/documet-id/binary")
                                                         .build())
                                                 .build()))
                                         .build())
@@ -223,8 +222,7 @@ public class CitizenRequestServiceTest {
         assertThat(response.get().getOutstandingHearingRecordings().get(0).getHearingId(), is("id_1"));
         assertThat(response.get().getOutstandingHearingRecordings().get(0).getHearingDate(), is("2021-01-03"));
         assertThat(response.get().getOutstandingHearingRecordings().get(0).getVenue(), is("Town house"));
-        assertThat(response.get().getOutstandingHearingRecordings().get(0).getHearingRecordings().get(0).getDocumentBinaryUrl(), is("http://dm-store:5005/binary"));
-        assertThat(response.get().getOutstandingHearingRecordings().get(0).getHearingRecordings().get(0).getDocumentUrl(), is("http://dm-store:5005"));
+        assertThat(response.get().getOutstandingHearingRecordings().get(0).getHearingRecordings().get(0).getDocumentUrl(), is("documet-id"));
         assertThat(response.get().getOutstandingHearingRecordings().get(0).getHearingRecordings().get(0).getFileName(), is("Test file.mp3"));
         assertThat(response.get().getOutstandingHearingRecordings().get(0).getHearingRecordings().get(0).getFileType(), is("mp3"));
     }
@@ -252,7 +250,7 @@ public class CitizenRequestServiceTest {
                                                         .value(DocumentLink.builder()
                                                                 .documentFilename("Test file.mp3")
                                                                 .documentUrl("http://dm-store:5005")
-                                                                .documentBinaryUrl("http://dm-store:5005/binary")
+                                                                .documentBinaryUrl("http://dm-store:5005/documents/documet-id/binary")
                                                                 .build())
                                                         .build()))
                                                 .build())
@@ -273,7 +271,7 @@ public class CitizenRequestServiceTest {
                                                     .value(DocumentLink.builder()
                                                             .documentFilename("Test file.mp3")
                                                             .documentUrl("http://dm-store:5005")
-                                                            .documentBinaryUrl("http://dm-store:5005/binary")
+                                                            .documentBinaryUrl("http://dm-store:5005/documents/documet-id/binary")
                                                             .build())
                                                     .build()))
                                             .build())
@@ -294,7 +292,7 @@ public class CitizenRequestServiceTest {
                                                 .value(DocumentLink.builder()
                                                         .documentFilename("Test file.mp3")
                                                         .documentUrl("http://dm-store:5005")
-                                                        .documentBinaryUrl("http://dm-store:5005/binary")
+                                                        .documentBinaryUrl("http://dm-store:5005/documents/documet-id/binary")
                                                         .build())
                                                 .build()))
                                         .build())
@@ -313,16 +311,14 @@ public class CitizenRequestServiceTest {
         assertThat(response.get().getOutstandingHearingRecordings().get(0).getHearingId(), is("id_1"));
         assertThat(response.get().getOutstandingHearingRecordings().get(0).getHearingDate(), is("2021-01-03"));
         assertThat(response.get().getOutstandingHearingRecordings().get(0).getVenue(), is("Town house"));
-        assertThat(response.get().getOutstandingHearingRecordings().get(0).getHearingRecordings().get(0).getDocumentBinaryUrl(), is("http://dm-store:5005/binary"));
-        assertThat(response.get().getOutstandingHearingRecordings().get(0).getHearingRecordings().get(0).getDocumentUrl(), is("http://dm-store:5005"));
+        assertThat(response.get().getOutstandingHearingRecordings().get(0).getHearingRecordings().get(0).getDocumentUrl(), is("documet-id"));
         assertThat(response.get().getOutstandingHearingRecordings().get(0).getHearingRecordings().get(0).getFileName(), is("Test file.mp3"));
         assertThat(response.get().getOutstandingHearingRecordings().get(0).getHearingRecordings().get(0).getFileType(), is("mp3"));
         assertThat(response.get().getReleasedHearingRecordings().size(), is(1));
         assertThat(response.get().getReleasedHearingRecordings().get(0).getHearingId(), is("id_1"));
         assertThat(response.get().getReleasedHearingRecordings().get(0).getHearingDate(), is("2021-01-03"));
         assertThat(response.get().getReleasedHearingRecordings().get(0).getVenue(), is("Town house"));
-        assertThat(response.get().getReleasedHearingRecordings().get(0).getHearingRecordings().get(0).getDocumentBinaryUrl(), is("http://dm-store:5005/binary"));
-        assertThat(response.get().getReleasedHearingRecordings().get(0).getHearingRecordings().get(0).getDocumentUrl(), is("http://dm-store:5005"));
+        assertThat(response.get().getReleasedHearingRecordings().get(0).getHearingRecordings().get(0).getDocumentUrl(), is("documet-id"));
         assertThat(response.get().getReleasedHearingRecordings().get(0).getHearingRecordings().get(0).getFileName(), is("Test file.mp3"));
         assertThat(response.get().getReleasedHearingRecordings().get(0).getHearingRecordings().get(0).getFileType(), is("mp3"));
     }
@@ -373,7 +369,7 @@ public class CitizenRequestServiceTest {
                                                         .value(DocumentLink.builder()
                                                                 .documentFilename("Test file.mp3")
                                                                 .documentUrl("http://dm-store:5005")
-                                                                .documentBinaryUrl("http://dm-store:5005/binary")
+                                                                .documentBinaryUrl("http://dm-store:5005/documents/documet-id/binary")
                                                                 .build())
                                                         .build()))
                                                 .build())
@@ -390,7 +386,7 @@ public class CitizenRequestServiceTest {
                                                         .value(DocumentLink.builder()
                                                                 .documentFilename("Test file.mp3")
                                                                 .documentUrl("http://dm-store:5005")
-                                                                .documentBinaryUrl("http://dm-store:5005/binary")
+                                                                .documentBinaryUrl("http://dm-store:5005/documents/documet-id/binary")
                                                                 .build())
                                                         .build()))
                                                 .build())
