@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 import static java.util.Collections.sort;
-import static java.util.Collections.sort;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
