@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.Arrays;
@@ -46,6 +47,8 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.UPDATE_OTHER_PARTY_DATA);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(sscsCaseData.getAppeal()).thenReturn(Appeal.builder()
+                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -131,7 +134,36 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         assertEquals("7", response.getData().getOtherParties().get(2).getValue().getId());
     }
 
+    private CcdValue<OtherParty> buildConfidentialOtherParty(String id, YesNo confidentialityRequired) {
+        return CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder()
+                        .id(id)
+                        .confidentialityRequired(confidentialityRequired)
+                        .build())
+                .build();
+    }
 
+    @Test
+    public void givenOtherPartyWantsConfidentiality_thenCaseIsConfidential() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build())
+                .otherParties(Arrays.asList(buildConfidentialOtherParty("2", YES), buildConfidentialOtherParty("1", NO))).build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(YES, response.getData().getIsConfidentialCase());
+    }
+
+    @Test
+    public void givenNoOtherPartyWantsConfidentiality_thenCaseIsNotConfidential() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build())
+                .otherParties(Arrays.asList(buildConfidentialOtherParty("2", NO), buildConfidentialOtherParty("1", NO))).build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(null, response.getData().getIsConfidentialCase());
+    }
 
     private CcdValue<OtherParty> buildOtherParty(String id) {
         return CcdValue.<OtherParty>builder()
