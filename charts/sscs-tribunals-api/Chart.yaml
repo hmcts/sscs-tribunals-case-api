@@ -26,7 +26,7 @@ dependencies:
     repository: '@hmctspublic'
     condition: elastic.enabled
   - name: sscs-evidence-share
-    version: 0.0.41
+    version: 0.0.42
     repository: '@hmctspublic'
     condition: sscs-evidence-share.enabled
   - name: sscs-ccd-callback-orchestrator
