@@ -189,7 +189,8 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     }
 
     private boolean hasPhmeRequestOrConfidentialityUnderReview(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response, boolean hasEditedDwpResponseDocument, boolean hasEditedDwpEvidenceBundleDocument) {
-        if (isPhmeStatusUnderReview(sscsCaseData) && (hasEditedDwpResponseDocument || hasEditedDwpEvidenceBundleDocument)) {
+        if (!sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) && isPhmeStatusUnderReview(sscsCaseData)
+                && (hasEditedDwpResponseDocument || hasEditedDwpEvidenceBundleDocument)) {
             response.addError("There is a pending PHME request on this case");
         }
 
@@ -219,8 +220,10 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     private List<MultiBundleConfig> getMultiBundleConfigs(SscsCaseData sscsCaseData) {
         boolean requiresMultiBundleForPhme = isPhmeReviewGranted(sscsCaseData) && (isHasEditedDwpResponseDocument(sscsCaseData) || isHasEditedDwpEvidenceBundleDocument(sscsCaseData));
         boolean requiresMultiBundleForConfidentiality = isConfidentialCase(sscsCaseData) && hasEditedSscsDocuments(sscsCaseData);
+        boolean requiresMultiBundleForNonPhme = sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT)
+                && hasEditedSscsDocuments(sscsCaseData);
 
-        if (requiresMultiBundleForPhme || requiresMultiBundleForConfidentiality)  {
+        if (requiresMultiBundleForPhme || requiresMultiBundleForConfidentiality || requiresMultiBundleForNonPhme) {
             return getEditedAndUneditedConfigs(sscsCaseData);
         }
         return getUneditedConfigs(sscsCaseData);
