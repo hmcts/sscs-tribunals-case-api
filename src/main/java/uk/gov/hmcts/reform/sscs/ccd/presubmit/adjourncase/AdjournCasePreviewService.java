@@ -200,15 +200,16 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
         stringBuilder.append("It will be ");
 
-        if (adjournCaseNextHearingSpecificTime != null) {
+        if (adjournCaseNextHearingSpecificTime != null
+                && (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime() != null
+                || CollectionUtils.isNotEmpty(adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession()))) {
             if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession() != null
                     && adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession().size() > 0) {
                 stringBuilder.append("first ");
             }
 
             if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime() != null
-                    || (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession() != null
-                    && adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession().size() > 0)) {
+                    || CollectionUtils.isNotEmpty(adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession())) {
                 String session = "";
                 if ("am".equalsIgnoreCase(adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime())) {
                     session = "morning ";
