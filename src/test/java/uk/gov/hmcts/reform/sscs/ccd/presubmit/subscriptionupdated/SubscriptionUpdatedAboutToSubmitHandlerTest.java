@@ -36,7 +36,8 @@ public class SubscriptionUpdatedAboutToSubmitHandlerTest {
 
         when(callback.getEvent()).thenReturn(EventType.SUBSCRIPTION_UPDATED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-        sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
+        sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code(Benefit.PIP.getShortName()).build()).build())
                 .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
