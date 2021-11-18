@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static java.util.Collections.sort;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -70,10 +72,12 @@ public class OtherPartyDataUtil {
         if (before.size() != after.size()) {
             return true;
         }
-        before.sort(getIdComparator());
-        after.sort(getIdComparator());
-        for (int i = 0; i < before.size(); i++) {
-            if (!before.get(i).getValue().getId().equals(after.get(i).getValue().getId())) {
+        List<String> beforeIds = before.stream().map(ccdValue -> ccdValue.getValue().getId()).collect(Collectors.toList());
+        List<String> afterIds = after.stream().map(ccdValue -> ccdValue.getValue().getId()).collect(Collectors.toList());
+        sort(beforeIds);
+        sort(afterIds);
+        for (int i = 0; i < beforeIds.size(); i++) {
+            if (!beforeIds.get(i).equals(afterIds.get(i))) {
                 return true;
             }
         }
