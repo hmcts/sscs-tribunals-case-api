@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.util;
 
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.ArrayList;
 import java.util.Comparator;
