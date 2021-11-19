@@ -65,7 +65,8 @@ public class SubscriptionUpdatedAboutToSubmitHandler implements PreSubmitCallbac
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if (Benefit.CHILD_SUPPORT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())) {
-            if (OtherPartyDataUtil.haveOtherPartiesChanged(callback.getCaseDetailsBefore().get().getCaseData().getOtherParties(),
+
+            if (callback.getCaseDetailsBefore().isPresent() && OtherPartyDataUtil.haveOtherPartiesChanged(callback.getCaseDetailsBefore().get().getCaseData().getOtherParties(),
                     sscsCaseData.getOtherParties())) {
                 response.addError("The other parties have changed, they cannot be changed within this event");
             }
