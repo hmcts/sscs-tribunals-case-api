@@ -101,7 +101,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         List<AudioVideoEvidence> dwpAudioVideoEvidence = sscsCaseData.getDwpUploadAudioVideoEvidence();
 
-        for (AudioVideoEvidence audioVideo: dwpAudioVideoEvidence) {
+        for (AudioVideoEvidence audioVideo : dwpAudioVideoEvidence) {
             audioVideo.getValue().setDateAdded(LocalDate.now());
             audioVideo.getValue().setFileName(audioVideo.getValue().getDocumentLink().getDocumentFilename());
             audioVideo.getValue().setPartyUploaded(UploadParty.DWP);
@@ -124,6 +124,9 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     private PreSubmitCallbackResponse<SscsCaseData> checkErrors(SscsCaseData sscsCaseData) {
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+
+        dwpDocumentService.validateEditedEvidenceReason(sscsCaseData, preSubmitCallbackResponse,
+                sscsCaseData.getDwpEditedEvidenceReason());
 
         validateDwpResponseDocuments(sscsCaseData, preSubmitCallbackResponse);
 

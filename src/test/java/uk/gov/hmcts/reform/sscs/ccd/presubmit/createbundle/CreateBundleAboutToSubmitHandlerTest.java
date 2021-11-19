@@ -243,6 +243,19 @@ public class CreateBundleAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenCaseWithEditedDwpDocsAndChildSupport_thenReturnNoError() {
+        addMandatoryDwpDocuments();
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        sscsCaseData.setLanguagePreferenceWelsh(NO.getValue());
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setBenefitCode("022");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
     @Parameters({"appellant, YES", "appellant, NO", "jointParty, YES", "jointParty, NO"})
     public void givenCaseWithPendingEnhancedConfidentiality_thenReturnErrorMessage(String party, YesNo phmeGranted) {
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(NO.getValue());
@@ -306,6 +319,26 @@ public class CreateBundleAboutToSubmitHandlerTest {
         assertEquals(2, response.getData().getMultiBundleConfiguration().size());
         assertEquals(expectedBundleConfig1, response.getData().getMultiBundleConfiguration().get(0).getValue());
         assertEquals(expectedBundleConfig2, response.getData().getMultiBundleConfiguration().get(1).getValue());
+        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
+    }
+
+    @Test
+    public void givenChildSupported_thenPopulateEditedAndUneditedConfigFilename() {
+        addMandatoryDwpDocuments();
+        addEditedSscsDocuments();
+        sscsCaseData.setBenefitCode("022");
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(2, response.getData().getMultiBundleConfiguration().size());
+        assertEquals("bundleEnglishEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
+        assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
         assertEquals("Benefit", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
         assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());

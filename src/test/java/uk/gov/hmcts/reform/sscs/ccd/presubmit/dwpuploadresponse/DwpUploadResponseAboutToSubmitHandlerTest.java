@@ -821,6 +821,76 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenADwpUploadResponseEventPhmeChildSupportThenErrorAdded() {
+
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName())
+                .description(Benefit.CHILD_SUPPORT.getDescription()).build());
+        sscsCaseData.setDwpEditedResponseDocument(getPdfDocument());
+        sscsCaseData.setDwpEditedEvidenceBundleDocument(getPdfDocument());
+        sscsCaseData.setDwpEditedEvidenceReason("phme");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler
+                .handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().iterator().next(),
+                is("Potential harmful evidence is not a valid selection for child support cases"));
+    }
+
+    @Test
+    public void givenADwpUploadResponseEventChildSupConfNonChildSupportThenNoErrorAdded() {
+
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+
+        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder()
+                .code(Benefit.PENSION_CREDIT.getShortName())
+                .description(Benefit.PENSION_CREDIT.getDescription()).build());
+        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(getPdfDocument());
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(getPdfDocument());
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("childSupportConfidentiality");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler
+                .handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().iterator().next(),
+                is("Child support - Confidentiality is not a valid selection for this case"));
+    }
+
+    @Test
+    public void givenADwpUploadResponseEventPhmeNonChildSupportThenNoErrorAdded() {
+
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.PENSION_CREDIT.getShortName())
+                .description(Benefit.PENSION_CREDIT.getDescription()).build());
+        sscsCaseData.setDwpEditedResponseDocument(getPdfDocument());
+        sscsCaseData.setDwpEditedEvidenceBundleDocument(getPdfDocument());
+        sscsCaseData.setDwpEditedEvidenceReason("phme");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler
+                .handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void givenADwpUploadResponseEventChildSupConfChildSupportThenNoErrorAdded() {
+
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName())
+                .description(Benefit.CHILD_SUPPORT.getDescription()).build());
+        sscsCaseData.setDwpEditedResponseDocument(getPdfDocument());
+        sscsCaseData.setDwpEditedEvidenceBundleDocument(getPdfDocument());
+        sscsCaseData.setDwpEditedEvidenceReason("childSupportConfidentiality");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler
+                .handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+    }
+
     public void givenChildSupportCaseAndCaseCodeIsChangedToNonChildSupportCodeAndCaseHasOtherParty_thenShowError() {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setBenefitCode("001");

@@ -13,5 +13,4 @@ public class HearingRecording {
     private String fileName;
     private String fileType;
     private String documentUrl;
-    private String documentBinaryUrl;
 }

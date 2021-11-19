@@ -20,7 +20,9 @@ import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
@@ -31,6 +33,8 @@ import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 @RunWith(JUnitParamsRunner.class)
 public class ManageDwpDocumentsAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
+
+    @InjectMocks
     private ManageDwpDocumentsAboutToSubmitHandler handler;
 
     @Mock
@@ -39,13 +43,13 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
     private SscsCaseData sscsCaseData;
-    @Mock
+
+    @Spy
     private DwpDocumentService dwpDocumentService;
 
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new ManageDwpDocumentsAboutToSubmitHandler(dwpDocumentService);
 
         when(callback.getEvent()).thenReturn(EventType.MANAGE_DWP_DOCUMENTS);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -162,6 +166,38 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
         assertThat(response.getErrors().size(), is(2));
         assertThat(response.getErrors().contains("You must upload an edited DWP evidence bundle"), is(true));
         assertThat(response.getErrors().contains("You must upload an edited DWP response document"), is(true));
+    }
+
+    @Test
+    public void givenADwpDocumentPmheEditedReasonInChildSupportCaseThenErrorAdded() {
+        addMandatoryDwpDocuments();
+        addEditedDwpDocuments();
+
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder()
+                .code(Benefit.CHILD_SUPPORT.getShortName())
+                .description(Benefit.CHILD_SUPPORT.getDescription()).build());
+
+        sscsCaseData.getDwpDocuments().get(0).getValue().setDwpEditedEvidenceReason("phme");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().iterator().next(),
+                is("Potential harmful evidence is not a valid selection for child support cases"));
+    }
+
+    @Test
+    public void givenADwpDocumentChildSupConfEditedReasonInNonChildSupportCaseThenErrorAdded() {
+        addMandatoryDwpDocuments();
+        addEditedDwpDocuments();
+
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder()
+                .code(Benefit.PENSION_CREDIT.getShortName())
+                .description(Benefit.PENSION_CREDIT.getDescription()).build());
+
+        sscsCaseData.getDwpDocuments().get(0).getValue().setDwpEditedEvidenceReason("childSupportConfidentiality");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().iterator().next(),
+                is("Child support - Confidentiality is not a valid selection for this case"));
     }
 
     private void addEditedDwpDocuments() {
