@@ -4,6 +4,8 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator.generateAppealNumber;
 
 import java.util.List;
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -65,8 +67,8 @@ public class SubscriptionUpdatedAboutToSubmitHandler implements PreSubmitCallbac
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if (Benefit.CHILD_SUPPORT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())) {
-
-            if (callback.getCaseDetailsBefore().isPresent() && OtherPartyDataUtil.haveOtherPartiesChanged(callback.getCaseDetailsBefore().get().getCaseData().getOtherParties(),
+            Optional<CaseDetails<SscsCaseData>> beforeData = callback.getCaseDetailsBefore();
+            if (beforeData.isPresent() && OtherPartyDataUtil.haveOtherPartiesChanged(beforeData.get().getCaseData().getOtherParties(),
                     sscsCaseData.getOtherParties())) {
                 response.addError("The other parties have changed, they cannot be changed within this event");
             }
