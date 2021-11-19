@@ -30,6 +30,7 @@ import static uk.gov.hmcts.reform.sscs.model.AppConstants.TYPE;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.VENUE_NAME;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.DATEFORMATTER;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDateTime;
+import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.stripUrl;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -231,17 +232,6 @@ public class TrackYourAppealJsonBuilder {
         }
 
         return outcomeNode;
-    }
-
-    protected String stripUrl(String documentBinaryUrl) {
-        if (documentBinaryUrl != null) {
-            int frontIndex = documentBinaryUrl.indexOf("documents") + 10;
-            int backIndex = documentBinaryUrl.indexOf("/binary");
-            if (frontIndex >= 10 && backIndex > 0) {
-                return documentBinaryUrl.substring(frontIndex, backIndex);
-            }
-        }
-        return documentBinaryUrl;
     }
 
     private Comparator<? super SscsDocumentDetails> createDateAddedComparator() {

@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.requestinfo;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPartiesOnCase;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getPartiesOnCase;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
