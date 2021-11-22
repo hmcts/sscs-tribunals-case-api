@@ -1,10 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.confirmpanelcomposition;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.doEveryOtherPartyHaveAtLeastOneHearingOption;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.processCaseState;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -41,16 +40,6 @@ public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCal
         processCaseState(sscsCaseData);
 
         return response;
-    }
-
-    private void processCaseState(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getIsFqpmRequired() != null) {
-            if (StringUtils.isBlank(sscsCaseData.getDwpDueDate())) {
-                sscsCaseData.setState(State.READY_TO_LIST);
-            } else if (!doEveryOtherPartyHaveAtLeastOneHearingOption(sscsCaseData)) {
-                sscsCaseData.setState(State.NOT_LISTABLE);
-            }
-        }
     }
 
     private void processInterloc(SscsCaseData sscsCaseData) {

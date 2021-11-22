@@ -6,10 +6,12 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
 
 public class OtherPartyDataUtil {
@@ -43,10 +45,24 @@ public class OtherPartyDataUtil {
         }
     }
 
-    public static boolean doEveryOtherPartyHaveAtLeastOneHearingOption(SscsCaseData sscsCaseData) {
+    public static void processCaseState(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getIsFqpmRequired() == null
+                || hasDueDateSetAndOtherPartyWithoutHearingOption(sscsCaseData)) {
+            sscsCaseData.setState(State.NOT_LISTABLE);
+        } else {
+            sscsCaseData.setState(State.READY_TO_LIST);
+        }
+    }
+
+    private static boolean hasDueDateSetAndOtherPartyWithoutHearingOption(SscsCaseData sscsCaseData) {
+        return StringUtils.isNotBlank(sscsCaseData.getDwpDueDate())
+                && !everyOtherPartyHasAtLeastOneHearingOption(sscsCaseData);
+    }
+
+    private static boolean everyOtherPartyHasAtLeastOneHearingOption(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getOtherParties() != null) {
             return sscsCaseData.getOtherParties().stream().noneMatch(otherParty -> otherParty.getValue().getHearingOptions() == null);
-        }else {
+        } else {
             return false;
         }
     }

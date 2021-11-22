@@ -2,8 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updateotherparty;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.assignOtherPartyId;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateOtherPartyUcb;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.*;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +38,11 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
         List<CcdValue<OtherParty>> otherParties = sscsCaseData.getOtherParties();
         updateOtherPartyUcb(sscsCaseData);
         assignOtherPartyId(otherParties);
+
+        processCaseState(sscsCaseData);
+        if (sscsCaseData.getState() != null && sscsCaseData.getState().equals(State.READY_TO_LIST)) {
+            sscsCaseData.setDwpDueDate(null);
+        }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
