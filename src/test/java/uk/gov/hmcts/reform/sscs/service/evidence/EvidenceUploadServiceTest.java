@@ -163,7 +163,7 @@ public class EvidenceUploadServiceTest {
 
         verify(ccdService).updateCase(
             and(hasSscsScannedDocumentAndSscsDocuments(expectedEvidenceUploadFilename),
-                doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo()),
+                doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo(YesNo.NO)),
             eq(someCcdCaseId),
             eq(UPLOAD_DOCUMENT.getCcdType()),
             eq("SSCS - upload evidence from MYA"),
@@ -219,7 +219,7 @@ public class EvidenceUploadServiceTest {
 
         verify(ccdService).updateCase(
                 and(and(and(and(hasAudioVideoDocumentAndSscsDocuments(avFileName, "http://dm-store/112"),
-                    doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo()),
+                    doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo(YesNo.YES)),
                     argThat(argument -> argument.getInterlocReviewState().equals(expectedInterlocReviewState.getId()))),
                         argThat(argument ->  argument.getInterlocReferralReason().equals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE.getId()))),
                         argThat(argument ->  argument.getHasUnprocessedAudioVideoEvidence().equals(YesNo.YES))),
@@ -576,10 +576,11 @@ public class EvidenceUploadServiceTest {
         });
     }
 
-    private SscsCaseData doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo() {
+    private SscsCaseData doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo(YesNo hasUnprocessedAudioVideoEvidence) {
         return argThat(argument -> {
             List<SscsDocument> sscsDocument = argument.getDraftSscsDocument();
-            return sscsDocument.isEmpty() && argument.getEvidenceHandled().equals("No");
+            return sscsDocument.isEmpty() && argument.getEvidenceHandled().equals("No")
+                    && argument.getHasUnprocessedAudioVideoEvidence().equals(hasUnprocessedAudioVideoEvidence);
         });
     }
 

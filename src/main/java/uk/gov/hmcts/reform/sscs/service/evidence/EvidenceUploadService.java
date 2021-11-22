@@ -326,6 +326,7 @@ public class EvidenceUploadService {
         } else {
             updateCaseDataWithNewPdfUpload(sscsCaseData, ldt, draftSscsDocument);
         }
+        setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
     }
 
     private void updateCaseDataWithNewPdfUpload(SscsCaseData sscsCaseData, LocalDateTime ldt, SscsDocument draftSscsDocument) {
@@ -366,7 +367,6 @@ public class EvidenceUploadService {
                     emptyIfNull(audioVideoEvidence));
             sscsCaseData.setAudioVideoEvidence(newAudioVideoEvidenceList);
         }
-        setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
     }
 
     @NotNull
