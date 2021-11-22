@@ -20,6 +20,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 
+import java.time.LocalDate;
+
 @RunWith(JUnitParamsRunner.class)
 public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
 
@@ -97,5 +99,47 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
 
         assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_JUDGE.getId()));
         assertThat(response.getData().getInterlocReferralReason(), is(InterlocReferralReason.NONE.getId()));
+    }
+
+    @Test
+    @Parameters({"YES", "NO"})
+    public void givenFqpmRequiredYesOrNoAndNoDueDateSetAndAllOtherPartyHearingOptionsSet_thenCaseStateIsReadyToList(String isFqpmRequired) {
+
+        sscsCaseData.setIsFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YesNo.YES : YesNo.NO);
+        sscsCaseData.setDwpDueDate(null);
+        //TODO: set at least one hearing options
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getState(), is(State.READY_TO_LIST));
+    }
+
+    @Test
+    @Parameters({"YES", "NO"})
+    public void givenFqpmRequiredYesOrNoAndNoDueDateSetAndNotAllOtherPartyHearingOptionsSet_thenCaseStateIsReadyToList(String isFqpmRequired) {
+
+        sscsCaseData.setIsFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YesNo.YES : YesNo.NO);
+        sscsCaseData.setDwpDueDate(null);
+        //TODO: set no hearing options
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getState(), is(State.READY_TO_LIST));
+    }
+
+    @Test
+    @Parameters({"YES", "NO"})
+    public void givenFqpmRequiredYesOrNoAndDueDateSetAndNotAllOtherPartyHearingOptionsSet_thenCaseStateIsNotListable(String isFqpmRequired) {
+
+        sscsCaseData.setIsFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YesNo.YES : YesNo.NO);
+        sscsCaseData.setDwpDueDate(LocalDate.now().toString());
+        //TODO: set no hearing options
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getState(), is(State.NOT_LISTABLE));
     }
 }
