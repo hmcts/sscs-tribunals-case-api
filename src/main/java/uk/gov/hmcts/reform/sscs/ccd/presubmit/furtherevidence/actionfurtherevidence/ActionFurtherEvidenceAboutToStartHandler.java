@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevid
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPartiesOnCaseWithDwpAndHmcts;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getPartiesOnCaseWithDwpAndHmcts;
 
 import java.util.ArrayList;
 import java.util.List;
