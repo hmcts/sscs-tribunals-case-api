@@ -10,6 +10,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.assignOtherPartyId;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateOtherPartyUcb;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -76,6 +78,12 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
 
         setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
+
+        if (Benefit.CHILD_SUPPORT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())
+                && sscsCaseData.getOtherParties() != null) {
+            assignOtherPartyId(sscsCaseData.getOtherParties());
+            updateOtherPartyUcb(sscsCaseData);
+        }
 
         return preSubmitCallbackResponse;
     }
