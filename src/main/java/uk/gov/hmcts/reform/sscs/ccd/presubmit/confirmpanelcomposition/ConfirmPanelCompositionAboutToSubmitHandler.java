@@ -35,7 +35,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCal
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (sscsCaseData.getIsFqpmRequired() != null
+        if (sscsCaseData.getIsFqpmRequired() != null && sscsCaseData.getInterlocReviewState() != null
                 && sscsCaseData.getInterlocReviewState().equals(InterlocReviewState.REVIEW_BY_JUDGE.getId())) {
             sscsCaseData.setInterlocReferralReason(null);
             sscsCaseData.setInterlocReviewState(null);
