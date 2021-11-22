@@ -43,6 +43,14 @@ public class OtherPartyDataUtil {
         }
     }
 
+    public static boolean doEveryOtherPartyHaveAtLeastOneHearingOption(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getOtherParties() != null) {
+            return sscsCaseData.getOtherParties().stream().noneMatch(otherParty -> otherParty.getValue().getHearingOptions() == null);
+        }else {
+            return false;
+        }
+    }
+
     @NotNull
     private static int getMaxId(List<CcdValue<OtherParty>> otherParties) {
         List<Integer> currentIds = new ArrayList<>();

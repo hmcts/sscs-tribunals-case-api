@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 
 @RunWith(JUnitParamsRunner.class)
 public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
@@ -107,7 +108,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
 
         sscsCaseData.setIsFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YesNo.YES : YesNo.NO);
         sscsCaseData.setDwpDueDate(null);
-        //TODO: set at least one hearing options
+        sscsCaseData.setOtherParties(Arrays.asList(buildOtherPartyWithHearing("2"), buildOtherParty("1", null)));
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -121,7 +122,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
 
         sscsCaseData.setIsFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YesNo.YES : YesNo.NO);
         sscsCaseData.setDwpDueDate(null);
-        //TODO: set no hearing options
+        sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty("2", null), buildOtherParty("1", null)));
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -135,11 +136,24 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
 
         sscsCaseData.setIsFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YesNo.YES : YesNo.NO);
         sscsCaseData.setDwpDueDate(LocalDate.now().toString());
-        //TODO: set no hearing options
+        sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty("2", null), buildOtherParty("1", null)));
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getState(), is(State.NOT_LISTABLE));
+    }
+
+    private CcdValue<OtherParty> buildOtherPartyWithHearing(String id){
+      return buildOtherParty(id, HearingOptions.builder().excludeDates(Arrays.asList(ExcludeDate.builder().build())).build());
+    }
+
+    private CcdValue<OtherParty> buildOtherParty(String id, HearingOptions hearingOptions) {
+        return CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder()
+                        .id(id)
+                        .unacceptableCustomerBehaviour(YesNo.YES)
+                        .hearingOptions(hearingOptions)
+                .build()).build();
     }
 }
