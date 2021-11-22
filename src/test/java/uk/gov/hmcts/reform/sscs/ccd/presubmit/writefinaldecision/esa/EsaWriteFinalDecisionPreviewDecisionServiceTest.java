@@ -38,22 +38,25 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody
 import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 
 public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDecisionPreviewDecisionServiceTestBase {
 
     protected EsaDecisionNoticeOutcomeService esaDecisionNoticeOutcomeService;
     protected EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService;
+    protected VenueDataLoader venueDataLoader;
 
     public EsaWriteFinalDecisionPreviewDecisionServiceTest() throws IOException {
         super("ESA");
         this.esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
         this.esaDecisionNoticeOutcomeService = new EsaDecisionNoticeOutcomeService(esaDecisionNoticeQuestionService);
+        this.venueDataLoader = new VenueDataLoader();
     }
 
     @Override
     protected WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
         DocumentConfiguration documentConfiguration) {
-        return new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration);
+        return new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
     }
 
     @Override

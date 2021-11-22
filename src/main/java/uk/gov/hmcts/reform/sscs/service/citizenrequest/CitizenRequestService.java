@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service.citizenrequest;
 
 import static org.apache.commons.io.FilenameUtils.getExtension;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.stripUrl;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -91,13 +92,13 @@ public class CitizenRequestService {
                     .map(CitizenHearingRecording::getHearingId)
                     .collect(Collectors.toList());
 
-            List<CitizenHearingRecording> requestabledRecordings = sscsCaseData.getHearings().stream()
+            List<CitizenHearingRecording> requestableRecordings = sscsCaseData.getHearings().stream()
                     .filter(hearing -> isHearingWithRecording(hearing, sscsCaseData.getSscsHearingRecordingCaseData()))
                     .filter(hearing -> !allRequestedHearingIds.contains(hearing.getValue().getHearingId()))
                     .map(this::populateCitizenHearingRecordings)
                     .collect(Collectors.toList());
 
-            return new HearingRecordingResponse(releasedRecordings, requestedRecordings, requestabledRecordings);
+            return new HearingRecordingResponse(releasedRecordings, requestedRecordings, requestableRecordings);
         }
     }
 
@@ -144,8 +145,7 @@ public class CitizenRequestService {
                         .map(r -> HearingRecording.builder()
                                 .fileName(r.getValue().getDocumentFilename())
                                 .fileType(getExtension(r.getValue().getDocumentFilename()))
-                                .documentUrl(r.getValue().getDocumentUrl())
-                                .documentBinaryUrl(r.getValue().getDocumentBinaryUrl())
+                                .documentUrl(stripUrl(r.getValue().getDocumentBinaryUrl()))
                                 .build())
                         .collect(Collectors.toList()))
                 .build();

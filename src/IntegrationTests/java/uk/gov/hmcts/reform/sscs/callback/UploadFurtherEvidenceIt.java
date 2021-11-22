@@ -72,7 +72,7 @@ public class UploadFurtherEvidenceIt extends AbstractEventIt {
     private List<DraftSscsDocument> getDraftSscsDocuments(String fileName) {
         final DraftSscsDocument doc = DraftSscsDocument.builder().value(DraftSscsDocumentDetails.builder()
                 .documentFileName(fileName)
-                .documentType("documentType")
+                .documentType("appellantEvidence")
                 .documentLink(DocumentLink.builder().documentUrl(
                         "documentUrl").documentFilename(fileName).build())
                 .build()).build();

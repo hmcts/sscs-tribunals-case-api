@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 @Slf4j
@@ -35,12 +36,18 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
     protected final DecisionNoticeQuestionService decisionNoticeQuestionService;
     protected final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
+    protected final VenueDataLoader venueDataLoader;
 
-    protected WriteFinalDecisionPreviewDecisionServiceBase(GenerateFile generateFile, UserDetailsService userDetailsService,
-        DecisionNoticeQuestionService decisionNoticeQuestionService,  DecisionNoticeOutcomeService decisionNoticeOutcomeService, DocumentConfiguration documentConfiguration) {
+    protected WriteFinalDecisionPreviewDecisionServiceBase(GenerateFile generateFile,
+                                                           UserDetailsService userDetailsService,
+                                                           DecisionNoticeQuestionService decisionNoticeQuestionService,
+                                                           DecisionNoticeOutcomeService decisionNoticeOutcomeService,
+                                                           DocumentConfiguration documentConfiguration,
+                                                           VenueDataLoader venueDataLoader) {
         super(generateFile, userDetailsService, languagePreference -> getTemplateId(documentConfiguration, languagePreference));
         this.decisionNoticeQuestionService = decisionNoticeQuestionService;
         this.decisionNoticeOutcomeService = decisionNoticeOutcomeService;
+        this.venueDataLoader = venueDataLoader;
     }
 
     public abstract String getBenefitType();
@@ -158,7 +165,9 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
                     writeFinalDecisionBuilder.heldOn(LocalDate.parse(finalHearing.getValue().getHearingDate()));
                 }
                 if (finalHearing.getValue().getVenue() != null) {
-                    writeFinalDecisionBuilder.heldAt(finalHearing.getValue().getVenue().getName());
+                    String venueName = venueDataLoader.getGapVenueName(finalHearing.getValue().getVenue(),
+                            finalHearing.getValue().getVenueId());
+                    writeFinalDecisionBuilder.heldAt(venueName);
                 }
             }
         } else {

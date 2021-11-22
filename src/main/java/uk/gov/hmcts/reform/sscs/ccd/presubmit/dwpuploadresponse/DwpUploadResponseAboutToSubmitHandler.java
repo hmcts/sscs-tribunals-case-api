@@ -10,6 +10,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.assignOtherPartyId;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateOtherPartyUcb;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -77,6 +79,12 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
 
+        if (Benefit.CHILD_SUPPORT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())
+                && sscsCaseData.getOtherParties() != null) {
+            assignOtherPartyId(sscsCaseData.getOtherParties());
+            updateOtherPartyUcb(sscsCaseData);
+        }
+
         return preSubmitCallbackResponse;
     }
 
@@ -93,7 +101,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         List<AudioVideoEvidence> dwpAudioVideoEvidence = sscsCaseData.getDwpUploadAudioVideoEvidence();
 
-        for (AudioVideoEvidence audioVideo: dwpAudioVideoEvidence) {
+        for (AudioVideoEvidence audioVideo : dwpAudioVideoEvidence) {
             audioVideo.getValue().setDateAdded(LocalDate.now());
             audioVideo.getValue().setFileName(audioVideo.getValue().getDocumentLink().getDocumentFilename());
             audioVideo.getValue().setPartyUploaded(UploadParty.DWP);
@@ -116,6 +124,9 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     private PreSubmitCallbackResponse<SscsCaseData> checkErrors(SscsCaseData sscsCaseData) {
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+
+        dwpDocumentService.validateEditedEvidenceReason(sscsCaseData, preSubmitCallbackResponse,
+                sscsCaseData.getDwpEditedEvidenceReason());
 
         validateDwpResponseDocuments(sscsCaseData, preSubmitCallbackResponse);
 

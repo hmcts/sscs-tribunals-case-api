@@ -38,22 +38,25 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody
 import uk.gov.hmcts.reform.sscs.service.UcDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.UcDecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 
 public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDecisionPreviewDecisionServiceTestBase {
 
     protected UcDecisionNoticeOutcomeService ucDecisionNoticeOutcomeService;
     protected UcDecisionNoticeQuestionService ucDecisionNoticeQuestionService;
+    protected VenueDataLoader venueDataLoader;
 
     public UcWriteFinalDecisionPreviewDecisionServiceTest() throws IOException {
         super("UC");
         this.ucDecisionNoticeQuestionService = new UcDecisionNoticeQuestionService();
         this.ucDecisionNoticeOutcomeService = new UcDecisionNoticeOutcomeService(ucDecisionNoticeQuestionService);
+        this.venueDataLoader = new VenueDataLoader();
     }
 
     @Override
     protected WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
         DocumentConfiguration documentConfiguration) {
-        return new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, ucDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration);
+        return new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, ucDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
     }
 
     @Override
