@@ -45,16 +45,7 @@ public class OtherPartyDataUtil {
         }
     }
 
-    public static void processCaseState(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getIsFqpmRequired() == null
-                || hasDueDateSetAndOtherPartyWithoutHearingOption(sscsCaseData)) {
-            sscsCaseData.setState(State.NOT_LISTABLE);
-        } else {
-            sscsCaseData.setState(State.READY_TO_LIST);
-        }
-    }
-
-    private static boolean hasDueDateSetAndOtherPartyWithoutHearingOption(SscsCaseData sscsCaseData) {
+    public static boolean hasDueDateSetAndOtherPartyWithoutHearingOption(SscsCaseData sscsCaseData) {
         return StringUtils.isNotBlank(sscsCaseData.getDwpDueDate())
                 && !everyOtherPartyHasAtLeastOneHearingOption(sscsCaseData);
     }

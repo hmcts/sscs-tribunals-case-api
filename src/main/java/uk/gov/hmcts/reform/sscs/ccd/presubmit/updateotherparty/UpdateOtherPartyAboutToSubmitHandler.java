@@ -39,11 +39,6 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
         updateOtherPartyUcb(sscsCaseData);
         assignOtherPartyId(otherParties);
 
-        processCaseState(sscsCaseData);
-        if (sscsCaseData.getState() != null && sscsCaseData.getState().equals(State.READY_TO_LIST)) {
-            sscsCaseData.setDwpDueDate(null);
-        }
-
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 }

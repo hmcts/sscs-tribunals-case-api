@@ -3,26 +3,35 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.confirmpanelcomposition;
 import static java.util.Objects.requireNonNull;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.panelcomposition.PanelCompositionService;
 
 
 @Service
 @Slf4j
-public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class ConfirmPanelCompositionSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    private PanelCompositionService panelCompositionService;
+
+    @Autowired
+    public ConfirmPanelCompositionSubmittedHandler(PanelCompositionService panelCompositionService) {
+        this.panelCompositionService = panelCompositionService;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
+        return callbackType.equals(CallbackType.SUBMITTED)
                 && callback.getEvent() == EventType.CONFIRM_PANEL_COMPOSITION;
     }
 
@@ -34,20 +43,9 @@ public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCal
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        SscsCaseData sscsCaseData = caseDetails.getCaseData();
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        SscsCaseDetails sscsCaseDetails = panelCompositionService.processCaseState(callback, caseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
-
-        processInterloc(sscsCaseData);
-        return response;
-    }
-
-    private void processInterloc(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getIsFqpmRequired() != null && sscsCaseData.getInterlocReviewState() != null
-                && sscsCaseData.getInterlocReviewState().equals(InterlocReviewState.REVIEW_BY_JUDGE.getId())) {
-            sscsCaseData.setInterlocReferralReason(null);
-            sscsCaseData.setInterlocReviewState(null);
-        }
+        return new PreSubmitCallbackResponse<>(sscsCaseDetails.getData());
     }
 }
