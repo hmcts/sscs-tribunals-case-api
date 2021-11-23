@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -50,6 +51,26 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     @Test
     public void givenAValidAboutToSubmitEvent_thenReturnTrue() {
         assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void throwsExceptionIfItCannotHandleTheAppeal() {
+        when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+    }
+
+    @Test
+    public void givenFqpmRequiredNull_thenNoChange() {
+
+        sscsCaseData.setIsFqpmRequired(null);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.NONE.getId());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_JUDGE.getId()));
+        assertThat(response.getData().getInterlocReferralReason(), is(InterlocReferralReason.NONE.getId()));
     }
 
     @Test

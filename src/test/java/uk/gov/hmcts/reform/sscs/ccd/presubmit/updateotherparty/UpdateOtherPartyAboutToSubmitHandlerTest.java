@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.Arrays;
@@ -45,6 +46,12 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.UPDATE_OTHER_PARTY_DATA);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void throwsExceptionIfItCannotHandleTheAppeal() {
+        when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 
     @Test
