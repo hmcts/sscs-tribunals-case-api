@@ -28,7 +28,7 @@ public class PanelCompositionService {
                 || hasDueDateSetAndOtherPartyWithoutHearingOption(caseData)) {
             return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
                     EventType.NOT_LISTABLE.getCcdType(), "Not listable",
-                    "Update to Not Listable as it is awaiting hearing enquiry form.", idamService.getIdamTokens());
+                    "Update to Not Listable as the case is either awaiting hearing enquiry form or for FQPM to be set", idamService.getIdamTokens());
         } else {
             return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
                     EventType.READY_TO_LIST.getCcdType(), "Ready to list",
