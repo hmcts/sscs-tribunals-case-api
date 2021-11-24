@@ -64,7 +64,7 @@ public class OtherPartyDataUtil {
     }
 
     public static boolean haveOtherPartiesChanged(List<CcdValue<OtherParty>> before, List<CcdValue<OtherParty>> after) {
-        if (before == null && after == null) {
+        if ((before == null || before.size() == 0) && (after == null || after.size() == 0)) {
             return false;
         }
         if (before == null ^ after == null) {

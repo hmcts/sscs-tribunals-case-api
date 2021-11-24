@@ -191,8 +191,24 @@ public class SubscriptionUpdatedAboutToSubmitHandlerTest {
         when(callback.getCaseDetailsBefore()).thenReturn(beforeData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-
         assertEquals(1, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size());
+    }
+
+    @Test
+    public void givenBeforeOtherPartiesNullNowEmptyList_doNotDisplayError() {
+        when(callback.getEvent()).thenReturn(EventType.SUBSCRIPTION_UPDATED);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
+        sscsCaseData.setOtherParties(Collections.emptyList());
+
+        SscsCaseData previousCaseData = SscsCaseData.builder()
+                .otherParties(null).build();
+        Optional<CaseDetails<SscsCaseData>> beforeData =
+                Optional.of(new CaseDetails<SscsCaseData>(33333333L, "", State.APPEAL_CREATED, previousCaseData, LocalDateTime.now(), "Benefit"));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
         assertEquals(0, response.getWarnings().size());
     }
 
