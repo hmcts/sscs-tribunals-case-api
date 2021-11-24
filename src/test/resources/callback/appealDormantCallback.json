@@ -74,6 +74,7 @@
               "document_url": "http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49"
             },
             "controlNumber": "3",
+            "includeInBundle": "No",
             "scannedDate": "2010-10-25T00:00:00.000",
             "fileName": "scanned.pdf",
             "type": "appellantEvidence"
