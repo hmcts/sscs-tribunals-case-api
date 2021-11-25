@@ -46,22 +46,20 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
         SscsHearingRecordingCaseData sscsHearingRecordingCaseData =
                 sscsCaseData.getSscsHearingRecordingCaseData();
 
-        sscsHearingRecordingCaseData.getProcessHearingRecordingRequests().stream()
-                .forEach(processHearingRecordingRequest -> processPartyRequests(sscsCaseData,
-                        sscsHearingRecordingCaseData, processHearingRecordingRequest));
+        processPartyRequests(sscsCaseData, sscsHearingRecordingCaseData, sscsHearingRecordingCaseData.getProcessHearingRecordingRequest());
 
         if (mutableEmptyListIfNull(sscsHearingRecordingCaseData.getRequestedHearings()).isEmpty()) {
             sscsHearingRecordingCaseData.setHearingRecordingRequestOutstanding(YesNo.NO);
         }
 
-        sscsHearingRecordingCaseData.setProcessHearingRecordingRequests(Collections.emptyList());
+        sscsHearingRecordingCaseData.setProcessHearingRecordingRequest(null);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
     private void processPartyRequests(SscsCaseData sscsCaseData, SscsHearingRecordingCaseData sscsHearingRecordingCaseData, ProcessHearingRecordingRequest processHearingRecordingRequest) {
-        ProcessHearingRecordingRequestDetails processHearingRecordingRequestValue =
-                processHearingRecordingRequest.getValue();
+        ProcessHearingRecordingRequest processHearingRecordingRequestValue =
+                processHearingRecordingRequest;
         if (isPartyItemSet(processHearingRecordingRequestValue.getDwp())) {
             processHearingRecordingsRequestsForParty(sscsCaseData, PartyItemList.DWP, sscsHearingRecordingCaseData,
                     processHearingRecordingRequestValue, processHearingRecordingRequestValue.getDwp()
@@ -90,7 +88,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
 
     private void processHearingRecordingsRequestsForParty(SscsCaseData sscsCaseData, PartyItemList partyItemList,
                                                           SscsHearingRecordingCaseData sscsHearingRecordingCaseData,
-                                                          ProcessHearingRecordingRequestDetails processHearingRecordingRequestValue,
+                                                          ProcessHearingRecordingRequest processHearingRecordingRequest,
                                                           String status) {
 
         Set<HearingRecordingRequest> dwpReleasedHearings =
@@ -108,7 +106,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
 
         if (StringUtils.isNotBlank(status) && !status.equals(RequestStatus.REQUESTED.getValue())) {
 
-            String hearingId = processHearingRecordingRequestValue.getHearingId();
+            String hearingId = processHearingRecordingRequest.getHearingId();
 
             Set<HearingRecordingRequest> partyHearingRecordingsRequests = allHearingRecordingsRequests.stream()
                     .filter(isFromRequestingParty(partyItemList))

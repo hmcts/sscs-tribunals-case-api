@@ -58,12 +58,12 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
         DynamicListItem appellantItem = party.equals(PartyItemList.APPELLANT.getCode()) ? new DynamicListItem(status.getValue(), status.getValue()) : null;
         DynamicListItem repItem = party.equals(PartyItemList.REPRESENTATIVE.getCode()) ? new DynamicListItem(status.getValue(), status.getValue()) : null;
 
-        return ProcessHearingRecordingRequest.builder().value(ProcessHearingRecordingRequestDetails.builder()
+        return ProcessHearingRecordingRequest.builder()
                 .dwp(new DynamicList(dwpItem, Collections.emptyList()))
                 .appellant(new DynamicList(appellantItem, Collections.emptyList()))
                 .jointParty(new DynamicList(jointItem, Collections.emptyList()))
                 .rep(new DynamicList(repItem, Collections.emptyList()))
-                .hearingId(hearingId).build()).build();
+                .hearingId(hearingId).build();
     }
 
     @Test
@@ -73,9 +73,8 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
                 .builder().sscsHearingRecording(recording1)
                 .requestingParty(PartyItemList.DWP.getCode()).build()).build();
         sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(new ArrayList<>(Arrays.asList(request1)));
-        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequests(Arrays
-                .asList(getProcessHearingRecordingRequest(RequestStatus.GRANTED, "an_id1",
-                        PartyItemList.DWP.getCode())));
+        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(getProcessHearingRecordingRequest(RequestStatus.GRANTED, "an_id1",
+                        PartyItemList.DWP.getCode()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -102,9 +101,9 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
                 .builder().sscsHearingRecording(recording1)
                 .requestingParty(PartyItemList.DWP.getCode()).build()).build();
         sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(new ArrayList<>(Arrays.asList(request1)));
-        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequests(Arrays
-                .asList(getProcessHearingRecordingRequest(RequestStatus.REFUSED, "an_id1",
-                        PartyItemList.DWP.getCode())));
+        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(
+                getProcessHearingRecordingRequest(RequestStatus.REFUSED, "an_id1",
+                        PartyItemList.DWP.getCode()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -130,9 +129,9 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
                 .builder().dateApproved(LocalDate.now().toString()).sscsHearingRecording(recording1)
                 .requestingParty(PartyItemList.DWP.getCode()).build()).build();
         sscsCaseData.getSscsHearingRecordingCaseData().setDwpReleasedHearings(new ArrayList<>(Arrays.asList(request1)));
-        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequests(Arrays
-                .asList(getProcessHearingRecordingRequest(RequestStatus.REFUSED, "an_id1",
-                        PartyItemList.DWP.getCode())));
+        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(
+                getProcessHearingRecordingRequest(RequestStatus.REFUSED, "an_id1",
+                        PartyItemList.DWP.getCode()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -159,9 +158,9 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
                 .builder().sscsHearingRecording(recording1)
                 .requestingParty(PartyItemList.DWP.getCode()).build()).build();
         sscsCaseData.getSscsHearingRecordingCaseData().setRefusedHearings(new ArrayList<>(Arrays.asList(request1)));
-        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequests(Arrays
-                .asList(getProcessHearingRecordingRequest(RequestStatus.GRANTED, "an_id1",
-                        PartyItemList.DWP.getCode())));
+        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(
+                getProcessHearingRecordingRequest(RequestStatus.GRANTED, "an_id1",
+                        PartyItemList.DWP.getCode()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -185,9 +184,9 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
                 .builder().sscsHearingRecording(recording1)
                 .requestingParty(PartyItemList.DWP.getCode()).build()).build();
         sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(new ArrayList<>(Arrays.asList(request1)));
-        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequests(Arrays
-                .asList(getProcessHearingRecordingRequest(RequestStatus.REQUESTED, "an_id1",
-                        PartyItemList.DWP.getCode())));
+        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(
+                getProcessHearingRecordingRequest(RequestStatus.REQUESTED, "an_id1",
+                        PartyItemList.DWP.getCode()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -210,8 +209,8 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
         SscsHearingRecording recording1 = getHearingRecording();
 
         sscsCaseData.getSscsHearingRecordingCaseData().setSscsHearingRecordings(Arrays.asList(recording1));
-        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequests(Arrays
-                .asList(getProcessHearingRecordingRequest(RequestStatus.GRANTED, "an_id1", party)));
+        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(
+                getProcessHearingRecordingRequest(RequestStatus.GRANTED, "an_id1", party));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -237,8 +236,8 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
                 .builder().sscsHearingRecording(recording1)
                 .requestingParty(party).build()).build();
         sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(new ArrayList<>(Arrays.asList(request1)));
-        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequests(Arrays
-                .asList(getProcessHearingRecordingRequest(RequestStatus.GRANTED, "an_id1", party)));
+        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(
+                getProcessHearingRecordingRequest(RequestStatus.GRANTED, "an_id1", party));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -264,8 +263,8 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
                 .builder().sscsHearingRecording(recording1)
                 .requestingParty(party).build()).build();
         sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(new ArrayList<>(Arrays.asList(request1)));
-        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequests(Arrays
-                .asList(getProcessHearingRecordingRequest(RequestStatus.REFUSED, "an_id1", party)));
+        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(
+                getProcessHearingRecordingRequest(RequestStatus.REFUSED, "an_id1", party));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -290,8 +289,8 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
                 .builder().dateApproved(LocalDate.now().toString()).sscsHearingRecording(recording1)
                 .requestingParty(party).build()).build();
         sscsCaseData.getSscsHearingRecordingCaseData().setCitizenReleasedHearings(new ArrayList<>(Arrays.asList(request1)));
-        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequests(Arrays
-                .asList(getProcessHearingRecordingRequest(RequestStatus.REFUSED, "an_id1", party)));
+        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(
+                getProcessHearingRecordingRequest(RequestStatus.REFUSED, "an_id1", party));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -317,8 +316,8 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
                 .builder().sscsHearingRecording(recording1)
                 .requestingParty(party).build()).build();
         sscsCaseData.getSscsHearingRecordingCaseData().setRefusedHearings(new ArrayList<>(Arrays.asList(request1)));
-        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequests(Arrays
-                .asList(getProcessHearingRecordingRequest(RequestStatus.GRANTED, "an_id1", party)));
+        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(
+                getProcessHearingRecordingRequest(RequestStatus.GRANTED, "an_id1", party));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -341,8 +340,8 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
                 .builder().sscsHearingRecording(recording1)
                 .requestingParty(party).build()).build();
         sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(new ArrayList<>(Arrays.asList(request1)));
-        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequests(Arrays
-                .asList(getProcessHearingRecordingRequest(RequestStatus.REQUESTED, "an_id1", party)));
+        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(
+                getProcessHearingRecordingRequest(RequestStatus.REQUESTED, "an_id1", party));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -364,9 +363,9 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
                 .builder().sscsHearingRecording(null)
                 .requestingParty(PartyItemList.APPELLANT.getCode()).build()).build();
 
-        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequests(
-                singletonList(getProcessHearingRecordingRequest(
-                        RequestStatus.GRANTED, "an_id1", PartyItemList.APPELLANT.getCode())));
+        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(
+                getProcessHearingRecordingRequest(
+                        RequestStatus.GRANTED, "an_id1", PartyItemList.APPELLANT.getCode()));
         sscsCaseData.getSscsHearingRecordingCaseData().setSscsHearingRecordings(singletonList(recording1));
         sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(singletonList(hearingRecordingRequest));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -374,9 +373,11 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
         assertThat(response.getErrors().size(), is(0));
     }
 
+
     private SscsHearingRecording getHearingRecording() {
         return SscsHearingRecording.builder()
                 .value(SscsHearingRecordingDetails.builder().hearingId("an_id1").build())
                 .build();
     }
+
 }
