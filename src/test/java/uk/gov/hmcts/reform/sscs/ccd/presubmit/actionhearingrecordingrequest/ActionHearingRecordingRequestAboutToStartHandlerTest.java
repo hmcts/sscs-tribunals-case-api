@@ -2,8 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
@@ -13,8 +12,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -34,7 +33,7 @@ import uk.gov.hmcts.reform.sscs.service.actionhearingrecordingrequest.ActionHear
 public class ActionHearingRecordingRequestAboutToStartHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-    static final Hearing HEARING = getHearing(1);
+    static final Hearing HEARING = getHearing("1");
 
     private final ActionHearingRecordingRequestAboutToStartHandler handler = new ActionHearingRecordingRequestAboutToStartHandler(new ActionHearingRecordingRequestService());
 
@@ -60,7 +59,7 @@ public class ActionHearingRecordingRequestAboutToStartHandlerTest {
                 .hearings(List.of(HEARING))
 
                 .sscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder()
-                        .sscsHearingRecordings(List.of(recording(1)))
+                        .sscsHearingRecordings(List.of(recording("1")))
                         .build())
                 .build();
 
@@ -70,7 +69,7 @@ public class ActionHearingRecordingRequestAboutToStartHandlerTest {
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
     }
 
-    static SscsHearingRecording recording(int hearingId) {
+    static SscsHearingRecording recording(String hearingId) {
         final Hearing hearing = getHearing(hearingId);
         return SscsHearingRecording.builder()
                 .value(SscsHearingRecordingDetails.builder()
@@ -94,22 +93,49 @@ public class ActionHearingRecordingRequestAboutToStartHandlerTest {
         assertEquals("No hearing recordings on this case", response.getErrors().toArray()[0]);
     }
 
+    @Test
+    public void givenThereAreHearingsWithNoHearingRecordings_ReturnError() {
+        sscsCaseData.getSscsHearingRecordingCaseData().setSscsHearingRecordings(null);
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+                .hearingDate("2021-01-01").time("12:00").hearingId("an_id1").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertEquals(1, response.getErrors().size());
+        assertEquals("No hearing recordings on this case", response.getErrors().toArray()[0]);
+    }
 
     @Test
-    public void givenHearingRecordings_showProcessHearingRecordingRequests() {
+    public void givenThereAreHearingRecordingsForAHearing_thenAddToDynamicList() {
+        SscsHearingRecording recording1 = getHearingRecording("an_id1");
+        sscsCaseData.getSscsHearingRecordingCaseData().setSscsHearingRecordings(singletonList(recording1));
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+                .hearingDate("2021-01-01").time("12:00").hearingId("an_id1").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        SscsCaseData responseData = response.getData();
-        assertThat(responseData.getSscsHearingRecordingCaseData().getProcessHearingRecordingRequests().size(), is(1));
-        final ProcessHearingRecordingRequestDetails processHearingRecordingRequest = responseData.getSscsHearingRecordingCaseData().getProcessHearingRecordingRequests().get(0).getValue();
-        assertThat(processHearingRecordingRequest.getHearingId(), is(HEARING.getValue().getHearingId()));
-        assertThat(processHearingRecordingRequest.getHearingTitle(), is("Hearing 1"));
-        assertThat(processHearingRecordingRequest.getHearingInformation(), is("Venue 1 12:00:00 18 May 2021"));
-        assertThat(processHearingRecordingRequest.getRecordings().size(), is(1));
-        assertThat(processHearingRecordingRequest.getAppellant().getValue().getCode(), is(""));
-        assertThat(processHearingRecordingRequest.getAppellant().getListItems().stream().map(DynamicListItem::getCode).collect(Collectors.toList()), is(List.of("Granted", "Refused")));
-        assertThat(processHearingRecordingRequest.getDwp().getValue().getCode(), is(""));
-        assertThat(processHearingRecordingRequest.getJointParty().getValue().getCode(), is(""));
-        assertThat(processHearingRecordingRequest.getRep().getValue().getCode(), is(""));
+        assertEquals(0, response.getErrors().size());
+        assertEquals(1, response.getData().getSscsHearingRecordingCaseData().getSelectHearingDetails().getListItems().size());
+        assertEquals("Venue Name 12:00:00 01 Jan 2021", response.getData().getSscsHearingRecordingCaseData().getSelectHearingDetails().getListItems().get(0).getLabel());
+        assertEquals("an_id1", response.getData().getSscsHearingRecordingCaseData().getSelectHearingDetails().getListItems().get(0).getCode());
+    }
+
+    @Test
+    public void givenThereAreMultipleHearingWithRecordings_thenAddToDynamicList() {
+        SscsHearingRecording recording1 = getHearingRecording("an_id1");
+        SscsHearingRecording recording2 = getHearingRecording("an_id2");
+        sscsCaseData.getSscsHearingRecordingCaseData().setSscsHearingRecordings(Arrays.asList(recording1, recording2));
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+                .hearingDate("2021-01-01").time("12:00").hearingId("an_id1").venue(Venue.builder().name("Venue Name").build()).build()).build(),
+                Hearing.builder().value(HearingDetails.builder()
+                        .hearingDate("2021-02-01").time("13:00").hearingId("an_id2").venue(Venue.builder().name("Venue Name2").build()).build()).build()));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+        assertEquals(2, response.getData().getSscsHearingRecordingCaseData().getSelectHearingDetails().getListItems().size());
+        assertEquals("Venue Name 12:00:00 01 Jan 2021", response.getData().getSscsHearingRecordingCaseData().getSelectHearingDetails().getListItems().get(0).getLabel());
+        assertEquals("an_id1", response.getData().getSscsHearingRecordingCaseData().getSelectHearingDetails().getListItems().get(0).getCode());
+        assertEquals("Venue Name2 13:00:00 01 Feb 2021", response.getData().getSscsHearingRecordingCaseData().getSelectHearingDetails().getListItems().get(1).getLabel());
+        assertEquals("an_id2", response.getData().getSscsHearingRecordingCaseData().getSelectHearingDetails().getListItems().get(1).getCode());
     }
 
     @Test
@@ -124,7 +150,13 @@ public class ActionHearingRecordingRequestAboutToStartHandlerTest {
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 
-    static Hearing getHearing(int hearingId) {
+    private SscsHearingRecording getHearingRecording(String id) {
+        return SscsHearingRecording.builder()
+                .value(SscsHearingRecordingDetails.builder().hearingId(id).build())
+                .build();
+    }
+
+    static Hearing getHearing(String hearingId) {
         HearingDetails hearingDetails = HearingDetails.builder()
                 .hearingId(String.valueOf(hearingId))
                 .hearingDate("2021-05-18")
