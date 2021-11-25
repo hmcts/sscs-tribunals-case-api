@@ -47,8 +47,9 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.UPDATE_OTHER_PARTY_DATA);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(sscsCaseData.getAppeal()).thenReturn(Appeal.builder()
-                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build());
+        Appeal appeal = Appeal.builder()
+                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build();
+        sscsCaseData.setAppeal(appeal);
     }
 
     @Test(expected = IllegalStateException.class)
