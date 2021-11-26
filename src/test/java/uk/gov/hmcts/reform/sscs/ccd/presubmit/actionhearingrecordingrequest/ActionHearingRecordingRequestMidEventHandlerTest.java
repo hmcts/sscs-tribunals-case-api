@@ -336,6 +336,36 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
         assertThat(processHearingRecordingRequest.getRep().getValue().getCode(), is(""));
     }
 
+    @Test
+    public void givenCaseWithOtherPartiesAndUserTriesToPressTheRemoveButtonForOtherPartyRequests_thenShowAnError() {
+
+        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(ProcessHearingRecordingRequest.builder()
+                .hearingId(HEARING.getValue().getHearingId())
+                .build());
+
+        List<OtherPartyHearingRecordingReq> otherPartyHearingRecordingReq = new ArrayList<>();
+
+        otherPartyHearingRecordingReq.add(OtherPartyHearingRecordingReq.builder().value(OtherPartyHearingRecordingReqDetails.builder()
+                .otherPartyId("1")
+                .hearingRecordingRequest(HearingRecordingRequestDetails.builder().status(REQUESTED.getLabel())
+                        .sscsHearingRecording(SscsHearingRecordingDetails.builder().hearingId("an_id1").build()).build()).build()).build());
+
+        sscsCaseData.getSscsHearingRecordingCaseData().setOtherPartyHearingRecordingReq(otherPartyHearingRecordingReq);
+
+        List<CcdValue<OtherParty>> otherParties = Arrays.asList(buildOtherPartyWithAppointeeAndRep("1", "2", "3"));
+        sscsCaseData.setOtherParties(otherParties);
+
+        List<OtherPartyHearingRecordingReqUi> otherPartyHearingRecordingReqUi = new ArrayList<>();
+        otherPartyHearingRecordingReqUi.add(OtherPartyHearingRecordingReqUi.builder().value(OtherPartyHearingRecordingReqUiDetails.builder().otherPartyName("Harry Kane").build()).build());
+        otherPartyHearingRecordingReqUi.add(OtherPartyHearingRecordingReqUi.builder().value(OtherPartyHearingRecordingReqUiDetails.builder().otherPartyName("Henry Smith").build()).build());
+
+        sscsCaseData.getSscsHearingRecordingCaseData().setOtherPartyHearingRecordingReqUi(otherPartyHearingRecordingReqUi);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getWarnings().size(), is(0));
+        assertThat(response.getErrors().iterator().next(), is("Please do not use the remove buttons within this event. You may need to start again."));
+    }
 
     private void setReleasedHearingsForParty(PartyItemList party) {
         if (party.equals(DWP)) {
