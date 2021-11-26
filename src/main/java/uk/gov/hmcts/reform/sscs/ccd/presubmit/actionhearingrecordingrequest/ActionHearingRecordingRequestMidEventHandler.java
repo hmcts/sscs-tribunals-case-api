@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.model.RequestStatus.*;
 import static uk.gov.hmcts.reform.sscs.model.RequestStatus.REQUESTED;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getAllOtherPartiesOnCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,12 +76,12 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
             sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(request);
 
             if (sscsCaseData.getOtherParties() != null && sscsCaseData.getOtherParties().size() > 0) {
-                buildOtherPartyHearingRequestUi(hearing.get(), sscsCaseData);
+                sscsCaseData.getSscsHearingRecordingCaseData().setOtherPartyHearingRecordingReqUi(buildOtherPartyHearingRequestUi(hearing.get(), sscsCaseData));
             }
         }
     }
 
-    private void buildOtherPartyHearingRequestUi(Hearing hearing, SscsCaseData sscsCaseData) {
+    private List<OtherPartyHearingRecordingReqUi> buildOtherPartyHearingRequestUi(Hearing hearing, SscsCaseData sscsCaseData) {
         List<OtherPartyHearingRecordingReqUi> otherPartyHearingRecordingReqUi = new ArrayList<>();
         for (CcdValue<OtherParty> otherParty : sscsCaseData.getOtherParties()) {
 
@@ -93,7 +94,7 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
                 otherPartyHearingRecordingReqUi.add(buildOtherPartyElement(sscsCaseData, hearing, otherParty.getValue().getRep().getId(), otherParty.getValue().getRep().getName(), " - Representative"));
             }
         }
-        sscsCaseData.getSscsHearingRecordingCaseData().setOtherPartyHearingRecordingReqUi(otherPartyHearingRecordingReqUi);
+        return otherPartyHearingRecordingReqUi;
     }
 
     private OtherPartyHearingRecordingReqUi buildOtherPartyElement(SscsCaseData sscsCaseData, Hearing hearing, String otherPartyId, Name name, String otherPartyType) {
@@ -210,6 +211,21 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
         if (caseHasARepresentative) {
             validateParty(PartyItemList.REPRESENTATIVE, processHearingRecordingRequest, response);
         }
+        if (response.getData().getOtherParties() != null && response.getData().getOtherParties().size() > 0) {
+            validateOtherPartyUiData(response);
+        }
+    }
+
+    private void validateOtherPartyUiData(PreSubmitCallbackResponse<SscsCaseData> response) {
+        List<String> otherParties = getAllOtherPartiesOnCase(response.getData());
+
+        if (otherParties.size() != response.getData().getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReqUi().size()) {
+            addWarningOtherPartyUiError(response);
+        }
+    }
+
+    private void addWarningOtherPartyUiError(PreSubmitCallbackResponse<SscsCaseData> response) {
+        response.addError("Please do not use the remove buttons within this event. You may need to start again.");
     }
 
     private void validateParty(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response) {
