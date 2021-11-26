@@ -40,13 +40,22 @@ public class OtherPartyDataUtil {
         }
     }
 
-    public static void assignOtherPartyId(List<CcdValue<OtherParty>> otherParties) {
+    public static void assignNewOtherPartyData(List<CcdValue<OtherParty>> otherParties, EventType eventType) {
         int maxId = getMaxId(otherParties);
         for (CcdValue<OtherParty> ccdOtherParty : otherParties) {
             OtherParty otherParty = ccdOtherParty.getValue();
             if (otherParty.getId() == null) {
                 otherParty.setId(Integer.toString(++maxId));
+                //All the newly added other parties will be sent a notification
+                otherParty.setSendNewOtherPartyNotification(YES);
+            } else if (EventType.DWP_UPLOAD_RESPONSE.equals(eventType) && otherParty.getSendNewOtherPartyNotification() == null) {
+                //The other party added at case creation time, by bulk-scan, will be notified in dwpUploadResponse event
+                otherParty.setSendNewOtherPartyNotification(YES);
+            } else if (YesNo.isYes(otherParty.getSendNewOtherPartyNotification())) {
+                //Notification flag is set to no for the other parties that already been notified
+                otherParty.setSendNewOtherPartyNotification(NO);
             }
+
             if (otherParty.getAppointee() != null && isYes(otherParty.getIsAppointee()) && otherParty.getAppointee().getId() == null) {
                 otherParty.getAppointee().setId(Integer.toString(++maxId));
             }
@@ -182,4 +191,19 @@ public class OtherPartyDataUtil {
                 .orElse(null);
     }
 
+    public static boolean hasNewOtherPartyAdded(List<CcdValue<OtherParty>> before, List<CcdValue<OtherParty>> after) {
+        if (after != null && !after.isEmpty()) {
+            if (before == null || before.isEmpty()) {
+                return true;
+            }
+
+            return !before.stream()
+                    .map(o -> o.getValue().getId())
+                    .collect(Collectors.toSet())
+                    .containsAll(after.stream()
+                            .map(o -> o.getValue().getId())
+                            .collect(Collectors.toList()));
+        }
+        return false;
+    }
 }

@@ -5,13 +5,13 @@ import static java.util.Collections.*;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.*;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_UPLOAD_RESPONSE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.assignOtherPartyId;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateOtherPartyUcb;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -51,7 +51,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.DWP_UPLOAD_RESPONSE;
+                && callback.getEvent() == DWP_UPLOAD_RESPONSE;
     }
 
     @Override
@@ -84,7 +84,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         if (Benefit.CHILD_SUPPORT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())
                 && sscsCaseData.getOtherParties() != null) {
-            assignOtherPartyId(sscsCaseData.getOtherParties());
+            assignNewOtherPartyData(sscsCaseData.getOtherParties(), DWP_UPLOAD_RESPONSE);
             updateOtherPartyUcb(sscsCaseData);
         }
 
