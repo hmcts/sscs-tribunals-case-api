@@ -69,12 +69,14 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
                 .filter(h -> sscsCaseData.getSscsHearingRecordingCaseData().getSelectHearingDetails().getValue().getCode().equals(h.getValue().getHearingId()))
                 .findFirst();
 
-        final ProcessHearingRecordingRequest request = getProcessHearingRecordingRequest(hearing.get(), sscsCaseData);
+        if (hearing.isPresent()) {
+            final ProcessHearingRecordingRequest request = getProcessHearingRecordingRequest(hearing.get(), sscsCaseData);
 
-        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(request);
+            sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(request);
 
-        if (sscsCaseData.getOtherParties() != null && sscsCaseData.getOtherParties().size() > 0) {
-            buildOtherPartyHearingRequestUi(hearing.get(), sscsCaseData);
+            if (sscsCaseData.getOtherParties() != null && sscsCaseData.getOtherParties().size() > 0) {
+                buildOtherPartyHearingRequestUi(hearing.get(), sscsCaseData);
+            }
         }
     }
 
