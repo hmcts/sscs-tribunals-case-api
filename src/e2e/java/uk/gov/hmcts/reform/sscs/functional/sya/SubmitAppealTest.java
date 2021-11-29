@@ -72,6 +72,11 @@ public class SubmitAppealTest {
     }
 
     @Test
+    public void givenValidChildSupportAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateValidAppeal() throws InterruptedException {
+        assertSscs2CaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_CHILD_SUPPORT.getSerializedMessage());
+    }
+
+    @Test
     public void givenIncompleteAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateIncompleteAppeal() throws InterruptedException {
         assertSscsCaseIsExpectedResult("incompleteApplication", ALL_DETAILS_NON_SAVE_AND_RETURN_NO_MRN_DATE_CCD.getSerializedMessage());
     }
@@ -81,17 +86,28 @@ public class SubmitAppealTest {
         assertSscsCaseIsExpectedResult("interlocutoryReviewState", ALL_DETAILS_NON_SAVE_AND_RETURN_WITH_INTERLOC_CCD.getSerializedMessage());
     }
 
+    private void assertSscs2CaseIsExpectedResult(String expectedState, String expectedResponse) {
+        assertCaseIsExpectedResult(ALL_DETAILS_NON_SAVE_AND_RETURN_CHILD_SUPPORT.getSerializedMessage(),  expectedState,
+                expectedResponse);
+    }
+
     private void assertSscsCaseIsExpectedResult(String expectedState, String expectedResponse) {
+        assertCaseIsExpectedResult(ALL_DETAILS_NON_SAVE_AND_RETURN.getSerializedMessage(),  expectedState,
+                expectedResponse);
+    }
+
+    private void assertCaseIsExpectedResult(String expectedBody, String expectedState, String expectedResponse) {
         LocalDate now = LocalDate.now();
         LocalDate interlocutoryReviewDate = now.minusMonths(13).minusDays(1);
         LocalDate mrnDate = expectedState.equals("interlocutoryReviewState") ? interlocutoryReviewDate :
                 expectedState.equals("incompleteApplication") ? null : now;
         String nino = submitHelper.getRandomNino();
 
-        String body = updateCaseJsonWithMrnDateAndNino(mrnDate, nino);
+        expectedBody = submitHelper.setNino(expectedBody, nino);
+        expectedBody = submitHelper.setLatestMrnDate(expectedBody, mrnDate);
 
         Response response = RestAssured.given()
-                .body(body)
+                .body(expectedBody)
                 .header("Content-Type", "application/json")
                 .post("/appeals");
 
@@ -106,13 +122,6 @@ public class SubmitAppealTest {
         assertJsonEquals(changeExpectedFields(expectedResponse, nino, mrnDate), sscsCaseDetails.getData(), whenIgnoringPaths("sscsDocument"));
 
         assertEquals(expectedState, sscsCaseDetails.getState());
-    }
-
-    private String updateCaseJsonWithMrnDateAndNino(LocalDate mrnDate, String nino) {
-        String body = ALL_DETAILS_NON_SAVE_AND_RETURN.getSerializedMessage();
-        body = submitHelper.setNino(body, nino);
-        body = submitHelper.setLatestMrnDate(body, mrnDate);
-        return body;
     }
 
     private String changeExpectedFields(String serializedMessage, String nino, LocalDate mrnDate) {

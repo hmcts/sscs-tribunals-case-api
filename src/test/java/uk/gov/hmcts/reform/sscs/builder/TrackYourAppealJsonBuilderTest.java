@@ -4,7 +4,6 @@ import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.*;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -120,29 +119,6 @@ public class TrackYourAppealJsonBuilderTest {
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter(), 1L, true, "appealCreated");
         assertJsonEquals("file.mp3", objectNode.get("appeal").get("audioVideoEvidence").get(0).get("name"));
-    }
-
-    @Test
-    public void shouldStripBinaryUrlAndReturnId() {
-        Assert.assertEquals("6d3b7351-168e-42f6-90b7-d263000e1864", trackYourAppealJsonBuilder.stripUrl("http://dm-store:5005/documents/6d3b7351-168e-42f6-90b7-d263000e1864/binary"));
-    }
-
-    @Test
-    public void shouldReturnSameUrlIfNotInRightFormatMissingDocument() {
-        String url = "http://dm-store:5005/6d3b7351-168e-42f6-90b7-d263000e1864/binary";
-        Assert.assertEquals(url, trackYourAppealJsonBuilder.stripUrl(url));
-    }
-
-    @Test
-    public void shouldReturnSameUrlIfNotInRightFormatMissingBinary() {
-        String url = "http://dm-store:5005/documents/6d3b7351-168e-42f6-90b7-d263000e1864";
-        Assert.assertEquals(url, trackYourAppealJsonBuilder.stripUrl(url));
-    }
-
-    @Test
-    public void shouldReturnSameUrlIfNotInRightFormatMissingBoth() {
-        String url = "http://dm-store:5005";
-        Assert.assertEquals(url, trackYourAppealJsonBuilder.stripUrl(url));
     }
 
     private RegionalProcessingCenter populateRegionalProcessingCenter() {

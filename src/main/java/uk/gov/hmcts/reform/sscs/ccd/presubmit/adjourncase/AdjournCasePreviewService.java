@@ -87,7 +87,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                     if (venueDetails == null) {
                         throw new IllegalStateException("Unable to load venue details for id:" + caseData.getAdjournCaseNextHearingVenueSelected().getValue().getCode());
                     }
-                    adjournCaseBuilder.nextHearingVenue(venueDetails.getVenName());
+                    adjournCaseBuilder.nextHearingVenue(venueDetails.getGapsVenName());
                     adjournCaseBuilder.nextHearingAtVenue(true);
                 } else {
                     throw new IllegalStateException("A next hearing venue of somewhere else has been specified but no venue has been selected");
@@ -197,36 +197,41 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
     private String buildSpecificTimeText(AdjournCaseTime adjournCaseNextHearingSpecificTime, boolean fixDate) {
         StringBuilder stringBuilder = new StringBuilder("");
-        if (adjournCaseNextHearingSpecificTime != null) {
 
-            stringBuilder.append("It will be ");
+        stringBuilder.append("It will be ");
 
+        if (adjournCaseNextHearingSpecificTime != null
+                && (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime() != null
+                || CollectionUtils.isNotEmpty(adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession()))) {
             if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession() != null
                     && adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession().size() > 0) {
                 stringBuilder.append("first ");
             }
 
             if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime() != null
-                || (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession() != null
-                        && adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession().size() > 0)) {
+                    || CollectionUtils.isNotEmpty(adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession())) {
                 String session = "";
                 if ("am".equalsIgnoreCase(adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime())) {
                     session = "morning ";
                 } else if ("pm".equalsIgnoreCase(adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime())) {
                     session = "afternoon ";
                 }
-                stringBuilder.append("in the " + session + "session ");
+                stringBuilder.append("in the ").append(session).append("session ");
             }
+        } else {
+            stringBuilder.append("re-scheduled ");
+        }
 
-            if (fixDate) {
-                stringBuilder.append("on a date to be fixed");
-            } else {
-                stringBuilder.append("on the first available date");
-            }
+
+        if (fixDate) {
+            stringBuilder.append("on a date to be fixed");
+        } else {
+            stringBuilder.append("on the first available date");
         }
 
         return stringBuilder.toString();
     }
+
 
     protected void validateRequiredProperties(AdjournCaseTemplateBody payload) {
         if (payload.getHeldAt() == null && payload.getHeldOn() == null) {
@@ -247,8 +252,12 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                     adjournCaseBuilder.heldOn(LocalDate.parse(finalHearing.getValue().getHearingDate()));
                 }
                 if (finalHearing.getValue().getVenue() != null) {
-                    adjournCaseBuilder.heldAt(finalHearing.getValue().getVenue().getName());
-                    venue = finalHearing.getValue().getVenue().getName();
+                    String venueName = venueDataLoader.getGapVenueName(finalHearing.getValue().getVenue(),
+                            finalHearing.getValue().getVenueId());
+                    if (venueName != null) {
+                        adjournCaseBuilder.heldAt(venueName);
+                        venue = venueName;
+                    }
                 }
             }
         } else {

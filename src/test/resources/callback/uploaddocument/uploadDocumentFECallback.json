@@ -720,7 +720,8 @@
             "adjourned": "PUBLIC",
             "eventDate": "PUBLIC",
             "hearingId": "PUBLIC",
-            "hearingDate": "PUBLIC"
+            "hearingDate": "PUBLIC",
+            "venueId": "PUBLIC"
           }
         }]
       },
@@ -936,7 +937,8 @@
           "adjourned": "No",
           "eventDate": null,
           "hearingId": "3698764",
-          "hearingDate": "2018-06-01"
+          "hearingDate": "2018-06-01",
+          "venueId": null
         }
       }],
       "regionalProcessingCenter": {
