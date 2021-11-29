@@ -201,11 +201,6 @@ ccd:
       autoscaling:
         enabled: false
 
-  am-role-assignment-service:
-    java:
-      environment:
-        ROLE_ASSIGNMENT_DB_PASSWORD: hmcts
-  
   ccd-api-gateway-web:
     nodejs:
       imagePullPolicy: Always
