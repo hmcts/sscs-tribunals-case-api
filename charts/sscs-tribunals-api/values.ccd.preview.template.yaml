@@ -39,7 +39,7 @@ idam-pr:
       - http://ccd-data-store-api-${SERVICE_FQDN}/oauth2redirect
 
 em-ccdorc:
-  enabled: false
+  enabled: true
   java:
     image: hmctspublic.azurecr.io/em/ccdorc:latest
     ingressHost: em-ccdorc-${SERVICE_FQDN}
