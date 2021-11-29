@@ -170,7 +170,7 @@ ccd:
 
   ccd-data-store-api:
     java:
-      image: hmctspublic.azurecr.io/ccd/data-store-api:pr-1485-235ed4c-20211123111336
+      image: hmctspublic.azurecr.io/ccd/data-store-api:pr-1485-1cad88c-20211129092150
       imagePullPolicy: Always
       memoryRequests: '1524Mi'
       cpuRequests: '900m'
