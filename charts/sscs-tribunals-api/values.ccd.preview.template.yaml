@@ -200,6 +200,10 @@ ccd:
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
       autoscaling:
         enabled: false
+        
+  am-role-assignment-service:
+    java:
+      keyVaults: [ ]
 
   ccd-api-gateway-web:
     nodejs:
