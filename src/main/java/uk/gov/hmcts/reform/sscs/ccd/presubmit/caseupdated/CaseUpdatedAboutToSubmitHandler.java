@@ -99,7 +99,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         //validate benefit type and dwp issuing office for updateCaseData event triggered by user, which is not by CaseLoader
         if (!hasSystemUserRole) {
-            validateAndUpdateDwpHandlingOffice(sscsCaseData,preSubmitCallbackResponse);
+            validateAndUpdateDwpHandlingOffice(sscsCaseData, preSubmitCallbackResponse);
+            validateHearingOptions(sscsCaseData, preSubmitCallbackResponse);
         }
 
         return preSubmitCallbackResponse;
@@ -115,6 +116,16 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (validBenefitType && validDwpIssuingOffice) {
             String regionalCenter = dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(benefitType.getCode(), mrnDetails.getDwpIssuingOffice());
             sscsCaseData.setDwpRegionalCentre(regionalCenter);
+        }
+    }
+
+    private void validateHearingOptions(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
+        if (hearingOptions != null && sscsCaseData.getAppeal().getHearingType() != null
+            && HearingType.ORAL.getValue().equals(sscsCaseData.getAppeal().getHearingType())
+            && !hearingOptions.isWantsToAttendHearing()) {
+            response.addWarning("There is a mismatch between the hearing type and the wants to attend field, "
+                + "all hearing options will be cleared please check if this is correct");
         }
     }
 
