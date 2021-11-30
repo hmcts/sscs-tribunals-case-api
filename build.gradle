@@ -369,7 +369,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
     compile group: 'com.github.hmcts', name: 'sscs-common', version: versions.sscsCommon
-    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.50-RC2-SSCS-9766'
+    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.50-RC3-SSCS-9766'
 
 
     compile group:'org.overviewproject', name: 'mime-types', version: '1.0.2'
