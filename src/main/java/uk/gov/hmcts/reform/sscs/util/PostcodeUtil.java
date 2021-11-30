@@ -3,10 +3,7 @@ package uk.gov.hmcts.reform.sscs.util;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.lang3.RegExUtils.replaceAll;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-<<<<<<< HEAD
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-=======
->>>>>>> SSCS-9726 - MYA Other party login (#2449)
 import static org.apache.commons.lang3.StringUtils.lowerCase;
 
 import java.util.List;
