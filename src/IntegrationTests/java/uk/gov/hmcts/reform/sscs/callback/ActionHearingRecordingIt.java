@@ -14,9 +14,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest.ActionHearingRecordingRequestAboutToStartHandlerTest.getHearingRecording;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest.ActionHearingRecordingRequestAboutToSubmitHandlerTest.getProcessHearingRecordingRequest;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest.ActionHearingRecordingRequestMidEventHandlerTest.*;
+import static uk.gov.hmcts.reform.sscs.model.RequestStatus.GRANTED;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
@@ -56,13 +58,16 @@ public class ActionHearingRecordingIt extends AbstractEventIt {
 
 
         SscsHearingRecording recording1 = SscsHearingRecording.builder().value(SscsHearingRecordingDetails.builder().hearingId("1").build()).build();
-
+        DynamicListItem selectedHearing = new DynamicListItem("1", "Venue Name 12:00:00 01 Jan 2021");
         sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("1")
                 .state(State.WITH_DWP)
                 .interlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId())
                 .hearings(List.of(hearing1))
-                .sscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder().sscsHearingRecordings(List.of(recording1)).build())
+                .sscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder()
+                        .selectHearingDetails(new DynamicList(selectedHearing, List.of(selectedHearing)))
+                        .sscsHearingRecordings(List.of(recording1))
+                        .build())
                 .appeal(Appeal.builder()
                         .mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build())
                         .rep(Representative.builder()
@@ -98,6 +103,42 @@ public class ActionHearingRecordingIt extends AbstractEventIt {
         assertThat(response.getWarnings().iterator().next(), is("Are you sure you want to change the request status"));
     }
 
+
+    @Test
+    public void midEventGivenCaseWithOtherPartiesAndExistingHearingRecordingRequestForSelectedHearing_thenBuildTheOtherPartyUi() throws Exception {
+
+        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(ProcessHearingRecordingRequest.builder()
+                .hearingId(HEARING.getValue().getHearingId())
+                .build());
+
+        List<OtherPartyHearingRecordingReq> otherPartyHearingRecordingReq = new ArrayList<>();
+
+        otherPartyHearingRecordingReq.add(OtherPartyHearingRecordingReq.builder().value(OtherPartyHearingRecordingReqDetails.builder()
+                .otherPartyId("1")
+                .hearingRecordingRequest(HearingRecordingRequestDetails.builder().status(GRANTED.getLabel())
+                        .sscsHearingRecording(SscsHearingRecordingDetails.builder().hearingId("1").build()).build()).build()).build());
+
+        sscsCaseData.getSscsHearingRecordingCaseData().setOtherPartyHearingRecordingReq(otherPartyHearingRecordingReq);
+
+        List<CcdValue<OtherParty>> otherParties = List.of(buildOtherPartyWithAppointeeAndRep("1", "2", "3"));
+        sscsCaseData.setOtherParties(otherParties);
+
+        setJson(sscsCaseData, ACTION_HEARING_RECORDING_REQUEST);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = assertResponseOkAndGetResult(MID_EVENT, "selectHearing");
+
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(0));
+        assertThat(response.getData().getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReqUi().size(), is(3));
+        assertThat(response.getData().getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReqUi().get(0).getValue().getOtherPartyName(), is("Harry Kane"));
+        assertThat(response.getData().getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReqUi().get(0).getValue().getHearingRecordingStatus().getValue().getCode(), is("Granted"));
+        assertThat(response.getData().getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReqUi().get(0).getValue().getHearingRecordingStatus().getListItems().size(), is(2));
+        assertThat(response.getData().getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReqUi().get(1).getValue().getOtherPartyName(), is("Henry Smith - Appointee"));
+        assertThat(response.getData().getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReqUi().get(1).getValue().getHearingRecordingStatus().getValue().getCode(), is(""));
+        assertThat(response.getData().getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReqUi().get(2).getValue().getOtherPartyName(), is("Wendy Smith - Representative"));
+        assertThat(response.getData().getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReqUi().get(2).getValue().getHearingRecordingStatus().getValue().getCode(), is(""));
+    }
 
     @Test
     public void aboutToStartGivenThereAreNoHearingRecordings_ReturnError() throws Exception {

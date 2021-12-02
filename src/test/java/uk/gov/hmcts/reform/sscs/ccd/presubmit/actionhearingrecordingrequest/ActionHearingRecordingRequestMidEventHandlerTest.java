@@ -305,7 +305,7 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
         assertThat(response.getData().getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReqUi().get(2).getValue().getHearingRecordingStatus().getValue().getCode(), is(""));
     }
 
-    private CcdValue<OtherParty> buildOtherPartyWithAppointeeAndRep(String id, String appointeeId, String repId) {
+    public static CcdValue<OtherParty> buildOtherPartyWithAppointeeAndRep(String id, String appointeeId, String repId) {
         return CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder()
                         .id(id)
