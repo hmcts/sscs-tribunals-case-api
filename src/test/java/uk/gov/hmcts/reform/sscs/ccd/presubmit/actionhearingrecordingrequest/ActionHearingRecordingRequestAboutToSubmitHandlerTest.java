@@ -51,7 +51,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
-    private ProcessHearingRecordingRequest getProcessHearingRecordingRequest(RequestStatus status, String hearingId, String party) {
+    public static ProcessHearingRecordingRequest getProcessHearingRecordingRequest(RequestStatus status, String hearingId, String party) {
 
         DynamicListItem dwpItem = party.equals(PartyItemList.DWP.getCode()) ? new DynamicListItem(status.getValue(), status.getValue()) : null;
         DynamicListItem jointItem = party.equals(PartyItemList.JOINT_PARTY.getCode()) ? new DynamicListItem(status.getValue(), status.getValue()) : null;
@@ -90,7 +90,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
         assertThat("Check DwpReleasedHearings has the correct approved date",
                 sscsHearingRecordingCaseDataResponse.getDwpReleasedHearings().get(0).getValue()
                         .getDateApproved(), is(LocalDate.now().toString()));
-        assertThat("Check DwpState is PROCESSED", sscsCaseData.getDwpState(),
+        assertThat("Check DwpState is PROCESSED", response.getData().getDwpState(),
                 is(DwpState.HEARING_RECORDING_PROCESSED.getId()));
     }
 

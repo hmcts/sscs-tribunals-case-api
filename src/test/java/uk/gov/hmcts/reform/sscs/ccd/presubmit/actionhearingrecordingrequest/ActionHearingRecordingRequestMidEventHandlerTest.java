@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest.ActionHearingRecordingRequestAboutToStartHandlerTest.*;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest.ActionHearingRecordingRequestAboutToStartHandlerTest.recording;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
 import static uk.gov.hmcts.reform.sscs.model.RequestStatus.*;
 
@@ -38,9 +38,9 @@ import uk.gov.hmcts.reform.sscs.service.actionhearingrecordingrequest.ActionHear
 @RunWith(JUnitParamsRunner.class)
 public class ActionHearingRecordingRequestMidEventHandlerTest {
 
+    public static final Hearing HEARING = getHearing("1");
     private static final String USER_AUTHORISATION = "Bearer token";
     private final ActionHearingRecordingRequestMidEventHandler handler = new ActionHearingRecordingRequestMidEventHandler(new ActionHearingRecordingRequestService());
-    static final Hearing HEARING = getHearing("an_id1");
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -57,7 +57,7 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
     public void setUp() {
         openMocks(this);
 
-        DynamicListItem selectedHearing = new DynamicListItem("an_id1", "Venue Name 12:00:00 01 Jan 2021");
+        DynamicListItem selectedHearing = new DynamicListItem("1", "Venue Name 12:00:00 01 Jan 2021");
         sscsCaseData = SscsCaseData.builder()
                 .appeal(Appeal.builder()
                         .mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build())
@@ -70,7 +70,7 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
                 .hearings(List.of(HEARING, getHearing("an_id2")))
                 .sscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder()
                         .selectHearingDetails(new DynamicList(selectedHearing, Arrays.asList(selectedHearing)))
-                        .sscsHearingRecordings(List.of(recording("an_id1"), recording("an_id2")))
+                        .sscsHearingRecordings(List.of(recording("1"), recording("an_id2")))
                         .build())
                 .build();
 
@@ -102,7 +102,7 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
     @Parameters({"REPRESENTATIVE", "APPELLANT", "DWP", "JOINT_PARTY"})
     public void changingRequestFromRefusedToGrantedReturnsWarning(PartyItemList party) {
 
-        setRefusedHearingsForParty(party);
+        setRefusedHearingsForParty(sscsCaseData, party);
 
         sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(
                 getProcessHearingRecordingRequestDetails(party, false)
@@ -114,7 +114,7 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
         assertThat(response.getWarnings().iterator().next(), is("Are you sure you want to change the request status"));
     }
 
-    private ProcessHearingRecordingRequest getProcessHearingRecordingRequestDetails(PartyItemList party, boolean setRefusedForParty) {
+    public static ProcessHearingRecordingRequest getProcessHearingRecordingRequestDetails(PartyItemList party, boolean setRefusedForParty) {
         return ProcessHearingRecordingRequest.builder()
                     .hearingId(HEARING.getValue().getHearingId())
                     .appellant(getDynamicList(party, APPELLANT, setRefusedForParty))
@@ -208,7 +208,7 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
         otherPartyHearingRecordingReq.add(OtherPartyHearingRecordingReq.builder().value(OtherPartyHearingRecordingReqDetails.builder()
                 .otherPartyId("1")
                 .hearingRecordingRequest(HearingRecordingRequestDetails.builder().status(GRANTED.getLabel())
-                        .sscsHearingRecording(SscsHearingRecordingDetails.builder().hearingId("an_id1").build()).build()).build()).build());
+                        .sscsHearingRecording(SscsHearingRecordingDetails.builder().hearingId("1").build()).build()).build()).build());
 
         sscsCaseData.getSscsHearingRecordingCaseData().setOtherPartyHearingRecordingReq(otherPartyHearingRecordingReq);
 
@@ -243,12 +243,12 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
         otherPartyHearingRecordingReq.add(OtherPartyHearingRecordingReq.builder().value(OtherPartyHearingRecordingReqDetails.builder()
                 .otherPartyId("2")
                 .hearingRecordingRequest(HearingRecordingRequestDetails.builder().status(GRANTED.getLabel())
-                        .sscsHearingRecording(SscsHearingRecordingDetails.builder().hearingId("an_id1").build()).build()).build()).build());
+                        .sscsHearingRecording(SscsHearingRecordingDetails.builder().hearingId("1").build()).build()).build()).build());
 
         otherPartyHearingRecordingReq.add(OtherPartyHearingRecordingReq.builder().value(OtherPartyHearingRecordingReqDetails.builder()
                 .otherPartyId("3")
                 .hearingRecordingRequest(HearingRecordingRequestDetails.builder().status(REFUSED.getLabel())
-                        .sscsHearingRecording(SscsHearingRecordingDetails.builder().hearingId("an_id1").build()).build()).build()).build());
+                        .sscsHearingRecording(SscsHearingRecordingDetails.builder().hearingId("1").build()).build()).build()).build());
 
         sscsCaseData.getSscsHearingRecordingCaseData().setOtherPartyHearingRecordingReq(otherPartyHearingRecordingReq);
 
@@ -283,7 +283,7 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
         otherPartyHearingRecordingReq.add(OtherPartyHearingRecordingReq.builder().value(OtherPartyHearingRecordingReqDetails.builder()
                 .otherPartyId("1")
                 .hearingRecordingRequest(HearingRecordingRequestDetails.builder().status(REQUESTED.getLabel())
-                        .sscsHearingRecording(SscsHearingRecordingDetails.builder().hearingId("an_id1").build()).build()).build()).build());
+                        .sscsHearingRecording(SscsHearingRecordingDetails.builder().hearingId("1").build()).build()).build()).build());
 
         sscsCaseData.getSscsHearingRecordingCaseData().setOtherPartyHearingRecordingReq(otherPartyHearingRecordingReq);
 
@@ -323,11 +323,11 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         SscsCaseData responseData = response.getData();
-        assertThat(responseData.getSscsHearingRecordingCaseData().getProcessHearingRecordingRequest().getHearingId(), is("an_id1"));
+        assertThat(responseData.getSscsHearingRecordingCaseData().getProcessHearingRecordingRequest().getHearingId(), is("1"));
         final ProcessHearingRecordingRequest processHearingRecordingRequest = responseData.getSscsHearingRecordingCaseData().getProcessHearingRecordingRequest();
         assertThat(processHearingRecordingRequest.getHearingId(), is(HEARING.getValue().getHearingId()));
         assertThat(processHearingRecordingRequest.getHearingTitle(), is("Hearing 1"));
-        assertThat(processHearingRecordingRequest.getHearingInformation(), is("Venue an_id1 12:00:00 18 May 2021"));
+        assertThat(processHearingRecordingRequest.getHearingInformation(), is("Venue 1 12:00:00 18 May 2021"));
         assertThat(processHearingRecordingRequest.getRecordings().size(), is(1));
         assertThat(processHearingRecordingRequest.getAppellant().getValue().getCode(), is(""));
         assertThat(processHearingRecordingRequest.getAppellant().getListItems().stream().map(DynamicListItem::getCode).collect(Collectors.toList()), is(List.of("Granted", "Refused")));
@@ -348,7 +348,7 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
         otherPartyHearingRecordingReq.add(OtherPartyHearingRecordingReq.builder().value(OtherPartyHearingRecordingReqDetails.builder()
                 .otherPartyId("1")
                 .hearingRecordingRequest(HearingRecordingRequestDetails.builder().status(REQUESTED.getLabel())
-                        .sscsHearingRecording(SscsHearingRecordingDetails.builder().hearingId("an_id1").build()).build()).build()).build());
+                        .sscsHearingRecording(SscsHearingRecordingDetails.builder().hearingId("1").build()).build()).build()).build());
 
         sscsCaseData.getSscsHearingRecordingCaseData().setOtherPartyHearingRecordingReq(otherPartyHearingRecordingReq);
 
@@ -377,30 +377,30 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
         }
     }
 
-    private void setRefusedHearingsForParty(PartyItemList party) {
+    public static void setRefusedHearingsForParty(SscsCaseData sscsCaseData, PartyItemList party) {
         sscsCaseData.getSscsHearingRecordingCaseData().setRefusedHearings(List.of(hearingRecordingRequest(party)));
     }
 
-    private HearingRecordingRequest hearingRecordingRequest(PartyItemList party) {
+    private static HearingRecordingRequest hearingRecordingRequest(PartyItemList party) {
         return HearingRecordingRequest.builder()
                 .value(HearingRecordingRequestDetails.builder()
                         .requestingParty(party.getCode())
-                        .sscsHearingRecording(recording("an_id1").getValue())
+                        .sscsHearingRecording(recording("1").getValue())
                         .build())
                 .build();
     }
 
     @NotNull
-    private DynamicList getDynamicList(PartyItemList party, PartyItemList partyItemList, boolean setRefusedForParty) {
+    private static DynamicList getDynamicList(PartyItemList party, PartyItemList partyItemList, boolean setRefusedForParty) {
         return new DynamicList(refusedSelectedIfTrueElseGranted(party.equals(partyItemList) && setRefusedForParty), getListItems());
     }
 
     @NotNull
-    private List<DynamicListItem> getListItems() {
+    private static List<DynamicListItem> getListItems() {
         return List.of(REFUSED, GRANTED).stream().map(s -> new DynamicListItem(s.getLabel(), s.getLabel())).collect(Collectors.toList());
     }
 
-    private DynamicListItem refusedSelectedIfTrueElseGranted(boolean trueIfRefused) {
+    private static DynamicListItem refusedSelectedIfTrueElseGranted(boolean trueIfRefused) {
         RequestStatus status = trueIfRefused ? REFUSED : GRANTED;
         return new DynamicListItem(status.getLabel(), status.getLabel());
     }
