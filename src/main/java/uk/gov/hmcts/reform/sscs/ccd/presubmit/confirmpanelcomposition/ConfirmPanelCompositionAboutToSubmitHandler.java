@@ -30,17 +30,24 @@ public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCal
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
                                                           String userAuthorisation) {
 
+        if (!canHandle(callbackType, callback)) {
+            throw new IllegalStateException("Cannot handle callback");
+        }
+
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        processInterloc(sscsCaseData);
+        return response;
+    }
+
+    private void processInterloc(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getIsFqpmRequired() != null && sscsCaseData.getInterlocReviewState() != null
                 && sscsCaseData.getInterlocReviewState().equals(InterlocReviewState.REVIEW_BY_JUDGE.getId())) {
             sscsCaseData.setInterlocReferralReason(null);
             sscsCaseData.setInterlocReviewState(null);
         }
-
-        return response;
     }
 }
