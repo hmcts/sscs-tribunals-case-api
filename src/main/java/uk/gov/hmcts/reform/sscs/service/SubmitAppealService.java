@@ -370,6 +370,8 @@ public class SubmitAppealService {
         if (Boolean.TRUE.equals(forceCreate)) {
             result = citizenCcdService.createDraft(caseData, idamTokens);
         } else {
+            log.info("Auth:" + idamTokens.getIdamOauth2Token());
+            log.info("ServiceAuth:" + idamTokens.getServiceAuthorization());
             result = citizenCcdService.saveCase(caseData, idamTokens);
         }
 
