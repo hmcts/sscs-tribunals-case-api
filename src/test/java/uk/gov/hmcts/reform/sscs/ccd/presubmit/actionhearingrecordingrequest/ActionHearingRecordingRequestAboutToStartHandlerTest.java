@@ -69,7 +69,7 @@ public class ActionHearingRecordingRequestAboutToStartHandlerTest {
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
     }
 
-    static SscsHearingRecording recording(String hearingId) {
+    public static SscsHearingRecording recording(String hearingId) {
         final Hearing hearing = getHearing(hearingId);
         return SscsHearingRecording.builder()
                 .value(SscsHearingRecordingDetails.builder()
@@ -150,7 +150,7 @@ public class ActionHearingRecordingRequestAboutToStartHandlerTest {
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 
-    private SscsHearingRecording getHearingRecording(String id) {
+    public static SscsHearingRecording getHearingRecording(String id) {
         return SscsHearingRecording.builder()
                 .value(SscsHearingRecordingDetails.builder().hearingId(id).build())
                 .build();

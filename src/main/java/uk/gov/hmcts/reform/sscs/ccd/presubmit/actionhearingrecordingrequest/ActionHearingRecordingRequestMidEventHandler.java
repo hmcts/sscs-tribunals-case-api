@@ -189,7 +189,7 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
     private List<CcdValue<DocumentLink>> getRecordings(Hearing h, List<SscsHearingRecording> sscsHearingRecordings) {
         return emptyIfNull(sscsHearingRecordings).stream()
                 .filter(s -> s.getValue().getHearingId().equals(h.getValue().getHearingId()))
-                .flatMap(s -> s.getValue().getRecordings().stream())
+                .flatMap(s -> emptyIfNull(s.getValue().getRecordings()).stream())
                 .map(r -> CcdValue.<DocumentLink>builder().value(r.getValue()).build())
                 .collect(Collectors.toList());
     }
