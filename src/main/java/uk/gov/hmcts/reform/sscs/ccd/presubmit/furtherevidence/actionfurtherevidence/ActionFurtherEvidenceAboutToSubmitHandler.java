@@ -220,7 +220,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private void checkForWarnings(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if ((null != preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeAppellant()
+        if (isConfidentialChildSupportCase(preSubmitCallbackResponse.getData())
+            || (null != preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeAppellant()
                 && GRANTED
                 .equals(preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeAppellant().getRequestOutcome())
                 && APPELLANT.getCode()
@@ -236,6 +237,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
     }
 
+    private boolean isConfidentialChildSupportCase(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getAppeal().getBenefitType() != null
+                && Benefit.CHILD_SUPPORT.getShortName().equalsIgnoreCase(sscsCaseData.getAppeal().getBenefitType().getCode())
+                && YesNo.YES.equals(sscsCaseData.getIsConfidentialCase());
+    }
 
     private boolean isFurtherEvidenceActionCode(DynamicList furtherEvidenceActionList, String code) {
         if (furtherEvidenceActionList != null && furtherEvidenceActionList.getValue() != null
