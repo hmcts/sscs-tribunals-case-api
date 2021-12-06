@@ -111,7 +111,6 @@ public class OnlineHearingService {
             for (CcdValue<OtherParty> op : emptyIfNull(sscsCaseDetails.getData().getOtherParties())) {
                 Map<UserType, Subscription> otherPartySubscriptions = getOtherPartySubscriptionMap(op);
                 if (isSignInSubscription(otherPartySubscriptions.values(), tya, email)) {
-<<<<<<< HEAD
                     return populateUserDetails(UserType.OTHER_PARTY, op.getValue().getName(),
                             op.getValue().getAddress(),
                             Optional.ofNullable(op.getValue().getContact()),
