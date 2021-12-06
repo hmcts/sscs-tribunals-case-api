@@ -963,6 +963,26 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenAConfidentialChildSupportCase_thenDisplayWarningWhenActionFurtherEvidenceEventTriggered() {
+        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setIsConfidentialCase(YesNo.YES);
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+        List<ScannedDocument> docs = new ArrayList<>();
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+
+        assertEquals(1, response.getWarnings().size());
+        assertEquals("This case has a confidentiality flag, ensure any evidence from the appellant (or appointee) has confidential information redacted", response.getWarnings().iterator().next());
+    }
+
+    @Test
     public void givenAnAppellantHasConfidentialityRequestGrantedAndJointPartySendsFurtherEvidence_thenDisplayWarningWhenActionFurtherEvidenceEventTriggered() {
         sscsCaseData.setConfidentialityRequestOutcomeAppellant(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(JOINT_PARTY.getCode(), JOINT_PARTY.getLabel()));
@@ -984,6 +1004,24 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setConfidentialityRequestOutcomeJointParty(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+        List<ScannedDocument> docs = new ArrayList<>();
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size());
+    }
+
+    @Test
+    public void givenANonConfidentialChildSupportCase_thenDoNotDisplayWarningWhenActionFurtherEvidenceEventTriggered() {
+        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setIsConfidentialCase(YesNo.NO);
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
                 ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
