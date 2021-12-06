@@ -100,36 +100,25 @@ public class OnlineHearingService {
     }
 
     private UserDetails convertUserDetails(SscsCaseDetails sscsCaseDetails, String tya, String email, boolean onlyForAppellant) {
-        Address address = null;
-        Optional<Contact> contact = Optional.empty();
-        Name name = null;
-        Map<UserType,Subscription> subscriptionsMap = null;
-        UserType type = null;
-
         Map<UserType, Subscription> appellantSubscriptions = getAppealSubscriptionMap(sscsCaseDetails);
 
         if (onlyForAppellant || isSignInSubscription(appellantSubscriptions.values(), tya, email)) {
-            address =  sscsCaseDetails.getData().getAppeal().getAppellant().getAddress();
-            contact = Optional.ofNullable(sscsCaseDetails.getData().getAppeal().getAppellant().getContact());
-            name = sscsCaseDetails.getData().getAppeal().getAppellant().getName();
-            subscriptionsMap = appellantSubscriptions;
-            type = UserType.APPELLANT;
+            return populateUserDetails(UserType.APPELLANT, sscsCaseDetails.getData().getAppeal().getAppellant().getName(),
+                    sscsCaseDetails.getData().getAppeal().getAppellant().getAddress(),
+                    Optional.ofNullable(sscsCaseDetails.getData().getAppeal().getAppellant().getContact()),
+                    appellantSubscriptions);
         } else {
             for (CcdValue<OtherParty> op : emptyIfNull(sscsCaseDetails.getData().getOtherParties())) {
                 Map<UserType, Subscription> otherPartySubscriptions = getOtherPartySubscriptionMap(op);
                 if (isSignInSubscription(otherPartySubscriptions.values(), tya, email)) {
-                    address =  op.getValue().getAddress();
-                    contact = Optional.ofNullable(op.getValue().getContact());
-                    name = op.getValue().getName();
-                    subscriptionsMap = otherPartySubscriptions;
-                    type = UserType.OTHER_PARTY;
-                    break;
+                    return populateUserDetails(UserType.OTHER_PARTY, op.getValue().getName(),
+                            op.getValue().getAddress(),
+                            Optional.ofNullable(op.getValue().getContact()),
+                            otherPartySubscriptions);
                 }
             }
         }
-
-        assert address != null;
-        return populateUserDetails(type, name, address, contact, subscriptionsMap);
+        return null;
     }
 
     @NotNull
