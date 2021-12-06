@@ -91,8 +91,6 @@ public class SubmitAppealService {
         appeal.setCaseType("draft");
 
         IdamTokens idamTokens = getUserTokens(oauth2Token);
-        log.info("Auth:" + idamTokens.getIdamOauth2Token());
-        log.info("ServiceAuth:" + idamTokens.getServiceAuthorization());
         if (!hasValidCitizenRole(idamTokens)) {
             throw new ApplicationErrorException(new Exception("User has a invalid role"));
         }
