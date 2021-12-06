@@ -3,15 +3,19 @@ package uk.gov.hmcts.reform.sscs.util;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
-import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.apache.commons.lang3.tuple.Pair;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
@@ -79,5 +83,26 @@ public class PartiesOnCaseUtil {
         return sscsCaseData.getBenefitType()
                 .filter(f -> f == Benefit.CHILD_SUPPORT)
                 .isPresent();
+    }
+
+    public static List<Pair<String, String>> getAllOtherPartiesOnCase(SscsCaseData sscsCaseData) {
+        return emptyIfNull(sscsCaseData.getOtherParties()).stream()
+                .map(CcdValue::getValue)
+                .flatMap(PartiesOnCaseUtil::getOtherPartyIdAndName)
+                .collect(Collectors.toList());
+    }
+
+    private static Stream<Pair<String, String>> getOtherPartyIdAndName(OtherParty otherParty) {
+        List<Pair<String, String>> otherParties = new ArrayList<>();
+        if (isYes(otherParty.getIsAppointee()) && null != otherParty.getAppointee()) {
+            otherParties.add(Pair.of(otherParty.getAppointee().getId(), otherParty.getAppointee().getName().getFullNameNoTitle() + " - Appointee"));
+        } else {
+            otherParties.add(Pair.of(otherParty.getId(), otherParty.getName().getFullNameNoTitle()));
+        }
+
+        if (null != otherParty.getRep() && isYes(otherParty.getRep().getHasRepresentative())) {
+            otherParties.add(Pair.of(otherParty.getRep().getId(), otherParty.getRep().getName().getFullNameNoTitle() + " - Representative"));
+        }
+        return otherParties.stream();
     }
 }
