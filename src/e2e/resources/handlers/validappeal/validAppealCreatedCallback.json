@@ -205,6 +205,19 @@
       "benefitCode": "002",
       "generatedEmail": "sscstest+notify@greencroftconsulting.com",
       "sscsDocument": [
+        {
+          "id": "cd75ad65-b54c-48ca-b87a-8f04188fb63a",
+          "value": {
+            "documentLink": {
+              "document_url": "http://dm-store:5005/documents/6aa7f7cd-7488-43a7-897e-f2b06e7aa328",
+              "document_filename": "Bloggs_NOW.pdf",
+              "document_binary_url": "http://dm-store:5005/documents/6aa7f7cd-7488-43a7-897e-f2b06e7aa328/binary"
+            },
+            "documentType": "sscs1",
+            "documentFileName": "Bloggs_NOW.pdf",
+            "documentDateAdded": "2019-10-21"
+          }
+        }
       ],
       "interlocReferralDate": "2019-10-21",
       "linkedCasesBoolean": "No",
@@ -1068,6 +1081,11 @@
           "scheduleHearing": "Yes",
           "signLanguageType": "Sign language",
           "languageInterpreter": "Yes"
+        },
+        "hearingSubtype": {
+          "wantsHearingTypeVideo": "No",
+          "wantsHearingTypeTelephone": "No",
+          "wantsHearingTypeFaceToFace": "Yes"
         }
       },
       "benefitCode": "002",
