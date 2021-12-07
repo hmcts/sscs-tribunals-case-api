@@ -418,7 +418,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         };
     }
 
-    private DynamicList buildOriginalSenderItemListForGivenOption(String code, String label) {
+    protected static DynamicList buildOriginalSenderItemListForGivenOption(String code, String label) {
         DynamicListItem value = new DynamicListItem(code, label);
         return new DynamicList(value, Collections.singletonList(value));
     }
