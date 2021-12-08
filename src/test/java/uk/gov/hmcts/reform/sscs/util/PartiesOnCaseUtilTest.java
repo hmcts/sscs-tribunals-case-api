@@ -134,7 +134,7 @@ public class PartiesOnCaseUtilTest {
     @Test
     public void getAllOtherPartiesOnCasesOnCaseWithIdAndNames() {
         setupOtherParties();
-        final List<Pair<String, String>> allOtherPartiesOnCase = PartiesOnCaseUtil.getAllOtherPartiesOnCase(sscsCaseData);
+        final List<Pair<String, String>> allOtherPartiesOnCase = PartiesOnCaseUtil.getAllOtherPartiesWithIdOnCase(sscsCaseData);
         assertThat(allOtherPartiesOnCase.size(), is(4));
         assertThat(allOtherPartiesOnCase.get(0), is(Pair.of("2", "Silva Lining - Appointee")));
         assertThat(allOtherPartiesOnCase.get(1), is(Pair.of("3", "Harry Rep - Representative")));

@@ -7,7 +7,13 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.APPELLANT;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.DWP;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.HMCTS;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.JOINT_PARTY;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY_REPRESENTATIVE;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.REPRESENTATIVE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +91,23 @@ public class PartiesOnCaseUtil {
                 .isPresent();
     }
 
-    public static List<Pair<String, String>> getAllOtherPartiesOnCase(SscsCaseData sscsCaseData) {
+    public static List<String> getAllOtherPartiesOnCase(SscsCaseData sscsCaseData) {
+        List<String> otherParties = new ArrayList<>();
+        for (CcdValue<OtherParty> otherParty : sscsCaseData.getOtherParties()) {
+
+            otherParties.add(otherParty.getValue().getName().getFullName());
+
+            if ("Yes".equals(otherParty.getValue().getIsAppointee()) && null != otherParty.getValue().getAppointee()) {
+                otherParties.add(otherParty.getValue().getAppointee().getName().getFullName() + " - Appointee");
+            }
+            if (null != otherParty.getValue().getRep() && "Yes".equals(otherParty.getValue().getRep().getHasRepresentative())) {
+                otherParties.add(otherParty.getValue().getRep().getName().getFullName() + " - Representative");
+            }
+        }
+        return otherParties;
+    }
+
+    public static List<Pair<String, String>> getAllOtherPartiesWithIdOnCase(SscsCaseData sscsCaseData) {
         return emptyIfNull(sscsCaseData.getOtherParties()).stream()
                 .map(CcdValue::getValue)
                 .flatMap(PartiesOnCaseUtil::getOtherPartyIdAndName)

@@ -4,7 +4,7 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
-import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getAllOtherPartiesOnCase;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getAllOtherPartiesWithIdOnCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,7 @@ public class ReissueDocumentAboutToStartHandler implements PreSubmitCallbackHand
     }
 
     private List<CcdValue<ReissueDocumentOtherParty>> getReissueDocumentOtherParty(SscsCaseData sscsCaseData) {
-        return getAllOtherPartiesOnCase(sscsCaseData).stream()
+        return getAllOtherPartiesWithIdOnCase(sscsCaseData).stream()
                 .map(pair -> new CcdValue<>(ReissueDocumentOtherParty.builder().otherPartyName(pair.getRight()).otherPartyId(pair.getLeft()).build()))
                 .collect(Collectors.toList());
     }
