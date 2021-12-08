@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState;
+import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @Component
@@ -35,6 +36,7 @@ public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHa
     public static final String POSTPONEMENTS_REVIEWED_BY_TCW = "Postponement requests need to be reviewed by TCW";
     public static final String POSTPONEMENT_IN_HEARING_STATE = "You can only submit a postponement request on cases in 'hearing' state";
     public static final String ONLY_ONE_POSTPONEMENT_AT_A_TIME = "Only one request for postponement can be submitted at a time";
+    public static final String OTHER_PARTY_ORIGINAL_PARTY_ERROR = "You cannot select 'Other party hearing preferences' as a Document Type as an Other party not selected from Original Sender list";
     private final FooterService footerService;
 
     @Autowired
@@ -72,6 +74,7 @@ public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHa
         }
 
         validatePostponementRequests(caseDetails, sscsCaseData, preSubmitCallbackResponse);
+        validateOtherPartyHearingPartyRequests(sscsCaseData, preSubmitCallbackResponse);
 
         return preSubmitCallbackResponse;
     }
@@ -91,6 +94,21 @@ public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHa
 
             if (!caseDetails.getState().equals(State.HEARING)) {
                 preSubmitCallbackResponse.addError(POSTPONEMENT_IN_HEARING_STATE);
+            }
+        }
+    }
+
+    private void validateOtherPartyHearingPartyRequests(SscsCaseData sscsCaseData,
+                                              PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+
+        Optional<ScannedDocument> otherPartyHearingPreferenceDoc = emptyIfNull(sscsCaseData.getScannedDocuments()).stream()
+                .filter(doc -> StringUtils.isNotBlank(doc.getValue().getType())
+                        && doc.getValue().getType().equals(DocumentType.OTHER_PARTY_HEARING_PREFERENCES.getValue())).findAny();
+
+        if (otherPartyHearingPreferenceDoc.isPresent()) {
+
+            if (!PartyItemList.isOtherPartyItemType(sscsCaseData.getOriginalSender().getValue().getCode())) {
+                preSubmitCallbackResponse.addError(OTHER_PARTY_ORIGINAL_PARTY_ERROR);
             }
         }
     }

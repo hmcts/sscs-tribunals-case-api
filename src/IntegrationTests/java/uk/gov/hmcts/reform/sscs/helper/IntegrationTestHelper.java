@@ -22,6 +22,10 @@ public class IntegrationTestHelper {
 
     }
 
+    public static MockHttpServletRequestBuilder getRequestWithAuthHeader(String json, CallbackType callbackType, String pageId) {
+        return getRequestWithAuthHeader(json, getEndpoint(callbackType) + "?pageId=" + pageId);
+    }
+
     public static MockHttpServletRequestBuilder getRequestWithAuthHeader(String json, CallbackType callbackType) {
         return getRequestWithAuthHeader(json, getEndpoint(callbackType));
     }

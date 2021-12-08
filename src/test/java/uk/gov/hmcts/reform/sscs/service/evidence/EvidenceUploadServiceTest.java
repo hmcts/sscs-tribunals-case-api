@@ -133,11 +133,10 @@ public class EvidenceUploadServiceTest {
 
     @Test
     @Parameters(method =
-//            "evidenceUploadByAppellantScenario, evidenceUploadByRepScenario, "
-//            + "evidenceUploadByJointPartyScenario, evidenceUploadByAppellantWithOtherSubscribersPresenceScenario, " +
-//            "evidenceUploadByOtherPartyPresenceScenario, " +
-//            "evidenceUploadByOtherPartyRepPresenceScenario, " +
-              "evidenceUploadByOtherPartyAppointeePresenceScenario")
+            "evidenceUploadByAppellantScenario, evidenceUploadByRepScenario, "
+                    + "evidenceUploadByJointPartyScenario, evidenceUploadByAppellantWithOtherSubscribersPresenceScenario,"
+                    + "evidenceUploadByOtherPartyPresenceScenario, evidenceUploadByOtherPartyRepPresenceScenario,"
+                    + "evidenceUploadByOtherPartyAppointeePresenceScenario")
     public void givenANonCorCaseWithScannedDocumentsAndDraftDocument_thenMoveDraftToScannedDocumentsAndUpdateCaseInCcd(
             SscsCaseDetails sscsCaseDetails, EvidenceDescription someDescription, String expectedEvidenceUploadFilename)
         throws IOException {
