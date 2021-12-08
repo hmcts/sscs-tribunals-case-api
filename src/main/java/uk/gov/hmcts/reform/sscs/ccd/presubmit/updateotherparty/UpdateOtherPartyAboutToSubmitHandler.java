@@ -38,6 +38,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
         List<CcdValue<OtherParty>> otherParties = sscsCaseData.getOtherParties();
         updateOtherPartyUcb(sscsCaseData);
         assignOtherPartyId(otherParties);
+        checkConfidentiality(sscsCaseData);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
