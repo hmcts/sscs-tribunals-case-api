@@ -201,15 +201,15 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
     }
 
     private void validateRequest(ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response) {
-        validateParty(PartyItemList.APPELLANT, processHearingRecordingRequest, response);
-        validateParty(PartyItemList.DWP, processHearingRecordingRequest, response);
+        validateParty(PartyItemList.APPELLANT, null, processHearingRecordingRequest, response);
+        validateParty(PartyItemList.DWP, null, processHearingRecordingRequest, response);
         if (response.getData().isThereAJointParty()) {
-            validateParty(PartyItemList.JOINT_PARTY, processHearingRecordingRequest, response);
+            validateParty(PartyItemList.JOINT_PARTY, null, processHearingRecordingRequest, response);
         }
         boolean caseHasARepresentative = isYes(ofNullable(response.getData().getAppeal().getRep()).map(Representative::getHasRepresentative).orElse(NO.getValue()));
 
         if (caseHasARepresentative) {
-            validateParty(PartyItemList.REPRESENTATIVE, processHearingRecordingRequest, response);
+            validateParty(PartyItemList.REPRESENTATIVE, null, processHearingRecordingRequest, response);
         }
         if (response.getData().getOtherParties() != null && response.getData().getOtherParties().size() > 0) {
             validateOtherPartyUiData(response);
@@ -228,14 +228,14 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
         response.addError("Please do not use the remove buttons within this event. You may need to start again.");
     }
 
-    private void validateParty(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response) {
+    private void validateParty(PartyItemList party, String otherPartyId, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response) {
         Optional<Hearing> hearingOptional = getHearingFromHearingRecordingRequest(processHearingRecordingRequest, response);
-        hearingOptional.ifPresent(hearing -> validateHearing(party, processHearingRecordingRequest, response, hearing));
+        hearingOptional.ifPresent(hearing -> validateHearing(party, otherPartyId, processHearingRecordingRequest, response, hearing));
     }
 
-    private void validateHearing(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response, Hearing hearing) {
-        final Optional<RequestStatus> requestStatus = actionHearingRecordingRequestService.getRequestStatus(party, hearing, response.getData());
-        final Optional<RequestStatus> changedRequestStatus = actionHearingRecordingRequestService.getChangedRequestStatus(party, processHearingRecordingRequest);
+    private void validateHearing(PartyItemList party, String otherPartyId, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response, Hearing hearing) {
+        final Optional<RequestStatus> requestStatus = actionHearingRecordingRequestService.getRequestStatus(party, otherPartyId, hearing, response.getData());
+        final Optional<RequestStatus> changedRequestStatus = actionHearingRecordingRequestService.getChangedRequestStatus(party, otherPartyId, processHearingRecordingRequest);
         if (requestStatus.isPresent() && changedRequestStatus.isPresent()) {
             validateIfRequestStatusChangedFromGrantedToRefused(requestStatus.get(), changedRequestStatus.get(), response);
             validateIfRequestStatusChangedFromRefusedToGranted(requestStatus.get(), changedRequestStatus.get(), response);
