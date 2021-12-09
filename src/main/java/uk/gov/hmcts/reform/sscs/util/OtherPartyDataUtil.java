@@ -7,8 +7,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
