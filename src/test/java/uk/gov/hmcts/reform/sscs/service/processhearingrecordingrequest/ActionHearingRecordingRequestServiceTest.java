@@ -93,7 +93,7 @@ public class ActionHearingRecordingRequestServiceTest {
             "DWP, GRANTED",  "DWP, REFUSED", "DWP, REQUESTED",
             "JOINT_PARTY, GRANTED", "JOINT_PARTY, REFUSED", "JOINT_PARTY, REQUESTED"})
     public void getChangedRequestStatus(PartyItemList party, RequestStatus status) {
-        final Optional<RequestStatus> changedRequestStatus = service.getChangedRequestStatus(party, null, processHearingRecordingRequests(status));
+        final Optional<RequestStatus> changedRequestStatus = service.getChangedRequestStatus(party, null, processHearingRecordingRequests(status), null);
         assertThat(changedRequestStatus.isPresent(), is(true));
         assertThat(changedRequestStatus.get(), is(status));
     }

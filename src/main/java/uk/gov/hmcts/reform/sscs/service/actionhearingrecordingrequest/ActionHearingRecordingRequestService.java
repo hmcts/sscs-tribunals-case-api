@@ -63,50 +63,40 @@ public class ActionHearingRecordingRequestService {
                 r.getValue().getRequestingParty().equals(party.getCode());
     }
 
-    public Optional<RequestStatus> getChangedRequestStatus(PartyItemList party, String otherPartyId, ProcessHearingRecordingRequest processHearingRecordingRequest) {
+    public Optional<RequestStatus> getChangedRequestStatus(PartyItemList party, String otherPartyId, ProcessHearingRecordingRequest processHearingRecordingRequest, List<OtherPartyHearingRecordingReqUi> otherPartyHearingRecordingReqUi) {
         switch (party) {
             case DWP:
-                return toRequestStatus(processHearingRecordingRequest.getDwp());
+                return toRequestStatus(Optional.ofNullable(processHearingRecordingRequest.getDwp()));
             case JOINT_PARTY:
-                return toRequestStatus(processHearingRecordingRequest.getJointParty());
+                return toRequestStatus(Optional.ofNullable(processHearingRecordingRequest.getJointParty()));
             case REPRESENTATIVE:
-                return toRequestStatus(processHearingRecordingRequest.getRep());
+                return toRequestStatus(Optional.ofNullable(processHearingRecordingRequest.getRep()));
             case OTHER_PARTY:
-                return toRequestStatus(getOtherPartyRequest(otherPartyId, processHearingRecordingRequest), PartyItemList.OTHER_PARTY);
+                return toRequestStatus(getOtherPartyRequest(otherPartyId, otherPartyHearingRecordingReqUi, processHearingRecordingRequest));
             case OTHER_PARTY_REPRESENTATIVE:
-                return toRequestStatus(getOtherPartyRequest(otherPartyId, processHearingRecordingRequest), PartyItemList.OTHER_PARTY_REPRESENTATIVE);
+                return toRequestStatus(getOtherPartyRequest(otherPartyId, otherPartyHearingRecordingReqUi, processHearingRecordingRequest));
             case APPELLANT: default:
-                return toRequestStatus(processHearingRecordingRequest.getAppellant());
+                return toRequestStatus(Optional.ofNullable(processHearingRecordingRequest.getAppellant()));
         }
     }
 
-    private Optional<OtherPartyRequest> getOtherPartyRequest(String otherPartyId, ProcessHearingRecordingRequest processHearingRecordingRequest) {
-        return processHearingRecordingRequest.getValue().getOtherPartyRequests().stream()
-                .map(CcdValue::getValue)
-                .filter(r -> r.getOtherParty().getId().equals(otherPartyId))
+    private Optional<DynamicList> getOtherPartyRequest(String otherPartyId, List<OtherPartyHearingRecordingReqUi> otherPartyHearingRecordingReqUi, ProcessHearingRecordingRequest processHearingRecordingRequest) {
+        return otherPartyHearingRecordingReqUi.stream()
+                .map(OtherPartyHearingRecordingReqUi::getValue)
+                .filter(r -> r.getOtherPartyId().equals(otherPartyId))
+                .map(OtherPartyHearingRecordingReqUiDetails::getHearingRecordingStatus)
                 .findFirst();
     }
 
-    private Optional<RequestStatus> toRequestStatus(DynamicList dynamicList) {
-        if (dynamicList != null && dynamicList.getValue() != null && dynamicList.getValue().getCode() != null) {
+    private Optional<RequestStatus> toRequestStatus(Optional<DynamicList> dynamicList) {
+        if (dynamicList.isPresent() && dynamicList.get().getValue() != null && dynamicList.get().getValue().getCode() != null) {
             return Arrays.stream(RequestStatus.values())
-                    .filter(s -> s.getLabel().equals(dynamicList.getValue().getCode()))
+                    .filter(s -> s.getLabel().equals(dynamicList.get().getValue().getCode()))
                     .findFirst();
         }
         return Optional.empty();
     }
 
-    private Optional<RequestStatus> toRequestStatus(Optional<OtherPartyRequest> request, PartyItemList party) {
-        if (request.isPresent()) {
-            DynamicList dynamicList = PartyItemList.OTHER_PARTY.equals(party) ? request.get().getRequestStatus() : request.get().getRepRequestStatus();
-            if (dynamicList != null && dynamicList.getValue() != null && dynamicList.getValue().getCode() != null) {
-                return Arrays.stream(RequestStatus.values())
-                        .filter(s -> s.getLabel().equals(dynamicList.getValue().getCode()))
-                        .findFirst();
-            }
-        }
-        return Optional.empty();
-    }
 
     @NotNull
     public String getFormattedHearingInformation(Hearing hearing) {

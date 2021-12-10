@@ -8,7 +8,6 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
@@ -84,83 +83,6 @@ public class ActionHearingRecordingRequestAboutToStartHandler implements PreSubm
         return hearing.getValue().getVenue().getName() + " "
                 + checkHearingTime(hearing.getValue().getTime()) + " "
                 + LocalDate.parse(hearing.getValue().getHearingDate(), formatter).format(resultFormatter);
-    }
-
-    private ProcessHearingRecordingRequest getProcessHearingRecordingRequest(Hearing h, SscsCaseData sscsCaseData) {
-        DynamicList dwp = toDynamicList(PartyItemList.DWP, null, h, sscsCaseData);
-        DynamicList jointParty = toDynamicList(PartyItemList.JOINT_PARTY, null, h, sscsCaseData);
-        DynamicList appellant = toDynamicList(PartyItemList.APPELLANT, null, h, sscsCaseData);
-        DynamicList rep = toDynamicList(PartyItemList.REPRESENTATIVE, null, h, sscsCaseData);
-        ProcessHearingRecordingRequestDetails value = new ProcessHearingRecordingRequestDetails(h.getValue().getHearingId(),
-                selectHearingTitle(h, sscsCaseData.getHearings()),
-                actionHearingRecordingRequestService.getFormattedHearingInformation(h),
-                getRecordings(h, sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings()),
-                dwp,
-                jointParty,
-                appellant,
-                rep,
-                getRequestedOtherParties(h, sscsCaseData)
-        );
-        return new ProcessHearingRecordingRequest(value);
-    }
-
-    private List<CcdValue<OtherPartyRequest>> getRequestedOtherParties(Hearing h, SscsCaseData sscsCaseData) {
-        return sscsCaseData.getOtherParties().stream().map(CcdValue::getValue)
-                .map(op -> toOtherPartyRequest(op, h, sscsCaseData))
-                .collect(Collectors.toList());
-    }
-
-    private CcdValue<OtherPartyRequest> toOtherPartyRequest(OtherParty otherParty, Hearing h, SscsCaseData sscsCaseData) {
-        DynamicList requestStatus = toDynamicList(PartyItemList.OTHER_PARTY, otherParty.getId(), h, sscsCaseData);
-        DynamicList repRequestStatus = null;
-        if (otherParty.hasRepresentative() && otherParty.getRep() != null && otherParty.getRep().getId() != null) {
-            repRequestStatus = toDynamicList(PartyItemList.OTHER_PARTY_REPRESENTATIVE, otherParty.getRep().getId(), h, sscsCaseData);
-        }
-
-        return CcdValue.<OtherPartyRequest>builder()
-                .value(OtherPartyRequest.builder()
-                        .otherParty(otherParty)
-                        .hasOtherPartyRep(repRequestStatus == null ? YesNo.NO.getValue() : YesNo.YES.getValue())
-                        .requestStatus(requestStatus)
-                        .repRequestStatus(repRequestStatus)
-                        .build())
-                .build();
-    }
-
-    private DynamicList toDynamicList(PartyItemList party, String otherPartyId, Hearing h, SscsCaseData sscsCaseData) {
-        final Optional<RequestStatus> partyStatus = actionHearingRecordingRequestService.getRequestStatus(party, otherPartyId, h, sscsCaseData);
-        final DynamicListItem selected = partyStatus
-                .map(this::toDynamicListItem)
-                .orElse(new DynamicListItem("", ""));
-
-        List<DynamicListItem> others = List.of(GRANTED, REFUSED, REQUESTED).stream()
-                .filter(status -> isPartyStatusRequestedOrOtherOptions(partyStatus, status))
-                .map(this::toDynamicListItem)
-                .collect(Collectors.toList());
-
-        return new DynamicList(selected, others);
-
-    }
-
-    private boolean isPartyStatusRequestedOrOtherOptions(Optional<RequestStatus> partyStatus, RequestStatus status) {
-        return !status.equals(REQUESTED) || isPartyStatusRequested(partyStatus);
-    }
-
-    private boolean isPartyStatusRequested(Optional<RequestStatus> partyStatus) {
-        return partyStatus.filter(s -> s.equals(REQUESTED)).isPresent();
-    }
-
-    private DynamicListItem toDynamicListItem(RequestStatus rs) {
-        return new DynamicListItem(rs.getLabel(), rs.getLabel());
-    }
-
-
-    private List<CcdValue<DocumentLink>> getRecordings(Hearing h, List<SscsHearingRecording> sscsHearingRecordings) {
-        return emptyIfNull(sscsHearingRecordings).stream()
-                .filter(s -> s.getValue().getHearingId().equals(h.getValue().getHearingId()))
-                .flatMap(s -> s.getValue().getRecordings().stream())
-                .map(r -> CcdValue.<DocumentLink>builder().value(r.getValue()).build())
-                .collect(Collectors.toList());
     }
 
     @NotNull
