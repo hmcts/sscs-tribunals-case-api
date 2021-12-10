@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service.evidence;
 
 import static java.util.Collections.singletonList;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
 import static org.mockito.AdditionalMatchers.and;
@@ -300,12 +299,18 @@ public class EvidenceUploadServiceTest {
     @Test
     public void testBuildScannedDocumentByGivenSscsDoc() {
         SscsCaseData sscsCaseData = createSscsCaseDetailsDraftDocsJustDescription("EvidenceDescription.pdf").getData();
-
+        sscsCaseData.setOtherParties(List.of(new CcdValue<>(OtherParty.builder()
+                .id("1")
+                .name(Name.builder().firstName("John").lastName("Smith").build())
+                .otherPartySubscription(Subscription.builder().email("op@email.com").build())
+                .build())));
         SscsDocument evidenceDescriptionDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentDateAdded("2021-01-30")
                 .documentLink(DocumentLink.builder().documentBinaryUrl("url/binary").documentFilename("description.pdf").documentUrl("url").build()).build()).build();
 
-        evidenceUploadService.buildUploadedDocumentByGivenSscsDoc(sscsCaseData, evidenceDescriptionDocument, null, null);
+        evidenceUploadService.buildUploadedDocumentByGivenSscsDoc(sscsCaseData, evidenceDescriptionDocument, null, "op@email.com");
         assertEquals(1, sscsCaseData.getScannedDocuments().size());
+        assertThat(sscsCaseData.getScannedDocuments().get(0).getValue().getOriginalSenderOtherPartyId(), is("1"));
+        assertThat(sscsCaseData.getScannedDocuments().get(0).getValue().getOriginalSenderOtherPartyName(), is("John Smith"));
         assertNull(sscsCaseData.getAudioVideoEvidence());
     }
 
@@ -376,10 +381,16 @@ public class EvidenceUploadServiceTest {
     }
 
     @Test
-    @Parameters({JP_EMAIL + ", JOINT_PARTY", REP_EMAIL + ", REP", APPELLANT_EMAIL + ", APPELLANT",
-            OTHER_PARTY_EMAIL + ", OTHER_PARTY", OTHER_PARTY_REP_EMAIL + ", OTHER_PARTY_REP",
-            OTHER_PARTY_APPOINTEE_EMAIL + ", OTHER_PARTY_APPOINTEE"})
-    public void givenSscsDocAndAudio_thenSetTheUploaderFromSubscriptionEmail(String idamEmail, UploadParty uploader) {
+    @Parameters({
+            JP_EMAIL + ", JOINT_PARTY, null, null",
+            REP_EMAIL + ", REP, null, null",
+            APPELLANT_EMAIL + ", APPELLANT, null, null",
+            OTHER_PARTY_EMAIL + ", OTHER_PARTY, 1, Oyster Smith",
+            OTHER_PARTY_REP_EMAIL + ", OTHER_PARTY_REP, 2, Raj Smith",
+            OTHER_PARTY_APPOINTEE_EMAIL + ", OTHER_PARTY_APPOINTEE, 4, Apple Smith"})
+    public void givenSscsDocAndAudio_thenSetTheUploaderFromSubscriptionEmail(String idamEmail, UploadParty uploader,
+                                                                             @Nullable String otherPartyId,
+                                                                             @Nullable String otherPartyName) {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithCcdDocumentsSubscription();
         List<SscsDocument> audioVideoDocuments = new ArrayList<>();
         audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("audio2.mp3").build()).build());
@@ -389,8 +400,8 @@ public class EvidenceUploadServiceTest {
         evidenceUploadService.buildUploadedDocumentByGivenSscsDoc(sscsCaseDetails.getData(), draftSscsDocument, audioVideoDocuments, idamEmail);
         assertEquals(1, sscsCaseDetails.getData().getAudioVideoEvidence().size());
         assertEquals(uploader, sscsCaseDetails.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded());
-        assertEquals("1121", sscsCaseDetails.getData().getAudioVideoEvidence().get(0).getValue().getOriginalSenderOtherPartyId());
-        assertEquals("12121", sscsCaseDetails.getData().getAudioVideoEvidence().get(0).getValue().getOriginalSenderOtherPartyName());
+        assertEquals(otherPartyId, sscsCaseDetails.getData().getAudioVideoEvidence().get(0).getValue().getOriginalSenderOtherPartyId());
+        assertEquals(otherPartyName, sscsCaseDetails.getData().getAudioVideoEvidence().get(0).getValue().getOriginalSenderOtherPartyName());
     }
 
     private SscsDocument getCombinedEvidenceDoc(String combinedEvidenceFilename, String otherEvidenceDocType) {
@@ -596,6 +607,7 @@ public class EvidenceUploadServiceTest {
         sscsCaseDetails.getData().setAppeal(Appeal.builder().hearingType("sya").build());
         EvidenceDescription someDescription = new EvidenceDescription("some description",
                 "opAppointee@email.com");
+
         return new Object[]{new Object[]{sscsCaseDetails, someDescription, "Other party - Appointee Trinity Smith upload 1 - 123.pdf"}};
     }
 
@@ -727,18 +739,22 @@ public class EvidenceUploadServiceTest {
                         .build())
                 .otherParties(List.of(new CcdValue<>(OtherParty.builder()
                         .id("1")
+                        .name(Name.builder().firstName("Oyster").lastName("Smith").build())
                         .otherPartySubscription(Subscription.builder().email(OTHER_PARTY_EMAIL).build())
                         .rep(Representative.builder()
                                 .id("2")
+                                .name(Name.builder().firstName("Raj").lastName("Smith").build())
                                 .hasRepresentative(YesNo.YES.getValue())
                                 .build())
                         .otherPartyRepresentativeSubscription(Subscription.builder().email(OTHER_PARTY_REP_EMAIL).build())
                         .build()),
                         new CcdValue<>(OtherParty.builder()
                                 .id("3")
+                                .name(Name.builder().firstName("Orange").lastName("Smith").build())
                                 .isAppointee(YesNo.YES.getValue())
                                 .appointee(Appointee.builder()
                                         .id("4")
+                                        .name(Name.builder().firstName("Apple").lastName("Smith").build())
                                         .build())
                                 .otherPartyAppointeeSubscription(Subscription.builder().email(OTHER_PARTY_APPOINTEE_EMAIL).build())
                                 .build())))

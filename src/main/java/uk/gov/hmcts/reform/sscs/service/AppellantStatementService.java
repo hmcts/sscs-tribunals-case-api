@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyIdFromTya;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyNameFromTya;
+
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +29,10 @@ public class AppellantStatementService {
                 storeAppellantStatementService.storePdfAndUpdate(
                 caseDetails.getId(),
                 identifier,
-                new AppellantStatementPdfData(caseDetails, statement)
+                new AppellantStatementPdfData(caseDetails, statement,
+                        getOtherPartyIdFromTya(caseDetails.getData(), statement.getTya()),
+                        getOtherPartyNameFromTya(caseDetails.getData(), statement.getTya())
+                )
         ));
     }
 }

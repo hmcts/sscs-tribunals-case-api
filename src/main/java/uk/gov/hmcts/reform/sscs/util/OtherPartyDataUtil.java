@@ -1,17 +1,17 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 import static java.util.Collections.sort;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-
 
 public class OtherPartyDataUtil {
 
@@ -107,4 +107,67 @@ public class OtherPartyDataUtil {
         }
         return false;
     }
+
+    public static boolean isOtherPartyAppointee(SscsCaseData sscsCaseData, Predicate<Subscription> predicate) {
+        return emptyIfNull(sscsCaseData.getOtherParties()).stream()
+                .map(CcdValue::getValue)
+                .filter(otherParty -> isYes(otherParty.getIsAppointee()))
+                .filter(otherParty -> nonNull(otherParty.getAppointee()))
+                .filter(otherParty -> nonNull(otherParty.getOtherPartyAppointeeSubscription()))
+                .anyMatch(otherParty -> predicate.test(otherParty.getOtherPartyAppointeeSubscription()));
+    }
+
+    public static Predicate<Subscription> withEmailPredicate(String email) {
+        return (Subscription sub) -> email.equalsIgnoreCase(sub.getEmail());
+    }
+
+    public static Predicate<Subscription> withTyaPredicate(String tya) {
+        return (Subscription sub) -> tya.equalsIgnoreCase(sub.getTya());
+    }
+
+    public static  boolean isOtherPartyRep(SscsCaseData sscsCaseData, Predicate<Subscription> predicate) {
+        return emptyIfNull(sscsCaseData.getOtherParties()).stream()
+                .map(CcdValue::getValue)
+                .filter(otherParty -> nonNull(otherParty.getRep()))
+                .filter(otherParty -> isYes(otherParty.getRep().getHasRepresentative()))
+                .filter(otherParty -> nonNull(otherParty.getOtherPartyRepresentativeSubscription()))
+                .anyMatch(otherParty -> predicate.test(otherParty.getOtherPartyRepresentativeSubscription()));
+    }
+
+    public static boolean isOtherParty(SscsCaseData sscsCaseData, Predicate<Subscription> predicate) {
+        return emptyIfNull(sscsCaseData.getOtherParties()).stream()
+                .map(CcdValue::getValue)
+                .filter(otherParty -> isNoOrNull(otherParty.getIsAppointee()))
+                .filter(otherParty -> nonNull(otherParty.getOtherPartySubscription()))
+                .anyMatch(otherParty -> predicate.test(otherParty.getOtherPartySubscription()));
+    }
+
+    public static String getOtherPartyName(SscsCaseData sscsCaseData, Predicate<Subscription> predicate) {
+        return emptyIfNull(sscsCaseData.getOtherParties()).stream()
+                .map(CcdValue::getValue)
+                .flatMap(op -> Stream.of((op.hasAppointee()) ? Pair.of(op.getOtherPartyAppointeeSubscription(), op.getAppointee().getName()) : Pair.of(op.getOtherPartySubscription(), op.getName()), (op.hasRepresentative()) ? Pair.of(op.getOtherPartyRepresentativeSubscription(), op.getRep().getName()) : null))
+                .filter(Objects::nonNull)
+                .filter(p -> nonNull(p.getLeft()))
+                .filter(p -> nonNull(p.getLeft().getEmail()))
+                .filter(p -> nonNull(p.getRight()))
+                .filter(p -> predicate.test(p.getLeft()))
+                .map(Pair::getRight)
+                .map(Name::getFullNameNoTitle)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static String getOtherPartyId(SscsCaseData sscsCaseData, Predicate<Subscription> predicate) {
+        return emptyIfNull(sscsCaseData.getOtherParties()).stream()
+                .map(CcdValue::getValue)
+                .flatMap(op -> Stream.of((op.hasAppointee()) ? Pair.of(op.getOtherPartyAppointeeSubscription(), op.getAppointee().getId()) : Pair.of(op.getOtherPartySubscription(), op.getId()), (op.hasRepresentative()) ? Pair.of(op.getOtherPartyRepresentativeSubscription(), op.getRep().getId()) : null))
+                .filter(Objects::nonNull)
+                .filter(p -> nonNull(p.getLeft()))
+                .filter(p -> nonNull(p.getRight()))
+                .filter(p -> predicate.test(p.getLeft()))
+                .map(Pair::getRight)
+                .findFirst()
+                .orElse(null);
+    }
+
 }

@@ -10,7 +10,13 @@ public class EvidenceDescriptionPdfData extends PdfData {
     private final List<String> fileNames;
 
     public EvidenceDescriptionPdfData(SscsCaseDetails caseDetails, EvidenceDescription description, List<String> fileNames) {
-        super(caseDetails);
+        super(caseDetails, null, null);
+        this.description = description;
+        this.fileNames = fileNames;
+    }
+
+    public EvidenceDescriptionPdfData(SscsCaseDetails caseDetails, EvidenceDescription description, List<String> fileNames, String otherPartyId, String otherPartyName) {
+        super(caseDetails, otherPartyId, otherPartyName);
         this.description = description;
         this.fileNames = fileNames;
     }

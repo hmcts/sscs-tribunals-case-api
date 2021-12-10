@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.domain.UpdateDocParams;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -71,8 +72,16 @@ public abstract class StorePdfService<E, D extends PdfData> {
         SscsCaseData caseData = caseDetails.getData();
         String pdfName = getPdfName(documentNamePrefix, caseData.getCcdCaseId());
         log.info("Adding pdf to ccd for [" + caseId + "]");
-        SscsCaseData sscsCaseData = ccdPdfService.mergeDocIntoCcd(pdfName, pdfBytes, caseId, caseData, idamTokens,
-                "Other evidence");
+        final UpdateDocParams params = UpdateDocParams.builder()
+                .fileName(pdfName)
+                .caseId(caseId)
+                .pdf(pdfBytes)
+                .caseData(caseData)
+                .otherPartyId(data.getOtherPartyId())
+                .otherPartyName(data.getOtherPartyName())
+                .documentType("Other evidence")
+                .build();
+        SscsCaseData sscsCaseData = ccdPdfService.mergeDocIntoCcd(params, idamTokens);
 
         return new MyaEventActionContext(pdf(pdfBytes, pdfName), data.getCaseDetails().toBuilder()
                 .data(sscsCaseData).build());
@@ -102,7 +111,17 @@ public abstract class StorePdfService<E, D extends PdfData> {
         SscsCaseData caseData = caseDetails.getData();
         String pdfName = getPdfName(documentNamePrefix, caseData.getCcdCaseId());
         log.info("Adding pdf to ccd for [" + caseId + "]");
-        SscsCaseData sscsCaseData = ccdPdfService.updateDoc(pdfName, pdfBytes, caseId, caseData, "Other evidence");
+
+        UpdateDocParams params = UpdateDocParams.builder()
+                .fileName(pdfName)
+                .pdf(pdfBytes)
+                .caseId(caseId)
+                .caseData(caseData)
+                .documentType("Other evidence")
+                .otherPartyId(data.getOtherPartyId())
+                .otherPartyName(data.getOtherPartyName())
+                .build();
+        SscsCaseData sscsCaseData = ccdPdfService.updateDoc(params);
 
         return new MyaEventActionContext(pdf(pdfBytes, pdfName), data.getCaseDetails().toBuilder()
                 .data(sscsCaseData).build());

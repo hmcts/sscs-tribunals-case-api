@@ -4,13 +4,25 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 
 public class PdfData {
     private final SscsCaseDetails caseDetails;
+    private final String otherPartyId;
+    private final String otherPartyName;
 
-    public PdfData(SscsCaseDetails caseDetails) {
+    public PdfData(SscsCaseDetails caseDetails, String otherPartyId, String otherPartyName) {
         this.caseDetails = caseDetails;
+        this.otherPartyId = otherPartyId;
+        this.otherPartyName = otherPartyName;
     }
 
     public SscsCaseDetails getCaseDetails() {
         return caseDetails;
+    }
+
+    public String getOtherPartyId() {
+        return otherPartyId;
+    }
+
+    public String getOtherPartyName() {
+        return otherPartyName;
     }
 
     @Override

@@ -8,11 +8,10 @@ import static org.apache.commons.collections4.ListUtils.union;
 import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService.TEMP_UNIQUE_ID;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -25,10 +24,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jetbrains.annotations.NotNull;
@@ -136,7 +133,9 @@ public class EvidenceUploadService {
                     SscsCaseData sscsCaseData = caseDetails.getData();
                     Long ccdCaseId = caseDetails.getId();
                     EvidenceDescriptionPdfData data = new EvidenceDescriptionPdfData(caseDetails, description,
-                        getFileNames(sscsCaseData));
+                            getFileNames(sscsCaseData),
+                            getOtherPartyId(sscsCaseData, withEmailPredicate(description.getIdamEmail())),
+                            getOtherPartyName(sscsCaseData, withEmailPredicate(description.getIdamEmail())));
                     MyaEventActionContext storePdfContext = storeEvidenceDescriptionService.storePdf(
                         ccdCaseId, identifier, data);
                     submitHearingWhenNoCoreCase(caseDetails, sscsCaseData, ccdCaseId, storePdfContext,
@@ -342,8 +341,8 @@ public class EvidenceUploadService {
                         .url(draftSscsDocument.getValue().getDocumentLink())
                         .fileName(draftSscsDocument.getValue().getDocumentFileName())
                         .scannedDate(ldt.toString())
-                        .originalSenderOtherPartyId(getIdForOtherParty(sscsCaseData, idamEmail))
-                        .originalSenderOtherPartyName(getNameForOtherParty(sscsCaseData, idamEmail))
+                        .originalSenderOtherPartyId(getOtherPartyId(sscsCaseData, withEmailPredicate(idamEmail)))
+                        .originalSenderOtherPartyName(getOtherPartyName(sscsCaseData, withEmailPredicate(idamEmail)))
                         .build())
                 .build();
 
@@ -357,8 +356,8 @@ public class EvidenceUploadService {
     private void updateCaseDataWithNewAudioVideoUpload(List<SscsDocument> audioVideoMedia, SscsCaseData sscsCaseData, String idamEmail, LocalDateTime ldt, SscsDocument draftSscsDocument) {
         List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>();
         UploadParty uploader = workOutAudioVideoUploadParty(sscsCaseData, idamEmail);
-        String originalSenderOtherPartyId = getIdForOtherParty(sscsCaseData, idamEmail);
-        String originalSenderPartyName = getNameForOtherParty(sscsCaseData, idamEmail);
+        String originalSenderOtherPartyId = getOtherPartyId(sscsCaseData, withEmailPredicate(idamEmail));
+        String originalSenderPartyName = getOtherPartyName(sscsCaseData, withEmailPredicate(idamEmail));
 
         for (SscsDocument audioVideoDocument : audioVideoMedia) {
 
@@ -385,44 +384,18 @@ public class EvidenceUploadService {
     private String workOutFileNamePrefix(SscsCaseDetails caseDetails, String idamEmail) {
         final UploadParty uploadParty = workOutAudioVideoUploadParty(caseDetails.getData(), idamEmail);
         if (uploadParty == OTHER_PARTY) {
-            return uploadParty.getLabel() + " - " + getNameForOtherParty(caseDetails.getData(), idamEmail);
+            return uploadParty.getLabel() + " - " + getOtherPartyName(caseDetails.getData(), withEmailPredicate(idamEmail));
         }
         if (uploadParty == OTHER_PARTY_REP) {
-            return "Other party - Representative " + getNameForOtherParty(caseDetails.getData(), idamEmail);
+            return "Other party - Representative " + getOtherPartyName(caseDetails.getData(), withEmailPredicate(idamEmail));
         }
         if (uploadParty == OTHER_PARTY_APPOINTEE) {
-            return "Other party - Appointee " + getNameForOtherParty(caseDetails.getData(), idamEmail);
+            return "Other party - Appointee " + getOtherPartyName(caseDetails.getData(), withEmailPredicate(idamEmail));
         }
 
         return uploadParty.getLabel();
     }
 
-    public static String getNameForOtherParty(SscsCaseData sscsCaseData, final String idamEmail) {
-        return emptyIfNull(sscsCaseData.getOtherParties()).stream()
-                .map(CcdValue::getValue)
-                .flatMap(op -> Stream.of((op.hasAppointee()) ? Pair.of(op.getOtherPartyAppointeeSubscription(), op.getAppointee().getName()) : Pair.of(op.getOtherPartySubscription(), op.getName()), (op.hasRepresentative()) ? Pair.of(op.getOtherPartyRepresentativeSubscription(), op.getRep().getName()) : null))
-                .filter(Objects::nonNull)
-                .filter(p -> p.getLeft() != null && p.getLeft().getEmail() != null && p.getRight() != null)
-                .filter(p -> idamEmail.equalsIgnoreCase(p.getLeft().getEmail()))
-                .map(Pair::getRight)
-                .map(Name::getFullNameNoTitle)
-                .findFirst()
-                .orElse(null);
-    }
-
-    public static String getIdForOtherParty(SscsCaseData sscsCaseData, final String idamEmail) {
-        return emptyIfNull(sscsCaseData.getOtherParties()).stream()
-                .map(CcdValue::getValue)
-                .flatMap(op -> Stream.of((op.hasAppointee()) ? Pair.of(op.getOtherPartyAppointeeSubscription(), op.getAppointee().getId()) : Pair.of(op.getOtherPartySubscription(), op.getId()), (op.hasRepresentative()) ? Pair.of(op.getOtherPartyRepresentativeSubscription(), op.getRep().getId()) : null))
-                .filter(Objects::nonNull)
-                .filter(p -> p.getLeft() != null && p.getLeft().getEmail() != null && p.getRight() != null)
-                .filter(p -> idamEmail.equalsIgnoreCase(p.getLeft().getEmail()))
-                .map(Pair::getRight)
-                .findFirst()
-                .orElse(null);
-    }
-
-    @NotNull
     private UploadParty workOutAudioVideoUploadParty(SscsCaseData sscsCaseData, String idamEmail) {
         UploadParty uploader = UploadParty.APPELLANT;
         Subscriptions subscriptions = sscsCaseData.getSubscriptions();
@@ -435,40 +408,14 @@ public class EvidenceUploadService {
                 uploader = UploadParty.JOINT_PARTY;
             }
         }
-        if (isOtherParty(sscsCaseData, idamEmail)) {
+        if (isOtherParty(sscsCaseData, withEmailPredicate(idamEmail))) {
             uploader = OTHER_PARTY;
-        } else if (isOtherPartyRep(sscsCaseData, idamEmail)) {
+        } else if (isOtherPartyRep(sscsCaseData, withEmailPredicate(idamEmail))) {
             uploader = OTHER_PARTY_REP;
-        } else if (isOtherPartyAppointee(sscsCaseData, idamEmail)) {
+        } else if (isOtherPartyAppointee(sscsCaseData, withEmailPredicate(idamEmail))) {
             uploader = OTHER_PARTY_APPOINTEE;
         }
         return uploader;
-    }
-
-    private boolean isOtherPartyAppointee(SscsCaseData sscsCaseData, String idamEmail) {
-        return emptyIfNull(sscsCaseData.getOtherParties()).stream()
-                .map(CcdValue::getValue)
-                .filter(otherParty -> isYes(otherParty.getIsAppointee()))
-                .filter(otherParty -> nonNull(otherParty.getAppointee()))
-                .filter(otherParty -> nonNull(otherParty.getOtherPartyAppointeeSubscription()))
-                .anyMatch(otherParty -> idamEmail.equalsIgnoreCase(otherParty.getOtherPartyAppointeeSubscription().getEmail()));
-    }
-
-    private boolean isOtherPartyRep(SscsCaseData sscsCaseData, String idamEmail) {
-        return emptyIfNull(sscsCaseData.getOtherParties()).stream()
-                .map(CcdValue::getValue)
-                .filter(otherParty -> nonNull(otherParty.getRep()))
-                .filter(otherParty -> isYes(otherParty.getRep().getHasRepresentative()))
-                .filter(otherParty -> nonNull(otherParty.getOtherPartyRepresentativeSubscription()))
-                .anyMatch(otherParty -> idamEmail.equalsIgnoreCase(otherParty.getOtherPartyRepresentativeSubscription().getEmail()));
-    }
-
-    private boolean isOtherParty(SscsCaseData sscsCaseData, String idamEmail) {
-        return emptyIfNull(sscsCaseData.getOtherParties()).stream()
-                .map(CcdValue::getValue)
-                .filter(otherParty -> isNoOrNull(otherParty.getIsAppointee()))
-                .filter(otherParty -> nonNull(otherParty.getOtherPartySubscription()))
-                .anyMatch(otherParty -> idamEmail.equalsIgnoreCase(otherParty.getOtherPartySubscription().getEmail()));
     }
 
     private List<String> getFileNames(SscsCaseData sscsCaseData) {

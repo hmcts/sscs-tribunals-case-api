@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service.pdf;
 
+import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.*;
+
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +29,8 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
 
     private static final String APPELLANT_STATEMENT = "Appellant statement ";
     private static final String REPRESENTATIVE_STATEMENT = "Representative statement ";
+    private static final String OTHER_PARTY_STATEMENT = "Other party statement %s ";
+    private static final String OTHER_PARTY_REP_STATEMENT = "Other party representative statement %s ";
 
     @Autowired
     public StoreAppellantStatementService(
@@ -56,32 +61,33 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
                 statementPrefix = REPRESENTATIVE_STATEMENT;
             }
         }
+        if (isOtherParty(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya()))) {
+            statementPrefix = String.format(OTHER_PARTY_STATEMENT, getOtherPartyName(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya())));
+        } else if (isOtherPartyRep(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya()))) {
+            statementPrefix = String.format(OTHER_PARTY_REP_STATEMENT, getOtherPartyName(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya())));
+        } else if (isOtherPartyAppointee(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya()))) {
+            statementPrefix = String.format(OTHER_PARTY_STATEMENT, "Appointee " + getOtherPartyName(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya())));
+        }
         return statementPrefix;
     }
 
     public static long getCountOfNextStatement(List<ScannedDocument> scannedDocuments, List<SscsDocument> sscsDocument) {
-        if ((scannedDocuments == null || scannedDocuments.isEmpty())
-            && (sscsDocument == null || sscsDocument.isEmpty())) {
-            return 1;
-        }
-        long statementNextCount = 0;
-        if (scannedDocuments != null) {
-            statementNextCount = scannedDocuments.stream()
-                .filter(doc -> doc.getValue() != null)
-                .filter(doc -> StringUtils.isNotBlank(doc.getValue().getFileName()))
-                .filter(doc -> docFileNameIsStatement(doc.getValue().getFileName())).count();
-        }
-        if (sscsDocument != null) {
-            statementNextCount += sscsDocument.stream()
-                .filter(doc -> doc.getValue() != null)
-                .filter(doc -> StringUtils.isNotBlank(doc.getValue().getDocumentFileName()))
-                .filter(doc -> docFileNameIsStatement(doc.getValue().getDocumentFileName())).count();
-        }
-        return statementNextCount + 1;
+        long scannedDocumentCount = emptyIfNull(scannedDocuments).stream()
+            .filter(doc -> doc.getValue() != null)
+            .filter(doc -> StringUtils.isNotBlank(doc.getValue().getFileName()))
+            .filter(doc -> docFileNameIsStatement(doc.getValue().getFileName())).count();
+        long sscsDocumentCount = emptyIfNull(sscsDocument).stream()
+            .filter(doc -> doc.getValue() != null)
+            .filter(doc -> StringUtils.isNotBlank(doc.getValue().getDocumentFileName()))
+            .filter(doc -> docFileNameIsStatement(doc.getValue().getDocumentFileName())).count();
+        return scannedDocumentCount + sscsDocumentCount + 1;
     }
 
     private static boolean docFileNameIsStatement(String fileName) {
-        return fileName.startsWith(APPELLANT_STATEMENT) || fileName.startsWith(REPRESENTATIVE_STATEMENT);
+        return fileName.startsWith(APPELLANT_STATEMENT)
+                || fileName.startsWith(REPRESENTATIVE_STATEMENT)
+                || fileName.startsWith(OTHER_PARTY_STATEMENT)
+                || fileName.startsWith(OTHER_PARTY_REP_STATEMENT);
     }
 
     @Override
