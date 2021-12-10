@@ -108,6 +108,13 @@ public abstract class AbstractEventIt {
     }
 
     @NotNull
+    protected PreSubmitCallbackResponse<SscsCaseData> assertResponseOkAndGetResult(CallbackType callbackType, String pageId) throws Exception {
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, callbackType, pageId));
+        assertHttpStatus(response, HttpStatus.OK);
+        return deserialize(response.getContentAsString());
+    }
+
+    @NotNull
     protected PreSubmitCallbackResponse<SscsCaseData> assertResponseOkAndGetResult(CallbackType callbackType) throws Exception {
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, callbackType));
         assertHttpStatus(response, HttpStatus.OK);

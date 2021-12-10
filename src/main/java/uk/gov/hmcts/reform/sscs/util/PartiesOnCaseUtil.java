@@ -11,11 +11,7 @@ import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY;
 
 import java.util.ArrayList;
 import java.util.List;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 public class PartiesOnCaseUtil {
     private PartiesOnCaseUtil() {
@@ -79,5 +75,21 @@ public class PartiesOnCaseUtil {
         return sscsCaseData.getBenefitType()
                 .filter(f -> f == Benefit.CHILD_SUPPORT)
                 .isPresent();
+    }
+
+    public static List<String> getAllOtherPartiesOnCase(SscsCaseData sscsCaseData) {
+        List<String> otherParties = new ArrayList<>();
+        for (CcdValue<OtherParty> otherParty : sscsCaseData.getOtherParties()) {
+
+            otherParties.add(otherParty.getValue().getName().getFullName());
+
+            if ("Yes".equals(otherParty.getValue().getIsAppointee()) && null != otherParty.getValue().getAppointee()) {
+                otherParties.add(otherParty.getValue().getAppointee().getName().getFullName() + " - Appointee");
+            }
+            if (null != otherParty.getValue().getRep() && "Yes".equals(otherParty.getValue().getRep().getHasRepresentative())) {
+                otherParties.add(otherParty.getValue().getRep().getName().getFullName() + " - Representative");
+            }
+        }
+        return otherParties;
     }
 }

@@ -56,13 +56,13 @@ public class ActionHearingRecordingRequestService {
     public Optional<RequestStatus> getChangedRequestStatus(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest) {
         switch (party) {
             case DWP:
-                return toRequestStatus(processHearingRecordingRequest.getValue().getDwp());
+                return toRequestStatus(processHearingRecordingRequest.getDwp());
             case JOINT_PARTY:
-                return toRequestStatus(processHearingRecordingRequest.getValue().getJointParty());
+                return toRequestStatus(processHearingRecordingRequest.getJointParty());
             case REPRESENTATIVE:
-                return toRequestStatus(processHearingRecordingRequest.getValue().getRep());
+                return toRequestStatus(processHearingRecordingRequest.getRep());
             case APPELLANT: default:
-                return toRequestStatus(processHearingRecordingRequest.getValue().getAppellant());
+                return toRequestStatus(processHearingRecordingRequest.getAppellant());
         }
     }
 
