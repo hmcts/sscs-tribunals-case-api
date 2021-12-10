@@ -1188,6 +1188,26 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals(occurs, response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count());
     }
 
+    @Test
+    @Parameters({"otherParty", "otherPartyRep"})
+    public void findOriginalSenderOtherPartyId(String otherPartyCode) {
+        ScannedDocument scannedDocument = ScannedDocument
+                .builder()
+                .value(
+                        ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+        List<ScannedDocument> docs = new ArrayList<>();
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+
+        DynamicList originalSender = buildOriginalSenderItemListForGivenOption(otherPartyCode + "2", "Other party John Paul");
+        sscsCaseData.setOriginalSender(originalSender);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("2", response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyId());
+    }
+
     private DatedRequestOutcome createDatedRequestOutcome(RequestOutcome requestOutcome) {
         return DatedRequestOutcome.builder().date(LocalDate.now().minusDays(1))
             .requestOutcome(requestOutcome).build();
