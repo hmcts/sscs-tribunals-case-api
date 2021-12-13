@@ -42,7 +42,6 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-
         List<? extends AbstractDocument> allSscsDocs = Stream.of(sscsCaseData.getSscsDocument(), sscsCaseData.getSscsWelshDocuments()).flatMap(x -> x == null ? null : x.stream()).filter(doc -> StringUtils.isNotBlank(doc.getValue().getDocumentType())).collect(Collectors.toList());
 
         ArrayList<? extends AbstractDocument> availableDocumentsToReIssue =
@@ -52,7 +51,6 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
                     || REPRESENTATIVE_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
                     || DWP_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
             ).collect(Collectors.toCollection(ArrayList::new));
-
 
         if (CollectionUtils.isNotEmpty(availableDocumentsToReIssue)) {
             setDocumentDropdown(sscsCaseData, availableDocumentsToReIssue);
@@ -121,13 +119,13 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
 
     private void addOtherPartyOption(List<OtherPartyOption> otherPartyOptions, CcdValue<OtherParty> otherParty) {
         OtherParty otherPartyDetail = otherParty.getValue();
-        otherPartyOptions.add(getOtherPartyElement(otherPartyDetail.getName().getFullNameNoTitle()));
+        otherPartyOptions.add(getOtherPartyElement(otherPartyDetail.getName().getFullNameNoTitle(), otherPartyDetail.getId()));
 
         if (isAppointee(otherPartyDetail)) {
-            otherPartyOptions.add(getOtherPartyElement(otherPartyDetail.getAppointee().getName().getFullNameNoTitle() + " - Appointee"));
+            otherPartyOptions.add(getOtherPartyElement(otherPartyDetail.getAppointee().getName().getFullNameNoTitle() + " - Appointee", otherPartyDetail.getAppointee().getId()));
         }
         if (isRepresentative(otherPartyDetail)) {
-            otherPartyOptions.add(getOtherPartyElement(otherPartyDetail.getRep().getName().getFullNameNoTitle() + " - Representative"));
+            otherPartyOptions.add(getOtherPartyElement(otherPartyDetail.getRep().getName().getFullNameNoTitle() + " - Representative", otherPartyDetail.getRep().getId()));
         }
     }
 
@@ -139,9 +137,11 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
         return  otherPartyDetail.getAppointee() != null && "Yes".equals(otherPartyDetail.getIsAppointee());
     }
 
-    private OtherPartyOption getOtherPartyElement(String name) {
+    private OtherPartyOption getOtherPartyElement(String name, String id) {
         return OtherPartyOption.builder()
                 .value(OtherPartyOptionDetails.builder()
-                        .otherPartyName(name).build()).build();
+                        .otherPartyOptionName(name)
+                        .otherPartyOptionId(id)
+                        .build()).build();
     }
 }

@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.reissuefurtherevidence;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -127,6 +130,32 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
     }
 
     @Test
+    public void givenCaseWithMultipleOtherParties_thenBuildTheOtherPartyOptionsSection() {
+
+        sscsCaseData.setOtherParties(Arrays.asList(buildOtherPartyWithAppointeeAndRep("1", "2", "3"),
+                buildOtherPartyWithAppointeeAndRep("4", "5", "6")));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(0));
+        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().size(), is(6));
+        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(0).getValue().getOtherPartyOptionName(), is("Peter Parker"));
+        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(0).getValue().getOtherPartyOptionId(), is("1"));
+        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(1).getValue().getOtherPartyOptionName(), is("Otto Octavius - Appointee"));
+        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(1).getValue().getOtherPartyOptionId(), is("2"));
+        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(2).getValue().getOtherPartyOptionName(), is("Harry Osbourne - Representative"));
+        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(2).getValue().getOtherPartyOptionId(), is("3"));
+        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(3).getValue().getOtherPartyOptionName(), is("Peter Parker"));
+        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(3).getValue().getOtherPartyOptionId(), is("4"));
+        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(4).getValue().getOtherPartyOptionName(), is("Otto Octavius - Appointee"));
+        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(4).getValue().getOtherPartyOptionId(), is("5"));
+        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(5).getValue().getOtherPartyOptionName(), is("Harry Osbourne - Representative"));
+        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(5).getValue().getOtherPartyOptionId(), is("6"));
+    }
+
+    @Test
     public void shouldIncludeValidWelshDocumentsInDropdown() {
 
         SscsWelshDocument document1 = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder()
@@ -164,5 +193,17 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
         assertEquals(new DynamicListItem("welshUrl2", "Bilingual - welshFile2.pdf -  Representative evidence"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(4));
         assertEquals(new DynamicListItem("welshUrl3", "Bilingual - welshFile3.pdf -  Dwp evidence"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(5));
         assertNull(response.getData().getOriginalSender());
+    }
+
+    public static CcdValue<OtherParty> buildOtherPartyWithAppointeeAndRep(String id, String appointeeId, String repId) {
+        return CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder()
+                        .id(id)
+                        .name(Name.builder().firstName("Peter").lastName("Parker").build())
+                        .isAppointee(YES.getValue())
+                        .appointee(Appointee.builder().id(appointeeId).name(Name.builder().firstName("Otto").lastName("Octavius").build()).build())
+                        .rep(Representative.builder().id(repId).name(Name.builder().firstName("Harry").lastName("Osbourne").build()).hasRepresentative(YES.getValue()).build())
+                        .build())
+                .build();
     }
 }
