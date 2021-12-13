@@ -93,15 +93,17 @@ public class PartiesOnCaseUtil {
 
     public static List<String> getAllOtherPartiesOnCase(SscsCaseData sscsCaseData) {
         List<String> otherParties = new ArrayList<>();
-        for (CcdValue<OtherParty> otherParty : sscsCaseData.getOtherParties()) {
+        if (sscsCaseData.getOtherParties() != null && sscsCaseData.getOtherParties().size() > 0) {
+            for (CcdValue<OtherParty> otherParty : sscsCaseData.getOtherParties()) {
 
-            otherParties.add(otherParty.getValue().getName().getFullName());
+                otherParties.add(otherParty.getValue().getName().getFullName());
 
-            if ("Yes".equals(otherParty.getValue().getIsAppointee()) && null != otherParty.getValue().getAppointee()) {
-                otherParties.add(otherParty.getValue().getAppointee().getName().getFullName() + " - Appointee");
-            }
-            if (null != otherParty.getValue().getRep() && "Yes".equals(otherParty.getValue().getRep().getHasRepresentative())) {
-                otherParties.add(otherParty.getValue().getRep().getName().getFullName() + " - Representative");
+                if ("Yes".equals(otherParty.getValue().getIsAppointee()) && null != otherParty.getValue().getAppointee()) {
+                    otherParties.add(otherParty.getValue().getAppointee().getName().getFullName() + " - Appointee");
+                }
+                if (null != otherParty.getValue().getRep() && "Yes".equals(otherParty.getValue().getRep().getHasRepresentative())) {
+                    otherParties.add(otherParty.getValue().getRep().getName().getFullName() + " - Representative");
+                }
             }
         }
         return otherParties;

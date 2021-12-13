@@ -4,7 +4,9 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getAllOtherPartiesOnCase;
 
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -16,6 +18,8 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Component
 @Slf4j
 public class UpdateReasonableAdjustmentAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private static String ADD_OR_REMOVE_OTHER_PARTIES_ERROR = "This event cannot be used to add/remove 'Other party' from the case'. You may need to restart this event to proceed.";
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -32,6 +36,10 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandler implements PreSubmit
         }
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
+
+        checkOtherPartyButtonsNotPressed(callback, response);
 
         final ReasonableAdjustments reasonableAdjustments = sscsCaseData.getReasonableAdjustments();
         if (isYes(sscsCaseData.getAppeal().getAppellant().getIsAppointee()) || nonNull(reasonableAdjustments.getAppellant()) && isNoOrNull(sscsCaseData.getReasonableAdjustments().getAppellant().getWantsReasonableAdjustment())) {
@@ -57,6 +65,23 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandler implements PreSubmit
 
         sscsCaseData.setReasonableAdjustmentChoice(null);
 
-        return new PreSubmitCallbackResponse<>(sscsCaseData);
+        return response;
     }
+
+    private void checkOtherPartyButtonsNotPressed(Callback<SscsCaseData> callback, PreSubmitCallbackResponse<SscsCaseData> response) {
+        CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
+        SscsCaseData oldCaseData = oldCaseDetails != null ? oldCaseDetails.getCaseData() : null;
+        List<String> oldOtherParties = getAllOtherPartiesOnCase(oldCaseData);
+        List<String> otherParties = getAllOtherPartiesOnCase(response.getData());
+
+        if (oldCaseData != null && otherParties != null && otherParties.size() != oldOtherParties.size()) {
+            response.addError(ADD_OR_REMOVE_OTHER_PARTIES_ERROR);
+        } else if (oldCaseData != null && otherParties != null && oldCaseData.getOtherParties() != null && otherParties.size() == oldOtherParties.size()) {
+            if (response.getData().getOtherParties().stream().anyMatch(e -> e.getValue().getId() == null)) {
+                response.addError(ADD_OR_REMOVE_OTHER_PARTIES_ERROR);
+            }
+        }
+    }
+
+
 }
