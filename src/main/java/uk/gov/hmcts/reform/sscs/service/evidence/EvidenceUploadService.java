@@ -11,7 +11,12 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService.TEMP_UNIQUE_ID;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.*;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyId;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyName;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherParty;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyAppointee;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyRep;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.withEmailPredicate;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,7 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
@@ -380,7 +384,6 @@ public class EvidenceUploadService {
         }
     }
 
-    @NotNull
     private String workOutFileNamePrefix(SscsCaseDetails caseDetails, String idamEmail) {
         final UploadParty uploadParty = workOutAudioVideoUploadParty(caseDetails.getData(), idamEmail);
         if (uploadParty == OTHER_PARTY) {

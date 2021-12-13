@@ -1,7 +1,11 @@
 package uk.gov.hmcts.reform.sscs.service.pdf;
 
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.*;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyName;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherParty;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyAppointee;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyRep;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.withTyaPredicate;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +33,8 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
 
     private static final String APPELLANT_STATEMENT = "Appellant statement ";
     private static final String REPRESENTATIVE_STATEMENT = "Representative statement ";
-    private static final String OTHER_PARTY_STATEMENT = "Other party statement %s ";
-    private static final String OTHER_PARTY_REP_STATEMENT = "Other party representative statement %s ";
+    private static final String OTHER_PARTY_STATEMENT = "Other party statement ";
+    private static final String OTHER_PARTY_REP_STATEMENT = "Other party representative statement ";
 
     @Autowired
     public StoreAppellantStatementService(
@@ -62,11 +66,11 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
             }
         }
         if (isOtherParty(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya()))) {
-            statementPrefix = String.format(OTHER_PARTY_STATEMENT, getOtherPartyName(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya())));
+            statementPrefix = String.format(OTHER_PARTY_STATEMENT + "%s ", getOtherPartyName(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya())));
         } else if (isOtherPartyRep(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya()))) {
-            statementPrefix = String.format(OTHER_PARTY_REP_STATEMENT, getOtherPartyName(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya())));
+            statementPrefix = String.format(OTHER_PARTY_REP_STATEMENT + "%s ", getOtherPartyName(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya())));
         } else if (isOtherPartyAppointee(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya()))) {
-            statementPrefix = String.format(OTHER_PARTY_STATEMENT, "Appointee " + getOtherPartyName(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya())));
+            statementPrefix = String.format(OTHER_PARTY_STATEMENT + "%s ", "Appointee " + getOtherPartyName(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya())));
         }
         return statementPrefix;
     }

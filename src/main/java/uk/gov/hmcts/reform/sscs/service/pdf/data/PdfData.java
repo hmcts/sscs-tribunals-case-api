@@ -7,6 +7,10 @@ public class PdfData {
     private final String otherPartyId;
     private final String otherPartyName;
 
+    public PdfData(SscsCaseDetails caseDetails) {
+        this(caseDetails, null, null);
+    }
+
     public PdfData(SscsCaseDetails caseDetails, String otherPartyId, String otherPartyName) {
         this.caseDetails = caseDetails;
         this.otherPartyId = otherPartyId;
