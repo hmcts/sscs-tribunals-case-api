@@ -199,8 +199,8 @@ public abstract class StorePdfService<E, D extends PdfData> {
         String nino = caseDetails.getData().getAppeal().getAppellant().getIdentity().getNino();
         String caseReference = caseDetails.getId().toString();
         String dateCreated = reformatDate(now());
-        boolean hideNino = caseDetails.getData().getBenefitType().
-                filter(benefit -> benefit.equals(Benefit.CHILD_SUPPORT))
+        boolean hideNino = caseDetails.getData().getBenefitType()
+                .filter(benefit -> benefit.equals(Benefit.CHILD_SUPPORT))
                 .isPresent();
 
         if (caseDetails.getData().isLanguagePreferenceWelsh()) {
