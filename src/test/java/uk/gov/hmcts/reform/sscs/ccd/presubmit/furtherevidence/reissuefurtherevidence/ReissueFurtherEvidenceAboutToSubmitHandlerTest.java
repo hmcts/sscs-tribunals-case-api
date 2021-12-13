@@ -165,13 +165,14 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
     public void returnsAnErrorIfThereIsNoPartySelectedToReIssueFurtherEvidence() {
         ReissueFurtherEvidence reissueFurtherEvidence = sscsCaseData.getReissueFurtherEvidence();
         reissueFurtherEvidence.setResendToAppellant(YesNo.NO);
+        reissueFurtherEvidence.setResendToRepresentative(YesNo.NO);
         reissueFurtherEvidence.setResendToDwp(YesNo.NO);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
-        assertEquals("Select a party to reissue the further evidence.", response.getErrors().toArray()[0]);
+        assertEquals("Select a party to reissue.", response.getErrors().toArray()[0]);
     }
 
     @Test

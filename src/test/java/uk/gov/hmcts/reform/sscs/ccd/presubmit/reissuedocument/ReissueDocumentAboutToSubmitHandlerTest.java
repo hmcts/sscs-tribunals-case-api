@@ -94,26 +94,30 @@ public class ReissueDocumentAboutToSubmitHandlerTest {
 
     @Test
     public void returnsAnErrorIfReissuedToRepresentativeWhenThereIsNoRepOnTheAppealToReissueDocument() {
-        sscsCaseData = sscsCaseData.toBuilder().reissueFurtherEvidence(ReissueFurtherEvidence.builder()
-                .resendToRepresentative(YesNo.YES).build()).build();
+        ReissueFurtherEvidence reissueFurtherEvidence = sscsCaseData.getReissueFurtherEvidence();
+        reissueFurtherEvidence.setResendToAppellant(YesNo.NO);
+        reissueFurtherEvidence.setResendToRepresentative(YesNo.YES);
+        reissueFurtherEvidence.setResendToDwp(YesNo.NO);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
-        assertEquals("Cannot re-issue to the representative as there is no representative on the appeal", response.getErrors().toArray()[0]);
+        assertEquals("Cannot re-issue to the representative as there is no representative on the appeal.", response.getErrors().toArray()[0]);
     }
 
     @Test
     public void returnsAnErrorIfNoPartySelectedForReissue() {
-        sscsCaseData = sscsCaseData.toBuilder().reissueFurtherEvidence(ReissueFurtherEvidence.builder()
-                .resendToAppellant(YesNo.NO).resendToRepresentative(YesNo.NO).build()).build();
+        ReissueFurtherEvidence reissueFurtherEvidence = sscsCaseData.getReissueFurtherEvidence();
+        reissueFurtherEvidence.setResendToAppellant(YesNo.NO);
+        reissueFurtherEvidence.setResendToRepresentative(YesNo.NO);
+        reissueFurtherEvidence.setResendToDwp(YesNo.NO);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
-        assertEquals("No party selected to reissue document", response.getErrors().toArray()[0]);
+        assertEquals("Select a party to reissue.", response.getErrors().toArray()[0]);
     }
 
     @Test(expected = IllegalStateException.class)

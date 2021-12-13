@@ -1,22 +1,25 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
+
+import java.util.ArrayList;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReissueFurtherEvidence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
-import java.util.ArrayList;
-import java.util.Optional;
-
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
 
 public class ReissueUtils {
+
+    private ReissueUtils() {
+    }
 
     public static void validateSelectedPartyOptions(SscsCaseData sscsCaseData, ArrayList<String> errors, boolean checkOtherParty) {
         boolean caseHasARepresentative = StringUtils.equalsIgnoreCase("YES", Optional.ofNullable(sscsCaseData.getAppeal().getRep()).map(Representative::getHasRepresentative).orElse("No"));
 
-        if (!isAnyPartySelectedToResend(sscsCaseData, caseHasARepresentative, checkOtherParty)) {
+        if (!isAnyPartySelectedToResend(sscsCaseData, checkOtherParty)) {
             errors.add("Select a party to reissue.");
         }
         if (!caseHasARepresentative && YesNo.isYes(sscsCaseData.getReissueFurtherEvidence().getResendToRepresentative())) {
@@ -24,10 +27,10 @@ public class ReissueUtils {
         }
     }
 
-    private static boolean isAnyPartySelectedToResend(SscsCaseData sscsCaseData, boolean caseHasARepresentative, boolean checkOtherParty) {
+    private static boolean isAnyPartySelectedToResend(SscsCaseData sscsCaseData,  boolean checkOtherParty) {
         ReissueFurtherEvidence reissueFurtherEvidence = sscsCaseData.getReissueFurtherEvidence();
         return YesNo.isYes(reissueFurtherEvidence.getResendToAppellant())
-                || (YesNo.isYes(reissueFurtherEvidence.getResendToRepresentative()) && caseHasARepresentative)
+                || YesNo.isYes(reissueFurtherEvidence.getResendToRepresentative())
                 || (checkOtherParty && isOtherPartyPresent(sscsCaseData) && isAnyOtherPartySelected(sscsCaseData));
     }
 
