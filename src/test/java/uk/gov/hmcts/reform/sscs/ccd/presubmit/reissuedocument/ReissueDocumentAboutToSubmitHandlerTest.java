@@ -57,22 +57,23 @@ public class ReissueDocumentAboutToSubmitHandlerTest {
                 .documentLink(DocumentLink.builder().documentUrl("url2").build())
                 .build()).build();
         SscsDocument document3 = SscsDocument.builder().value(SscsDocumentDetails.builder()
-            .documentFileName("file3.pdf")
-            .documentType(FINAL_DECISION_NOTICE.getValue())
-            .documentLink(DocumentLink.builder().documentUrl("url1").build())
-            .build()).build();
+                .documentFileName("file3.pdf")
+                .documentType(FINAL_DECISION_NOTICE.getValue())
+                .documentLink(DocumentLink.builder().documentUrl("url1").build())
+                .build()).build();
         SscsDocument document4 = SscsDocument.builder().value(SscsDocumentDetails.builder()
-            .documentFileName("file4.pdf")
-            .documentType(ADJOURNMENT_NOTICE.getValue())
-            .documentLink(DocumentLink.builder().documentUrl("url1").build())
-            .build()).build();
+                .documentFileName("file4.pdf")
+                .documentType(ADJOURNMENT_NOTICE.getValue())
+                .documentLink(DocumentLink.builder().documentUrl("url1").build())
+                .build()).build();
         List<SscsDocument> sscsDocuments = Arrays.asList(document1, document2, document3, document4);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
                 .sscsDocument(sscsDocuments)
-                .resendToAppellant("YES")
-                .resendToDwp("YES")
-                .resendToRepresentative("No")
-                .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem("url2", "file2.pdf - appellantEvidence"), null))
+                .reissueFurtherEvidence(ReissueFurtherEvidence.builder()
+                        .resendToAppellant(YesNo.YES)
+                        .resendToDwp(YesNo.YES)
+                        .resendToRepresentative(YesNo.NO)
+                        .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem("url2", "file2.pdf - appellantEvidence"), null)).build())
                 .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -93,7 +94,8 @@ public class ReissueDocumentAboutToSubmitHandlerTest {
 
     @Test
     public void returnsAnErrorIfReissuedToRepresentativeWhenThereIsNoRepOnTheAppealToReissueDocument() {
-        sscsCaseData = sscsCaseData.toBuilder().resendToRepresentative("YES").build();
+        sscsCaseData = sscsCaseData.toBuilder().reissueFurtherEvidence(ReissueFurtherEvidence.builder()
+                .resendToRepresentative(YesNo.YES).build()).build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -104,8 +106,8 @@ public class ReissueDocumentAboutToSubmitHandlerTest {
 
     @Test
     public void returnsAnErrorIfNoPartySelectedForReissue() {
-        sscsCaseData = sscsCaseData.toBuilder().resendToAppellant("No").build();
-        sscsCaseData = sscsCaseData.toBuilder().resendToRepresentative("No").build();
+        sscsCaseData = sscsCaseData.toBuilder().reissueFurtherEvidence(ReissueFurtherEvidence.builder()
+                .resendToAppellant(YesNo.NO).resendToRepresentative(YesNo.NO).build()).build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

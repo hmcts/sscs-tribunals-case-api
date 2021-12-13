@@ -55,9 +55,9 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
 
         if (CollectionUtils.isNotEmpty(availableDocumentsToReIssue)) {
             setDocumentDropdown(sscsCaseData, availableDocumentsToReIssue);
-            sscsCaseData.setResendToAppellant(null);
-            sscsCaseData.setResendToRepresentative(null);
-            sscsCaseData.setResendToDwp(null);
+            sscsCaseData.getReissueFurtherEvidence().setResendToAppellant(null);
+            sscsCaseData.getReissueFurtherEvidence().setResendToRepresentative(null);
+            sscsCaseData.getReissueFurtherEvidence().setResendToDwp(null);
             sscsCaseData.setOriginalSender(null);
         }
 
@@ -65,7 +65,17 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
         if (CollectionUtils.isEmpty(availableDocumentsToReIssue)) {
             response.addError("There are no evidence documents in the appeal. Cannot reissue further evidence.");
         }
+
+        if (isOtherPartyPresent(sscsCaseData)) {
+            setUpOtherPartyOptions(sscsCaseData);
+        }
+
         return response;
+    }
+
+    private void setUpOtherPartyOptions(SscsCaseData sscsCaseData) {
+        sscsCaseData.getReissueFurtherEvidence().setShowReissueToOtherPartyUiSection(YesNo.YES);
+        sscsCaseData.getReissueFurtherEvidence().setOtherPartyOptions(getOtherPartyOptions(sscsCaseData));
     }
 
     private void setDocumentDropdown(SscsCaseData sscsCaseData, List<? extends AbstractDocument> availableDocumentsToReIssue) {
@@ -78,7 +88,7 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
             }
         }
 
-        sscsCaseData.setReissueFurtherEvidenceDocument(new DynamicList(listCostOptions.get(0), listCostOptions));
+        sscsCaseData.getReissueFurtherEvidence().setReissueFurtherEvidenceDocument(new DynamicList(listCostOptions.get(0), listCostOptions));
     }
 
     private String buildFormattedLabel(AbstractDocument doc) {
@@ -96,5 +106,43 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
             sb.append(doc.getValue().getDocumentLink().getDocumentFilename());
         }
         return sb.toString();
+    }
+
+    private boolean isOtherPartyPresent(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getOtherParties() != null && sscsCaseData.getOtherParties().size() > 0;
+    }
+
+    private List<OtherPartyOption> getOtherPartyOptions(SscsCaseData sscsCaseData) {
+        List<OtherPartyOption> otherPartyOptions = new ArrayList<>();
+
+        sscsCaseData.getOtherParties().forEach(otherParty -> addOtherPartyOption(otherPartyOptions, otherParty));
+
+        return otherPartyOptions;
+    }
+
+    private void addOtherPartyOption(List<OtherPartyOption> otherPartyOptions, CcdValue<OtherParty> otherParty) {
+        OtherParty otherPartyDetail = otherParty.getValue();
+        otherPartyOptions.add(getOtherPartyElement(otherPartyDetail.getName().getFullNameNoTitle()));
+
+        if (isAppointee(otherPartyDetail)) {
+            otherPartyOptions.add(getOtherPartyElement(otherPartyDetail.getAppointee().getName().getFullNameNoTitle() + " - Appointee"));
+        }
+        if (isRepresentative(otherPartyDetail)) {
+            otherPartyOptions.add(getOtherPartyElement(otherPartyDetail.getRep().getName().getFullNameNoTitle() + " - Representative"));
+        }
+    }
+
+    private boolean isRepresentative(OtherParty otherPartyDetail) {
+        return otherPartyDetail.getRep() != null && "Yes".equals(otherPartyDetail.getRep().getHasRepresentative());
+    }
+
+    private boolean isAppointee(OtherParty otherPartyDetail) {
+        return  otherPartyDetail.getAppointee() != null && "Yes".equals(otherPartyDetail.getIsAppointee());
+    }
+
+    private OtherPartyOption getOtherPartyElement(String name) {
+        return OtherPartyOption.builder()
+                .value(OtherPartyOptionDetails.builder()
+                        .otherPartyName(name).build()).build();
     }
 }

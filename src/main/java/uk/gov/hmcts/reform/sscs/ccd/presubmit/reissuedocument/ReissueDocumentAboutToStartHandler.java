@@ -35,9 +35,7 @@ public class ReissueDocumentAboutToStartHandler implements PreSubmitCallbackHand
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        final SscsCaseData sscsCaseData = caseDetails.getCaseData();
-
+        final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         List<DynamicListItem> dropdownList = getDocumentDropdown(sscsCaseData);
@@ -45,9 +43,9 @@ public class ReissueDocumentAboutToStartHandler implements PreSubmitCallbackHand
         if (isEmpty(dropdownList)) {
             response.addError("There are no documents in this appeal available to reissue.");
         } else {
-            sscsCaseData.setReissueFurtherEvidenceDocument(new DynamicList(dropdownList.get(0), dropdownList));
-            sscsCaseData.setResendToAppellant(null);
-            sscsCaseData.setResendToRepresentative(null);
+            sscsCaseData.getReissueFurtherEvidence().setReissueFurtherEvidenceDocument(new DynamicList(dropdownList.get(0), dropdownList));
+            sscsCaseData.getReissueFurtherEvidence().setResendToAppellant(null);
+            sscsCaseData.getReissueFurtherEvidence().setResendToRepresentative(null);
         }
 
         return response;
@@ -79,4 +77,6 @@ public class ReissueDocumentAboutToStartHandler implements PreSubmitCallbackHand
         return listCostOptions;
 
     }
+
+
 }

@@ -61,7 +61,7 @@ public class ReissueFurtherEvidenceIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
-        assertEquals(expected, result.getData().getReissueFurtherEvidenceDocument());
+        assertEquals(expected, result.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument());
     }
 
 }

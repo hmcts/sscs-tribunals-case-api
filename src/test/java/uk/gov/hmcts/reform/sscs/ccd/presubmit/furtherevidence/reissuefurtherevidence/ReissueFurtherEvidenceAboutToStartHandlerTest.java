@@ -91,10 +91,10 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
-        assertEquals(3, response.getData().getReissueFurtherEvidenceDocument().getListItems().size());
-        assertEquals(new DynamicListItem("url1", "file1.pdf -  Appellant evidence"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(0));
-        assertEquals(new DynamicListItem("url2", "file2.pdf -  Representative evidence"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(1));
-        assertEquals(new DynamicListItem("url3", "file3.pdf -  Dwp evidence"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(2));
+        assertEquals(3, response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().size());
+        assertEquals(new DynamicListItem("url1", "file1.pdf -  Appellant evidence"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(0));
+        assertEquals(new DynamicListItem("url2", "file2.pdf -  Representative evidence"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(1));
+        assertEquals(new DynamicListItem("url3", "file3.pdf -  Dwp evidence"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(2));
         assertNull(response.getData().getOriginalSender());
     }
 
@@ -105,7 +105,7 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getReissueFurtherEvidenceDocument());
+        assertNull(response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument());
         assertEquals("There are no evidence documents in the appeal. Cannot reissue further evidence.", response.getErrors().iterator().next());
     }
 
@@ -122,7 +122,7 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getReissueFurtherEvidenceDocument());
+        assertNull(response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument());
         assertEquals("There are no evidence documents in the appeal. Cannot reissue further evidence.", response.getErrors().iterator().next());
     }
 
@@ -155,14 +155,14 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
-        assertEquals(6, response.getData().getReissueFurtherEvidenceDocument().getListItems().size());
-        assertEquals(new DynamicListItem("url1", "file1.pdf -  Appellant evidence"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(0));
-        assertEquals(new DynamicListItem("url2", "file2.pdf -  Representative evidence"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(1));
-        assertEquals(new DynamicListItem("url3", "file3.pdf -  Dwp evidence"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(2));
+        assertEquals(6, response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().size());
+        assertEquals(new DynamicListItem("url1", "file1.pdf -  Appellant evidence"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(0));
+        assertEquals(new DynamicListItem("url2", "file2.pdf -  Representative evidence"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(1));
+        assertEquals(new DynamicListItem("url3", "file3.pdf -  Dwp evidence"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(2));
         assertNull(response.getData().getOriginalSender());
-        assertEquals(new DynamicListItem("welshUrl1", "Bilingual - welshFile1.pdf -  Appellant evidence"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(3));
-        assertEquals(new DynamicListItem("welshUrl2", "Bilingual - welshFile2.pdf -  Representative evidence"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(4));
-        assertEquals(new DynamicListItem("welshUrl3", "Bilingual - welshFile3.pdf -  Dwp evidence"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(5));
+        assertEquals(new DynamicListItem("welshUrl1", "Bilingual - welshFile1.pdf -  Appellant evidence"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(3));
+        assertEquals(new DynamicListItem("welshUrl2", "Bilingual - welshFile2.pdf -  Representative evidence"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(4));
+        assertEquals(new DynamicListItem("welshUrl3", "Bilingual - welshFile3.pdf -  Dwp evidence"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(5));
         assertNull(response.getData().getOriginalSender());
     }
 }

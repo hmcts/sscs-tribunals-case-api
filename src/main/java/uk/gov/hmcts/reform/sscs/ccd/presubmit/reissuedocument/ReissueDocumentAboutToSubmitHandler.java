@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.reissuedocument;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.util.ReissueUtils.validateSelectedPartyOptions;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -37,13 +38,7 @@ public class ReissueDocumentAboutToSubmitHandler implements PreSubmitCallbackHan
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         ArrayList<String> errors = new ArrayList<>();
 
-        boolean caseHasARepresentative = StringUtils.equalsIgnoreCase("Yes", Optional.ofNullable(sscsCaseData.getAppeal().getRep()).map(Representative::getHasRepresentative).orElse("No"));
-
-        if (!sscsCaseData.isResendToRepresentative() && !sscsCaseData.isResendToAppellant()) {
-            errors.add("No party selected to reissue document");
-        } else if (!caseHasARepresentative && sscsCaseData.isResendToRepresentative()) {
-            errors.add("Cannot re-issue to the representative as there is no representative on the appeal");
-        }
+        validateSelectedPartyOptions(sscsCaseData, errors);
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
         if (CollectionUtils.isNotEmpty(errors)) {

@@ -82,7 +82,10 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
                                 new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()),
                                 new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()))
                 ))
-                .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem(selectWhoReviewsCase.getId(), selectWhoReviewsCase.getLabel()), null)).build();
+                .reissueFurtherEvidence(ReissueFurtherEvidence.builder()
+                        .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem(selectWhoReviewsCase.getId(),
+                                selectWhoReviewsCase.getLabel()), null)).build())
+                .build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -175,10 +178,10 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(eventType);
 
         sscsCaseData = sscsCaseData.toBuilder().selectWhoReviewsCase(new DynamicList(
-                new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()),
-                Arrays.asList(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()),
-                        new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()),
-                        new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()))
+                        new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()),
+                        Arrays.asList(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()),
+                                new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()),
+                                new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()))
                 ))
                 .originalSender(null).build();
 
