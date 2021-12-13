@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.ActionFurtherEvidenceAboutToSubmitHandlerTest.buildOriginalSenderItemListForGivenOption;
 
 import java.util.*;
 import junitparams.JUnitParamsRunner;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState;
+import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -386,6 +388,48 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
         assertEquals("Testing.jpg", iterator.next());
     }
 
+    @Test
+    @Parameters({"OTHER_PARTY", "OTHER_PARTY_REPRESENTATIVE"})
+    public void givenARequestWithOtherPartySelectedAsOriginalSenderAndOtherPartyHearingPreferencesDocumentSelected_thenNoErrorShown(PartyItemList partyItemList) {
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder()
+                        .fileName("Testing.jpg")
+                        .type(DocumentType.OTHER_PARTY_HEARING_PREFERENCES.getValue())
+                        .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                        .build()).build();
+
+        sscsCaseData.setOriginalSender(buildOriginalSenderItemListForGivenOption(partyItemList.getCode(),
+                PartyItemList.OTHER_PARTY.getLabel()));
+
+        scannedDocumentList.add(scannedDocument);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getWarnings().isEmpty());
+        assertTrue(response.getErrors().isEmpty());
+    }
+
+    @Test
+    public void givenARequestWithOtherPartyNotSelectedAsOriginalSenderAndOtherPartyHearingPreferencesDocumentSelected_thenErrorShown() {
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder()
+                        .fileName("Testing.jpg")
+                        .type(DocumentType.OTHER_PARTY_HEARING_PREFERENCES.getValue())
+                        .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                        .build()).build();
+
+        sscsCaseData.setOriginalSender(buildOriginalSenderItemListForGivenOption(PartyItemList.APPELLANT.getCode(),
+                PartyItemList.APPELLANT.getLabel()));
+
+        scannedDocumentList.add(scannedDocument);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getWarnings().isEmpty());
+        assertEquals(1, response.getErrors().size());
+        Iterator<String> iterator = response.getErrors().iterator();
+        assertEquals("You cannot select 'Other party hearing preferences' as a Document Type as an Other party not selected from Original Sender list", iterator.next());
+    }
 
     @Test(expected = IllegalStateException.class)
     public void throwsExceptionIfItCannotHandleTheAppeal() {

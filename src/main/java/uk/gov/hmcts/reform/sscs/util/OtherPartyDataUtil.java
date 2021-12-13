@@ -7,11 +7,14 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 
 public class OtherPartyDataUtil {
@@ -79,6 +82,30 @@ public class OtherPartyDataUtil {
         sort(afterIds);
         for (int i = 0; i < beforeIds.size(); i++) {
             if (!beforeIds.get(i).equals(afterIds.get(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void checkConfidentiality(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getAppeal().getBenefitType() != null
+                && Benefit.CHILD_SUPPORT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())) {
+            if ((sscsCaseData.getAppeal().getAppellant() != null
+                    && sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired() != null
+                    && YesNo.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired()))
+                    || otherPartyHasConfidentiality(sscsCaseData)) {
+                sscsCaseData.setIsConfidentialCase(YesNo.YES);
+            } else {
+                sscsCaseData.setIsConfidentialCase(null);
+            }
+        }
+    }
+
+    private static boolean otherPartyHasConfidentiality(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getOtherParties() != null) {
+            Optional otherParty = sscsCaseData.getOtherParties().stream().filter(op -> YesNo.isYes(op.getValue().getConfidentialityRequired())).findAny();
+            if (otherParty.isPresent()) {
                 return true;
             }
         }

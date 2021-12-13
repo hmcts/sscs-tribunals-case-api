@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.docassembly.domain.FormPayload;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -54,6 +55,7 @@ public class IssueDocumentHandler {
                 .appointeeFullName(buildAppointeeName(caseData).orElse(null))
                 .caseId(caseData.getCcdCaseId())
                 .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
+                .isChildSupport(caseData.isBenefitType(Benefit.CHILD_SUPPORT))
                 .noticeBody(Optional.ofNullable(caseData.getBodyContent())
                         .orElse(caseData.getDirectionNoticeContent()))
                 .userName(caseData.getSignedBy())
