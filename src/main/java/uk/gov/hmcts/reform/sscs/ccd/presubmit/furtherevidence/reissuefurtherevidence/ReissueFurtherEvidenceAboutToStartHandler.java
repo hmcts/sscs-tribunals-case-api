@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.reissuefurtherevi
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.userFriendlyName;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -55,9 +56,11 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
 
         if (CollectionUtils.isNotEmpty(availableDocumentsToReIssue)) {
             setDocumentDropdown(sscsCaseData, availableDocumentsToReIssue);
-            sscsCaseData.getReissueFurtherEvidence().setResendToAppellant(null);
-            sscsCaseData.getReissueFurtherEvidence().setResendToRepresentative(null);
-            sscsCaseData.getReissueFurtherEvidence().setResendToDwp(null);
+            ReissueFurtherEvidence reissueFurtherEvidence = sscsCaseData.getReissueFurtherEvidence();
+            reissueFurtherEvidence.setResendToAppellant(null);
+            reissueFurtherEvidence.setResendToRepresentative(null);
+            reissueFurtherEvidence.setResendToDwp(null);
+            reissueFurtherEvidence.setOtherPartyOptions(null);
             sscsCaseData.setOriginalSender(null);
         }
 
@@ -106,10 +109,6 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
             sb.append(doc.getValue().getDocumentLink().getDocumentFilename());
         }
         return sb.toString();
-    }
-
-    private boolean isOtherPartyPresent(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getOtherParties() != null && sscsCaseData.getOtherParties().size() > 0;
     }
 
     private List<OtherPartyOption> getOtherPartyOptions(SscsCaseData sscsCaseData) {

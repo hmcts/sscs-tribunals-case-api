@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.reissuefurtherevi
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
 import static uk.gov.hmcts.reform.sscs.util.ReissueUtils.validateSelectedPartyOptions;
 
 import java.util.*;
@@ -50,7 +51,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandler implements PreSubmitCall
             errors.add("Select a document to re-issue further evidence.");
         }
 
-        validateSelectedPartyOptions(sscsCaseData, errors);
+        validateSelectedPartyOptions(sscsCaseData, errors, isOtherPartyPresent(sscsCaseData));
 
         if (errors.isEmpty() && selectedDocumentUrl.isPresent()) {
             Optional<? extends AbstractDocument> optionalSelectedDocument  = Stream

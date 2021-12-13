@@ -74,6 +74,10 @@ public class OtherPartyDataUtil {
         }
     }
 
+    public static boolean isOtherPartyPresent(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getOtherParties() != null && sscsCaseData.getOtherParties().size() > 0;
+    }
+
     private static boolean otherPartyHasConfidentiality(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getOtherParties() != null) {
             Optional otherParty = sscsCaseData.getOtherParties().stream().filter(op -> YesNo.isYes(op.getValue().getConfidentialityRequired())).findAny();

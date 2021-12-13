@@ -38,7 +38,7 @@ public class ReissueDocumentAboutToSubmitHandler implements PreSubmitCallbackHan
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         ArrayList<String> errors = new ArrayList<>();
 
-        validateSelectedPartyOptions(sscsCaseData, errors);
+        validateSelectedPartyOptions(sscsCaseData, errors, false);
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
         if (CollectionUtils.isNotEmpty(errors)) {
