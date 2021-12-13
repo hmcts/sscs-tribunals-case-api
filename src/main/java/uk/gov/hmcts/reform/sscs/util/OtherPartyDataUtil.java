@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static java.util.Collections.sort;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
@@ -58,6 +60,28 @@ public class OtherPartyDataUtil {
             }
         });
         return currentIds.stream().max(Comparator.naturalOrder()).orElse(0);
+    }
+
+    public static boolean haveOtherPartiesChanged(List<CcdValue<OtherParty>> before, List<CcdValue<OtherParty>> after) {
+        if ((before == null || before.size() == 0) && (after == null || after.size() == 0)) {
+            return false;
+        }
+        if (before == null ^ after == null) {
+            return true;
+        }
+        if (before.size() != after.size()) {
+            return true;
+        }
+        List<String> beforeIds = before.stream().map(ccdValue -> ccdValue.getValue().getId()).collect(Collectors.toList());
+        List<String> afterIds = after.stream().map(ccdValue -> ccdValue.getValue().getId()).collect(Collectors.toList());
+        sort(beforeIds);
+        sort(afterIds);
+        for (int i = 0; i < beforeIds.size(); i++) {
+            if (!beforeIds.get(i).equals(afterIds.get(i))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void checkConfidentiality(SscsCaseData sscsCaseData) {
