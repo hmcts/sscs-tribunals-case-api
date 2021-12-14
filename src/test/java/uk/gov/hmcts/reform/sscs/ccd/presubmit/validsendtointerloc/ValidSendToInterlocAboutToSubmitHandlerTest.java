@@ -82,7 +82,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
                                 new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()),
                                 new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()))
                 ))
-                .reissueFurtherEvidence(ReissueFurtherEvidence.builder()
+                .reissueArtifactUi(ReissueArtifactUi.builder()
                         .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem(selectWhoReviewsCase.getId(),
                                 selectWhoReviewsCase.getLabel()), null)).build())
                 .build();

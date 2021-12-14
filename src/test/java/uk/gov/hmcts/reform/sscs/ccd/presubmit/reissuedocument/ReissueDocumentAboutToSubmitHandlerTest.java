@@ -69,7 +69,7 @@ public class ReissueDocumentAboutToSubmitHandlerTest {
         List<SscsDocument> sscsDocuments = Arrays.asList(document1, document2, document3, document4);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
                 .sscsDocument(sscsDocuments)
-                .reissueFurtherEvidence(ReissueFurtherEvidence.builder()
+                .reissueArtifactUi(ReissueArtifactUi.builder()
                         .resendToAppellant(YesNo.YES)
                         .resendToDwp(YesNo.YES)
                         .resendToRepresentative(YesNo.NO)
@@ -94,10 +94,10 @@ public class ReissueDocumentAboutToSubmitHandlerTest {
 
     @Test
     public void returnsAnErrorIfReissuedToRepresentativeWhenThereIsNoRepOnTheAppealToReissueDocument() {
-        ReissueFurtherEvidence reissueFurtherEvidence = sscsCaseData.getReissueFurtherEvidence();
-        reissueFurtherEvidence.setResendToAppellant(YesNo.NO);
-        reissueFurtherEvidence.setResendToRepresentative(YesNo.YES);
-        reissueFurtherEvidence.setResendToDwp(YesNo.NO);
+        ReissueArtifactUi reissueArtifactUi = sscsCaseData.getReissueArtifactUi();
+        reissueArtifactUi.setResendToAppellant(YesNo.NO);
+        reissueArtifactUi.setResendToRepresentative(YesNo.YES);
+        reissueArtifactUi.setResendToDwp(YesNo.NO);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -108,10 +108,10 @@ public class ReissueDocumentAboutToSubmitHandlerTest {
 
     @Test
     public void returnsAnErrorIfNoPartySelectedForReissue() {
-        ReissueFurtherEvidence reissueFurtherEvidence = sscsCaseData.getReissueFurtherEvidence();
-        reissueFurtherEvidence.setResendToAppellant(YesNo.NO);
-        reissueFurtherEvidence.setResendToRepresentative(YesNo.NO);
-        reissueFurtherEvidence.setResendToDwp(YesNo.NO);
+        ReissueArtifactUi reissueArtifactUi = sscsCaseData.getReissueArtifactUi();
+        reissueArtifactUi.setResendToAppellant(YesNo.NO);
+        reissueArtifactUi.setResendToRepresentative(YesNo.NO);
+        reissueArtifactUi.setResendToDwp(YesNo.NO);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

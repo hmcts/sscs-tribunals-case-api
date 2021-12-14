@@ -114,13 +114,13 @@ public class ReissueDocumentAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
-        assertEquals(4, response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().size());
-        assertEquals(new DynamicListItem("decisionIssued", "Decision Notice"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(0));
-        assertEquals(new DynamicListItem("directionIssued", "Directions Notice"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(1));
-        assertEquals(new DynamicListItem("issueFinalDecision", "Final Decision Notice"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(2));
-        assertEquals(new DynamicListItem("issueAdjournmentNotice", "Adjournment Notice"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(3));
-        assertNull(response.getData().getReissueFurtherEvidence().getResendToAppellant());
-        assertNull(response.getData().getReissueFurtherEvidence().getResendToRepresentative());
+        assertEquals(4, response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().size());
+        assertEquals(new DynamicListItem("decisionIssued", "Decision Notice"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(0));
+        assertEquals(new DynamicListItem("directionIssued", "Directions Notice"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(1));
+        assertEquals(new DynamicListItem("issueFinalDecision", "Final Decision Notice"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(2));
+        assertEquals(new DynamicListItem("issueAdjournmentNotice", "Adjournment Notice"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(3));
+        assertNull(response.getData().getReissueArtifactUi().getResendToAppellant());
+        assertNull(response.getData().getReissueArtifactUi().getResendToRepresentative());
     }
 
     @Test
@@ -154,13 +154,13 @@ public class ReissueDocumentAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
-        assertEquals(4, response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().size());
-        assertEquals(new DynamicListItem("decisionIssuedWelsh", "Decision Notice"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(0));
-        assertEquals(new DynamicListItem("directionIssuedWelsh", "Directions Notice"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(1));
-        assertEquals(new DynamicListItem("issueFinalDecision", "Final Decision Notice"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(2));
-        assertEquals(new DynamicListItem("issueAdjournmentNotice", "Adjournment Notice"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(3));
-        assertNull(response.getData().getReissueFurtherEvidence().getResendToAppellant());
-        assertNull(response.getData().getReissueFurtherEvidence().getResendToRepresentative());
+        assertEquals(4, response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().size());
+        assertEquals(new DynamicListItem("decisionIssuedWelsh", "Decision Notice"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(0));
+        assertEquals(new DynamicListItem("directionIssuedWelsh", "Directions Notice"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(1));
+        assertEquals(new DynamicListItem("issueFinalDecision", "Final Decision Notice"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(2));
+        assertEquals(new DynamicListItem("issueAdjournmentNotice", "Adjournment Notice"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(3));
+        assertNull(response.getData().getReissueArtifactUi().getResendToAppellant());
+        assertNull(response.getData().getReissueArtifactUi().getResendToRepresentative());
     }
 
     @Test
@@ -170,7 +170,7 @@ public class ReissueDocumentAboutToStartHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument());
+        assertNull(response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument());
         assertEquals("There are no documents in this appeal available to reissue.", response.getErrors().iterator().next());
     }
 }

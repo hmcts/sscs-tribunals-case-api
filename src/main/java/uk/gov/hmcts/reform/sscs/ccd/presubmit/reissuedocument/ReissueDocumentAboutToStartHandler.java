@@ -43,9 +43,9 @@ public class ReissueDocumentAboutToStartHandler implements PreSubmitCallbackHand
         if (isEmpty(dropdownList)) {
             response.addError("There are no documents in this appeal available to reissue.");
         } else {
-            sscsCaseData.getReissueFurtherEvidence().setReissueFurtherEvidenceDocument(new DynamicList(dropdownList.get(0), dropdownList));
-            sscsCaseData.getReissueFurtherEvidence().setResendToAppellant(null);
-            sscsCaseData.getReissueFurtherEvidence().setResendToRepresentative(null);
+            sscsCaseData.getReissueArtifactUi().setReissueFurtherEvidenceDocument(new DynamicList(dropdownList.get(0), dropdownList));
+            sscsCaseData.getReissueArtifactUi().setResendToAppellant(null);
+            sscsCaseData.getReissueArtifactUi().setResendToRepresentative(null);
         }
 
         return response;

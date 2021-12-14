@@ -94,10 +94,10 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
-        assertEquals(3, response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().size());
-        assertEquals(new DynamicListItem("url1", "file1.pdf -  Appellant evidence"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(0));
-        assertEquals(new DynamicListItem("url2", "file2.pdf -  Representative evidence"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(1));
-        assertEquals(new DynamicListItem("url3", "file3.pdf -  Dwp evidence"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(2));
+        assertEquals(3, response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().size());
+        assertEquals(new DynamicListItem("url1", "file1.pdf -  Appellant evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(0));
+        assertEquals(new DynamicListItem("url2", "file2.pdf -  Representative evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(1));
+        assertEquals(new DynamicListItem("url3", "file3.pdf -  Dwp evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(2));
         assertNull(response.getData().getOriginalSender());
     }
 
@@ -108,7 +108,7 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument());
+        assertNull(response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument());
         assertEquals("There are no evidence documents in the appeal. Cannot reissue further evidence.", response.getErrors().iterator().next());
     }
 
@@ -125,7 +125,7 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument());
+        assertNull(response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument());
         assertEquals("There are no evidence documents in the appeal. Cannot reissue further evidence.", response.getErrors().iterator().next());
     }
 
@@ -140,19 +140,19 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getWarnings().size(), is(0));
-        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().size(), is(6));
-        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(0).getValue().getOtherPartyOptionName(), is("Peter Parker"));
-        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(0).getValue().getOtherPartyOptionId(), is("1"));
-        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(1).getValue().getOtherPartyOptionName(), is("Otto Octavius - Appointee"));
-        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(1).getValue().getOtherPartyOptionId(), is("2"));
-        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(2).getValue().getOtherPartyOptionName(), is("Harry Osbourne - Representative"));
-        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(2).getValue().getOtherPartyOptionId(), is("3"));
-        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(3).getValue().getOtherPartyOptionName(), is("Peter Parker"));
-        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(3).getValue().getOtherPartyOptionId(), is("4"));
-        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(4).getValue().getOtherPartyOptionName(), is("Otto Octavius - Appointee"));
-        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(4).getValue().getOtherPartyOptionId(), is("5"));
-        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(5).getValue().getOtherPartyOptionName(), is("Harry Osbourne - Representative"));
-        assertThat(response.getData().getReissueFurtherEvidence().getOtherPartyOptions().get(5).getValue().getOtherPartyOptionId(), is("6"));
+        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().size(), is(6));
+        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(0).getValue().getOtherPartyOptionName(), is("Peter Parker"));
+        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(0).getValue().getOtherPartyOptionId(), is("1"));
+        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(1).getValue().getOtherPartyOptionName(), is("Otto Octavius - Appointee"));
+        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(1).getValue().getOtherPartyOptionId(), is("2"));
+        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(2).getValue().getOtherPartyOptionName(), is("Harry Osbourne - Representative"));
+        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(2).getValue().getOtherPartyOptionId(), is("3"));
+        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(3).getValue().getOtherPartyOptionName(), is("Peter Parker"));
+        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(3).getValue().getOtherPartyOptionId(), is("4"));
+        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(4).getValue().getOtherPartyOptionName(), is("Otto Octavius - Appointee"));
+        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(4).getValue().getOtherPartyOptionId(), is("5"));
+        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(5).getValue().getOtherPartyOptionName(), is("Harry Osbourne - Representative"));
+        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(5).getValue().getOtherPartyOptionId(), is("6"));
     }
 
     @Test
@@ -184,14 +184,14 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
-        assertEquals(6, response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().size());
-        assertEquals(new DynamicListItem("url1", "file1.pdf -  Appellant evidence"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(0));
-        assertEquals(new DynamicListItem("url2", "file2.pdf -  Representative evidence"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(1));
-        assertEquals(new DynamicListItem("url3", "file3.pdf -  Dwp evidence"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(2));
+        assertEquals(6, response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().size());
+        assertEquals(new DynamicListItem("url1", "file1.pdf -  Appellant evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(0));
+        assertEquals(new DynamicListItem("url2", "file2.pdf -  Representative evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(1));
+        assertEquals(new DynamicListItem("url3", "file3.pdf -  Dwp evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(2));
         assertNull(response.getData().getOriginalSender());
-        assertEquals(new DynamicListItem("welshUrl1", "Bilingual - welshFile1.pdf -  Appellant evidence"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(3));
-        assertEquals(new DynamicListItem("welshUrl2", "Bilingual - welshFile2.pdf -  Representative evidence"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(4));
-        assertEquals(new DynamicListItem("welshUrl3", "Bilingual - welshFile3.pdf -  Dwp evidence"), response.getData().getReissueFurtherEvidence().getReissueFurtherEvidenceDocument().getListItems().get(5));
+        assertEquals(new DynamicListItem("welshUrl1", "Bilingual - welshFile1.pdf -  Appellant evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(3));
+        assertEquals(new DynamicListItem("welshUrl2", "Bilingual - welshFile2.pdf -  Representative evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(4));
+        assertEquals(new DynamicListItem("welshUrl3", "Bilingual - welshFile3.pdf -  Dwp evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(5));
         assertNull(response.getData().getOriginalSender());
     }
 

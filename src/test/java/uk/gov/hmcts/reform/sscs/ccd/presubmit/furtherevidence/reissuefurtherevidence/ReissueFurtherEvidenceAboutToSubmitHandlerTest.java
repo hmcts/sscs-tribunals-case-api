@@ -64,7 +64,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
         List<SscsDocument> sscsDocuments = Arrays.asList(document1, document2);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
                 .sscsDocument(sscsDocuments)
-                .reissueFurtherEvidence(ReissueFurtherEvidence.builder()
+                .reissueArtifactUi(ReissueArtifactUi.builder()
                         .resendToAppellant(YesNo.YES)
                         .resendToDwp(YesNo.YES)
                         .resendToRepresentative(YesNo.NO)
@@ -117,7 +117,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
                         Arrays.asList(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()),
                                 new DynamicListItem(DWP.getCode(), DWP.getLabel()))
                 ))
-                .reissueFurtherEvidence(ReissueFurtherEvidence.builder().resendToAppellant(YesNo.YES)
+                .reissueArtifactUi(ReissueArtifactUi.builder().resendToAppellant(YesNo.YES)
                         .resendToDwp(YesNo.YES)
                         .resendToRepresentative(YesNo.NO)
                         .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem(selectedUrl, selectedLabel), null)).build()).build();
@@ -142,7 +142,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     public void returnAnErrorIfNoSelectedDocument() {
-        sscsCaseData.getReissueFurtherEvidence().setReissueFurtherEvidenceDocument(null);
+        sscsCaseData.getReissueArtifactUi().setReissueFurtherEvidenceDocument(null);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -163,7 +163,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     public void returnsAnErrorIfThereIsNoPartySelectedToReIssueFurtherEvidence() {
-        ReissueFurtherEvidence reissueFurtherEvidence = sscsCaseData.getReissueFurtherEvidence();
+        ReissueArtifactUi reissueFurtherEvidence = sscsCaseData.getReissueArtifactUi();
         reissueFurtherEvidence.setResendToAppellant(YesNo.NO);
         reissueFurtherEvidence.setResendToRepresentative(YesNo.NO);
         reissueFurtherEvidence.setResendToDwp(YesNo.NO);
@@ -177,7 +177,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     public void returnsAnErrorIfItCouldNotFindTheSelectedDocumentToReIssueFurtherEvidence() {
-        sscsCaseData.getReissueFurtherEvidence().setReissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem("code", "label"), null));
+        sscsCaseData.getReissueArtifactUi().setReissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem("code", "label"), null));
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -188,7 +188,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     public void returnsAnErrorIfReIssuedToRepresentativeWhenThereIsNoRepOnTheAppealToReIssueFurtherEvidence() {
-        sscsCaseData.getReissueFurtherEvidence().setResendToRepresentative(YesNo.YES);
+        sscsCaseData.getReissueArtifactUi().setResendToRepresentative(YesNo.YES);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

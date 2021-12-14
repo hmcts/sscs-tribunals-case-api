@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Service
 public class ReissueFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private static Map<String, String> originalSenderToDocumentType = new HashMap<>();
+    private static final Map<String, String> originalSenderToDocumentType = new HashMap<>();
 
     static {
         originalSenderToDocumentType.put(APPELLANT.getCode(), APPELLANT_EVIDENCE.getValue());
@@ -44,10 +44,10 @@ public class ReissueFurtherEvidenceAboutToSubmitHandler implements PreSubmitCall
         }
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
-        Optional<String> selectedDocumentUrl = Optional.ofNullable(sscsCaseData.getReissueFurtherEvidence().getReissueFurtherEvidenceDocument()).map(f -> f.getValue().getCode());
+        Optional<String> selectedDocumentUrl = Optional.ofNullable(sscsCaseData.getReissueArtifactUi().getReissueFurtherEvidenceDocument()).map(f -> f.getValue().getCode());
         ArrayList<String> errors = new ArrayList<>();
 
-        if (!selectedDocumentUrl.isPresent()) {
+        if (selectedDocumentUrl.isEmpty()) {
             errors.add("Select a document to re-issue further evidence.");
         }
 
@@ -59,7 +59,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandler implements PreSubmitCall
                     .flatMap(x -> x == null ? null : x.stream())
                     .filter(f -> selectedDocumentUrl.get().equals(f.getValue().getDocumentLink().getDocumentUrl()))
                     .findFirst();
-            if (!optionalSelectedDocument.isPresent()) {
+            if (optionalSelectedDocument.isEmpty()) {
                 errors.add(String.format("Could not find the selected document with url '%s' to re-issue further evidence in the appeal with id '%s'.", selectedDocumentUrl.get(), sscsCaseData.getCcdCaseId()));
             } else {
                 AbstractDocumentDetails documentDetails = optionalSelectedDocument.get().getValue();

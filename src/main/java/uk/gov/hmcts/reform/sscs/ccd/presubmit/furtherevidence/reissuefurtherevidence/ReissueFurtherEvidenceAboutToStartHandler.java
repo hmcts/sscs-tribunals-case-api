@@ -54,11 +54,11 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
 
         if (CollectionUtils.isNotEmpty(availableDocumentsToReIssue)) {
             setDocumentDropdown(sscsCaseData, availableDocumentsToReIssue);
-            ReissueFurtherEvidence reissueFurtherEvidence = sscsCaseData.getReissueFurtherEvidence();
-            reissueFurtherEvidence.setResendToAppellant(null);
-            reissueFurtherEvidence.setResendToRepresentative(null);
-            reissueFurtherEvidence.setResendToDwp(null);
-            reissueFurtherEvidence.setOtherPartyOptions(null);
+            ReissueArtifactUi reissueArtifactUi = sscsCaseData.getReissueArtifactUi();
+            reissueArtifactUi.setResendToAppellant(null);
+            reissueArtifactUi.setResendToRepresentative(null);
+            reissueArtifactUi.setResendToDwp(null);
+            reissueArtifactUi.setOtherPartyOptions(null);
             sscsCaseData.setOriginalSender(null);
         }
 
@@ -75,8 +75,8 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
     }
 
     private void setUpOtherPartyOptions(SscsCaseData sscsCaseData) {
-        sscsCaseData.getReissueFurtherEvidence().setShowReissueToOtherPartyUiSection(YesNo.YES);
-        sscsCaseData.getReissueFurtherEvidence().setOtherPartyOptions(getOtherPartyOptions(sscsCaseData));
+        sscsCaseData.getReissueArtifactUi().setShowReissueToOtherPartyUiSection(YesNo.YES);
+        sscsCaseData.getReissueArtifactUi().setOtherPartyOptions(getOtherPartyOptions(sscsCaseData));
     }
 
     private void setDocumentDropdown(SscsCaseData sscsCaseData, List<? extends AbstractDocument> availableDocumentsToReIssue) {
@@ -89,7 +89,7 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
             }
         }
 
-        sscsCaseData.getReissueFurtherEvidence().setReissueFurtherEvidenceDocument(new DynamicList(listCostOptions.get(0), listCostOptions));
+        sscsCaseData.getReissueArtifactUi().setReissueFurtherEvidenceDocument(new DynamicList(listCostOptions.get(0), listCostOptions));
     }
 
     private String buildFormattedLabel(AbstractDocument doc) {
