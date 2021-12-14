@@ -113,7 +113,7 @@ public class CitizenRequestService {
                 .map(CcdValue::getValue)
                 .flatMap(op -> Stream.of((op.hasAppointee()) ? Pair.of(op.getId(), getSubscriptionEmail(op.getOtherPartyAppointeeSubscription())) : null,
                         Pair.of(op.getId(), getSubscriptionEmail(op.getOtherPartySubscription())),
-                        (op.hasRepresentative()) ? Pair.of(op.getRep().getId(), op.getRep().getAddress()) : null))
+                        (op.hasRepresentative()) ? Pair.of(op.getRep().getId(), getSubscriptionEmail(op.getOtherPartyRepresentativeSubscription())) : null))
                 .filter(Objects::nonNull)
                 .filter(p -> p.getLeft() != null && p.getRight() != null)
                 .filter(p -> idamEmail.equals(p.getRight()))

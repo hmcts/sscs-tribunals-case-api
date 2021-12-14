@@ -72,15 +72,15 @@ public class ActionHearingRecordingRequestService {
             case REPRESENTATIVE:
                 return toRequestStatus(Optional.ofNullable(processHearingRecordingRequest.getRep()));
             case OTHER_PARTY:
-                return toRequestStatus(getOtherPartyRequest(otherPartyId, otherPartyHearingRecordingReqUi, processHearingRecordingRequest));
+                return toRequestStatus(getOtherPartyRequest(otherPartyId, otherPartyHearingRecordingReqUi));
             case OTHER_PARTY_REPRESENTATIVE:
-                return toRequestStatus(getOtherPartyRequest(otherPartyId, otherPartyHearingRecordingReqUi, processHearingRecordingRequest));
+                return toRequestStatus(getOtherPartyRequest(otherPartyId, otherPartyHearingRecordingReqUi));
             case APPELLANT: default:
                 return toRequestStatus(Optional.ofNullable(processHearingRecordingRequest.getAppellant()));
         }
     }
 
-    private Optional<DynamicList> getOtherPartyRequest(String otherPartyId, List<OtherPartyHearingRecordingReqUi> otherPartyHearingRecordingReqUi, ProcessHearingRecordingRequest processHearingRecordingRequest) {
+    private Optional<DynamicList> getOtherPartyRequest(String otherPartyId, List<OtherPartyHearingRecordingReqUi> otherPartyHearingRecordingReqUi) {
         return otherPartyHearingRecordingReqUi.stream()
                 .map(OtherPartyHearingRecordingReqUi::getValue)
                 .filter(r -> r.getOtherPartyId().equals(otherPartyId))

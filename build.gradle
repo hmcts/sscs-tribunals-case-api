@@ -214,7 +214,7 @@ def versions = [
         pact: '4.1.7',
         junitJupiter: '5.7.2',
         lombok: '1.18.22',
-        sscsCommon: '4.6.10-RC-SSCS-9826'
+        sscsCommon: '4.6.10-RC3-SSCS-9826'
 ]
 
 ext["rest-assured.version"] = '4.2.0'
@@ -369,7 +369,6 @@ dependencies {
     //remove when secure doc store is live
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile files('/Users/Rasika.Abeyrathna/Workspce/dev/hmcts/SSCS_Common/sscs-common/build/libs/sscs-common-DEV-SNAPSHOT.jar')
     compile group: 'com.github.hmcts', name: 'sscs-common', version: versions.sscsCommon
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.51'
 

@@ -101,6 +101,7 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
                 .value(OtherPartyHearingRecordingReqUiDetails.builder()
                         .otherPartyName(name.getFullNameNoTitle() + (PartyItemList.OTHER_PARTY_REPRESENTATIVE.equals(otherPartyItem) ? " - Representative" : ""))
                         .otherPartyId(otherPartyId)
+                        .requestingParty(otherPartyItem.getCode())
                         .hearingRecordingStatus(otherPartyList).build()).build();
     }
 
@@ -185,11 +186,11 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
     private void validateOtherPartyUiData(ProcessHearingRecordingRequest processHearingRecordingRequest, List<OtherPartyHearingRecordingReqUi> otherPartyHearingRecordingReqUi, PreSubmitCallbackResponse<SscsCaseData> response) {
         int numberOfParties = 0;
         for (CcdValue<OtherParty> otherParty : response.getData().getOtherParties()) {
-            validateParty(PartyItemList.OTHER_PARTY, processHearingRecordingRequest, otherParty.getValue().getRep().getId(), otherPartyHearingRecordingReqUi, response);
+            validateParty(PartyItemList.OTHER_PARTY, processHearingRecordingRequest, otherParty.getValue().getId(), otherPartyHearingRecordingReqUi, response);
             numberOfParties++;
 
             if (null != otherParty.getValue().getRep() && "Yes".equals(otherParty.getValue().getRep().getHasRepresentative())) {
-                validateParty(PartyItemList.OTHER_PARTY, processHearingRecordingRequest, otherParty.getValue().getRep().getId(), otherPartyHearingRecordingReqUi, response);
+                validateParty(PartyItemList.OTHER_PARTY_REPRESENTATIVE, processHearingRecordingRequest, otherParty.getValue().getRep().getId(), otherPartyHearingRecordingReqUi, response);
                 numberOfParties++;
             }
         }

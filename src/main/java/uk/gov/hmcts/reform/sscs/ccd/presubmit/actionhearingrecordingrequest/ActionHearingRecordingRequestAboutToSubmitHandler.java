@@ -75,13 +75,16 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
             processHearingRecordingsRequestsForParty(sscsCaseData, PartyItemList.REPRESENTATIVE, sscsHearingRecordingCaseData,
                     hearingId, processHearingRecordingRequest.getRep().getValue().getCode(), null);
         }
-        sscsCaseData.getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReqUi().stream()
-                .map(OtherPartyHearingRecordingReqUi::getValue).forEach(opr -> processOtherPartyRequest(sscsCaseData, sscsHearingRecordingCaseData, hearingId, opr));
+        if (sscsCaseData.getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReqUi() != null) {
+            sscsCaseData.getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReqUi().stream()
+                    .map(OtherPartyHearingRecordingReqUi::getValue)
+                    .forEach(opr -> processOtherPartyRequest(sscsCaseData, sscsHearingRecordingCaseData, hearingId, opr));
+        }
     }
 
     private void processOtherPartyRequest(SscsCaseData sscsCaseData, SscsHearingRecordingCaseData sscsHearingRecordingCaseData, String hearingId, OtherPartyHearingRecordingReqUiDetails otherPartyRequest) {
         if (isPartyItemSet(otherPartyRequest.getHearingRecordingStatus())) {
-            processHearingRecordingsRequestsForParty(sscsCaseData, PartyItemList.OTHER_PARTY, sscsHearingRecordingCaseData,
+            processHearingRecordingsRequestsForParty(sscsCaseData, PartyItemList.findPartyItemByCode(otherPartyRequest.getRequestingParty()), sscsHearingRecordingCaseData,
                     hearingId, otherPartyRequest.getHearingRecordingStatus().getValue().getCode(), otherPartyRequest.getOtherPartyId());
         }
     }
@@ -116,7 +119,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
                     .collect(Collectors.toSet());
 
             if (partyHearingRecordingsRequests.isEmpty()) {
-                createNewHearingRecordingRequest(partyItemList, sscsHearingRecordingCaseData, hearingId, partyHearingRecordingsRequests);
+                createNewHearingRecordingRequest(partyItemList, sscsHearingRecordingCaseData, hearingId, partyHearingRecordingsRequests, otherPartyId);
             }
 
             if (status.equals(RequestStatus.GRANTED.getValue())) {
@@ -149,7 +152,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
         }
     }
 
-    private void createNewHearingRecordingRequest(PartyItemList partyItemList, SscsHearingRecordingCaseData sscsHearingRecordingCaseData, String hearingId, Set<HearingRecordingRequest> partyHearingRecordingsRequests) {
+    private void createNewHearingRecordingRequest(PartyItemList partyItemList, SscsHearingRecordingCaseData sscsHearingRecordingCaseData, String hearingId, Set<HearingRecordingRequest> partyHearingRecordingsRequests, String otherPartyId) {
         Optional<SscsHearingRecording> recording = sscsHearingRecordingCaseData.getSscsHearingRecordings().stream()
                 .filter(sscsHearing -> sscsHearing.getValue().getHearingId().equals(hearingId)).findAny();
 
@@ -157,6 +160,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
             HearingRecordingRequest recordingRequest = HearingRecordingRequest.builder()
                     .value(HearingRecordingRequestDetails.builder()
                             .sscsHearingRecording(recording.get().getValue()).dateRequested(LocalDate.now().toString())
+                            .otherPartyId(otherPartyId)
                             .requestingParty(partyItemList.getCode()).build()).build();
             partyHearingRecordingsRequests.add(recordingRequest);
         }
@@ -164,7 +168,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
 
     @NotNull
     private Predicate<HearingRecordingRequest> isFromRequestingParty(PartyItemList party, String otherPartyId) {
-        return r -> PartyItemList.OTHER_PARTY.equals(party) ?
+        return r -> (PartyItemList.OTHER_PARTY.equals(party) || PartyItemList.OTHER_PARTY_REPRESENTATIVE.equals(party)) ?
                 (r.getValue().getRequestingParty().equals(party.getCode()) && otherPartyId.equals(r.getValue().getOtherPartyId())) :
                 r.getValue().getRequestingParty().equals(party.getCode());
     }
