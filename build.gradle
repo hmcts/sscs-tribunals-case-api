@@ -205,7 +205,7 @@ def versions = [
         pact: '4.1.7',
         junitJupiter: '5.7.2',
         lombok: '1.18.22',
-        sscsCommon: '4.6.5'
+        sscsCommon: '4.6.8'
 ]
 
 ext["rest-assured.version"] = '4.2.0'
@@ -367,7 +367,7 @@ dependencies {
     implementation group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: versions.sscsCommon
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.49'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.50'
 
     implementation group:'org.overviewproject', name: 'mime-types', version: '1.0.2'
 
