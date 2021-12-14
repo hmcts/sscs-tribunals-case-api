@@ -10,12 +10,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import javax.validation.constraints.NotNull;
-
-import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
@@ -58,9 +55,9 @@ public class ActionHearingRecordingRequestService {
     }
 
     private Predicate<? super HearingRecordingRequest> isRequestingParty(PartyItemList party, String otherPartyId) {
-        return r -> (PartyItemList.OTHER_PARTY.equals(party) || PartyItemList.OTHER_PARTY_REPRESENTATIVE.equals(party)) ?
-                (r.getValue().getRequestingParty().equals(party.getCode()) && otherPartyId.equals(r.getValue().getOtherPartyId())) :
-                r.getValue().getRequestingParty().equals(party.getCode());
+        return r -> (PartyItemList.OTHER_PARTY.equals(party) || PartyItemList.OTHER_PARTY_REPRESENTATIVE.equals(party))
+                ? (r.getValue().getRequestingParty().equals(party.getCode()) && otherPartyId.equals(r.getValue().getOtherPartyId()))
+                : r.getValue().getRequestingParty().equals(party.getCode());
     }
 
     public Optional<RequestStatus> getChangedRequestStatus(PartyItemList party, String otherPartyId, ProcessHearingRecordingRequest processHearingRecordingRequest, List<OtherPartyHearingRecordingReqUi> otherPartyHearingRecordingReqUi) {

@@ -168,9 +168,9 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
 
     @NotNull
     private Predicate<HearingRecordingRequest> isFromRequestingParty(PartyItemList party, String otherPartyId) {
-        return r -> (PartyItemList.OTHER_PARTY.equals(party) || PartyItemList.OTHER_PARTY_REPRESENTATIVE.equals(party)) ?
-                (r.getValue().getRequestingParty().equals(party.getCode()) && otherPartyId.equals(r.getValue().getOtherPartyId())) :
-                r.getValue().getRequestingParty().equals(party.getCode());
+        return r -> (PartyItemList.OTHER_PARTY.equals(party) || PartyItemList.OTHER_PARTY_REPRESENTATIVE.equals(party))
+                ? (r.getValue().getRequestingParty().equals(party.getCode()) && otherPartyId.equals(r.getValue().getOtherPartyId()))
+                : r.getValue().getRequestingParty().equals(party.getCode());
     }
 
     @NotNull

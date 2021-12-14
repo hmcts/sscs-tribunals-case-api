@@ -123,7 +123,7 @@ public class CitizenRequestService {
 
     @Nullable
     private String getSubscriptionEmail(Subscription subscription) {
-       return subscription != null ? subscription.getEmail() : null;
+        return subscription != null ? subscription.getEmail() : null;
     }
 
     private boolean submitHearingRecordingRequest(SscsCaseData sscsCaseData, Long ccdCaseId, List<String> hearingIds, String idamEmail) {

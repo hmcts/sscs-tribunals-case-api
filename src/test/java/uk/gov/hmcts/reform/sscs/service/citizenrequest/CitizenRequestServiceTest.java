@@ -14,7 +14,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -513,6 +512,7 @@ public class CitizenRequestServiceTest {
         assertThat(response.get().getRequestableHearingRecordings().get(0).getHearingDate(), is("2021-01-03"));
         assertThat(response.get().getRequestableHearingRecordings().get(0).getVenue(), is("Town house"));
     }
+
     @Test
     public void testFindHearingRecordings_returnsHearingWithRecording_asRequestableHearingRecordings_OtherPartyRep() {
         when(caseData.getHearings()).thenReturn(List.of(Hearing.builder()
@@ -764,24 +764,24 @@ public class CitizenRequestServiceTest {
 
     private Object[] buildOtherParty() {
         return new Object[]{
-                new Object[]{CcdValue.<OtherParty>builder()
-                        .value(OtherParty.builder()
-                                .id("1")
-                                .otherPartySubscription(Subscription.builder().email(E_MAIL).build()).build())
-                        .build(), "1", PartyItemList.OTHER_PARTY.getCode()},
-                new Object[]{CcdValue.<OtherParty>builder()
-                        .value(OtherParty.builder()
-                                .id("1")
-                                .isAppointee(YesNo.YES.getValue())
-                                .appointee(Appointee.builder().id("2").build())
-                                .otherPartyAppointeeSubscription(Subscription.builder().email(E_MAIL).build()).build())
-                        .build(), "1", PartyItemList.OTHER_PARTY.getCode()},
-                new Object[]{CcdValue.<OtherParty>builder()
-                        .value(OtherParty.builder()
-                                .id("1")
-                                .rep(Representative.builder().id("2").hasRepresentative(YesNo.YES.getValue()).build())
-                                .otherPartyRepresentativeSubscription(Subscription.builder().email(E_MAIL).build()).build())
-                        .build(), "2", PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode()}
+            new Object[]{CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder()
+                    .id("1")
+                    .otherPartySubscription(Subscription.builder().email(E_MAIL).build()).build())
+                .build(), "1", PartyItemList.OTHER_PARTY.getCode()},
+            new Object[]{CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder()
+                    .id("1")
+                    .isAppointee(YesNo.YES.getValue())
+                    .appointee(Appointee.builder().id("2").build())
+                    .otherPartyAppointeeSubscription(Subscription.builder().email(E_MAIL).build()).build())
+                .build(), "1", PartyItemList.OTHER_PARTY.getCode()},
+            new Object[]{CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder()
+                    .id("1")
+                    .rep(Representative.builder().id("2").hasRepresentative(YesNo.YES.getValue()).build())
+                    .otherPartyRepresentativeSubscription(Subscription.builder().email(E_MAIL).build()).build())
+                .build(), "2", PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode()}
         };
     }
 

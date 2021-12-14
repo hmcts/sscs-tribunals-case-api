@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.model.RequestStatus.*;
 import static uk.gov.hmcts.reform.sscs.model.RequestStatus.REQUESTED;
-import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getAllOtherPartiesOnCase;
 
 import java.util.ArrayList;
 import java.util.List;
