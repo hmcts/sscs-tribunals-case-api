@@ -974,6 +974,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     public void givenAConfidentialChildSupportCase_thenDisplayWarningWhenActionFurtherEvidenceEventTriggered() {
+        when(callback.isIgnoreWarnings()).thenReturn(false);
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
@@ -988,7 +989,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
 
-        assertEquals(1, response.getWarnings().size());
+        assertEquals(2, response.getWarnings().size());
         assertEquals("This case has a confidentiality flag, ensure any evidence from the appellant (or appointee) has confidential information redacted", response.getWarnings().iterator().next());
     }
 
