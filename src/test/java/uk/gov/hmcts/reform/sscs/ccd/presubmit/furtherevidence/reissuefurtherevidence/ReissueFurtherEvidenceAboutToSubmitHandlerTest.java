@@ -8,13 +8,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -151,9 +149,10 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void doesNotReturnAnErrorIfNoSelectedOriginalSender() {
-        sscsCaseData = sscsCaseData.toBuilder().originalSender(null).build();
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+    @Parameters({"Yes", "No"})
+    public void doesNotReturnAnErrorIfNoSelectedOriginalSender(String includeOtherParty) {
+        sscsCaseData.setOriginalSender(null);
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
@@ -161,12 +160,30 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals(document1, response.getData().getSscsDocument().get(0));
     }
 
+    @NotNull
+    private List<OtherPartyOption> getOtherPartyOptions(YesNo resendToOtherParty) {
+        return Collections.singletonList(OtherPartyOption
+                .builder()
+                .value(OtherPartyOptionDetails
+                        .builder()
+                        .otherPartyOptionId("1")
+                        .otherPartyOptionName("Tony Stark")
+                        .resendToOtherParty(resendToOtherParty)
+                        .build())
+                .build());
+    }
+
     @Test
-    public void returnsAnErrorIfThereIsNoPartySelectedToReIssueFurtherEvidence() {
+    @Parameters({"Yes", "No"})
+    public void returnsAnErrorIfThereIsNoPartySelectedToReIssueFurtherEvidence(String includeOtherParty) {
         ReissueArtifactUi reissueFurtherEvidence = sscsCaseData.getReissueArtifactUi();
         reissueFurtherEvidence.setResendToAppellant(YesNo.NO);
         reissueFurtherEvidence.setResendToRepresentative(YesNo.NO);
         reissueFurtherEvidence.setResendToDwp(YesNo.NO);
+        if ("Yes".equals(includeOtherParty)) {
+            sscsCaseData.setOtherParties(Collections.singletonList(buildOtherParty("1")));
+            sscsCaseData.getReissueArtifactUi().setOtherPartyOptions(getOtherPartyOptions(YesNo.NO));
+        }
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -203,5 +220,12 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 
-
+    public static CcdValue<OtherParty> buildOtherParty(String id) {
+        return CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder()
+                        .id(id)
+                        .name(Name.builder().firstName("Tony").lastName("Stark").build())
+                        .build())
+                .build();
+    }
 }
