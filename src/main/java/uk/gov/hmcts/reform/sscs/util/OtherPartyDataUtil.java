@@ -62,6 +62,8 @@ public class OtherPartyDataUtil {
             if (otherParty.getRep() != null && isYes(otherParty.getRep().getHasRepresentative()) && otherParty.getRep().getId() == null) {
                 otherParty.getRep().setId(Integer.toString(++maxId));
             }
+
+            log.info("Other party id {}, isSendNewOtherPartyNotification {}", otherParty.getId(), otherParty.getSendNewOtherPartyNotification());
         }
     }
 
