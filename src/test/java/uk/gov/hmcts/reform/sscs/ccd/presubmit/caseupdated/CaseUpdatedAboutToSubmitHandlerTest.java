@@ -517,6 +517,24 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         assertEquals(regionalCenter, response.getData().getDwpRegionalCentre());
     }
 
+    @Test
+    @Parameters({
+        "caseworker-sscs-superuser,1", "caseworker-sscs-systemupdate,0", "caseworker-sscs-clerk,1"
+    })
+    public void givenHearingTypeOralAndWantsToAttendHearingNo_thenAddWarningMessage(String idamUserRole, int warnings) {
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingType(HearingType.ORAL.getValue());
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend("No").build());
+        when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(idamUserRole)).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(warnings, response.getWarnings().size());
+        if (warnings > 0) {
+            assertThat(response.getWarnings(), hasItems("There is a mismatch between the hearing type and the wants to attend field, "
+                + "all hearing options will be cleared please check if this is correct"));
+        }
+    }
+
     private long getNumberOfExpectedError(PreSubmitCallbackResponse<SscsCaseData> response) {
         return response.getErrors().stream()
                 .filter(error -> error.equalsIgnoreCase("Invalid characters are being used at the beginning of address fields, please correct"))
