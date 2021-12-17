@@ -983,7 +983,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertTrue(YesNo.isYes(response.getData().getOtherParties().get(0).getValue().getSendNewOtherPartyNotification()));
         assertTrue(YesNo.isYes(response.getData().getOtherParties().get(1).getValue().getSendNewOtherPartyNotification()));
         assertTrue(YesNo.isYes(response.getData().getOtherParties().get(2).getValue().getSendNewOtherPartyNotification()));
-        assertEquals(DateTimeUtils.generateDwpResponseDueDate(NEW_OTHER_PARTY_RESPONSE_DUE_DAYS), sscsCaseData.getDwpDueDate());
+        assertEquals(DateTimeUtils.generateDwpResponseDueDate(NEW_OTHER_PARTY_RESPONSE_DUE_DAYS), sscsCaseData.getDirectionDueDate());
     }
 
     @Test

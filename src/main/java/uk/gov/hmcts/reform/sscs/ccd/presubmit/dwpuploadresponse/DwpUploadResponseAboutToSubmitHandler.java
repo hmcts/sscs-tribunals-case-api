@@ -89,7 +89,8 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             assignNewOtherPartyData(sscsCaseData.getOtherParties(), DWP_UPLOAD_RESPONSE);
             updateOtherPartyUcb(sscsCaseData);
             if (sscsCaseData.getOtherParties().stream().anyMatch(o -> YesNo.isYes(o.getValue().getSendNewOtherPartyNotification()))) {
-                sscsCaseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate(NEW_OTHER_PARTY_RESPONSE_DUE_DAYS));
+                sscsCaseData.setDirectionDueDate(DateTimeUtils.generateDwpResponseDueDate(NEW_OTHER_PARTY_RESPONSE_DUE_DAYS));
+                sscsCaseData.setDwpDueDate(null);
             }
         }
 
