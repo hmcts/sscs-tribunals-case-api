@@ -33,8 +33,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         // Empty
     }
 
-    public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, String region, RegionalProcessingCenter rpc) {
-        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
+    public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, String region, RegionalProcessingCenter rpc,
+            boolean workAllocationEnabled) {
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, workAllocationEnabled);
 
         return caseData.toBuilder()
                 .region(region)
@@ -42,7 +43,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .build();
     }
 
-    public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper) {
+    public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, boolean workAllocationEnabled) {
         Appeal appeal = getAppeal(syaCaseWrapper);
 
         boolean isDraft = isDraft(syaCaseWrapper);
@@ -61,25 +62,56 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         String ccdCaseId = StringUtils.isEmpty(syaCaseWrapper.getCcdCaseId()) ? null : syaCaseWrapper.getCcdCaseId();
 
         List<SscsDocument> sscsDocuments = getEvidenceDocumentDetails(syaCaseWrapper);
-        return SscsCaseData.builder()
-                .caseCreated(LocalDate.now().toString())
-                .isSaveAndReturn(syaCaseWrapper.getIsSaveAndReturn())
-                .appeal(appeal)
-                .subscriptions(getSubscriptions(syaCaseWrapper))
-                .sscsDocument(sscsDocuments.isEmpty() ? Collections.emptyList() : sscsDocuments)
-                .evidencePresent(hasEvidence(syaCaseWrapper.getEvidenceProvide()))
-                .benefitCode(benefitCode)
-                .issueCode(issueCode)
-                .caseCode(caseCode)
-                .dwpRegionalCentre(getDwpRegionalCenterGivenDwpIssuingOffice(appeal.getBenefitType().getCode(),
-                        appeal.getMrnDetails().getDwpIssuingOffice()))
-                .pcqId(syaCaseWrapper.getPcqId())
-                .languagePreferenceWelsh(booleanToYesNo(syaCaseWrapper.getLanguagePreferenceWelsh()))
-                .translationWorkOutstanding(booleanToYesNull(!sscsDocuments.isEmpty()
-                        && syaCaseWrapper.getLanguagePreferenceWelsh() != null
-                        && syaCaseWrapper.getLanguagePreferenceWelsh()))
-                .ccdCaseId(ccdCaseId)
-                .build();
+
+        if (workAllocationEnabled) {
+            String caseName = null;
+            if (appeal.getAppellant() != null & appeal.getAppellant().getName() != null) {
+                Name name = appeal.getAppellant().getName();
+                caseName = name.getFullNameNoTitle();
+            }
+
+
+            return SscsCaseData.builder()
+                    .caseCreated(LocalDate.now().toString())
+                    .isSaveAndReturn(syaCaseWrapper.getIsSaveAndReturn())
+                    .appeal(appeal)
+                    .subscriptions(getSubscriptions(syaCaseWrapper))
+                    .sscsDocument(sscsDocuments.isEmpty() ? Collections.emptyList() : sscsDocuments)
+                    .evidencePresent(hasEvidence(syaCaseWrapper.getEvidenceProvide()))
+                    .benefitCode(benefitCode)
+                    .issueCode(issueCode)
+                    .caseCode(caseCode)
+                    .dwpRegionalCentre(getDwpRegionalCenterGivenDwpIssuingOffice(appeal.getBenefitType().getCode(),
+                            appeal.getMrnDetails().getDwpIssuingOffice()))
+                    .pcqId(syaCaseWrapper.getPcqId())
+                    .languagePreferenceWelsh(booleanToYesNo(syaCaseWrapper.getLanguagePreferenceWelsh()))
+                    .translationWorkOutstanding(booleanToYesNull(!sscsDocuments.isEmpty()
+                            && syaCaseWrapper.getLanguagePreferenceWelsh() != null
+                            && syaCaseWrapper.getLanguagePreferenceWelsh()))
+                    .ccdCaseId(ccdCaseId)
+                    .caseName(caseName)
+                    .build();
+        } else {
+            return SscsCaseData.builder()
+                    .caseCreated(LocalDate.now().toString())
+                    .isSaveAndReturn(syaCaseWrapper.getIsSaveAndReturn())
+                    .appeal(appeal)
+                    .subscriptions(getSubscriptions(syaCaseWrapper))
+                    .sscsDocument(sscsDocuments.isEmpty() ? Collections.emptyList() : sscsDocuments)
+                    .evidencePresent(hasEvidence(syaCaseWrapper.getEvidenceProvide()))
+                    .benefitCode(benefitCode)
+                    .issueCode(issueCode)
+                    .caseCode(caseCode)
+                    .dwpRegionalCentre(getDwpRegionalCenterGivenDwpIssuingOffice(appeal.getBenefitType().getCode(),
+                            appeal.getMrnDetails().getDwpIssuingOffice()))
+                    .pcqId(syaCaseWrapper.getPcqId())
+                    .languagePreferenceWelsh(booleanToYesNo(syaCaseWrapper.getLanguagePreferenceWelsh()))
+                    .translationWorkOutstanding(booleanToYesNull(!sscsDocuments.isEmpty()
+                            && syaCaseWrapper.getLanguagePreferenceWelsh() != null
+                            && syaCaseWrapper.getLanguagePreferenceWelsh()))
+                    .ccdCaseId(ccdCaseId)
+                    .build();
+        }
     }
 
     private static String getDwpRegionalCenterGivenDwpIssuingOffice(String benefitTypeCode, String dwpIssuingOffice) {
