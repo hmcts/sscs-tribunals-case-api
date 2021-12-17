@@ -144,12 +144,12 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
         assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().size(), is(4));
         assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(0).getValue().getOtherPartyOptionName(), is("Peter Parker"));
         assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(0).getValue().getOtherPartyOptionId(), is("1"));
-        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(2).getValue().getOtherPartyOptionName(), is("Harry Osbourne - Representative"));
-        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(2).getValue().getOtherPartyOptionId(), is("3"));
-        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(4).getValue().getOtherPartyOptionName(), is("Otto Octavius - Appointee"));
-        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(4).getValue().getOtherPartyOptionId(), is("5"));
-        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(5).getValue().getOtherPartyOptionName(), is("Harry Osbourne - Representative"));
-        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(5).getValue().getOtherPartyOptionId(), is("6"));
+        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(1).getValue().getOtherPartyOptionName(), is("Harry Osbourne - Representative"));
+        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(1).getValue().getOtherPartyOptionId(), is("3"));
+        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(2).getValue().getOtherPartyOptionName(), is("Otto Octavius - Appointee"));
+        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(2).getValue().getOtherPartyOptionId(), is("5"));
+        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(3).getValue().getOtherPartyOptionName(), is("Harry Osbourne - Representative"));
+        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(3).getValue().getOtherPartyOptionId(), is("6"));
     }
 
     @Test
