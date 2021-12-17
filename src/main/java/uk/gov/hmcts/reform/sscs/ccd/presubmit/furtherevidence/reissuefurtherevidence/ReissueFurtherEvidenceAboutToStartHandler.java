@@ -30,7 +30,7 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_START)
-            && callback.getEvent() == EventType.REISSUE_FURTHER_EVIDENCE;
+                && callback.getEvent() == EventType.REISSUE_FURTHER_EVIDENCE;
     }
 
     @Override
@@ -45,12 +45,12 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
         List<? extends AbstractDocument> allSscsDocs = Stream.of(sscsCaseData.getSscsDocument(), sscsCaseData.getSscsWelshDocuments()).flatMap(x -> x == null ? null : x.stream()).filter(doc -> StringUtils.isNotBlank(doc.getValue().getDocumentType())).collect(Collectors.toList());
 
         ArrayList<? extends AbstractDocument> availableDocumentsToReIssue =
-            Optional.ofNullable(allSscsDocs).map(Collection::stream)
-                .orElse(Stream.empty()).filter(f ->
-                APPELLANT_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
-                    || REPRESENTATIVE_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
-                    || DWP_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
-            ).collect(Collectors.toCollection(ArrayList::new));
+                Optional.ofNullable(allSscsDocs).map(Collection::stream)
+                        .orElse(Stream.empty()).filter(f ->
+                                APPELLANT_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
+                                        || REPRESENTATIVE_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
+                                        || DWP_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
+                        ).collect(Collectors.toCollection(ArrayList::new));
 
         if (CollectionUtils.isNotEmpty(availableDocumentsToReIssue)) {
             setDocumentDropdown(sscsCaseData, availableDocumentsToReIssue);
@@ -119,22 +119,24 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
 
     private void addOtherPartyOption(List<OtherPartyOption> otherPartyOptions, CcdValue<OtherParty> otherParty) {
         OtherParty otherPartyDetail = otherParty.getValue();
-        otherPartyOptions.add(getOtherPartyElement(otherPartyDetail.getName().getFullNameNoTitle(), otherPartyDetail.getId()));
 
-        if (isAppointee(otherPartyDetail)) {
+        if (isOtherPartyWithAppointee(otherPartyDetail)) {
             otherPartyOptions.add(getOtherPartyElement(otherPartyDetail.getAppointee().getName().getFullNameNoTitle() + " - Appointee", otherPartyDetail.getAppointee().getId()));
+        } else {
+            otherPartyOptions.add(getOtherPartyElement(otherPartyDetail.getName().getFullNameNoTitle(), otherPartyDetail.getId()));
         }
-        if (isRepresentative(otherPartyDetail)) {
+
+        if (isOtherPartyWithRepresentative(otherPartyDetail)) {
             otherPartyOptions.add(getOtherPartyElement(otherPartyDetail.getRep().getName().getFullNameNoTitle() + " - Representative", otherPartyDetail.getRep().getId()));
         }
     }
 
-    private boolean isRepresentative(OtherParty otherPartyDetail) {
+    private boolean isOtherPartyWithRepresentative(OtherParty otherPartyDetail) {
         return otherPartyDetail.getRep() != null && "Yes".equals(otherPartyDetail.getRep().getHasRepresentative());
     }
 
-    private boolean isAppointee(OtherParty otherPartyDetail) {
-        return  otherPartyDetail.getAppointee() != null && "Yes".equals(otherPartyDetail.getIsAppointee());
+    private boolean isOtherPartyWithAppointee(OtherParty otherPartyDetail) {
+        return otherPartyDetail.getAppointee() != null && "Yes".equals(otherPartyDetail.getIsAppointee());
     }
 
     private OtherPartyOption getOtherPartyElement(String name, String id) {
