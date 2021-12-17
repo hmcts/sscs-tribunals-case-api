@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -132,7 +133,7 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
     @Test
     public void givenCaseWithMultipleOtherParties_thenBuildTheOtherPartyOptionsSection() {
 
-        sscsCaseData.setOtherParties(Arrays.asList(buildOtherPartyWithAppointeeAndRep("1", "2", "3"),
+        sscsCaseData.setOtherParties(Arrays.asList(buildOtherPartyWithAppointeeAndRep("1", "", "3"),
                 buildOtherPartyWithAppointeeAndRep("4", "5", "6")));
 
         final PreSubmitCallbackResponse<SscsCaseData> response =
@@ -140,15 +141,11 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getWarnings().size(), is(0));
-        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().size(), is(6));
+        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().size(), is(4));
         assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(0).getValue().getOtherPartyOptionName(), is("Peter Parker"));
         assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(0).getValue().getOtherPartyOptionId(), is("1"));
-        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(1).getValue().getOtherPartyOptionName(), is("Otto Octavius - Appointee"));
-        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(1).getValue().getOtherPartyOptionId(), is("2"));
         assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(2).getValue().getOtherPartyOptionName(), is("Harry Osbourne - Representative"));
         assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(2).getValue().getOtherPartyOptionId(), is("3"));
-        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(3).getValue().getOtherPartyOptionName(), is("Peter Parker"));
-        assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(3).getValue().getOtherPartyOptionId(), is("4"));
         assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(4).getValue().getOtherPartyOptionName(), is("Otto Octavius - Appointee"));
         assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(4).getValue().getOtherPartyOptionId(), is("5"));
         assertThat(response.getData().getReissueArtifactUi().getOtherPartyOptions().get(5).getValue().getOtherPartyOptionName(), is("Harry Osbourne - Representative"));
@@ -200,8 +197,8 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
                 .value(OtherParty.builder()
                         .id(id)
                         .name(Name.builder().firstName("Peter").lastName("Parker").build())
-                        .isAppointee(YES.getValue())
-                        .appointee(Appointee.builder().id(appointeeId).name(Name.builder().firstName("Otto").lastName("Octavius").build()).build())
+                        .isAppointee(StringUtils.isBlank(appointeeId) ? YesNo.NO.getValue() : YES.getValue())
+                        .appointee(StringUtils.isBlank(appointeeId) ? null : Appointee.builder().id(appointeeId).name(Name.builder().firstName("Otto").lastName("Octavius").build()).build())
                         .rep(Representative.builder().id(repId).name(Name.builder().firstName("Harry").lastName("Osbourne").build()).hasRepresentative(YES.getValue()).build())
                         .build())
                 .build();
