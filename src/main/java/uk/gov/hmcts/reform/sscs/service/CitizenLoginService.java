@@ -122,7 +122,7 @@ public class CitizenLoginService {
                         log.info(format("Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] has subscription", caseByAppealNumber.getId(), tya, email, postcode));
                         citizenCcdService.addUserToCase(idamService.getIdamTokens(), citizenIdamTokens.getUserId(), caseByAppealNumber.getId());
                         updateCaseWithLastLoggedIntoMya(email, caseByAppealNumber);
-                        return onlineHearingService.loadHearing(caseByAppealNumber);
+                        return onlineHearingService.loadHearing(caseByAppealNumber, tya, email);
                     } else {
                         log.info(format("Associate case: Subscription does not match id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
                     }
