@@ -61,7 +61,7 @@ public class SubmitAppealService {
                         ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
                         AirLookupService airLookupService,
                         EvidenceManagementSecureDocStoreService secureDocStoreService,
-                        @Value("${feature.work_allocation.enabled}")  boolean workAllocationFeature) {
+                        @Value("${feature.work-allocation.enabled}")  boolean workAllocationFeature) {
 
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
