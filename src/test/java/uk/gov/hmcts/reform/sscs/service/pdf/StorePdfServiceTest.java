@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.io.ByteArrayResource;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.domain.UpdateDocParams;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -69,12 +70,13 @@ public class StorePdfServiceTest {
         byte[] expectedPdfBytes = {2, 4, 6, 0, 1};
         when(pdfService.createPdf(pdfContent, "sometemplate")).thenReturn(expectedPdfBytes);
         String expectedCaseId = "expectedCcdCaseId";
-        when(sscsPdfService.updateDoc(fileNamePrefix + CASE_ID + ".pdf", expectedPdfBytes, caseId, caseDetails.getData(), "Other evidence"))
+        UpdateDocParams params = UpdateDocParams.builder().pdf(expectedPdfBytes).fileName(fileNamePrefix + CASE_ID + ".pdf").caseId(caseId).caseData(caseDetails.getData()).documentType("Other evidence").build();
+        when(sscsPdfService.updateDoc(params))
                 .thenReturn(SscsCaseData.builder().ccdCaseId(expectedCaseId).build());
 
         MyaEventActionContext myaEventActionContext = storePdfService.storePdf(caseId, someOnlineHearingId, new PdfData(caseDetails));
 
-        verify(sscsPdfService).updateDoc(fileNamePrefix + CASE_ID + ".pdf", expectedPdfBytes, caseId, caseDetails.getData(), "Other evidence");
+        verify(sscsPdfService).updateDoc(params);
         assertThat(myaEventActionContext.getPdf().getContent(), is(new ByteArrayResource(expectedPdfBytes)));
         assertThat(myaEventActionContext.getPdf().getName(), is(fileNamePrefix + CASE_ID + ".pdf"));
         assertThat(myaEventActionContext.getDocument().getData().getCcdCaseId(), is(expectedCaseId));
@@ -88,12 +90,13 @@ public class StorePdfServiceTest {
         when(pdfService.createPdf(pdfContent, "sometemplate")).thenReturn(expectedPdfBytes);
         String expectedCaseId = "expectedCcdCaseId";
 
-        when(sscsPdfService.updateDoc(fileNamePrefix + CASE_ID + ".pdf", expectedPdfBytes, caseId, caseDetails.getData(), "Other evidence"))
+        UpdateDocParams params = UpdateDocParams.builder().pdf(expectedPdfBytes).fileName(fileNamePrefix + CASE_ID + ".pdf").caseId(caseId).caseData(caseDetails.getData()).documentType("Other evidence").build();
+        when(sscsPdfService.updateDoc(params))
                 .thenReturn(SscsCaseData.builder().ccdCaseId(expectedCaseId).build());
 
         MyaEventActionContext myaEventActionContext = storePdfService.storePdf(caseId, someOnlineHearingId, new PdfData(caseDetails));
 
-        verify(sscsPdfService).updateDoc(fileNamePrefix + CASE_ID + ".pdf", expectedPdfBytes, caseId, caseDetails.getData(), "Other evidence");
+        verify(sscsPdfService).updateDoc(params);
         assertThat(myaEventActionContext.getPdf().getContent(), is(new ByteArrayResource(expectedPdfBytes)));
         assertThat(myaEventActionContext.getPdf().getName(), is(fileNamePrefix + CASE_ID + ".pdf"));
         assertThat(myaEventActionContext.getDocument().getData().getCcdCaseId(), is(expectedCaseId));
@@ -105,12 +108,13 @@ public class StorePdfServiceTest {
         byte[] expectedPdfBytes = {2, 4, 6, 0, 1};
         when(pdfService.createPdf(pdfContent, "sometemplate")).thenReturn(expectedPdfBytes);
         String expectedCaseId = "expectedCcdCaseId";
-        when(sscsPdfService.mergeDocIntoCcd(fileNamePrefix + CASE_ID + ".pdf", expectedPdfBytes, caseId, caseDetails.getData(), idamTokens, "Other evidence"))
+        UpdateDocParams params = UpdateDocParams.builder().pdf(expectedPdfBytes).fileName(fileNamePrefix + CASE_ID + ".pdf").caseId(caseId).caseData(caseDetails.getData()).documentType("Other evidence").build();
+        when(sscsPdfService.mergeDocIntoCcd(params, idamTokens))
                 .thenReturn(SscsCaseData.builder().ccdCaseId(expectedCaseId).build());
 
         MyaEventActionContext myaEventActionContext = storePdfService.storePdfAndUpdate(caseId, someOnlineHearingId, new PdfData(caseDetails));
 
-        verify(sscsPdfService).mergeDocIntoCcd(fileNamePrefix + CASE_ID + ".pdf", expectedPdfBytes, caseId, caseDetails.getData(), idamTokens, "Other evidence");
+        verify(sscsPdfService).mergeDocIntoCcd(params, idamTokens);
         assertThat(myaEventActionContext.getPdf().getContent(), is(new ByteArrayResource(expectedPdfBytes)));
         assertThat(myaEventActionContext.getPdf().getName(), is(fileNamePrefix + CASE_ID + ".pdf"));
         assertThat(myaEventActionContext.getDocument().getData().getCcdCaseId(), is(expectedCaseId));

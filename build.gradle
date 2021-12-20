@@ -214,7 +214,7 @@ def versions = [
         pact: '4.1.7',
         junitJupiter: '5.7.2',
         lombok: '1.18.22',
-        sscsCommon: '4.6.5'
+        sscsCommon: '4.6.13'
 ]
 
 ext["rest-assured.version"] = '4.2.0'
@@ -229,6 +229,7 @@ dependencyManagement {
         dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
         dependency group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.16.0'
         dependency group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.16.0'
+        
         // resolves: CVE-2020-28052
         dependency group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.69'
         //CVE-2021-40690
@@ -369,7 +370,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
     compile group: 'com.github.hmcts', name: 'sscs-common', version: versions.sscsCommon
-    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.49'
+    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.51'
 
 
     compile group:'org.overviewproject', name: 'mime-types', version: '1.0.2'
