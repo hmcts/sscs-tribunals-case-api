@@ -2,15 +2,19 @@ package uk.gov.hmcts.reform.sscs.util;
 
 
 import static org.junit.Assert.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
-
+@RunWith(JUnitParamsRunner.class)
 public class OtherPartyDataUtilTest {
 
     @Test
@@ -28,51 +32,92 @@ public class OtherPartyDataUtilTest {
     }
 
     @Test
-    public void givenNewOtherPartyAdded_thenAssignAnId() {
+    @Parameters({"UPDATE_OTHER_PARTY_DATA", "DWP_UPLOAD_RESPONSE"})
+    public void givenNewOtherPartyAdded_thenAssignAnIdAndNotificationFlag(EventType eventType) {
         List<CcdValue<OtherParty>> otherParties = Arrays.asList(buildOtherPartyWithAppointeeAndRep(null, null, null));
 
-        OtherPartyDataUtil.assignOtherPartyId(otherParties);
+        OtherPartyDataUtil.assignNewOtherPartyData(otherParties, eventType);
 
         assertEquals(1, otherParties.size());
         assertEquals("1", otherParties.get(0).getValue().getId());
         assertEquals("2", otherParties.get(0).getValue().getAppointee().getId());
         assertEquals("3", otherParties.get(0).getValue().getRep().getId());
+        assertTrue(YesNo.isYes(otherParties.get(0).getValue().getSendNewOtherPartyNotification()));
     }
 
     @Test
-    public void givenExistingOtherParties_thenNewOtherPartyAssignedNextId() {
-        List<CcdValue<OtherParty>> otherParties = Arrays.asList(buildOtherParty("2"), buildOtherParty("1"), buildOtherPartyWithAppointeeAndRep(null, null, null));
+    public void givenExistingOtherPartiesInUpdateOtherParty_thenNewOtherPartyAssignedNextIdAndSetNotificationFlagForOnlyNewOnes() {
+        List<CcdValue<OtherParty>> otherParties = Arrays.asList(buildOtherPartyWithNotificationFlag("2", true), buildOtherParty("1"), buildOtherPartyWithAppointeeAndRep(null, null, null));
 
-        OtherPartyDataUtil.assignOtherPartyId(otherParties);
+        OtherPartyDataUtil.assignNewOtherPartyData(otherParties, EventType.UPDATE_OTHER_PARTY_DATA);
 
         assertEquals(3, otherParties.size());
         assertEquals("3", otherParties.get(2).getValue().getId());
         assertEquals("4", otherParties.get(2).getValue().getAppointee().getId());
         assertEquals("5", otherParties.get(2).getValue().getRep().getId());
+        assertTrue(YesNo.isYes(otherParties.get(2).getValue().getSendNewOtherPartyNotification()));
+        assertFalse(YesNo.isYes(otherParties.get(1).getValue().getSendNewOtherPartyNotification()));
+        assertFalse(YesNo.isYes(otherParties.get(0).getValue().getSendNewOtherPartyNotification()));
     }
 
     @Test
-    public void givenExistingOtherPartiesWithAppointeeAndRep_thenNewOtherPartyAssignedNextId() {
+    public void givenExistingOtherPartiesInDwpResponse_thenNewOtherPartyAssignedNextIdAndSetNotificationFlagForAllPartiesNotSentTheNotificationYet() {
+        List<CcdValue<OtherParty>> otherParties = Arrays.asList(buildOtherPartyWithNotificationFlag("2", true), buildOtherParty("1"), buildOtherPartyWithAppointeeAndRep(null, null, null));
+
+        OtherPartyDataUtil.assignNewOtherPartyData(otherParties, EventType.DWP_UPLOAD_RESPONSE);
+
+        assertEquals(3, otherParties.size());
+        assertEquals("3", otherParties.get(2).getValue().getId());
+        assertEquals("4", otherParties.get(2).getValue().getAppointee().getId());
+        assertEquals("5", otherParties.get(2).getValue().getRep().getId());
+        assertTrue(YesNo.isYes(otherParties.get(2).getValue().getSendNewOtherPartyNotification()));
+        assertTrue(YesNo.isYes(otherParties.get(1).getValue().getSendNewOtherPartyNotification()));
+        assertFalse(YesNo.isYes(otherParties.get(0).getValue().getSendNewOtherPartyNotification()));
+    }
+
+    @Test
+    @Parameters({"UPDATE_OTHER_PARTY_DATA", "DWP_UPLOAD_RESPONSE"})
+    public void givenExistingOtherPartiesWithAppointeeAndRep_thenNewOtherPartyAssignedNextId(EventType eventType) {
         List<CcdValue<OtherParty>> otherParties = Arrays.asList(buildOtherParty("2"), buildOtherPartyWithAppointeeAndRep("1", "3", "4"), buildOtherPartyWithAppointeeAndRep(null, null, null));
 
-        OtherPartyDataUtil.assignOtherPartyId(otherParties);
+        OtherPartyDataUtil.assignNewOtherPartyData(otherParties, eventType);
 
         assertEquals(3, otherParties.size());
         assertEquals("5", otherParties.get(2).getValue().getId());
+        assertTrue(YesNo.isYes(otherParties.get(2).getValue().getSendNewOtherPartyNotification()));
         assertEquals("6", otherParties.get(2).getValue().getAppointee().getId());
         assertEquals("7", otherParties.get(2).getValue().getRep().getId());
     }
 
     @Test
-    public void givenExistingOtherParties_thenNewOtherPartyAppointeeAndRepAssignedNextId() {
+    @Parameters({"UPDATE_OTHER_PARTY_DATA", "DWP_UPLOAD_RESPONSE"})
+    public void givenExistingOtherParties_thenNewOtherPartyAppointeeAndRepAssignedNextId(EventType eventType) {
         List<CcdValue<OtherParty>> otherParties = Arrays.asList(buildOtherPartyWithAppointeeAndRep("2", null, null), buildOtherPartyWithAppointeeAndRep("1", "3", "4"), buildOtherParty(null));
 
-        OtherPartyDataUtil.assignOtherPartyId(otherParties);
+        OtherPartyDataUtil.assignNewOtherPartyData(otherParties, eventType);
 
         assertEquals(3, otherParties.size());
         assertEquals("5", otherParties.get(0).getValue().getAppointee().getId());
         assertEquals("6", otherParties.get(0).getValue().getRep().getId());
         assertEquals("7", otherParties.get(2).getValue().getId());
+    }
+
+    @Test
+    @Parameters(method = "buildOtherPartyBeforeAndAfterCollections")
+    public void givenNewOtherPartyAdded_thenReturnTrue(List<CcdValue<OtherParty>> before, List<CcdValue<OtherParty>> after, boolean hasNewOtherParty) {
+        assertEquals(hasNewOtherParty, OtherPartyDataUtil.hasNewOtherPartyAdded(before,after));
+    }
+
+    public Object[] buildOtherPartyBeforeAndAfterCollections() {
+        return new Object[] {
+            new Object[] { null, null, false },
+            new Object[] { null, List.of(), false },
+            new Object[] { null, List.of(buildOtherParty("1")), true },
+            new Object[] { List.of(), List.of(buildOtherParty("1")), true },
+            new Object[] { List.of(buildOtherParty("1"), buildOtherParty("2")), List.of(buildOtherParty("1"), buildOtherParty("2")), false },
+            new Object[] { List.of(buildOtherParty("1"), buildOtherParty("2")), List.of(buildOtherParty("1"), buildOtherParty("2"), buildOtherParty("3")), true },
+            new Object[] { List.of(buildOtherParty("1"), buildOtherParty("2")), List.of(buildOtherParty("1"), buildOtherParty("3")), true },
+        };
     }
 
     private CcdValue<OtherParty> buildOtherParty(String id) {
@@ -84,6 +129,15 @@ public class OtherPartyDataUtilTest {
                 .value(OtherParty.builder()
                         .id(id)
                         .unacceptableCustomerBehaviour(ucb ? YesNo.YES : YesNo.NO)
+                        .build())
+                .build();
+    }
+
+    private CcdValue<OtherParty> buildOtherPartyWithNotificationFlag(String id, boolean sendNotification) {
+        return CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder()
+                        .id(id)
+                        .sendNewOtherPartyNotification(sendNotification ? YES : NO)
                         .build())
                 .build();
     }
