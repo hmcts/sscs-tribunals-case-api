@@ -435,7 +435,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         YesNo evidenceIssued = isEvidenceIssuedAndShouldNotBeSentToBulkPrint(sscsCaseData.getFurtherEvidenceAction()) ? YesNo.YES : YesNo.NO;
 
-        String originalSenderOtherPartyId = findOriginalSenderOtherPartyId(documentType, sscsCaseData.getOriginalSender().getValue().getCode());
+        String originalSenderOtherPartyId = scannedDocument.getValue().getOriginalSenderOtherPartyId();
+
+        if (originalSenderOtherPartyId == null) {
+            originalSenderOtherPartyId = findOriginalSenderOtherPartyId(documentType, sscsCaseData.getOriginalSender().getValue().getCode());
+        }
 
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentType(documentType.getValue())
@@ -447,11 +451,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 .documentDateAdded(scannedDate)
                 .controlNumber(scannedDocument.getValue().getControlNumber())
                 .evidenceIssued(evidenceIssued.getValue())
-                .originalSenderOtherPartyId(scannedDocument.getValue().getOriginalSenderOtherPartyId())
+                .originalSenderOtherPartyId(originalSenderOtherPartyId)
                 .originalSenderOtherPartyName(scannedDocument.getValue().getOriginalSenderOtherPartyName())
                 .documentTranslationStatus(
                         sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null)
-                .originalSenderOtherPartyId(originalSenderOtherPartyId)
                 .build()).build();
     }
 
