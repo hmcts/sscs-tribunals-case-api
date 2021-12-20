@@ -448,6 +448,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 .documentDateAdded(scannedDate)
                 .controlNumber(scannedDocument.getValue().getControlNumber())
                 .evidenceIssued(evidenceIssued.getValue())
+                .originalSenderOtherPartyId(scannedDocument.getValue().getOriginalSenderOtherPartyId())
+                .originalSenderOtherPartyName(scannedDocument.getValue().getOriginalSenderOtherPartyName())
                 .documentTranslationStatus(
                         sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null)
                 .build()).build();
