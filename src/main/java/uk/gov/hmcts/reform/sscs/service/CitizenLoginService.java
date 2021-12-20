@@ -116,13 +116,13 @@ public class CitizenLoginService {
             log.info(format("Associate case: Found case to assign id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
             String appealPostcode = caseByAppealNumber.getData().getAppeal().getAppellant().getAddress().getPostcode();
             if (appealPostcode != null && !appealPostcode.isEmpty()) {
-                if (postcodeUtil.hasAppellantOrOtherPartyPostcode(caseByAppealNumber, postcode)) {
+                if (postcodeUtil.hasAppellantOrOtherPartyPostcode(caseByAppealNumber, postcode, email)) {
                     log.info(format("Associate case: Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] matches postcode", caseByAppealNumber.getId(), tya, email, postcode));
                     if (caseHasSubscriptionWithTyaAndEmail(caseByAppealNumber, tya, email)) {
                         log.info(format("Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] has subscription", caseByAppealNumber.getId(), tya, email, postcode));
                         citizenCcdService.addUserToCase(idamService.getIdamTokens(), citizenIdamTokens.getUserId(), caseByAppealNumber.getId());
                         updateCaseWithLastLoggedIntoMya(email, caseByAppealNumber);
-                        return onlineHearingService.loadHearing(caseByAppealNumber);
+                        return onlineHearingService.loadHearing(caseByAppealNumber, tya, email);
                     } else {
                         log.info(format("Associate case: Subscription does not match id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
                     }

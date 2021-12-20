@@ -183,6 +183,7 @@
                             {{ pdfSummary.appealDetails.surname }}
                         </dd>
                     </div>
+                    {% if pdfSummary.appealDetails.hideNino == false  %}
                     <div>
                         <dt class="cya-question">
                             NINO
@@ -191,6 +192,7 @@
                             {{ pdfSummary.appealDetails.nino }}
                         </dd>
                     </div>
+                    {% endif %}
                     <div>
                         <dt class="cya-question">
                             Appeal reference number
