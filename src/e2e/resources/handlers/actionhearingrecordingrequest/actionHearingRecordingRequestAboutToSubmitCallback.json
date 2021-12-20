@@ -124,48 +124,43 @@
         }
       ],
       "benefitCode": "002",
-      "processHearingRecordingRequests": [
-        {
+      "processHearingRecordingRequest": {
+        "hearingTitle": "Hearing 1",
+        "hearingInformation": "asdgsdfgsdfgsdfg 12:12:00 12 Dec 2000",
+        "dwp": {
           "value": {
-            "hearingTitle": "Hearing 1",
-            "hearingInformation": "asdgsdfgsdfgsdfg 12:12:00 12 Dec 2000",
-            "dwp": {
-              "value": {
-                "code": "Granted",
-                "label": "Refused"
-              },
-              "list_items": [
-                {
-                  "code": "Granted",
-                  "label": "Granted"
-                },
-                {
-                  "code": "Refused",
-                  "label": "Refused"
-                },
-                {
-                  "code": "Requested",
-                  "label": "Requested"
-                }
-              ]
-            },
-            "jointParty": null,
-            "appellant": null,
-            "hearingId": "12345566767",
-            "recordings": [
-              {
-                "value": {
-                  "document_url": "http://dm-store:5005/documents/75b515f7-e5ad-4f1d-99ad-18ffb1a98d10",
-                  "document_binary_url": "http://dm-store:5005/documents/75b515f7-e5ad-4f1d-99ad-18ffb1a98d10/binary",
-                  "document_filename": "Final asdgsdfgsdfgsdfg 12 Dec 2000.mp3"
-                },
-                "id": "03ebc02c-f5cf-48d7-ba80-aa735a21a95e"
-              }
-            ]
+            "code": "Granted",
+            "label": "Refused"
           },
-          "id": "943414f0-4bd0-415a-a704-f1eb87f50404"
-        }
-      ],
+          "list_items": [
+            {
+              "code": "Granted",
+              "label": "Granted"
+            },
+            {
+              "code": "Refused",
+              "label": "Refused"
+            },
+            {
+              "code": "Requested",
+              "label": "Requested"
+            }
+          ]
+        },
+        "jointParty": null,
+        "appellant": null,
+        "hearingId": "12345566767",
+        "recordings": [
+          {
+            "value": {
+              "document_url": "http://dm-store:5005/documents/75b515f7-e5ad-4f1d-99ad-18ffb1a98d10",
+              "document_binary_url": "http://dm-store:5005/documents/75b515f7-e5ad-4f1d-99ad-18ffb1a98d10/binary",
+              "document_filename": "Final asdgsdfgsdfgsdfg 12 Dec 2000.mp3"
+            },
+            "id": "03ebc02c-f5cf-48d7-ba80-aa735a21a95e"
+          }
+        ]
+      },
       "releasedHearingsTextList": "No hearing recordings have been released to DWP on this case",
       "hearingRecording": {
         "recordings": [

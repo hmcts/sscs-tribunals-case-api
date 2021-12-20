@@ -7,6 +7,8 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 
 import java.util.ArrayList;
@@ -451,7 +453,10 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(2, response.getWarnings().size());
-        assertThat(response.getWarnings(), hasItems("Benefit type code is invalid, should be one of: ESA, JSA, PIP, DLA, UC, carersAllowance, attendanceAllowance, bereavementBenefit, industrialInjuriesDisablement, maternityAllowance, socialFund, incomeSupport, bereavementSupportPaymentScheme, industrialDeathBenefit, pensionCredit, retirementPension, childSupport",
+        assertThat(response.getWarnings(), hasItems("Benefit type code is invalid, should be one of: ESA, JSA, PIP, DLA, UC, carersAllowance, attendanceAllowance, "
+                        + "bereavementBenefit, industrialInjuriesDisablement, maternityAllowance, socialFund, incomeSupport, bereavementSupportPaymentScheme, "
+                        + "industrialDeathBenefit, pensionCredit, retirementPension, childSupport, taxCredit, guardiansAllowance, taxFreeChildcare, "
+                        + "homeResponsibilitiesProtection, childBenefit, thirtyHoursFreeChildcare, guaranteedMinimumPension, nationalInsuranceCredits",
                 "DWP issuing office is empty"));
     }
 
@@ -463,7 +468,10 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getWarnings().size());
-        assertThat(response.getWarnings(), hasItems("Benefit type code is invalid, should be one of: ESA, JSA, PIP, DLA, UC, carersAllowance, attendanceAllowance, bereavementBenefit, industrialInjuriesDisablement, maternityAllowance, socialFund, incomeSupport, bereavementSupportPaymentScheme, industrialDeathBenefit, pensionCredit, retirementPension, childSupport"));
+        assertThat(response.getWarnings(), hasItems("Benefit type code is invalid, should be one of: ESA, JSA, PIP, DLA, UC, carersAllowance, attendanceAllowance, "
+                + "bereavementBenefit, industrialInjuriesDisablement, maternityAllowance, socialFund, incomeSupport, bereavementSupportPaymentScheme, "
+                + "industrialDeathBenefit, pensionCredit, retirementPension, childSupport, taxCredit, guardiansAllowance, taxFreeChildcare, "
+                + "homeResponsibilitiesProtection, childBenefit, thirtyHoursFreeChildcare, guaranteedMinimumPension, nationalInsuranceCredits"));
     }
 
     @Test
@@ -515,6 +523,24 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         assertEquals(regionalCenter, response.getData().getDwpRegionalCentre());
     }
 
+    @Test
+    @Parameters({
+        "caseworker-sscs-superuser,1", "caseworker-sscs-systemupdate,0", "caseworker-sscs-clerk,1"
+    })
+    public void givenHearingTypeOralAndWantsToAttendHearingNo_thenAddWarningMessage(String idamUserRole, int warnings) {
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingType(HearingType.ORAL.getValue());
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend("No").build());
+        when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(idamUserRole)).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(warnings, response.getWarnings().size());
+        if (warnings > 0) {
+            assertThat(response.getWarnings(), hasItems("There is a mismatch between the hearing type and the wants to attend field, "
+                + "all hearing options will be cleared please check if this is correct"));
+        }
+    }
+
     private long getNumberOfExpectedError(PreSubmitCallbackResponse<SscsCaseData> response) {
         return response.getErrors().stream()
                 .filter(error -> error.equalsIgnoreCase("Invalid characters are being used at the beginning of address fields, please correct"))
@@ -523,5 +549,74 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     private Address buildAddress(String line1, String line2, String county, String town) {
         return Address.builder().line1(line1).line2(line2).county(county).town(town).build();
+    }
+
+    @Test
+    public void givenACaseAppellantConfidentialityYes_thenCaseConfidentialYes() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(YES);
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(YES, response.getData().getIsConfidentialCase());
+    }
+
+    @Test
+    public void givenACaseAppellantConfidentialityNo_thenCaseConfidentialNull() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(null, response.getData().getIsConfidentialCase());
+    }
+
+    @Test
+    public void givenACaseAppellantConfidentialityNoOtherPartyYes_thenCaseConfidentialYes() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequired(YES).build()).build();
+        otherPartyList.add(ccdValue);
+        callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(YES, response.getData().getIsConfidentialCase());
+    }
+
+    @Test
+    public void givenACaseOtherPartyConfidentialityYes_thenCaseConfidentialYes() {
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequired(YES).build()).build();
+        otherPartyList.add(ccdValue);
+        callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(YES, response.getData().getIsConfidentialCase());
+    }
+
+    @Test
+    public void givenACaseOtherPartyConfidentialityNo_thenCaseConfidentialNull() {
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequired(NO).build()).build();
+        otherPartyList.add(ccdValue);
+        callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(null, response.getData().getIsConfidentialCase());
+    }
+
+    @Test
+    public void givenACaseOtherPartyConfidentialityNoAndYes_thenCaseConfidentialYes() {
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequired(NO).build()).build();
+        otherPartyList.add(ccdValue);
+        CcdValue<OtherParty> ccdValue1 = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequired(YES).build()).build();
+        otherPartyList.add(ccdValue1);
+        callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(YES, response.getData().getIsConfidentialCase());
     }
 }

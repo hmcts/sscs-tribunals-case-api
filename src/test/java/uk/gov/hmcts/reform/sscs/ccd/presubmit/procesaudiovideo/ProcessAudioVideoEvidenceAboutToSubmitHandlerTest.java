@@ -213,6 +213,8 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertEquals("Addition A - Appellant - Statement for A/V file: music.mp3", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals(DocumentType.AUDIO_DOCUMENT.getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("Appellant", response.getData().getSscsDocument().get(0).getValue().getPartyUploaded().getLabel());
+        assertNull(response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyName());
+        assertNull(response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyId());
         assertEquals("New doc with footer", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentFilename());
         assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
     }
@@ -713,5 +715,24 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         } else {
             assertThat(response.getData().getInterlocReviewState(), is(finalState.getId()));
         }
+    }
+
+
+    @Test
+    public void givenAdmitEvidence_willCopyOtherPartyFieldsToSscsDocuments() {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(ADMIT_EVIDENCE.getCode()));
+        sscsCaseData.getAudioVideoEvidence().get(0).getValue().setOriginalSenderOtherPartyId("1");
+        sscsCaseData.getAudioVideoEvidence().get(0).getValue().setOriginalSenderOtherPartyName("Other Party");
+        sscsCaseData.setSelectedAudioVideoEvidenceDetails(sscsCaseData.getAudioVideoEvidence().get(0).getValue());
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("Addition A - Appellant - Statement for A/V file: music.mp3", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals(DocumentType.AUDIO_DOCUMENT.getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals("Appellant", response.getData().getSscsDocument().get(0).getValue().getPartyUploaded().getLabel());
+        assertEquals("New doc with footer", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentFilename());
+        assertEquals("Other Party", response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyName());
+        assertEquals("1", response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyId());
+        assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
     }
 }
