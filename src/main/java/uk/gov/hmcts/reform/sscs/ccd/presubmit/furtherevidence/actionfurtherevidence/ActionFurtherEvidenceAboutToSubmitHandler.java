@@ -19,17 +19,17 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurth
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyName;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -40,10 +40,12 @@ import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil;
+import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 
 @Component
 @Slf4j
 public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+    private static final Enum<EventType> EVENT_TYPE = EventType.ACTION_FURTHER_EVIDENCE;
     public static final String YES = YesNo.YES.getValue();
     public static final String NO = YesNo.NO.getValue();
     public static final String POSTPONEMENT_DETAILS_IS_MANDATORY = "Postponement Details is mandatory for postponement requests.";
@@ -59,17 +61,17 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private final FooterService footerService;
     private final BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder;
     private final UserDetailsService userDetailsService;
-    private final boolean workAllocationFeature;
+    private final AddedDocumentsUtil addedDocumentsUtil;
 
     @Autowired
     public ActionFurtherEvidenceAboutToSubmitHandler(FooterService footerService,
                                                      BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder,
                                                      UserDetailsService userDetailsService,
-                                                     @Value("${feature.workAllocation.enabled}") boolean workAllocationFeature) {
+                                                     AddedDocumentsUtil addedDocumentsUtil) {
         this.footerService = footerService;
         this.bundleAdditionFilenameBuilder = bundleAdditionFilenameBuilder;
         this.userDetailsService = userDetailsService;
-        this.workAllocationFeature = workAllocationFeature;
+        this.addedDocumentsUtil = addedDocumentsUtil;
     }
 
     public static void checkWarningsAndErrors(SscsCaseData sscsCaseData, ScannedDocument scannedDocument, String caseId,
@@ -158,7 +160,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() == EventType.ACTION_FURTHER_EVIDENCE
+            && callback.getEvent() == EVENT_TYPE
             && caseData.getFurtherEvidenceAction() != null
             && caseData.getOriginalSender() != null;
     }
@@ -308,7 +310,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private void buildSscsDocumentFromScan(SscsCaseData sscsCaseData, State caseState, Boolean ignoreWarnings,
                                            PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        Map<String, Integer> documentsAddedThisEvent = new HashMap<>();
+        List<String> documentsAddedThisEvent = new ArrayList<>();
         if (sscsCaseData.getScannedDocuments() != null) {
             for (ScannedDocument scannedDocument : sscsCaseData.getScannedDocuments()) {
                 if (scannedDocument != null && scannedDocument.getValue() != null) {
@@ -325,13 +327,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
                     if (!equalsIgnoreCase(scannedDocument.getValue().getType(), COVERSHEET)) {
                         SscsDocument sscsDocument = buildSscsDocument(sscsCaseData, scannedDocument, caseState);
-
+                        documentsAddedThisEvent.add(sscsDocument.getValue().getDocumentType());
                         addSscsDocumentToCaseData(sscsCaseData, sscsDocument);
                         setReinstateCaseFieldsIfReinstatementRequest(sscsCaseData, sscsDocument);
                         setTranslationWorkOutstanding(sscsCaseData);
-                        if (workAllocationFeature) {
-                            insertDocumentAddedThisEvent(documentsAddedThisEvent, sscsDocument);
-                        }
                     }
 
                     sscsCaseData.setEvidenceHandled(YES);
@@ -342,9 +341,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                         sscsCaseData.getCcdCaseId());
                 }
             }
-            if (workAllocationFeature) {
-                setDocumentsAddedThisEvent(sscsCaseData, documentsAddedThisEvent);
-            }
+
+            addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, documentsAddedThisEvent, EVENT_TYPE);
 
         } else {
             preSubmitCallbackResponse.addError("No further evidence to process");
@@ -400,30 +398,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             if (preSubmitCallbackResponse.getErrors().size() == 0) {
                 setConfidentialCaseFields(sscsCaseData);
             }
-        }
-    }
-
-    private void insertDocumentAddedThisEvent(Map<String, Integer> documentsAddedThisEvent,
-                                              SscsDocument document) {
-        SscsDocumentDetails details = document.getValue();
-        String type = details.getDocumentType();
-        if (documentsAddedThisEvent.containsKey(type)) {
-            Integer count = documentsAddedThisEvent.get(type);
-            documentsAddedThisEvent.put(type, ++count);
-        } else {
-            documentsAddedThisEvent.put(type, 1);
-        }
-    }
-
-    private void setDocumentsAddedThisEvent(SscsCaseData sscsCaseData, Map<String, Integer> documentsAddedThisEvent) {
-        if (!documentsAddedThisEvent.isEmpty()) {
-            try {
-                sscsCaseData.setAddedDocuments(new ObjectMapper().writeValueAsString(documentsAddedThisEvent));
-            } catch (JsonProcessingException e) {
-                throw new IllegalStateException(e);
-            }
-            log.info("Case {} with event actionFurtherEvidence added documents: {}.", sscsCaseData.getCcdCaseId(),
-                sscsCaseData.getAddedDocuments());
         }
     }
 
