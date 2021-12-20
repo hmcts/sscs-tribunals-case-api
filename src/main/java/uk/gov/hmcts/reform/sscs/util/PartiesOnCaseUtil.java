@@ -73,15 +73,15 @@ public class PartiesOnCaseUtil {
 
     private static void addOtherPartyRepresentativeToListOptions(List<DynamicListItem> listOptions, int i, OtherParty otherParty) {
         if (isYes(ofNullable(otherParty.getRep()).map(Representative::getHasRepresentative).orElse(NO.getValue())) && otherParty.getRep() != null && otherParty.getRep().getName() != null) {
-            listOptions.add(new DynamicListItem(OTHER_PARTY_REPRESENTATIVE.getCode(), format("%s %s - Representative - %s", OTHER_PARTY_REPRESENTATIVE.getLabel(), i + 1, otherParty.getRep().getName().getFullNameNoTitle())));
+            listOptions.add(new DynamicListItem(OTHER_PARTY_REPRESENTATIVE.getCode() + otherParty.getRep().getId(), format("%s %s - Representative - %s", OTHER_PARTY_REPRESENTATIVE.getLabel(), i + 1, otherParty.getRep().getName().getFullNameNoTitle())));
         }
     }
 
     private static void addOtherPartyOrOtherPartyAppointeeToListOptions(List<DynamicListItem> listOptions, int i, OtherParty otherParty) {
         if (isYes(otherParty.getIsAppointee()) && otherParty.getAppointee() != null && otherParty.getAppointee().getName() != null) {
-            listOptions.add(new DynamicListItem(OTHER_PARTY.getCode(), format("%s %s - %s / Appointee - %s", OTHER_PARTY.getLabel(), i + 1, otherParty.getName().getFullNameNoTitle(), otherParty.getAppointee().getName().getFullNameNoTitle())));
+            listOptions.add(new DynamicListItem(OTHER_PARTY.getCode() + otherParty.getAppointee().getId(), format("%s %s - %s / Appointee - %s", OTHER_PARTY.getLabel(), i + 1, otherParty.getName().getFullNameNoTitle(), otherParty.getAppointee().getName().getFullNameNoTitle())));
         } else {
-            listOptions.add(new DynamicListItem(OTHER_PARTY.getCode(), format("%s %s - %s", OTHER_PARTY.getLabel(), i + 1, otherParty.getName().getFullNameNoTitle())));
+            listOptions.add(new DynamicListItem(OTHER_PARTY.getCode() + otherParty.getId(), format("%s %s - %s", OTHER_PARTY.getLabel(), i + 1, otherParty.getName().getFullNameNoTitle())));
         }
     }
 
