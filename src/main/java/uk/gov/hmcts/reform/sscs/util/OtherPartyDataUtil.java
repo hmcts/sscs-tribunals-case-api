@@ -3,9 +3,7 @@ package uk.gov.hmcts.reform.sscs.util;
 import static java.util.Collections.sort;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -17,13 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 public class OtherPartyDataUtil {
 
@@ -112,7 +104,7 @@ public class OtherPartyDataUtil {
                     && sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired() != null
                     && YesNo.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired()))
                     || otherPartyHasConfidentiality(sscsCaseData)) {
-                sscsCaseData.setIsConfidentialCase(YesNo.YES);
+                sscsCaseData.setIsConfidentialCase(YES);
             } else {
                 sscsCaseData.setIsConfidentialCase(null);
             }
