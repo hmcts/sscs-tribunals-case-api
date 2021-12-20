@@ -1,10 +1,11 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -97,5 +98,75 @@ public class OtherPartyDataUtilTest {
                         .build())
                 .build();
     }
+
+    List<CcdValue<OtherParty>> before;
+    List<CcdValue<OtherParty>> after;
+
+    @Test
+    public void testComparingListsOfOtherParties() {
+        before = Arrays.asList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_1").build()).build());
+        after = Arrays.asList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_1").build()).build());
+
+        assertFalse(OtherPartyDataUtil.haveOtherPartiesChanged(before, after));
+    }
+
+    @Test
+    public void testComparingListsOfOtherPartiesRemoved() {
+        before = Arrays.asList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_1").build()).build());
+        after = Collections.emptyList();
+
+        assertTrue(OtherPartyDataUtil.haveOtherPartiesChanged(before, after));
+    }
+
+    @Test
+    public void testComparingListsOfOtherPartiesDifferentIds() {
+        before = Arrays.asList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_1").build()).build());
+        after = Arrays.asList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_2").build()).build());
+
+        assertTrue(OtherPartyDataUtil.haveOtherPartiesChanged(before, after));
+    }
+
+    @Test
+    public void testComparingListsOfOtherPartiesOrder() {
+        before = Arrays.asList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_1").build()).build(),
+                CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_2").build()).build());
+        after = Arrays.asList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_2").build()).build(),
+                CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_1").build()).build());
+
+        assertFalse(OtherPartyDataUtil.haveOtherPartiesChanged(before, after));
+    }
+
+    @Test
+    public void testComparingListsOfOtherPartiesNullId() {
+        before = Arrays.asList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_1").build()).build());
+        after = Arrays.asList(CcdValue.<OtherParty>builder().value(OtherParty.builder().build()).build());
+
+        assertTrue(OtherPartyDataUtil.haveOtherPartiesChanged(before, after));
+    }
+
+    @Test
+    public void testComparingListsOfOtherPartiesNullList() {
+        before = null;
+        after = null;
+
+        assertFalse(OtherPartyDataUtil.haveOtherPartiesChanged(before, after));
+    }
+
+    @Test
+    public void testComparingListsOfOtherPartiesNullBfore() {
+        before = null;
+        after = Arrays.asList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_1").build()).build());;
+
+        assertTrue(OtherPartyDataUtil.haveOtherPartiesChanged(before, after));
+    }
+
+    @Test
+    public void testComparingListsOfOtherPartiesNullAfter() {
+        before = Arrays.asList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_1").build()).build());;
+        after = null;
+
+        assertTrue(OtherPartyDataUtil.haveOtherPartiesChanged(before, after));
+    }
+
 
 }
