@@ -6,11 +6,10 @@ import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnproce
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 @RunWith(JUnitParamsRunner.class)
 public class AudioVideoEvidenceUtilTest {
@@ -38,14 +37,27 @@ public class AudioVideoEvidenceUtilTest {
 
     @Test
     @Parameters({
-            "appellantEvidence",
-            "jointPartyEvidence",
-            "representativeEvidence",
-            "dwpEvidence",
-            "hmctsEvidence"
+        "appellantEvidence",
+        "jointPartyEvidence",
+        "representativeEvidence",
+        "dwpEvidence",
+        "hmctsEvidence"
     })
     public void shouldBeValidAudioVideoDocumentType(String documentType) {
         assertTrue(AudioVideoEvidenceUtil.isValidAudioVideoDocumentType(documentType));
+    }
+
+    @Test
+    @Parameters({
+        "test.mp3, audioDocument",
+        "test2.mp4, videoDocument",
+        "test3.doc, null",
+    })
+    public void shouldReturnCorrectDocumentTypeValue(String documentFileName, @Nullable String documentTypeValue) {
+        AudioVideoEvidenceDetails details = AudioVideoEvidenceDetails.builder()
+            .documentLink(DocumentLink.builder()
+                .documentFilename(documentFileName).build()).build();
+        assertEquals(AudioVideoEvidenceUtil.getDocumentTypeValue(details), documentTypeValue);
     }
 
     @Test
@@ -55,11 +67,11 @@ public class AudioVideoEvidenceUtilTest {
 
     @Test
     @Parameters({
-            "jointPartyEvidence, Joint party",
-            "representativeEvidence, Representative",
-            "dwpEvidence, DWP",
-            "hmctsEvidence, HMCTS",
-            "default, Appellant"
+        "jointPartyEvidence, Joint party",
+        "representativeEvidence, Representative",
+        "dwpEvidence, DWP",
+        "hmctsEvidence, HMCTS",
+        "default, Appellant"
     })
     public void shouldMatchOriginalSender(String input, String expected) {
         assertEquals(AudioVideoEvidenceUtil.getOriginalSender(input), expected);

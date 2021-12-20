@@ -2,11 +2,7 @@ package uk.gov.hmcts.reform.sscs.util;
 
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DWP_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.HMCTS_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.JOINT_PARTY_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -32,6 +28,14 @@ public class AudioVideoEvidenceUtil {
         return null;
     }
 
+    public static String getDocumentTypeValue(AudioVideoEvidenceDetails evidence) {
+        DocumentType type = getDocumentType(evidence);
+        if (type != null) {
+            return type.getValue();
+        }
+        return null;
+    }
+
     public static boolean isSelectedEvidence(AudioVideoEvidence evidence, SscsCaseData caseData) {
         return evidence.getValue().getDocumentLink().getDocumentUrl()
             .equals(caseData.getSelectedAudioVideoEvidence().getValue().getCode());
@@ -49,10 +53,10 @@ public class AudioVideoEvidenceUtil {
 
     public static boolean isValidAudioVideoDocumentType(String documentType) {
         return APPELLANT_EVIDENCE.getValue().equals(documentType)
-                || JOINT_PARTY_EVIDENCE.getValue().equals(documentType)
-                || REPRESENTATIVE_EVIDENCE.getValue().equals(documentType)
-                || DWP_EVIDENCE.getValue().equals(documentType)
-                || HMCTS_EVIDENCE.getValue().equals(documentType);
+            || JOINT_PARTY_EVIDENCE.getValue().equals(documentType)
+            || REPRESENTATIVE_EVIDENCE.getValue().equals(documentType)
+            || DWP_EVIDENCE.getValue().equals(documentType)
+            || HMCTS_EVIDENCE.getValue().equals(documentType);
     }
 
     public static String getOriginalSender(String documentType) {
@@ -65,7 +69,8 @@ public class AudioVideoEvidenceUtil {
                 return "DWP";
             case "hmctsEvidence":
                 return "HMCTS";
-            default: return "Appellant";
+            default:
+                return "Appellant";
         }
     }
 }

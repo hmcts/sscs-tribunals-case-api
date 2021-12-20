@@ -6,8 +6,11 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -19,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 
 @RunWith(JUnitParamsRunner.class)
 public class SupplementaryResponseAboutToSubmitHandlerTest {
@@ -35,17 +39,20 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
+    private AddedDocumentsUtil addedDocumentsUtil;
+
     @Before
     public void setUp() {
+        addedDocumentsUtil = new AddedDocumentsUtil(false);
         openMocks(this);
-        handler = new SupplementaryResponseAboutToSubmitHandler();
+        handler = new SupplementaryResponseAboutToSubmitHandler(addedDocumentsUtil);
 
         when(callback.getEvent()).thenReturn(EventType.DWP_SUPPLEMENTARY_RESPONSE);
 
         sscsCaseData = SscsCaseData.builder()
-                .ccdCaseId("1234")
-                .appeal(Appeal.builder().build())
-                .build();
+            .ccdCaseId("1234")
+            .appeal(Appeal.builder().build())
+            .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -177,6 +184,58 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         assertNull(response.getData().getDwpOtherDoc());
         assertNull(response.getData().getShowRip1DocPage());
         assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
+    }
+
+    @Test
+    @Parameters({
+        "test.mp3, audioDocument",
+        "test2.mp4, videoDocument",
+    })
+    public void givenASupplementaryResponseWithAudioVideoEvidence_shouldInsertIntoAddedDocuments(String documentFileName,
+                                                                                                 String documentTypeValue)
+        throws JsonProcessingException {
+        handler = new SupplementaryResponseAboutToSubmitHandler(new AddedDocumentsUtil(true));
+        sscsCaseData.setDwpOtherDoc(DwpResponseDocument.builder()
+            .documentLink(DocumentLink.builder()
+                .documentFilename(documentFileName)
+                .documentUrl("myurl2")
+                .build())
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
+            .readValue(response.getData().getAddedDocuments());
+
+        org.assertj.core.api.Assertions.assertThat(addedDocuments)
+            .as("One audio or video file has been added to the case. Correct type should be added to added documents.")
+            .containsOnly(org.assertj.core.api.Assertions.entry(documentTypeValue, 1));
+    }
+
+    @Test
+    public void givenASupplementaryResponseWitOnlyDocuments_shouldNotBeInsertedIntoAddedDocuments() {
+        handler = new SupplementaryResponseAboutToSubmitHandler(new AddedDocumentsUtil(true));
+
+        sscsCaseData.setDwpSupplementaryResponseDoc(DwpResponseDocument.builder()
+            .documentLink(DocumentLink.builder()
+                .documentFilename("test1.doc")
+                .documentUrl("myurl1")
+                .build())
+            .build());
+
+        sscsCaseData.
+            setDwpOtherDoc(DwpResponseDocument.builder()
+                .documentLink(DocumentLink.builder()
+                    .documentFilename("test2.doc")
+                    .documentUrl("myurl2")
+                    .build())
+                .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        org.assertj.core.api.Assertions.assertThat(response.getData().getAddedDocuments())
+            .as("Only audio evidence should be inserted into added documents.")
+            .isNull();
     }
 
     @Test
