@@ -4,6 +4,7 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getAllOtherPartiesWithIdOnCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,9 +47,16 @@ public class ReissueDocumentAboutToStartHandler implements PreSubmitCallbackHand
             sscsCaseData.getReissueArtifactUi().setReissueFurtherEvidenceDocument(new DynamicList(dropdownList.get(0), dropdownList));
             sscsCaseData.getReissueArtifactUi().setResendToAppellant(null);
             sscsCaseData.getReissueArtifactUi().setResendToRepresentative(null);
+            sscsCaseData.getTransientFields().setReissueDocumentOtherParty(getReissueDocumentOtherParty(sscsCaseData));
         }
 
         return response;
+    }
+
+    private List<CcdValue<ReissueDocumentOtherParty>> getReissueDocumentOtherParty(SscsCaseData sscsCaseData) {
+        return getAllOtherPartiesWithIdOnCase(sscsCaseData).stream()
+                .map(pair -> new CcdValue<>(ReissueDocumentOtherParty.builder().otherPartyName(pair.getRight()).otherPartyId(pair.getLeft()).build()))
+                .collect(Collectors.toList());
     }
 
     private List<DynamicListItem> getDocumentDropdown(SscsCaseData sscsCaseData) {
@@ -77,6 +85,4 @@ public class ReissueDocumentAboutToStartHandler implements PreSubmitCallbackHand
         return listCostOptions;
 
     }
-
-
 }

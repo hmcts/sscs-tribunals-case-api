@@ -120,6 +120,25 @@ public class ReissueDocumentAboutToSubmitHandlerTest {
         assertEquals("Select a party to reissue.", response.getErrors().toArray()[0]);
     }
 
+    @Test
+    public void canReIssueToAnOtherParty() {
+        sscsCaseData = sscsCaseData.toBuilder().resendToAppellant("No").build();
+        sscsCaseData = sscsCaseData.toBuilder().resendToRepresentative("No").build();
+        ReissueDocumentOtherParty reissueDocumentOtherParty = ReissueDocumentOtherParty.builder().otherPartyId("1")
+                .otherPartyName("Name").reissue(YesNo.YES).build();
+        sscsCaseData = sscsCaseData.toBuilder().transientFields(TransientFields.builder()
+                .reissueDocumentOtherParty(List.of(new CcdValue<>(reissueDocumentOtherParty)))
+                .build())
+                .otherParties(List.of(new CcdValue<>(OtherParty.builder().id("1").build())))
+                .build();
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size());
+    }
+
     @Test(expected = IllegalStateException.class)
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
