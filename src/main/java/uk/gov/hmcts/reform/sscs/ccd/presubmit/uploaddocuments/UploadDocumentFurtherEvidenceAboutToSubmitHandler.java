@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -132,14 +131,17 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
             .filter(doc -> DocumentUtil.isFileAMedia(doc.getValue().getDocumentLink()))
             .map(doc ->
                 AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
-                    .documentLink(doc.getValue().getDocumentLink())
-                    .fileName(doc.getValue().getDocumentFileName() != null ? doc.getValue().getDocumentFileName() :
-                        doc.getValue().getDocumentLink().getDocumentFilename())
-                    .dateAdded(LocalDate.now())
-                    .partyUploaded(UploadParty.CTSC)
-                    .originalPartySender(getOriginalSender(doc.getValue().getDocumentType()))
-                    .documentType(resolveAudioVideoDocumentTypeFromFileNameOrDocumentLink(doc))
-                    .build()).build()).collect(toList());
+                        .documentLink(doc.getValue().getDocumentLink())
+                        .fileName(doc.getValue().getDocumentFileName() != null ? doc.getValue().getDocumentFileName() :
+                            doc.getValue().getDocumentLink().getDocumentFilename())
+                        .dateAdded(LocalDate.now())
+                        .partyUploaded(UploadParty.CTSC)
+                        .originalPartySender(getOriginalSender(doc.getValue().getDocumentType()))
+                        .documentType(AudioVideoEvidenceUtil.getDocumentTypeValue(doc.getValue().getDocumentLink()
+                            .getDocumentFilename()))
+                        .build())
+                    .build())
+            .collect(toList());
 
         addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, newAudioVideoEvidence.stream()
             .map(audioVideoEvidence -> audioVideoEvidence.getValue().getDocumentType())
@@ -155,15 +157,6 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
             }
             sscsCaseData.setInterlocReferralReason(REVIEW_AUDIO_VIDEO_EVIDENCE.getId());
         }
-    }
-
-    @Nullable
-    private String resolveAudioVideoDocumentTypeFromFileNameOrDocumentLink(SscsFurtherEvidenceDoc doc) {
-        return AudioVideoEvidenceUtil.getDocumentTypeValue(doc.getValue()
-            .getDocumentFileName()) != null ? AudioVideoEvidenceUtil.getDocumentTypeValue(doc.getValue()
-            .getDocumentFileName())
-            : AudioVideoEvidenceUtil.getDocumentTypeValue(doc.getValue()
-            .getDocumentLink().getDocumentFilename());
     }
 
     private void uploadHearingRecordingRequest(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
