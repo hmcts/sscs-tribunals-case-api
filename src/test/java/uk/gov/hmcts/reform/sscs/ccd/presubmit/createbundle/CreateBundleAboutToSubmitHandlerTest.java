@@ -325,8 +325,7 @@ public class CreateBundleAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenChildSupported_thenPopulateEditedAndUneditedConfigFilename() {
-        addMandatoryDwpDocuments();
+    public void givenChildSupportedCaseWithEditedSscsDocument_thenPopulateEditedAndUneditedConfigFilename() {
         addEditedSscsDocuments();
         sscsCaseData.setBenefitCode("022");
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
@@ -343,6 +342,26 @@ public class CreateBundleAboutToSubmitHandlerTest {
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
         assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
+
+    @Test
+    public void givenChildSupportedCaseWithEditedDwpDocument_thenPopulateEditedAndUneditedConfigFilename() {
+        addMandatoryDwpDocuments();
+        sscsCaseData.setBenefitCode("022");
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(2, response.getData().getMultiBundleConfiguration().size());
+        assertEquals("bundleEnglishEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
+        assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
+        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
+    }
+
 
     @Test
     public void givenPhmeGrantedAndEnhancedConfidentiality_thenPopulateEditedAndUneditedConfigFilename() {
