@@ -213,6 +213,36 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenASupplementaryResponseWithAudioVideoEvidenceSentMultipleTimes_shouldInsertMostRecentIntoAddedDocuments()
+        throws JsonProcessingException {
+        handler = new SupplementaryResponseAboutToSubmitHandler(new AddedDocumentsUtil(true));
+        sscsCaseData.setDwpOtherDoc(DwpResponseDocument.builder()
+            .documentLink(DocumentLink.builder()
+                .documentFilename("test.mp4")
+                .documentUrl("myurl2")
+                .build())
+            .build());
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        sscsCaseData.setDwpOtherDoc(DwpResponseDocument.builder()
+            .documentLink(DocumentLink.builder()
+                .documentFilename("test.mp3")
+                .documentUrl("myurl2")
+                .build())
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
+            .readValue(response.getData().getAddedDocuments());
+
+        org.assertj.core.api.Assertions.assertThat(addedDocuments)
+            .as("Added documents should only contain evidence added in the most recent event.")
+            .containsOnly(org.assertj.core.api.Assertions.entry("audioDocument", 1));
+    }
+
+    @Test
     public void givenASupplementaryResponseWitOnlyDocuments_shouldNotBeInsertedIntoAddedDocuments() {
         handler = new SupplementaryResponseAboutToSubmitHandler(new AddedDocumentsUtil(true));
 

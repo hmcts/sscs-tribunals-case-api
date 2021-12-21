@@ -9,7 +9,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidenceDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @Slf4j
@@ -19,19 +18,21 @@ public class AudioVideoEvidenceUtil {
         //
     }
 
-    public static DocumentType getDocumentType(AudioVideoEvidenceDetails evidence) {
-        if (evidence.getDocumentLink().getDocumentFilename().toLowerCase().contains("mp3")) {
+    public static DocumentType getDocumentType(String filename) {
+        if (filename.toLowerCase().contains("mp3")) {
             return DocumentType.AUDIO_DOCUMENT;
-        } else if (evidence.getDocumentLink().getDocumentFilename().toLowerCase().contains("mp4")) {
+        } else if (filename.toLowerCase().contains("mp4")) {
             return DocumentType.VIDEO_DOCUMENT;
         }
         return null;
     }
 
-    public static String getDocumentTypeValue(AudioVideoEvidenceDetails evidence) {
-        DocumentType type = getDocumentType(evidence);
-        if (type != null) {
-            return type.getValue();
+    public static String getDocumentTypeValue(String filename) {
+        if (filename != null) {
+            DocumentType type = getDocumentType(filename);
+            if (type != null) {
+                return type.getValue();
+            }
         }
         return null;
     }

@@ -96,20 +96,17 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private void addAudioVideoEvidence(SscsCaseData sscsCaseData) {
+        String fileName = sscsCaseData.getDwpOtherDoc().getDocumentLink().getDocumentFilename();
         AudioVideoEvidence audioVideoEvidence = AudioVideoEvidence.builder()
             .value(AudioVideoEvidenceDetails.builder()
                 .documentLink(sscsCaseData.getDwpOtherDoc().getDocumentLink())
-                .fileName(sscsCaseData.getDwpOtherDoc().getDocumentLink().getDocumentFilename())
+                .fileName(fileName)
                 .rip1Document(sscsCaseData.getRip1Doc())
+                .documentType(AudioVideoEvidenceUtil.getDocumentTypeValue(fileName))
                 .dateAdded(LocalDate.now())
                 .partyUploaded(UploadParty.DWP)
                 .build())
             .build();
-
-        AudioVideoEvidenceDetails audioVideoEvidenceDetails = audioVideoEvidence.getValue();
-        
-        audioVideoEvidenceDetails.setDocumentType(AudioVideoEvidenceUtil
-            .getDocumentTypeValue(audioVideoEvidenceDetails));
 
         if (sscsCaseData.getAudioVideoEvidence() == null) {
             sscsCaseData.setAudioVideoEvidence(new ArrayList<>());

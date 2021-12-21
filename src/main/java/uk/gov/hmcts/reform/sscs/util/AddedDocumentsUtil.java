@@ -42,6 +42,8 @@ public class AddedDocumentsUtil {
                 }
                 log.info("Case {} with event {} added documents: {}.", sscsCaseData.getCcdCaseId(), eventType,
                     sscsCaseData.getAddedDocuments());
+            } else {
+                sscsCaseData.setAddedDocuments(null);
             }
         }
     }

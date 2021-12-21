@@ -9,7 +9,9 @@ import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 @RunWith(JUnitParamsRunner.class)
 public class AudioVideoEvidenceUtilTest {
@@ -54,10 +56,7 @@ public class AudioVideoEvidenceUtilTest {
         "test3.doc, null",
     })
     public void shouldReturnCorrectDocumentTypeValue(String documentFileName, @Nullable String documentTypeValue) {
-        AudioVideoEvidenceDetails details = AudioVideoEvidenceDetails.builder()
-            .documentLink(DocumentLink.builder()
-                .documentFilename(documentFileName).build()).build();
-        assertEquals(AudioVideoEvidenceUtil.getDocumentTypeValue(details), documentTypeValue);
+        assertEquals(AudioVideoEvidenceUtil.getDocumentTypeValue(documentFileName), documentTypeValue);
     }
 
     @Test

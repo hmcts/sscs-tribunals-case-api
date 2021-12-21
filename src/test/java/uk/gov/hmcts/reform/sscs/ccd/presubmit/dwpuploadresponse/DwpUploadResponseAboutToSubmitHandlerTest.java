@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -13,6 +14,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVI
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse.DwpUploadResponseAboutToSubmitHandler.NEW_OTHER_PARTY_RESPONSE_DUE_DAYS;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -34,6 +37,7 @@ import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
+import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 
 @RunWith(JUnitParamsRunner.class)
 public class DwpUploadResponseAboutToSubmitHandlerTest {
@@ -57,15 +61,20 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     private DwpDocumentService dwpDocumentService;
 
+    private AddedDocumentsUtil addedDocumentsUtil;
+
     @Before
     public void setUp() {
+        addedDocumentsUtil = new AddedDocumentsUtil(false);
+
         openMocks(this);
         dwpDocumentService = new DwpDocumentService();
         AddNoteService addNoteService = new AddNoteService(userDetailsService);
-        dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService, addNoteService);
+        dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
+            addNoteService, addedDocumentsUtil);
 
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
-                .forename("Chris").surname("Davis").build().getFullName());
+            .forename("Chris").surname("Davis").build().getFullName());
 
         when(callback.getEvent()).thenReturn(EventType.DWP_UPLOAD_RESPONSE);
 
@@ -523,7 +532,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenHandleAudioVideoDocuments_thenItMovesToAudioVideoListAndFillsInFieldsSendToTcw() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
-                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
+                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build())
                 .rip1Document(DocumentLink.builder()
                         .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("rip1").build()).build();
 
@@ -537,7 +546,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         AudioVideoEvidence audioVideoEvidence = callback.getCaseDetails().getCaseData().getAudioVideoEvidence().get(0);
         assertEquals("/url", audioVideoEvidence.getValue().getDocumentLink().getDocumentUrl());
         assertEquals("rip1", audioVideoEvidence.getValue().getRip1Document().getDocumentFilename());
-        assertEquals("filename", audioVideoEvidence.getValue().getFileName());
+        assertEquals("filename.mp4", audioVideoEvidence.getValue().getFileName());
         assertEquals(UploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
         assertNotNull(audioVideoEvidence.getValue().getDateAdded());
         assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
@@ -547,7 +556,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenHandleAudioVideoDocumentsNoRip1_thenItMovesToAudioVideoListAndFillsInFieldsSendToTcw() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
-                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build()).build();
+            .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build()).build();
 
         sscsCaseData.setDwpUploadAudioVideoEvidence(Collections
                 .singletonList(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build()));
@@ -559,7 +568,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         AudioVideoEvidence audioVideoEvidence = callback.getCaseDetails().getCaseData().getAudioVideoEvidence().get(0);
         assertEquals("/url", audioVideoEvidence.getValue().getDocumentLink().getDocumentUrl());
         assertNull("rip1", audioVideoEvidence.getValue().getRip1Document());
-        assertEquals("filename", audioVideoEvidence.getValue().getFileName());
+        assertEquals("filename.mp4", audioVideoEvidence.getValue().getFileName());
         assertEquals(UploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
         assertNotNull(audioVideoEvidence.getValue().getDateAdded());
         assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
@@ -582,7 +591,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenExistingAudioVideo_thenItGetsAddedToListSendToTcw() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
-                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
+                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build())
                 .rip1Document(DocumentLink.builder()
                         .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("surveillance").build()).build();
 
@@ -606,7 +615,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenHandleAudioVideoDocumentsAndPhme_thenItMovesToAudioVideoListAndFillsInFieldsSendToJudge() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
-                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
+                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build())
                 .rip1Document(DocumentLink.builder()
                         .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("rip1").build()).build();
 
@@ -622,7 +631,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         AudioVideoEvidence audioVideoEvidence = callback.getCaseDetails().getCaseData().getAudioVideoEvidence().get(0);
         assertEquals("/url", audioVideoEvidence.getValue().getDocumentLink().getDocumentUrl());
         assertEquals("rip1", audioVideoEvidence.getValue().getRip1Document().getDocumentFilename());
-        assertEquals("filename", audioVideoEvidence.getValue().getFileName());
+        assertEquals("filename.mp4", audioVideoEvidence.getValue().getFileName());
         assertEquals(UploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
         assertNotNull(audioVideoEvidence.getValue().getDateAdded());
         assertEquals(REVIEW_BY_JUDGE.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
@@ -632,7 +641,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenHandleAudioVideoDocumentsAndInterlocReviewStateAlreadyReviewByJudge_thenLeaveAsReviewByJudge() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
-                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
+                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build())
                 .rip1Document(DocumentLink.builder()
                         .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("surveillance").build()).build();
 
@@ -653,6 +662,123 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(2, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
         assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
         assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), callback.getCaseDetails().getCaseData().getInterlocReferralReason());
+    }
+
+    @Test
+    public void givenAudioVideoDocuments_shouldComputeCorrectAudioVideoTotals() throws JsonProcessingException {
+        dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
+            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true));
+
+        List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>();
+
+        audioVideoEvidence.add(AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
+                .documentLink(DocumentLink.builder()
+                    .documentUrl("/url")
+                    .documentBinaryUrl("/url/binary")
+                    .documentFilename("video.mp4")
+                    .build())
+                .rip1Document(DocumentLink.builder()
+                    .documentUrl("/url")
+                    .documentBinaryUrl("/url/binary")
+                    .documentFilename("surveillance")
+                    .build())
+                .build())
+            .build());
+
+        audioVideoEvidence.add(AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
+                .documentLink(DocumentLink.builder()
+                    .documentUrl("/url")
+                    .documentBinaryUrl("/url/binary")
+                    .documentFilename("audio.mp3")
+                    .build())
+                .rip1Document(DocumentLink.builder()
+                    .documentUrl("/url")
+                    .documentBinaryUrl("/url/binary")
+                    .documentFilename("surveillance")
+                    .build())
+                .build())
+            .build());
+
+
+        sscsCaseData.setDwpUploadAudioVideoEvidence(audioVideoEvidence);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT,
+            callback, USER_AUTHORISATION);
+
+        Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
+            .readValue(response.getData().getAddedDocuments());
+
+        org.assertj.core.api.Assertions.assertThat(addedDocuments)
+            .as("One piece of audio and video evidence each have been added, should be reflected in the map.")
+            .containsOnly(org.assertj.core.api.Assertions.entry("audioDocument", 1),
+                org.assertj.core.api.Assertions.entry("videoDocument", 1));
+    }
+
+    @Test
+    public void givenPreExistingAudioVideoDocuments_shouldComputeCorrectAudioVideoTotalsForAVAddedThisEvent() throws JsonProcessingException {
+        dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
+            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true));
+
+        List<AudioVideoEvidence> newAudioVideoEvidence = new ArrayList<>();
+
+        newAudioVideoEvidence.add(AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
+                .documentLink(DocumentLink.builder()
+                    .documentUrl("/url")
+                    .documentBinaryUrl("/url/binary")
+                    .documentFilename("video.mp4")
+                    .build())
+                .rip1Document(DocumentLink.builder()
+                    .documentUrl("/url")
+                    .documentBinaryUrl("/url/binary")
+                    .documentFilename("surveillance")
+                    .build())
+                .build())
+            .build());
+
+        List<AudioVideoEvidence> existingAudioVideoEvidence = new ArrayList<>();
+
+        existingAudioVideoEvidence.add(AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
+                .documentLink(DocumentLink.builder()
+                    .documentUrl("/url")
+                    .documentBinaryUrl("/url/binary")
+                    .documentFilename("audio.mp3")
+                    .build())
+                .rip1Document(DocumentLink.builder()
+                    .documentUrl("/url")
+                    .documentBinaryUrl("/url/binary")
+                    .documentFilename("surveillance")
+                    .build())
+                .build())
+            .build());
+
+
+        sscsCaseData.setDwpUploadAudioVideoEvidence(newAudioVideoEvidence);
+        sscsCaseData.setAudioVideoEvidence(existingAudioVideoEvidence);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT,
+            callback, USER_AUTHORISATION);
+
+        Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
+            .readValue(response.getData().getAddedDocuments());
+
+        org.assertj.core.api.Assertions.assertThat(addedDocuments)
+            .as("Only video evidence was added this event, audio should not be inserted into added documents.")
+            .containsOnly(org.assertj.core.api.Assertions.entry("videoDocument", 1));
+    }
+
+    @Test
+    public void givenNoNewAudioVideoDocuments_shouldStillClearAddedDocuments() throws JsonProcessingException {
+        dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
+            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true));
+
+        sscsCaseData.setDwpUploadAudioVideoEvidence(new ArrayList<>());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT,
+            callback, USER_AUTHORISATION);
+
+        org.assertj.core.api.Assertions.assertThat(response.getData().getAddedDocuments())
+            .as("Added documents should be cleared every event..")
+            .isNull();
     }
 
     @Test
@@ -689,7 +815,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenADwpUploadResponseEventWithRip1DocumentAndAvFile_thenDoNotDisplayAnError() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
-                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
+                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build())
                 .rip1Document(DocumentLink.builder()
                         .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("surveillance").build()).build();
 
@@ -706,7 +832,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenADwpUploadResponseEventWithAvFileAndNoRip1Document_thenDoNotDisplayAnError() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
-                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
+                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build())
                 .rip1Document(null).build();
 
         List<AudioVideoEvidence> audioVideoList = new ArrayList<>();
