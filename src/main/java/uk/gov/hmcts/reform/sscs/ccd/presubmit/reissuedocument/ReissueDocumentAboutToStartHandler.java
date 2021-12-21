@@ -4,7 +4,8 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
-import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getAllOtherPartiesWithIdOnCase;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
+import static uk.gov.hmcts.reform.sscs.util.ReissueUtils.setUpOtherPartyOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,19 +45,15 @@ public class ReissueDocumentAboutToStartHandler implements PreSubmitCallbackHand
         if (isEmpty(dropdownList)) {
             response.addError("There are no documents in this appeal available to reissue.");
         } else {
+            sscsCaseData.setReissueArtifactUi(null);
             sscsCaseData.getReissueArtifactUi().setReissueFurtherEvidenceDocument(new DynamicList(dropdownList.get(0), dropdownList));
-            sscsCaseData.getReissueArtifactUi().setResendToAppellant(null);
-            sscsCaseData.getReissueArtifactUi().setResendToRepresentative(null);
-            sscsCaseData.getTransientFields().setReissueDocumentOtherParty(getReissueDocumentOtherParty(sscsCaseData));
+        }
+
+        if (isOtherPartyPresent(sscsCaseData)) {
+            setUpOtherPartyOptions(sscsCaseData);
         }
 
         return response;
-    }
-
-    private List<CcdValue<ReissueDocumentOtherParty>> getReissueDocumentOtherParty(SscsCaseData sscsCaseData) {
-        return getAllOtherPartiesWithIdOnCase(sscsCaseData).stream()
-                .map(pair -> new CcdValue<>(ReissueDocumentOtherParty.builder().otherPartyName(pair.getRight()).otherPartyId(pair.getLeft()).build()))
-                .collect(Collectors.toList());
     }
 
     private List<DynamicListItem> getDocumentDropdown(SscsCaseData sscsCaseData) {

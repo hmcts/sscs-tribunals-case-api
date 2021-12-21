@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.reissuedocument;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
@@ -20,9 +22,10 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.reissueartifact.ReissueArtifactHandlerTest;
 
 @RunWith(JUnitParamsRunner.class)
-public class ReissueDocumentAboutToSubmitHandlerTest {
+public class ReissueDocumentAboutToSubmitHandlerTest extends ReissueArtifactHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private ReissueDocumentAboutToSubmitHandler handler;
@@ -121,22 +124,16 @@ public class ReissueDocumentAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void canReIssueToAnOtherParty() {
-        sscsCaseData = sscsCaseData.toBuilder().resendToAppellant("No").build();
-        sscsCaseData = sscsCaseData.toBuilder().resendToRepresentative("No").build();
-        ReissueDocumentOtherParty reissueDocumentOtherParty = ReissueDocumentOtherParty.builder().otherPartyId("1")
-                .otherPartyName("Name").reissue(YesNo.YES).build();
-        sscsCaseData = sscsCaseData.toBuilder().transientFields(TransientFields.builder()
-                .reissueDocumentOtherParty(List.of(new CcdValue<>(reissueDocumentOtherParty)))
-                .build())
-                .otherParties(List.of(new CcdValue<>(OtherParty.builder().id("1").build())))
-                .build();
+    public void givenCaseWithMultipleOtherParties_thenBuildTheOtherPartyOptionsSection() {
 
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        sscsCaseData.setOtherParties(Arrays.asList(buildOtherPartyWithAppointeeAndRep("1", "", "3"),
+                buildOtherPartyWithAppointeeAndRep("4", "5", "6")));
 
-        assertEquals(0, response.getErrors().size());
-        assertEquals(0, response.getWarnings().size());
+        final PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(0));
     }
 
     @Test(expected = IllegalStateException.class)
@@ -144,6 +141,4 @@ public class ReissueDocumentAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
-
-
 }

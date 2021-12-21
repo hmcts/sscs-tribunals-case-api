@@ -3,12 +3,10 @@ package uk.gov.hmcts.reform.sscs.util;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ReissueArtifactUi;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 
 public class ReissueUtils {
@@ -41,5 +39,48 @@ public class ReissueUtils {
                 && reissueArtifactUi.getOtherPartyOptions().stream()
                 .anyMatch(otherPartyOption -> otherPartyOption.getValue() != null
                         && YesNo.isYes(otherPartyOption.getValue().getResendToOtherParty()));
+    }
+
+    public static void setUpOtherPartyOptions(SscsCaseData sscsCaseData) {
+        sscsCaseData.getReissueArtifactUi().setShowReissueToOtherPartyUiSection(YesNo.YES);
+        sscsCaseData.getReissueArtifactUi().setOtherPartyOptions(getOtherPartyOptions(sscsCaseData));
+    }
+
+    private static List<OtherPartyOption> getOtherPartyOptions(SscsCaseData sscsCaseData) {
+        List<OtherPartyOption> otherPartyOptions = new ArrayList<>();
+
+        sscsCaseData.getOtherParties().forEach(otherParty -> addOtherPartyOption(otherPartyOptions, otherParty));
+
+        return otherPartyOptions;
+    }
+
+    private static void addOtherPartyOption(List<OtherPartyOption> otherPartyOptions, CcdValue<OtherParty> otherParty) {
+        OtherParty otherPartyDetail = otherParty.getValue();
+
+        if (isOtherPartyWithAppointee(otherPartyDetail)) {
+            otherPartyOptions.add(getOtherPartyElement(otherPartyDetail.getAppointee().getName().getFullNameNoTitle() + " - Appointee", otherPartyDetail.getAppointee().getId()));
+        } else {
+            otherPartyOptions.add(getOtherPartyElement(otherPartyDetail.getName().getFullNameNoTitle(), otherPartyDetail.getId()));
+        }
+
+        if (isOtherPartyWithRepresentative(otherPartyDetail)) {
+            otherPartyOptions.add(getOtherPartyElement(otherPartyDetail.getRep().getName().getFullNameNoTitle() + " - Representative", otherPartyDetail.getRep().getId()));
+        }
+    }
+
+    private static boolean isOtherPartyWithRepresentative(OtherParty otherPartyDetail) {
+        return otherPartyDetail.getRep() != null && "Yes".equals(otherPartyDetail.getRep().getHasRepresentative());
+    }
+
+    private static boolean isOtherPartyWithAppointee(OtherParty otherPartyDetail) {
+        return otherPartyDetail.getAppointee() != null && "Yes".equals(otherPartyDetail.getIsAppointee());
+    }
+
+    private static OtherPartyOption getOtherPartyElement(String name, String id) {
+        return OtherPartyOption.builder()
+                .value(OtherPartyOptionDetails.builder()
+                        .otherPartyOptionName(name)
+                        .otherPartyOptionId(id)
+                        .build()).build();
     }
 }

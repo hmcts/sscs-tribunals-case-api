@@ -1,13 +1,10 @@
 package uk.gov.hmcts.reform.sscs.util;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.List;
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -134,17 +131,6 @@ public class PartiesOnCaseUtilTest {
         assertEquals(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode() + "5", response.get(4).getCode());
         assertEquals("Other party 2 - Representative - Peter Rep", response.get(4).getLabel());
 
-    }
-
-    @Test
-    public void getAllOtherPartiesOnCasesOnCaseWithIdAndNames() {
-        setupOtherParties();
-        final List<Pair<String, String>> allOtherPartiesOnCase = PartiesOnCaseUtil.getAllOtherPartiesWithIdOnCase(sscsCaseData);
-        assertThat(allOtherPartiesOnCase.size(), is(4));
-        assertThat(allOtherPartiesOnCase.get(0), is(Pair.of("2", "Silva Lining - Appointee")));
-        assertThat(allOtherPartiesOnCase.get(1), is(Pair.of("3", "Harry Rep - Representative")));
-        assertThat(allOtherPartiesOnCase.get(2), is(Pair.of("4", "Cat Snack")));
-        assertThat(allOtherPartiesOnCase.get(3), is(Pair.of("5", "Peter Rep - Representative")));
     }
 
     private void setupOtherParties() {

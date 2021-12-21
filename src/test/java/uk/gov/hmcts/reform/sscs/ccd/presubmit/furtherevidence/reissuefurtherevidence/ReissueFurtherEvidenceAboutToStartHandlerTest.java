@@ -7,14 +7,12 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,9 +21,10 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.reissueartifact.ReissueArtifactHandlerTest;
 
 @RunWith(JUnitParamsRunner.class)
-public class ReissueFurtherEvidenceAboutToStartHandlerTest {
+public class ReissueFurtherEvidenceAboutToStartHandlerTest extends ReissueArtifactHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private ReissueFurtherEvidenceAboutToStartHandler handler;
@@ -46,24 +45,24 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.REISSUE_FURTHER_EVIDENCE);
 
         SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder()
-            .documentFileName("file1.pdf")
-            .documentType(APPELLANT_EVIDENCE.getValue())
-            .documentLink(DocumentLink.builder().documentUrl("url1").build())
-            .build()).build();
+                .documentFileName("file1.pdf")
+                .documentType(APPELLANT_EVIDENCE.getValue())
+                .documentLink(DocumentLink.builder().documentUrl("url1").build())
+                .build()).build();
         SscsDocument document2 = SscsDocument.builder().value(SscsDocumentDetails.builder()
-            .documentFileName("file2.pdf")
-            .documentType(REPRESENTATIVE_EVIDENCE.getValue())
-            .documentLink(DocumentLink.builder().documentUrl("url2").build())
-            .build()).build();
+                .documentFileName("file2.pdf")
+                .documentType(REPRESENTATIVE_EVIDENCE.getValue())
+                .documentLink(DocumentLink.builder().documentUrl("url2").build())
+                .build()).build();
         SscsDocument document3 = SscsDocument.builder().value(SscsDocumentDetails.builder()
-            .documentFileName("file3.pdf")
-            .documentType(DWP_EVIDENCE.getValue())
-            .documentLink(DocumentLink.builder().documentUrl("url3").build())
-            .build()).build();
+                .documentFileName("file3.pdf")
+                .documentType(DWP_EVIDENCE.getValue())
+                .documentLink(DocumentLink.builder().documentUrl("url3").build())
+                .build()).build();
         List<SscsDocument> sscsDocuments = Arrays.asList(document1, document2, document3);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build())
-            .sscsDocument(sscsDocuments)
-            .build();
+                .sscsDocument(sscsDocuments)
+                .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -116,10 +115,10 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
     @Test
     public void willNotPopulateDocumentDropdownWhenThereAreNoSscsDocumentsOfDocumentTypeEvidence() {
         SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder()
-            .documentFileName("file1.pdf")
-            .documentType(DL6.getValue())
-            .documentLink(DocumentLink.builder().documentUrl("url1").build())
-            .build()).build();
+                .documentFileName("file1.pdf")
+                .documentType(DL6.getValue())
+                .documentLink(DocumentLink.builder().documentUrl("url1").build())
+                .build()).build();
 
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).sscsDocument(Collections.singletonList(document1)).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -156,23 +155,23 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
     public void shouldIncludeValidWelshDocumentsInDropdown() {
 
         SscsWelshDocument document1 = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder()
-            .documentFileName("welshFile1.pdf")
-            .documentType(APPELLANT_EVIDENCE.getValue())
-            .documentDateAdded("09-09-2020")
-            .documentLink(DocumentLink.builder().documentFilename("welshFile1.pdf").documentUrl("welshUrl1").build())
-            .build()).build();
+                .documentFileName("welshFile1.pdf")
+                .documentType(APPELLANT_EVIDENCE.getValue())
+                .documentDateAdded("09-09-2020")
+                .documentLink(DocumentLink.builder().documentFilename("welshFile1.pdf").documentUrl("welshUrl1").build())
+                .build()).build();
         SscsWelshDocument document2 = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder()
-            .documentFileName("welshFile2.pdf")
-            .documentDateAdded("09-09-2020")
-            .documentType(REPRESENTATIVE_EVIDENCE.getValue())
-            .documentLink(DocumentLink.builder().documentFilename("welshFile2.pdf").documentUrl("welshUrl2").build())
-            .build()).build();
+                .documentFileName("welshFile2.pdf")
+                .documentDateAdded("09-09-2020")
+                .documentType(REPRESENTATIVE_EVIDENCE.getValue())
+                .documentLink(DocumentLink.builder().documentFilename("welshFile2.pdf").documentUrl("welshUrl2").build())
+                .build()).build();
         SscsWelshDocument document3 = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder()
-            .documentFileName("welshFile3.pdf")
-            .documentType(DWP_EVIDENCE.getValue())
-            .documentDateAdded("09-09-2020")
-            .documentLink(DocumentLink.builder().documentFilename("welshFile3.pdf").documentUrl("welshUrl3").build())
-            .build()).build();
+                .documentFileName("welshFile3.pdf")
+                .documentType(DWP_EVIDENCE.getValue())
+                .documentDateAdded("09-09-2020")
+                .documentLink(DocumentLink.builder().documentFilename("welshFile3.pdf").documentUrl("welshUrl3").build())
+                .build()).build();
         List<SscsWelshDocument> sscsWelshDocuments = Arrays.asList(document1, document2, document3);
         sscsCaseData.setSscsWelshDocuments(sscsWelshDocuments);
 
@@ -190,17 +189,5 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
         assertEquals(new DynamicListItem("welshUrl2", "Bilingual - welshFile2.pdf -  Representative evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(4));
         assertEquals(new DynamicListItem("welshUrl3", "Bilingual - welshFile3.pdf -  Dwp evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(5));
         assertNull(response.getData().getOriginalSender());
-    }
-
-    public static CcdValue<OtherParty> buildOtherPartyWithAppointeeAndRep(String id, String appointeeId, String repId) {
-        return CcdValue.<OtherParty>builder()
-                .value(OtherParty.builder()
-                        .id(id)
-                        .name(Name.builder().firstName("Peter").lastName("Parker").build())
-                        .isAppointee(StringUtils.isBlank(appointeeId) ? YesNo.NO.getValue() : YES.getValue())
-                        .appointee(StringUtils.isBlank(appointeeId) ? null : Appointee.builder().id(appointeeId).name(Name.builder().firstName("Otto").lastName("Octavius").build()).build())
-                        .rep(Representative.builder().id(repId).name(Name.builder().firstName("Harry").lastName("Osbourne").build()).hasRepresentative(YES.getValue()).build())
-                        .build())
-                .build();
     }
 }

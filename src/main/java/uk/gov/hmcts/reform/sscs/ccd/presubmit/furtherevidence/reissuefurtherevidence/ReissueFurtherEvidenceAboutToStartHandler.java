@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.userFriendlyName;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
+import static uk.gov.hmcts.reform.sscs.util.ReissueUtils.setUpOtherPartyOptions;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,12 +54,8 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
                         ).collect(Collectors.toCollection(ArrayList::new));
 
         if (CollectionUtils.isNotEmpty(availableDocumentsToReIssue)) {
+            sscsCaseData.setReissueArtifactUi(null);
             setDocumentDropdown(sscsCaseData, availableDocumentsToReIssue);
-            ReissueArtifactUi reissueArtifactUi = sscsCaseData.getReissueArtifactUi();
-            reissueArtifactUi.setResendToAppellant(null);
-            reissueArtifactUi.setResendToRepresentative(null);
-            reissueArtifactUi.setResendToDwp(null);
-            reissueArtifactUi.setOtherPartyOptions(null);
             sscsCaseData.setOriginalSender(null);
         }
 
@@ -72,11 +69,6 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
         }
 
         return response;
-    }
-
-    private void setUpOtherPartyOptions(SscsCaseData sscsCaseData) {
-        sscsCaseData.getReissueArtifactUi().setShowReissueToOtherPartyUiSection(YesNo.YES);
-        sscsCaseData.getReissueArtifactUi().setOtherPartyOptions(getOtherPartyOptions(sscsCaseData));
     }
 
     private void setDocumentDropdown(SscsCaseData sscsCaseData, List<? extends AbstractDocument> availableDocumentsToReIssue) {
@@ -107,43 +99,5 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
             sb.append(doc.getValue().getDocumentLink().getDocumentFilename());
         }
         return sb.toString();
-    }
-
-    private List<OtherPartyOption> getOtherPartyOptions(SscsCaseData sscsCaseData) {
-        List<OtherPartyOption> otherPartyOptions = new ArrayList<>();
-
-        sscsCaseData.getOtherParties().forEach(otherParty -> addOtherPartyOption(otherPartyOptions, otherParty));
-
-        return otherPartyOptions;
-    }
-
-    private void addOtherPartyOption(List<OtherPartyOption> otherPartyOptions, CcdValue<OtherParty> otherParty) {
-        OtherParty otherPartyDetail = otherParty.getValue();
-
-        if (isOtherPartyWithAppointee(otherPartyDetail)) {
-            otherPartyOptions.add(getOtherPartyElement(otherPartyDetail.getAppointee().getName().getFullNameNoTitle() + " - Appointee", otherPartyDetail.getAppointee().getId()));
-        } else {
-            otherPartyOptions.add(getOtherPartyElement(otherPartyDetail.getName().getFullNameNoTitle(), otherPartyDetail.getId()));
-        }
-
-        if (isOtherPartyWithRepresentative(otherPartyDetail)) {
-            otherPartyOptions.add(getOtherPartyElement(otherPartyDetail.getRep().getName().getFullNameNoTitle() + " - Representative", otherPartyDetail.getRep().getId()));
-        }
-    }
-
-    private boolean isOtherPartyWithRepresentative(OtherParty otherPartyDetail) {
-        return otherPartyDetail.getRep() != null && "Yes".equals(otherPartyDetail.getRep().getHasRepresentative());
-    }
-
-    private boolean isOtherPartyWithAppointee(OtherParty otherPartyDetail) {
-        return otherPartyDetail.getAppointee() != null && "Yes".equals(otherPartyDetail.getIsAppointee());
-    }
-
-    private OtherPartyOption getOtherPartyElement(String name, String id) {
-        return OtherPartyOption.builder()
-                .value(OtherPartyOptionDetails.builder()
-                        .otherPartyOptionName(name)
-                        .otherPartyOptionId(id)
-                        .build()).build();
     }
 }
