@@ -13,7 +13,9 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
-import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.*;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.getOriginalSender;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.isValidAudioVideoDocumentType;
+import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -27,7 +29,15 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidenceDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DraftSscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 import uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil;
@@ -145,10 +155,8 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     .dateAdded(LocalDate.now())
                     .partyUploaded(UploadParty.CTSC)
                     .originalPartySender(getOriginalSender(doc.getValue().getDocumentType()))
-                    .documentType(AudioVideoEvidenceUtil.getDocumentTypeValue(doc.getValue()
-                        .getDocumentFileName()) != null ? AudioVideoEvidenceUtil.getDocumentTypeValue(doc.getValue()
-                        .getDocumentFileName())
-                        : AudioVideoEvidenceUtil.getDocumentTypeValue(doc.getValue().getDocumentLink().getDocumentFilename()))
+                    .documentType(AudioVideoEvidenceUtil.getDocumentTypeValue(
+                        doc.getValue().getDocumentLink().getDocumentFilename()))
                     .build()).build()).collect(toList());
 
         addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, newAudioVideoEvidence.stream()

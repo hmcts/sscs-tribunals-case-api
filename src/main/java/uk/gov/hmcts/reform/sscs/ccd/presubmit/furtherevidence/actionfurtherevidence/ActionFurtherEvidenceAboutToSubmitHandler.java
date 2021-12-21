@@ -8,7 +8,10 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CONFIDENTIALITY_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REINSTATEMENT_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome.GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_TCW;
@@ -31,7 +34,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.ccd.callback.*;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.callback.ScannedDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -512,8 +519,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         return false;
     }
 
-    private boolean isBundleAdditionSelectedForActionType(SscsCaseData sscsCaseData, ScannedDocument
-        scannedDocument) {
+    private boolean isBundleAdditionSelectedForActionType(SscsCaseData sscsCaseData, ScannedDocument scannedDocument) {
         return isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), ISSUE_FURTHER_EVIDENCE.getCode())
             || ((isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL.getCode())
             || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),

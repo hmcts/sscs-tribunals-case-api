@@ -1,13 +1,11 @@
 package uk.gov.hmcts.reform.sscs.service.evidence;
 
-import static java.util.Collections.*;
-import static java.util.Objects.nonNull;
-import static java.util.stream.Collectors.*;
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.collections4.ListUtils.union;
 import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService.TEMP_UNIQUE_ID;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
@@ -24,9 +22,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
@@ -52,6 +54,8 @@ import uk.gov.hmcts.reform.sscs.service.pdf.MyaEventActionContext;
 import uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.EvidenceDescriptionPdfData;
 import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
+import uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil;
 
 @Slf4j
 @Service
@@ -66,7 +70,8 @@ public class EvidenceUploadService {
     private final PdfStoreService pdfStoreService;
 
     public static final String DM_STORE_USER_ID = "sscs";
-
+    private static final Enum<EventType> EVENT_TYPE = EventType.UPLOAD_DOCUMENT;
+    private final AddedDocumentsUtil addedDocumentsUtil;
     private static final DraftHearingDocumentExtractor draftHearingDocumentExtractor = new DraftHearingDocumentExtractor();
 
     @Autowired
@@ -75,7 +80,8 @@ public class EvidenceUploadService {
                                  IdamService idamService, OnlineHearingService onlineHearingService,
                                  StoreEvidenceDescriptionService storeEvidenceDescriptionService,
                                  FileToPdfConversionService fileToPdfConversionService,
-                                 EvidenceManagementService evidenceManagementService, PdfStoreService pdfStoreService) {
+                                 EvidenceManagementService evidenceManagementService, 
+                                 PdfStoreService pdfStoreService, AddedDocumentsUtil addedDocumentsUtil) {
         this.documentManagementService = documentManagementService;
         this.ccdService = ccdService;
         this.idamService = idamService;
@@ -84,6 +90,7 @@ public class EvidenceUploadService {
         this.fileToPdfConversionService = fileToPdfConversionService;
         this.evidenceManagementService = evidenceManagementService;
         this.pdfStoreService = pdfStoreService;
+        this.addedDocumentsUtil = addedDocumentsUtil;
     }
 
     public Optional<Evidence> uploadDraftEvidence(String identifier, MultipartFile file) {
@@ -95,8 +102,9 @@ public class EvidenceUploadService {
     private SscsDocumentDetails createNewDocumentDetails(Document document) {
         String createdOn = getCreatedDate(document);
         DocumentLink documentLink = DocumentLink.builder()
-                .documentUrl(document.links.self.href)
-                .build();
+            .documentUrl(document.links.self.href)
+            .documentFilename(document.originalDocumentName)
+            .build();
 
         return SscsDocumentDetails.builder()
                 .documentType("Other evidence")
@@ -447,22 +455,28 @@ public class EvidenceUploadService {
         String originalSenderPartyName = getOtherPartyName(sscsCaseData, withEmailPredicate(idamEmail));
 
         for (SscsDocument audioVideoDocument : audioVideoMedia) {
-
+            SscsDocumentDetails sscsDocumentDetails = audioVideoDocument.getValue();
             audioVideoEvidence.add(AudioVideoEvidence.builder()
-                    .value(AudioVideoEvidenceDetails.builder()
-                            .documentLink(audioVideoDocument.getValue().getDocumentLink())
-                            .dateAdded(ldt.toLocalDate())
-                            .fileName(audioVideoDocument.getValue().getDocumentFileName())
-                            .partyUploaded(uploader)
-                            .originalSenderOtherPartyId(originalSenderOtherPartyId)
-                            .originalSenderOtherPartyName(originalSenderPartyName)
-                            .statementOfEvidencePdf(draftSscsDocument.getValue().getDocumentLink())
-                            .build())
-                    .build());
+                .value(AudioVideoEvidenceDetails.builder()
+                    .documentLink(sscsDocumentDetails.getDocumentLink())
+                    .dateAdded(ldt.toLocalDate())
+                    .fileName(sscsDocumentDetails.getDocumentFileName())
+                    .partyUploaded(uploader)
+                    .documentType(AudioVideoEvidenceUtil.getDocumentTypeValue(
+                        sscsDocumentDetails.getDocumentLink().getDocumentFilename()))
+                    .statementOfEvidencePdf(draftSscsDocument.getValue().getDocumentLink())
+                    .build())
+                .build());
+            System.out.println(sscsDocumentDetails.getDocumentLink().getDocumentFilename());
         }
+
+        addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, audioVideoEvidence.stream()
+            .map(evidence -> evidence.getValue().getDocumentType())
+            .collect(Collectors.toUnmodifiableList()), EVENT_TYPE);
+
         if (!audioVideoEvidence.isEmpty()) {
             List<AudioVideoEvidence> newAudioVideoEvidenceList = union(emptyIfNull(sscsCaseData.getAudioVideoEvidence()),
-                    emptyIfNull(audioVideoEvidence));
+                emptyIfNull(audioVideoEvidence));
             sscsCaseData.setAudioVideoEvidence(newAudioVideoEvidenceList);
         }
     }
