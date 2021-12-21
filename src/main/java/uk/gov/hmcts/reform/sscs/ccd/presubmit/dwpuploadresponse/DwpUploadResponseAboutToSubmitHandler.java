@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
 import static java.lang.String.format;
-import static java.util.Collections.*;
+import static java.util.Collections.sort;
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_UPLOAD_RESPONSE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
@@ -18,11 +18,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.ccd.callback.*;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -31,6 +34,8 @@ import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
+import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
+import uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil;
 
 @Component
 @Slf4j
@@ -40,11 +45,16 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     public static final int NEW_OTHER_PARTY_RESPONSE_DUE_DAYS = 14;
     private final DwpDocumentService dwpDocumentService;
     private final AddNoteService addNoteService;
+    private final AddedDocumentsUtil addedDocumentsUtil;
+    private static final Enum<EventType> EVENT_TYPE = EventType.DWP_UPLOAD_RESPONSE;
+
 
     @Autowired
-    public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService, AddNoteService addNoteService) {
+    public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService, AddNoteService addNoteService,
+                                                 AddedDocumentsUtil addedDocumentsUtil) {
         this.dwpDocumentService = dwpDocumentService;
         this.addNoteService = addNoteService;
+        this.addedDocumentsUtil = addedDocumentsUtil;
     }
 
     @Override
@@ -53,7 +63,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == DWP_UPLOAD_RESPONSE;
+            && callback.getEvent() == EVENT_TYPE;
     }
 
     @Override
@@ -126,6 +136,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     protected void handleAudioVideoDocuments(SscsCaseData sscsCaseData) {
         if (isEmpty(sscsCaseData.getDwpUploadAudioVideoEvidence())) {
+            sscsCaseData.setAddedDocuments(null);
             return;
         }
 
@@ -138,12 +149,20 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         List<AudioVideoEvidence> dwpAudioVideoEvidence = sscsCaseData.getDwpUploadAudioVideoEvidence();
 
         for (AudioVideoEvidence audioVideo : dwpAudioVideoEvidence) {
-            audioVideo.getValue().setDateAdded(LocalDate.now());
-            audioVideo.getValue().setFileName(audioVideo.getValue().getDocumentLink().getDocumentFilename());
-            audioVideo.getValue().setPartyUploaded(UploadParty.DWP);
+            AudioVideoEvidenceDetails details = audioVideo.getValue();
+            details.setDateAdded(LocalDate.now());
+            details.setFileName(audioVideo.getValue().getDocumentLink().getDocumentFilename());
+            details.setPartyUploaded(UploadParty.DWP);
+            details.setDocumentType(AudioVideoEvidenceUtil.getDocumentTypeValue(details
+                .getDocumentLink().getDocumentFilename()));
             sscsCaseData.getAudioVideoEvidence().add(audioVideo);
         }
         log.info("DWP audio video documents moved into case audio video {}", sscsCaseData.getCcdCaseId());
+
+        addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, dwpAudioVideoEvidence.stream()
+            .map(evidence -> evidence.getValue().getDocumentType())
+            .collect(Collectors.toUnmodifiableList()), EVENT_TYPE);
+
         sort(sscsCaseData.getAudioVideoEvidence());
 
         sscsCaseData.setDwpUploadAudioVideoEvidence(null);

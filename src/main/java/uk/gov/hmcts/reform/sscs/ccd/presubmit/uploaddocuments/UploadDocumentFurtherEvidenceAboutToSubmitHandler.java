@@ -15,26 +15,41 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.stereotype.Service;
+import org.jetbrains.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
+import uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil;
 import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
 
-@Service
+@Component
 public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private static final String UPLOAD_DATE_FORMATTER = "yyyy-MM-dd";
+
+    private final AddedDocumentsUtil addedDocumentsUtil;
+
+    private static final Enum<EventType> EVENT_TYPE = EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE;
+
+    @Autowired
+    public UploadDocumentFurtherEvidenceAboutToSubmitHandler(AddedDocumentsUtil addedDocumentsUtil) {
+        this.addedDocumentsUtil = addedDocumentsUtil;
+    }
+
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType != null && callback != null
             && callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent().equals(EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE);
+            && callback.getEvent().equals(EVENT_TYPE);
     }
 
     @Override
@@ -123,7 +138,12 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
                     .dateAdded(LocalDate.now())
                     .partyUploaded(UploadParty.CTSC)
                     .originalPartySender(getOriginalSender(doc.getValue().getDocumentType()))
+                    .documentType(resolveAudioVideoDocumentTypeFromFileNameOrDocumentLink(doc))
                     .build()).build()).collect(toList());
+
+        addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, newAudioVideoEvidence.stream()
+            .map(audioVideoEvidence -> audioVideoEvidence.getValue().getDocumentType())
+            .collect(Collectors.toUnmodifiableList()), EVENT_TYPE);
 
         if (!newAudioVideoEvidence.isEmpty()) {
             if (sscsCaseData.getAudioVideoEvidence() == null) {
@@ -137,11 +157,20 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
         }
     }
 
+    @Nullable
+    private String resolveAudioVideoDocumentTypeFromFileNameOrDocumentLink(SscsFurtherEvidenceDoc doc) {
+        return AudioVideoEvidenceUtil.getDocumentTypeValue(doc.getValue()
+            .getDocumentFileName()) != null ? AudioVideoEvidenceUtil.getDocumentTypeValue(doc.getValue()
+            .getDocumentFileName())
+            : AudioVideoEvidenceUtil.getDocumentTypeValue(doc.getValue()
+            .getDocumentLink().getDocumentFilename());
+    }
+
     private void uploadHearingRecordingRequest(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
 
         if (sscsCaseData.getDraftSscsFurtherEvidenceDocument() != null) {
             List<SscsFurtherEvidenceDoc> sscsFurtherEvidenceDocList = sscsCaseData.getDraftSscsFurtherEvidenceDocument().stream()
-                    .filter(draftDoc -> REQUEST_FOR_HEARING_RECORDING.getId().equals(draftDoc.getValue().getDocumentType())).collect(toList());
+                .filter(draftDoc -> REQUEST_FOR_HEARING_RECORDING.getId().equals(draftDoc.getValue().getDocumentType())).collect(toList());
 
             if (sscsCaseData.getSscsHearingRecordingCaseData() != null
                 && sscsCaseData.getSscsHearingRecordingCaseData().getRequestingParty() != null

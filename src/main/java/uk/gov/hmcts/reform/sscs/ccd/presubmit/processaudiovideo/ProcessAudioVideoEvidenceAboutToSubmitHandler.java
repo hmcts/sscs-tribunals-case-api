@@ -21,7 +21,10 @@ import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnproce
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +60,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.PROCESS_AUDIO_VIDEO;
+            && callback.getEvent() == EventType.PROCESS_AUDIO_VIDEO;
     }
 
     @Override
@@ -242,7 +245,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     }
 
     private String findAudioVideoDocumentType(AudioVideoEvidenceDetails audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response) {
-        DocumentType documentType = getDocumentType(audioVideoEvidence);
+        DocumentType documentType = getDocumentType(audioVideoEvidence.getDocumentLink().getDocumentFilename());
 
         if (isNull(documentType)) {
             response.addError("Evidence cannot be included as it is not in .mp3 or .mp4 format");
@@ -301,7 +304,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
 
     private void addProcessedActionToSelectedEvidence(SscsCaseData caseData, ProcessedAction processedAction) {
         caseData.getAudioVideoEvidence().stream().filter(evidence -> isSelectedEvidence(evidence, caseData))
-                .forEach(evidence -> evidence.getValue().setProcessedAction(processedAction));
+            .forEach(evidence -> evidence.getValue().setProcessedAction(processedAction));
     }
 
     private void overrideInterlocReviewStateIfSelected(SscsCaseData caseData) {

@@ -215,6 +215,7 @@ def versions = [
         junitJupiter: '5.7.2',
         lombok: '1.18.22',
         sscsCommon: '4.6.20'
+        assertj: '3.21.0'
 ]
 
 ext["rest-assured.version"] = '4.2.0'
@@ -399,6 +400,7 @@ dependencies {
     testCompile "org.junit.jupiter:junit-jupiter-api:$versions.junitJupiter"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:$versions.junitJupiter"
     testImplementation "org.junit.jupiter:junit-jupiter-api:$versions.junitJupiter"
+    testImplementation "org.assertj:assertj-core:$versions.assertj"
 
     e2eRuntime "org.junit.platform:junit-platform-commons:1.8.1"
 
