@@ -344,6 +344,45 @@ public class CreateBundleAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenChildSupportedCaseWithEditedDwpEvidenceDocument_thenPopulateEditedAndUneditedConfigFilename() {
+        addMandatoryDwpEvidenceDocuments();
+        sscsCaseData.setBenefitCode("022");
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(2, response.getData().getMultiBundleConfiguration().size());
+        assertEquals("bundleEnglishEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
+        assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
+        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
+    }
+
+    @Test
+    public void givenChildSupportedCaseWithNonEditedDocuments_thenPopulateOnlyUneditedConfigFilename() {
+        addMandatoryNonEditedDwpDocuments();
+        addMandatoryNonEditedDwpEvidenceDocuments();
+        addNonEditedSscsDocuments();
+        sscsCaseData.setBenefitCode("022");
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(1, response.getData().getMultiBundleConfiguration().size());
+        assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
+        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
+    }
+
+    @Test
     public void givenChildSupportedCaseWithEditedDwpDocument_thenPopulateEditedAndUneditedConfigFilename() {
         addMandatoryDwpDocuments();
         sscsCaseData.setBenefitCode("022");
@@ -490,15 +529,25 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
     private void addMandatoryDwpDocuments() {
         List<DwpDocument> dwpDocuments = new ArrayList<>();
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
+    }
+
+    private void addMandatoryDwpEvidenceDocuments() {
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
         callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
     }
 
     private void addMandatoryNonEditedDwpDocuments() {
         List<DwpDocument> dwpDocuments = new ArrayList<>();
-        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
+        callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
+    }
+
+    private void addMandatoryNonEditedDwpEvidenceDocuments() {
+        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
         callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
     }
 
