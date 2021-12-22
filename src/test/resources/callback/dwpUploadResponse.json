@@ -48,7 +48,8 @@
           "value": {
             "fileName": "file.mp3",
             "documentLink": {
-              "document_url": "url"
+              "document_url": "url",
+              "document_filename": "file.mp3"
             }
           }
         }
