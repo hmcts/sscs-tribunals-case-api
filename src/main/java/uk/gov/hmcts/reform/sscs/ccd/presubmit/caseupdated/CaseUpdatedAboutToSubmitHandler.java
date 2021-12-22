@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -36,18 +37,21 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final AirLookupService airLookupService;
     private final DwpAddressLookupService dwpAddressLookupService;
     private IdamService idamService;
+    private final boolean workAllocationFeature;
 
     @Autowired
     CaseUpdatedAboutToSubmitHandler(RegionalProcessingCenterService regionalProcessingCenterService,
                                     AssociatedCaseLinkHelper associatedCaseLinkHelper,
                                     AirLookupService airLookupService,
                                     DwpAddressLookupService dwpAddressLookupService,
-                                    IdamService idamService) {
+                                    IdamService idamService,
+                                    @Value("${feature.work-allocation.enabled}")  boolean workAllocationFeature) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
         this.airLookupService = airLookupService;
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.idamService = idamService;
+        this.workAllocationFeature = workAllocationFeature;
     }
 
     @Override
@@ -93,6 +97,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
 
         checkConfidentiality(sscsCaseData);
+        updateCaseNameIfNameUpdated(callback, sscsCaseData);
 
         final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
         final boolean hasSystemUserRole = userDetails.hasRole(SYSTEM_USER);
@@ -185,6 +190,23 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             sscsCaseData.setProcessingVenue(venue);
         }
 
+    }
+
+
+    private void updateCaseNameIfNameUpdated(Callback<SscsCaseData> callback, SscsCaseData caseData) {
+        if (workAllocationFeature) {
+            String caseName = caseData.getAppeal().getAppellant() != null
+                    && caseData.getAppeal().getAppellant().getName() != null
+                    ? caseData.getAppeal().getAppellant().getName().getFullNameNoTitle()
+                    : null;
+
+            CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
+            if (oldCaseDetails == null
+                    || oldCaseDetails.getCaseData().getCaseName() == null
+                    || !oldCaseDetails.getCaseData().getCaseName().equals(caseName)) {
+                caseData.setCaseName(caseName);
+            }
+        }
     }
 
 }
