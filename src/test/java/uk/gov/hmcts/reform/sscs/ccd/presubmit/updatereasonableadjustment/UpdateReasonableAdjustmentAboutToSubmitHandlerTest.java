@@ -9,6 +9,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -33,7 +36,11 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private CaseDetails<SscsCaseData> caseDetailsBefore;
+
     private SscsCaseData sscsCaseData;
+    private SscsCaseData sscsCaseDataBefore;
 
     @Before
     public void setUp() {
@@ -59,6 +66,9 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandlerTest {
                 .jointParty(YES.getValue())
                 .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        sscsCaseDataBefore = SscsCaseData.builder().build();
+        when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
     }
 
     @Test
@@ -137,6 +147,73 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandlerTest {
         assertNull(response.getData().getReasonableAdjustments().getAppointee());
         assertEquals(YES, response.getData().getReasonableAdjustments().getJointParty().getWantsReasonableAdjustment());
         assertEquals(RED_FONT, response.getData().getReasonableAdjustments().getJointParty().getReasonableAdjustmentRequirements());
+    }
+
+    @Test
+    public void givenOtherPartyReasonableAdjustment_thenSetReasonableAdjustment() {
+
+        List<CcdValue<OtherParty>> otherPartyListBefore = new ArrayList<>();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().id("1").name(Name.builder().build()).build()).build();
+        otherPartyListBefore.add(ccdValue);
+        sscsCaseDataBefore.setOtherParties(otherPartyListBefore);
+
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        CcdValue<OtherParty> ccdValue2 = CcdValue.<OtherParty>builder().value(OtherParty.builder().id("1")
+                .reasonableAdjustment(ReasonableAdjustmentDetails.builder().wantsReasonableAdjustment(YES).reasonableAdjustmentRequirements(RED_FONT).build()).name(Name.builder().build()).build()).build();
+        otherPartyList.add(ccdValue2);
+        sscsCaseData.setOtherParties(otherPartyList);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(YES, response.getData().getOtherParties().get(0).getValue().getReasonableAdjustment().getWantsReasonableAdjustment());
+        assertEquals(RED_FONT, response.getData().getOtherParties().get(0).getValue().getReasonableAdjustment().getReasonableAdjustmentRequirements());
+    }
+
+    @Test
+    public void givenAddOtherPartyButtonPressed_thenShowError() {
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().name(Name.builder().build()).build()).build();
+        otherPartyList.add(ccdValue);
+        sscsCaseData.setOtherParties(otherPartyList);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("This event cannot be used to add/remove 'Other party' from the case'. You may need to restart this event to proceed.", error);
+    }
+
+    @Test
+    public void givenRemoveOtherPartyButtonPressed_thenShowError() {
+        List<CcdValue<OtherParty>> otherPartyListBefore = new ArrayList<>();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().id("1").name(Name.builder().build()).build()).build();
+        otherPartyListBefore.add(ccdValue);
+        sscsCaseDataBefore.setOtherParties(otherPartyListBefore);
+
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        sscsCaseData.setOtherParties(otherPartyList);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("This event cannot be used to add/remove 'Other party' from the case'. You may need to restart this event to proceed.", error);
+    }
+
+    @Test
+    public void givenAddAndRemoveOtherPartyButtonPressed_thenShowError() {
+        List<CcdValue<OtherParty>> otherPartyListBefore = new ArrayList<>();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().id("1").name(Name.builder().build()).build()).build();
+        otherPartyListBefore.add(ccdValue);
+        sscsCaseDataBefore.setOtherParties(otherPartyListBefore);
+
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        CcdValue<OtherParty> ccdValue2 = CcdValue.<OtherParty>builder().value(OtherParty.builder().name(Name.builder().build()).build()).build();
+        otherPartyList.add(ccdValue2);
+        sscsCaseData.setOtherParties(otherPartyList);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("This event cannot be used to add/remove 'Other party' from the case'. You may need to restart this event to proceed.", error);
     }
 
     @Test
