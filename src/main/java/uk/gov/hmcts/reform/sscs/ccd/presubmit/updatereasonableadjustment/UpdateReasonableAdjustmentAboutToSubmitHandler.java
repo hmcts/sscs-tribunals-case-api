@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatereasonableadjustment;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
@@ -73,7 +74,7 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandler implements PreSubmit
         if (beforeData.isPresent() && OtherPartyDataUtil.haveOtherPartiesChanged(beforeData.get().getCaseData().getOtherParties(), response.getData().getOtherParties())) {
             response.addError(ADD_OR_REMOVE_OTHER_PARTIES_ERROR);
         }
-        if (response.getErrors().size() == 0 && otherParties.isEmpty()) {
+        if (response.getErrors().size() == 0 && isEmpty(response.getData().getOtherParties())) {
             response.getData().setOtherParties(null);
         }
     }
