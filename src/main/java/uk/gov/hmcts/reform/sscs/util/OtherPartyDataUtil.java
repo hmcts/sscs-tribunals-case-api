@@ -155,6 +155,22 @@ public class OtherPartyDataUtil {
                 .anyMatch(otherParty -> predicate.test(otherParty.getOtherPartySubscription()));
     }
 
+
+    public static String getOtherPartyName(SscsCaseData sscsCaseData, String otherPartyId) {
+        return emptyIfNull(sscsCaseData.getOtherParties()).stream()
+                .map(CcdValue::getValue)
+                .flatMap(op -> Stream.of((op.hasAppointee()) ? Pair.of(op.getAppointee().getName(), op.getAppointee().getId()) : Pair.of(op.getName(), op.getId()), (op.hasRepresentative()) ? Pair.of(op.getRep().getName(), op.getRep().getId()) : null))
+                .filter(Objects::nonNull)
+                .filter(p -> nonNull(p.getLeft()))
+                .filter(p -> nonNull(p.getRight()))
+                .filter(p -> p.getRight().equals(otherPartyId))
+                .map(Pair::getLeft)
+                .map(Name::getFullNameNoTitle)
+                .findFirst()
+                .orElse(null);
+
+    }
+
     public static String getOtherPartyName(SscsCaseData sscsCaseData, Predicate<Subscription> predicate) {
         return emptyIfNull(sscsCaseData.getOtherParties()).stream()
                 .map(CcdValue::getValue)

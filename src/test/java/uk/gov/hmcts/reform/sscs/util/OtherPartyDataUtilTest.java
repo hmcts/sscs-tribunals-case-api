@@ -1,7 +1,12 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -128,6 +133,7 @@ public class OtherPartyDataUtilTest {
         return CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder()
                         .id(id)
+                        .name(name("OtherParty", id))
                         .unacceptableCustomerBehaviour(ucb ? YesNo.YES : YesNo.NO)
                         .build())
                 .build();
@@ -146,11 +152,16 @@ public class OtherPartyDataUtilTest {
         return CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder()
                         .id(id)
+                        .name(name("OtherParty", id))
                         .isAppointee(YES.getValue())
-                        .appointee(Appointee.builder().id(appointeeId).build())
-                        .rep(Representative.builder().id(repId).hasRepresentative(YES.getValue()).build())
+                        .appointee(Appointee.builder().id(appointeeId).name(name("Appointee", appointeeId)).build())
+                        .rep(Representative.builder().id(repId).hasRepresentative(YES.getValue()).name(name("Rep", repId)).build())
                         .build())
                 .build();
+    }
+
+    private Name name(String name, String id) {
+        return Name.builder().firstName(name).lastName(id).build();
     }
 
     List<CcdValue<OtherParty>> before;
@@ -222,5 +233,24 @@ public class OtherPartyDataUtilTest {
         assertTrue(OtherPartyDataUtil.haveOtherPartiesChanged(before, after));
     }
 
+    @Test
+    public void getOtherPartyNameFromId_withNullReturnsNull() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder().build();
+        String otherPartyName = OtherPartyDataUtil.getOtherPartyName(sscsCaseData, (String) null);
+        assertThat(otherPartyName, is(nullValue()));
+    }
+
+    @Test
+    @Parameters({
+            "1, OtherParty 1",
+            "3, Appointee 3",
+            "4, Rep 4"
+    })
+    public void getOtherPartyNameFromId_forOtherPartyRepReturnsRepName(String otherPartyId, String expectedName) {
+        List<CcdValue<OtherParty>> otherParties = List.of(buildOtherParty("1"), buildOtherPartyWithAppointeeAndRep("2", "3", "4"));
+        SscsCaseData sscsCaseData = SscsCaseData.builder().otherParties(otherParties).build();
+        String otherPartyName = OtherPartyDataUtil.getOtherPartyName(sscsCaseData, otherPartyId);
+        assertThat(otherPartyName, is(expectedName));
+    }
 
 }
