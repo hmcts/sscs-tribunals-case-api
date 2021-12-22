@@ -11,7 +11,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.*;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.assignNewOtherPartyData;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateOtherPartyUcb;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -33,9 +34,9 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
-import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 import uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil;
+import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 
 @Component
 @Slf4j

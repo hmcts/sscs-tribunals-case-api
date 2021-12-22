@@ -1,15 +1,18 @@
 package uk.gov.hmcts.reform.sscs.service.evidence;
 
 import static java.util.Collections.singletonList;
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.collections4.ListUtils.union;
 import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty.OTHER_PARTY;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty.OTHER_PARTY_APPOINTEE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty.OTHER_PARTY_REP;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService.TEMP_UNIQUE_ID;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.*;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.withEmailPredicate;
 
 import java.io.ByteArrayOutputStream;
@@ -458,6 +461,8 @@ public class EvidenceUploadService {
             SscsDocumentDetails sscsDocumentDetails = audioVideoDocument.getValue();
             audioVideoEvidence.add(AudioVideoEvidence.builder()
                 .value(AudioVideoEvidenceDetails.builder()
+                    .originalSenderOtherPartyId(originalSenderOtherPartyId)
+                    .originalSenderOtherPartyName(originalSenderPartyName)
                     .documentLink(sscsDocumentDetails.getDocumentLink())
                     .dateAdded(ldt.toLocalDate())
                     .fileName(sscsDocumentDetails.getDocumentFileName())

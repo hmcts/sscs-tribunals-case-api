@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.supplementaryresponse;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -253,8 +256,8 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
                 .build())
             .build());
 
-        sscsCaseData.
-            setDwpOtherDoc(DwpResponseDocument.builder()
+        sscsCaseData
+            .setDwpOtherDoc(DwpResponseDocument.builder()
                 .documentLink(DocumentLink.builder()
                     .documentFilename("test2.doc")
                     .documentUrl("myurl2")
