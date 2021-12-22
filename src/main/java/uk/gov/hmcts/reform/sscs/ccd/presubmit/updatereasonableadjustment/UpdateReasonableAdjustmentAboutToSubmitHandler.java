@@ -81,6 +81,9 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandler implements PreSubmit
                 response.addError(ADD_OR_REMOVE_OTHER_PARTIES_ERROR);
             }
         }
+        if (response.getErrors().size() == 0 && otherParties.isEmpty()) {
+            response.getData().setOtherParties(null);
+        }
     }
 
 
