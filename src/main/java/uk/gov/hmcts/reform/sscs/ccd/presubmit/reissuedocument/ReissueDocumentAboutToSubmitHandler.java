@@ -1,13 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.reissuedocument;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
+import static uk.gov.hmcts.reform.sscs.util.ReissueUtils.validateSelectedPartyOptions;
 
 import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Optional;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -36,17 +34,7 @@ public class ReissueDocumentAboutToSubmitHandler implements PreSubmitCallbackHan
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         ArrayList<String> errors = new ArrayList<>();
 
-        boolean caseHasARepresentative = StringUtils.equalsIgnoreCase("Yes", Optional.ofNullable(sscsCaseData.getAppeal().getRep()).map(Representative::getHasRepresentative).orElse("No"));
-        boolean isSendToOtherParty = emptyIfNull(sscsCaseData.getTransientFields().getReissueDocumentOtherParty()).stream()
-                .map(CcdValue::getValue)
-                .filter(f -> Objects.nonNull(f.getOtherPartyId()))
-                .anyMatch(f -> YesNo.isYes(f.getReissue()));
-
-        if (!sscsCaseData.isResendToRepresentative() && !sscsCaseData.isResendToAppellant() && !isSendToOtherParty) {
-            errors.add("No party selected to reissue document");
-        } else if (!caseHasARepresentative && sscsCaseData.isResendToRepresentative()) {
-            errors.add("Cannot re-issue to the representative as there is no representative on the appeal");
-        }
+        validateSelectedPartyOptions(sscsCaseData, errors, isOtherPartyPresent(sscsCaseData));
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
         if (CollectionUtils.isNotEmpty(errors)) {
