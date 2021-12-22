@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.util.List;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -66,8 +69,10 @@ public class PartiesOnCaseUtilTest {
     public void willGetOtherPartyAndRepOnChildSupportAppeal() {
 
         OtherParty otherParty = OtherParty.builder()
+                .id("1")
                 .name(Name.builder().firstName("Bo").lastName("Surname").title("Mr").build())
                 .rep(Representative.builder()
+                        .id("2")
                         .hasRepresentative(YES.getValue())
                         .name(Name.builder().firstName("Harry").lastName("Rep").build())
                         .build())
@@ -76,9 +81,9 @@ public class PartiesOnCaseUtilTest {
         List<DynamicListItem> response = PartiesOnCaseUtil.getPartiesOnCase(sscsCaseData);
         assertEquals(3, response.size());
         assertEquals(PartyItemList.APPELLANT.getCode(), response.get(0).getCode());
-        assertEquals(PartyItemList.OTHER_PARTY.getCode(), response.get(1).getCode());
+        assertEquals(PartyItemList.OTHER_PARTY.getCode() + "1", response.get(1).getCode());
         assertEquals("Other party 1 - Bo Surname", response.get(1).getLabel());
-        assertEquals(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode(), response.get(2).getCode());
+        assertEquals(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode() + "2", response.get(2).getCode());
         assertEquals("Other party 1 - Representative - Harry Rep", response.get(2).getLabel());
     }
 
@@ -86,12 +91,15 @@ public class PartiesOnCaseUtilTest {
     public void willGetOtherPartyAppointeeAndRepOnChildSupportAppeal() {
 
         OtherParty otherParty = OtherParty.builder()
+                .id("1")
                 .name(Name.builder().firstName("Bo").lastName("Surname").title("Mr").build())
                 .isAppointee(YES.getValue())
                 .appointee(Appointee.builder()
+                        .id("2")
                         .name(Name.builder().firstName("Silva").lastName("Lining").build())
                         .build())
                 .rep(Representative.builder()
+                        .id("3")
                         .hasRepresentative(YES.getValue())
                         .name(Name.builder().firstName("Harry").lastName("Rep").build())
                         .build())
@@ -100,30 +108,66 @@ public class PartiesOnCaseUtilTest {
         List<DynamicListItem> response = PartiesOnCaseUtil.getPartiesOnCase(sscsCaseData);
         assertEquals(3, response.size());
         assertEquals(PartyItemList.APPELLANT.getCode(), response.get(0).getCode());
-        assertEquals(PartyItemList.OTHER_PARTY.getCode(), response.get(1).getCode());
+        assertEquals(PartyItemList.OTHER_PARTY.getCode() + "2", response.get(1).getCode());
         assertEquals("Other party 1 - Bo Surname / Appointee - Silva Lining", response.get(1).getLabel());
-        assertEquals(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode(), response.get(2).getCode());
+        assertEquals(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode() + "3", response.get(2).getCode());
         assertEquals("Other party 1 - Representative - Harry Rep", response.get(2).getLabel());
     }
 
     @Test
     public void willIncrementCounterOnLabelWhenGetMultipleOtherPartiesOnChildSupportAppeal() {
 
+        setupOtherParties();
+        List<DynamicListItem> response = PartiesOnCaseUtil.getPartiesOnCase(sscsCaseData);
+        assertEquals(5, response.size());
+        assertEquals(PartyItemList.APPELLANT.getCode(), response.get(0).getCode());
+
+        assertEquals(PartyItemList.OTHER_PARTY.getCode() + "2", response.get(1).getCode());
+        assertEquals("Other party 1 - Bo Surname / Appointee - Silva Lining", response.get(1).getLabel());
+
+        assertEquals(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode() + "3", response.get(2).getCode());
+        assertEquals("Other party 1 - Representative - Harry Rep", response.get(2).getLabel());
+
+        assertEquals(PartyItemList.OTHER_PARTY.getCode() + "4", response.get(3).getCode());
+        assertEquals("Other party 2 - Cat Snack", response.get(3).getLabel());
+
+        assertEquals(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode() + "5", response.get(4).getCode());
+        assertEquals("Other party 2 - Representative - Peter Rep", response.get(4).getLabel());
+
+    }
+
+    @Test
+    public void getAllOtherPartiesOnCasesOnCaseWithIdAndNames() {
+        setupOtherParties();
+        final List<Pair<String, String>> allOtherPartiesOnCase = PartiesOnCaseUtil.getAllOtherPartiesWithIdOnCase(sscsCaseData);
+        assertThat(allOtherPartiesOnCase.size(), is(4));
+        assertThat(allOtherPartiesOnCase.get(0), is(Pair.of("2", "Silva Lining - Appointee")));
+        assertThat(allOtherPartiesOnCase.get(1), is(Pair.of("3", "Harry Rep - Representative")));
+        assertThat(allOtherPartiesOnCase.get(2), is(Pair.of("4", "Cat Snack")));
+        assertThat(allOtherPartiesOnCase.get(3), is(Pair.of("5", "Peter Rep - Representative")));
+    }
+
+    private void setupOtherParties() {
         OtherParty otherParty1 = OtherParty.builder()
+                .id("1")
                 .name(Name.builder().firstName("Bo").lastName("Surname").title("Mr").build())
                 .isAppointee(YES.getValue())
                 .appointee(Appointee.builder()
+                        .id("2")
                         .name(Name.builder().firstName("Silva").lastName("Lining").build())
                         .build())
                 .rep(Representative.builder()
+                        .id("3")
                         .hasRepresentative(YES.getValue())
                         .name(Name.builder().firstName("Harry").lastName("Rep").build())
                         .build())
                 .build();
 
         OtherParty otherParty2 = OtherParty.builder()
+                .id("4")
                 .name(Name.builder().firstName("Cat").lastName("Snack").title("Mrs").build())
                 .rep(Representative.builder()
+                        .id("5")
                         .hasRepresentative(YES.getValue())
                         .name(Name.builder().firstName("Peter").lastName("Rep").build())
                         .build())
@@ -133,16 +177,16 @@ public class PartiesOnCaseUtilTest {
         assertEquals(5, response.size());
         assertEquals(PartyItemList.APPELLANT.getCode(), response.get(0).getCode());
 
-        assertEquals(PartyItemList.OTHER_PARTY.getCode(), response.get(1).getCode());
+        assertEquals(PartyItemList.OTHER_PARTY.getCode() + "2", response.get(1).getCode());
         assertEquals("Other party 1 - Bo Surname / Appointee - Silva Lining", response.get(1).getLabel());
 
-        assertEquals(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode(), response.get(2).getCode());
+        assertEquals(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode() + "3", response.get(2).getCode());
         assertEquals("Other party 1 - Representative - Harry Rep", response.get(2).getLabel());
 
-        assertEquals(PartyItemList.OTHER_PARTY.getCode(), response.get(3).getCode());
+        assertEquals(PartyItemList.OTHER_PARTY.getCode() + "4", response.get(3).getCode());
         assertEquals("Other party 2 - Cat Snack", response.get(3).getLabel());
 
-        assertEquals(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode(), response.get(4).getCode());
+        assertEquals(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode() + "5", response.get(4).getCode());
         assertEquals("Other party 2 - Representative - Peter Rep", response.get(4).getLabel());
 
     }
