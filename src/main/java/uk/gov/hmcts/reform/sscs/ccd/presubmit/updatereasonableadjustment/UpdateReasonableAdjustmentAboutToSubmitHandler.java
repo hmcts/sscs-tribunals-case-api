@@ -4,9 +4,8 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getAllOtherPartiesOnCase;
 
-import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -14,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
 
 @Component
 @Slf4j
@@ -69,22 +69,13 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandler implements PreSubmit
     }
 
     private void checkOtherPartyButtonsNotPressed(Callback<SscsCaseData> callback, PreSubmitCallbackResponse<SscsCaseData> response) {
-        CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
-        SscsCaseData oldCaseData = oldCaseDetails != null ? oldCaseDetails.getCaseData() : null;
-        List<String> oldOtherParties = getAllOtherPartiesOnCase(oldCaseData);
-        List<String> otherParties = getAllOtherPartiesOnCase(response.getData());
-
-        if (oldCaseData != null && otherParties != null && otherParties.size() != oldOtherParties.size()) {
+        Optional<CaseDetails<SscsCaseData>> beforeData = callback.getCaseDetailsBefore();
+        if (beforeData.isPresent() && OtherPartyDataUtil.haveOtherPartiesChanged(beforeData.get().getCaseData().getOtherParties(), response.getData().getOtherParties())) {
             response.addError(ADD_OR_REMOVE_OTHER_PARTIES_ERROR);
-        } else if (oldCaseData != null && otherParties != null && oldCaseData.getOtherParties() != null && otherParties.size() == oldOtherParties.size()) {
-            if (response.getData().getOtherParties().stream().anyMatch(e -> e.getValue().getId() == null)) {
-                response.addError(ADD_OR_REMOVE_OTHER_PARTIES_ERROR);
-            }
         }
         if (response.getErrors().size() == 0 && otherParties.isEmpty()) {
             response.getData().setOtherParties(null);
         }
     }
-
 
 }
