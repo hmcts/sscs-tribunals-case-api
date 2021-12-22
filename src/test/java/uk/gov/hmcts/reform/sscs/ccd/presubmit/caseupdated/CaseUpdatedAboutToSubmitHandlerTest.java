@@ -70,7 +70,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     public void setUp() {
         openMocks(this);
         associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService);
-        handler = new CaseUpdatedAboutToSubmitHandler(regionalProcessingCenterService, associatedCaseLinkHelper, airLookupService, new DwpAddressLookupService(), idamService);
+        handler = new CaseUpdatedAboutToSubmitHandler(regionalProcessingCenterService, associatedCaseLinkHelper, airLookupService, new DwpAddressLookupService(), idamService, true);
 
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -630,5 +630,51 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(YES, response.getData().getIsConfidentialCase());
+    }
+
+    @Test
+    public void givenNewAppellantName_thenSetCaseName() {
+        sscsCaseDataBefore.setCaseName("Old Name");
+        sscsCaseData.setCaseName("Old Name");
+        sscsCaseData.setAppeal(Appeal.builder()
+                        .benefitType(new BenefitType("UC", "Universal credit"))
+                        .appellant(Appellant.builder()
+                                .name(Name.builder().firstName("New").lastName("Name").build())
+                                .build())
+                        .build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals("New Name", response.getData().getCaseName());
+    }
+
+    @Test
+    public void givenAppellantNameAdded_thenSetCaseName() {
+        sscsCaseData.setAppeal(Appeal.builder()
+                        .benefitType(new BenefitType("UC", "Universal credit"))
+                        .appellant(Appellant.builder()
+                                .name(Name.builder().firstName("New").lastName("Name").build())
+                                .build())
+                        .build());
+
+        IdamTokens idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals("New Name", response.getData().getCaseName());
+    }
+
+    @Test
+    public void givenAppellantNameDeleted_thenUnsetCaseName() {
+        sscsCaseDataBefore.setCaseName("Old Name");
+        sscsCaseData.setCaseName("Old Name");
+        sscsCaseData.setAppeal(Appeal.builder()
+                .benefitType(new BenefitType("UC", "Universal credit"))
+                .appellant(Appellant.builder().build())
+                .build());
+
+        IdamTokens idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertNull(response.getData().getCaseName());
     }
 }
