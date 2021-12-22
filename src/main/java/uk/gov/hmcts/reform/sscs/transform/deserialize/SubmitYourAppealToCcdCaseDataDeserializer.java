@@ -65,7 +65,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
         if (workAllocationEnabled) {
             String caseName = null;
-            if (appeal.getAppellant() != null & appeal.getAppellant().getName() != null) {
+            if (appeal.getAppellant() != null && appeal.getAppellant().getName() != null) {
                 Name name = appeal.getAppellant().getName();
                 caseName = name.getFullNameNoTitle();
             }
