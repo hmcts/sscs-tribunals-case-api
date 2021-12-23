@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatereasonableadjustment;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.clearOtherPartyIfEmpty;
 
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +41,7 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandler implements PreSubmit
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         checkOtherPartyButtonsNotPressed(callback, response);
+        clearOtherPartyIfEmpty(response.getData());
 
         final ReasonableAdjustments reasonableAdjustments = sscsCaseData.getReasonableAdjustments();
         if (isYes(sscsCaseData.getAppeal().getAppellant().getIsAppointee()) || nonNull(reasonableAdjustments.getAppellant()) && isNoOrNull(sscsCaseData.getReasonableAdjustments().getAppellant().getWantsReasonableAdjustment())) {
@@ -73,9 +74,6 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandler implements PreSubmit
         Optional<CaseDetails<SscsCaseData>> beforeData = callback.getCaseDetailsBefore();
         if (beforeData.isPresent() && OtherPartyDataUtil.haveOtherPartiesChanged(beforeData.get().getCaseData().getOtherParties(), response.getData().getOtherParties())) {
             response.addError(ADD_OR_REMOVE_OTHER_PARTIES_ERROR);
-        }
-        if (response.getErrors().size() == 0 && isEmpty(response.getData().getOtherParties())) {
-            response.getData().setOtherParties(null);
         }
     }
 
