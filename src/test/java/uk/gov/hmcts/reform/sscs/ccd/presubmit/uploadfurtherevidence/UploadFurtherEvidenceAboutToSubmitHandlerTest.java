@@ -275,14 +275,13 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
     @Parameters({"audio.mp3", "video.mp4"})
     public void shouldGiveErrorIfAudioVideoEvidenceHasIncorrectDocumentType(String filename) {
         List<DraftSscsDocument> draftDocuments = Collections.singletonList(DraftSscsDocument.builder()
-            .value(DraftSscsDocumentDetails.builder()
-                .documentFileName(filename)
-                .documentType("incorrectType")
-                .documentLink(DocumentLink.builder()
-                    .documentUrl("http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655")
-                    .documentFilename(filename).build())
-                .build())
-                .build());
+                .value(DraftSscsDocumentDetails.builder()
+                        .documentFileName(filename)
+                        .documentType("incorrectType")
+                        .documentLink(DocumentLink.builder()
+                                .documentUrl("http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655")
+                                .documentFilename(filename).build()).build())
+                        .build());
         sscsCaseData.setDraftFurtherEvidenceDocuments(draftDocuments);
         sscsCaseData.setSscsDocument(null);
 

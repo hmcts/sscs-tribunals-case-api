@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
 import java.util.List;
@@ -39,11 +41,11 @@ public class AudioVideoEvidenceUtilTest {
 
     @Test
     @Parameters({
-        "appellantEvidence",
-        "jointPartyEvidence",
-        "representativeEvidence",
-        "dwpEvidence",
-        "hmctsEvidence"
+            "appellantEvidence",
+            "jointPartyEvidence",
+            "representativeEvidence",
+            "dwpEvidence",
+            "hmctsEvidence"
     })
     public void shouldBeValidAudioVideoDocumentType(String documentType) {
         assertTrue(AudioVideoEvidenceUtil.isValidAudioVideoDocumentType(documentType));
@@ -66,11 +68,11 @@ public class AudioVideoEvidenceUtilTest {
 
     @Test
     @Parameters({
-        "jointPartyEvidence, Joint party",
-        "representativeEvidence, Representative",
-        "dwpEvidence, DWP",
-        "hmctsEvidence, HMCTS",
-        "default, Appellant"
+            "jointPartyEvidence, Joint party",
+            "representativeEvidence, Representative",
+            "dwpEvidence, DWP",
+            "hmctsEvidence, HMCTS",
+            "default, Appellant"
     })
     public void shouldMatchOriginalSender(String input, String expected) {
         assertEquals(AudioVideoEvidenceUtil.getOriginalSender(input), expected);

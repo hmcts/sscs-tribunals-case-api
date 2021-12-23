@@ -385,7 +385,6 @@ public class EvidenceUploadService {
                     .statementOfEvidencePdf(draftSscsDocument.getValue().getDocumentLink())
                     .build())
                 .build());
-            System.out.println(sscsDocumentDetails.getDocumentLink().getDocumentFilename());
         }
 
         addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, audioVideoEvidence.stream()

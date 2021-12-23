@@ -79,7 +79,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             addNoteService, addedDocumentsUtil);
 
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
-            .forename("Chris").surname("Davis").build().getFullName());
+                .forename("Chris").surname("Davis").build().getFullName());
 
         when(callback.getEvent()).thenReturn(EventType.DWP_UPLOAD_RESPONSE);
 

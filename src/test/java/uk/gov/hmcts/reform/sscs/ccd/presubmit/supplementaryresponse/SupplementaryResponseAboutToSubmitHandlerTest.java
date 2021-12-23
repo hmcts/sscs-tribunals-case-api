@@ -53,9 +53,9 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.DWP_SUPPLEMENTARY_RESPONSE);
 
         sscsCaseData = SscsCaseData.builder()
-            .ccdCaseId("1234")
-            .appeal(Appeal.builder().build())
-            .build();
+                .ccdCaseId("1234")
+                .appeal(Appeal.builder().build())
+                .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);

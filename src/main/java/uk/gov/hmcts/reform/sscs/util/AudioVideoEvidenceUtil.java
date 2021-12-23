@@ -54,10 +54,10 @@ public class AudioVideoEvidenceUtil {
 
     public static boolean isValidAudioVideoDocumentType(String documentType) {
         return APPELLANT_EVIDENCE.getValue().equals(documentType)
-            || JOINT_PARTY_EVIDENCE.getValue().equals(documentType)
-            || REPRESENTATIVE_EVIDENCE.getValue().equals(documentType)
-            || DWP_EVIDENCE.getValue().equals(documentType)
-            || HMCTS_EVIDENCE.getValue().equals(documentType);
+                || JOINT_PARTY_EVIDENCE.getValue().equals(documentType)
+                || REPRESENTATIVE_EVIDENCE.getValue().equals(documentType)
+                || DWP_EVIDENCE.getValue().equals(documentType)
+                || HMCTS_EVIDENCE.getValue().equals(documentType);
     }
 
     public static String getOriginalSender(String documentType) {
@@ -70,8 +70,7 @@ public class AudioVideoEvidenceUtil {
                 return "DWP";
             case "hmctsEvidence":
                 return "HMCTS";
-            default:
-                return "Appellant";
+            default: return "Appellant";
         }
     }
 }

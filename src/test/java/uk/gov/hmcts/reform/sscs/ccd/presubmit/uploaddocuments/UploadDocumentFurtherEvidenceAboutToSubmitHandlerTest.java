@@ -150,11 +150,11 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
         callback.getCaseDetails().getCaseData().setDraftSscsFurtherEvidenceDocument(draftDocuments);
 
         PreSubmitCallbackResponse<SscsCaseData> actualResponse = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+                USER_AUTHORISATION);
 
         long numberOfExpectedError = actualResponse.getErrors().stream()
-            .filter(error -> error.equalsIgnoreCase("Type not accepted for AV evidence. Select a Type for the party that originally submitted the audio/video evidence"))
-            .count();
+                .filter(error -> error.equalsIgnoreCase("Type not accepted for AV evidence. Select a Type for the party that originally submitted the audio/video evidence"))
+                .count();
         assertEquals(1, numberOfExpectedError);
     }
 
@@ -290,11 +290,11 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
 
     @Test
     public void handleHappyPathWhenAudioVideoAndPdfFileUploaded() throws IOException {
-        Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE, "appealCreated",
-            DocumentType.OTHER_EVIDENCE.getId(), DocumentType.APPELLANT_EVIDENCE.getId(), UPLOAD_AUDIO_VIDEO_DOCUMENT_FE_CALLBACK_JSON);
+        Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,"appealCreated",
+                DocumentType.OTHER_EVIDENCE.getId(), DocumentType.APPELLANT_EVIDENCE.getId(), UPLOAD_AUDIO_VIDEO_DOCUMENT_FE_CALLBACK_JSON);
 
         PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+                USER_AUTHORISATION);
 
         assertEquals(1, actualCaseData.getData().getScannedDocuments().size());
         assertEquals("reps-some-name.pdf", actualCaseData.getData().getScannedDocuments().get(0).getValue().getFileName());
