@@ -36,14 +36,15 @@ public class AddedDocumentsUtil {
 
             if (!documentsAddedThisEvent.isEmpty()) {
                 try {
-                    sscsCaseData.setAddedDocuments(new ObjectMapper().writeValueAsString(documentsAddedThisEventCounts));
+                    sscsCaseData.getWorkAllocationFields().setAddedDocuments(new ObjectMapper()
+                        .writeValueAsString(documentsAddedThisEventCounts));
                 } catch (JsonProcessingException e) {
                     throw new IllegalStateException(e);
                 }
                 log.info("Case {} with event {} added documents: {}.", sscsCaseData.getCcdCaseId(), eventType,
-                    sscsCaseData.getAddedDocuments());
+                    sscsCaseData.getWorkAllocationFields().getAddedDocuments());
             } else {
-                sscsCaseData.setAddedDocuments(null);
+                sscsCaseData.getWorkAllocationFields().setAddedDocuments(null);
             }
         }
     }

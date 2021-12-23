@@ -711,7 +711,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             callback, USER_AUTHORISATION);
 
         Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
-            .readValue(response.getData().getAddedDocuments());
+            .readValue(response.getData().getWorkAllocationFields().getAddedDocuments());
 
         org.assertj.core.api.Assertions.assertThat(addedDocuments)
             .as("One piece of audio and video evidence each have been added, should be reflected in the map.")
@@ -764,7 +764,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             callback, USER_AUTHORISATION);
 
         Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
-            .readValue(response.getData().getAddedDocuments());
+            .readValue(response.getData().getWorkAllocationFields().getAddedDocuments());
 
         org.assertj.core.api.Assertions.assertThat(addedDocuments)
             .as("Only video evidence was added this event, audio should not be inserted into added documents.")
@@ -781,7 +781,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT,
             callback, USER_AUTHORISATION);
 
-        org.assertj.core.api.Assertions.assertThat(response.getData().getAddedDocuments())
+        org.assertj.core.api.Assertions.assertThat(response.getData().getWorkAllocationFields().getAddedDocuments())
             .as("Added documents should be cleared every event..")
             .isNull();
     }
