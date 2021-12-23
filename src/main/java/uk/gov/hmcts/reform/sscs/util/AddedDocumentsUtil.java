@@ -17,7 +17,7 @@ public class AddedDocumentsUtil {
 
     private final boolean workAllocationFeature;
 
-    public AddedDocumentsUtil(@Value("${feature.workAllocation.enabled}") boolean workAllocationFeature) {
+    public AddedDocumentsUtil(@Value("${feature.work-allocation.enabled}") boolean workAllocationFeature) {
         this.workAllocationFeature = workAllocationFeature;
     }
 
