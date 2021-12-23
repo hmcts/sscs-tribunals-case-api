@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updateotherparty;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.*;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.UPDATE_OTHER_PARTY_DATA
+                && callback.getEvent() == UPDATE_OTHER_PARTY_DATA
                 && nonNull(callback.getCaseDetails().getCaseData().getOtherParties());
     }
 
@@ -37,8 +38,8 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         List<CcdValue<OtherParty>> otherParties = sscsCaseData.getOtherParties();
         updateOtherPartyUcb(sscsCaseData);
-        assignOtherPartyId(otherParties);
         checkConfidentiality(sscsCaseData);
+        assignNewOtherPartyData(otherParties, UPDATE_OTHER_PARTY_DATA);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }

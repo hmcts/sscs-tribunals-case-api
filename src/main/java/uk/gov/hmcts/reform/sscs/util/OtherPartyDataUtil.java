@@ -1,12 +1,9 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 import static java.util.Collections.sort;
-import static java.util.Collections.sort;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -18,13 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 public class OtherPartyDataUtil {
 
@@ -41,13 +32,22 @@ public class OtherPartyDataUtil {
         }
     }
 
-    public static void assignOtherPartyId(List<CcdValue<OtherParty>> otherParties) {
+    public static void assignNewOtherPartyData(List<CcdValue<OtherParty>> otherParties, EventType eventType) {
         int maxId = getMaxId(otherParties);
         for (CcdValue<OtherParty> ccdOtherParty : otherParties) {
             OtherParty otherParty = ccdOtherParty.getValue();
             if (otherParty.getId() == null) {
                 otherParty.setId(Integer.toString(++maxId));
+                //All the newly added other parties will be sent a notification
+                otherParty.setSendNewOtherPartyNotification(YES);
+            } else if (EventType.DWP_UPLOAD_RESPONSE.equals(eventType) && otherParty.getSendNewOtherPartyNotification() == null) {
+                //The other party added at case creation time, by bulk-scan, will be notified in dwpUploadResponse event
+                otherParty.setSendNewOtherPartyNotification(YES);
+            } else if (YesNo.isYes(otherParty.getSendNewOtherPartyNotification())) {
+                //Notification flag is set to no for the other parties that already been notified
+                otherParty.setSendNewOtherPartyNotification(NO);
             }
+
             if (otherParty.getAppointee() != null && isYes(otherParty.getIsAppointee()) && otherParty.getAppointee().getId() == null) {
                 otherParty.getAppointee().setId(Integer.toString(++maxId));
             }
@@ -104,7 +104,7 @@ public class OtherPartyDataUtil {
                     && sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired() != null
                     && YesNo.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired()))
                     || otherPartyHasConfidentiality(sscsCaseData)) {
-                sscsCaseData.setIsConfidentialCase(YesNo.YES);
+                sscsCaseData.setIsConfidentialCase(YES);
             } else {
                 sscsCaseData.setIsConfidentialCase(null);
             }
@@ -183,4 +183,19 @@ public class OtherPartyDataUtil {
                 .orElse(null);
     }
 
+    public static boolean hasNewOtherPartyAdded(List<CcdValue<OtherParty>> before, List<CcdValue<OtherParty>> after) {
+        if (after != null && !after.isEmpty()) {
+            if (before == null || before.isEmpty()) {
+                return true;
+            }
+
+            return !before.stream()
+                    .map(o -> o.getValue().getId())
+                    .collect(Collectors.toSet())
+                    .containsAll(after.stream()
+                            .map(o -> o.getValue().getId())
+                            .collect(Collectors.toList()));
+        }
+        return false;
+    }
 }

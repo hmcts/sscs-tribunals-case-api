@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -14,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 
 @SpringBootTest
@@ -35,7 +35,9 @@ public class UpdateOtherPartyDataIt extends AbstractEventIt {
         assertEquals("1", result.getData().getOtherParties().get(0).getValue().getId());
         assertEquals("2", result.getData().getOtherParties().get(0).getValue().getAppointee().getId());
         assertEquals("3", result.getData().getOtherParties().get(0).getValue().getRep().getId());
+        assertFalse(YesNo.isYes(result.getData().getOtherParties().get(0).getValue().getSendNewOtherPartyNotification()));
         assertEquals("4", result.getData().getOtherParties().get(1).getValue().getId());
+        assertTrue(YesNo.isYes(result.getData().getOtherParties().get(1).getValue().getSendNewOtherPartyNotification()));
         assertNull(result.getData().getOtherParties().get(1).getValue().getAppointee().getId());
         assertNull(result.getData().getOtherParties().get(1).getValue().getRep().getId());
     }
