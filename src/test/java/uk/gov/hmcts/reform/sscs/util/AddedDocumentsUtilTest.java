@@ -2,7 +2,11 @@ package uk.gov.hmcts.reform.sscs.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -31,7 +35,7 @@ public class AddedDocumentsUtilTest {
         addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, documentsAddedThisEvent,
             EventType.ACTION_FURTHER_EVIDENCE);
 
-        org.assertj.core.api.Assertions.assertThat(sscsCaseData.getAddedDocuments())
+        org.assertj.core.api.Assertions.assertThat(sscsCaseData.getWorkAllocationFields().getAddedDocuments())
             .as("The feature flag is off. No documents should be added.")
             .isNull();
     }
@@ -45,7 +49,7 @@ public class AddedDocumentsUtilTest {
             EventType.ACTION_FURTHER_EVIDENCE);
 
         Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
-            .readValue(sscsCaseData.getAddedDocuments());
+            .readValue(sscsCaseData.getWorkAllocationFields().getAddedDocuments());
 
         org.assertj.core.api.Assertions.assertThat(addedDocuments)
             .as("One document has been added to the case and should be added to added documents.")
@@ -64,7 +68,7 @@ public class AddedDocumentsUtilTest {
 
 
         Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
-            .readValue(sscsCaseData.getAddedDocuments());
+            .readValue(sscsCaseData.getWorkAllocationFields().getAddedDocuments());
 
         org.assertj.core.api.Assertions.assertThat(addedDocuments)
             .as("Multiple document have been added to the case and should be added to added documents.")
@@ -79,7 +83,7 @@ public class AddedDocumentsUtilTest {
         addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, new ArrayList<>(),
             EventType.ACTION_FURTHER_EVIDENCE);
 
-        org.assertj.core.api.Assertions.assertThat(sscsCaseData.getAddedDocuments())
+        org.assertj.core.api.Assertions.assertThat(sscsCaseData.getWorkAllocationFields().getAddedDocuments())
             .as("No documents have been attached - map of added documents should be empty.")
             .isNull();
     }

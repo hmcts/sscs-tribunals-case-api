@@ -198,7 +198,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
-            .readValue(response.getData().getAddedDocuments());
+            .readValue(response.getData().getWorkAllocationFields().getAddedDocuments());
 
         org.assertj.core.api.Assertions.assertThat(addedDocuments)
             .as("Only audio video evidence should be added into added documents for this event type.")
@@ -225,7 +225,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
-            .readValue(response.getData().getAddedDocuments());
+            .readValue(response.getData().getWorkAllocationFields().getAddedDocuments());
 
         org.assertj.core.api.Assertions.assertThat(addedDocuments)
             .as("Without a given document file name the file type should be resolveable from the document link.")
@@ -267,7 +267,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
-            .readValue(response.getData().getAddedDocuments());
+            .readValue(response.getData().getWorkAllocationFields().getAddedDocuments());
 
         org.assertj.core.api.Assertions.assertThat(addedDocuments)
             .as("Added documents should only contain evidence added in the most recent event.")
@@ -282,7 +282,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        org.assertj.core.api.Assertions.assertThat(response.getData().getAddedDocuments())
+        org.assertj.core.api.Assertions.assertThat(response.getData().getWorkAllocationFields().getAddedDocuments())
             .as("Added documents should be cleared regardless of whether audio video evidence has been added.")
             .isNull();
     }

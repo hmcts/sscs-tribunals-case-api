@@ -142,7 +142,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     protected void handleAudioVideoDocuments(SscsCaseData sscsCaseData) {
         if (isEmpty(sscsCaseData.getDwpUploadAudioVideoEvidence())) {
-            sscsCaseData.setAddedDocuments(null);
+            sscsCaseData.getWorkAllocationFields().setAddedDocuments(null);
             return;
         }
 

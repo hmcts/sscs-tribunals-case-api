@@ -208,7 +208,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
-            .readValue(response.getData().getAddedDocuments());
+            .readValue(response.getData().getWorkAllocationFields().getAddedDocuments());
 
         org.assertj.core.api.Assertions.assertThat(addedDocuments)
             .as("One audio or video file has been added to the case. Correct type should be added to added documents.")
@@ -238,7 +238,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
-            .readValue(response.getData().getAddedDocuments());
+            .readValue(response.getData().getWorkAllocationFields().getAddedDocuments());
 
         org.assertj.core.api.Assertions.assertThat(addedDocuments)
             .as("Added documents should only contain evidence added in the most recent event.")
@@ -266,7 +266,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        org.assertj.core.api.Assertions.assertThat(response.getData().getAddedDocuments())
+        org.assertj.core.api.Assertions.assertThat(response.getData().getWorkAllocationFields().getAddedDocuments())
             .as("Only audio evidence should be inserted into added documents.")
             .isNull();
     }

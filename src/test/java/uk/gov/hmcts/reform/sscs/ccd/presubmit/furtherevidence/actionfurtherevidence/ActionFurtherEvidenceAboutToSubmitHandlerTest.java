@@ -1456,7 +1456,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
-            .readValue(response.getData().getAddedDocuments());
+            .readValue(response.getData().getWorkAllocationFields().getAddedDocuments());
 
         org.assertj.core.api.Assertions.assertThat(addedDocuments)
             .as("One document has been added to the case and should be added to added documents.")
@@ -1500,7 +1500,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
-            .readValue(response.getData().getAddedDocuments());
+            .readValue(response.getData().getWorkAllocationFields().getAddedDocuments());
 
         org.assertj.core.api.Assertions.assertThat(addedDocuments)
             .as("Added documents should only contain documents from the current event.")
@@ -1517,7 +1517,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        org.assertj.core.api.Assertions.assertThat(response.getData().getAddedDocuments())
+        org.assertj.core.api.Assertions.assertThat(response.getData().getWorkAllocationFields().getAddedDocuments())
             .as("Added documents should be reset on each event.")
             .isNull();
     }
@@ -1543,7 +1543,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        org.assertj.core.api.Assertions.assertThat(response.getData().getAddedDocuments())
+        org.assertj.core.api.Assertions.assertThat(response.getData().getWorkAllocationFields().getAddedDocuments())
             .as("Only a coversheet has been attached - this should be ignored.")
             .isNull();
     }

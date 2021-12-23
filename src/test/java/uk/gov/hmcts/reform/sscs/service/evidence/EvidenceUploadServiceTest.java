@@ -539,7 +539,7 @@ public class EvidenceUploadServiceTest {
         evidenceUploadService.submitHearingEvidence(someOnlineHearingId, someDescription, file);
 
         Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
-            .readValue(sscsCaseDetails.getData().getAddedDocuments());
+            .readValue(sscsCaseDetails.getData().getWorkAllocationFields().getAddedDocuments());
 
         org.assertj.core.api.Assertions.assertThat(addedDocuments)
             .as("One piece of audio or video evidence each have been added, this should be reflected in "
@@ -585,7 +585,7 @@ public class EvidenceUploadServiceTest {
 
         evidenceUploadService.submitHearingEvidence(someOnlineHearingId, someDescription, file);
 
-        org.assertj.core.api.Assertions.assertThat(sscsCaseDetails.getData().getAddedDocuments())
+        org.assertj.core.api.Assertions.assertThat(sscsCaseDetails.getData().getWorkAllocationFields().getAddedDocuments())
             .as("Added documents should be cleared each event.")
             .isNull();
     }
