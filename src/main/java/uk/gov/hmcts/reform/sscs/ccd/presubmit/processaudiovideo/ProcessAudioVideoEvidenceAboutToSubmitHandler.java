@@ -60,7 +60,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() == EventType.PROCESS_AUDIO_VIDEO;
+                && callback.getEvent() == EventType.PROCESS_AUDIO_VIDEO;
     }
 
     @Override
@@ -304,7 +304,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
 
     private void addProcessedActionToSelectedEvidence(SscsCaseData caseData, ProcessedAction processedAction) {
         caseData.getAudioVideoEvidence().stream().filter(evidence -> isSelectedEvidence(evidence, caseData))
-            .forEach(evidence -> evidence.getValue().setProcessedAction(processedAction));
+                .forEach(evidence -> evidence.getValue().setProcessedAction(processedAction));
     }
 
     private void overrideInterlocReviewStateIfSelected(SscsCaseData caseData) {

@@ -90,7 +90,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService,
-            bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
+                bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_FURTHER_EVIDENCE);
         when(callback.isIgnoreWarnings()).thenReturn(true);
@@ -700,8 +700,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Parameters({"null", "DORMANT_APPEAL_STATE", "VOID_STATE"})
     public void shouldReviewByJudgeAndUpdatePreviousStateWhenActionManuallyAndHasReinstatementRequestDocument(@Nullable State previousState) {
 
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService,
-            new AddedDocumentsUtil(false));
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
 
         List<ScannedDocument> docs = new ArrayList<>();
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
@@ -724,8 +723,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Parameters({"VALID_APPEAL", "READY_TO_LIST"})
     public void shouldReviewByJudgeButNotUpdatePreviousStateWhenActionManuallyAndHasReinstatementRequestDocument(@Nullable State previousState) {
 
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService,
-            new AddedDocumentsUtil(false));
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
 
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
@@ -750,16 +748,15 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         State previousState = State.VALID_APPEAL;
 
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService,
-            new AddedDocumentsUtil(false));
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
         sscsCaseData.setPreviousState(previousState);
         sscsCaseData.setLanguagePreferenceWelsh("yes");
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.REINSTATEMENT_REQUEST.getValue())
-                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.REINSTATEMENT_REQUEST.getValue())
+                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -776,16 +773,15 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Parameters({"VALID_APPEAL", "READY_TO_LIST"})
     public void shouldReviewByJudgeButNotUpdatePreviousStateWhenActionManuallyAndHasUrgentHearingRequestDocument(@Nullable State previousState) {
 
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService,
-            new AddedDocumentsUtil(false));
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
 
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
         sscsCaseData.setPreviousState(previousState);
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.URGENT_HEARING_REQUEST.getValue())
-                .url(DocumentLink.builder().documentUrl("test.com").build()).includeInBundle(NO).build()).build();
+                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.URGENT_HEARING_REQUEST.getValue())
+                        .url(DocumentLink.builder().documentUrl("test.com").build()).includeInBundle(NO).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -799,16 +795,15 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Parameters({"READY_TO_LIST,1", "RESPONSE_RECEIVED,1", "DORMANT_APPEAL_STATE,1", "HEARING,1", "WITH_DWP,1", "VALID_APPEAL,0", "NOT_LISTABLE,1"})
     public void shouldSetBundleAdditionBasedOnPreviousState(@Nullable State state, int occurrs) {
 
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService,
-            new AddedDocumentsUtil(false));
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(ISSUE_FURTHER_EVIDENCE.code, ISSUE_FURTHER_EVIDENCE.label));
         when(caseDetails.getState()).thenReturn(state);
         when(footerService.getNextBundleAddition(any())).thenReturn("A");
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.URGENT_HEARING_REQUEST.getValue())
-                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.URGENT_HEARING_REQUEST.getValue())
+                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
 
         docs.add(scannedDocument);
@@ -827,8 +822,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,Yes,1", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,No,0"})
     public void shouldSetBundleAdditionBasedOnFurtherEvidenceActionType(FurtherEvidenceActionDynamicListItems actionType, String includeInBundle, int occurs) {
 
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService,
-            new AddedDocumentsUtil(false));
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(actionType.code, actionType.label));
 
@@ -836,10 +830,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         when(footerService.getNextBundleAddition(any())).thenReturn("A");
 
         ScannedDocument scannedDocument = ScannedDocument
-            .builder()
-            .value(
+                .builder()
+                .value(
                 ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.URGENT_HEARING_REQUEST.getValue())
-                    .url(DocumentLink.builder().documentUrl("test.com").build()).includeInBundle(includeInBundle).build()).build();
+                        .url(DocumentLink.builder().documentUrl("test.com").build()).includeInBundle(includeInBundle).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
 
         docs.add(scannedDocument);
@@ -849,104 +843,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         assertEquals(occurs, response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count());
         assertEquals(0, response.getWarnings().size());
-    }
-
-    @Test
-    public void givenACaseWithScannedDocuments_shouldGenerateAMapOfSscsDocuments() throws JsonProcessingException {
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService,
-            bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true));
-        ScannedDocument scannedDocument = ScannedDocument.builder().value(
-            ScannedDocumentDetails.builder()
-                .fileName("new_test.pdf")
-                .subtype("sscs1")
-                .type("reinstatementRequest")
-                .url(DocumentLink.builder().documentUrl("www.test.com").build())
-                .editedUrl(DocumentLink.builder().documentUrl("www.edited.com").build())
-                .scannedDate("2020-06-13T00:00:00.000")
-                .controlNumber("4321")
-                .build()).build();
-
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
-
-        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
-            ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
-            .readValue(response.getData().getAddedDocuments());
-
-        org.assertj.core.api.Assertions.assertThat(addedDocuments)
-            .as("One document has been added to the case and should be added to added documents.")
-            .containsOnly(org.assertj.core.api.Assertions.entry("reinstatementRequest", 1));
-    }
-
-    @Test
-    public void givenACaseWithScannedDocumentsSubmittedMultipleTimes_shouldGenerateAMapOfSscsDocumentsWithTheMostRecentDocuments()
-        throws JsonProcessingException {
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService,
-            bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true));
-        ScannedDocument reinstatementRequestScannedDocument = ScannedDocument.builder().value(
-            ScannedDocumentDetails.builder()
-                .fileName("new_test.pdf")
-                .subtype("sscs1")
-                .type("reinstatementRequest")
-                .url(DocumentLink.builder().documentUrl("www.test.com").build())
-                .editedUrl(DocumentLink.builder().documentUrl("www.edited.com").build())
-                .scannedDate("2020-06-13T00:00:00.000")
-                .controlNumber("4321")
-                .build()).build();
-
-        sscsCaseData.setScannedDocuments(Collections.singletonList(reinstatementRequestScannedDocument));
-
-        actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        ScannedDocument confidentialityRequestScannedDocument = ScannedDocument.builder().value(
-            ScannedDocumentDetails.builder()
-                .fileName("new_test2.pdf")
-                .subtype("sscs1")
-                .type("confidentialityRequest")
-                .url(DocumentLink.builder().documentUrl("www.test.com").build())
-                .editedUrl(DocumentLink.builder().documentUrl("www.edited.com").build())
-                .scannedDate("2020-06-13T00:00:00.000")
-                .controlNumber("111")
-                .build()).build();
-
-        sscsCaseData.setScannedDocuments(Collections.singletonList(confidentialityRequestScannedDocument));
-
-        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
-            ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
-            .readValue(response.getData().getAddedDocuments());
-
-        org.assertj.core.api.Assertions.assertThat(addedDocuments)
-            .as("Added documents should only contain documents from the current event.")
-            .containsOnly(org.assertj.core.api.Assertions.entry("confidentialityRequest", 1));
-    }
-
-    @Test
-    public void givenACaseWitScannedDocumentCoversheet_shouldGenerateAnEmptyMapOfSscsDocuments() {
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService,
-            bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true));
-        List<ScannedDocument> scannedDocuments = new ArrayList<>();
-        scannedDocuments.add(ScannedDocument.builder().value(
-            ScannedDocumentDetails.builder()
-                .fileName("new_test5.pdf")
-                .subtype("sscs1")
-                .type("coversheet")
-                .url(DocumentLink.builder().documentUrl("www.test.com").build())
-                .editedUrl(DocumentLink.builder().documentUrl("www.edited.com").build())
-                .scannedDate("2020-06-13T00:00:00.000")
-                .controlNumber("43215")
-                .build()).build());
-
-        sscsCaseData.setScannedDocuments(scannedDocuments);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
-            ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        org.assertj.core.api.Assertions.assertThat(response.getData().getAddedDocuments())
-            .as("Only a coversheet has been attached - this should be ignored.")
-            .isNull();
     }
 
     @Test
@@ -1394,8 +1290,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     })
     public void shouldAddDocumentToBundleBasedOnFurtherEvidenceActionType(FurtherEvidenceActionDynamicListItems actionType, String includeInBundle, int occurs) {
 
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService,
-            new AddedDocumentsUtil(false));
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(actionType.code, actionType.label));
 
@@ -1458,8 +1353,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,Yes,0", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,No,0", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,null,1"})
     public void shouldSetBundleAdditionWarningBasedOnFurtherEvidenceActionType(FurtherEvidenceActionDynamicListItems actionType, String includeInBundle, int warnings) {
 
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService,
-            new AddedDocumentsUtil(false));
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(actionType.code, actionType.label));
 
         when(callback.isIgnoreWarnings()).thenReturn(false);
@@ -1541,4 +1435,116 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         executor.shutdown();
     }
 
+    @Test
+    public void givenACaseWithScannedDocuments_shouldGenerateAMapOfSscsDocuments() throws JsonProcessingException {
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService,
+            bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true));
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+            ScannedDocumentDetails.builder()
+                .fileName("new_test.pdf")
+                .subtype("sscs1")
+                .type("reinstatementRequest")
+                .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                .editedUrl(DocumentLink.builder().documentUrl("www.edited.com").build())
+                .scannedDate("2020-06-13T00:00:00.000")
+                .controlNumber("4321")
+                .build()).build();
+
+        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
+            ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
+            .readValue(response.getData().getAddedDocuments());
+
+        org.assertj.core.api.Assertions.assertThat(addedDocuments)
+            .as("One document has been added to the case and should be added to added documents.")
+            .containsOnly(org.assertj.core.api.Assertions.entry("reinstatementRequest", 1));
+    }
+
+    @Test
+    public void givenACaseWithScannedDocumentsSubmittedMultipleTimes_shouldGenerateAMapOfSscsDocumentsWithTheMostRecentDocuments()
+        throws JsonProcessingException {
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService,
+            bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true));
+        ScannedDocument reinstatementRequestScannedDocument = ScannedDocument.builder().value(
+            ScannedDocumentDetails.builder()
+                .fileName("new_test.pdf")
+                .subtype("sscs1")
+                .type("reinstatementRequest")
+                .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                .editedUrl(DocumentLink.builder().documentUrl("www.edited.com").build())
+                .scannedDate("2020-06-13T00:00:00.000")
+                .controlNumber("4321")
+                .build()).build();
+
+        sscsCaseData.setScannedDocuments(Collections.singletonList(reinstatementRequestScannedDocument));
+
+        actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        ScannedDocument confidentialityRequestScannedDocument = ScannedDocument.builder().value(
+            ScannedDocumentDetails.builder()
+                .fileName("new_test2.pdf")
+                .subtype("sscs1")
+                .type("confidentialityRequest")
+                .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                .editedUrl(DocumentLink.builder().documentUrl("www.edited.com").build())
+                .scannedDate("2020-06-13T00:00:00.000")
+                .controlNumber("111")
+                .build()).build();
+
+        sscsCaseData.setScannedDocuments(Collections.singletonList(confidentialityRequestScannedDocument));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
+            ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
+            .readValue(response.getData().getAddedDocuments());
+
+        org.assertj.core.api.Assertions.assertThat(addedDocuments)
+            .as("Added documents should only contain documents from the current event.")
+            .containsOnly(org.assertj.core.api.Assertions.entry("confidentialityRequest", 1));
+    }
+
+    @Test
+    public void givenACaseWithScannedDocumentCoversheet_shouldGenerateAnEmptyMapOfSscsDocuments() {
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService,
+            bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true));
+
+        sscsCaseData.setScannedDocuments(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
+            ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        org.assertj.core.api.Assertions.assertThat(response.getData().getAddedDocuments())
+            .as("Added documents should be reset on each event.")
+            .isNull();
+    }
+
+    @Test
+    public void givenACaseWithNoScannedDocumentCoversheet_shouldGenerateAnEmptyMapOfSscsDocuments() {
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService,
+            bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true));
+        List<ScannedDocument> scannedDocuments = new ArrayList<>();
+        scannedDocuments.add(ScannedDocument.builder().value(
+            ScannedDocumentDetails.builder()
+                .fileName("new_test5.pdf")
+                .subtype("sscs1")
+                .type("coversheet")
+                .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                .editedUrl(DocumentLink.builder().documentUrl("www.edited.com").build())
+                .scannedDate("2020-06-13T00:00:00.000")
+                .controlNumber("43215")
+                .build()).build());
+
+        sscsCaseData.setScannedDocuments(scannedDocuments);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
+            ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        org.assertj.core.api.Assertions.assertThat(response.getData().getAddedDocuments())
+            .as("Only a coversheet has been attached - this should be ignored.")
+            .isNull();
+    }
 }

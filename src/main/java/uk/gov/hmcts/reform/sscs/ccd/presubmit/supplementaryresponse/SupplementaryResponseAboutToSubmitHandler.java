@@ -99,13 +99,13 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
         String fileName = sscsCaseData.getDwpOtherDoc().getDocumentLink().getDocumentFilename();
         AudioVideoEvidence audioVideoEvidence = AudioVideoEvidence.builder()
             .value(AudioVideoEvidenceDetails.builder()
-                .documentLink(sscsCaseData.getDwpOtherDoc().getDocumentLink())
-                .fileName(fileName)
-                .rip1Document(sscsCaseData.getRip1Doc())
-                .documentType(AudioVideoEvidenceUtil.getDocumentTypeValue(fileName))
-                .dateAdded(LocalDate.now())
-                .partyUploaded(UploadParty.DWP)
-                .build())
+                    .documentLink(sscsCaseData.getDwpOtherDoc().getDocumentLink())
+                    .fileName(fileName)
+                    .rip1Document(sscsCaseData.getRip1Doc())
+                    .documentType(AudioVideoEvidenceUtil.getDocumentTypeValue(fileName))
+                    .dateAdded(LocalDate.now())
+                    .partyUploaded(UploadParty.DWP)
+                    .build())
             .build();
 
         if (sscsCaseData.getAudioVideoEvidence() == null) {
@@ -122,19 +122,19 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
         for (DwpResponseDocument responseDocument : responseDocuments) {
             ScannedDocument scannedDocument = ScannedDocument.builder().value(
                 ScannedDocumentDetails.builder()
-                    .type("other")
-                    .url(responseDocument.getDocumentLink())
-                    .fileName(responseDocument.getDocumentLink().getDocumentFilename())
-                    .scannedDate(LocalDateTime.now().toString())
-                    .subtype(DocumentSubtype.DWP_EVIDENCE.getValue())
-                    .build()).build();
+                        .type("other")
+                        .url(responseDocument.getDocumentLink())
+                        .fileName(responseDocument.getDocumentLink().getDocumentFilename())
+                        .scannedDate(LocalDateTime.now().toString())
+                        .subtype(DocumentSubtype.DWP_EVIDENCE.getValue())
+                        .build()).build();
 
             scannedDocs.add(scannedDocument);
         }
 
         return union(
-            emptyIfNull(sscsCaseData.getScannedDocuments()),
-            emptyIfNull(scannedDocs)
+                emptyIfNull(sscsCaseData.getScannedDocuments()),
+                emptyIfNull(scannedDocs)
         );
     }
 }
