@@ -111,6 +111,32 @@ public class EvidenceUploadController {
     }
 
     @ApiOperation(value = "Submit MYA evidence",
+            notes = "Submits the evidence attached to the request. This means it will be "
+                    + "visible in CCD by a caseworker. You need to have an appeal in CCD "
+                    + "and an online hearing in the references the appeal in CCD. Will create a cover sheet for the "
+                    + "evidence uploaded containing the file names and a description from the appellant."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Evidence has been submitted to the appeal"),
+            @ApiResponse(code = 404, message = "No online hearing found with online hearing id"),
+            @ApiResponse(code = 422, message = "The file cannot be added to the document store")
+    })
+    @PostMapping(
+            value = "{identifier}/singleevidence",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity submitSingleEvidence(
+            @ApiParam(value = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx") @PathVariable("identifier") String identifier,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("body") String body,
+            @RequestParam("idamEmail") String idamEmail
+    ) {
+        boolean evidenceSubmitted = evidenceUploadService.submitSingleHearingEvidence(identifier, new EvidenceDescription(body, idamEmail), file);
+        return evidenceSubmitted ? ResponseEntity.noContent().build() : notFound().build();
+    }
+
+    @ApiOperation(value = "Submit MYA evidence",
             notes = "Submits the evidence that has already been uploaded in a draft state. This means it will be "
                     + "visible in CCD by a caseworker. You need to have an appeal in CCD "
                     + "and an online hearing in the references the appeal in CCD. Will create a cover sheet for the "

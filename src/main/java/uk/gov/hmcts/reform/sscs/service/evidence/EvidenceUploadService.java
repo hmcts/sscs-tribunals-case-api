@@ -9,6 +9,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService.TEMP_UNIQUE_ID;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.*;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.withEmailPredicate;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -108,6 +110,50 @@ public class EvidenceUploadService {
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate()
                 .format(DateTimeFormatter.ISO_DATE);
+    }
+
+    public boolean submitSingleHearingEvidence(String identifier, EvidenceDescription description, MultipartFile file) {
+        return onlineHearingService.getCcdCaseByIdentifier(identifier)
+                .map(caseDetails -> {
+                    String md5Checksum = "";
+                    String filename = "";
+                    try {
+                        md5Checksum = DigestUtils.md5DigestAsHex(file.getBytes()).toUpperCase();
+                        filename = file.getOriginalFilename();
+                        log.info("uploadEvidence: for case ID Case({}): User has uploaded the file ({}) with a checksum of ({})", caseDetails.getId(), filename, md5Checksum);
+                    } catch (IOException ioException) {
+                        log.error(ioException.getMessage()
+                                + ". Something has gone wrong for caseId: ", caseDetails.getId()
+                                + " when logging uploadEvidence for file (" + filename
+                                + ") with a checksum of (" + md5Checksum + ")");
+                        return false;
+                    }
+
+
+                    List<MultipartFile> convertedFiles = fileToPdfConversionService.convert(singletonList(file));
+
+                    Document document = evidenceManagementService.upload(convertedFiles, DM_STORE_USER_ID).getEmbedded().getDocuments().get(0);
+
+                    List<SscsDocument> currentDocuments = draftHearingDocumentExtractor.getDocuments().apply(caseDetails.getData());
+                    ArrayList<SscsDocument> newDocuments = (currentDocuments == null) ? new ArrayList<>() : new ArrayList<>(currentDocuments);
+                    newDocuments.add(new SscsDocument(createNewDocumentDetails(document)));
+
+                    draftHearingDocumentExtractor.setDocuments().accept(caseDetails.getData(), newDocuments);
+
+                    SscsCaseData sscsCaseData = caseDetails.getData();
+                    Long ccdCaseId = caseDetails.getId();
+                    EvidenceDescriptionPdfData data = new EvidenceDescriptionPdfData(caseDetails, description,
+                            getFileNames(sscsCaseData),
+                            getOtherPartyId(sscsCaseData, withEmailPredicate(description.getIdamEmail())),
+                            getOtherPartyName(sscsCaseData, withEmailPredicate(description.getIdamEmail())));
+                    MyaEventActionContext storePdfContext = storeEvidenceDescriptionService.storePdf(
+                            ccdCaseId, identifier, data);
+                    submitHearingWhenNoCoreCase(caseDetails, sscsCaseData, ccdCaseId, storePdfContext,
+                            data.getDescription().getIdamEmail());
+
+                    return true;
+                })
+                .orElse(false);
     }
 
     private <E> Optional<Evidence> uploadEvidence(String identifier, MultipartFile file,
