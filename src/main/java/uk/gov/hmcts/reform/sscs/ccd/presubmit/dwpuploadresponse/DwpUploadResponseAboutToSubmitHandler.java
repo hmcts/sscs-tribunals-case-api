@@ -5,18 +5,19 @@ import static java.util.Collections.*;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.*;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_UPLOAD_RESPONSE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.assignOtherPartyId;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateOtherPartyUcb;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +30,14 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
+import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 
 @Component
 @Slf4j
 public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private static final DateTimeFormatter DD_MM_YYYY_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    public static final int NEW_OTHER_PARTY_RESPONSE_DUE_DAYS = 14;
     private final DwpDocumentService dwpDocumentService;
     private final AddNoteService addNoteService;
 
@@ -50,7 +53,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.DWP_UPLOAD_RESPONSE;
+                && callback.getEvent() == DWP_UPLOAD_RESPONSE;
     }
 
     @Override
@@ -79,13 +82,46 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
 
+        checkSscs2Confidentiality(preSubmitCallbackResponse, sscsCaseData);
+
         if (Benefit.CHILD_SUPPORT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())
                 && sscsCaseData.getOtherParties() != null) {
-            assignOtherPartyId(sscsCaseData.getOtherParties());
+            assignNewOtherPartyData(sscsCaseData.getOtherParties(), DWP_UPLOAD_RESPONSE);
             updateOtherPartyUcb(sscsCaseData);
+            if (sscsCaseData.getOtherParties().stream().anyMatch(o -> YesNo.isYes(o.getValue().getSendNewOtherPartyNotification()))) {
+                sscsCaseData.setDirectionDueDate(DateTimeUtils.generateDwpResponseDueDate(NEW_OTHER_PARTY_RESPONSE_DUE_DAYS));
+                sscsCaseData.setDwpDueDate(null);
+            }
         }
 
         return preSubmitCallbackResponse;
+    }
+
+    private void checkSscs2Confidentiality(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, SscsCaseData sscsCaseData) {
+        if (Benefit.CHILD_SUPPORT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode()) && sscsCaseData.getIsConfidentialCase() != null && YesNo.isYes(sscsCaseData.getIsConfidentialCase())) {
+            if (sscsCaseData.getDwpEditedEvidenceReason() == null) {
+                if (!otherPartyHasConfidentiality(sscsCaseData)) {
+                    sscsCaseData.setIsConfidentialCase(null);
+                }
+                if (sscsCaseData.getAppeal().getAppellant() != null && YesNo.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired())) {
+                    sscsCaseData.getAppeal().getAppellant().setConfidentialityRequired(YesNo.NO);
+                }
+                preSubmitCallbackResponse.addWarning("Are you sure you want change the Appellant confidentiality requirement?");
+            }
+        }
+        if (otherPartyHasConfidentiality(sscsCaseData)) {
+            sscsCaseData.setIsConfidentialCase(YesNo.YES);
+        }
+    }
+
+    private boolean otherPartyHasConfidentiality(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getOtherParties() != null) {
+            Optional otherParty = sscsCaseData.getOtherParties().stream().filter(op -> YesNo.isYes(op.getValue().getConfidentialityRequired())).findAny();
+            if (otherParty.isPresent()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected void handleAudioVideoDocuments(SscsCaseData sscsCaseData) {
