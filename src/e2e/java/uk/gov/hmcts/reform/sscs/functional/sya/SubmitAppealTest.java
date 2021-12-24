@@ -122,6 +122,8 @@ public class SubmitAppealTest {
         assertJsonEquals(changeExpectedFields(expectedResponse, nino, mrnDate), sscsCaseDetails.getData(), whenIgnoringPaths("sscsDocument"));
 
         assertEquals(expectedState, sscsCaseDetails.getState());
+
+        assertEquals("Joe Bloggs", sscsCaseDetails.getData().getCaseName());
     }
 
     private String changeExpectedFields(String serializedMessage, String nino, LocalDate mrnDate) {

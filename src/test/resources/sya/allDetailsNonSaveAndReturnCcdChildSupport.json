@@ -1,5 +1,6 @@
 {
   "caseCreated" : "${json-unit.ignore}",
+  "caseName":"Joe Bloggs",
   "benefitCode" : "022",
   "issueCode" : "DD",
   "caseCode" : "022DD",
@@ -69,7 +70,8 @@
         "identity": {
           "dob": "1991-03-31",
           "nino": null
-        }
+        },
+        "id": null
       }
     },
     "benefitType": {
@@ -151,7 +153,8 @@
         "phone": null,
         "mobile": "07411999999"
       },
-      "organisation": "HP Ltd"
+      "organisation": "HP Ltd",
+      "id": null
     },
     "signer": "Joe Bloggs",
     "hearingSubtype": {},

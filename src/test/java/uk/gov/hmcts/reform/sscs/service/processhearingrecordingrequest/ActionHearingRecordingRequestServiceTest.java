@@ -113,13 +113,11 @@ public class ActionHearingRecordingRequestServiceTest {
 
     private ProcessHearingRecordingRequest processHearingRecordingRequests(RequestStatus status) {
         return ProcessHearingRecordingRequest.builder()
-                .value(ProcessHearingRecordingRequestDetails.builder()
-                        .hearingId(HEARING.getValue().getHearingId())
-                        .jointParty(dynamicList(status))
-                        .dwp(dynamicList(status))
-                        .appellant(dynamicList(status))
-                        .jointParty(dynamicList(status))
-                        .build())
+                    .hearingId(HEARING.getValue().getHearingId())
+                    .jointParty(dynamicList(status))
+                    .dwp(dynamicList(status))
+                    .appellant(dynamicList(status))
+                    .jointParty(dynamicList(status))
                 .build();
     }
 

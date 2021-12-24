@@ -4,7 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.DocumentType.REQUEST_FOR_HEARING_RECORDING;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPartiesOnCase;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getPartiesOnCase;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
