@@ -100,6 +100,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         assertEquals("1", response.getData().getOtherParties().get(0).getValue().getId());
         assertEquals("2", response.getData().getOtherParties().get(0).getValue().getAppointee().getId());
         assertEquals("3", response.getData().getOtherParties().get(0).getValue().getRep().getId());
+        assertTrue(YesNo.isYes(response.getData().getOtherParties().get(0).getValue().getSendNewOtherPartyNotification()));
     }
 
     @Test
@@ -111,6 +112,9 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         assertEquals("3", response.getData().getOtherParties().get(2).getValue().getId());
         assertEquals("4", response.getData().getOtherParties().get(2).getValue().getAppointee().getId());
         assertEquals("5", response.getData().getOtherParties().get(2).getValue().getRep().getId());
+        assertFalse(YesNo.isYes(response.getData().getOtherParties().get(0).getValue().getSendNewOtherPartyNotification()));
+        assertFalse(YesNo.isYes(response.getData().getOtherParties().get(1).getValue().getSendNewOtherPartyNotification()));
+        assertTrue(YesNo.isYes(response.getData().getOtherParties().get(2).getValue().getSendNewOtherPartyNotification()));
     }
 
     @Test

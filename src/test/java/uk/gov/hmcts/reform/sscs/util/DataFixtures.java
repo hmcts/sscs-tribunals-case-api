@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import java.util.List;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
 
 public class DataFixtures {
@@ -13,8 +14,8 @@ public class DataFixtures {
 
     public static OnlineHearing someOnlineHearing(long caseId) {
         AddressDetails addressDetails = new AddressDetails("line1", "line2", "town", "country", "postcode");
-        AppellantDetails appellantDetails = new AppellantDetails(addressDetails, "email", "phone", "mobile");
-        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", caseId, null, new FinalDecision("final decision"), true, appellantDetails, someAppealDetails());
+        UserDetails userDetails = new UserDetails(UserType.APPELLANT.getType(), "First Last", addressDetails, "email", "phone", "mobile", List.of());
+        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", caseId, null, new FinalDecision("final decision"), true, userDetails, someAppealDetails());
     }
 
     public static AppealDetails someAppealDetails() {
