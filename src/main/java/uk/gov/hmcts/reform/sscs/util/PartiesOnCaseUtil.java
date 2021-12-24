@@ -6,12 +6,18 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.APPELLANT;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.DWP;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.HMCTS;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.JOINT_PARTY;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY_REPRESENTATIVE;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.REPRESENTATIVE;
 
 import java.util.ArrayList;
 import java.util.List;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
@@ -63,15 +69,15 @@ public class PartiesOnCaseUtil {
 
     private static void addOtherPartyRepresentativeToListOptions(List<DynamicListItem> listOptions, int i, OtherParty otherParty) {
         if (isYes(ofNullable(otherParty.getRep()).map(Representative::getHasRepresentative).orElse(NO.getValue())) && otherParty.getRep() != null && otherParty.getRep().getName() != null) {
-            listOptions.add(new DynamicListItem(OTHER_PARTY_REPRESENTATIVE.getCode(), format("%s %s - Representative - %s", OTHER_PARTY_REPRESENTATIVE.getLabel(), i + 1, otherParty.getRep().getName().getFullNameNoTitle())));
+            listOptions.add(new DynamicListItem(OTHER_PARTY_REPRESENTATIVE.getCode() + otherParty.getRep().getId(), format("%s %s - Representative - %s", OTHER_PARTY_REPRESENTATIVE.getLabel(), i + 1, otherParty.getRep().getName().getFullNameNoTitle())));
         }
     }
 
     private static void addOtherPartyOrOtherPartyAppointeeToListOptions(List<DynamicListItem> listOptions, int i, OtherParty otherParty) {
         if (isYes(otherParty.getIsAppointee()) && otherParty.getAppointee() != null && otherParty.getAppointee().getName() != null) {
-            listOptions.add(new DynamicListItem(OTHER_PARTY.getCode(), format("%s %s - %s / Appointee - %s", OTHER_PARTY.getLabel(), i + 1, otherParty.getName().getFullNameNoTitle(), otherParty.getAppointee().getName().getFullNameNoTitle())));
+            listOptions.add(new DynamicListItem(OTHER_PARTY.getCode() + otherParty.getAppointee().getId(), format("%s %s - %s / Appointee - %s", OTHER_PARTY.getLabel(), i + 1, otherParty.getName().getFullNameNoTitle(), otherParty.getAppointee().getName().getFullNameNoTitle())));
         } else {
-            listOptions.add(new DynamicListItem(OTHER_PARTY.getCode(), format("%s %s - %s", OTHER_PARTY.getLabel(), i + 1, otherParty.getName().getFullNameNoTitle())));
+            listOptions.add(new DynamicListItem(OTHER_PARTY.getCode() + otherParty.getId(), format("%s %s - %s", OTHER_PARTY.getLabel(), i + 1, otherParty.getName().getFullNameNoTitle())));
         }
     }
 
@@ -79,5 +85,23 @@ public class PartiesOnCaseUtil {
         return sscsCaseData.getBenefitType()
                 .filter(f -> f == Benefit.CHILD_SUPPORT)
                 .isPresent();
+    }
+
+    public static List<String> getAllOtherPartiesOnCase(SscsCaseData sscsCaseData) {
+        List<String> otherParties = new ArrayList<>();
+        if (sscsCaseData.getOtherParties() != null && sscsCaseData.getOtherParties().size() > 0) {
+            for (CcdValue<OtherParty> otherParty : sscsCaseData.getOtherParties()) {
+
+                otherParties.add(otherParty.getValue().getName().getFullName());
+
+                if ("Yes".equals(otherParty.getValue().getIsAppointee()) && null != otherParty.getValue().getAppointee()) {
+                    otherParties.add(otherParty.getValue().getAppointee().getName().getFullName() + " - Appointee");
+                }
+                if (null != otherParty.getValue().getRep() && "Yes".equals(otherParty.getValue().getRep().getHasRepresentative())) {
+                    otherParties.add(otherParty.getValue().getRep().getName().getFullName() + " - Representative");
+                }
+            }
+        }
+        return otherParties;
     }
 }

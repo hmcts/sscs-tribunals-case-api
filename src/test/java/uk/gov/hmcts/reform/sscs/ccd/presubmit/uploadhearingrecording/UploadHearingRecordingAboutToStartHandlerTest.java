@@ -32,7 +32,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
 
@@ -49,21 +48,18 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
     private Callback<SscsCaseData> callback;
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
-    @Mock
-    private IdamService idamService;
     private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new UploadHearingRecordingAboutToStartHandler(idamService);
+        handler = new UploadHearingRecordingAboutToStartHandler();
         sscsCaseData = SscsCaseData.builder().appeal(
                 Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getEvent()).thenReturn(EventType.UPLOAD_HEARING_RECORDING);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
     }
 
     @Test
