@@ -1056,6 +1056,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
+        assertTrue(response.getErrors().contains("Appellant requires confidentiality, upload edited and unedited responses"));
         assertThat(response.getWarnings().size(), is(0));
         assertThat(YES, is(response.getData().getAppeal().getAppellant().getConfidentialityRequired()));
         assertThat(YES, is(response.getData().getIsConfidentialCase()));
@@ -1098,8 +1099,31 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
+        assertTrue(response.getErrors().contains("Other Party requires confidentiality, upload edited and unedited responses"));
         assertThat(response.getWarnings().size(), is(0));
         assertThat(NO, is(response.getData().getAppeal().getAppellant().getConfidentialityRequired()));
+        assertThat(YES, is(response.getData().getIsConfidentialCase()));
+    }
+
+    @Test
+    public void givenChildSupportCaseAppellantAndOtherPartyWantsConfidentialNoEditedDocs_thenShow2Error() {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequired(YES).build());
+        sscsCaseData.setIsConfidentialCase(YES);
+
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequired(YES).build()).build();
+        otherPartyList.add(ccdValue);
+        sscsCaseData.setOtherParties(otherPartyList);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(2));
+        assertTrue(response.getErrors().contains("Appellant requires confidentiality, upload edited and unedited responses"));
+        assertTrue(response.getErrors().contains("Other Party requires confidentiality, upload edited and unedited responses"));
+
+        assertThat(response.getWarnings().size(), is(0));
+        assertThat(YES, is(response.getData().getAppeal().getAppellant().getConfidentialityRequired()));
         assertThat(YES, is(response.getData().getIsConfidentialCase()));
     }
 
