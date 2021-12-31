@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.exception.ApplicationErrorException;
+import uk.gov.hmcts.reform.sscs.exception.CaseAccessException;
 import uk.gov.hmcts.reform.sscs.exception.DuplicateCaseException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -42,6 +43,8 @@ import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
 public class SubmitAppealService {
     public static final String DM_STORE_USER_ID = "sscs";
     private static final String CITIZEN_ROLE = "citizen";
+    private static final String CASEWORKER_ROLE_CLERK = "caseworker-sscs-clerk";
+    private static final String CASEWORKER_ROLE_REGISTRAR = "caseworker-sscs-registrar";
 
     private final CcdService ccdService;
     private final CitizenCcdService citizenCcdService;
@@ -95,6 +98,11 @@ public class SubmitAppealService {
         appeal.setCaseType("draft");
 
         IdamTokens idamTokens = getUserTokens(oauth2Token);
+        if (hasValidCaseworkerRole(idamTokens)) {
+            log.info("IDAM ID {} with caseworker roles have attempted to use save and return",
+                idamTokens != null ? idamTokens.getUserId() : null);
+            throw new CaseAccessException("User has a Caseworker role");
+        }
         if (!hasValidCitizenRole(idamTokens)) {
             throw new ApplicationErrorException(new Exception("User has a invalid role"));
         }
@@ -116,13 +124,18 @@ public class SubmitAppealService {
         appeal.setCaseType("draft");
 
         IdamTokens idamTokens = getUserTokens(oauth2Token);
+        if (hasValidCaseworkerRole(idamTokens)) {
+            log.info("IDAM ID {} with caseworker roles have attempted to use save and return",
+                idamTokens != null ? idamTokens.getUserId() : null);
+            throw new CaseAccessException("User has a Caseworker role");
+        }
         if (!hasValidCitizenRole(idamTokens)) {
             throw new ApplicationErrorException(new Exception("User has a invalid role"));
         }
 
         try {
             SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal, workAllocationFeature);
-            
+
             CaseDetails caseDetails = citizenCcdService.updateCase(sscsCaseData, EventType.UPDATE_DRAFT.getCcdType(), "Update draft",
                     "Update draft in CCD", idamTokens, appeal.getCcdCaseId());
 
@@ -157,7 +170,11 @@ public class SubmitAppealService {
         appeal.setCaseType("draft");
 
         IdamTokens idamTokens = getUserTokens(oauth2Token);
-
+        if (hasValidCaseworkerRole(idamTokens)) {
+            log.info("IDAM ID {} with caseworker roles have attempted to use save and return",
+                idamTokens != null ? idamTokens.getUserId() : null);
+            throw new CaseAccessException("User has a Caseworker role");
+        }
         if (!hasValidCitizenRole(idamTokens)) {
             throw new ApplicationErrorException(new Exception("User has a invalid role"));
         }
@@ -180,7 +197,11 @@ public class SubmitAppealService {
         SscsCaseData caseDetails = null;
         SessionDraft sessionDraft = null;
         IdamTokens idamTokens = getUserTokens(oauth2Token);
-
+        if (hasValidCaseworkerRole(idamTokens)) {
+            log.info("IDAM ID {} with caseworker roles have attempted to use save and return",
+                idamTokens != null ? idamTokens.getUserId() : null);
+            throw new CaseAccessException("User has a Caseworker role");
+        }
         if (!hasValidCitizenRole(idamTokens)) {
             throw new ApplicationErrorException(new Exception("User has a invalid role"));
         }
@@ -201,7 +222,11 @@ public class SubmitAppealService {
 
     public List<SessionDraft> getDraftAppeals(String oauth2Token) {
         IdamTokens idamTokens = getUserTokens(oauth2Token);
-
+        if (hasValidCaseworkerRole(idamTokens)) {
+            log.info("IDAM ID {} with caseworker roles have attempted to use save and return",
+                idamTokens != null ? idamTokens.getUserId() : null);
+            throw new CaseAccessException("User has a Caseworker role");
+        }
         if (!hasValidCitizenRole(idamTokens)) {
             throw new ApplicationErrorException(new Exception("User has a invalid role"));
         }
@@ -226,9 +251,17 @@ public class SubmitAppealService {
     }
 
     private boolean hasValidCitizenRole(IdamTokens idamTokens) {
+        return hasValidRole(idamTokens, CITIZEN_ROLE);
+    }
+
+    private boolean hasValidCaseworkerRole(IdamTokens idamTokens) {
+        return hasValidRole(idamTokens, CASEWORKER_ROLE_CLERK) || hasValidRole(idamTokens, CASEWORKER_ROLE_REGISTRAR);
+    }
+
+    private boolean hasValidRole(IdamTokens idamTokens, String role) {
         boolean hasRole = false;
         if (idamTokens != null && !CollectionUtils.isEmpty(idamTokens.getRoles())) {
-            hasRole = idamTokens.getRoles().stream().anyMatch(CITIZEN_ROLE::equalsIgnoreCase);
+            hasRole = idamTokens.getRoles().stream().anyMatch(role::equalsIgnoreCase);
         }
         return hasRole;
     }

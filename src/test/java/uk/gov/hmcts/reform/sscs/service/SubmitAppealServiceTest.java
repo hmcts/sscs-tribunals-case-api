@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaMrn;
 import uk.gov.hmcts.reform.sscs.exception.ApplicationErrorException;
+import uk.gov.hmcts.reform.sscs.exception.CaseAccessException;
 import uk.gov.hmcts.reform.sscs.exception.DuplicateCaseException;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -430,6 +431,15 @@ public class SubmitAppealServiceTest {
     @Test(expected = ApplicationErrorException.class)
     public void shouldRaisedExceptionOnUpdateDraftWhenCitizenRoleIsNotPresent() {
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
+        Optional<SaveCaseResult> result = submitAppealService.updateDraftAppeal("authorisation", appealData);
+
+        assertFalse(result.isPresent());
+    }
+
+    @Parameters ({"caseworker-sscs-clerk","caseworker-sscs-registrar"})
+    @Test(expected = CaseAccessException.class)
+    public void shouldRaisedExceptionOnUpdateDraftWhenCaseWorkerRoleIsPresent(String role) {
+        given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().roles(Arrays.asList(role)).build()); // no citizen role
         Optional<SaveCaseResult> result = submitAppealService.updateDraftAppeal("authorisation", appealData);
 
         assertFalse(result.isPresent());
