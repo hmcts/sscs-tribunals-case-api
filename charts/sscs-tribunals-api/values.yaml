@@ -34,8 +34,7 @@ java:
         - appeal-email-to
         - appeal-email-from
         - docmosis-endpoint
-        - name: docmosis-api-key
-          alias: PDF_SERVICE_ACCESS_KEY
+        - docmosis-api-key
         - name: AppInsightsInstrumentationKey
           alias: azure.application-insights.instrumentation-key
   environment:
@@ -52,6 +51,7 @@ java:
     PDF_SERVICE_CONVERT_URL: https://docmosis.aat.platform.hmcts.net/rs/convert
     PDF_SERVICE_HEALTH_URL: https://docmosis.aat.platform.hmcts.net/rs/status
     DOCMOSIS_SERVICE_BASE_URL: https://docmosis.aat.platform.hmcts.net/rs/render
+    PDF_SERVICE_ACCESS_KEY: ${PDF_SERVICE_ACCESS_KEY}
     DOC_ASSEMBLY_URL: "http://dg-docassembly-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     IDAM_OAUTH2_REDIRECT_URL: "https://evidence-sharing-preprod.sscs.reform.hmcts.net"
     PDF_API_URL: "http://rpe-pdf-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
