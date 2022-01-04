@@ -65,6 +65,7 @@ java:
     DM_GATEWAY_URL: https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net
     CASE_DOCUMENT_AM_URL: "http://ccd-case-document-am-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     SECURE_DOC_STORE_FEATURE: true
+    WORK_ALLOCATION_FEATURE: true
 
 idam-pr:
   enabled: false

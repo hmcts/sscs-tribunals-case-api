@@ -4,6 +4,8 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
+import static uk.gov.hmcts.reform.sscs.util.ReissueUtils.setUpOtherPartyOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +37,7 @@ public class ReissueDocumentAboutToStartHandler implements PreSubmitCallbackHand
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        final SscsCaseData sscsCaseData = caseDetails.getCaseData();
-
+        final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         List<DynamicListItem> dropdownList = getDocumentDropdown(sscsCaseData);
@@ -45,9 +45,12 @@ public class ReissueDocumentAboutToStartHandler implements PreSubmitCallbackHand
         if (isEmpty(dropdownList)) {
             response.addError("There are no documents in this appeal available to reissue.");
         } else {
-            sscsCaseData.setReissueFurtherEvidenceDocument(new DynamicList(dropdownList.get(0), dropdownList));
-            sscsCaseData.setResendToAppellant(null);
-            sscsCaseData.setResendToRepresentative(null);
+            sscsCaseData.setReissueArtifactUi(null);
+            sscsCaseData.getReissueArtifactUi().setReissueFurtherEvidenceDocument(new DynamicList(dropdownList.get(0), dropdownList));
+        }
+
+        if (isOtherPartyPresent(sscsCaseData)) {
+            setUpOtherPartyOptions(sscsCaseData);
         }
 
         return response;
