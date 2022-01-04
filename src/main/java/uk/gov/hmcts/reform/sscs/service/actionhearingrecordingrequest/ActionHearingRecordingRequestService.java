@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import javax.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
@@ -82,7 +83,9 @@ public class ActionHearingRecordingRequestService {
                 .map(OtherPartyHearingRecordingReqUi::getValue)
                 .filter(r -> r.getOtherPartyId().equals(otherPartyId))
                 .map(OtherPartyHearingRecordingReqUiDetails::getHearingRecordingStatus)
-                .findFirst();
+                .map(Optional::ofNullable)
+                .findFirst()
+                .flatMap(Function.identity());
     }
 
     private Optional<RequestStatus> toRequestStatus(Optional<DynamicList> dynamicList) {
