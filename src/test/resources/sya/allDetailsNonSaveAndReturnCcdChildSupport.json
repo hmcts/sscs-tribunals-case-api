@@ -1,5 +1,6 @@
 {
   "caseCreated" : "${json-unit.ignore}",
+  "caseName":"Joe Bloggs",
   "benefitCode" : "022",
   "issueCode" : "DD",
   "caseCode" : "022DD",
