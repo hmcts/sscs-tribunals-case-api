@@ -67,7 +67,7 @@ public class ProcessReasonableAdjustmentAboutToSubmitHandlerTest {
 
         sscsCaseData.setReasonableAdjustmentsOutstanding(YesNo.YES);
         ReasonableAdjustmentsLetters reasonableAdjustmentsLetters =
-                new ReasonableAdjustmentsLetters(correspondenceList, correspondenceList, correspondenceList, correspondenceList);
+                new ReasonableAdjustmentsLetters(correspondenceList, correspondenceList, correspondenceList, correspondenceList, correspondenceList);
         sscsCaseData.setReasonableAdjustmentsLetters(reasonableAdjustmentsLetters);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -81,7 +81,7 @@ public class ProcessReasonableAdjustmentAboutToSubmitHandlerTest {
 
         sscsCaseData.setReasonableAdjustmentsOutstanding(YesNo.YES);
         ReasonableAdjustmentsLetters reasonableAdjustmentsLetters =
-                new ReasonableAdjustmentsLetters(correspondenceList, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+                new ReasonableAdjustmentsLetters(correspondenceList, Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
         sscsCaseData.setReasonableAdjustmentsLetters(reasonableAdjustmentsLetters);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -95,7 +95,7 @@ public class ProcessReasonableAdjustmentAboutToSubmitHandlerTest {
 
         sscsCaseData.setReasonableAdjustmentsOutstanding(YesNo.YES);
         ReasonableAdjustmentsLetters reasonableAdjustmentsLetters =
-                new ReasonableAdjustmentsLetters(Collections.emptyList(), correspondenceList, Collections.emptyList(), Collections.emptyList());
+                new ReasonableAdjustmentsLetters(Collections.emptyList(), correspondenceList, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
         sscsCaseData.setReasonableAdjustmentsLetters(reasonableAdjustmentsLetters);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -109,7 +109,7 @@ public class ProcessReasonableAdjustmentAboutToSubmitHandlerTest {
 
         sscsCaseData.setReasonableAdjustmentsOutstanding(YesNo.YES);
         ReasonableAdjustmentsLetters reasonableAdjustmentsLetters =
-                new ReasonableAdjustmentsLetters(Collections.emptyList(), Collections.emptyList(), correspondenceList, Collections.emptyList());
+                new ReasonableAdjustmentsLetters(Collections.emptyList(), Collections.emptyList(), correspondenceList, Collections.emptyList(), Collections.emptyList());
         sscsCaseData.setReasonableAdjustmentsLetters(reasonableAdjustmentsLetters);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -123,13 +123,26 @@ public class ProcessReasonableAdjustmentAboutToSubmitHandlerTest {
 
         sscsCaseData.setReasonableAdjustmentsOutstanding(YesNo.YES);
         ReasonableAdjustmentsLetters reasonableAdjustmentsLetters =
-                new ReasonableAdjustmentsLetters(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), correspondenceList);
+                new ReasonableAdjustmentsLetters(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), correspondenceList, Collections.emptyList());
         sscsCaseData.setReasonableAdjustmentsLetters(reasonableAdjustmentsLetters);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(YesNo.NO, response.getData().getReasonableAdjustmentsOutstanding());
     }
 
+    @Test
+    public void givenAOtherPartyProcessReasonableAdjustmentEventWithAllDocsActioned_thenClearReasonableAdjustmentsOutstandingFlag() {
+        List<Correspondence> correspondenceList = new ArrayList<>();
+        correspondenceList.add(Correspondence.builder().value(CorrespondenceDetails.builder().reasonableAdjustmentStatus(ReasonableAdjustmentStatus.ACTIONED).build()).build());
+
+        sscsCaseData.setReasonableAdjustmentsOutstanding(YesNo.YES);
+        ReasonableAdjustmentsLetters reasonableAdjustmentsLetters =
+                new ReasonableAdjustmentsLetters(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), correspondenceList);
+        sscsCaseData.setReasonableAdjustmentsLetters(reasonableAdjustmentsLetters);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(YesNo.NO, response.getData().getReasonableAdjustmentsOutstanding());
+    }
 
     @Test
     public void givenAProcessReasonableAdjustmentEventWithSomeDocsStillRequired_thenDoNotClearReasonableAdjustmentsOutstandingFlag() {
@@ -139,7 +152,7 @@ public class ProcessReasonableAdjustmentAboutToSubmitHandlerTest {
 
         sscsCaseData.setReasonableAdjustmentsOutstanding(YesNo.YES);
         ReasonableAdjustmentsLetters reasonableAdjustmentsLetters =
-                new ReasonableAdjustmentsLetters(correspondenceList, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+                new ReasonableAdjustmentsLetters(correspondenceList, Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
         sscsCaseData.setReasonableAdjustmentsLetters(reasonableAdjustmentsLetters);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -154,7 +167,7 @@ public class ProcessReasonableAdjustmentAboutToSubmitHandlerTest {
 
         sscsCaseData.setReasonableAdjustmentsOutstanding(YesNo.YES);
         ReasonableAdjustmentsLetters reasonableAdjustmentsLetters =
-                new ReasonableAdjustmentsLetters(correspondenceList, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+                new ReasonableAdjustmentsLetters(correspondenceList, Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
         sscsCaseData.setReasonableAdjustmentsLetters(reasonableAdjustmentsLetters);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
