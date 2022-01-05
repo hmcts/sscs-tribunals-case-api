@@ -50,7 +50,7 @@ public class CreateAndUpdateCaseInCcdTest {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
 
-        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, rpc.getName(), rpc);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, rpc.getName(), rpc, false);
         caseData.setCreatedInGapsFrom("readyToList");
 
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, CREATE_TEST_CASE.getCcdType(),
@@ -62,7 +62,7 @@ public class CreateAndUpdateCaseInCcdTest {
     public void givenASyaCaseWithoutAMatchingRpcShouldBeSavedIntoCcd() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
 
-        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, false);
         caseData.setCreatedInGapsFrom("readyToList");
 
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, CREATE_TEST_CASE.getCcdType(), "Test case created from functional test", "Test case created from givenASyaCaseWithoutAMatchingRpcShouldBeSavedIntoCcd", idamTokens);
@@ -73,7 +73,7 @@ public class CreateAndUpdateCaseInCcdTest {
     public void givenACaseWithDetails_thenCorrectlyUpdateAndDeserializeFromCcd() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
 
-        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, false);
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, CREATE_TEST_CASE.getCcdType(), "Test case created from functional test", "Test case created from givenACaseWithDetails_thenCorrectlyUpdateAndDeserializeFromCcd", idamTokens);
         assertNotNull(caseDetails);
 
