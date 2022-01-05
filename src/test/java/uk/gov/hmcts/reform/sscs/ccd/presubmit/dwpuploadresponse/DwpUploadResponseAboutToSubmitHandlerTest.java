@@ -306,7 +306,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenUcCaseWithPhmeNoFurtherInfo_thenSetReviewByJudge() {
+    public void givenUcCaseWithPheNoFurtherInfo_thenSetReviewByJudge() {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder()
                 .documentLink(
@@ -332,14 +332,14 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("phmeRequest", response.getData().getInterlocReferralReason());
         assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
         assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
-        assertEquals("Referred to interloc for review by judge - PHME request", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
+        assertEquals("Referred to interloc for review by judge - PHE request", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
         assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
 
         dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 
     @Test
-    public void givenUcCaseWithPhmeNoFurtherInfo2ndCall_thenNoError() {
+    public void givenUcCaseWithPheNoFurtherInfo2ndCall_thenNoError() {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder()
                 .documentLink(
@@ -368,12 +368,12 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("phmeRequest", response.getData().getInterlocReferralReason());
         assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
         assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
-        assertEquals("Referred to interloc for review by judge - PHME request", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
+        assertEquals("Referred to interloc for review by judge - PHE request", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
         assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
     }
 
     @Test
-    public void givenUcCaseWithPhmeYesFurtherInfo_thenDontReviewByJudge() {
+    public void givenUcCaseWithPheYesFurtherInfo_thenDontReviewByJudge() {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder()
                 .documentLink(
@@ -401,7 +401,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("phmeRequest", response.getData().getInterlocReferralReason());
         assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
         assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
-        assertEquals("Referred to interloc for review by judge - PHME request", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
+        assertEquals("Referred to interloc for review by judge - PHE request", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
         assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
     }
 

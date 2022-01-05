@@ -63,7 +63,7 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
         if (sscsCaseData.isBenefitType(CHILD_SUPPORT) && sscsCaseData.getInterlocReferralReason() != null
                 && sscsCaseData.getInterlocReferralReason().equals("phmeRequest")) {
             preSubmitCallbackResponse
-                    .addError("PHME request' is not a valid selection for child support cases");
+                    .addError("PHE request' is not a valid selection for child support cases");
         }
     }
 
