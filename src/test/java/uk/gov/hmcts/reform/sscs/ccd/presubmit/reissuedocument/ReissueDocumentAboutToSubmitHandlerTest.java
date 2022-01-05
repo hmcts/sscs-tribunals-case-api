@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.reissuedocument;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
@@ -20,9 +22,10 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.reissueartifact.ReissueArtifactHandlerTest;
 
 @RunWith(JUnitParamsRunner.class)
-public class ReissueDocumentAboutToSubmitHandlerTest {
+public class ReissueDocumentAboutToSubmitHandlerTest extends ReissueArtifactHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private ReissueDocumentAboutToSubmitHandler handler;
@@ -57,22 +60,23 @@ public class ReissueDocumentAboutToSubmitHandlerTest {
                 .documentLink(DocumentLink.builder().documentUrl("url2").build())
                 .build()).build();
         SscsDocument document3 = SscsDocument.builder().value(SscsDocumentDetails.builder()
-            .documentFileName("file3.pdf")
-            .documentType(FINAL_DECISION_NOTICE.getValue())
-            .documentLink(DocumentLink.builder().documentUrl("url1").build())
-            .build()).build();
+                .documentFileName("file3.pdf")
+                .documentType(FINAL_DECISION_NOTICE.getValue())
+                .documentLink(DocumentLink.builder().documentUrl("url1").build())
+                .build()).build();
         SscsDocument document4 = SscsDocument.builder().value(SscsDocumentDetails.builder()
-            .documentFileName("file4.pdf")
-            .documentType(ADJOURNMENT_NOTICE.getValue())
-            .documentLink(DocumentLink.builder().documentUrl("url1").build())
-            .build()).build();
+                .documentFileName("file4.pdf")
+                .documentType(ADJOURNMENT_NOTICE.getValue())
+                .documentLink(DocumentLink.builder().documentUrl("url1").build())
+                .build()).build();
         List<SscsDocument> sscsDocuments = Arrays.asList(document1, document2, document3, document4);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
                 .sscsDocument(sscsDocuments)
-                .resendToAppellant("YES")
-                .resendToDwp("YES")
-                .resendToRepresentative("No")
-                .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem("url2", "file2.pdf - appellantEvidence"), null))
+                .reissueArtifactUi(ReissueArtifactUi.builder()
+                        .resendToAppellant(YesNo.YES)
+                        .resendToDwp(YesNo.YES)
+                        .resendToRepresentative(YesNo.NO)
+                        .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem("url2", "file2.pdf - appellantEvidence"), null)).build())
                 .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -93,25 +97,43 @@ public class ReissueDocumentAboutToSubmitHandlerTest {
 
     @Test
     public void returnsAnErrorIfReissuedToRepresentativeWhenThereIsNoRepOnTheAppealToReissueDocument() {
-        sscsCaseData = sscsCaseData.toBuilder().resendToRepresentative("YES").build();
+        ReissueArtifactUi reissueArtifactUi = sscsCaseData.getReissueArtifactUi();
+        reissueArtifactUi.setResendToAppellant(YesNo.NO);
+        reissueArtifactUi.setResendToRepresentative(YesNo.YES);
+        reissueArtifactUi.setResendToDwp(YesNo.NO);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
-        assertEquals("Cannot re-issue to the representative as there is no representative on the appeal", response.getErrors().toArray()[0]);
+        assertEquals("Cannot re-issue to the representative as there is no representative on the appeal.", response.getErrors().toArray()[0]);
     }
 
     @Test
     public void returnsAnErrorIfNoPartySelectedForReissue() {
-        sscsCaseData = sscsCaseData.toBuilder().resendToAppellant("No").build();
-        sscsCaseData = sscsCaseData.toBuilder().resendToRepresentative("No").build();
+        ReissueArtifactUi reissueArtifactUi = sscsCaseData.getReissueArtifactUi();
+        reissueArtifactUi.setResendToAppellant(YesNo.NO);
+        reissueArtifactUi.setResendToRepresentative(YesNo.NO);
+        reissueArtifactUi.setResendToDwp(YesNo.NO);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
-        assertEquals("No party selected to reissue document", response.getErrors().toArray()[0]);
+        assertEquals("Select a party to reissue.", response.getErrors().toArray()[0]);
+    }
+
+    @Test
+    public void givenCaseWithMultipleOtherParties_thenBuildTheOtherPartyOptionsSection() {
+
+        sscsCaseData.setOtherParties(Arrays.asList(buildOtherPartyWithAppointeeAndRep("1", "", "3"),
+                buildOtherPartyWithAppointeeAndRep("4", "5", "6")));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(0));
     }
 
     @Test(expected = IllegalStateException.class)
@@ -119,6 +141,4 @@ public class ReissueDocumentAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
-
-
 }

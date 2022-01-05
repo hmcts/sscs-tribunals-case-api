@@ -155,7 +155,7 @@ public class SubmitAppealServiceTest {
 
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, regionalProcessingCenterService,
-            idamService, convertAIntoBService, airLookupService, secureDocStoreService);
+            idamService, convertAIntoBService, airLookupService, secureDocStoreService, false);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
