@@ -914,4 +914,78 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             .build()).build();
     }
 
+
+    @Test
+    @Parameters({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
+    public void givenSscs5CaseAndCaseCodeIsSetToSscs5Code_thenNoErrorIsShown(String sscs5BenefitCode) {
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("taxFreeChildcare").description("Tax Credit").build());
+        sscsCaseData.setBenefitCode(sscs5BenefitCode);
+        sscsCaseDataBefore.setBenefitCode("022");
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(0));
+    }
+
+    @Test
+    @Parameters({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
+    public void givenSscs5CaseAndCaseCodeIsChangedToNonSscs5_thenShowError(String sscs5BenefitCode) {
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+        sscsCaseData.getAppeal().setBenefitType(
+            BenefitType.builder().code("homeResponsibilitiesProtection")
+                .description("Home Responsibilities Protection").build());
+        sscsCaseData.setBenefitCode("001");
+        sscsCaseDataBefore.setBenefitCode(sscs5BenefitCode);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getWarnings().size(), is(0));
+        assertEquals("Benefit code cannot be changed to the selected code",
+            response.getErrors().stream().findFirst().get());
+    }
+
+    @Test
+    @Parameters({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
+    public void givenNonSscs5CaseAndCaseCodeIsSetToSscs5Code_thenErrorIsShown(String sscs5BenefitCode) {
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").description("test").build());
+        sscsCaseData.setBenefitCode(sscs5BenefitCode);
+        sscsCaseDataBefore.setBenefitCode("002");
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getWarnings().size(), is(0));
+        assertEquals("Benefit code cannot be changed to the selected code",
+            response.getErrors().stream().findFirst().get());
+    }
+
+    @Test
+    @Parameters({
+        "guaranteedMinimumPension,Guaranteed Minimum Pension,054,0",
+        "nationalInsuranceCredits,Bereavement Benefit,test,2",
+        "socialFund,30 Hours Free Childcare,002,1",
+        "childSupport,Child Support,022,0"
+    })
+    public void givenSscs5CaseBenefitCodeAndDescription_thenErrorIsShownForInvalidSet(String code, String description,
+                                                                                      String benefitCode, int error) {
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(code).description(description).build());
+        sscsCaseData.setBenefitCode(benefitCode);
+        sscsCaseDataBefore.setBenefitCode(benefitCode);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(error));
+        assertThat(response.getWarnings().size(), is(0));
+        if (error > 0) {
+            assertTrue(response.getErrors().stream().anyMatch(e -> e.equals("Benefit type cannot be changed to the selected type")));
+        }
+    }
 }

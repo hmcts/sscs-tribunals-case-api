@@ -1,12 +1,17 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static java.util.Objects.isNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsType.SSCS5;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -82,17 +87,88 @@ public class ResponseEventsAboutToSubmit {
         final Optional<CaseDetails<SscsCaseData>> caseDetailsBefore = callback.getCaseDetailsBefore();
 
         if (response.getData().getAppeal().getBenefitType() != null
-            && Benefit.CHILD_SUPPORT.getShortName().equalsIgnoreCase(response.getData().getAppeal().getBenefitType().getCode())
-            && !Benefit.CHILD_SUPPORT.getCaseLoaderKeyId().contains(response.getData().getBenefitCode())
             && caseDetailsBefore.isPresent()
-            && caseDetailsBefore.get().getCaseData().getBenefitCode() != null
-            && !caseDetailsBefore.get().getCaseData().getBenefitCode().equals(callback.getCaseDetails().getCaseData().getBenefitCode())) {
+            && caseDetailsBefore.get().getCaseData().getBenefitCode() != null) {
 
-            if (response.getData().getOtherParties() != null && response.getData().getOtherParties().size() > 0) {
-                response.addError("Benefit code cannot be changed on cases with registered 'Other Party'");
-            } else {
-                response.addWarning("The benefit code will be changed to a non-child support benefit code");
+            if (!caseDetailsBefore.get().getCaseData().getBenefitCode()
+                .equals(callback.getCaseDetails().getCaseData().getBenefitCode())) {
+                if (Benefit.CHILD_SUPPORT.getShortName()
+                    .equalsIgnoreCase(response.getData().getAppeal().getBenefitType().getCode())
+                    && !Benefit.CHILD_SUPPORT.getCaseLoaderKeyId().contains(response.getData().getBenefitCode())) {
+                    if (response.getData().getOtherParties() != null
+                        && response.getData().getOtherParties().size() > 0) {
+                        response.addError("Benefit code cannot be changed on cases with registered 'Other Party'");
+                    } else {
+                        response.addWarning("The benefit code will be changed to a non-child support benefit code");
+                    }
+                }
+            }
+
+            boolean isSscs5CaseData = isSscs5Case(response, callback);
+            if ((isSscs5CaseData
+                && !buildSscs5BenefitCaseLoaderKeyId().contains(response.getData().getBenefitCode()))
+                || (!isSscs5CaseData
+                && buildSscs5BenefitCaseLoaderKeyId().contains(response.getData().getBenefitCode()))) {
+                response.addError("Benefit code cannot be changed to the selected code");
             }
         }
+    }
+
+    private boolean isSscs5Case(PreSubmitCallbackResponse<SscsCaseData> response, Callback<SscsCaseData> callback) {
+        //Consider SSCS5 case if caseDetailsBefore is SSCS5 or else consider present benefit type code
+        String benefitTypeCode = response.getData().getAppeal().getBenefitType().getCode();
+        if (callback.getCaseDetailsBefore().isPresent()
+            && callback.getCaseDetailsBefore().get().getCaseData().getAppeal() != null
+            && callback.getCaseDetailsBefore().get().getCaseData().getAppeal().getBenefitType() != null) {
+            benefitTypeCode =
+                callback.getCaseDetailsBefore().get().getCaseData().getAppeal().getBenefitType().getCode();
+        }
+        return isSscs5Case(benefitTypeCode);
+    }
+
+    private boolean isSscs5Case(String benefitTypeCode) {
+        return Optional.ofNullable(benefitTypeCode)
+            .filter(b -> Benefit.findBenefitByShortName(b)
+                .filter(benefit -> benefit.getSscsType().equals(SSCS5)).isPresent())
+            .isPresent();
+    }
+
+    public void validateBenefitForCase(PreSubmitCallbackResponse<SscsCaseData> response,
+                                       Callback<SscsCaseData> callback) {
+        if (callback.getCaseDetails().getCaseData().getAppeal().getBenefitType() != null) {
+            String benefitCode = callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().getCode();
+            String benefitDescription =
+                callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().getDescription();
+
+            boolean isSscs5CaseData = isSscs5Case(response, callback);
+            if ((isSscs5CaseData && (!buildSscs5BenefitCode().contains(benefitCode)
+                || !buildSscs5BenefitDescription().contains(benefitDescription)))
+                || (!isSscs5CaseData && (buildSscs5BenefitCode().contains(benefitCode)
+                || buildSscs5BenefitDescription().contains(benefitDescription)))) {
+                response.addError("Benefit type cannot be changed to the selected type");
+            }
+        }
+    }
+
+    private List<String> buildSscs5BenefitCaseLoaderKeyId() {
+        return Arrays.stream(Benefit.values())
+            .filter(benefit -> SSCS5.equals(benefit.getSscsType()))
+            .map(Benefit::getCaseLoaderKeyId)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+    }
+
+    private List<String> buildSscs5BenefitCode() {
+        return Arrays.stream(Benefit.values())
+            .filter(benefit -> SSCS5.equals(benefit.getSscsType()))
+            .map(Benefit::getShortName)
+            .collect(Collectors.toList());
+    }
+
+    private List<String> buildSscs5BenefitDescription() {
+        return Arrays.stream(Benefit.values())
+            .filter(benefit -> SSCS5.equals(benefit.getSscsType()))
+            .map(Benefit::getDescription)
+            .collect(Collectors.toList());
     }
 }

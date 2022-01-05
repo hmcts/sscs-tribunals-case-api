@@ -344,4 +344,45 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors().iterator().next(), is("PHE request' is not a valid selection for child support cases"));
     }
+
+    @Test
+    @Parameters({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
+    public void givenSscs5CaseAndCaseCodeIsSetToSscs5Code_thenNoErrorIsShown(String sscs5BenefitCode) {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childBenefit").build());
+        sscsCaseData.setBenefitCode(sscs5BenefitCode);
+        sscsCaseDataBefore.setBenefitCode("022");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(0));
+    }
+
+    @Test
+    @Parameters({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
+    public void givenSscs5CaseAndCaseCodeIsChangedToNonSscs5_thenShowError(String sscs5BenefitCode) {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("thirtyHoursFreeChildcare").build());
+        sscsCaseData.setBenefitCode("001");
+        sscsCaseDataBefore.setBenefitCode(sscs5BenefitCode);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getWarnings().size(), is(0));
+        assertEquals("Benefit code cannot be changed to the selected code", response.getErrors().stream().findFirst().get());
+    }
+
+    @Test
+    @Parameters({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
+    public void givenNonSscs5CaseAndCaseCodeIsSetToSscs5Code_thenErrorIsShown(String sscs5BenefitCode) {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("ESA").build());
+        sscsCaseData.setBenefitCode(sscs5BenefitCode);
+        sscsCaseDataBefore.setBenefitCode("051");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getWarnings().size(), is(0));
+        assertEquals("Benefit code cannot be changed to the selected code", response.getErrors().stream().findFirst().get());
+    }
 }
