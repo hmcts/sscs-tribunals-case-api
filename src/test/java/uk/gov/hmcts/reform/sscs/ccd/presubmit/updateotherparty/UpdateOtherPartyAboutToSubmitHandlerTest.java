@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updateotherparty;
 
+import static java.util.Collections.*;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
@@ -137,6 +139,14 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         assertEquals("5", response.getData().getOtherParties().get(0).getValue().getAppointee().getId());
         assertEquals("6", response.getData().getOtherParties().get(0).getValue().getRep().getId());
         assertEquals("7", response.getData().getOtherParties().get(2).getValue().getId());
+    }
+
+    @Test
+    public void givenEmptyOtherParties_thenSetToNullRatherThanEmpty() {
+        sscsCaseData.setOtherParties(emptyList());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getOtherParties(), is(nullValue()));
     }
 
     private CcdValue<OtherParty> buildConfidentialOtherParty(String id, YesNo confidentialityRequired) {
