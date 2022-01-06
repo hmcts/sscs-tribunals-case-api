@@ -8,7 +8,12 @@ public class AppellantStatementPdfData extends PdfData {
     private final Statement statement;
 
     public AppellantStatementPdfData(SscsCaseDetails caseDetails, Statement statement) {
-        super(caseDetails);
+        super(caseDetails, null, null);
+        this.statement = statement;
+    }
+
+    public AppellantStatementPdfData(SscsCaseDetails caseDetails, Statement statement, String otherPartyId, String otherPartyName) {
+        super(caseDetails, otherPartyId, otherPartyName);
         this.statement = statement;
     }
 

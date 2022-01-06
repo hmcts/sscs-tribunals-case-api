@@ -104,6 +104,7 @@
                             {{ pdfSummary.appealDetails.surname }}
                         </dd>
                     </div>
+                    {% if pdfSummary.appealDetails.hideNino == false  %}
                     <div>
                         <dt class="cya-question">
                             Rhif Yswiriant Gwladol
@@ -112,6 +113,7 @@
                             {{ pdfSummary.appealDetails.nino }}
                         </dd>
                     </div>
+                    {% endif %}
                     <div>
                         <dt class="cya-question">
                             Cyfeirnod yr apêl

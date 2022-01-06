@@ -16,7 +16,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -25,6 +24,7 @@ import org.mockito.quality.Strictness;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.domain.UpdateDocParams;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Statement;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -195,22 +195,20 @@ public class StoreAppellantStatementServiceTest {
         String tya, String expectedFilename) {
         when(pdfService.createPdf(any(), eq("templatePath"))).thenReturn(new byte[0]);
 
-        when(ccdPdfService.mergeDocIntoCcd(eq(expectedFilename), any(), eq(1234567890L), any(SscsCaseData.class),
-            any(IdamTokens.class), eq(OTHER_EVIDENCE)))
+        SscsCaseDetails caseDetails = buildSscsCaseDetailsTestData();
+        UpdateDocParams params = UpdateDocParams.builder().pdf(new byte[0]).fileName(expectedFilename).caseId(1234567890L).caseData(caseDetails.getData()).documentType(OTHER_EVIDENCE).build();
+        when(ccdPdfService.mergeDocIntoCcd(eq(params),
+            any(IdamTokens.class)))
             .thenReturn(SscsCaseData.builder().build());
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
-        SscsCaseDetails caseDetails = buildSscsCaseDetailsTestData();
         Statement statement = new Statement("some statement", tya);
         AppellantStatementPdfData data = new AppellantStatementPdfData(caseDetails, statement);
 
         storeAppellantStatementService.storePdfAndUpdate(1234567890L, "onlineHearingId", data);
 
-        ArgumentCaptor<String> acForPdfName = ArgumentCaptor.forClass(String.class);
-        verify(ccdPdfService, times(1)).mergeDocIntoCcd(acForPdfName.capture(), any(),
-            eq(1234567890L), any(SscsCaseData.class), any(IdamTokens.class), eq(OTHER_EVIDENCE));
-        assertThat(acForPdfName.getValue(), is(expectedFilename));
+        verify(ccdPdfService, times(1)).mergeDocIntoCcd(eq(params), any(IdamTokens.class));
         verify(pdfStoreService, never()).storeDocument(any(), anyString(), anyString());
     }
 

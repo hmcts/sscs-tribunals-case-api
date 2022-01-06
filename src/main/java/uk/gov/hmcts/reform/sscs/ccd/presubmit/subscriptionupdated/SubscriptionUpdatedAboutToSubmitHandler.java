@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.subscriptionupdated;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator.generateAppealNumber;
 
+import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -11,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
 
 @Component
 @Slf4j
@@ -60,7 +63,34 @@ public class SubscriptionUpdatedAboutToSubmitHandler implements PreSubmitCallbac
             jointPartySubscription.setTya(getTyaNumber(jointPartySubscription));
         }
 
-        return new PreSubmitCallbackResponse<>(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
+
+        if (Benefit.CHILD_SUPPORT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())) {
+            Optional<CaseDetails<SscsCaseData>> beforeData = callback.getCaseDetailsBefore();
+            if (beforeData.isPresent() && OtherPartyDataUtil.haveOtherPartiesChanged(beforeData.get().getCaseData().getOtherParties(),
+                    sscsCaseData.getOtherParties())) {
+                response.addError("The other parties have changed, they cannot be changed within this event");
+            }
+
+            List<CcdValue<OtherParty>> otherParties = sscsCaseData.getOtherParties();
+            if (otherParties != null) {
+                for (CcdValue<OtherParty> otherParty : otherParties) {
+                    Subscription opAppellantSubscription = otherParty.getValue().getOtherPartySubscription();
+                    if (opAppellantSubscription != null && !opAppellantSubscription.isEmpty()) {
+                        opAppellantSubscription.setTya(getTyaNumber(opAppellantSubscription));
+                    }
+                    Subscription opAppointeeSubscription = otherParty.getValue().getOtherPartyAppointeeSubscription();
+                    if (opAppointeeSubscription != null && !opAppointeeSubscription.isEmpty()) {
+                        opAppointeeSubscription.setTya(getTyaNumber(opAppointeeSubscription));
+                    }
+                    Subscription opRepSubscription = otherParty.getValue().getOtherPartyRepresentativeSubscription();
+                    if (opRepSubscription != null && !opRepSubscription.isEmpty()) {
+                        opRepSubscription.setTya(getTyaNumber(opRepSubscription));
+                    }
+                }
+            }
+        }
+        return response;
     }
 
     private String getTyaNumber(Subscription existingSubscription) {

@@ -1036,13 +1036,18 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
                 ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                        .url(DocumentLink.builder().documentUrl("test.com").build())
+                        .originalSenderOtherPartyId("1")
+                        .originalSenderOtherPartyName("Other Party")
+                        .build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
         assertEquals(0, response.getWarnings().size());
+        assertEquals("1", response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyId());
+        assertEquals("Other Party", response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyName());
     }
 
     @Test
@@ -1200,6 +1205,25 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    @Parameters({"otherParty", "otherPartyRep"})
+    public void findOriginalSenderOtherPartyId(String otherPartyCode) {
+        ScannedDocument scannedDocument = ScannedDocument
+                .builder()
+                .value(
+                        ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+        List<ScannedDocument> docs = new ArrayList<>();
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+
+        DynamicList originalSender = buildOriginalSenderItemListForGivenOption(otherPartyCode + "2", "Other party John Paul");
+        sscsCaseData.setOriginalSender(originalSender);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("2", response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyId());
+    }
+  
     @Parameters({"ISSUE_FURTHER_EVIDENCE,No,0", "ISSUE_FURTHER_EVIDENCE,Yes,0", "ISSUE_FURTHER_EVIDENCE,null,0",
         "OTHER_DOCUMENT_MANUAL,Yes,0", "OTHER_DOCUMENT_MANUAL,No,0", "OTHER_DOCUMENT_MANUAL,null,1",
         "SEND_TO_INTERLOC_REVIEW_BY_TCW,Yes,0", "SEND_TO_INTERLOC_REVIEW_BY_TCW,No,0", "SEND_TO_INTERLOC_REVIEW_BY_TCW,,1",
