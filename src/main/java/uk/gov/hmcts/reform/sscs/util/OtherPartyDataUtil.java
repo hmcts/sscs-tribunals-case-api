@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.util;
 import static java.util.Collections.sort;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.util.ArrayList;
@@ -20,6 +21,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 public class OtherPartyDataUtil {
 
     private OtherPartyDataUtil() {
+    }
+
+    public static void clearOtherPartyIfEmpty(SscsCaseData sscsCaseData) {
+        if (isEmpty(sscsCaseData.getOtherParties())) {
+            sscsCaseData.setOtherParties(null);
+        }
     }
 
     public static void updateOtherPartyUcb(SscsCaseData sscsCaseData) {
