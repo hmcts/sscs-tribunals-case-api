@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevid
 import static java.util.Arrays.stream;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -43,6 +44,7 @@ import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil;
 
 @Component
 @Slf4j
@@ -138,6 +140,16 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             preSubmitCallbackResponse.addError(String
                     .format("Further evidence action must be '%s' for a %s", OTHER_DOCUMENT_MANUAL.getLabel(),
                             URGENT_HEARING_REQUEST.getLabel()));
+        }
+
+        if (PartiesOnCaseUtil.isChildSupportAppeal(sscsCaseData) && isNotEmpty(sscsCaseData.getOtherParties())
+                && sscsCaseData.getOriginalSender() != null
+                && sscsCaseData.getOriginalSender().getValue() != null
+                && scannedDocument != null && scannedDocument.getValue() != null) {
+            if (!sscsCaseData.getOriginalSender().getValue().getCode().equalsIgnoreCase(scannedDocument.getValue().getOriginalSenderOtherPartyId())) {
+                preSubmitCallbackResponse
+                        .addError("The PDF evidence does not match the Original Sender selected");
+            }
         }
     }
 

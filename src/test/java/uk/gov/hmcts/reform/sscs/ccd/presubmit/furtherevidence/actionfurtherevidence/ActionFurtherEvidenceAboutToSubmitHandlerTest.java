@@ -1131,6 +1131,57 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenConfidentialRequestFromOtherPartyDoNotMatchWithDocumentOriginalSender_thenShowAnError() {
+
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
+        sscsCaseData.setJointParty(YES);
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        OtherParty otherParty = OtherParty.builder().id("10").name(Name.builder().firstName("John").lastName("smith").build()).build();
+        CcdValue ccdValue = CcdValue.builder().value(otherParty).build();
+        otherPartyList.add(ccdValue);
+        sscsCaseData.setOtherParties(otherPartyList);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
+        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(OTHER_PARTY.getCode() + otherParty.getId(), OTHER_PARTY.getLabel() + " - " + otherParty.getName()));
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
+                        .originalSenderOtherPartyId("otherPartyUnknown")
+                        .originalSenderOtherPartyName("unknown name")
+                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+        List<ScannedDocument> docs = new ArrayList<>();
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(2, response.getErrors().size());
+        assertTrue(response.getErrors().stream().anyMatch(e -> e.equals("The PDF evidence does not match the Original Sender selected")));
+    }
+
+    @Test
+    public void givenConfidentialRequestFromOtherPartyDoMatchWithDocumentOriginalSender_thenDontShowAnError() {
+
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
+        sscsCaseData.setJointParty(YES);
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        OtherParty otherParty = OtherParty.builder().id("10").name(Name.builder().firstName("John").lastName("smith").build()).build();
+        CcdValue ccdValue = CcdValue.builder().value(otherParty).build();
+        otherPartyList.add(ccdValue);
+        sscsCaseData.setOtherParties(otherPartyList);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
+        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(OTHER_PARTY.getCode() + otherParty.getId(), OTHER_PARTY.getLabel() + " - " + otherParty.getName()));
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                        .originalSenderOtherPartyId("otherParty10")
+                        .originalSenderOtherPartyName("John Smith")
+                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+        List<ScannedDocument> docs = new ArrayList<>();
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
     public void givenConfidentialRequestWithInvalidFurtherEvidenceAction_thenShowAnError() {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(ISSUE_FURTHER_EVIDENCE.code, ISSUE_FURTHER_EVIDENCE.label));
@@ -1237,7 +1288,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals(otherPartyId, response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyId());
         assertEquals(expectedName, response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyName());
     }
-  
+
     @Parameters({"ISSUE_FURTHER_EVIDENCE,No,0", "ISSUE_FURTHER_EVIDENCE,Yes,0", "ISSUE_FURTHER_EVIDENCE,null,0",
         "OTHER_DOCUMENT_MANUAL,Yes,0", "OTHER_DOCUMENT_MANUAL,No,0", "OTHER_DOCUMENT_MANUAL,null,1",
         "SEND_TO_INTERLOC_REVIEW_BY_TCW,Yes,0", "SEND_TO_INTERLOC_REVIEW_BY_TCW,No,0", "SEND_TO_INTERLOC_REVIEW_BY_TCW,,1",
