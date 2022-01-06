@@ -1205,8 +1205,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"otherParty", "otherPartyRep"})
-    public void findOriginalSenderOtherPartyId(String otherPartyCode) {
+    @Parameters({
+            "otherParty,    1, Other Party",
+            "otherPartyRep, 2, Rep Party"
+    })
+    public void findOriginalSenderOtherPartyId(String otherPartyCode, String otherPartyId, String expectedName) {
         ScannedDocument scannedDocument = ScannedDocument
                 .builder()
                 .value(
@@ -1215,13 +1218,24 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
+        sscsCaseData.setOtherParties(List.of(new CcdValue<>(
+                OtherParty.builder()
+                        .id("1")
+                        .name(Name.builder().firstName("Other").lastName("Party").build())
+                        .rep(Representative.builder()
+                                .id("2")
+                                .name(Name.builder().firstName("Rep").lastName("Party").build())
+                                .hasRepresentative(YES)
+                                .build())
+                        .build())));
 
-        DynamicList originalSender = buildOriginalSenderItemListForGivenOption(otherPartyCode + "2", "Other party John Paul");
+        DynamicList originalSender = buildOriginalSenderItemListForGivenOption(otherPartyCode + otherPartyId, "Other party " + expectedName);
         sscsCaseData.setOriginalSender(originalSender);
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("2", response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyId());
+        assertEquals(otherPartyId, response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyId());
+        assertEquals(expectedName, response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyName());
     }
   
     @Parameters({"ISSUE_FURTHER_EVIDENCE,No,0", "ISSUE_FURTHER_EVIDENCE,Yes,0", "ISSUE_FURTHER_EVIDENCE,null,0",

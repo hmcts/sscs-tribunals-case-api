@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurth
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.APPELLANT;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.JOINT_PARTY;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyName;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -436,9 +437,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         YesNo evidenceIssued = isEvidenceIssuedAndShouldNotBeSentToBulkPrint(sscsCaseData.getFurtherEvidenceAction()) ? YesNo.YES : YesNo.NO;
 
         String originalSenderOtherPartyId = scannedDocument.getValue().getOriginalSenderOtherPartyId();
+        String originalSenderOtherPartyName = scannedDocument.getValue().getOriginalSenderOtherPartyName();
 
         if (originalSenderOtherPartyId == null) {
             originalSenderOtherPartyId = findOriginalSenderOtherPartyId(documentType, sscsCaseData.getOriginalSender().getValue().getCode());
+            originalSenderOtherPartyName = getOtherPartyName(sscsCaseData, originalSenderOtherPartyId);
         }
 
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
@@ -452,7 +455,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 .controlNumber(scannedDocument.getValue().getControlNumber())
                 .evidenceIssued(evidenceIssued.getValue())
                 .originalSenderOtherPartyId(originalSenderOtherPartyId)
-                .originalSenderOtherPartyName(scannedDocument.getValue().getOriginalSenderOtherPartyName())
+                .originalSenderOtherPartyName(originalSenderOtherPartyName)
                 .documentTranslationStatus(
                         sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null)
                 .build()).build();
