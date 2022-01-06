@@ -59,7 +59,17 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest extends ReissueArtifa
                 .documentType(DWP_EVIDENCE.getValue())
                 .documentLink(DocumentLink.builder().documentUrl("url3").build())
                 .build()).build();
-        List<SscsDocument> sscsDocuments = Arrays.asList(document1, document2, document3);
+        SscsDocument document4 = SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentFileName("file4.pdf")
+                .documentType(OTHER_PARTY_EVIDENCE.getValue())
+                .documentLink(DocumentLink.builder().documentUrl("url4").build())
+                .build()).build();
+        SscsDocument document5 = SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentFileName("file5.pdf")
+                .documentType(OTHER_PARTY_REPRESENTATIVE_EVIDENCE.getValue())
+                .documentLink(DocumentLink.builder().documentUrl("url5").build())
+                .build()).build();
+        List<SscsDocument> sscsDocuments = Arrays.asList(document1, document2, document3, document4, document5);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build())
                 .sscsDocument(sscsDocuments)
                 .build();
@@ -94,10 +104,12 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest extends ReissueArtifa
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
-        assertEquals(3, response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().size());
+        assertEquals(5, response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().size());
         assertEquals(new DynamicListItem("url1", "file1.pdf -  Appellant evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(0));
         assertEquals(new DynamicListItem("url2", "file2.pdf -  Representative evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(1));
         assertEquals(new DynamicListItem("url3", "file3.pdf -  Dwp evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(2));
+        assertEquals(new DynamicListItem("url4", "file4.pdf -  Other party evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(3));
+        assertEquals(new DynamicListItem("url5", "file5.pdf -  Other party rep evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(4));
         assertNull(response.getData().getOriginalSender());
     }
 
@@ -172,7 +184,19 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest extends ReissueArtifa
                 .documentDateAdded("09-09-2020")
                 .documentLink(DocumentLink.builder().documentFilename("welshFile3.pdf").documentUrl("welshUrl3").build())
                 .build()).build();
-        List<SscsWelshDocument> sscsWelshDocuments = Arrays.asList(document1, document2, document3);
+        SscsWelshDocument document4 = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder()
+                .documentFileName("welshFile4.pdf")
+                .documentType(OTHER_PARTY_EVIDENCE.getValue())
+                .documentDateAdded("09-09-2020")
+                .documentLink(DocumentLink.builder().documentFilename("welshFile4.pdf").documentUrl("welshUrl4").build())
+                .build()).build();
+        SscsWelshDocument document5 = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder()
+                .documentFileName("welshFile5.pdf")
+                .documentDateAdded("09-09-2020")
+                .documentType(OTHER_PARTY_REPRESENTATIVE_EVIDENCE.getValue())
+                .documentLink(DocumentLink.builder().documentFilename("welshFile5.pdf").documentUrl("welshUrl5").build())
+                .build()).build();
+        List<SscsWelshDocument> sscsWelshDocuments = Arrays.asList(document1, document2, document3, document4, document5);
         sscsCaseData.setSscsWelshDocuments(sscsWelshDocuments);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -180,14 +204,18 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest extends ReissueArtifa
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
-        assertEquals(6, response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().size());
+        assertEquals(10, response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().size());
         assertEquals(new DynamicListItem("url1", "file1.pdf -  Appellant evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(0));
         assertEquals(new DynamicListItem("url2", "file2.pdf -  Representative evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(1));
         assertEquals(new DynamicListItem("url3", "file3.pdf -  Dwp evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(2));
+        assertEquals(new DynamicListItem("url4", "file4.pdf -  Other party evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(3));
+        assertEquals(new DynamicListItem("url5", "file5.pdf -  Other party rep evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(4));
         assertNull(response.getData().getOriginalSender());
-        assertEquals(new DynamicListItem("welshUrl1", "Bilingual - welshFile1.pdf -  Appellant evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(3));
-        assertEquals(new DynamicListItem("welshUrl2", "Bilingual - welshFile2.pdf -  Representative evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(4));
-        assertEquals(new DynamicListItem("welshUrl3", "Bilingual - welshFile3.pdf -  Dwp evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(5));
+        assertEquals(new DynamicListItem("welshUrl1", "Bilingual - welshFile1.pdf -  Appellant evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(5));
+        assertEquals(new DynamicListItem("welshUrl2", "Bilingual - welshFile2.pdf -  Representative evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(6));
+        assertEquals(new DynamicListItem("welshUrl3", "Bilingual - welshFile3.pdf -  Dwp evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(7));
+        assertEquals(new DynamicListItem("welshUrl4", "Bilingual - welshFile4.pdf -  Other party evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(8));
+        assertEquals(new DynamicListItem("welshUrl5", "Bilingual - welshFile5.pdf -  Other party rep evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(9));
         assertNull(response.getData().getOriginalSender());
     }
 }

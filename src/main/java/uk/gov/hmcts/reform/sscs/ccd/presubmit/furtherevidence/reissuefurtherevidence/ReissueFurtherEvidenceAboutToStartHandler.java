@@ -50,6 +50,8 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
                         .orElse(Stream.empty()).filter(f ->
                                 APPELLANT_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
                                         || REPRESENTATIVE_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
+                                        || OTHER_PARTY_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
+                                        || OTHER_PARTY_REPRESENTATIVE_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
                                         || DWP_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
                         ).collect(Collectors.toCollection(ArrayList::new));
 
