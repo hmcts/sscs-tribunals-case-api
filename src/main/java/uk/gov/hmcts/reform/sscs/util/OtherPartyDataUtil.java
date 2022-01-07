@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.util;
 import static java.util.Collections.sort;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.util.ArrayList;
@@ -20,6 +21,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 public class OtherPartyDataUtil {
 
     private OtherPartyDataUtil() {
+    }
+
+    public static void clearOtherPartyIfEmpty(SscsCaseData sscsCaseData) {
+        if (isEmpty(sscsCaseData.getOtherParties())) {
+            sscsCaseData.setOtherParties(null);
+        }
     }
 
     public static void updateOtherPartyUcb(SscsCaseData sscsCaseData) {
@@ -157,6 +164,22 @@ public class OtherPartyDataUtil {
                 .filter(otherParty -> isNoOrNull(otherParty.getIsAppointee()))
                 .filter(otherParty -> nonNull(otherParty.getOtherPartySubscription()))
                 .anyMatch(otherParty -> predicate.test(otherParty.getOtherPartySubscription()));
+    }
+
+
+    public static String getOtherPartyName(SscsCaseData sscsCaseData, String otherPartyId) {
+        return emptyIfNull(sscsCaseData.getOtherParties()).stream()
+                .map(CcdValue::getValue)
+                .flatMap(op -> Stream.of((op.hasAppointee()) ? Pair.of(op.getAppointee().getName(), op.getAppointee().getId()) : Pair.of(op.getName(), op.getId()), (op.hasRepresentative()) ? Pair.of(op.getRep().getName(), op.getRep().getId()) : null))
+                .filter(Objects::nonNull)
+                .filter(p -> nonNull(p.getLeft()))
+                .filter(p -> nonNull(p.getRight()))
+                .filter(p -> p.getRight().equals(otherPartyId))
+                .map(Pair::getLeft)
+                .map(Name::getFullNameNoTitle)
+                .findFirst()
+                .orElse(null);
+
     }
 
     public static String getOtherPartyName(SscsCaseData sscsCaseData, Predicate<Subscription> predicate) {
