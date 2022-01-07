@@ -112,6 +112,8 @@ ccd:
       enabled: false
     elastic:
       enabled: false
+    ras:
+      enabled: true
 
   ingressHost: ${SERVICE_FQDN}
 
@@ -196,8 +198,47 @@ ccd:
         IDAM_DATA_STORE_SYSTEM_USER_USERNAME: ${IDAM_DATA_STORE_SYSTEM_USER_USERNAME}
         IDAM_DATA_STORE_SYSTEM_USER_PASSWORD: ${IDAM_DATA_STORE_SYSTEM_USER_PASSWORD}
         IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET: ${IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET}
+        ENABLE_ATTRIBUTE_BASED_ACCESS_CONTROL: "true"
+        ENABLE_PSEUDO_ROLE_ASSIGNMENTS_GENERATION: "true"
+        ENABLE_PSEUDO_ACCESS_PROFILES_GENERATION: "true"
+        ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-${SERVICE_FQDN}
       keyVaults: [ ]
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
+      autoscaling:
+        enabled: false
+
+  am-role-assignment-service:
+    java:
+      image: "hmctspublic.azurecr.io/am/role-assignment-service:latest"
+      imagePullPolicy: Always
+      environment:
+        ROLE_ASSIGNMENT_DB_HOST: ${SERVICE_NAME}-postgresql
+        ROLE_ASSIGNMENT_DB_NAME: role_assignment
+        ROLE_ASSIGNMENT_DB_USERNAME: role_assignment
+        ROLE_ASSIGNMENT_DB_PASSWORD: role_assignment
+        ROLE_ASSIGNMENT_DB_PORT: 5432
+        ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified"
+        ROLE_ASSIGNMENT_S2S_AUTHORISED_SERVICES: ccd_gw,am_role_assignment_service,am_org_role_mapping_service,xui_webapp,ccd_data
+        IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
+        IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+        OPEN_ID_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
+        OIDC_ISSUER_URL: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/hmcts
+        ROLE_ASSIGNMENT_IDAM_CLIENT_ID: am_role_assignment
+        ROLE_ASSIGNMENT_IDAM_ADMIN_USERID: ras-validation-system@hmcts.net
+        CCD_DATA_STORE_URL: http://ccd-data-store-api-${SERVICE_FQDN}
+        AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY: ${APPINSIGHTS_INSTRUMENTATIONKEY}
+        REFORM_SERVICE_NAME: am-role-assignment-service
+        REFORM_TEAM: sscs
+        BYPASS_ORG_DROOL_RULE: "true"
+        LAUNCH_DARKLY_ENV: pr
+        keyVaults: 
+          am:
+            secrets:
+              - am-role-assignment-service-s2s-secret
+              - role-assignment-service-IDAM-CLIENT-SECRET
+              - role-assignment-service-IDAM-ADMIN-SECRET
+              - role-assignment-service-LD-SDK-KEY
+      ingressHost: am-role-assignment-service-${SERVICE_FQDN}
       autoscaling:
         enabled: false
 
