@@ -40,6 +40,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
         updateOtherPartyUcb(sscsCaseData);
         checkConfidentiality(sscsCaseData);
         assignNewOtherPartyData(otherParties, UPDATE_OTHER_PARTY_DATA);
+        clearOtherPartyIfEmpty(sscsCaseData);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }

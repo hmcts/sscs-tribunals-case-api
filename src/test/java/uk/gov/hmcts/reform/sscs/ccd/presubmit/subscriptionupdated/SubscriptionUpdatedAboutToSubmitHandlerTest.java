@@ -1,6 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.subscriptionupdated;
 
-import static org.junit.Assert.*;
+import static java.util.Collections.emptyList;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -231,8 +239,14 @@ public class SubscriptionUpdatedAboutToSubmitHandlerTest {
         assertTrue(response.getData().getOtherParties().get(0).getValue().getOtherPartySubscription().getTya() != null);
         assertTrue(response.getData().getOtherParties().get(0).getValue().getOtherPartyAppointeeSubscription().getTya() != null);
         assertTrue(response.getData().getOtherParties().get(0).getValue().getOtherPartyRepresentativeSubscription().getTya() != null);
+    }
 
+    @Test
+    public void givenEmptyOtherParties_thenSetToNullRatherThanEmpty() {
+        sscsCaseData.setOtherParties(emptyList());
 
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getOtherParties(), is(nullValue()));
     }
 
 }
