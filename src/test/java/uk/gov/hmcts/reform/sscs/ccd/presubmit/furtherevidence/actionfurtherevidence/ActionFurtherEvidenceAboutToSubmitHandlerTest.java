@@ -1171,7 +1171,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
                 ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
-                        .originalSenderOtherPartyId("otherParty10")
+                        .originalSenderOtherPartyId("10")
                         .originalSenderOtherPartyName("John Smith")
                         .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();

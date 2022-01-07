@@ -16,8 +16,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurth
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW;
-import static uk.gov.hmcts.reform.sscs.model.PartyItemList.APPELLANT;
-import static uk.gov.hmcts.reform.sscs.model.PartyItemList.JOINT_PARTY;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyName;
 
 import java.time.LocalDate;
@@ -147,7 +146,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 && sscsCaseData.getOriginalSender().getValue() != null
                 && scannedDocument != null && scannedDocument.getValue() != null
                 && scannedDocument.getValue().getOriginalSenderOtherPartyId() != null) {
-            if (!sscsCaseData.getOriginalSender().getValue().getCode().equalsIgnoreCase(scannedDocument.getValue().getOriginalSenderOtherPartyId())) {
+            if (!sscsCaseData.getOriginalSender().getValue().getCode().equalsIgnoreCase(OTHER_PARTY.getCode() + scannedDocument.getValue().getOriginalSenderOtherPartyId())) {
                 preSubmitCallbackResponse
                         .addError("The PDF evidence does not match the Original Sender selected");
             }
