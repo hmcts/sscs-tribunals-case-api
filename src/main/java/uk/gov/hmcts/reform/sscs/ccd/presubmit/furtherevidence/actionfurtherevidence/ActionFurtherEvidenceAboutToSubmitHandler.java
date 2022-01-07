@@ -145,7 +145,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         if (PartiesOnCaseUtil.isChildSupportAppeal(sscsCaseData) && isNotEmpty(sscsCaseData.getOtherParties())
                 && sscsCaseData.getOriginalSender() != null
                 && sscsCaseData.getOriginalSender().getValue() != null
-                && scannedDocument != null && scannedDocument.getValue() != null) {
+                && scannedDocument != null && scannedDocument.getValue() != null
+                && scannedDocument.getValue().getOriginalSenderOtherPartyId() != null) {
             if (!sscsCaseData.getOriginalSender().getValue().getCode().equalsIgnoreCase(scannedDocument.getValue().getOriginalSenderOtherPartyId())) {
                 preSubmitCallbackResponse
                         .addError("The PDF evidence does not match the Original Sender selected");
