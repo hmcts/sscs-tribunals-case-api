@@ -29,7 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
@@ -199,7 +198,9 @@ public class EvidenceUploadService {
                     SscsCaseData sscsCaseData = caseDetails.getData();
                     Long ccdCaseId = caseDetails.getId();
                     EvidenceDescriptionPdfData data = new EvidenceDescriptionPdfData(caseDetails, description,
-                            getFileNames(sscsCaseData));
+                            getFileNames(sscsCaseData),
+                            getOtherPartyId(sscsCaseData, withEmailPredicate(description.getIdamEmail())),
+                            getOtherPartyName(sscsCaseData, withEmailPredicate(description.getIdamEmail())));
                     MyaEventActionContext storePdfContext = storeEvidenceDescriptionService.storePdf(
                             ccdCaseId, identifier, data);
                     submitHearingWhenNoCoreCase(caseDetails, sscsCaseData, ccdCaseId, storePdfContext,

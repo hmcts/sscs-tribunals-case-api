@@ -113,34 +113,34 @@ public class StoreAppellantStatementServiceTest {
                 .build();
 
         return new Object[]{
-                new Object[]{sscsCaseDataWithNoDocs, APPELLANT_STATEMENT_1, null},
-                new Object[]{buildCaseDataWithSscsDocumentAndGivenScannedDocumentFilename(
-                        APPELLANT_STATEMENT_1_1234567890_PDF), APPELLANT_STATEMENT_3, null},
-                new Object[]{buildCaseDataWithSscsDocumentAndGivenScannedDocumentFilename(
-                        APPELLANT_STATEMENT_2_1234567890_PDF), APPELLANT_STATEMENT_3, null},
-                new Object[]{sscsCaseDataWithDocWithNullValue, APPELLANT_STATEMENT_1, null},
-                new Object[]{sscsCaseDataWithDocWithEmptyFilename, APPELLANT_STATEMENT_1, null},
-                new Object[]{sscsCaseDataWithDocWithNullFilename, APPELLANT_STATEMENT_1, null},
-                new Object[]{buildCaseDataWithNoDocsAndWithGivenSubs(appellantSubscription, representativeSubscription),
-                        "Representative statement 1 - ", "someTyaRepsCode"},
-                new Object[]{buildCaseDataWithRepStatementAndGivenSubs(appellantSubscription, representativeSubscription),
-                        "Representative statement 3 - ", "someTyaRepsCode"},
-                new Object[]{buildCaseDataWithRepStatementAndGivenSubs(null, null),
-                        "Appellant statement 3 - ", "someTyaRepsCode"},
-                new Object[]{buildCaseDataWithRepStatementAndGivenSubs(null, null),
-                        "Appellant statement 3 - ", null},
-                new Object[]{buildCaseDataWithRepStatementAndGivenSubs(appellantSubscription, representativeSubscription),
-                        "Appellant statement 3 - ", null},
-                new Object[]{buildCaseDataWithRepStatementAndGivenSubs(appellantSubscription, Subscription.builder()
-                        .tya(null).build()), "Appellant statement 3 - ", "someTyaRepsCode"},
-                new Object[]{sscsCaseDataWithNoDocs, APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
-                new Object[]{buildCaseDataWithSscsDocumentAndGivenScannedDocumentFilename(
-                        "Some other document.txt"), APPELLANT_STATEMENT_2, "someTyaAppellantCode"},
-                new Object[]{buildCaseDataWithSscsDocumentAndGivenScannedDocumentFilename(
-                        APPELLANT_STATEMENT_1_1234_5678_9012_3456_PDF), "Appellant statement 3 - ", "someTyaAppellantCode"},
-                new Object[]{sscsCaseDataWithDocWithNullValue, APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
-                new Object[]{sscsCaseDataWithDocWithEmptyFilename, APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
-                new Object[]{sscsCaseDataWithDocWithNullFilename, APPELLANT_STATEMENT_1, "someTyaAppellantCode"}
+            new Object[]{sscsCaseDataWithNoDocs, APPELLANT_STATEMENT_1, null},
+            new Object[]{buildCaseDataWithSscsDocumentAndGivenScannedDocumentFilename(
+                    APPELLANT_STATEMENT_1_1234567890_PDF), APPELLANT_STATEMENT_3, null},
+            new Object[]{buildCaseDataWithSscsDocumentAndGivenScannedDocumentFilename(
+                    APPELLANT_STATEMENT_2_1234567890_PDF), APPELLANT_STATEMENT_3, null},
+            new Object[]{sscsCaseDataWithDocWithNullValue, APPELLANT_STATEMENT_1, null},
+            new Object[]{sscsCaseDataWithDocWithEmptyFilename, APPELLANT_STATEMENT_1, null},
+            new Object[]{sscsCaseDataWithDocWithNullFilename, APPELLANT_STATEMENT_1, null},
+            new Object[]{buildCaseDataWithNoDocsAndWithGivenSubs(appellantSubscription, representativeSubscription),
+                "Representative statement 1 - ", "someTyaRepsCode"},
+            new Object[]{buildCaseDataWithRepStatementAndGivenSubs(appellantSubscription, representativeSubscription),
+                "Representative statement 3 - ", "someTyaRepsCode"},
+            new Object[]{buildCaseDataWithRepStatementAndGivenSubs(null, null),
+                "Appellant statement 3 - ", "someTyaRepsCode"},
+            new Object[]{buildCaseDataWithRepStatementAndGivenSubs(null, null),
+                "Appellant statement 3 - ", null},
+            new Object[]{buildCaseDataWithRepStatementAndGivenSubs(appellantSubscription, representativeSubscription),
+                "Appellant statement 3 - ", null},
+            new Object[]{buildCaseDataWithRepStatementAndGivenSubs(appellantSubscription, Subscription.builder()
+                    .tya(null).build()), "Appellant statement 3 - ", "someTyaRepsCode"},
+            new Object[]{sscsCaseDataWithNoDocs, APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
+            new Object[]{buildCaseDataWithSscsDocumentAndGivenScannedDocumentFilename(
+                    "Some other document.txt"), APPELLANT_STATEMENT_2, "someTyaAppellantCode"},
+            new Object[]{buildCaseDataWithSscsDocumentAndGivenScannedDocumentFilename(
+                    APPELLANT_STATEMENT_1_1234_5678_9012_3456_PDF), "Appellant statement 3 - ", "someTyaAppellantCode"},
+            new Object[]{sscsCaseDataWithDocWithNullValue, APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
+            new Object[]{sscsCaseDataWithDocWithEmptyFilename, APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
+            new Object[]{sscsCaseDataWithDocWithNullFilename, APPELLANT_STATEMENT_1, "someTyaAppellantCode"}
         };
     }
 
