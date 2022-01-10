@@ -1131,7 +1131,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenConfidentialRequestFromOtherPartyDoNotMatchWithDocumentOriginalSender_thenShowAnError() {
+    public void givenChildSupportWithConfidentialRequestFromOtherPartyDoNotMatchWithDocumentOriginalSender_thenShowAnError() {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
         sscsCaseData.setJointParty(YES);
@@ -1157,7 +1157,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenConfidentialRequestFromOtherPartyDoMatchWithDocumentOriginalSender_thenDontShowAnError() {
+    public void givenChildSupportWithOtherRequestFromOtherPartyWithDocumentOriginalSenderIsNull_thenDonNotShowAnError() {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
         sscsCaseData.setJointParty(YES);
@@ -1168,6 +1168,52 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setOtherParties(otherPartyList);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(OTHER_PARTY.getCode() + otherParty.getId(), OTHER_PARTY.getLabel() + " - " + otherParty.getName()));
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                        .originalSenderOtherPartyId(null)
+                        .originalSenderOtherPartyName(null)
+                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+        List<ScannedDocument> docs = new ArrayList<>();
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void givenChildSupportWithConfidentialRequestFromOtherPartyDoMatchWithDocumentOriginalSender_thenDontShowAnError() {
+
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
+        sscsCaseData.setJointParty(YES);
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        OtherParty otherParty = OtherParty.builder().id("10").name(Name.builder().firstName("John").lastName("smith").build()).build();
+        CcdValue ccdValue = CcdValue.builder().value(otherParty).build();
+        otherPartyList.add(ccdValue);
+        sscsCaseData.setOtherParties(otherPartyList);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
+        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(OTHER_PARTY.getCode() + otherParty.getId(), OTHER_PARTY.getLabel() + " - " + otherParty.getName()));
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                        .originalSenderOtherPartyId("10")
+                        .originalSenderOtherPartyName("John Smith")
+                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+        List<ScannedDocument> docs = new ArrayList<>();
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void givenChildSupportWithOtherRequestWhenOtherPartyIsEmpty_thenDontShowAnError() {
+
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
+        sscsCaseData.setJointParty(YES);
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        sscsCaseData.setOtherParties(otherPartyList);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
                 ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
