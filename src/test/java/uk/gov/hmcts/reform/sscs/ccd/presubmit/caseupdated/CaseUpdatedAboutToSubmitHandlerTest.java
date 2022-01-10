@@ -634,8 +634,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     public void givenNewAppellantName_thenSetCaseName() {
-        sscsCaseDataBefore.setCaseName("Old Name");
-        sscsCaseData.setCaseName("Old Name");
+        sscsCaseDataBefore.setCaseNameHmctsInternal("Old Name");
+        sscsCaseData.setCaseNameHmctsInternal("Old Name");
         sscsCaseData.setAppeal(Appeal.builder()
                         .benefitType(new BenefitType("UC", "Universal credit"))
                         .appellant(Appellant.builder()
@@ -643,7 +643,9 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                                 .build())
                         .build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals("New Name", response.getData().getCaseName());
+        assertEquals("New Name", response.getData().getCaseNameHmctsInternal());
+        assertEquals("New Name", response.getData().getCaseNameHmctsRestricted());
+        assertEquals("New Name", response.getData().getCaseNamePublic());
     }
 
     @Test
@@ -659,13 +661,15 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals("New Name", response.getData().getCaseName());
+        assertEquals("New Name", response.getData().getCaseNameHmctsInternal());
+        assertEquals("New Name", response.getData().getCaseNameHmctsRestricted());
+        assertEquals("New Name", response.getData().getCaseNamePublic());
     }
 
     @Test
     public void givenAppellantNameDeleted_thenUnsetCaseName() {
-        sscsCaseDataBefore.setCaseName("Old Name");
-        sscsCaseData.setCaseName("Old Name");
+        sscsCaseDataBefore.setCaseNameHmctsInternal("Old Name");
+        sscsCaseData.setCaseNameHmctsInternal("Old Name");
         sscsCaseData.setAppeal(Appeal.builder()
                 .benefitType(new BenefitType("UC", "Universal credit"))
                 .appellant(Appellant.builder().build())
@@ -675,6 +679,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getCaseName());
+        assertNull(response.getData().getCaseNameHmctsInternal());
+        assertNull(response.getData().getCaseNameHmctsRestricted());
+        assertNull(response.getData().getCaseNamePublic());
     }
 }

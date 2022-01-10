@@ -426,12 +426,21 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     }
 
     @Test
-    public void syaWithAppellantNameSetsCaseName() {
+    public void syaWithAppellantNameSetsWorkAllocationFields() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         syaCaseWrapper.getAppellant().setFirstName("George");
         syaCaseWrapper.getAppellant().setLastName("Foreman");
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, regionalProcessingCenter.getName(), regionalProcessingCenter, true);
-        assertEquals("George Foreman", caseData.getCaseName());
+        assertEquals("George Foreman", caseData.getCaseNameHmctsInternal());
+        assertEquals("George Foreman", caseData.getCaseNameHmctsRestricted());
+        assertEquals("George Foreman", caseData.getCaseNamePublic());
+
+        assertEquals("Personal Independence Payment", caseData.getCaseAccessCategory());
+        assertEquals("DWP", caseData.getOgdType());
+        assertEquals("Personal Independence Payment", caseData.getCaseManagementCategory().getValue().getLabel());
+        assertEquals("PIP", caseData.getCaseManagementCategory().getValue().getCode());
+
+
     }
 
 }

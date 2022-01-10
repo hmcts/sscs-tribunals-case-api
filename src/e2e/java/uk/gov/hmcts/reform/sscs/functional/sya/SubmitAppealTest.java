@@ -124,7 +124,9 @@ public class SubmitAppealTest {
 
         assertEquals(expectedState, sscsCaseDetails.getState());
 
-        assertEquals("Joe Bloggs", sscsCaseDetails.getData().getCaseName());
+        assertEquals("Joe Bloggs", sscsCaseDetails.getData().getCaseNameHmctsInternal());
+        assertEquals("Joe Bloggs", sscsCaseDetails.getData().getCaseNameHmctsRestricted());
+        assertEquals("Joe Bloggs", sscsCaseDetails.getData().getCaseNamePublic());
     }
 
     private String changeExpectedFields(String serializedMessage, String nino, LocalDate mrnDate) {

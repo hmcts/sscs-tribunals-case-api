@@ -8,10 +8,7 @@ import static uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil.cleanPhoneNumber
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -56,6 +53,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         String benefitCode = isDraft ? null : generateBenefitCode(appeal.getBenefitType().getCode(), addressName)
                 .orElseThrow(() -> BenefitMappingException.createException(appeal.getBenefitType().getCode()));
 
+
         String issueCode = isDraft ? null : generateIssueCode();
         String caseCode = isDraft ? null : generateCaseCode(benefitCode, issueCode);
 
@@ -70,8 +68,18 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 caseName = name.getFullNameNoTitle();
             }
 
+            Benefit benefit = Benefit.getBenefitByCodeOrThrowException(appeal.getBenefitType().getCode());
+
+            DynamicListItem caseManagementCategory = new DynamicListItem(benefit.getShortName(), benefit.getDescription());
+            List<DynamicListItem> listItems = Arrays.asList(caseManagementCategory);
 
             return SscsCaseData.builder()
+                    .caseNameHmctsInternal(caseName)
+                    .caseNameHmctsRestricted(caseName)
+                    .caseNamePublic(caseName)
+                    .ogdType("DWP")
+                    .caseAccessCategory(benefit.getDescription())
+                    .caseManagementCategory(new DynamicList(caseManagementCategory, listItems))
                     .caseCreated(LocalDate.now().toString())
                     .isSaveAndReturn(syaCaseWrapper.getIsSaveAndReturn())
                     .appeal(appeal)
@@ -89,7 +97,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                             && syaCaseWrapper.getLanguagePreferenceWelsh() != null
                             && syaCaseWrapper.getLanguagePreferenceWelsh()))
                     .ccdCaseId(ccdCaseId)
-                    .caseName(caseName)
                     .build();
         } else {
             return SscsCaseData.builder()

@@ -202,9 +202,11 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
             CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
             if (oldCaseDetails == null
-                    || oldCaseDetails.getCaseData().getCaseName() == null
-                    || !oldCaseDetails.getCaseData().getCaseName().equals(caseName)) {
-                caseData.setCaseName(caseName);
+                    || oldCaseDetails.getCaseData().getCaseNameHmctsInternal() == null
+                    || !oldCaseDetails.getCaseData().getCaseNameHmctsInternal().equals(caseName)) {
+                caseData.setCaseNameHmctsInternal(caseName);
+                caseData.setCaseNameHmctsRestricted(caseName);
+                caseData.setCaseNamePublic(caseName);
             }
         }
     }
