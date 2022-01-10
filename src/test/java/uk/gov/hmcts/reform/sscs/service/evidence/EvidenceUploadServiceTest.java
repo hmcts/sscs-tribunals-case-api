@@ -60,6 +60,9 @@ public class EvidenceUploadServiceTest {
     private static final String JP_EMAIL = "jp@gmail.com";
     private static final String REP_EMAIL = "rep@gmail.com";
     private static final String APPELLANT_EMAIL = "app@gmail.com";
+    private static final String OTHER_PARTY_EMAIL = "op@gmail.com";
+    private static final String OTHER_PARTY_REP_EMAIL = "op-rep@gmail.com";
+    private static final String OTHER_PARTY_APPOINTEE_EMAIL = "op-appointee@gmail.com";
     private EvidenceUploadService evidenceUploadService;
     private CcdService ccdService;
     private OnlineHearingService onlineHearingService;
@@ -68,6 +71,7 @@ public class EvidenceUploadServiceTest {
     private long someCcdCaseId;
     private IdamTokens idamTokens;
     private String fileName;
+    private String existingFileName;
     private String documentUrl;
     private MultipartFile file;
     private final Date evidenceCreatedOn = new Date();
@@ -179,11 +183,12 @@ public class EvidenceUploadServiceTest {
 
 
     @Test
-    @Parameters(method = "evidenceUploadByAppellantScenario, evidenceUploadByRepScenario, "
-            + "evidenceUploadByJointPartyScenario, evidenceUploadByAppellantWithOtherSubscribersPresenceScenario")
+    @Parameters(method =
+            "evidenceUploadByAppellantScenario, evidenceUploadByRepScenario, "
+                    + "evidenceUploadByJointPartyScenario, evidenceUploadByAppellantWithOtherSubscribersPresenceScenario")
     public void givenANonCorCaseWithScannedDocumentsAndDraftDocument_thenMoveDraftToScannedDocumentsAndUpdateCaseInCcd(
             SscsCaseDetails sscsCaseDetails, EvidenceDescription someDescription, String expectedEvidenceUploadFilename)
-            throws IOException {
+        throws IOException {
 
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
@@ -378,12 +383,18 @@ public class EvidenceUploadServiceTest {
     @Test
     public void testBuildScannedDocumentByGivenSscsDoc() {
         SscsCaseData sscsCaseData = createSscsCaseDetailsDraftDocsJustDescription("EvidenceDescription.pdf").getData();
-
+        sscsCaseData.setOtherParties(List.of(new CcdValue<>(OtherParty.builder()
+                .id("1")
+                .name(Name.builder().firstName("John").lastName("Smith").build())
+                .otherPartySubscription(Subscription.builder().email("op@email.com").build())
+                .build())));
         SscsDocument evidenceDescriptionDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentDateAdded("2021-01-30")
                 .documentLink(DocumentLink.builder().documentBinaryUrl("url/binary").documentFilename("description.pdf").documentUrl("url").build()).build()).build();
 
-        evidenceUploadService.buildUploadedDocumentByGivenSscsDoc(sscsCaseData, evidenceDescriptionDocument, null, null);
+        evidenceUploadService.buildUploadedDocumentByGivenSscsDoc(sscsCaseData, evidenceDescriptionDocument, null, "op@email.com");
         assertEquals(1, sscsCaseData.getScannedDocuments().size());
+        assertThat(sscsCaseData.getScannedDocuments().get(0).getValue().getOriginalSenderOtherPartyId(), is("1"));
+        assertThat(sscsCaseData.getScannedDocuments().get(0).getValue().getOriginalSenderOtherPartyName(), is("John Smith"));
         assertNull(sscsCaseData.getAudioVideoEvidence());
     }
 
@@ -456,8 +467,16 @@ public class EvidenceUploadServiceTest {
     }
 
     @Test
-    @Parameters({JP_EMAIL + ", JOINT_PARTY", REP_EMAIL + ", REP", APPELLANT_EMAIL + ", APPELLANT"})
-    public void givenSscsDocAndAudio_thenSetTheUploaderFromSubscriptionEmail(String idamEmail, UploadParty uploader) {
+    @Parameters({
+            JP_EMAIL + ", JOINT_PARTY, null, null",
+            REP_EMAIL + ", REP, null, null",
+            APPELLANT_EMAIL + ", APPELLANT, null, null",
+            OTHER_PARTY_EMAIL + ", OTHER_PARTY, 1, Oyster Smith",
+            OTHER_PARTY_REP_EMAIL + ", OTHER_PARTY_REP, 2, Raj Smith",
+            OTHER_PARTY_APPOINTEE_EMAIL + ", OTHER_PARTY_APPOINTEE, 4, Apple Smith"})
+    public void givenSscsDocAndAudio_thenSetTheUploaderFromSubscriptionEmail(String idamEmail, UploadParty uploader,
+                                                                             @Nullable String otherPartyId,
+                                                                             @Nullable String otherPartyName) {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithCcdDocumentsSubscription();
         List<SscsDocument> audioVideoDocuments = new ArrayList<>();
         audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("audio2.mp3").build()).build());
@@ -467,16 +486,18 @@ public class EvidenceUploadServiceTest {
         evidenceUploadService.buildUploadedDocumentByGivenSscsDoc(sscsCaseDetails.getData(), draftSscsDocument, audioVideoDocuments, idamEmail);
         assertEquals(1, sscsCaseDetails.getData().getAudioVideoEvidence().size());
         assertEquals(uploader, sscsCaseDetails.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded());
+        assertEquals(otherPartyId, sscsCaseDetails.getData().getAudioVideoEvidence().get(0).getValue().getOriginalSenderOtherPartyId());
+        assertEquals(otherPartyName, sscsCaseDetails.getData().getAudioVideoEvidence().get(0).getValue().getOriginalSenderOtherPartyName());
     }
 
     private SscsDocument getCombinedEvidenceDoc(String combinedEvidenceFilename, String otherEvidenceDocType) {
         DocumentLink documentLink = DocumentLink.builder().documentUrl("http://dm-store/112").build();
         SscsDocumentDetails sscsDocumentDetails = SscsDocumentDetails.builder()
-                .documentFileName(combinedEvidenceFilename)
-                .documentDateAdded(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE))
-                .documentLink(documentLink)
-                .documentType(otherEvidenceDocType)
-                .build();
+            .documentFileName(combinedEvidenceFilename)
+            .documentDateAdded(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE))
+            .documentLink(documentLink)
+            .documentType(otherEvidenceDocType)
+            .build();
         return SscsDocument.builder().value(sscsDocumentDetails).build();
     }
 
@@ -582,17 +603,107 @@ public class EvidenceUploadServiceTest {
         return new Object[]{new Object[]{sscsCaseDetails, someDescription, "Appellant upload 1 - 123.pdf"}};
     }
 
+    @SuppressWarnings("unused")
+    private Object[] evidenceUploadByOtherPartyPresenceScenario() {
+        initCommonParams("someFileName.txt");
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, existingFileName,
+                documentUrl, evidenceCreatedOn);
+        sscsCaseDetails.getData().setSubscriptions(Subscriptions.builder()
+                .jointPartySubscription(Subscription.builder()
+                        .email("jp@email.com")
+                        .build())
+                .representativeSubscription(Subscription.builder()
+                        .email("rep@email.com")
+                        .build())
+                .build());
+        sscsCaseDetails.getData().setOtherParties(List.of(new CcdValue<>(OtherParty.builder()
+                .id("1")
+                .name(Name.builder().firstName("John").lastName("Smith").build())
+                .otherPartySubscription(Subscription.builder().email("op@email.com").build())
+                .build())));
+        sscsCaseDetails.getData().setScannedDocuments(getScannedDocuments());
+        sscsCaseDetails.getData().setSscsDocument(buildSscsDocumentList());
+        sscsCaseDetails.getData().setAppeal(Appeal.builder().hearingType("sya").build());
+        EvidenceDescription someDescription = new EvidenceDescription("some description",
+                "op@email.com");
+        return new Object[]{new Object[]{sscsCaseDetails, someDescription, "Other party - John Smith upload 1 - 123.pdf"}};
+    }
+
+    @SuppressWarnings("unused")
+    private Object[] evidenceUploadByOtherPartyRepPresenceScenario() {
+        initCommonParams("someFileName.txt");
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, existingFileName,
+                documentUrl, evidenceCreatedOn);
+        sscsCaseDetails.getData().setSubscriptions(Subscriptions.builder()
+                .jointPartySubscription(Subscription.builder()
+                        .email("jp@email.com")
+                        .build())
+                .representativeSubscription(Subscription.builder()
+                        .email("rep@email.com")
+                        .build())
+                .build());
+        sscsCaseDetails.getData().setOtherParties(List.of(new CcdValue<>(OtherParty.builder()
+                .id("1")
+                .name(Name.builder().firstName("John").lastName("Smith").build())
+                .rep(Representative.builder()
+                        .id("2")
+                        .hasRepresentative(YesNo.YES.getValue())
+                        .name(Name.builder().firstName("Myles").lastName("Smith").build())
+                        .build())
+                .otherPartySubscription(Subscription.builder().email("op@email.com").build())
+                .otherPartyRepresentativeSubscription(Subscription.builder().email("opRep@email.com").build())
+                .build())));
+        sscsCaseDetails.getData().setScannedDocuments(getScannedDocuments());
+        sscsCaseDetails.getData().setSscsDocument(buildSscsDocumentList());
+        sscsCaseDetails.getData().setAppeal(Appeal.builder().hearingType("sya").build());
+        EvidenceDescription someDescription = new EvidenceDescription("some description",
+                "opRep@email.com");
+        return new Object[]{new Object[]{sscsCaseDetails, someDescription, "Other party - Representative Myles Smith upload 1 - 123.pdf"}};
+    }
+
+    @SuppressWarnings("unused")
+    private Object[] evidenceUploadByOtherPartyAppointeePresenceScenario() {
+        initCommonParams("someFileName.txt");
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, existingFileName,
+                documentUrl, evidenceCreatedOn);
+        sscsCaseDetails.getData().setSubscriptions(Subscriptions.builder()
+                .jointPartySubscription(Subscription.builder()
+                        .email("jp@email.com")
+                        .build())
+                .representativeSubscription(Subscription.builder()
+                        .email("rep@email.com")
+                        .build())
+                .build());
+        sscsCaseDetails.getData().setOtherParties(List.of(new CcdValue<>(OtherParty.builder()
+                .id("1")
+                .name(Name.builder().firstName("John").lastName("Smith").build())
+                .isAppointee(YesNo.YES.getValue())
+                .appointee(Appointee.builder()
+                        .id("2")
+                        .name(Name.builder().firstName("Trinity").lastName("Smith").build())
+                        .build())
+                .otherPartyAppointeeSubscription(Subscription.builder().email("opAppointee@email.com").build())
+                .build())));
+        sscsCaseDetails.getData().setScannedDocuments(getScannedDocuments());
+        sscsCaseDetails.getData().setSscsDocument(buildSscsDocumentList());
+        sscsCaseDetails.getData().setAppeal(Appeal.builder().hearingType("sya").build());
+        EvidenceDescription someDescription = new EvidenceDescription("some description",
+                "opAppointee@email.com");
+
+        return new Object[]{new Object[]{sscsCaseDetails, someDescription, "Other party - Appointee Trinity Smith upload 1 - 123.pdf"}};
+    }
+
     @NotNull
     private List<ScannedDocument> getScannedDocuments() {
         ScannedDocument evidenceDocument = ScannedDocument.builder()
-                .value(ScannedDocumentDetails.builder()
-                        .fileName("anotherFileName")
-                        .url(DocumentLink.builder()
-                                .documentUrl("http://anotherUrl")
-                                .build())
-                        .scannedDate(convertCreatedOnDate(evidenceCreatedOn))
-                        .build())
-                .build();
+            .value(ScannedDocumentDetails.builder()
+                .fileName("anotherFileName")
+                .url(DocumentLink.builder()
+                    .documentUrl("http://anotherUrl")
+                    .build())
+                .scannedDate(convertCreatedOnDate(evidenceCreatedOn))
+                .build())
+            .build();
         return singletonList(evidenceDocument);
     }
 
@@ -738,7 +849,29 @@ public class EvidenceUploadServiceTest {
                                 .email(APPELLANT_EMAIL)
                                 .build())
                         .build())
-                .build()).build();
+                .otherParties(List.of(new CcdValue<>(OtherParty.builder()
+                        .id("1")
+                        .name(Name.builder().firstName("Oyster").lastName("Smith").build())
+                        .otherPartySubscription(Subscription.builder().email(OTHER_PARTY_EMAIL).build())
+                        .rep(Representative.builder()
+                                .id("2")
+                                .name(Name.builder().firstName("Raj").lastName("Smith").build())
+                                .hasRepresentative(YesNo.YES.getValue())
+                                .build())
+                        .otherPartyRepresentativeSubscription(Subscription.builder().email(OTHER_PARTY_REP_EMAIL).build())
+                        .build()),
+                        new CcdValue<>(OtherParty.builder()
+                                .id("3")
+                                .name(Name.builder().firstName("Orange").lastName("Smith").build())
+                                .isAppointee(YesNo.YES.getValue())
+                                .appointee(Appointee.builder()
+                                        .id("4")
+                                        .name(Name.builder().firstName("Apple").lastName("Smith").build())
+                                        .build())
+                                .otherPartyAppointeeSubscription(Subscription.builder().email(OTHER_PARTY_APPOINTEE_EMAIL).build())
+                                .build())))
+                .build())
+                .build();
     }
 
     private String convertCreatedOnDate(Date date) {
