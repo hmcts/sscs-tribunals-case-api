@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatereasonableadjustment;
 
+import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -57,6 +58,7 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandlerTest {
                         .representative(ReasonableAdjustmentDetails.builder().reasonableAdjustmentRequirements(RED_FONT).wantsReasonableAdjustment(NO).build())
                         .jointParty(ReasonableAdjustmentDetails.builder().reasonableAdjustmentRequirements(RED_FONT).wantsReasonableAdjustment(NO).build())
                         .build())
+                .otherParties(emptyList())
                 .appeal(Appeal.builder().appellant(
                         Appellant.builder().isAppointee(NO.getValue())
                                 .appointee(Appointee.builder().build()).build())
@@ -84,6 +86,7 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandlerTest {
 
         assertNull(response.getData().getReasonableAdjustmentChoice());
         assertNull(response.getData().getReasonableAdjustments());
+        assertNull(response.getData().getOtherParties());
     }
 
     @Test
@@ -96,6 +99,7 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandlerTest {
         assertNull(response.getData().getReasonableAdjustments().getAppointee());
         assertEquals(YES, response.getData().getReasonableAdjustments().getAppellant().getWantsReasonableAdjustment());
         assertEquals(RED_FONT, response.getData().getReasonableAdjustments().getAppellant().getReasonableAdjustmentRequirements());
+        assertNull(response.getData().getOtherParties());
     }
 
     @Test
