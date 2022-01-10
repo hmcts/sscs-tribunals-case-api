@@ -257,14 +257,6 @@ public class EvidenceUploadService {
         return String.format("%s upload %s - %s.pdf", appellantOrRepsFileNamePrefix, uploadCounter, ccdCaseId);
     }
 
-    private void mergeNewUnprocessedCorrespondenceToTheExistingInTheCase(SscsCaseDetails caseDetails,
-                                                                         SscsCaseData sscsCaseData,
-                                                                         List<ScannedDocument> scannedDocs) {
-        List<ScannedDocument> newScannedDocumentsList = union(emptyIfNull(caseDetails.getData().getScannedDocuments()),
-                emptyIfNull(scannedDocs));
-        sscsCaseData.setScannedDocuments(newScannedDocumentsList);
-    }
-
     private void appendEvidenceUploadsToStatementAndStoreIt(SscsCaseData sscsCaseData,
                                                             MyaEventActionContext storePdfContext,
                                                             String filename,
