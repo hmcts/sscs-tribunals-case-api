@@ -98,19 +98,24 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     }
 
     private void checkSscs2AndSscs5Confidentiality(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, SscsCaseData sscsCaseData) {
-        if (isValidBenefitTypeForConfidentiality(sscsCaseData) && sscsCaseData.getIsConfidentialCase() != null && YesNo.isYes(sscsCaseData.getIsConfidentialCase())) {
+        if (isValidBenefitTypeForConfidentiality(sscsCaseData)) {
             if (sscsCaseData.getDwpEditedEvidenceReason() == null) {
-                if (!otherPartyHasConfidentiality(sscsCaseData)) {
-                    sscsCaseData.setIsConfidentialCase(null);
+                if (otherPartyHasConfidentiality(sscsCaseData)) {
+                    preSubmitCallbackResponse.addError("Other Party requires confidentiality, upload edited and unedited responses");
+                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
                 }
                 if (sscsCaseData.getAppeal().getAppellant() != null && YesNo.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired())) {
-                    sscsCaseData.getAppeal().getAppellant().setConfidentialityRequired(YesNo.NO);
+                    preSubmitCallbackResponse.addError("Appellant requires confidentiality, upload edited and unedited responses");
+                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
                 }
-                preSubmitCallbackResponse.addWarning("Are you sure you want change the Appellant confidentiality requirement?");
+            } else {
+                if (otherPartyHasConfidentiality(sscsCaseData)) {
+                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
+                }
+                if (sscsCaseData.getAppeal().getAppellant() != null && YesNo.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired())) {
+                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
+                }
             }
-        }
-        if (otherPartyHasConfidentiality(sscsCaseData)) {
-            sscsCaseData.setIsConfidentialCase(YesNo.YES);
         }
     }
 
