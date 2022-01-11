@@ -7,11 +7,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,15 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 public class OtherPartyDataUtil {
-
-    public static final List<Benefit> SSCS5_BENEFIT = List.of(TAX_CREDIT,
-            GUARDIANS_ALLOWANCE,
-            TAX_FREE_CHILDCARE,
-            HOME_RESPONSIBILITIES_PROTECTION,
-            CHILD_BENEFIT,
-            THIRTY_HOURS_FREE_CHILDCARE,
-            GUARANTEED_MINIMUM_PENSION,
-            NATIONAL_INSURANCE_CREDITS);
 
     private OtherPartyDataUtil() {
     }
@@ -129,8 +116,8 @@ public class OtherPartyDataUtil {
 
     public static boolean isValidBenefitTypeForConfidentiality(SscsCaseData sscsCaseData) {
         return sscsCaseData.getAppeal().getBenefitType() != null
-                && (CHILD_SUPPORT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())
-                || SSCS5_BENEFIT.stream().anyMatch(b -> b.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())));
+                && (Arrays.stream(Benefit.values()).anyMatch(b -> (SscsType.SSCS2.equals(b.getSscsType()) || SscsType.SSCS5.equals(b.getSscsType()))
+                && b.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())));
     }
 
     public static boolean isOtherPartyPresent(SscsCaseData sscsCaseData) {

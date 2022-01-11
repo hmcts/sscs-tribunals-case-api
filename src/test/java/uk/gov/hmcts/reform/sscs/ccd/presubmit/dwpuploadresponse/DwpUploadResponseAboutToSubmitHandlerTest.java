@@ -1050,7 +1050,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
             "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
-    public void givenChildSupportCaseAppellantWantsConfidentialNoEditedDocs_thenShowError(String shortNam) {
+    public void givenChildSupportCaseAppellantWantsConfidentialNoEditedDocs_thenShowError(String shortName) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(shortName).build());
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequired(YES).build());
         sscsCaseData.setIsConfidentialCase(YES);
