@@ -1031,7 +1031,9 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenChildSupportCaseThatIsConfidentialNoEditedDocs_thenShowWarning() {
+    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
+            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+    public void givenChildSupportCaseThatIsConfidentialNoEditedDocs_thenShowWarning(String shortName) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequired(YES).build());
         sscsCaseData.setIsConfidentialCase(YES);
@@ -1045,8 +1047,10 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenChildSupportCaseThatIsNotConfidentialNoEditedDocs_thenNoWarning() {
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
+            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+    public void givenChildSupportCaseThatIsNotConfidentialNoEditedDocs_thenNoWarning(String shortName) {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(shortName).build());
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequired(NO).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -1058,8 +1062,10 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenChildSupportCaseThatIsConfidentialNoEditedDocsIgnoreWarning_thenUpdate() {
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
+            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+    public void givenChildSupportCaseThatIsConfidentialNoEditedDocsIgnoreWarning_thenUpdate(String shortName) {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(shortName).build());
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequired(YES).build());
         sscsCaseData.setIsConfidentialCase(YES);
 
@@ -1077,8 +1083,10 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenChildSupportCaseThatIsConfidentialNoEditedDocsIgnoreWarningOtherParty_thenUpdate() {
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
+            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+    public void givenChildSupportCaseThatIsConfidentialNoEditedDocsIgnoreWarningOtherParty_thenUpdate(String shortName) {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(shortName).build());
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequired(YES).build());
         sscsCaseData.setIsConfidentialCase(YES);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
