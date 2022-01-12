@@ -69,17 +69,13 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             }
 
             Benefit benefit = Benefit.getBenefitByCodeOrThrowException(appeal.getBenefitType().getCode());
-
-            DynamicListItem caseManagementCategory = new DynamicListItem(benefit.getShortName(), benefit.getDescription());
-            List<DynamicListItem> listItems = Arrays.asList(caseManagementCategory);
+            WorkAllocationFields workAllocationFields = new WorkAllocationFields();
+            workAllocationFields.setCaseNames(caseName);
+            workAllocationFields.setOgdType("DWP");
+            workAllocationFields.setCategorys(benefit);
 
             return SscsCaseData.builder()
-                    .caseNameHmctsInternal(caseName)
-                    .caseNameHmctsRestricted(caseName)
-                    .caseNamePublic(caseName)
-                    .ogdType("DWP")
-                    .caseAccessCategory(benefit.getDescription())
-                    .caseManagementCategory(new DynamicList(caseManagementCategory, listItems))
+                    .workAllocationFields(workAllocationFields)
                     .caseCreated(LocalDate.now().toString())
                     .isSaveAndReturn(syaCaseWrapper.getIsSaveAndReturn())
                     .appeal(appeal)
