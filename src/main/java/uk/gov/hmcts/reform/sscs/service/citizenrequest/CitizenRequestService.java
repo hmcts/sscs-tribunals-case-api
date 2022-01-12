@@ -109,7 +109,7 @@ public class CitizenRequestService {
     }
 
     private Optional<String> getOtherPartyIdBySubscriptionEmail(SscsCaseData sscsCaseData, String idamEmail) {
-        return sscsCaseData.getOtherParties().stream()
+        return Stream.ofNullable(sscsCaseData.getOtherParties()).flatMap(Collection::stream)
                 .map(CcdValue::getValue)
                 .flatMap(op -> Stream.of((op.hasAppointee()) ? Pair.of(op.getId(), getSubscriptionEmail(op.getOtherPartyAppointeeSubscription())) : null,
                         Pair.of(op.getId(), getSubscriptionEmail(op.getOtherPartySubscription())),
@@ -214,7 +214,7 @@ public class CitizenRequestService {
     }
 
     private Optional<PartyItemList> findOtherPartyUserSubscriptionForUserEmail(SscsCaseData sscsCaseData, String idamEmail) {
-        return sscsCaseData.getOtherParties().stream()
+        return Stream.ofNullable(sscsCaseData.getOtherParties()).flatMap(Collection::stream)
                 .map(CcdValue::getValue)
                 .flatMap(o -> Stream.of(Pair.of(PartyItemList.OTHER_PARTY, getSubscriptionEmail(o.getOtherPartySubscription())),
                                 Pair.of(PartyItemList.OTHER_PARTY, getSubscriptionEmail(o.getOtherPartyAppointeeSubscription())),
