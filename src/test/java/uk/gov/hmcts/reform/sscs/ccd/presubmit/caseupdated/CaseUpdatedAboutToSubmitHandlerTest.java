@@ -442,7 +442,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(2, response.getWarnings().size());
-        assertThat(response.getWarnings(), hasItems("Benefit type code is empty", "DWP issuing office is empty"));
+        assertThat(response.getWarnings(), hasItems("Benefit type code is empty", "FTA issuing office is empty"));
     }
 
     @Test
