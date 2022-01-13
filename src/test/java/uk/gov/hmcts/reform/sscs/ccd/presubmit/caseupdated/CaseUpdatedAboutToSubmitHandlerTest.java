@@ -457,7 +457,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                         + "bereavementBenefit, industrialInjuriesDisablement, maternityAllowance, socialFund, incomeSupport, bereavementSupportPaymentScheme, "
                         + "industrialDeathBenefit, pensionCredit, retirementPension, childSupport, taxCredit, guardiansAllowance, taxFreeChildcare, "
                         + "homeResponsibilitiesProtection, childBenefit, thirtyHoursFreeChildcare, guaranteedMinimumPension, nationalInsuranceCredits",
-                "DWP issuing office is empty"));
+                "FTA issuing office is empty"));
     }
 
     @Test
