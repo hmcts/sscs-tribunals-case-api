@@ -47,7 +47,7 @@ public class EvidenceUploadControllerTest {
     @Test
     public void canUploadEvidence() {
         MultipartFile file = mock(MultipartFile.class);
-        when(evidenceUploadService.uploadDraftHearingEvidence(someOnlineHearingId, file)).thenReturn(of(evidence));
+        when(evidenceUploadService.uploadDraftEvidence(someOnlineHearingId, file)).thenReturn(of(evidence));
 
         ResponseEntity<Evidence> evidenceResponseEntity = evidenceUploadController.uploadEvidence(someOnlineHearingId, file);
 
@@ -57,7 +57,7 @@ public class EvidenceUploadControllerTest {
     @Test
     public void cannotUploadEvidenceWhenOnlineHearingDoesNotExist() {
         MultipartFile file = mock(MultipartFile.class);
-        when(evidenceUploadService.uploadDraftHearingEvidence(someOnlineHearingId, file)).thenReturn(empty());
+        when(evidenceUploadService.uploadDraftEvidence(someOnlineHearingId, file)).thenReturn(empty());
 
         ResponseEntity<Evidence> evidenceResponseEntity = evidenceUploadController.uploadEvidence(someOnlineHearingId, file);
 
@@ -67,7 +67,7 @@ public class EvidenceUploadControllerTest {
     @Test
     public void cannotUploadDocumentsThatDocumentStoreDoesNotSupport() {
         MultipartFile file = mock(MultipartFile.class);
-        when(evidenceUploadService.uploadDraftHearingEvidence(someOnlineHearingId, file)).thenThrow(new IllegalFileTypeException("someFile.bad"));
+        when(evidenceUploadService.uploadDraftEvidence(someOnlineHearingId, file)).thenThrow(new IllegalFileTypeException("someFile.bad"));
 
         ResponseEntity<Evidence> evidenceResponseEntity = evidenceUploadController.uploadEvidence(someOnlineHearingId, file);
 
@@ -138,7 +138,7 @@ public class EvidenceUploadControllerTest {
 
     @Test
     public void canDeleteEvidence() {
-        when(evidenceUploadService.deleteDraftHearingEvidence(someOnlineHearingId, someEvidenceId)).thenReturn(true);
+        when(evidenceUploadService.deleteDraftEvidence(someOnlineHearingId, someEvidenceId)).thenReturn(true);
 
         ResponseEntity evidenceResponseEntity = evidenceUploadController
                 .deleteEvidence(someOnlineHearingId, someEvidenceId);
@@ -148,7 +148,7 @@ public class EvidenceUploadControllerTest {
 
     @Test
     public void cannotDeleteEvidenceWhenOnlineHearingDoesNotExist() {
-        when(evidenceUploadService.deleteDraftHearingEvidence(someOnlineHearingId, someEvidenceId)).thenReturn(false);
+        when(evidenceUploadService.deleteDraftEvidence(someOnlineHearingId, someEvidenceId)).thenReturn(false);
 
         ResponseEntity evidenceResponseEntity = evidenceUploadController
                 .deleteEvidence(someOnlineHearingId, someEvidenceId);

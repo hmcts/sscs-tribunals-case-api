@@ -58,7 +58,7 @@ public class EvidenceUploadController {
             @ApiParam(value = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx") @PathVariable("identifier") String identifier,
             @RequestParam("file") MultipartFile file
     ) {
-        return uploadEvidence(() -> evidenceUploadService.uploadDraftHearingEvidence(identifier, file));
+        return uploadEvidence(() -> evidenceUploadService.uploadDraftEvidence(identifier, file));
     }
 
     private ResponseEntity<Evidence> uploadEvidence(Supplier<Optional<Evidence>> uploadEvidence) {
@@ -106,7 +106,7 @@ public class EvidenceUploadController {
             @PathVariable("identifier") String identifier,
             @PathVariable("evidenceId") String evidenceId
     ) {
-        boolean hearingFound = evidenceUploadService.deleteDraftHearingEvidence(identifier, evidenceId);
+        boolean hearingFound = evidenceUploadService.deleteDraftEvidence(identifier, evidenceId);
         return hearingFound ? ResponseEntity.noContent().build() : notFound().build();
     }
 

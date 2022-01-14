@@ -9,7 +9,7 @@ import static org.mockito.AdditionalMatchers.and;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ATTACH_SCANNED_DOCS;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT;
 
 import java.io.File;
 import java.io.IOException;
@@ -133,7 +133,7 @@ public class EvidenceUploadServiceTest {
         when(file.getOriginalFilename()).thenReturn(fileName);
         when(file.getBytes()).thenReturn(fileName.getBytes());
 
-        Optional<Evidence> evidenceOptional = evidenceUploadService.uploadDraftHearingEvidence(someOnlineHearingId, file);
+        Optional<Evidence> evidenceOptional = evidenceUploadService.uploadDraftEvidence(someOnlineHearingId, file);
 
         assertThat(evidenceOptional.isPresent(), is(true));
         Evidence evidence = evidenceOptional.get();
@@ -144,7 +144,7 @@ public class EvidenceUploadServiceTest {
                 eq(someCcdCaseId),
                 eq("uploadDraftDocument"),
                 eq("SSCS - upload document from MYA"),
-                eq("Updated SSCS"),
+                eq("Uploaded a further evidence document"),
                 eq(idamTokens)
         );
     }
@@ -156,7 +156,7 @@ public class EvidenceUploadServiceTest {
 
         when(file.getOriginalFilename()).thenReturn(fileName);
         when(file.getBytes()).thenReturn(fileName.getBytes());
-        Optional<Evidence> evidenceOptional = evidenceUploadService.uploadDraftHearingEvidence(someOnlineHearingId, file);
+        Optional<Evidence> evidenceOptional = evidenceUploadService.uploadDraftEvidence(someOnlineHearingId, file);
 
         assertThat(evidenceOptional.isPresent(), is(true));
         Evidence evidence = evidenceOptional.get();
@@ -166,7 +166,7 @@ public class EvidenceUploadServiceTest {
                 eq(someCcdCaseId),
                 eq("uploadDraftDocument"),
                 eq("SSCS - upload document from MYA"),
-                eq("Updated SSCS"),
+                eq("Uploaded a further evidence document"),
                 eq(idamTokens)
         );
     }
@@ -176,7 +176,7 @@ public class EvidenceUploadServiceTest {
         String nonExistentHearingId = "nonExistentHearingId";
         when(onlineHearingService.getCcdCase(nonExistentHearingId)).thenReturn(Optional.empty());
 
-        Optional<Evidence> evidence = evidenceUploadService.uploadDraftHearingEvidence(nonExistentHearingId, file);
+        Optional<Evidence> evidence = evidenceUploadService.uploadDraftEvidence(nonExistentHearingId, file);
 
         assertThat(evidence.isPresent(), is(false));
     }
@@ -217,7 +217,7 @@ public class EvidenceUploadServiceTest {
                 and(hasSscsScannedDocumentAndSscsDocuments(expectedEvidenceUploadFilename),
                         doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo()),
                 eq(someCcdCaseId),
-                eq(ATTACH_SCANNED_DOCS.getCcdType()),
+                eq(UPLOAD_DOCUMENT.getCcdType()),
                 eq("SSCS - upload evidence from MYA"),
                 eq("Uploaded a further evidence document"),
                 eq(idamTokens)
@@ -274,7 +274,7 @@ public class EvidenceUploadServiceTest {
                         argThat(argument ->  argument.getInterlocReferralReason().equals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE.getId()))),
                         argThat(argument ->  argument.getHasUnprocessedAudioVideoEvidence().equals(YesNo.YES))),
                 eq(someCcdCaseId),
-                eq(ATTACH_SCANNED_DOCS.getCcdType()),
+                eq(UPLOAD_DOCUMENT.getCcdType()),
                 eq("SSCS - upload evidence from MYA"),
                 eq("Uploaded a further evidence document"),
                 eq(idamTokens)
@@ -286,7 +286,7 @@ public class EvidenceUploadServiceTest {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
-        boolean hearingFound = evidenceUploadService.deleteDraftHearingEvidence(someOnlineHearingId, someEvidenceId);
+        boolean hearingFound = evidenceUploadService.deleteDraftEvidence(someOnlineHearingId, someEvidenceId);
 
         assertThat(hearingFound, is(true));
         verify(ccdService).updateCase(
@@ -294,7 +294,7 @@ public class EvidenceUploadServiceTest {
                 eq(someCcdCaseId),
                 eq("uploadDraftDocument"),
                 eq("SSCS - evidence deleted"),
-                eq("Updated SSCS"),
+                eq("Uploaded a draft evidence deleted"),
                 eq(idamTokens)
         );
     }
@@ -304,7 +304,7 @@ public class EvidenceUploadServiceTest {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
-        boolean hearingFound = evidenceUploadService.deleteDraftHearingEvidence(someOnlineHearingId, someEvidenceId);
+        boolean hearingFound = evidenceUploadService.deleteDraftEvidence(someOnlineHearingId, someEvidenceId);
 
         assertThat(hearingFound, is(true));
         verify(ccdService, never()).updateCase(any(), any(), any(), any(), any(), any());
@@ -315,7 +315,7 @@ public class EvidenceUploadServiceTest {
         String nonExistentHearingId = "nonExistentHearingId";
         when(onlineHearingService.getCcdCase(nonExistentHearingId)).thenReturn(Optional.empty());
 
-        boolean hearingFound = evidenceUploadService.deleteDraftHearingEvidence(nonExistentHearingId, someEvidenceId);
+        boolean hearingFound = evidenceUploadService.deleteDraftEvidence(nonExistentHearingId, someEvidenceId);
 
         assertThat(hearingFound, is(false));
     }
@@ -427,7 +427,7 @@ public class EvidenceUploadServiceTest {
 
         when(file.getOriginalFilename()).thenReturn(fileName);
         when(file.getBytes()).thenThrow(new IOException());
-        Optional<Evidence> evidenceOptional = evidenceUploadService.uploadDraftHearingEvidence(someOnlineHearingId, file);
+        Optional<Evidence> evidenceOptional = evidenceUploadService.uploadDraftEvidence(someOnlineHearingId, file);
 
         assertThat(evidenceOptional.isPresent(), is(true));
         Evidence evidence = evidenceOptional.get();

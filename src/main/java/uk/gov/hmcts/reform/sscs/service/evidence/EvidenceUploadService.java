@@ -64,7 +64,6 @@ public class EvidenceUploadService {
     private final EvidenceManagementService evidenceManagementService;
     private final PdfStoreService pdfStoreService;
 
-    private static final String UPDATED_SSCS = "Updated SSCS";
     public static final String DM_STORE_USER_ID = "sscs";
 
     private static final DraftHearingDocumentExtractor draftHearingDocumentExtractor = new DraftHearingDocumentExtractor();
@@ -86,7 +85,7 @@ public class EvidenceUploadService {
         this.pdfStoreService = pdfStoreService;
     }
 
-    public Optional<Evidence> uploadDraftHearingEvidence(String identifier, MultipartFile file) {
+    public Optional<Evidence> uploadDraftEvidence(String identifier, MultipartFile file) {
         return uploadEvidence(identifier, file, draftHearingDocumentExtractor,
                 document -> new SscsDocument(createNewDocumentDetails(document)), UPLOAD_DRAFT_DOCUMENT,
                 "SSCS - upload document from MYA");
@@ -174,7 +173,7 @@ public class EvidenceUploadService {
 
                     documentExtract.setDocuments().accept(caseDetails.getData(), newDocuments);
 
-                    ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), eventType.getCcdType(), summary, UPDATED_SSCS, idamService.getIdamTokens());
+                    ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), eventType.getCcdType(), summary, "Uploaded a further evidence document", idamService.getIdamTokens());
                     String md5Checksum = "";
                     String filename = "";
 
@@ -211,7 +210,7 @@ public class EvidenceUploadService {
                 .orElse(false);
     }
 
-    public boolean deleteDraftHearingEvidence(String identifier, String evidenceId) {
+    public boolean deleteDraftEvidence(String identifier, String evidenceId) {
         return deleteEvidence(identifier, evidenceId, draftHearingDocumentExtractor);
     }
 
@@ -226,7 +225,7 @@ public class EvidenceUploadService {
                                 .collect(toList());
                         documentExtract.setDocuments().accept(caseDetails.getData(), newDocuments);
 
-                        ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), UPLOAD_DRAFT_DOCUMENT.getCcdType(), "SSCS - evidence deleted", UPDATED_SSCS, idamService.getIdamTokens());
+                        ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), UPLOAD_DRAFT_DOCUMENT.getCcdType(), "SSCS - evidence deleted", "Uploaded a draft evidence deleted", idamService.getIdamTokens());
 
                         documentManagementService.delete(evidenceId);
                     }
@@ -244,7 +243,7 @@ public class EvidenceUploadService {
 
         sscsCaseData.setDraftSscsDocument(Collections.emptyList());
         sscsCaseData.setEvidenceHandled("No");
-        ccdService.updateCase(sscsCaseData, ccdCaseId, ATTACH_SCANNED_DOCS.getCcdType(),
+        ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_DOCUMENT.getCcdType(),
                 "SSCS - upload evidence from MYA",
                 "Uploaded a further evidence document", idamService.getIdamTokens());
     }
