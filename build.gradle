@@ -214,7 +214,7 @@ def versions = [
         pact: '4.1.7',
         junitJupiter: '5.7.2',
         lombok: '1.18.22',
-        sscsCommon: '4.6.20'
+        sscsCommon: '4.6.25'
 ]
 
 ext["rest-assured.version"] = '4.2.0'
@@ -227,8 +227,9 @@ ext {
 dependencyManagement {
     dependencies {
         dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
-        dependency group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.15.0'
-        dependency group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.15.0'
+        dependency group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.16.0'
+        dependency group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.16.0'
+
         // resolves: CVE-2020-28052
         dependency group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.69'
         //CVE-2021-40690
@@ -400,7 +401,7 @@ dependencies {
     testRuntime "org.junit.jupiter:junit-jupiter-engine:$versions.junitJupiter"
     testImplementation "org.junit.jupiter:junit-jupiter-api:$versions.junitJupiter"
 
-    e2eRuntime "org.junit.platform:junit-platform-commons:1.8.1"
+    e2eRuntime "org.junit.platform:junit-platform-commons:1.8.2"
 
     compile group: 'org.pitest', name: 'pitest', version: versions.pitest
     compile group:'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest

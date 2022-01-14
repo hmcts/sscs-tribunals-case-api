@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.model.RequestStatus.*;
 import static uk.gov.hmcts.reform.sscs.model.RequestStatus.REQUESTED;
-import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getAllOtherPartiesOnCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,24 +84,23 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
         List<OtherPartyHearingRecordingReqUi> otherPartyHearingRecordingReqUi = new ArrayList<>();
         for (CcdValue<OtherParty> otherParty : sscsCaseData.getOtherParties()) {
 
-            otherPartyHearingRecordingReqUi.add(buildOtherPartyElement(sscsCaseData, hearing, otherParty.getValue().getId(), otherParty.getValue().getName(), ""));
+            otherPartyHearingRecordingReqUi.add(buildOtherPartyElement(sscsCaseData, hearing, otherParty.getValue().getId(), otherParty.getValue().getName(), PartyItemList.OTHER_PARTY));
 
-            if ("Yes".equals(otherParty.getValue().getIsAppointee()) && null != otherParty.getValue().getAppointee()) {
-                otherPartyHearingRecordingReqUi.add(buildOtherPartyElement(sscsCaseData, hearing, otherParty.getValue().getAppointee().getId(), otherParty.getValue().getAppointee().getName(), " - Appointee"));
-            }
             if (null != otherParty.getValue().getRep() && "Yes".equals(otherParty.getValue().getRep().getHasRepresentative())) {
-                otherPartyHearingRecordingReqUi.add(buildOtherPartyElement(sscsCaseData, hearing, otherParty.getValue().getRep().getId(), otherParty.getValue().getRep().getName(), " - Representative"));
+                otherPartyHearingRecordingReqUi.add(buildOtherPartyElement(sscsCaseData, hearing, otherParty.getValue().getRep().getId(), otherParty.getValue().getRep().getName(), PartyItemList.OTHER_PARTY_REPRESENTATIVE));
             }
         }
         return otherPartyHearingRecordingReqUi;
     }
 
-    private OtherPartyHearingRecordingReqUi buildOtherPartyElement(SscsCaseData sscsCaseData, Hearing hearing, String otherPartyId, Name name, String otherPartyType) {
-        DynamicList otherPartyList = toDynamicListForOtherParty(otherPartyId, hearing, sscsCaseData);
+    private OtherPartyHearingRecordingReqUi buildOtherPartyElement(SscsCaseData sscsCaseData, Hearing hearing, String otherPartyId, Name name, PartyItemList otherPartyItem) {
+        DynamicList otherPartyList = toDynamicList(otherPartyItem, otherPartyId, hearing, sscsCaseData);
 
         return OtherPartyHearingRecordingReqUi.builder()
                 .value(OtherPartyHearingRecordingReqUiDetails.builder()
-                        .otherPartyName(name.getFullNameNoTitle() + otherPartyType)
+                        .otherPartyName(name.getFullNameNoTitle() + (PartyItemList.OTHER_PARTY_REPRESENTATIVE.equals(otherPartyItem) ? " - Representative" : ""))
+                        .otherPartyId(otherPartyId)
+                        .requestingParty(otherPartyItem.getCode())
                         .hearingRecordingStatus(otherPartyList).build()).build();
     }
 
@@ -111,7 +109,7 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
         DynamicList jointParty = toDynamicList(PartyItemList.JOINT_PARTY, h, sscsCaseData);
         DynamicList appellant = toDynamicList(PartyItemList.APPELLANT, h, sscsCaseData);
         DynamicList rep = toDynamicList(PartyItemList.REPRESENTATIVE, h, sscsCaseData);
-        ProcessHearingRecordingRequest value = new ProcessHearingRecordingRequest(h.getValue().getHearingId(),
+        return new ProcessHearingRecordingRequest(h.getValue().getHearingId(),
                 selectHearingTitle(h, sscsCaseData.getHearings()),
                 actionHearingRecordingRequestService.getFormattedHearingInformation(h),
                 getRecordings(h, sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings()),
@@ -120,11 +118,14 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
                 appellant,
                 rep
         );
-        return value;
     }
 
     private DynamicList toDynamicList(PartyItemList party, Hearing h, SscsCaseData sscsCaseData) {
-        final Optional<RequestStatus> partyStatus = actionHearingRecordingRequestService.getRequestStatus(party, h, sscsCaseData);
+        return toDynamicList(party, null, h, sscsCaseData);
+    }
+
+    private DynamicList toDynamicList(PartyItemList party, String otherPartyId, Hearing h, SscsCaseData sscsCaseData) {
+        final Optional<RequestStatus> partyStatus = actionHearingRecordingRequestService.getRequestStatus(party, otherPartyId, h, sscsCaseData);
         final DynamicListItem selected = partyStatus
                 .map(this::toDynamicListItem)
                 .orElse(new DynamicListItem("", ""));
@@ -136,41 +137,6 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
 
         return new DynamicList(selected, others);
 
-    }
-
-    private DynamicList toDynamicListForOtherParty(String otherPartyId, Hearing h, SscsCaseData sscsCaseData) {
-        List<OtherPartyHearingRecordingReq> existingRequests = new ArrayList<>();
-        if (sscsCaseData.getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReq() != null) {
-            existingRequests = sscsCaseData.getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReq().stream()
-                .filter(e -> null != e.getValue().getHearingRecordingRequest().getStatus())
-                .filter(e -> otherPartyId != null && otherPartyId.equals(e.getValue().getOtherPartyId()))
-                .filter(e -> e.getValue().getHearingRecordingRequest().getSscsHearingRecording() != null
-                        && h.getValue().getHearingId() != null
-                        && h.getValue().getHearingId().equals(e.getValue().getHearingRecordingRequest().getSscsHearingRecording().getHearingId()))
-                .collect(Collectors.toList());
-        }
-
-        DynamicListItem selected;
-        List<RequestStatus> selectableItems = new ArrayList<>();
-        selectableItems.add(GRANTED);
-        selectableItems.add(REFUSED);
-
-        if (!existingRequests.isEmpty()) {
-            String requestStatus = existingRequests.get(0).getValue().getHearingRecordingRequest().getStatus();
-            selected = new DynamicListItem(requestStatus, requestStatus);
-
-            if (requestStatus.equals(REQUESTED.getLabel())) {
-                selectableItems.add(REQUESTED);
-            }
-        } else {
-            selected = new DynamicListItem("", "");
-        }
-
-        List<DynamicListItem> others = selectableItems.stream()
-                .map(this::toDynamicListItem)
-                .collect(Collectors.toList());
-
-        return new DynamicList(selected, others);
     }
 
     private boolean isPartyStatusRequestedOrOtherOptions(Optional<RequestStatus> partyStatus, RequestStatus status) {
@@ -212,14 +178,23 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
             validateParty(PartyItemList.REPRESENTATIVE, processHearingRecordingRequest, response);
         }
         if (response.getData().getOtherParties() != null && response.getData().getOtherParties().size() > 0) {
-            validateOtherPartyUiData(response);
+            validateOtherPartyUiData(processHearingRecordingRequest, response.getData().getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReqUi(), response);
         }
     }
 
-    private void validateOtherPartyUiData(PreSubmitCallbackResponse<SscsCaseData> response) {
-        List<String> otherParties = getAllOtherPartiesOnCase(response.getData());
+    private void validateOtherPartyUiData(ProcessHearingRecordingRequest processHearingRecordingRequest, List<OtherPartyHearingRecordingReqUi> otherPartyHearingRecordingReqUi, PreSubmitCallbackResponse<SscsCaseData> response) {
+        int numberOfParties = 0;
+        for (CcdValue<OtherParty> otherParty : response.getData().getOtherParties()) {
+            validateParty(PartyItemList.OTHER_PARTY, processHearingRecordingRequest, otherParty.getValue().getId(), otherPartyHearingRecordingReqUi, response);
+            numberOfParties++;
 
-        if (otherParties.size() != response.getData().getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReqUi().size()) {
+            if (null != otherParty.getValue().getRep() && "Yes".equals(otherParty.getValue().getRep().getHasRepresentative())) {
+                validateParty(PartyItemList.OTHER_PARTY_REPRESENTATIVE, processHearingRecordingRequest, otherParty.getValue().getRep().getId(), otherPartyHearingRecordingReqUi, response);
+                numberOfParties++;
+            }
+        }
+
+        if (numberOfParties != response.getData().getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReqUi().size()) {
             addWarningOtherPartyUiError(response);
         }
     }
@@ -229,13 +204,17 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
     }
 
     private void validateParty(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response) {
-        Optional<Hearing> hearingOptional = getHearingFromHearingRecordingRequest(processHearingRecordingRequest, response);
-        hearingOptional.ifPresent(hearing -> validateHearing(party, processHearingRecordingRequest, response, hearing));
+        validateParty(party, processHearingRecordingRequest, null, null,  response);
     }
 
-    private void validateHearing(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response, Hearing hearing) {
-        final Optional<RequestStatus> requestStatus = actionHearingRecordingRequestService.getRequestStatus(party, hearing, response.getData());
-        final Optional<RequestStatus> changedRequestStatus = actionHearingRecordingRequestService.getChangedRequestStatus(party, processHearingRecordingRequest);
+    private void validateParty(PartyItemList party, ProcessHearingRecordingRequest processHearingRecordingRequest, String otherPartyId, List<OtherPartyHearingRecordingReqUi> otherPartyHearingRecordingReqUi, PreSubmitCallbackResponse<SscsCaseData> response) {
+        Optional<Hearing> hearingOptional = getHearingFromHearingRecordingRequest(processHearingRecordingRequest, response);
+        hearingOptional.ifPresent(hearing -> validateHearing(party, otherPartyId, processHearingRecordingRequest, otherPartyHearingRecordingReqUi, response, hearing));
+    }
+
+    private void validateHearing(PartyItemList party, String otherPartyId, ProcessHearingRecordingRequest processHearingRecordingRequest, List<OtherPartyHearingRecordingReqUi> otherPartyHearingRecordingReqUi, PreSubmitCallbackResponse<SscsCaseData> response, Hearing hearing) {
+        final Optional<RequestStatus> requestStatus = actionHearingRecordingRequestService.getRequestStatus(party, otherPartyId, hearing, response.getData());
+        final Optional<RequestStatus> changedRequestStatus = actionHearingRecordingRequestService.getChangedRequestStatus(party, otherPartyId, processHearingRecordingRequest, otherPartyHearingRecordingReqUi);
         if (requestStatus.isPresent() && changedRequestStatus.isPresent()) {
             validateIfRequestStatusChangedFromGrantedToRefused(requestStatus.get(), changedRequestStatus.get(), response);
             validateIfRequestStatusChangedFromRefusedToGranted(requestStatus.get(), changedRequestStatus.get(), response);
