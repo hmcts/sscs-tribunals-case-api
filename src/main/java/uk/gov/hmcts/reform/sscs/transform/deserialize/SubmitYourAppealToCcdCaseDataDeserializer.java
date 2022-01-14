@@ -72,7 +72,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             WorkAllocationFields workAllocationFields = new WorkAllocationFields();
             workAllocationFields.setCaseNames(caseName);
             workAllocationFields.setOgdType("DWP");
-            workAllocationFields.setCategorys(benefit);
+            workAllocationFields.setCategories(benefit);
 
             return SscsCaseData.builder()
                     .workAllocationFields(workAllocationFields)
