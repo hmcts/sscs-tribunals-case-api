@@ -97,7 +97,7 @@ withPipeline(type, product, component) {
     syncBranchesWithMaster(branchesToSync)
 
     before('akschartsinstall'){
-        def sscsCommonVersion = sh(script: './gradlew -q getSscsCommonVersion', returnStdout: true).trim()
+        def sscsCommonVersion = sh(script: './gradlew -q getSscsCommonVersion --info', returnStdout: true).trim()
         def languages = sh(script: "curl https://raw.githubusercontent.com/hmcts/sscs-common/${sscsCommonVersion}/src/main/resources/reference-data/languages.txt", returnStdout: true)
         env.CCD_DEF_LANGUAGES = "'${languages}'"
         def pipQues = sh(script: "curl https://raw.githubusercontent.com/hmcts/sscs-common/${sscsCommonVersion}/src/main/resources/reference-data/pip-decision-notice-questions.txt", returnStdout: true)
