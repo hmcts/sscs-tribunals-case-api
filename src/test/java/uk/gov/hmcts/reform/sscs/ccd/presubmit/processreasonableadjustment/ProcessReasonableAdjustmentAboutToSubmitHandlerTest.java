@@ -145,6 +145,22 @@ public class ProcessReasonableAdjustmentAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenAProcessReasonableAdjustmentEventWithOtherPartyDocsStillRequired_thenDoNotClearReasonableAdjustmentsOutstandingFlag() {
+        List<Correspondence> correspondenceList = new ArrayList<>();
+        correspondenceList.add(Correspondence.builder().value(CorrespondenceDetails.builder().reasonableAdjustmentStatus(ReasonableAdjustmentStatus.ACTIONED).build()).build());
+        correspondenceList.add(Correspondence.builder().value(CorrespondenceDetails.builder().reasonableAdjustmentStatus(ReasonableAdjustmentStatus.REQUIRED).build()).build());
+
+        sscsCaseData.setReasonableAdjustmentsOutstanding(YesNo.YES);
+        ReasonableAdjustmentsLetters reasonableAdjustmentsLetters =
+                ReasonableAdjustmentsLetters.builder().otherParty(correspondenceList).build();
+        sscsCaseData.setReasonableAdjustmentsLetters(reasonableAdjustmentsLetters);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().isEmpty());
+        assertEquals(YesNo.YES, response.getData().getReasonableAdjustmentsOutstanding());
+    }
+
+    @Test
     public void givenAProcessReasonableAdjustmentEventWithSomeDocsStillRequired_thenDoNotClearReasonableAdjustmentsOutstandingFlag() {
         List<Correspondence> correspondenceList = new ArrayList<>();
         correspondenceList.add(Correspondence.builder().value(CorrespondenceDetails.builder().reasonableAdjustmentStatus(ReasonableAdjustmentStatus.ACTIONED).build()).build());
@@ -158,6 +174,7 @@ public class ProcessReasonableAdjustmentAboutToSubmitHandlerTest {
 
         assertEquals(YesNo.YES, response.getData().getReasonableAdjustmentsOutstanding());
     }
+
 
     @Test
     public void givenAProcessReasonableAdjustmentEventWithSomeDocsWithNullStatus_thenDoNotClearReasonableAdjustmentsOutstandingFlag() {
