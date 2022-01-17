@@ -39,7 +39,7 @@ public class ReviewPhmeAboutToSubmitHandler implements PreSubmitCallbackHandler<
 
         caseData.setInterlocReviewState(InterlocReviewState.NONE.getId());
         caseData.setInterlocReferralReason(InterlocReferralReason.NONE.getId());
-        caseData.setDwpState(caseData.getPhmeGranted().toBoolean() ? PHME_GRANTED.getId() : PHME_REFUSED.getId());
+        caseData.setDwpState(caseData.getPhmeGranted().toBoolean() ? PHE_GRANTED.getId() : PHE_REFUSED.getId());
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 

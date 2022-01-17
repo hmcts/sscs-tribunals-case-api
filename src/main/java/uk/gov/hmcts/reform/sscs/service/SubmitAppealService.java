@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.sscs.exception.DuplicateCaseException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
@@ -49,6 +50,7 @@ public class SubmitAppealService {
     private final IdamService idamService;
     private final ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
     private final AirLookupService airLookupService;
+    private final RefDataService refDataService;
     private final EvidenceManagementSecureDocStoreService secureDocStoreService;
     private final boolean workAllocationFeature;
 
@@ -61,6 +63,7 @@ public class SubmitAppealService {
                         ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
                         AirLookupService airLookupService,
                         EvidenceManagementSecureDocStoreService secureDocStoreService,
+                        RefDataService refDataService,
                         @Value("${feature.work-allocation.enabled}")  boolean workAllocationFeature) {
 
         this.ccdService = ccdService;
@@ -70,6 +73,7 @@ public class SubmitAppealService {
         this.convertAIntoBService = convertAIntoBService;
         this.airLookupService = airLookupService;
         this.secureDocStoreService = secureDocStoreService;
+        this.refDataService = refDataService;
         this.workAllocationFeature = workAllocationFeature;
     }
 
@@ -122,7 +126,7 @@ public class SubmitAppealService {
 
         try {
             SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal, workAllocationFeature);
-            
+
             CaseDetails caseDetails = citizenCcdService.updateCase(sscsCaseData, EventType.UPDATE_DRAFT.getCcdType(), "Update draft",
                     "Update draft in CCD", idamTokens, appeal.getCcdCaseId());
 
@@ -255,7 +259,17 @@ public class SubmitAppealService {
         }
 
         sscsCaseData.setCreatedInGapsFrom(READY_TO_LIST.getId());
-        sscsCaseData.setProcessingVenue(airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType()));
+        String processingVenue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
+        sscsCaseData.setProcessingVenue(processingVenue);
+
+        if (workAllocationFeature && !StringUtils.isEmpty(processingVenue)) {
+            CourtVenue courtVenue = refDataService.getVenueRefData(processingVenue);
+            if (courtVenue != null) {
+                sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
+                        .baseLocation(courtVenue.getEpimsId())
+                        .region(courtVenue.getRegionId()).build());
+            }
+        }
 
         log.info("{} - setting venue name to {}", sscsCaseData.getAppeal().getAppellant().getIdentity().getNino(), sscsCaseData.getProcessingVenue());
 
