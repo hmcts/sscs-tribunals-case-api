@@ -119,7 +119,7 @@ public class EvidenceUploadService {
                     String sha512HashChecksum = "";
                     String filename = "";
                     try {
-                        sha512HashChecksum = MessageDigest.getInstance("SHA-512").digest(file.getBytes()).toString().toUpperCase();
+                        sha512HashChecksum = Arrays.toString(MessageDigest.getInstance("SHA-512").digest(file.getBytes())).toUpperCase();
                         filename = file.getOriginalFilename();
                         log.info("uploadEvidence: for case ID Case({}): User has uploaded the file ({}) with a checksum of ({})", caseDetails.getId(), filename, sha512HashChecksum);
                     } catch (IOException | NoSuchAlgorithmException e) {
@@ -178,7 +178,7 @@ public class EvidenceUploadService {
                     String filename = "";
 
                     try {
-                        sha512HashChecksum = MessageDigest.getInstance("SHA-512").digest(file.getBytes()).toString().toUpperCase();
+                        sha512HashChecksum = Arrays.toString(MessageDigest.getInstance("SHA-512").digest(file.getBytes())).toUpperCase();
                         filename = file.getOriginalFilename();
                         log.info("uploadEvidence: for case ID Case({}): User has uploaded the file ({}) with a checksum of ({})", caseDetails.getId(), filename, sha512HashChecksum);
                     } catch (IOException | NoSuchAlgorithmException e) {
