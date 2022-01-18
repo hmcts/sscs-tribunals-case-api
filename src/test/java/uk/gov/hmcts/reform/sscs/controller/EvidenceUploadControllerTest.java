@@ -85,11 +85,33 @@ public class EvidenceUploadControllerTest {
     }
 
     @Test
+    public void submitSingleAudioVideoEvidence() {
+        MultipartFile file = mock(MultipartFile.class);
+        EvidenceDescription description = new EvidenceDescription("some description", "idamEmail");
+        when(evidenceUploadService.submitSingleHearingEvidence(someOnlineHearingId, description, file)).thenReturn(true);
+
+        ResponseEntity responseEntity = evidenceUploadController.submitSingleEvidence(someOnlineHearingId, file, "some description", "idamEmail");
+
+        assertThat(responseEntity.getStatusCode(), is(NO_CONTENT));
+    }
+
+    @Test
     public void submitEvidenceWhenHearingDoesNotExist() {
         EvidenceDescription description = new EvidenceDescription("some description", "idamEmail");
         when(evidenceUploadService.submitHearingEvidence(someOnlineHearingId, description)).thenReturn(false);
 
         ResponseEntity responseEntity = evidenceUploadController.submitEvidence(someOnlineHearingId, description);
+
+        assertThat(responseEntity.getStatusCode(), is(NOT_FOUND));
+    }
+
+    @Test
+    public void submitSingleAudioVideoEvidenceWhenHearingDoesNotExist() {
+        MultipartFile file = mock(MultipartFile.class);
+        EvidenceDescription description = new EvidenceDescription("some description", "idamEmail");
+        when(evidenceUploadService.submitSingleHearingEvidence(someOnlineHearingId, description, file)).thenReturn(false);
+
+        ResponseEntity responseEntity = evidenceUploadController.submitSingleEvidence(someOnlineHearingId, file, "some description", "idamEmail");
 
         assertThat(responseEntity.getStatusCode(), is(NOT_FOUND));
     }

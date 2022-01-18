@@ -508,6 +508,7 @@ public class EvidenceUploadServiceTest {
         return Files.readAllBytes(Paths.get(file.getPath()));
     }
 
+    @SuppressWarnings("unused")
     private Object[] evidenceUploadByAppellantScenario() {
         initCommonParams("someFileName.txt");
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName,
@@ -545,6 +546,7 @@ public class EvidenceUploadServiceTest {
                 .build();
     }
 
+    @SuppressWarnings("unused")
     private Object[] evidenceUploadByRepScenario() {
         initCommonParams("someFileName.txt");
         SscsCaseDetails sscsCaseDetailsWithRepSubs = createSscsCaseDetails(someQuestionId, fileName,
@@ -565,6 +567,7 @@ public class EvidenceUploadServiceTest {
         };
     }
 
+    @SuppressWarnings("unused")
     private Object[] evidenceUploadByJointPartyScenario() {
         initCommonParams("someFileName.txt");
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName,
@@ -584,6 +587,7 @@ public class EvidenceUploadServiceTest {
         return new Object[]{new Object[]{sscsCaseDetails, someDescription, "Joint party upload 1 - 123.pdf"}};
     }
 
+    @SuppressWarnings("unused")
     private Object[] evidenceUploadByAppellantWithOtherSubscribersPresenceScenario() {
         initCommonParams("someFileName.txt");
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName,
