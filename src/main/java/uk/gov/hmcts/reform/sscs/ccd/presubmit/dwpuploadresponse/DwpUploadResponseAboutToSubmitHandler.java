@@ -40,6 +40,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     public static final int NEW_OTHER_PARTY_RESPONSE_DUE_DAYS = 14;
     private final DwpDocumentService dwpDocumentService;
     private final AddNoteService addNoteService;
+    public static final String APPENDIX_12_DOC_NOT_FOR_SSCS5_CONFIDENTIALITY = "You cannot upload an Appendix 12 document when submitting Confidentiality documents";
 
     @Autowired
     public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService, AddNoteService addNoteService) {
@@ -172,8 +173,30 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         validateDwpResponseDocuments(sscsCaseData, preSubmitCallbackResponse);
 
         validateDwpAudioVideoEvidence(sscsCaseData, preSubmitCallbackResponse);
+
+        validateSscs5CaseConfidentialityNoAppendix12Doc(sscsCaseData, preSubmitCallbackResponse);
+
         return preSubmitCallbackResponse;
     }
+
+
+    private void validateSscs5CaseConfidentialityNoAppendix12Doc(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (Benefit.TAX_CREDIT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())
+                || Benefit.GUARDIANS_ALLOWANCE.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())
+                || Benefit.TAX_FREE_CHILDCARE.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())
+                || Benefit.HOME_RESPONSIBILITIES_PROTECTION.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())
+                || Benefit.CHILD_BENEFIT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())
+                || Benefit.THIRTY_HOURS_FREE_CHILDCARE.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())
+                || Benefit.GUARANTEED_MINIMUM_PENSION.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())
+                || Benefit.NATIONAL_INSURANCE_CREDITS.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())) {
+            if (StringUtils.equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "childSupportConfidentiality")) {
+                if (sscsCaseData.getAppendix12Doc() != null && sscsCaseData.getAppendix12Doc().getDocumentLink() != null) {
+                    preSubmitCallbackResponse.addError(APPENDIX_12_DOC_NOT_FOR_SSCS5_CONFIDENTIALITY);
+                }
+            }
+        }
+    }
+
 
     private void validateDwpAudioVideoEvidence(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (sscsCaseData.getDwpUploadAudioVideoEvidence() != null) {
