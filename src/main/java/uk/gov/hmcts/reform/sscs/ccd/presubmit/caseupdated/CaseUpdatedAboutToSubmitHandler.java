@@ -222,21 +222,19 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
             if (benefit.isPresent()) {
                 sscsCaseData.getWorkAllocationFields().setCategories(benefit.get());
-            } else if (benfitCodeHasValue(sscsCaseData)) {
+            } else if (benefitCodeHasValue(sscsCaseData)) {
                 String errorMessage = "Benefit type code is invalid, shoould be one of ";
                 StringBuilder sb = new StringBuilder();
                 sb.append("Benefit type code is invalid, shoould be one of ");
                 Arrays.stream(Benefit.values()).forEach(benefit1 -> sb.append(benefit1.getShortName() + ", "));
                 preSubmitCallbackResponse.addError(sb.toString());
-            } else if (oldCaseDetails != null) {
-                if (oldBenefit.isPresent()) {
-                    preSubmitCallbackResponse.addError("Benefit type code is empty");
-                }
+            } else if (oldBenefit.isPresent()) {
+                preSubmitCallbackResponse.addError("Benefit type code is empty");
             }
         }
     }
 
-    private boolean benfitCodeHasValue(SscsCaseData sscsCaseData) {
+    private boolean benefitCodeHasValue(SscsCaseData sscsCaseData) {
         return sscsCaseData.getAppeal() != null
                 && sscsCaseData.getAppeal().getBenefitType() != null
                 && sscsCaseData.getAppeal().getBenefitType().getCode() != null
