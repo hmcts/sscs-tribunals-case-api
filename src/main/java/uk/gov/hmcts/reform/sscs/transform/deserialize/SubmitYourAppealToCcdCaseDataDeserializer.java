@@ -71,7 +71,11 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             Benefit benefit = Benefit.getBenefitByCodeOrThrowException(appeal.getBenefitType().getCode());
             WorkAllocationFields workAllocationFields = new WorkAllocationFields();
             workAllocationFields.setCaseNames(caseName);
-            workAllocationFields.setOgdType("DWP");
+            if (benefit.getSscsType().equals(SscsType.SSCS5)) {
+                workAllocationFields.setOgdType("HMRC");
+            } else {
+                workAllocationFields.setOgdType("DWP");
+            }
             workAllocationFields.setCategories(benefit);
 
             return SscsCaseData.builder()
