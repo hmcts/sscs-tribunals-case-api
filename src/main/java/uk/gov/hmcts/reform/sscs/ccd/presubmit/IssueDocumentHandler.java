@@ -12,10 +12,7 @@ import uk.gov.hmcts.reform.docassembly.domain.FormPayload;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
@@ -55,7 +52,7 @@ public class IssueDocumentHandler {
                 .appointeeFullName(buildAppointeeName(caseData).orElse(null))
                 .caseId(caseData.getCcdCaseId())
                 .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
-                .isChildSupport(caseData.isBenefitType(Benefit.CHILD_SUPPORT))
+                .shouldHideNino(isBenefitTypeValidToHideNino(caseData.getBenefitType()))
                 .noticeBody(Optional.ofNullable(caseData.getBodyContent())
                         .orElse(caseData.getDirectionNoticeContent()))
                 .userName(caseData.getSignedBy())
@@ -77,6 +74,12 @@ public class IssueDocumentHandler {
         }
         return formPayload;
     }
+
+    protected boolean isBenefitTypeValidToHideNino(Optional<Benefit> benefitType) {
+        return benefitType.filter(benefit -> benefit.isBenefitSscsType(SscsType.SSCS2)
+                || benefit.isBenefitSscsType(SscsType.SSCS5)).isPresent();
+    }
+
 
     protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation) {
 
