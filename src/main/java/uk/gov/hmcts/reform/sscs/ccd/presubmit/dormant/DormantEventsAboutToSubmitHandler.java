@@ -28,6 +28,7 @@ public class DormantEventsAboutToSubmitHandler implements PreSubmitCallbackHandl
                 || callback.getEvent() == EventType.DORMANT
                 || callback.getEvent() == EventType.ADMIN_SEND_TO_DORMANT_APPEAL_STATE
                 || callback.getEvent() == EventType.ADMIN_APPEAL_WITHDRAWN
+                || callback.getEvent() == EventType.ISSUE_FINAL_DECISION
             );
     }
 

@@ -260,9 +260,9 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
 
             if (StringUtils.equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "phme")) {
-                sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHME_REQUEST.getId());
+                sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHE_REQUEST.getId());
                 sscsCaseData.setInterlocReferralDate(LocalDate.now().toString());
-                String note = "Referred to interloc for review by judge - PHME request";
+                String note = "Referred to interloc for review by judge - PHE request";
                 addNoteService.addNote(userAuthorisation, sscsCaseData, note);
             }
 

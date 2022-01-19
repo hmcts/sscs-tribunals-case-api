@@ -127,8 +127,9 @@ withPipeline(type, product, component) {
         enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
     }
     onPR() {
-        enablePactAs([AppPipelineDsl.PactRoles.CONSUMER,
-                      AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK])
+        enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
+                //CCD not running their provider test so disabling this until it is fixed
+//                      AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK])
     }
 
 }
