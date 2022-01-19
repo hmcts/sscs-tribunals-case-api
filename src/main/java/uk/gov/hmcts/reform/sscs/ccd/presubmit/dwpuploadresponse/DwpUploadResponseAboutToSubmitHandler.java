@@ -40,7 +40,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     public static final int NEW_OTHER_PARTY_RESPONSE_DUE_DAYS = 14;
     private final DwpDocumentService dwpDocumentService;
     private final AddNoteService addNoteService;
-    public static final String APPENDIX_12_DOC_NOT_FOR_SSCS5_CONFIDENTIALITY = "You cannot upload an Appendix 12 document when submitting Confidentiality documents";
 
     @Autowired
     public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService, AddNoteService addNoteService) {
@@ -173,13 +172,8 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         validateDwpResponseDocuments(sscsCaseData, preSubmitCallbackResponse);
 
         validateDwpAudioVideoEvidence(sscsCaseData, preSubmitCallbackResponse);
-
-
-
         return preSubmitCallbackResponse;
     }
-
-
 
     private void validateDwpAudioVideoEvidence(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (sscsCaseData.getDwpUploadAudioVideoEvidence() != null) {
