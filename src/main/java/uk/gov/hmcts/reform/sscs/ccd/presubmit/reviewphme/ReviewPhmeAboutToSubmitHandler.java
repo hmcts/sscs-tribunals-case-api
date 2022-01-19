@@ -35,7 +35,7 @@ public class ReviewPhmeAboutToSubmitHandler implements PreSubmitCallbackHandler<
         }
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        log.info("Reviewing PHME request for case id: {}", callback.getCaseDetails().getId());
+        log.info("Reviewing PHE request for case id: {}", callback.getCaseDetails().getId());
 
         caseData.setInterlocReviewState(InterlocReviewState.NONE.getId());
         caseData.setInterlocReferralReason(InterlocReferralReason.NONE.getId());
