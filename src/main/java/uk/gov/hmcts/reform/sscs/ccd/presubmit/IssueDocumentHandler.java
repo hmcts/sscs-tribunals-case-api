@@ -76,10 +76,9 @@ public class IssueDocumentHandler {
     }
 
     protected boolean isBenefitTypeValidToHideNino(Optional<Benefit> benefitType) {
-        return benefitType.filter(benefit -> benefit.isBenefitSscsType(SscsType.SSCS2)
-                || benefit.isBenefitSscsType(SscsType.SSCS5)).isPresent();
+        return benefitType.filter(benefit -> SscsType.SSCS2.equals(benefit.getSscsType())
+                || SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
     }
-
 
     protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation) {
 
