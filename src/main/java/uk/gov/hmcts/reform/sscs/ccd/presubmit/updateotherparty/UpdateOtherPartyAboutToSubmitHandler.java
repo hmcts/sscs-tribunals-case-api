@@ -3,9 +3,11 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updateotherparty;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_OTHER_PARTY_DATA;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsType.SSCS5;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.*;
 
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -40,7 +42,34 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
         updateOtherPartyUcb(sscsCaseData);
         checkConfidentiality(sscsCaseData);
         assignNewOtherPartyData(otherParties, UPDATE_OTHER_PARTY_DATA);
+        clearOtherPartyIfEmpty(sscsCaseData);
 
-        return new PreSubmitCallbackResponse<>(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
+        if (sscsCaseData.getAppeal() != null && sscsCaseData.getAppeal().getBenefitType() != null
+            && isSscs5Case(sscsCaseData)) {
+            if (callback.isIgnoreWarnings()) {
+                validateOtherPartyForSscs5Case(sscsCaseData);
+            } else {
+                if (roleExistsForOtherParties(sscsCaseData.getOtherParties())) {
+                    response.addWarning("You have entered a role for the Other Party which is not valid "
+                        + "for an SSCS5 case. This role will be ignored when the event completes.");
+                } else {
+                    validateOtherPartyForSscs5Case(sscsCaseData);
+                }
+            }
+            return response;
+        }
+        //Check if role is not entered for a Child support case
+        if (roleAbsentForOtherParties(sscsCaseData.getOtherParties())) {
+            response.addError("Role is required for the selected case");
+        }
+        return response;
+    }
+
+    private boolean isSscs5Case(SscsCaseData sscsCaseData) {
+        return Optional.ofNullable(sscsCaseData.getAppeal().getBenefitType().getCode())
+            .filter(b -> Benefit.findBenefitByShortName(b)
+                .filter(benefit -> benefit.getSscsType().equals(SSCS5)).isPresent())
+            .isPresent();
     }
 }

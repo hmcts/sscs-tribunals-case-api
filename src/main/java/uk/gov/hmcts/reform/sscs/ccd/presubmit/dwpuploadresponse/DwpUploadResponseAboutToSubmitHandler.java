@@ -98,19 +98,24 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     }
 
     private void checkSscs2Confidentiality(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, SscsCaseData sscsCaseData) {
-        if (Benefit.CHILD_SUPPORT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode()) && sscsCaseData.getIsConfidentialCase() != null && YesNo.isYes(sscsCaseData.getIsConfidentialCase())) {
+        if (Benefit.CHILD_SUPPORT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())) {
             if (sscsCaseData.getDwpEditedEvidenceReason() == null) {
-                if (!otherPartyHasConfidentiality(sscsCaseData)) {
-                    sscsCaseData.setIsConfidentialCase(null);
+                if (otherPartyHasConfidentiality(sscsCaseData)) {
+                    preSubmitCallbackResponse.addError("Other Party requires confidentiality, upload edited and unedited responses");
+                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
                 }
                 if (sscsCaseData.getAppeal().getAppellant() != null && YesNo.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired())) {
-                    sscsCaseData.getAppeal().getAppellant().setConfidentialityRequired(YesNo.NO);
+                    preSubmitCallbackResponse.addError("Appellant requires confidentiality, upload edited and unedited responses");
+                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
                 }
-                preSubmitCallbackResponse.addWarning("Are you sure you want change the Appellant confidentiality requirement?");
+            } else {
+                if (otherPartyHasConfidentiality(sscsCaseData)) {
+                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
+                }
+                if (sscsCaseData.getAppeal().getAppellant() != null && YesNo.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired())) {
+                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
+                }
             }
-        }
-        if (otherPartyHasConfidentiality(sscsCaseData)) {
-            sscsCaseData.setIsConfidentialCase(YesNo.YES);
         }
     }
 
@@ -255,9 +260,9 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
 
             if (StringUtils.equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "phme")) {
-                sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHME_REQUEST.getId());
+                sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHE_REQUEST.getId());
                 sscsCaseData.setInterlocReferralDate(LocalDate.now().toString());
-                String note = "Referred to interloc for review by judge - PHME request";
+                String note = "Referred to interloc for review by judge - PHE request";
                 addNoteService.addNote(userAuthorisation, sscsCaseData, note);
             }
 

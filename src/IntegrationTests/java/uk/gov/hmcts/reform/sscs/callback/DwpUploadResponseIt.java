@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.PHME_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.PHE_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
@@ -90,8 +90,8 @@ public class DwpUploadResponseIt extends AbstractEventIt {
     }
 
     @Test
-    public void callToAboutToSubmit_willSetPhmeRequestIfPhmeIsSelected_AndAddAudioVideoEvidenceWithRip1Doc() throws Exception {
-        setup("callback/dwpUploadResponsePhme.json");
+    public void callToAboutToSubmit_willSetPheRequestIfPhmeIsSelected_AndAddAudioVideoEvidenceWithRip1Doc() throws Exception {
+        setup("callback/dwpUploadResponsePhe.json");
 
         when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
         json = json.replace("BENEFIT_CODE_PLACEHOLDER", "PIP");
@@ -104,7 +104,7 @@ public class DwpUploadResponseIt extends AbstractEventIt {
         assertEquals(2, result.getData().getAudioVideoEvidence().size());
         assertNotNull(result.getData().getAudioVideoEvidence().get(0).getValue().getRip1Document());
         assertNotNull(result.getData().getAudioVideoEvidence().get(1).getValue().getRip1Document());
-        assertEquals(PHME_REQUEST.getId(), result.getData().getInterlocReferralReason());
+        assertEquals(PHE_REQUEST.getId(), result.getData().getInterlocReferralReason());
         assertEquals(REVIEW_BY_JUDGE.getId(), result.getData().getInterlocReviewState());
     }
 
