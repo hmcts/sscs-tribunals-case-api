@@ -25,9 +25,11 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish.IsScottishHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
+import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 @Component
@@ -39,6 +41,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final AirLookupService airLookupService;
     private final DwpAddressLookupService dwpAddressLookupService;
     private IdamService idamService;
+    private final RefDataService refDataService;
     private final boolean workAllocationFeature;
 
     @Autowired
@@ -47,12 +50,14 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                     AirLookupService airLookupService,
                                     DwpAddressLookupService dwpAddressLookupService,
                                     IdamService idamService,
+                                    RefDataService refDataService,
                                     @Value("${feature.work-allocation.enabled}")  boolean workAllocationFeature) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
         this.airLookupService = airLookupService;
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.idamService = idamService;
+        this.refDataService = refDataService;
         this.workAllocationFeature = workAllocationFeature;
     }
 
@@ -220,6 +225,15 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             log.info("Case id: {} - setting venue name to {} from {}", caseDetails.getId(), venue, sscsCaseData.getProcessingVenue());
 
             sscsCaseData.setProcessingVenue(venue);
+
+            if (workAllocationFeature && !StringUtils.isEmpty(venue)) {
+                CourtVenue courtVenue = refDataService.getVenueRefData(venue);
+                if (courtVenue != null) {
+                    sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
+                            .baseLocation(courtVenue.getEpimsId())
+                            .region(courtVenue.getRegionId()).build());
+                }
+            }
         }
 
     }

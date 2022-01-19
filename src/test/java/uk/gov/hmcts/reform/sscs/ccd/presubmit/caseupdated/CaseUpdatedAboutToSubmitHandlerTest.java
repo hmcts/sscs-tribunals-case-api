@@ -38,8 +38,10 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
+import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -73,11 +75,14 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     private AssociatedCaseLinkHelper associatedCaseLinkHelper;
 
+    @Mock
+    private RefDataService refDataService;
+
     @Before
     public void setUp() {
         openMocks(this);
         associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService);
-        handler = new CaseUpdatedAboutToSubmitHandler(regionalProcessingCenterService, associatedCaseLinkHelper, airLookupService, new DwpAddressLookupService(), idamService, true);
+        handler = new CaseUpdatedAboutToSubmitHandler(regionalProcessingCenterService, associatedCaseLinkHelper, airLookupService, new DwpAddressLookupService(), idamService, refDataService, true);
 
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -238,10 +243,14 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB1200B");
 
         when(airLookupService.lookupAirVenueNameByPostCode("AB1200B", sscsCaseData.getAppeal().getBenefitType())).thenReturn("VenueB");
+        when(refDataService.getVenueRefData("VenueB")).thenReturn(CourtVenue.builder().epimsId("epimsId").regionId("regionId").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("VenueB", response.getData().getProcessingVenue());
+        assertNotNull(response.getData().getCaseManagementLocation());
+        assertEquals("epimsId", response.getData().getCaseManagementLocation().getBaseLocation());
+        assertEquals("regionId", response.getData().getCaseManagementLocation().getRegion());
     }
 
     @Test
@@ -250,10 +259,14 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().address(Address.builder().postcode("AB1200B").build()).build());
 
         when(airLookupService.lookupAirVenueNameByPostCode("AB1200B", sscsCaseData.getAppeal().getBenefitType())).thenReturn("VenueB");
+        when(refDataService.getVenueRefData("VenueB")).thenReturn(CourtVenue.builder().epimsId("epimsId").regionId("regionId").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("VenueB", response.getData().getProcessingVenue());
+        assertNotNull(response.getData().getCaseManagementLocation());
+        assertEquals("epimsId", response.getData().getCaseManagementLocation().getBaseLocation());
+        assertEquals("regionId", response.getData().getCaseManagementLocation().getRegion());
     }
 
     @Test
@@ -264,12 +277,16 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode(postcode);
         callback.getCaseDetails().getCaseData().setRegionalProcessingCenter(RegionalProcessingCenter.builder().name("rpc1").build());
         callback.getCaseDetails().getCaseData().setProcessingVenue("VenueA");
+        callback.getCaseDetails().getCaseData().setCaseManagementLocation(CaseManagementLocation.builder().baseLocation("base").region("region").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verifyNoInteractions(airLookupService);
         assertEquals("VenueA", response.getData().getProcessingVenue());
         assertEquals("rpc1", response.getData().getRegionalProcessingCenter().getName());
+        assertNotNull(response.getData().getCaseManagementLocation());
+        assertEquals("base", response.getData().getCaseManagementLocation().getBaseLocation());
+        assertEquals("region", response.getData().getCaseManagementLocation().getRegion());
     }
 
     @Test
@@ -284,10 +301,14 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             .build());
 
         when(airLookupService.lookupAirVenueNameByPostCode("AB1200B", sscsCaseData.getAppeal().getBenefitType())).thenReturn("VenueB");
+        when(refDataService.getVenueRefData("VenueB")).thenReturn(CourtVenue.builder().epimsId("epimsId").regionId("regionId").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("VenueB", response.getData().getProcessingVenue());
+        assertNotNull(response.getData().getCaseManagementLocation());
+        assertEquals("epimsId", response.getData().getCaseManagementLocation().getBaseLocation());
+        assertEquals("regionId", response.getData().getCaseManagementLocation().getRegion());
     }
 
     @Test

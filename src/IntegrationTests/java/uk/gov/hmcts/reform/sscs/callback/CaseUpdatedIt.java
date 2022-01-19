@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.callback;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
@@ -19,9 +20,11 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.client.RefDataApi;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -33,12 +36,16 @@ public class CaseUpdatedIt extends AbstractEventIt {
     @MockBean
     private CcdService ccdService;
 
+    @MockBean
+    private RefDataApi refDataApi;
+
     @Before
     public void setup() throws IOException {
         setup("callback/caseUpdated.json");
 
-        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().idamOauth2Token("Bearer Token:").serviceAuthorization("sscs").build());
         when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(SUPER_USER.getValue())).build());
+        when(refDataApi.courtVenueByName(eq("Bearer Token:"), eq("sscs"), anyString())).thenReturn(List.of(CourtVenue.builder().epimsId("1").regionId("2").venueName("Basildon CC").build()));
     }
 
     @Test
@@ -48,6 +55,8 @@ public class CaseUpdatedIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         assertEquals("Basildon CC", result.getData().getProcessingVenue());
+        assertEquals("1", result.getData().getCaseManagementLocation().getBaseLocation());
+        assertEquals("2", result.getData().getCaseManagementLocation().getRegion());
     }
 
 }
