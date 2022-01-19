@@ -14,12 +14,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 
-
 @Component
 @Slf4j
 public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    public static final String APPENDIX_12_DOC_NOT_FOR_SSCS5_CONFIDENTIALITY = "You cannot upload an Appendix 12 document when submitting Confidentiality documents";
+    public static final String APPENDIX_12_DOC_NOT_FOR_SSCS5_CONFIDENTIALITY = "An Appendix 12 document cannot be uploaded with Confidentiality documents";
 
     @Autowired
     public DwpUploadResponseMidEventHandler() {
@@ -49,7 +48,6 @@ public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandle
                 new PreSubmitCallbackResponse<>(sscsCaseData);
 
 
-
         validatePostponementRequests(caseDetails, sscsCaseData, preSubmitCallbackResponse);
 
 
@@ -59,14 +57,8 @@ public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandle
     private void validatePostponementRequests(CaseDetails<SscsCaseData> caseDetails, SscsCaseData sscsCaseData,
                                               PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
 
-        if (Benefit.TAX_CREDIT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())
-            || Benefit.GUARDIANS_ALLOWANCE.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())
-            || Benefit.TAX_FREE_CHILDCARE.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())
-            || Benefit.HOME_RESPONSIBILITIES_PROTECTION.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())
-            || Benefit.CHILD_BENEFIT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())
-            || Benefit.THIRTY_HOURS_FREE_CHILDCARE.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())
-            || Benefit.GUARANTEED_MINIMUM_PENSION.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())
-            || Benefit.NATIONAL_INSURANCE_CREDITS.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())) {
+        Benefit benefit = Benefit.getBenefitByCodeOrThrowException(sscsCaseData.getAppeal().getBenefitType().getCode());
+        if (benefit.getSscsType().equals(SscsType.SSCS5)) {
             if (StringUtils.equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "childSupportConfidentiality")) {
                 if (sscsCaseData.getAppendix12Doc() != null && sscsCaseData.getAppendix12Doc().getDocumentLink() != null) {
                     preSubmitCallbackResponse.addError(APPENDIX_12_DOC_NOT_FOR_SSCS5_CONFIDENTIALITY);
