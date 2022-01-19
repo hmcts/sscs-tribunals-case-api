@@ -144,7 +144,7 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"Yes, bundleWelshConfig", " No, bundleEnglishConfig"})
-    public void givenCaseWithEditedDwpDocsAndPhmeNotGranted_thenReturnErrorMessageAndDoNotSendRequestToBundleService(String languagePreference, String expectedConfigFile) {
+    public void givenCaseWithEditedDwpDocsAndPheNotGranted_thenReturnErrorMessageAndDoNotSendRequestToBundleService(String languagePreference, String expectedConfigFile) {
         addMandatoryDwpDocuments();
         addNonEditedSscsDocuments();
         sscsCaseData.setIsConfidentialCase(NO);
@@ -227,7 +227,7 @@ public class CreateBundleAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenCaseWithEditedDwpDocsAndPhmeUnderReview_thenReturnErrorMessageAndDoNotSendRequestToBundleService() {
+    public void givenCaseWithEditedDwpDocsAndPheUnderReview_thenReturnErrorMessageAndDoNotSendRequestToBundleService() {
         addMandatoryDwpDocuments();
 
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(NO.getValue());
@@ -238,7 +238,7 @@ public class CreateBundleAboutToSubmitHandlerTest {
         String error = response.getErrors().stream()
                 .findFirst()
                 .orElse("");
-        assertEquals("There is a pending PHME request on this case", error);
+        assertEquals("There is a pending PHE request on this case", error);
         verifyNoInteractions(serviceRequestExecutor);
     }
 
@@ -257,7 +257,7 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"appellant, YES", "appellant, NO", "jointParty, YES", "jointParty, NO"})
-    public void givenCaseWithPendingEnhancedConfidentiality_thenReturnErrorMessage(String party, YesNo phmeGranted) {
+    public void givenCaseWithPendingEnhancedConfidentiality_thenReturnErrorMessage(String party, YesNo pheGranted) {
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(NO.getValue());
         if (party.equals("appellant")) {
             callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeAppellant(getDatedRequestOutcome(RequestOutcome.IN_PROGRESS));
@@ -265,9 +265,9 @@ public class CreateBundleAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeJointParty(getDatedRequestOutcome(RequestOutcome.IN_PROGRESS));
         }
 
-        if (isYes(phmeGranted)) {
-            sscsCaseData.setDwpPhme(phmeGranted.getValue());
-            sscsCaseData.setPhmeGranted(phmeGranted);
+        if (isYes(pheGranted)) {
+            sscsCaseData.setDwpPhme(pheGranted.getValue());
+            sscsCaseData.setPhmeGranted(pheGranted);
             addMandatoryDwpDocuments();
         } else {
             addMandatoryNonEditedDwpDocuments();
@@ -296,7 +296,7 @@ public class CreateBundleAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(2));
-        assertEquals("There is a pending PHME request on this case", response.getErrors().toArray()[0]);
+        assertEquals("There is a pending PHE request on this case", response.getErrors().toArray()[0]);
         assertEquals("There is a pending enhanced confidentiality request on this case", response.getErrors().toArray()[1]);
         verifyNoInteractions(serviceRequestExecutor);
     }
