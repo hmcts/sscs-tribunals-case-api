@@ -37,7 +37,7 @@ public class ActionHearingRecordingRequestServiceTest {
     @Parameters({"APPELLANT", "DWP", "JOINT_PARTY"})
     public void getRequestStatusWithNoHearingRecordingRequests_willReturnEmpty(PartyItemList party) {
         SscsCaseData sscsCaseData = SscsCaseData.builder().hearings(newArrayList(HEARING)).build();
-        final Optional<RequestStatus> requestStatus = service.getRequestStatus(party, HEARING, sscsCaseData);
+        final Optional<RequestStatus> requestStatus = service.getRequestStatus(party, null, HEARING, sscsCaseData);
         assertThat(requestStatus, is(Optional.empty()));
     }
 
@@ -48,7 +48,7 @@ public class ActionHearingRecordingRequestServiceTest {
                 .requestedHearings(newArrayList(getHearingRecordingRequest(party, REQUESTED)))
                 .build();
         SscsCaseData sscsCaseData = SscsCaseData.builder().sscsHearingRecordingCaseData(sscsHearingRecordingCaseData).hearings(newArrayList(HEARING)).build();
-        final Optional<RequestStatus> requestStatus = service.getRequestStatus(party, HEARING, sscsCaseData);
+        final Optional<RequestStatus> requestStatus = service.getRequestStatus(party, null, HEARING, sscsCaseData);
         assertThat(requestStatus, is(Optional.of(REQUESTED)));
     }
 
@@ -65,7 +65,7 @@ public class ActionHearingRecordingRequestServiceTest {
                 .jointParty(YES.getValue())
                 .sscsHearingRecordingCaseData(sscsHearingRecordingCaseData)
                 .hearings(newArrayList(HEARING)).build();
-        final Optional<RequestStatus> requestStatus = service.getRequestStatus(party, HEARING, sscsCaseData);
+        final Optional<RequestStatus> requestStatus = service.getRequestStatus(party, null, HEARING, sscsCaseData);
         assertThat(requestStatus, is(Optional.of(GRANTED)));
     }
 
@@ -83,7 +83,7 @@ public class ActionHearingRecordingRequestServiceTest {
                 .jointParty(YES.getValue())
                 .sscsHearingRecordingCaseData(sscsHearingRecordingCaseData)
                 .hearings(newArrayList(HEARING)).build();
-        final Optional<RequestStatus> requestStatus = service.getRequestStatus(party, HEARING, sscsCaseData);
+        final Optional<RequestStatus> requestStatus = service.getRequestStatus(party, null, HEARING, sscsCaseData);
         assertThat(requestStatus, is(Optional.of(REFUSED)));
     }
 
@@ -93,7 +93,7 @@ public class ActionHearingRecordingRequestServiceTest {
             "DWP, GRANTED",  "DWP, REFUSED", "DWP, REQUESTED",
             "JOINT_PARTY, GRANTED", "JOINT_PARTY, REFUSED", "JOINT_PARTY, REQUESTED"})
     public void getChangedRequestStatus(PartyItemList party, RequestStatus status) {
-        final Optional<RequestStatus> changedRequestStatus = service.getChangedRequestStatus(party, processHearingRecordingRequests(status));
+        final Optional<RequestStatus> changedRequestStatus = service.getChangedRequestStatus(party, null, processHearingRecordingRequests(status), null);
         assertThat(changedRequestStatus.isPresent(), is(true));
         assertThat(changedRequestStatus.get(), is(status));
     }
@@ -107,7 +107,7 @@ public class ActionHearingRecordingRequestServiceTest {
                 .requestedHearings(newArrayList(hearingRecordingRequest))
                 .build();
         SscsCaseData sscsCaseData = SscsCaseData.builder().sscsHearingRecordingCaseData(sscsHearingRecordingCaseData).hearings(newArrayList(HEARING)).build();
-        final Optional<RequestStatus> requestStatus = service.getRequestStatus(PartyItemList.APPELLANT, HEARING, sscsCaseData);
+        final Optional<RequestStatus> requestStatus = service.getRequestStatus(PartyItemList.APPELLANT, null, HEARING, sscsCaseData);
         assertThat(requestStatus, is(Optional.empty()));
     }
 

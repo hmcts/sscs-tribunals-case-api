@@ -89,5 +89,4 @@ public class ActionHearingRecordingRequestAboutToStartHandler implements PreSubm
     private String checkHearingTime(String hearingTime) {
         return (hearingTime.length() == 5) ? (hearingTime + ":00") : hearingTime;
     }
-
 }

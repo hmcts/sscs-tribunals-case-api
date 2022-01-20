@@ -225,4 +225,32 @@ public class OtherPartyDataUtil {
         }
         return false;
     }
+
+    public static void validateOtherPartyForSscs5Case(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getOtherParties() != null && !sscsCaseData.getOtherParties().isEmpty()) {
+            sscsCaseData.getOtherParties().stream()
+                .filter(otherPartyCcdValue -> otherPartyCcdValue.getValue() != null)
+                .map(otherPartyCcdValue -> otherPartyCcdValue.getValue())
+                .forEach(otherParty -> clearRoleForOtherParty(otherParty));
+        }
+    }
+
+    public static boolean roleExistsForOtherParties(List<CcdValue<OtherParty>> otherParties) {
+        return emptyIfNull(otherParties).stream()
+            .filter(otherPartyCcdValue -> otherPartyCcdValue.getValue() != null)
+            .map(otherPartyCcdValue -> otherPartyCcdValue.getValue())
+            .anyMatch(otherParty -> otherParty.getRole() != null && otherParty.getRole().getName() != null);
+    }
+
+    public static boolean roleAbsentForOtherParties(List<CcdValue<OtherParty>> otherParties) {
+        return emptyIfNull(otherParties).stream()
+            .filter(otherPartyCcdValue -> otherPartyCcdValue.getValue() != null)
+            .map(otherPartyCcdValue -> otherPartyCcdValue.getValue())
+            .anyMatch(otherParty -> otherParty.getRole() == null || otherParty.getRole().getName() == null);
+    }
+
+    private static void clearRoleForOtherParty(OtherParty otherParty) {
+        otherParty.setShowRole(NO);
+        otherParty.setRole(null);
+    }
 }

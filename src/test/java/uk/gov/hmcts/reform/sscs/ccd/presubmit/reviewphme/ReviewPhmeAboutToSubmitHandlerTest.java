@@ -40,7 +40,7 @@ public class ReviewPhmeAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.REVIEW_PHME_REQUEST);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build()).build();
-        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHME_REQUEST.getId());
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHE_REQUEST.getId());
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
@@ -62,7 +62,7 @@ public class ReviewPhmeAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"YES, PHME_GRANTED", "NO, PHME_REFUSED"})
+    @Parameters({"YES, PHE_GRANTED", "NO, PHE_REFUSED"})
     public void givenReviewPhmeEvent_thenSetDwpStateAndResetInterloc(YesNo phmeGranted, DwpState dwpState) {
         sscsCaseData.setPhmeGranted(phmeGranted);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

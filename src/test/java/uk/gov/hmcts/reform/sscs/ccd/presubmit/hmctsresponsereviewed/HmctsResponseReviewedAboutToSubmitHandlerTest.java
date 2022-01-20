@@ -334,7 +334,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenChildSupportCaseAndReferralReasonPhme_thenErrorIsShown() {
+    public void givenChildSupportCaseAndReferralReasonPhe_thenErrorIsShown() {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setBenefitCode("022");
         sscsCaseData.setInterlocReferralReason("phmeRequest");
@@ -342,6 +342,6 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors().iterator().next(), is("PHME request' is not a valid selection for child support cases"));
+        assertThat(response.getErrors().iterator().next(), is("PHE request' is not a valid selection for child support cases"));
     }
 }
