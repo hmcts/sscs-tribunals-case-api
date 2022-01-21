@@ -143,8 +143,12 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             response.addWarning("Benefit type code is empty");
             return false;
         } else if (Benefit.findBenefitByShortName(benefitType.getCode()).isEmpty()) {
-            String validBenefitTypes = Arrays.stream(Benefit.values()).sequential().map(Benefit::getShortName).collect(Collectors.joining(", "));
-            response.addWarning("Benefit type code is invalid, should be one of: " + validBenefitTypes);
+            if (!workAllocationFeature) {
+                //this can be removed once workallocation is in PROD as the validation and warnings are done
+                //in updateCaseCategoriesIfBenefitTypeUpdated below
+                String validBenefitTypes = Arrays.stream(Benefit.values()).sequential().map(Benefit::getShortName).collect(Collectors.joining(", "));
+                response.addWarning("Benefit type code is invalid, should be one of: " + validBenefitTypes);
+            }
             return false;
         }
         return true;
@@ -223,9 +227,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             if (benefit.isPresent()) {
                 sscsCaseData.getWorkAllocationFields().setCategories(benefit.get());
             } else if (benefitCodeHasValue(sscsCaseData)) {
-                String errorMessage = "Benefit type code is invalid, shoould be one of ";
                 StringBuilder sb = new StringBuilder();
-                sb.append("Benefit type code is invalid, shoould be one of ");
+                sb.append("Benefit type code is invalid, should be one of ");
                 Arrays.stream(Benefit.values()).forEach(benefit1 -> sb.append(benefit1.getShortName() + ", "));
                 preSubmitCallbackResponse.addError(sb.toString());
             } else if (oldBenefit.isPresent()) {
