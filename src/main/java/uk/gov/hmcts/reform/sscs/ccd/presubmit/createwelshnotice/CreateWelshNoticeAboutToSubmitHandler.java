@@ -149,8 +149,14 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
         dataMap.put("generated_date", formatter.format(new Date()));
         dataMap.put("welsh_date_added", LocalDateToWelshStringConverter.convert(dateAdded));
         dataMap.put("welsh_generated_date", LocalDateToWelshStringConverter.convert(LocalDate.now()));
+        dataMap.put("should_hide_nino", isBenefitTypeValidToHideNino(caseData.getBenefitType()));
 
         return dataMap;
+    }
+
+    protected boolean isBenefitTypeValidToHideNino(Optional<Benefit> benefitType) {
+        return benefitType.filter(benefit -> SscsType.SSCS2.equals(benefit.getSscsType())
+                || SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
     }
 
     private String buildFullName(SscsCaseData caseData) {
