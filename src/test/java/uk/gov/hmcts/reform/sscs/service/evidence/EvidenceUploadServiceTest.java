@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.AdditionalMatchers.and;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -22,6 +23,7 @@ import java.util.*;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
+import org.assertj.core.util.Lists;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Rule;
@@ -545,6 +547,29 @@ public class EvidenceUploadServiceTest {
         assertEquals(uploader, sscsCaseDetails.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded());
         assertEquals(otherPartyId, sscsCaseDetails.getData().getAudioVideoEvidence().get(0).getValue().getOriginalSenderOtherPartyId());
         assertEquals(otherPartyName, sscsCaseDetails.getData().getAudioVideoEvidence().get(0).getValue().getOriginalSenderOtherPartyName());
+    }
+
+    @Test
+    public void givenListDraftHearingEvidenceIsEmptyThenShouldReturnEmptyEvidence() {
+        String identifier = "12345";
+        List<SscsDocument> draftSscsDocument = Lists.emptyList();
+        SscsCaseDetails caseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().draftSscsDocument(draftSscsDocument).build()).build();
+        when(onlineHearingService.getCcdCaseByIdentifier(identifier)).thenReturn(Optional.of(caseDetails));
+        List<Evidence> result = evidenceUploadService.listDraftHearingEvidence(identifier);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void givenListDraftHearingEvidenceIsNotEmptyThenShouldReturnListOfEvidence() {
+        String identifier = "12345";
+        List<SscsDocument> draftSscsDocument = buildSscsDocumentList();
+        SscsCaseDetails caseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().draftSscsDocument(draftSscsDocument).build()).build();
+        when(onlineHearingService.getCcdCaseByIdentifier(identifier)).thenReturn(Optional.of(caseDetails));
+        List<Evidence> result = evidenceUploadService.listDraftHearingEvidence(identifier);
+        assertFalse(result.isEmpty());
+        assertEquals(2, result.size());
+        assertEquals(draftSscsDocument.get(0).getValue().getDocumentFileName(), result.get(0).getFileName());
+        assertEquals(draftSscsDocument.get(1).getValue().getDocumentFileName(), result.get(1).getFileName());
     }
 
     private SscsDocument getCombinedEvidenceDoc(String combinedEvidenceFilename, String otherEvidenceDocType) {
