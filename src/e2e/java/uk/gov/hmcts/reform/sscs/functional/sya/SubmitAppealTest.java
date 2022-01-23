@@ -68,31 +68,32 @@ public class SubmitAppealTest {
 
     @Test
     public void givenValidAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateValidAppeal() throws InterruptedException {
-        assertSscsCaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD.getSerializedMessage());
+        assertSscsCaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN);
     }
 
     @Test
-    public void givenValidChildSupportAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateValidAppeal() throws InterruptedException {
-        assertSscs2CaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_CHILD_SUPPORT.getSerializedMessage());
+    public void givenValidChildSupportAppealIsSubmitted_thenCreateValidAppeal() throws InterruptedException {
+        assertSscsCaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_CHILD_SUPPORT.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN_CHILD_SUPPORT);
+    }
+
+    @Test
+    public void givenValidSscs5AppealIsSubmitted_thenCreateValidAppeal() throws InterruptedException {
+        assertSscsCaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_SSCS5.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN_SSCS5);
     }
 
     @Test
     public void givenIncompleteAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateIncompleteAppeal() throws InterruptedException {
-        assertSscsCaseIsExpectedResult("incompleteApplication", ALL_DETAILS_NON_SAVE_AND_RETURN_NO_MRN_DATE_CCD.getSerializedMessage());
+        assertSscsCaseIsExpectedResult("incompleteApplication", ALL_DETAILS_NON_SAVE_AND_RETURN_NO_MRN_DATE_CCD.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN);
     }
 
     @Test
     public void givenNonCompliantAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateNonCompliantAppeal() throws InterruptedException {
-        assertSscsCaseIsExpectedResult("interlocutoryReviewState", ALL_DETAILS_NON_SAVE_AND_RETURN_WITH_INTERLOC_CCD.getSerializedMessage());
+        assertSscsCaseIsExpectedResult("interlocutoryReviewState", ALL_DETAILS_NON_SAVE_AND_RETURN_WITH_INTERLOC_CCD.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN);
     }
 
-    private void assertSscs2CaseIsExpectedResult(String expectedState, String expectedResponse) {
-        assertCaseIsExpectedResult(ALL_DETAILS_NON_SAVE_AND_RETURN_CHILD_SUPPORT.getSerializedMessage(),  expectedState,
-                expectedResponse);
-    }
 
-    private void assertSscsCaseIsExpectedResult(String expectedState, String expectedResponse) {
-        assertCaseIsExpectedResult(ALL_DETAILS_NON_SAVE_AND_RETURN.getSerializedMessage(),  expectedState,
+    private void assertSscsCaseIsExpectedResult(String expectedState, String expectedResponse, SyaJsonMessageSerializer jsonMessage) {
+        assertCaseIsExpectedResult(jsonMessage.getSerializedMessage(),  expectedState,
                 expectedResponse);
     }
 

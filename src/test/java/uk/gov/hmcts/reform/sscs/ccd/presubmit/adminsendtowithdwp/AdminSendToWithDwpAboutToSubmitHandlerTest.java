@@ -76,9 +76,9 @@ public class AdminSendToWithDwpAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAdminSendToDwpEventWithInterlocReferralReasonSetToPhme_thenClearInterlocFlags() {
+    public void givenAdminSendToDwpEventWithInterlocReferralReasonSetToPhe_thenClearInterlocFlags() {
 
-        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHME_REQUEST.getId());
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHE_REQUEST.getId());
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
