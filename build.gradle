@@ -214,7 +214,7 @@ def versions = [
         pact: '4.1.7',
         junitJupiter: '5.7.2',
         lombok: '1.18.22',
-        sscsCommon: '4.6.28'
+        sscsCommon: '4.6.31'
 ]
 
 ext["rest-assured.version"] = '4.2.0'
@@ -423,7 +423,7 @@ dependencies {
     contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junitJupiter
     contractTestRuntime "org.junit.platform:junit-platform-commons:1.8.1"
 
-    contractTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.29') {
+    contractTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.30') {
         force = true
     }
 
