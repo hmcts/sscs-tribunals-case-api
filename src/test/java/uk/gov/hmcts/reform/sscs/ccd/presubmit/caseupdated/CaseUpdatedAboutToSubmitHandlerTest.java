@@ -552,27 +552,33 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenACaseAppellantConfidentialityYes_thenCaseConfidentialYes() {
+    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
+            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+    public void givenACaseAppellantConfidentialityYes_thenCaseConfidentialYes(String shortName) {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(YES);
-        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(YES, response.getData().getIsConfidentialCase());
     }
 
     @Test
-    public void givenACaseAppellantConfidentialityNo_thenCaseConfidentialNull() {
+    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
+            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+    public void givenACaseAppellantConfidentialityNo_thenCaseConfidentialNull(String shortName) {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
-        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(null, response.getData().getIsConfidentialCase());
     }
 
     @Test
-    public void givenACaseAppellantConfidentialityNoOtherPartyYes_thenCaseConfidentialYes() {
+    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
+            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+    public void givenACaseAppellantConfidentialityNoOtherPartyYes_thenCaseConfidentialYes(String shortName) {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
-        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequired(YES).build()).build();
         otherPartyList.add(ccdValue);
@@ -583,8 +589,10 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenACaseOtherPartyConfidentialityYes_thenCaseConfidentialYes() {
-        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
+    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
+            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+    public void givenACaseOtherPartyConfidentialityYes_thenCaseConfidentialYes(String shortName) {
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequired(YES).build()).build();
         otherPartyList.add(ccdValue);
@@ -595,8 +603,10 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenACaseOtherPartyConfidentialityNo_thenCaseConfidentialNull() {
-        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
+    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
+            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+    public void givenACaseOtherPartyConfidentialityNo_thenCaseConfidentialNull(String shortName) {
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequired(NO).build()).build();
         otherPartyList.add(ccdValue);
@@ -607,8 +617,10 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenACaseOtherPartyConfidentialityNoAndYes_thenCaseConfidentialYes() {
-        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
+    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
+            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+    public void givenACaseOtherPartyConfidentialityNoAndYes_thenCaseConfidentialYes(String shortName) {
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequired(NO).build()).build();
         otherPartyList.add(ccdValue);

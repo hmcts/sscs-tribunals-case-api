@@ -4,13 +4,10 @@ import static java.util.Collections.sort;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -105,8 +102,7 @@ public class OtherPartyDataUtil {
     }
 
     public static void checkConfidentiality(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getAppeal().getBenefitType() != null
-                && Benefit.CHILD_SUPPORT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())) {
+        if (isValidBenefitTypeForConfidentiality(sscsCaseData)) {
             if ((sscsCaseData.getAppeal().getAppellant() != null
                     && sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired() != null
                     && YesNo.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired()))
@@ -116,6 +112,12 @@ public class OtherPartyDataUtil {
                 sscsCaseData.setIsConfidentialCase(null);
             }
         }
+    }
+
+    public static boolean isValidBenefitTypeForConfidentiality(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getAppeal().getBenefitType() != null
+                && (Arrays.stream(Benefit.values()).anyMatch(b -> (SscsType.SSCS2.equals(b.getSscsType()) || SscsType.SSCS5.equals(b.getSscsType()))
+                && b.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())));
     }
 
     public static boolean isOtherPartyPresent(SscsCaseData sscsCaseData) {
