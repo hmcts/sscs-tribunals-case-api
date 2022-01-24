@@ -602,33 +602,42 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
-            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
-    public void givenACaseAppellantConfidentialityYes_thenCaseConfidentialYes(String shortName) {
+    @Parameters({"childSupport,Child Support", "taxCredit,Tax Credit", "guardiansAllowance,Guardians Allowance",
+        "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
+        "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare",
+        "guaranteedMinimumPension,Guaranteed Minimum Pension","nationalInsuranceCredits,National Insurance Credits"})
+    public void givenACaseAppellantConfidentialityYes_thenCaseConfidentialYes(String shortName, String benefitDescription) {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(YES);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefitDescription);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(YES, response.getData().getIsConfidentialCase());
     }
 
     @Test
-    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
-            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
-    public void givenACaseAppellantConfidentialityNo_thenCaseConfidentialNull(String shortName) {
+    @Parameters({"childSupport,Child Support", "taxCredit,Tax Credit", "guardiansAllowance,Guardians Allowance",
+        "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
+        "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare",
+        "guaranteedMinimumPension,Guaranteed Minimum Pension","nationalInsuranceCredits,National Insurance Credits"})
+    public void givenACaseAppellantConfidentialityNo_thenCaseConfidentialNull(String shortName, String benefitDescription) {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefitDescription);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(null, response.getData().getIsConfidentialCase());
     }
 
     @Test
-    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
-            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
-    public void givenACaseAppellantConfidentialityNoOtherPartyYes_thenCaseConfidentialYes(String shortName) {
+    @Parameters({"childSupport,Child Support", "taxCredit,Tax Credit", "guardiansAllowance,Guardians Allowance",
+        "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
+        "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare",
+        "guaranteedMinimumPension,Guaranteed Minimum Pension","nationalInsuranceCredits,National Insurance Credits"})
+    public void givenACaseAppellantConfidentialityNoOtherPartyYes_thenCaseConfidentialYes(String shortName, String benefitDescription) {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefitDescription);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequired(YES).build()).build();
         otherPartyList.add(ccdValue);
@@ -639,10 +648,13 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
-            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
-    public void givenACaseOtherPartyConfidentialityYes_thenCaseConfidentialYes(String shortName) {
+    @Parameters({"childSupport,Child Support", "taxCredit,Tax Credit", "guardiansAllowance,Guardians Allowance",
+        "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
+        "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare",
+        "guaranteedMinimumPension,Guaranteed Minimum Pension","nationalInsuranceCredits,National Insurance Credits"})
+    public void givenACaseOtherPartyConfidentialityYes_thenCaseConfidentialYes(String shortName, String benefitDescription) {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefitDescription);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequired(YES).build()).build();
         otherPartyList.add(ccdValue);
@@ -653,10 +665,13 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
-            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
-    public void givenACaseOtherPartyConfidentialityNo_thenCaseConfidentialNull(String shortName) {
+    @Parameters({"childSupport,Child Support", "taxCredit,Tax Credit", "guardiansAllowance,Guardians Allowance",
+        "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
+        "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare",
+        "guaranteedMinimumPension,Guaranteed Minimum Pension","nationalInsuranceCredits,National Insurance Credits"})
+    public void givenACaseOtherPartyConfidentialityNo_thenCaseConfidentialNull(String shortName, String benefitDescription) {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefitDescription);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequired(NO).build()).build();
         otherPartyList.add(ccdValue);
@@ -667,10 +682,13 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
-            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
-    public void givenACaseOtherPartyConfidentialityNoAndYes_thenCaseConfidentialYes(String shortName) {
+    @Parameters({"childSupport,Child Support", "taxCredit,Tax Credit", "guardiansAllowance,Guardians Allowance",
+        "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
+        "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare",
+        "guaranteedMinimumPension,Guaranteed Minimum Pension","nationalInsuranceCredits,National Insurance Credits"})
+    public void givenACaseOtherPartyConfidentialityNoAndYes_thenCaseConfidentialYes(String shortName, String benefitDescription) {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefitDescription);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequired(NO).build()).build();
         otherPartyList.add(ccdValue);
@@ -971,7 +989,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         "guaranteedMinimumPension,Guaranteed Minimum Pension,054,0",
         "nationalInsuranceCredits,Bereavement Benefit,test,2",
         "socialFund,30 Hours Free Childcare,002,1",
-        "childSupport,Child Support,022,0"
+        "childSupport,Child Support,002,0"
     })
     public void givenSscs5CaseBenefitCodeAndDescription_thenErrorIsShownForInvalidSet(String code, String description,
                                                                                       String benefitCode, int error) {

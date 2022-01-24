@@ -78,6 +78,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         setCaseCode(preSubmitCallbackResponse, callback);
         validateBenefitForCase(preSubmitCallbackResponse, callback);
+        if (!preSubmitCallbackResponse.getErrors().isEmpty()) {
+            return preSubmitCallbackResponse;
+        }
 
         if (sscsCaseData.getAppeal().getAppellant() != null
                 && sscsCaseData.getAppeal().getAppellant().getAddress() != null

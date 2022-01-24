@@ -1185,8 +1185,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getWarnings().size(), is(1));
+        assertThat(response.getWarnings().size(), is(0));
         assertEquals("Benefit code cannot be changed to the selected code", response.getErrors().stream().findFirst().get());
-        assertEquals("The benefit code will be changed to a non-child support benefit code", response.getWarnings().stream().findFirst().get());
     }
 }

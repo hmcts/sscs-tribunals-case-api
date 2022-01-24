@@ -90,6 +90,16 @@ public class ResponseEventsAboutToSubmit {
             && caseDetailsBefore.isPresent()
             && caseDetailsBefore.get().getCaseData().getBenefitCode() != null) {
 
+            boolean hasErrors = false;
+            boolean isSscs5CaseData = isSscs5Case(response, callback);
+            if ((isSscs5CaseData
+                && !buildSscs5BenefitCaseLoaderKeyId().contains(response.getData().getBenefitCode()))
+                || (!isSscs5CaseData
+                && buildSscs5BenefitCaseLoaderKeyId().contains(response.getData().getBenefitCode()))) {
+                response.addError("Benefit code cannot be changed to the selected code");
+                hasErrors = true;
+            }
+
             if (!caseDetailsBefore.get().getCaseData().getBenefitCode()
                 .equals(callback.getCaseDetails().getCaseData().getBenefitCode())) {
                 if (Benefit.CHILD_SUPPORT.getShortName()
@@ -99,17 +109,11 @@ public class ResponseEventsAboutToSubmit {
                         && response.getData().getOtherParties().size() > 0) {
                         response.addError("Benefit code cannot be changed on cases with registered 'Other Party'");
                     } else {
-                        response.addWarning("The benefit code will be changed to a non-child support benefit code");
+                        if (!hasErrors) {
+                            response.addWarning("The benefit code will be changed to a non-child support benefit code");
+                        }
                     }
                 }
-            }
-
-            boolean isSscs5CaseData = isSscs5Case(response, callback);
-            if ((isSscs5CaseData
-                && !buildSscs5BenefitCaseLoaderKeyId().contains(response.getData().getBenefitCode()))
-                || (!isSscs5CaseData
-                && buildSscs5BenefitCaseLoaderKeyId().contains(response.getData().getBenefitCode()))) {
-                response.addError("Benefit code cannot be changed to the selected code");
             }
         }
     }
@@ -117,11 +121,11 @@ public class ResponseEventsAboutToSubmit {
     private boolean isSscs5Case(PreSubmitCallbackResponse<SscsCaseData> response, Callback<SscsCaseData> callback) {
         //Consider SSCS5 case if caseDetailsBefore is SSCS5 or else consider present benefit type code
         String benefitTypeCode = response.getData().getAppeal().getBenefitType().getCode();
-        if (callback.getCaseDetailsBefore().isPresent()
-            && callback.getCaseDetailsBefore().get().getCaseData().getAppeal() != null
-            && callback.getCaseDetailsBefore().get().getCaseData().getAppeal().getBenefitType() != null) {
-            benefitTypeCode =
-                callback.getCaseDetailsBefore().get().getCaseData().getAppeal().getBenefitType().getCode();
+        final Optional<CaseDetails<SscsCaseData>> caseDetailsBefore = callback.getCaseDetailsBefore();
+        if (caseDetailsBefore.isPresent()
+            && caseDetailsBefore.get().getCaseData().getAppeal() != null
+            && caseDetailsBefore.get().getCaseData().getAppeal().getBenefitType() != null) {
+            benefitTypeCode = caseDetailsBefore.get().getCaseData().getAppeal().getBenefitType().getCode();
         }
         return isSscs5Case(benefitTypeCode);
     }
