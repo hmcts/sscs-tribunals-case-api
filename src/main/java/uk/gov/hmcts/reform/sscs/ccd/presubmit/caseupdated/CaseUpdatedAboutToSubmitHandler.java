@@ -245,7 +245,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private Optional<Benefit> getOldBenefitCode(CaseDetails<SscsCaseData> oldCaseDetails) {
         if (oldCaseDetails == null || oldCaseDetails.getCaseData() == null
-                || oldCaseDetails.getCaseData().getBenefitType() == null) {
+                || oldCaseDetails.getCaseData().getBenefitType().isEmpty()) {
             return Optional.empty();
         } else {
             return oldCaseDetails.getCaseData().getBenefitType();
