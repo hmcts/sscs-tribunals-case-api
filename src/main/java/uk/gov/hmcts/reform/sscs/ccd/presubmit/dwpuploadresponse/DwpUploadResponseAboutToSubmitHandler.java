@@ -209,39 +209,39 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     private void validateEditedDwpEvidenceBundle(DwpResponseDocument dwpResponseDocument, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (dwpResponseDocument == null || dwpResponseDocument.getDocumentLink() == null) {
-            preSubmitCallbackResponse.addError("You must upload an edited DWP evidence bundle");
+            preSubmitCallbackResponse.addError("You must upload an edited FTA evidence bundle");
         } else {
-            validateDocumentIsAPdf("DWP edited evidence bundle", dwpResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
+            validateDocumentIsAPdf("FTA edited evidence bundle", dwpResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
         }
     }
 
     private void validateEditedDwpResponseDocument(DwpResponseDocument dwpEditedResponseDocument, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (dwpEditedResponseDocument == null || dwpEditedResponseDocument.getDocumentLink() == null) {
-            preSubmitCallbackResponse.addError("You must upload an edited DWP response document");
+            preSubmitCallbackResponse.addError("You must upload an edited FTA response document");
         } else {
-            validateDocumentIsAPdf("DWP edited response document", dwpEditedResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
+            validateDocumentIsAPdf("FTA edited response document", dwpEditedResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
         }
     }
 
     private void validateDwpEvidenceBundle(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (sscsCaseData.getDwpEvidenceBundleDocument() == null || sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink() == null) {
-            preSubmitCallbackResponse.addError("DWP evidence bundle cannot be empty.");
+            preSubmitCallbackResponse.addError("FTA evidence bundle cannot be empty.");
         } else {
-            validateDocumentIsAPdf("DWP evidence bundle", sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink(), preSubmitCallbackResponse);
+            validateDocumentIsAPdf("FTA evidence bundle", sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink(), preSubmitCallbackResponse);
         }
     }
 
     private void validateDwpAt38Document(DwpResponseDocument dwpResponseDocument, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (dwpResponseDocument != null && dwpResponseDocument.getDocumentLink() != null) {
-            validateDocumentIsAPdf("DWP AT38 document", dwpResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
+            validateDocumentIsAPdf("FTA AT38 document", dwpResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
         }
     }
 
     private void validateDwpResponseDocument(DwpResponseDocument dwpResponseDocument, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (dwpResponseDocument == null || dwpResponseDocument.getDocumentLink() == null) {
-            preSubmitCallbackResponse.addError("DWP response document cannot be empty.");
+            preSubmitCallbackResponse.addError("FTA response document cannot be empty.");
         } else {
-            validateDocumentIsAPdf("DWP response document", dwpResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
+            validateDocumentIsAPdf("FTA response document", dwpResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
         }
     }
 

@@ -139,7 +139,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         assertEquals(1, response.getErrors().size());
 
-        assertEquals("DWP response document cannot be empty.", response.getErrors().iterator().next());
+        assertEquals("FTA response document cannot be empty.", response.getErrors().iterator().next());
     }
 
     @Test
@@ -149,7 +149,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         assertEquals(1, response.getErrors().size());
 
-        assertEquals("DWP evidence bundle cannot be empty.", response.getErrors().iterator().next());
+        assertEquals("FTA evidence bundle cannot be empty.", response.getErrors().iterator().next());
     }
 
     @Test
@@ -422,7 +422,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(1, response.getErrors().size());
 
         for (String error : response.getErrors()) {
-            assertEquals("You must upload an edited DWP response document", error);
+            assertEquals("You must upload an edited FTA response document", error);
         }
     }
 
@@ -443,7 +443,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(1, response.getErrors().size());
 
         for (String error : response.getErrors()) {
-            assertEquals("You must upload an edited DWP evidence bundle", error);
+            assertEquals("You must upload an edited FTA evidence bundle", error);
         }
     }
 
@@ -762,7 +762,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(getMovieDocument());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("DWP response document must be a PDF."));
+        assertThat(response.getErrors().iterator().next(), is("FTA response document must be a PDF."));
     }
 
     @Test
@@ -770,7 +770,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(getMovieDocument());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("DWP evidence bundle must be a PDF."));
+        assertThat(response.getErrors().iterator().next(), is("FTA evidence bundle must be a PDF."));
     }
 
     @Test
@@ -778,7 +778,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpAT38Document(getMovieDocument());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("DWP AT38 document must be a PDF."));
+        assertThat(response.getErrors().iterator().next(), is("FTA AT38 document must be a PDF."));
     }
 
     @Test
@@ -788,7 +788,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(getMovieDocument());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("DWP edited response document must be a PDF."));
+        assertThat(response.getErrors().iterator().next(), is("FTA edited response document must be a PDF."));
     }
 
     @Test
@@ -798,7 +798,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(getMovieDocument());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("DWP edited evidence bundle must be a PDF."));
+        assertThat(response.getErrors().iterator().next(), is("FTA edited evidence bundle must be a PDF."));
     }
 
     @Test
