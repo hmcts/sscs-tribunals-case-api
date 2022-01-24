@@ -30,8 +30,8 @@ public class NoticeIssuedTemplateBody implements FormPayload {
     private String caseId;
     @JsonProperty("notice_type")
     private String noticeType;
-    @JsonProperty("is_child_support")
-    private boolean isChildSupport;
+    @JsonProperty("should_hide_nino")
+    private boolean shouldHideNino;
     @JsonProperty("notice_body")
     private String noticeBody;
     @JsonProperty("user_name")
