@@ -227,10 +227,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             if (benefit.isPresent()) {
                 sscsCaseData.getWorkAllocationFields().setCategories(benefit.get());
             } else if (benefitCodeHasValue(sscsCaseData)) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("Benefit type code is invalid, should be one of ");
-                Arrays.stream(Benefit.values()).forEach(benefit1 -> sb.append(benefit1.getShortName() + ", "));
-                preSubmitCallbackResponse.addError(sb.toString());
+                String validBenefitTypes = Arrays.stream(Benefit.values()).sequential().map(Benefit::getShortName).collect(Collectors.joining(", "));
+                preSubmitCallbackResponse.addError("Benefit type code is invalid, should be one of: " + validBenefitTypes);
+
             } else if (oldBenefit.isPresent()) {
                 preSubmitCallbackResponse.addError("Benefit type code is empty");
             }
