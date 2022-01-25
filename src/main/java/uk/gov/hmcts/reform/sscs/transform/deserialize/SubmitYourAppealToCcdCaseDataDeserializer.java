@@ -61,6 +61,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
         List<SscsDocument> sscsDocuments = getEvidenceDocumentDetails(syaCaseWrapper);
 
+        log.info("workAllocationEnabled=" + workAllocationEnabled);
         if (workAllocationEnabled) {
             String caseName = null;
             if (appeal.getAppellant() != null && appeal.getAppellant().getName() != null) {
