@@ -1,6 +1,22 @@
 {
   "caseCreated" : "${json-unit.ignore}",
-  "caseName":"Joe Bloggs",
+  "caseAccessCategory": "Child Support",
+  "caseManagementCategory": {
+    "value": {
+      "code": "childSupport",
+      "label": "Child Support"
+    },
+    "list_items": [
+      {
+        "code": "childSupport",
+        "label": "Child Support"
+      }
+    ]
+  },
+  "caseNameHmctsInternal": "Joe Bloggs",
+  "caseNameHmctsRestricted": "Joe Bloggs",
+  "caseNamePublic": "Joe Bloggs",
+  "ogdType": "DWP",
   "benefitCode" : "022",
   "issueCode" : "DD",
   "caseCode" : "022DD",

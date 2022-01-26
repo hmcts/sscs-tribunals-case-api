@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SYSTEM_USER;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.checkConfidentiality;
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -36,18 +38,21 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final AirLookupService airLookupService;
     private final DwpAddressLookupService dwpAddressLookupService;
     private IdamService idamService;
+    private final boolean workAllocationFeature;
 
     @Autowired
     CaseUpdatedAboutToSubmitHandler(RegionalProcessingCenterService regionalProcessingCenterService,
                                     AssociatedCaseLinkHelper associatedCaseLinkHelper,
                                     AirLookupService airLookupService,
                                     DwpAddressLookupService dwpAddressLookupService,
-                                    IdamService idamService) {
+                                    IdamService idamService,
+                                    @Value("${feature.work-allocation.enabled}")  boolean workAllocationFeature) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
         this.airLookupService = airLookupService;
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.idamService = idamService;
+        this.workAllocationFeature = workAllocationFeature;
     }
 
     @Override
@@ -93,6 +98,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
 
         checkConfidentiality(sscsCaseData);
+        updateCaseNameIfNameUpdated(callback, sscsCaseData);
+        updateCaseCategoriesIfBenefitTypeUpdated(callback, sscsCaseData, preSubmitCallbackResponse);
 
         final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
         final boolean hasSystemUserRole = userDetails.hasRole(SYSTEM_USER);
@@ -105,6 +112,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         return preSubmitCallbackResponse;
     }
+
+
 
 
     private void validateAndUpdateDwpHandlingOffice(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
@@ -134,8 +143,12 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             response.addWarning("Benefit type code is empty");
             return false;
         } else if (Benefit.findBenefitByShortName(benefitType.getCode()).isEmpty()) {
-            String validBenefitTypes = Arrays.stream(Benefit.values()).sequential().map(Benefit::getShortName).collect(Collectors.joining(", "));
-            response.addWarning("Benefit type code is invalid, should be one of: " + validBenefitTypes);
+            if (!workAllocationFeature) {
+                //this can be removed once workallocation is in PROD as the validation and warnings are done
+                //in updateCaseCategoriesIfBenefitTypeUpdated below
+                String validBenefitTypes = Arrays.stream(Benefit.values()).sequential().map(Benefit::getShortName).collect(Collectors.joining(", "));
+                response.addWarning("Benefit type code is invalid, should be one of: " + validBenefitTypes);
+            }
             return false;
         }
         return true;
@@ -185,6 +198,58 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             sscsCaseData.setProcessingVenue(venue);
         }
 
+    }
+
+
+    private void updateCaseNameIfNameUpdated(Callback<SscsCaseData> callback, SscsCaseData caseData) {
+        if (workAllocationFeature) {
+            String caseName = caseData.getAppeal().getAppellant() != null
+                    && caseData.getAppeal().getAppellant().getName() != null
+                    ? caseData.getAppeal().getAppellant().getName().getFullNameNoTitle()
+                    : null;
+
+            CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
+            if (oldCaseDetails == null
+                    || oldCaseDetails.getCaseData().getWorkAllocationFields().getCaseNameHmctsInternal() == null
+                    || !oldCaseDetails.getCaseData().getWorkAllocationFields().getCaseNameHmctsInternal().equals(caseName)) {
+                caseData.getWorkAllocationFields().setCaseNames(caseName);
+            }
+        }
+    }
+
+    private void updateCaseCategoriesIfBenefitTypeUpdated(Callback<SscsCaseData> callback, SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (workAllocationFeature) {
+            Optional<Benefit> benefit = sscsCaseData.getBenefitType();
+
+            CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
+            Optional<Benefit> oldBenefit = getOldBenefitCode(oldCaseDetails);
+
+            if (benefit.isPresent()) {
+                sscsCaseData.getWorkAllocationFields().setCategories(benefit.get());
+            } else if (benefitCodeHasValue(sscsCaseData)) {
+                String validBenefitTypes = Arrays.stream(Benefit.values()).sequential().map(Benefit::getShortName).collect(Collectors.joining(", "));
+                preSubmitCallbackResponse.addError("Benefit type code is invalid, should be one of: " + validBenefitTypes);
+
+            } else if (oldBenefit.isPresent()) {
+                preSubmitCallbackResponse.addError("Benefit type code is empty");
+            }
+        }
+    }
+
+    private boolean benefitCodeHasValue(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getAppeal() != null
+                && sscsCaseData.getAppeal().getBenefitType() != null
+                && sscsCaseData.getAppeal().getBenefitType().getCode() != null
+                && !isEmpty(sscsCaseData.getAppeal().getBenefitType().getCode());
+    }
+
+    private Optional<Benefit> getOldBenefitCode(CaseDetails<SscsCaseData> oldCaseDetails) {
+        if (oldCaseDetails == null || oldCaseDetails.getCaseData() == null
+                || oldCaseDetails.getCaseData().getBenefitType().isEmpty()) {
+            return Optional.empty();
+        } else {
+            return oldCaseDetails.getCaseData().getBenefitType();
+        }
     }
 
 }
