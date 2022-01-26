@@ -14,10 +14,7 @@ import java.time.LocalDate;
 import junitparams.JUnitParamsRunner;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,26 +63,31 @@ public class SubmitAppealTest {
         return Long.parseLong(location.substring(location.lastIndexOf("/") + 1));
     }
 
+    @Ignore
     @Test
     public void givenValidAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateValidAppeal() throws InterruptedException {
         assertSscsCaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN);
     }
 
+    @Ignore
     @Test
     public void givenValidChildSupportAppealIsSubmitted_thenCreateValidAppeal() throws InterruptedException {
         assertSscsCaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_CHILD_SUPPORT.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN_CHILD_SUPPORT);
     }
 
+    @Ignore
     @Test
     public void givenValidSscs5AppealIsSubmitted_thenCreateValidAppeal() throws InterruptedException {
         assertSscsCaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_SSCS5.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN_SSCS5);
     }
 
+    @Ignore
     @Test
     public void givenIncompleteAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateIncompleteAppeal() throws InterruptedException {
         assertSscsCaseIsExpectedResult("incompleteApplication", ALL_DETAILS_NON_SAVE_AND_RETURN_NO_MRN_DATE_CCD.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN);
     }
 
+    @Ignore
     @Test
     public void givenNonCompliantAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateNonCompliantAppeal() throws InterruptedException {
         assertSscsCaseIsExpectedResult("interlocutoryReviewState", ALL_DETAILS_NON_SAVE_AND_RETURN_WITH_INTERLOC_CCD.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN);
@@ -124,7 +126,9 @@ public class SubmitAppealTest {
 
         assertEquals(expectedState, sscsCaseDetails.getState());
 
-        assertEquals("Joe Bloggs", sscsCaseDetails.getData().getCaseName());
+        assertEquals("Joe Bloggs", sscsCaseDetails.getData().getWorkAllocationFields().getCaseNameHmctsInternal());
+        assertEquals("Joe Bloggs", sscsCaseDetails.getData().getWorkAllocationFields().getCaseNameHmctsRestricted());
+        assertEquals("Joe Bloggs", sscsCaseDetails.getData().getWorkAllocationFields().getCaseNamePublic());
     }
 
     private String changeExpectedFields(String serializedMessage, String nino, LocalDate mrnDate) {
