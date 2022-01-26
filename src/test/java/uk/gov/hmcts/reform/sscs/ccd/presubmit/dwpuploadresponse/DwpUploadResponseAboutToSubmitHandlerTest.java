@@ -772,17 +772,20 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenNoNewAudioVideoDocuments_shouldStillClearAddedDocuments() throws JsonProcessingException {
+    public void givenNoNewAudioVideoDocuments_shouldStillClearAddedDocuments() {
         dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
             new AddNoteService(userDetailsService), new AddedDocumentsUtil(true));
 
         sscsCaseData.setDwpUploadAudioVideoEvidence(new ArrayList<>());
+        sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder()
+            .addedDocuments("{audioEvidence=1}")
+            .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT,
             callback, USER_AUTHORISATION);
 
         org.assertj.core.api.Assertions.assertThat(response.getData().getWorkAllocationFields().getAddedDocuments())
-            .as("Added documents should be cleared every event..")
+            .as("Added documents should be cleared every event.")
             .isNull();
     }
 

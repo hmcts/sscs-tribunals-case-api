@@ -79,6 +79,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         log.info("About to submit Upload Further Evidence caseID:  {}", sscsCaseData.getCcdCaseId());
         final PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+        addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(sscsCaseData);
         if (isNotEmpty(sscsCaseData.getDraftFurtherEvidenceDocuments())) {
             sscsCaseData.getDraftFurtherEvidenceDocuments().forEach(doc -> {
                 if (isBlank(doc.getValue().getDocumentType())) {

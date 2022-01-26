@@ -263,6 +263,9 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
             new AddedDocumentsUtil(true));
 
         sscsCaseData.setDraftFurtherEvidenceDocuments(new ArrayList<>());
+        sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder()
+            .addedDocuments("{audioEvidence=1}")
+            .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

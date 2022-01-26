@@ -186,6 +186,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             checkForWarnings(preSubmitCallbackResponse);
         }
 
+        addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(sscsCaseData);
+
         if (isFurtherEvidenceActionCode(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction(),
                 ISSUE_FURTHER_EVIDENCE.getCode())) {
 

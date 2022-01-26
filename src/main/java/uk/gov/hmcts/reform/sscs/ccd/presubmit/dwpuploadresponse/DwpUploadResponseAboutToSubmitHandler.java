@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.assignNewOtherPartyData;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isValidBenefitTypeForConfidentiality;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateOtherPartyUcb;
 
 import java.time.LocalDate;
@@ -81,6 +82,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             return preSubmitCallbackResponse;
         }
 
+        addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(sscsCaseData);
         setCaseCode(preSubmitCallbackResponse, callback);
 
         sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
@@ -142,7 +144,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     protected void handleAudioVideoDocuments(SscsCaseData sscsCaseData) {
         if (isEmpty(sscsCaseData.getDwpUploadAudioVideoEvidence())) {
-            sscsCaseData.getWorkAllocationFields().setAddedDocuments(null);
             return;
         }
 

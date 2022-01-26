@@ -1509,11 +1509,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenACaseWithScannedDocumentCoversheet_shouldGenerateAnEmptyMapOfSscsDocuments() {
+    public void givenACaseWithNoScannedDocument_shouldClearAddedDocuments() {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService,
             bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true));
 
         sscsCaseData.setScannedDocuments(null);
+        sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder()
+            .addedDocuments("{audioEvidence=1}")
+            .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -1524,7 +1527,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenACaseWithNoScannedDocumentCoversheet_shouldGenerateAnEmptyMapOfSscsDocuments() {
+    public void givenACaseWithScannedDocumentCoversheet_shouldGenerateAnEmptyMapOfSscsDocuments() {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService,
             bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true));
         List<ScannedDocument> scannedDocuments = new ArrayList<>();

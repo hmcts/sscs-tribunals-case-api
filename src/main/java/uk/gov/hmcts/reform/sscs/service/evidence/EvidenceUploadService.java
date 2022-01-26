@@ -128,6 +128,7 @@ public class EvidenceUploadService {
         return onlineHearingService.getCcdCaseByIdentifier(identifier)
                 .map(caseDetails -> {
                     String sha512HashChecksum = "";
+                    addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(caseDetails.getData());
                     String filename = "";
                     try {
                         sha512HashChecksum = Arrays.toString(MessageDigest.getInstance("SHA-512").digest(file.getBytes())).toUpperCase();

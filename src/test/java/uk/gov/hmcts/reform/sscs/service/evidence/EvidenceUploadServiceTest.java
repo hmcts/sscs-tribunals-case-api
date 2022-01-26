@@ -554,6 +554,9 @@ public class EvidenceUploadServiceTest {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
         sscsCaseDetails.getData().setSscsDocument(buildSscsDocumentList());
         sscsCaseDetails.getData().setAppeal(Appeal.builder().hearingType("sya").build());
+        sscsCaseDetails.getData().setWorkAllocationFields(WorkAllocationFields.builder()
+            .addedDocuments("{audioEvidence=1}")
+            .build());
 
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
         List<String> files = new ArrayList<>();

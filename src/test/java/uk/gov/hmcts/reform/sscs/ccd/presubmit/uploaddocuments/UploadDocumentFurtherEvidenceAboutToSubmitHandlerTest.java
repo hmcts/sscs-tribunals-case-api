@@ -279,6 +279,9 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
         handler = new UploadDocumentFurtherEvidenceAboutToSubmitHandler(new AddedDocumentsUtil(true));
 
         sscsCaseData.setDraftSscsFurtherEvidenceDocument(new ArrayList<>());
+        sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder()
+            .addedDocuments("{audioEvidence=1}")
+            .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

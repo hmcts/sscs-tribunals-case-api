@@ -21,6 +21,10 @@ public class AddedDocumentsUtil {
         this.workAllocationFeature = workAllocationFeature;
     }
 
+    public void clearAddedDocumentsBeforeEventSubmit(SscsCaseData sscsCaseData) {
+        sscsCaseData.getWorkAllocationFields().setAddedDocuments(null);
+    }
+
     public void computeDocumentsAddedThisEvent(SscsCaseData sscsCaseData, List<String> documentsAddedThisEvent,
                                                Enum<EventType> eventType) {
         if (workAllocationFeature) {
@@ -41,11 +45,21 @@ public class AddedDocumentsUtil {
                 } catch (JsonProcessingException e) {
                     throw new IllegalStateException(e);
                 }
-                log.info("Case {} with event {} added documents: {}.", sscsCaseData.getCcdCaseId(), eventType,
-                    sscsCaseData.getWorkAllocationFields().getAddedDocuments());
+
+                logMessage(sscsCaseData, eventType);
             } else {
                 sscsCaseData.getWorkAllocationFields().setAddedDocuments(null);
             }
+        }
+    }
+
+    private void logMessage(SscsCaseData sscsCaseData, Enum<EventType> eventType) {
+        if (eventType == EventType.UPLOAD_DOCUMENT) {
+            log.info("Case {} with event {} added documents: {} from MYA.", sscsCaseData.getCcdCaseId(), eventType,
+                sscsCaseData.getWorkAllocationFields().getAddedDocuments());
+        } else {
+            log.info("Case {} with event {} added documents: {}.", sscsCaseData.getCcdCaseId(), eventType,
+                sscsCaseData.getWorkAllocationFields().getAddedDocuments());
         }
     }
 }

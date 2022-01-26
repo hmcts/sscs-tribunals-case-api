@@ -216,6 +216,27 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenASupplementaryResponseEvent_shouldClearAddedDocuments() {
+        handler = new SupplementaryResponseAboutToSubmitHandler(new AddedDocumentsUtil(true));
+        sscsCaseData.setDwpOtherDoc(DwpResponseDocument.builder()
+            .documentLink(DocumentLink.builder()
+                .documentFilename("test.docx")
+                .documentUrl("myurl2")
+                .build())
+            .build());
+
+        sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder()
+            .addedDocuments("{audioEvidence=1}")
+            .build());
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        org.assertj.core.api.Assertions.assertThat(sscsCaseData.getWorkAllocationFields().getAddedDocuments())
+            .as("Added documents should be cleared everytime the event fires.")
+            .isNull();
+    }
+
+    @Test
     public void givenASupplementaryResponseWithAudioVideoEvidenceSentMultipleTimes_shouldInsertMostRecentIntoAddedDocuments()
         throws JsonProcessingException {
         handler = new SupplementaryResponseAboutToSubmitHandler(new AddedDocumentsUtil(true));

@@ -69,6 +69,8 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
             callbackResponse.addError(SUPPLEMENTARY_RESPONSE_DOCUMENT_CANNOT_BE_EMPTY);
         }
 
+        addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(sscsCaseData);
+
         if (sscsCaseData.getDwpOtherDoc() != null && sscsCaseData.getDwpOtherDoc().getDocumentLink() != null) {
             if (DocumentUtil.isFileAMedia(sscsCaseData.getDwpOtherDoc().getDocumentLink())) {
                 addAudioVideoEvidence(sscsCaseData);

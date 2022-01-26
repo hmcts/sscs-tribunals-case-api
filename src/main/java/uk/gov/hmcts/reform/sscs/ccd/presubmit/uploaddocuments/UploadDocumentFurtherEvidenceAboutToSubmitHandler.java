@@ -60,6 +60,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
+        addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(caseData);
         moveDraftsToSscsDocs(caseData);
         moveDraftsToAudioVideoEvidence(caseData);
         caseData.setEvidenceHandled("No");
