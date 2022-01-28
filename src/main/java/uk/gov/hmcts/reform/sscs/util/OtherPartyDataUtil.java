@@ -4,7 +4,6 @@ import static java.util.Collections.sort;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.springframework.util.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.util.*;
@@ -231,24 +230,32 @@ public class OtherPartyDataUtil {
     public static void validateOtherPartyForSscs5Case(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getOtherParties() != null && !sscsCaseData.getOtherParties().isEmpty()) {
             sscsCaseData.getOtherParties().stream()
-                .filter(otherPartyCcdValue -> otherPartyCcdValue.getValue() != null)
-                .map(otherPartyCcdValue -> otherPartyCcdValue.getValue())
+                .filter(otherPartyCcdValue -> nonNull(otherPartyCcdValue.getValue()))
+                .map(CcdValue::getValue)
                 .forEach(otherParty -> clearRoleForOtherParty(otherParty));
         }
     }
 
     public static boolean roleExistsForOtherParties(List<CcdValue<OtherParty>> otherParties) {
         return emptyIfNull(otherParties).stream()
-            .filter(otherPartyCcdValue -> otherPartyCcdValue.getValue() != null)
-            .map(otherPartyCcdValue -> otherPartyCcdValue.getValue())
+            .filter(otherPartyCcdValue -> nonNull(otherPartyCcdValue.getValue()))
+            .map(CcdValue::getValue)
             .anyMatch(otherParty -> otherParty.getRole() != null && otherParty.getRole().getName() != null);
     }
 
     public static boolean roleAbsentForOtherParties(List<CcdValue<OtherParty>> otherParties) {
         return emptyIfNull(otherParties).stream()
-            .filter(otherPartyCcdValue -> otherPartyCcdValue.getValue() != null)
-            .map(otherPartyCcdValue -> otherPartyCcdValue.getValue())
+            .filter(otherPartyCcdValue -> nonNull(otherPartyCcdValue.getValue()))
+            .map(CcdValue::getValue)
             .anyMatch(otherParty -> otherParty.getRole() == null || otherParty.getRole().getName() == null);
+    }
+
+    public static boolean otherPartyWantsToAttendHearing(List<CcdValue<OtherParty>> otherParties) {
+        return emptyIfNull(otherParties).stream()
+            .filter(otherPartyCcdValue -> nonNull(otherPartyCcdValue.getValue()))
+            .map(otherParty -> otherParty.getValue())
+            .filter(otherParty -> nonNull(otherParty.getHearingOptions()))
+            .anyMatch(otherPartyHearing -> otherPartyHearing.getHearingOptions().isWantsToAttendHearing().equals(Boolean.TRUE));
     }
 
     private static void clearRoleForOtherParty(OtherParty otherParty) {
