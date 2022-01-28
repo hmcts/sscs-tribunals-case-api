@@ -4,10 +4,16 @@ import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerBase;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Objects.nonNull;
+import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
 
 @Slf4j
 @Component
@@ -24,7 +30,16 @@ public class GenWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setDefaultFields(SscsCaseData sscsCaseData) {
-        // N/A for GEN
+        if (isOtherPartyPresent(sscsCaseData)) {
+            final List<OtherPartyAttendedQuestion> otherPartyAttendedQuestionList = new ArrayList<>();
+            sscsCaseData.getOtherParties().stream()
+                     .filter(otherPartyCcdValue -> nonNull(otherPartyCcdValue.getValue()))
+                     .map(CcdValue::getValue)
+                     .forEach(otherParty -> otherPartyAttendedQuestionList.add(OtherPartyAttendedQuestion.builder()
+                             .value(OtherPartyAttendedQuestionDetails.builder()
+                                     .otherPartyName(otherParty.getName().getFullNameNoTitle()).build()).build()));
+            sscsCaseData.getSscsFinalDecisionCaseData().setOtherPartyAttendedQuestions(otherPartyAttendedQuestionList);
+        }
     }
 
     @Override

@@ -31,6 +31,8 @@ import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
+
 @Slf4j
 public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends IssueNoticeHandler {
 
@@ -131,6 +133,9 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         writeFinalDecisionBuilder.hearingType(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionTypeOfHearing());
         writeFinalDecisionBuilder.attendedHearing("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion()));
         writeFinalDecisionBuilder.presentingOfficerAttended("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPresentingOfficerAttendedQuestion()));
+        /*if (isOtherPartyPresent(caseData)) {
+            writeFinalDecisionBuilder.otherPartyAttendedHearing()
+        }*/
 
         WriteFinalDecisionTemplateBody payload = writeFinalDecisionBuilder.build();
 
@@ -147,6 +152,10 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         setTemplateContent(decisionNoticeOutcomeService, response, builder, caseData, payload);
 
         return builder.build();
+
+    }
+
+    private void setUpOtherPartyAttendedQuestion(SscsCaseData caseData) {
 
     }
 

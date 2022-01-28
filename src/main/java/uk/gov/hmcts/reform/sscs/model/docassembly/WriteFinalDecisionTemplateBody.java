@@ -63,6 +63,8 @@ public class WriteFinalDecisionTemplateBody {
     private String pageNumber;
     @JsonProperty("attended_hearing")
     private boolean attendedHearing;
+    @JsonProperty("other_party_attended_hearing")
+    private List<OtherPartyAttendedDescriptor> otherPartyAttendedHearing;
     @JsonProperty("presenting_officer_attended")
     private boolean presentingOfficerAttended;
     @JsonProperty("is_descriptor_flow")
