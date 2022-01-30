@@ -128,7 +128,10 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         writeFinalDecisionBuilder.attendedHearing("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion()));
         writeFinalDecisionBuilder.presentingOfficerAttended("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPresentingOfficerAttendedQuestion()));
         if (isOtherPartyPresent(caseData) && CollectionUtils.isNotEmpty(caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions())) {
-            writeFinalDecisionBuilder.otherPartyNamesAttendedHearing(caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions().stream().map(aq -> aq.getValue().getOtherPartyName()).collect(Collectors.joining(", ")));
+            writeFinalDecisionBuilder.otherPartyNamesAttendedHearing(caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions().stream()
+                            .filter(aq -> YesNo.YES.equals(aq.getValue().getAttendedOtherParty()))
+                            .map(aq -> aq.getValue().getOtherPartyName())
+                            .collect(Collectors.joining(", ")));
         }
 
         WriteFinalDecisionTemplateBody payload = writeFinalDecisionBuilder.build();
