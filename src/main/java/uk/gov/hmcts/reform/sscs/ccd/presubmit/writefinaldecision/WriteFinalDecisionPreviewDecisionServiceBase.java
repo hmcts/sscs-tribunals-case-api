@@ -152,10 +152,6 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
     }
 
-    private void setUpOtherPartyAttendedQuestion(SscsCaseData caseData) {
-
-    }
-
     protected boolean isSetAside(SscsCaseData sscsCaseData, Outcome outcome) {
         return Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome);
     }
