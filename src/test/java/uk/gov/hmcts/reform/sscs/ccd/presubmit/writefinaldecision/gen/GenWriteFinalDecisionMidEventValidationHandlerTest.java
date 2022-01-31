@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
+import java.util.Arrays;
+import java.util.List;
 import javax.validation.Validator;
 import junitparams.JUnitParamsRunner;
 import org.junit.Test;
@@ -15,8 +17,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecis
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerTestBase;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 
-import java.util.Arrays;
-import java.util.List;
 
 @RunWith(JUnitParamsRunner.class)
 public class GenWriteFinalDecisionMidEventValidationHandlerTest extends WriteFinalDecisionMidEventValidationHandlerTestBase {
