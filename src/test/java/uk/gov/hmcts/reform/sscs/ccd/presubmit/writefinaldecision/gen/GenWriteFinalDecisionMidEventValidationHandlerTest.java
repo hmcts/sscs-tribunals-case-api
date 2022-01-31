@@ -75,5 +75,10 @@ public class GenWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         assertNull(response.getData().getShowWorkCapabilityAssessmentPage());
     }
 
+    @Test
+    public void givenGenerateNoticeValueAndCaseIsGenAndHasOtherParties_thenShowOtherPartiesAttendedHearing() {
+
+    }
+
 }
 

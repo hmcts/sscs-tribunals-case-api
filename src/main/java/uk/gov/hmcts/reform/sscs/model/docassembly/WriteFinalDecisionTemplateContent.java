@@ -124,11 +124,11 @@ public abstract class WriteFinalDecisionTemplateContent {
         }
     }
 
-    public List<String> getHearingTypeSentences(String appellantName, String bundlePage, String hearingType, boolean appellantAttended, boolean presentingOfficerAttened) {
+    public List<String> getHearingTypeSentences(String appellantName, String bundlePage, String hearingType, boolean appellantAttended, boolean presentingOfficerAttened, String otherPartyNamesAttended) {
         if (equalsIgnoreCase("paper", hearingType)) {
             return asList("No party has objected to the matter being decided without a hearing.", "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.");
         } else  {
-            return getFaceToFaceTelephoneVideoHearingTypeSentences(hearingType, appellantName, bundlePage, appellantAttended, presentingOfficerAttened);
+            return getFaceToFaceTelephoneVideoHearingTypeSentences(hearingType, appellantName, bundlePage, appellantAttended, presentingOfficerAttened, otherPartyNamesAttended);
         }
     }
 
@@ -151,14 +151,21 @@ public abstract class WriteFinalDecisionTemplateContent {
         }
     }
 
-    protected String getAppellantAttended(String hearingType, String appellantName, boolean presentingOfifficerAttened, String bundlePage) {
+    protected String getAppellantAndOtherPartyAttended(String hearingType, String appellantName, boolean presentingOfifficerAttened, String bundlePage, String otherPartyNamesAttended) {
         if (equalsIgnoreCase("faceToFace", hearingType)) {
-            return appellantName + " attended the hearing today and the Tribunal considered the appeal bundle to page " + bundlePage + ". "
+            return appellantName + getOtherPartyNamesAttendedString(otherPartyNamesAttended) + " attended the hearing today and the Tribunal considered the appeal bundle to page " + bundlePage + ". "
                 + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.";
         } else {
-            return appellantName + " attended and the Tribunal considered the appeal bundle to page " + bundlePage + ". "
+            return appellantName + getOtherPartyNamesAttendedString(otherPartyNamesAttended) + " attended and the Tribunal considered the appeal bundle to page " + bundlePage + ". "
                 + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.";
         }
+    }
+
+    protected String getOtherPartyNamesAttendedString(String otherPartyNamesAttended) {
+        if (StringUtils.isNotEmpty(otherPartyNamesAttended)) {
+            return ", " + otherPartyNamesAttended;
+        }
+        return "";
     }
 
     protected String getConsideredParagraph(String bundlePage, String appellantName) {
@@ -170,16 +177,16 @@ public abstract class WriteFinalDecisionTemplateContent {
     }
 
     public List<String> getFaceToFaceTelephoneVideoHearingTypeSentences(String hearingType, String appellantName, String bundlePage,
-        boolean appellantAttended, boolean presentingOfifficerAttened) {
+        boolean appellantAttended, boolean presentingOfifficerAttened, String otherPartyNamesAttended) {
         if (appellantAttended) {
             if (equalsIgnoreCase("faceToFace", hearingType)) {
                 return singletonList("This has been an oral (face to face) hearing. "
-                    + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
+                    + getAppellantAndOtherPartyAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage, otherPartyNamesAttended));
             } else if (equalsIgnoreCase("triage", hearingType)) {
                 return singletonList(getTriageConsideredParagraph(bundlePage));
             } else {
                 return singletonList("This has been a remote hearing in the form of a " + hearingType + " hearing. "
-                    + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
+                    + getAppellantAndOtherPartyAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage, otherPartyNamesAttended));
             }
         } else {
             if (equalsIgnoreCase("faceToFace", hearingType)) {
@@ -198,7 +205,8 @@ public abstract class WriteFinalDecisionTemplateContent {
 
     public void addHearingType(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
         for (String hearingTypeSentence : getHearingTypeSentences(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getPageNumber(),
-            writeFinalDecisionTemplateBody.getHearingType(), writeFinalDecisionTemplateBody.isAttendedHearing(), writeFinalDecisionTemplateBody.isPresentingOfficerAttended())) {
+            writeFinalDecisionTemplateBody.getHearingType(), writeFinalDecisionTemplateBody.isAttendedHearing(), writeFinalDecisionTemplateBody.isPresentingOfficerAttended(),
+                writeFinalDecisionTemplateBody.getOtherPartyNamesAttendedHearing())) {
             addComponent(new Paragraph(WriteFinalDecisionComponentId.HEARING_TYPE.name(), hearingTypeSentence));
         }
     }
