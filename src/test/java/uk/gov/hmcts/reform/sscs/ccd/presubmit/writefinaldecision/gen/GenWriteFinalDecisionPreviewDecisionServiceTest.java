@@ -221,6 +221,7 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
     }
 
+    @Test
     public void willSetPreviewFileWithReasonsAndOtherPartiesAdded_whenAllowed() {
 
         setCommonNonDescriptorRoutePreviewParams(sscsCaseData);
@@ -228,9 +229,17 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         setDescriptorFlowIndicator("no", sscsCaseData);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childsupport").build());
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
-        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().name(Name.builder().firstName("otherPartyFirstname").lastName("otherPartyLastName").build()).build()).build();
-        otherPartyList.add(ccdValue);
+        CcdValue<OtherParty> otherPartyCcdValue1 = CcdValue.<OtherParty>builder().value(OtherParty.builder().name(Name.builder().firstName("otherPartyFirstName1").lastName("otherPartyLastName1").build()).build()).build();
+        CcdValue<OtherParty> otherPartyCcdValue2 = CcdValue.<OtherParty>builder().value(OtherParty.builder().name(Name.builder().firstName("otherPartyFirstName2").lastName("otherPartyLastName2").build()).build()).build();
+        otherPartyList.add(otherPartyCcdValue1);
+        otherPartyList.add(otherPartyCcdValue2);
         sscsCaseData.setOtherParties(otherPartyList);
+        OtherPartyAttendedQuestion otherPartyAttendedQuestion1 = OtherPartyAttendedQuestion.builder().value(OtherPartyAttendedQuestionDetails.builder().otherPartyName("otherPartyFirstName1 otherPartyLastName1").attendedOtherParty(YesNo.YES).build()).build();
+        OtherPartyAttendedQuestion otherPartyAttendedQuestion2 = OtherPartyAttendedQuestion.builder().value(OtherPartyAttendedQuestionDetails.builder().otherPartyName("otherPartyFirstName2 otherPartyLastName2").attendedOtherParty(YesNo.NO).build()).build();
+        List<OtherPartyAttendedQuestion> otherPartyAttendedQuestionList = new ArrayList<>();
+        otherPartyAttendedQuestionList.add(otherPartyAttendedQuestion1);
+        otherPartyAttendedQuestionList.add(otherPartyAttendedQuestion2);
+        sscsCaseData.getSscsFinalDecisionCaseData().setOtherPartyAttendedQuestions(otherPartyAttendedQuestionList);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -262,7 +271,6 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNotNull(body);
 
         // Common assertions
-        assertCommonNonDescriptorFlowPreviewParams(body, false);
         assertNull(body.getMobilityAwardRate());
         assertEquals(false, body.isMobilityIsSeverelyLimited());
         assertEquals(false, body.isMobilityIsEntited());
@@ -276,7 +284,7 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDailyLivingDescriptors());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertEquals("otherPartyFirstname otherPartyLastname", payload.getWriteFinalDecisionTemplateBody().getOtherPartyNamesAttendedHearing());
+        assertEquals("otherPartyFirstName1 otherPartyLastName1", payload.getWriteFinalDecisionTemplateBody().getOtherPartyNamesAttendedHearing());
     }
 
     @Test
