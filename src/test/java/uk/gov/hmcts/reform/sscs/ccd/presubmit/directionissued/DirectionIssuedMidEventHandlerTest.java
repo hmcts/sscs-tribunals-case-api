@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
@@ -211,13 +212,24 @@ public class DirectionIssuedMidEventHandlerTest {
     }
 
     @Test
-    public void shouldErrorWhenDirectionTypeIsProvideInformationAndNoDueDate() {
+    public void shouldErrorWhenDirectionTypeIsGrantExtensionAndNoDueDate() {
         sscsCaseData.setDirectionDueDate(null);
-        sscsCaseData.getDirectionTypeDl().setValue(new DynamicListItem(DirectionType.PROVIDE_INFORMATION.toString(), "appeal To Proceed"));
+        sscsCaseData.getDirectionTypeDl().setValue(new DynamicListItem(DirectionType.GRANT_EXTENSION.toString(), "Allow time extension"));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
 
         assertEquals("Please populate the direction due date", response.getErrors().toArray()[0]);
+    }
+
+
+    @Test
+    public void shouldErrorWhenDirectionTypeIsGrantExtensionAndDueDateIsNotFutureDay() {
+        sscsCaseData.setDirectionDueDate(LocalDate.now().plus(-1, ChronoUnit.DAYS).toString());
+        sscsCaseData.getDirectionTypeDl().setValue(new DynamicListItem(DirectionType.GRANT_EXTENSION.toString(), "Allow time extension"));
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertEquals(1, response.getErrors().size());
+
+        assertEquals("Directions due date must be in the future", response.getErrors().toArray()[0]);
     }
 
 }

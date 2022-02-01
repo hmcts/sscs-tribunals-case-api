@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
+import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
@@ -40,10 +41,12 @@ import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 @Slf4j
 public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    private final AddNoteService addNoteService;
     private final FooterService footerService;
     private final ServiceRequestExecutor serviceRequestExecutor;
     private final String bulkScanEndpoint;
     private final DwpAddressLookupService dwpAddressLookupService;
+
     private final int dwpResponseDueDays;
     private final int dwpResponseDueDaysChildSupport;
 
@@ -53,13 +56,15 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                                                @Value("${bulk_scan.validateEndpoint}") String validateEndpoint,
                                                DwpAddressLookupService dwpAddressLookupService,
                                                @Value("${dwp.response.due.days}") int dwpResponseDueDays,
-                                               @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport) {
+                                               @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport,
+                                               AddNoteService addNoteService) {
         this.footerService = footerService;
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bulkScanEndpoint = String.format("%s%s", trimToEmpty(bulkScanUrl), trimToEmpty(validateEndpoint));
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.dwpResponseDueDays = dwpResponseDueDays;
         this.dwpResponseDueDaysChildSupport = dwpResponseDueDaysChildSupport;
+        this.addNoteService = addNoteService;
     }
 
     @Override
@@ -82,7 +87,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         return validateDirectionType(caseData)
                 .or(()        -> validateDirectionDueDate(caseData))
-                .orElseGet(() -> validateForPdfAndCreateCallbackResponse(callback, caseDetails, caseData, documentTranslationStatus));
+                .orElseGet(() -> validateForPdfAndCreateCallbackResponse(callback, caseDetails, caseData, documentTranslationStatus, userAuthorisation));
     }
 
     private void updateDwpRegionalCentre(SscsCaseData caseData) {
@@ -138,14 +143,50 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         return caseData;
     }
 
+    private SscsCaseData updateCaseAfterExtensionRefusedWithListForHearing(SscsCaseData caseData, String userAuthorisation) {
+        caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
+        caseData.setState(State.RESPONSE_RECEIVED);
+
+        String note = "DWP time extension rejected, judge next action – list for hearing";
+        addNoteService.addNote(userAuthorisation, caseData, note);
+        caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
+        caseData.setInterlocReferralReason(null);
+        caseData.setTimeExtensionRequested("No");
+
+        return caseData;
+    }
+
+
+
+    private SscsCaseData updateCaseAfterExtensionRefusedWithMakeValidAppeal(SscsCaseData caseData, String userAuthorisation) {
+        caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
+        String note = "DWP time extension rejected, judge next action – make valid appeal";
+        addNoteService.addNote(userAuthorisation, caseData, note);
+        caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
+        caseData.setInterlocReferralReason(null);
+        caseData.setTimeExtensionRequested("No");
+        return caseData;
+    }
+
+    private SscsCaseData updateCaseAfterExtensionRefusedWithNoFurtherAction(SscsCaseData caseData, String userAuthorisation) {
+        caseData.setInterlocReviewState(null);
+        String note = "DWP time extension rejected, judge next action - no further action";
+        addNoteService.addNote(userAuthorisation, caseData, note);
+        caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
+        caseData.setInterlocReferralReason(null);
+        caseData.setTimeExtensionRequested("No");
+        return caseData;
+    }
+
+
     @NotNull
-    private SscsCaseData updateCaseForDirectionType(CaseDetails<SscsCaseData> caseDetails, SscsCaseData caseData, SscsDocumentTranslationStatus documentTranslationStatus) {
+    private SscsCaseData updateCaseForDirectionType(CaseDetails<SscsCaseData> caseDetails, SscsCaseData caseData, SscsDocumentTranslationStatus documentTranslationStatus, String userAuthorisation) {
 
         if (DirectionType.PROVIDE_INFORMATION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
 
             caseData.setInterlocReviewState(AWAITING_INFORMATION.getId());
 
-        } else if (getPreValidStates().contains(caseDetails.getState())
+        }  else if (getPreValidStates().contains(caseDetails.getState())
                 && DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setDateSentToDwp(LocalDate.now().toString());
             caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate(getResponseDueDays(caseData)));
@@ -156,9 +197,38 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             if (caseData.getCreatedInGapsFrom() == null || VALID_APPEAL.getId().equalsIgnoreCase(caseData.getCreatedInGapsFrom())) {
                 caseData.setCreatedInGapsFrom(READY_TO_LIST.getId());
             }
+        }  else if (DirectionType.GRANT_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
+                && VALID_APPEAL.equals(caseData.getState())) {
+            caseData = updateCaseGrantExtensionPostValidCase(caseData);
+
+        } else if (DirectionType.GRANT_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
+                && getPreValidStates().contains(caseDetails.getState())) {
+            caseData = updateCaseGrantExtensionPreValidCase(caseData);
+
+        }  else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
+                && ExtensionNextEvent.SEND_TO_LISTING.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())
+                && StringUtils.isBlank(caseData.getDirectionDueDate())) {
+            caseData = updateCaseAfterExtensionRefusedWithListForHearing(caseData, userAuthorisation);
+
+        } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
+                && ExtensionNextEvent.SEND_TO_LISTING.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())
+                && !StringUtils.isBlank(caseData.getDirectionDueDate())) {
+            caseData = updateCaseAfterExtensionRefusedWithListForHearing(caseData, userAuthorisation);
+
         } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
                 && ExtensionNextEvent.SEND_TO_LISTING.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
             caseData = updateCaseAfterExtensionRefused(caseData, AWAITING_ADMIN_ACTION.getId(), State.RESPONSE_RECEIVED);
+
+        }  else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
+                && ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())
+                && getPreValidStates().contains(caseDetails.getState())
+                && StringUtils.isBlank(caseData.getDirectionDueDate())) {
+            caseData = updateCaseAfterExtensionRefusedWithMakeValidAppeal(caseData, userAuthorisation);
+
+        } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
+                && ExtensionNextEvent.NO_FURTHER_ACTION.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())
+                && StringUtils.isBlank(caseData.getDirectionDueDate())) {
+            caseData = updateCaseAfterExtensionRefusedWithNoFurtherAction(caseData, userAuthorisation);
 
         } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
                 && ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
@@ -241,6 +311,25 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         return caseData;
     }
 
+    private SscsCaseData updateCaseGrantExtensionPostValidCase(SscsCaseData caseData) {
+
+        caseData.setTimeExtensionRequested("No");
+        caseData.setDwpResponseDate(caseData.getDirectionDueDate());
+        caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
+        caseData.setInterlocReviewState(null);
+        caseData.setInterlocReferralReason(null);
+
+
+        return caseData;
+    }
+
+    private SscsCaseData updateCaseGrantExtensionPreValidCase(SscsCaseData caseData) {
+        caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
+        caseData.setInterlocReferralReason(null);
+        caseData.setTimeExtensionRequested("No");
+        return caseData;
+    }
+
     private void updateStateIfInterLockReviewState(SscsCaseData caseData) {
         State previousState = caseData.getPreviousState();
 
@@ -254,7 +343,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
     @NotNull
     private PreSubmitCallbackResponse<SscsCaseData> validateForPdfAndCreateCallbackResponse(
-            Callback<SscsCaseData> callback, CaseDetails<SscsCaseData> caseDetails, SscsCaseData caseData, SscsDocumentTranslationStatus documentTranslationStatus) {
+            Callback<SscsCaseData> callback, CaseDetails<SscsCaseData> caseDetails, SscsCaseData caseData, SscsDocumentTranslationStatus documentTranslationStatus, String userAuthorisation) {
 
         final PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse =
                 new PreSubmitCallbackResponse<>(caseData);
@@ -279,7 +368,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             return sscsCaseDataPreSubmitCallbackResponse;
         }
 
-        return buildResponse(callback, caseDetails, caseData, sscsCaseDataPreSubmitCallbackResponse, url, documentTranslationStatus);
+        return buildResponse(callback, caseDetails, caseData, sscsCaseDataPreSubmitCallbackResponse, url, documentTranslationStatus, userAuthorisation);
     }
 
     private PreSubmitCallbackResponse<SscsCaseData> buildResponse(Callback<SscsCaseData> callback,
@@ -287,9 +376,10 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                                                                   SscsCaseData caseData,
                                                                   PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse,
                                                                   DocumentLink url,
-                                                                  SscsDocumentTranslationStatus documentTranslationStatus) {
+                                                                  SscsDocumentTranslationStatus documentTranslationStatus,
+                                                                  String userAuthorisation) {
 
-        caseData = updateCaseForDirectionType(caseDetails, caseData, documentTranslationStatus);
+        caseData = updateCaseForDirectionType(caseDetails, caseData, documentTranslationStatus, userAuthorisation);
 
 
         if (callback.getEvent() == EventType.DIRECTION_ISSUED) {
