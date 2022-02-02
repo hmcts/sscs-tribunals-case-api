@@ -221,7 +221,6 @@ public class DirectionIssuedMidEventHandlerTest {
         assertEquals("Please populate the direction due date", response.getErrors().toArray()[0]);
     }
 
-
     @Test
     public void shouldErrorWhenDirectionTypeIsGrantExtensionAndDueDateIsNotFutureDay() {
         sscsCaseData.setDirectionDueDate(LocalDate.now().plus(-1, ChronoUnit.DAYS).toString());

@@ -605,39 +605,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         verifyNoInteractions(footerService);
     }
-    /*
-        @Test
-        @Parameters({"pip, 35", "childSupport, 42"})
-        public void givenWelshDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToListing_setResponseReceivedStateAndInterlocStateToAwaitingAdminAction(String benefitType, int expectedResponseDays) {
-            callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_EXTENSION.toString()));
-            callback.getCaseDetails().getCaseData().setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_LISTING.toString()));
-            callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefitType).build());
-
-            when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED_WELSH);
-            sscsCaseData.setLanguagePreferenceWelsh("Yes");
-
-            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-            assertValues(response, AWAITING_ADMIN_ACTION.getId(), DIRECTION_ACTION_REQUIRED.getId(), State.RESPONSE_RECEIVED, expectedResponseDays);
-        }
-    */
-
-    /* @Test
-        @Parameters({"pip, 35", "childSupport, 42"})
-        public void givenWelshDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToValidAppeal_setWithDwpStateAndDoNotSetInterlocState(String benefitType, int expectedResponseDays) {
-            callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_EXTENSION.toString()));
-            callback.getCaseDetails().getCaseData().setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString()));
-            callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefitType).build());
-
-            when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED_WELSH);
-            sscsCaseData.setLanguagePreferenceWelsh("Yes");
-
-            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-            assertValues(response, null, DIRECTION_ACTION_REQUIRED.getId(), State.WITH_DWP, expectedResponseDays);
-        }
-
-    */
 
     @Test
     public void givenIssueDirectionNoticeForAppealToProceedForPreValidCase_thenSetNonDigitalToDigitalCase() {
@@ -714,9 +681,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
         assertNull(response.getData().getInterlocReferralReason());
         assertThat(response.getData().getTimeExtensionRequested(), is("No"));
-
     }
-
 
     @Test
     @Parameters({"pip, 35", "childSupport, 42"})
@@ -748,7 +713,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
         assertThat(response.getData().getTimeExtensionRequested(), is("No"));
     }
-
 
     private void assertValues(PreSubmitCallbackResponse<SscsCaseData> response, String interlocReviewState, String dwpState, State state, int expectedResponseDays) {
         assertEquals(interlocReviewState, response.getData().getInterlocReviewState());
