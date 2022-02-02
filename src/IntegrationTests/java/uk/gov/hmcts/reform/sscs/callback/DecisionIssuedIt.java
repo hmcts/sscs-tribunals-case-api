@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.callback;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.STRUCK_OUT;
@@ -26,14 +25,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
-import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -46,7 +46,7 @@ public class DecisionIssuedIt extends AbstractEventIt {
     private AuthTokenGenerator authTokenGenerator;
 
     @MockBean
-    private EvidenceManagementService evidenceManagementService;
+    private EvidenceManagementSecureDocStoreService evidenceManagementService;
 
     @MockBean
     private GenerateFile generateFile;
@@ -80,10 +80,10 @@ public class DecisionIssuedIt extends AbstractEventIt {
     @Test
     public void callToAboutToSubmitEventHandler_willSaveTheInterlocDecisionDocumentFromPreview() throws Exception {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
-        when(evidenceManagementService.download(any(), anyString())).thenReturn(pdfBytes);
+        when(evidenceManagementService.download(any(), IdamTokens.builder().build())).thenReturn(pdfBytes);
 
         UploadResponse uploadResponse = createUploadResponse();
-        when(evidenceManagementService.upload(any(), anyString())).thenReturn(uploadResponse);
+        when(evidenceManagementService.upload(any(), IdamTokens.builder().build())).thenReturn(uploadResponse);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -111,10 +111,10 @@ public class DecisionIssuedIt extends AbstractEventIt {
         setup("callback/decisionIssuedManualInterloc.json");
 
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
-        when(evidenceManagementService.download(any(), anyString())).thenReturn(pdfBytes);
+        when(evidenceManagementService.download(any(), IdamTokens.builder().build())).thenReturn(pdfBytes);
 
         UploadResponse uploadResponse = createUploadResponse();
-        when(evidenceManagementService.upload(any(), anyString())).thenReturn(uploadResponse);
+        when(evidenceManagementService.upload(any(), IdamTokens.builder().build())).thenReturn(uploadResponse);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         assertHttpStatus(response, HttpStatus.OK);

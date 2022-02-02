@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import uk.gov.hmcts.reform.document.domain.Document;
-import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.ccd.document.am.model.Document;
+import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
@@ -50,15 +50,13 @@ public class IntegrationTestHelper {
 
     public static UploadResponse createUploadResponse() {
         UploadResponse response = mock(UploadResponse.class);
-        UploadResponse.Embedded embedded = mock(UploadResponse.Embedded.class);
-        when(response.getEmbedded()).thenReturn(embedded);
         Document document = createDocument();
-        when(embedded.getDocuments()).thenReturn(Collections.singletonList(document));
+        when(response.getDocuments()).thenReturn(Collections.singletonList(document));
         return response;
     }
 
     private static Document createDocument() {
-        Document document = new Document();
+        Document document = Document.builder().build();
         Document.Links links = new Document.Links();
         Document.Link link = new Document.Link();
         link.href = "some location";

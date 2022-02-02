@@ -8,7 +8,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -44,15 +43,16 @@ import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.document.domain.Document;
-import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.ccd.document.am.model.Document;
+import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @SpringBootTest
@@ -73,7 +73,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
     private AuthTokenGenerator authTokenGenerator;
 
     @MockBean
-    private EvidenceManagementService evidenceManagementService;
+    private EvidenceManagementSecureDocStoreService evidenceManagementService;
 
     @MockBean
     UploadResponse uploadResponse;
@@ -84,7 +84,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
     }
 
     private Document createDocument() {
-        Document document = new Document();
+        Document document = Document.builder().build();
         Document.Links links = new Document.Links();
         Document.Link link = new Document.Link();
         link.href = "a location";
@@ -100,10 +100,10 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
         json = json.replaceAll("DOCUMENT_TYPE", documentType);
 
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
-        when(evidenceManagementService.download(any(), anyString())).thenReturn(pdfBytes);
+        when(evidenceManagementService.download(any(), IdamTokens.builder().build())).thenReturn(pdfBytes);
 
         UploadResponse uploadResponse = createUploadResponse();
-        when(evidenceManagementService.upload(any(), anyString())).thenReturn(uploadResponse);
+        when(evidenceManagementService.upload(any(), IdamTokens.builder().build())).thenReturn(uploadResponse);
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
 
@@ -319,13 +319,12 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
 
         ArgumentCaptor<List<MultipartFile>> captor = ArgumentCaptor.forClass(List.class);
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
-        when(evidenceManagementService.download(any(), anyString())).thenReturn(pdfBytes);
+        when(evidenceManagementService.download(any(), IdamTokens.builder().build())).thenReturn(pdfBytes);
 
-        UploadResponse.Embedded embedded = mock(UploadResponse.Embedded.class);
         List<Document> documents = Collections.singletonList(createDocument());
-        when(embedded.getDocuments()).thenReturn(documents);
-        when(uploadResponse.getEmbedded()).thenReturn(embedded);
-        when(evidenceManagementService.upload(captor.capture(), anyString())).thenReturn(uploadResponse);
+
+        when(uploadResponse.getDocuments()).thenReturn(documents);
+        when(evidenceManagementService.upload(captor.capture(), IdamTokens.builder().build())).thenReturn(uploadResponse);
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
 

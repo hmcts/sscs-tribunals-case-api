@@ -44,7 +44,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDecisionDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -62,7 +62,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     private DecisionIssuedAboutToSubmitHandler handler;
 
     @Mock
-    private EvidenceManagementService evidenceManagementService;
+    private EvidenceManagementSecureDocStoreService evidenceManagementService;
 
     @Mock
     private Callback<SscsCaseData> callback;

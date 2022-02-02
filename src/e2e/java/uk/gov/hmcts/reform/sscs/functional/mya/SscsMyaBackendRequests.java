@@ -6,10 +6,8 @@ import static org.apache.http.client.methods.RequestBuilder.*;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static uk.gov.hmcts.reform.sscs.service.evidence.EvidenceUploadService.DM_STORE_USER_ID;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +28,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 
 @Slf4j
 public class SscsMyaBackendRequests {
@@ -38,15 +36,15 @@ public class SscsMyaBackendRequests {
     private final CitizenIdamService citizenIdamService;
     private String baseUrl;
     private CloseableHttpClient client;
-    private EvidenceManagementService evidenceManagementService;
+    private PdfStoreService pdfStoreService;
 
 
-    public SscsMyaBackendRequests(IdamService idamService, CitizenIdamService citizenIdamService, String baseUrl, CloseableHttpClient client, EvidenceManagementService evidenceManagementService) {
+    public SscsMyaBackendRequests(IdamService idamService, CitizenIdamService citizenIdamService, String baseUrl, CloseableHttpClient client, PdfStoreService pdfStoreService) {
         this.idamTokens = idamService.getIdamTokens();
         this.citizenIdamService = citizenIdamService;
         this.baseUrl = baseUrl;
         this.client = client;
-        this.evidenceManagementService = evidenceManagementService;
+        this.pdfStoreService = pdfStoreService;
     }
 
     public JSONArray getOnlineHearingForCitizen(String tya, String email) throws IOException {
@@ -217,9 +215,6 @@ public class SscsMyaBackendRequests {
     }
 
     public byte[] toBytes(String documentUrl) {
-        return evidenceManagementService.download(
-                URI.create(documentUrl),
-                DM_STORE_USER_ID
-        );
+        return pdfStoreService.download(documentUrl);
     }
 }
