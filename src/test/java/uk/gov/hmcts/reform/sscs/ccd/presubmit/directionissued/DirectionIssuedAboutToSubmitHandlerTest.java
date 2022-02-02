@@ -330,37 +330,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
     }
 
-    /*
-        @Test
-        @Parameters({"pip, 35", "childSupport, 42"})
-        public void givenDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToListing_setResponseReceivedStateAndInterlocStateToAwaitingAdminAction(String benefitType, int expectedResponseDays) {
-            callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_EXTENSION.toString()));
-
-            callback.getCaseDetails().getCaseData().setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_LISTING.toString()));
-
-            callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefitType).build());
-
-            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-            assertValues(response, AWAITING_ADMIN_ACTION.getId(), DIRECTION_ACTION_REQUIRED.getId(), State.RESPONSE_RECEIVED, expectedResponseDays);
-        }
-    */
-
-    /*
-        @Test
-        @Parameters({"pip, 35", "childSupport, 42"})
-        public void givenDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToValidAppeal_setWithDwpStateAndDoNotSetInterlocState(String benefitType, int expectedResponseDays) {
-            callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_EXTENSION.toString()));
-            callback.getCaseDetails().getCaseData().setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString()));
-            callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefitType).build());
-            callback.getCaseDetails().getCaseData().setDirectionDueDate(null);
-
-            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-            assertValues(response, AWAITING_ADMIN_ACTION.getId(), DIRECTION_ACTION_REQUIRED.getId(), State.WITH_DWP, expectedResponseDays);
-        }
-    */
-
     @Test
     public void givenDirectionTypeOfGrantReinstatementAndNotInterlocReview_setState() {
 
@@ -713,13 +682,5 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
         assertThat(response.getData().getTimeExtensionRequested(), is("No"));
     }
-
-    private void assertValues(PreSubmitCallbackResponse<SscsCaseData> response, String interlocReviewState, String dwpState, State state, int expectedResponseDays) {
-        assertEquals(interlocReviewState, response.getData().getInterlocReviewState());
-        assertThat(response.getData().getDwpState(), is(dwpState));
-        assertThat(response.getData().getState(), is(state));
-        assertThat(response.getData().getHmctsDwpState(), is("sentToDwp"));
-        assertThat(response.getData().getDateSentToDwp(), is(LocalDate.now().toString()));
-        assertThat(response.getData().getDwpDueDate(), is(LocalDate.now().plusDays(expectedResponseDays).toString()));
-    }
+    
 }
