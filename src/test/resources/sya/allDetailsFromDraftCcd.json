@@ -1,6 +1,22 @@
 {
   "caseCreated" : "${json-unit.ignore}",
-  "caseName":"Joe Bloggs",
+  "caseAccessCategory": "Personal Independence Payment",
+  "caseManagementCategory": {
+    "value": {
+      "code": "PIP",
+      "label": "Personal Independence Payment"
+    },
+    "list_items": [
+      {
+        "code": "PIP",
+        "label": "Personal Independence Payment"
+      }
+    ]
+  },
+  "caseNameHmctsInternal": "Joe Bloggs",
+  "caseNameHmctsRestricted": "Joe Bloggs",
+  "caseNamePublic": "Joe Bloggs",
+  "ogdType": "DWP",
   "benefitCode" : "002",
   "issueCode" : "DD",
   "caseCode" : "002DD",

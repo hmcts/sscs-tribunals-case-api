@@ -31,7 +31,7 @@
         <cve>CVE-2020-11022</cve>
         <cve>CVE-2020-11023</cve>
     </suppress>
-    <suppress until="2022-02-01">
+    <suppress until="2022-03-01">
         <notes><![CDATA[
    file name: jakarta.el-3.0.3.jar
    ]]></notes>
