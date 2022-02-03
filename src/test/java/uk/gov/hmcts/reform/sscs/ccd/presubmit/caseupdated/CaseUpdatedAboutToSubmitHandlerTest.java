@@ -699,7 +699,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                         .build())
                 .build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals("universalCredit", response.getData().getWorkAllocationFields().getCaseAccessCategory());
+        assertEquals("Universal Credit", response.getData().getWorkAllocationFields().getCaseAccessCategory());
         assertEquals("Universal Credit", response.getData().getWorkAllocationFields().getCaseManagementCategory().getValue().getLabel());
         assertEquals("UC", response.getData().getWorkAllocationFields().getCaseManagementCategory().getValue().getCode());
     }
@@ -764,7 +764,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                 .build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("personalIndependencePayment", response.getData().getWorkAllocationFields().getCaseAccessCategory());
+        assertEquals("Personal Independence Payment", response.getData().getWorkAllocationFields().getCaseAccessCategory());
         assertEquals("Personal Independence Payment", response.getData().getWorkAllocationFields().getCaseManagementCategory().getValue().getLabel());
         assertEquals("PIP", response.getData().getWorkAllocationFields().getCaseManagementCategory().getValue().getCode());
     }
