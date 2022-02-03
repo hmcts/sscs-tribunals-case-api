@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.processreasonableadjustment;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -37,10 +38,11 @@ public class ProcessReasonableAdjustmentAboutToSubmitHandler implements PreSubmi
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if ((sscsCaseData.getReasonableAdjustmentsLetters() == null)
-                || (sscsCaseData.getReasonableAdjustmentsLetters().getAppellant().isEmpty()
-                && sscsCaseData.getReasonableAdjustmentsLetters().getRepresentative().isEmpty()
-                && sscsCaseData.getReasonableAdjustmentsLetters().getAppointee().isEmpty()
-                && sscsCaseData.getReasonableAdjustmentsLetters().getJointParty().isEmpty())) {
+                || (isEmpty(sscsCaseData.getReasonableAdjustmentsLetters().getAppellant())
+                && isEmpty(sscsCaseData.getReasonableAdjustmentsLetters().getRepresentative())
+                && isEmpty(sscsCaseData.getReasonableAdjustmentsLetters().getAppointee())
+                && isEmpty(sscsCaseData.getReasonableAdjustmentsLetters().getJointParty())
+                && isEmpty(sscsCaseData.getReasonableAdjustmentsLetters().getOtherParty()))) {
             callbackResponse.addError("No reasonable adjustment correspondence has been generated on this case");
         }
 

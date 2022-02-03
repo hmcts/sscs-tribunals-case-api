@@ -108,6 +108,7 @@
       "otherReasons": "Another reason"
     },
     "rep": {
+      "id": null,
       "hasRepresentative": "No",
       "name": null,
       "address": null,

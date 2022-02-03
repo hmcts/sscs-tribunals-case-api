@@ -1,5 +1,22 @@
 {
   "caseCreated" : "${json-unit.ignore}",
+  "caseAccessCategory": "Child Support",
+  "caseManagementCategory": {
+    "value": {
+      "code": "childSupport",
+      "label": "Child Support"
+    },
+    "list_items": [
+      {
+        "code": "childSupport",
+        "label": "Child Support"
+      }
+    ]
+  },
+  "caseNameHmctsInternal": "Joe Bloggs",
+  "caseNameHmctsRestricted": "Joe Bloggs",
+  "caseNamePublic": "Joe Bloggs",
+  "ogdType": "DWP",
   "benefitCode" : "022",
   "issueCode" : "DD",
   "caseCode" : "022DD",
@@ -69,7 +86,8 @@
         "identity": {
           "dob": "1991-03-31",
           "nino": null
-        }
+        },
+        "id": null
       }
     },
     "benefitType": {
@@ -151,7 +169,8 @@
         "phone": null,
         "mobile": "07411999999"
       },
-      "organisation": "HP Ltd"
+      "organisation": "HP Ltd",
+      "id": null
     },
     "signer": "Joe Bloggs",
     "hearingSubtype": {},

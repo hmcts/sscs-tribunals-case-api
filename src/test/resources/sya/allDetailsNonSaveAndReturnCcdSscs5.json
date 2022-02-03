@@ -1,0 +1,241 @@
+{
+  "caseCreated" : "${json-unit.ignore}",
+
+  "caseAccessCategory": "Tax Credit",
+  "caseManagementCategory": {
+    "value": {
+      "code": "taxCredit",
+      "label": "Tax Credit"
+    },
+    "list_items": [
+      {
+        "code": "taxCredit",
+        "label": "Tax Credit"
+      }
+    ]
+  },
+  "caseNameHmctsInternal": "Joe Bloggs",
+  "caseNameHmctsRestricted": "Joe Bloggs",
+  "caseNamePublic": "Joe Bloggs",
+  "ogdType": "HMRC",
+  "benefitCode" : "053",
+  "issueCode" : "DD",
+  "caseCode" : "053DD",
+  "region": "BRADFORD",
+  "regionalProcessingCenter": {
+    "name" : "BRADFORD",
+    "address1" : "HM Courts & Tribunals Service",
+    "address2" : "Social Security & Child Support Appeals",
+    "address3" : "Phoenix House",
+    "address4" : "Rushton Avenue",
+    "city" : "BRADFORD",
+    "postcode" : "BD3 7BH",
+    "phoneNumber" : "0300 123 1142",
+    "faxNumber" : "0126 434 7983",
+    "email": "SSCS_Bradford@justice.gov.uk"
+  },
+  "appeal": {
+    "mrnDetails": {
+      "dwpIssuingOffice": "TCO Preston Appeals Team",
+      "mrnDate": "2018-02-01",
+      "mrnLateReason": null,
+      "mrnMissingReason": null
+    },
+    "appellant": {
+      "name": {
+        "title": "Mr",
+        "firstName": "Joe",
+        "lastName": "Bloggs"
+      },
+      "address": {
+        "line1": "123 Hairy Lane",
+        "line2": "Off Hairy Park",
+        "town": "Hairyfield",
+        "county": "Kent",
+        "postcode": "TN32 6PL"
+      },
+      "contact": {
+        "email": null,
+        "phone": null,
+        "mobile": null
+      },
+      "identity": {
+        "dob": "1990-02-26",
+        "nino": "AB877533C"
+      },
+      "isAppointee": "No",
+      "role":{},
+      "confidentialityRequired": null,
+      "isAddressSameAsAppointee": "No",
+      "appointee": {
+        "name": {
+          "title": "Mrs",
+          "firstName": "Mary",
+          "lastName": "Bloggs"
+        },
+        "address": {
+          "line1": "999 Another Street",
+          "town": "Another Town",
+          "county": "Newcastle",
+          "postcode": "NE1 1AW"
+        },
+        "contact": {
+          "email": "sscsappointee@greencroftconsulting.com",
+          "phone": null,
+          "mobile": "01234567810"
+        },
+        "identity": {
+          "dob": "1991-03-31",
+          "nino": null
+        },
+        "id": null
+      }
+    },
+    "benefitType": {
+      "code": "taxCredit",
+      "description": "Tax Credit"
+    },
+    "hearingOptions": {
+      "wantsToAttend": "Yes",
+      "wantsSupport": "Yes",
+      "languageInterpreter": "Yes",
+      "languages": "Telugu",
+      "signLanguageType": "Sign language",
+      "arrangements": [
+        "signLanguageInterpreter",
+        "hearingLoop"
+      ],
+      "scheduleHearing": "Yes",
+      "excludeDates": [
+        {
+          "value": {
+            "start": "2018-04-04",
+            "end": "2018-04-04"
+          }
+        },
+        {
+          "value": {
+            "start": "2018-04-05",
+            "end": "2018-04-05"
+          }
+        },
+        {
+          "value": {
+            "start": "2018-04-06",
+            "end": "2018-04-06"
+          }
+        }
+      ],
+      "other": "Yes, this..."
+    },
+    "appealReasons": {
+      "reasons": [
+        {
+          "value": {
+            "reason": "aaaaaaaaaa",
+            "description": "aaaaaaaaaa"
+          }
+        },
+        {
+          "value": {
+            "reason": "bbbbbbbbbb",
+            "description": "bbbbbbbbbb"
+          }
+        },
+        {
+          "value": {
+            "reason": "cccccccccc",
+            "description": "cccccccccc"
+          }
+        }
+      ],
+      "otherReasons": "Another reason"
+    },
+    "rep": {
+      "hasRepresentative": "Yes",
+      "name": {
+        "title": "Mr",
+        "firstName": "Harry",
+        "lastName": "Potter"
+      },
+      "address": {
+        "line1": "123 Hairy Lane",
+        "line2": "Off Hairy Park",
+        "town": "Town",
+        "county": "County",
+        "postcode": "CM14 4LQ"
+      },
+      "contact": {
+        "email": "harry.potter@wizards.com",
+        "phone": null,
+        "mobile": "07411999999"
+      },
+      "organisation": "HP Ltd",
+      "id": null
+    },
+    "signer": "Joe Bloggs",
+    "hearingSubtype": {},
+    "hearingType": "oral",
+    "receivedVia": "Online"
+  },
+  "subscriptions": {
+    "appellantSubscription": {
+      "wantSmsNotifications": "Yes",
+      "tya": "${json-unit.ignore}",
+      "email": "sscstest+notify@greencroftconsulting.com",
+      "mobile": "+447398785050",
+      "subscribeEmail": "Yes",
+      "subscribeSms": "Yes",
+      "reason": null,
+      "lastLoggedIntoMya": null
+    },
+    "supporterSubscription": {
+      "wantSmsNotifications": null,
+      "tya":null,
+      "email": null,
+      "mobile": null,
+      "subscribeEmail": null,
+      "subscribeSms": null,
+      "reason":null,
+      "lastLoggedIntoMya": null
+    },
+    "appointeeSubscription": {
+      "wantSmsNotifications": null,
+      "tya":null,
+      "email": null,
+      "mobile": null,
+      "subscribeEmail": null,
+      "subscribeSms": null,
+      "reason":null,
+      "lastLoggedIntoMya": null
+    },
+    "representativeSubscription": {
+      "wantSmsNotifications":"Yes",
+      "tya": "${json-unit.ignore}",
+      "email":"harry.potter@wizards.com",
+      "mobile":"+447411999999",
+      "subscribeEmail":"Yes",
+      "subscribeSms":"Yes",
+      "reason":null,
+      "lastLoggedIntoMya": null
+    },
+    "jointPartySubscription": {
+      "wantSmsNotifications": null,
+      "tya":null,
+      "email": null,
+      "mobile": null,
+      "subscribeEmail": null,
+      "subscribeSms": null,
+      "reason":null,
+      "lastLoggedIntoMya": null
+    }
+  },
+  "evidencePresent" : "No",
+  "sscsDocument":[],
+  "dwpRegionalCentre": "TCO Preston Appeals Team",
+  "pcqId": "12345678",
+  "languagePreferenceWelsh" : "No",
+  "createdInGapsFrom": "readyToList",
+  "processingVenue": "Ashford",
+  "isScottishCase" : "No"
+}

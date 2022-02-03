@@ -58,7 +58,7 @@ public class DormantEventsAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"HMCTS_LAPSE_CASE", "CONFIRM_LAPSED", "WITHDRAWN", "LAPSED_REVISED", "DORMANT", "ADMIN_SEND_TO_DORMANT_APPEAL_STATE", "ADMIN_APPEAL_WITHDRAWN"})
+    @Parameters({"HMCTS_LAPSE_CASE", "CONFIRM_LAPSED", "WITHDRAWN", "LAPSED_REVISED", "DORMANT", "ADMIN_SEND_TO_DORMANT_APPEAL_STATE", "ADMIN_APPEAL_WITHDRAWN", "ISSUE_FINAL_DECISION"})
     public void clearInterlocReviewStateAndDirectionDueDateForDormantEvents(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
 

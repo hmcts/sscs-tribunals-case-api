@@ -46,41 +46,46 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
         SscsHearingRecordingCaseData sscsHearingRecordingCaseData =
                 sscsCaseData.getSscsHearingRecordingCaseData();
 
-        sscsHearingRecordingCaseData.getProcessHearingRecordingRequests().stream()
-                .forEach(processHearingRecordingRequest -> processPartyRequests(sscsCaseData,
-                        sscsHearingRecordingCaseData, processHearingRecordingRequest));
+        processPartyRequests(sscsCaseData, sscsHearingRecordingCaseData, sscsHearingRecordingCaseData.getProcessHearingRecordingRequest());
 
         if (mutableEmptyListIfNull(sscsHearingRecordingCaseData.getRequestedHearings()).isEmpty()) {
             sscsHearingRecordingCaseData.setHearingRecordingRequestOutstanding(YesNo.NO);
         }
 
-        sscsHearingRecordingCaseData.setProcessHearingRecordingRequests(Collections.emptyList());
+        sscsHearingRecordingCaseData.setProcessHearingRecordingRequest(null);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
     private void processPartyRequests(SscsCaseData sscsCaseData, SscsHearingRecordingCaseData sscsHearingRecordingCaseData, ProcessHearingRecordingRequest processHearingRecordingRequest) {
-        ProcessHearingRecordingRequestDetails processHearingRecordingRequestValue =
-                processHearingRecordingRequest.getValue();
-        if (isPartyItemSet(processHearingRecordingRequestValue.getDwp())) {
+        String hearingId = processHearingRecordingRequest.getHearingId();
+        if (isPartyItemSet(processHearingRecordingRequest.getDwp())) {
             processHearingRecordingsRequestsForParty(sscsCaseData, PartyItemList.DWP, sscsHearingRecordingCaseData,
-                    processHearingRecordingRequestValue, processHearingRecordingRequestValue.getDwp()
-                            .getValue().getCode());
+                    hearingId, processHearingRecordingRequest.getDwp().getValue().getCode(), null);
         }
-        if (isPartyItemSet(processHearingRecordingRequestValue.getAppellant())) {
+        if (isPartyItemSet(processHearingRecordingRequest.getAppellant())) {
             processHearingRecordingsRequestsForParty(sscsCaseData, PartyItemList.APPELLANT, sscsHearingRecordingCaseData,
-                    processHearingRecordingRequestValue, processHearingRecordingRequestValue.getAppellant()
-                            .getValue().getCode());
+                    hearingId, processHearingRecordingRequest.getAppellant().getValue().getCode(), null);
         }
-        if (isPartyItemSet(processHearingRecordingRequestValue.getJointParty())) {
+        if (isPartyItemSet(processHearingRecordingRequest.getJointParty())) {
             processHearingRecordingsRequestsForParty(sscsCaseData, PartyItemList.JOINT_PARTY, sscsHearingRecordingCaseData,
-                    processHearingRecordingRequestValue, processHearingRecordingRequestValue.getJointParty()
-                            .getValue().getCode());
+                    hearingId, processHearingRecordingRequest.getJointParty().getValue().getCode(), null);
         }
-        if (isPartyItemSet(processHearingRecordingRequestValue.getRep())) {
+        if (isPartyItemSet(processHearingRecordingRequest.getRep())) {
             processHearingRecordingsRequestsForParty(sscsCaseData, PartyItemList.REPRESENTATIVE, sscsHearingRecordingCaseData,
-                    processHearingRecordingRequestValue, processHearingRecordingRequestValue.getRep()
-                            .getValue().getCode());
+                    hearingId, processHearingRecordingRequest.getRep().getValue().getCode(), null);
+        }
+        if (sscsCaseData.getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReqUi() != null) {
+            sscsCaseData.getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReqUi().stream()
+                    .map(OtherPartyHearingRecordingReqUi::getValue)
+                    .forEach(opr -> processOtherPartyRequest(sscsCaseData, sscsHearingRecordingCaseData, hearingId, opr));
+        }
+    }
+
+    private void processOtherPartyRequest(SscsCaseData sscsCaseData, SscsHearingRecordingCaseData sscsHearingRecordingCaseData, String hearingId, OtherPartyHearingRecordingReqUiDetails otherPartyRequest) {
+        if (isPartyItemSet(otherPartyRequest.getHearingRecordingStatus())) {
+            processHearingRecordingsRequestsForParty(sscsCaseData, PartyItemList.findPartyItemByCode(otherPartyRequest.getRequestingParty()), sscsHearingRecordingCaseData,
+                    hearingId, otherPartyRequest.getHearingRecordingStatus().getValue().getCode(), otherPartyRequest.getOtherPartyId());
         }
     }
 
@@ -90,8 +95,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
 
     private void processHearingRecordingsRequestsForParty(SscsCaseData sscsCaseData, PartyItemList partyItemList,
                                                           SscsHearingRecordingCaseData sscsHearingRecordingCaseData,
-                                                          ProcessHearingRecordingRequestDetails processHearingRecordingRequestValue,
-                                                          String status) {
+                                                          String hearingId, String status, String otherPartyId) {
 
         Set<HearingRecordingRequest> dwpReleasedHearings =
                 new HashSet<>(mutableEmptyListIfNull(sscsHearingRecordingCaseData.getDwpReleasedHearings()));
@@ -107,24 +111,21 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
                 .flatMap(Collection::stream).collect(Collectors.toSet());
 
         if (StringUtils.isNotBlank(status) && !status.equals(RequestStatus.REQUESTED.getValue())) {
-
-            String hearingId = processHearingRecordingRequestValue.getHearingId();
-
             Set<HearingRecordingRequest> partyHearingRecordingsRequests = allHearingRecordingsRequests.stream()
-                    .filter(isFromRequestingParty(partyItemList))
+                    .filter(isFromRequestingParty(partyItemList, otherPartyId))
                     .filter(hr -> nonNull(hr.getValue().getSscsHearingRecording()))
                     .filter(hr -> nonNull(hr.getValue().getSscsHearingRecording().getHearingId()))
                     .filter(hasHearingId(hearingId))
                     .collect(Collectors.toSet());
 
             if (partyHearingRecordingsRequests.isEmpty()) {
-                createNewHearingRecordingRequest(partyItemList, sscsHearingRecordingCaseData, hearingId, partyHearingRecordingsRequests);
+                createNewHearingRecordingRequest(partyItemList, sscsHearingRecordingCaseData, hearingId, partyHearingRecordingsRequests, otherPartyId);
             }
 
             if (status.equals(RequestStatus.GRANTED.getValue())) {
                 refusedHearings.removeAll(partyHearingRecordingsRequests);
                 requestedHearings.removeAll(partyHearingRecordingsRequests);
-                partyHearingRecordingsRequests.stream().forEach(req -> req.getValue()
+                partyHearingRecordingsRequests.forEach(req -> req.getValue()
                         .setDateApproved(LocalDate.now().toString()));
                 if (partyItemList.equals(PartyItemList.DWP)) {
                     dwpReleasedHearings.addAll(partyHearingRecordingsRequests);
@@ -141,7 +142,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
                     citizenReleasedHearings.removeAll(partyHearingRecordingsRequests);
                 }
                 refusedHearings.addAll(partyHearingRecordingsRequests);
-                refusedHearings.stream().forEach(req -> req.getValue().setDateApproved(null));
+                refusedHearings.forEach(req -> req.getValue().setDateApproved(null));
             }
 
             sscsHearingRecordingCaseData.setDwpReleasedHearings(List.copyOf(dwpReleasedHearings));
@@ -151,7 +152,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
         }
     }
 
-    private void createNewHearingRecordingRequest(PartyItemList partyItemList, SscsHearingRecordingCaseData sscsHearingRecordingCaseData, String hearingId, Set<HearingRecordingRequest> partyHearingRecordingsRequests) {
+    private void createNewHearingRecordingRequest(PartyItemList partyItemList, SscsHearingRecordingCaseData sscsHearingRecordingCaseData, String hearingId, Set<HearingRecordingRequest> partyHearingRecordingsRequests, String otherPartyId) {
         Optional<SscsHearingRecording> recording = sscsHearingRecordingCaseData.getSscsHearingRecordings().stream()
                 .filter(sscsHearing -> sscsHearing.getValue().getHearingId().equals(hearingId)).findAny();
 
@@ -159,14 +160,17 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
             HearingRecordingRequest recordingRequest = HearingRecordingRequest.builder()
                     .value(HearingRecordingRequestDetails.builder()
                             .sscsHearingRecording(recording.get().getValue()).dateRequested(LocalDate.now().toString())
+                            .otherPartyId(otherPartyId)
                             .requestingParty(partyItemList.getCode()).build()).build();
             partyHearingRecordingsRequests.add(recordingRequest);
         }
     }
 
     @NotNull
-    private Predicate<HearingRecordingRequest> isFromRequestingParty(PartyItemList party) {
-        return recordingRequest -> recordingRequest.getValue().getRequestingParty().equals(party.getCode());
+    private Predicate<HearingRecordingRequest> isFromRequestingParty(PartyItemList party, String otherPartyId) {
+        return r -> (PartyItemList.OTHER_PARTY.equals(party) || PartyItemList.OTHER_PARTY_REPRESENTATIVE.equals(party))
+                ? (r.getValue().getRequestingParty().equals(party.getCode()) && otherPartyId.equals(r.getValue().getOtherPartyId()))
+                : r.getValue().getRequestingParty().equals(party.getCode());
     }
 
     @NotNull

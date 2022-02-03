@@ -3,14 +3,12 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevid
 import static java.util.Arrays.stream;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CONFIDENTIALITY_REQUEST;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REINSTATEMENT_REQUEST;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome.GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_TCW;
@@ -18,8 +16,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurth
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW;
-import static uk.gov.hmcts.reform.sscs.model.PartyItemList.APPELLANT;
-import static uk.gov.hmcts.reform.sscs.model.PartyItemList.JOINT_PARTY;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyName;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,11 +43,13 @@ import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil;
 
 @Component
 @Slf4j
 public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     public static final String YES = YesNo.YES.getValue();
+    public static final String NO = YesNo.NO.getValue();
     public static final String POSTPONEMENT_DETAILS_IS_MANDATORY = "Postponement Details is mandatory for postponement requests.";
     public static final String FURTHER_EVIDENCE_RECEIVED = "furtherEvidenceReceived";
     private static final String COVERSHEET = "coversheet";
@@ -140,6 +140,17 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     .format("Further evidence action must be '%s' for a %s", OTHER_DOCUMENT_MANUAL.getLabel(),
                             URGENT_HEARING_REQUEST.getLabel()));
         }
+
+        if (PartiesOnCaseUtil.isChildSupportAppeal(sscsCaseData) && isNotEmpty(sscsCaseData.getOtherParties())
+                && sscsCaseData.getOriginalSender() != null
+                && sscsCaseData.getOriginalSender().getValue() != null
+                && scannedDocument != null && scannedDocument.getValue() != null
+                && scannedDocument.getValue().getOriginalSenderOtherPartyId() != null) {
+            if (!sscsCaseData.getOriginalSender().getValue().getCode().equalsIgnoreCase(OTHER_PARTY.getCode() + scannedDocument.getValue().getOriginalSenderOtherPartyId())) {
+                preSubmitCallbackResponse
+                        .addError("The PDF evidence does not match the Original Sender selected");
+            }
+        }
     }
 
     @Override
@@ -220,7 +231,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private void checkForWarnings(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if ((null != preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeAppellant()
+        if (isConfidentialChildSupportCase(preSubmitCallbackResponse.getData())
+            || (null != preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeAppellant()
                 && GRANTED
                 .equals(preSubmitCallbackResponse.getData().getConfidentialityRequestOutcomeAppellant().getRequestOutcome())
                 && APPELLANT.getCode()
@@ -236,6 +248,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
     }
 
+    private boolean isConfidentialChildSupportCase(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getAppeal().getBenefitType() != null
+                && Benefit.CHILD_SUPPORT.getShortName().equalsIgnoreCase(sscsCaseData.getAppeal().getBenefitType().getCode())
+                && YesNo.YES.equals(sscsCaseData.getIsConfidentialCase());
+    }
 
     private boolean isFurtherEvidenceActionCode(DynamicList furtherEvidenceActionList, String code) {
         if (furtherEvidenceActionList != null && furtherEvidenceActionList.getValue() != null
@@ -306,6 +323,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                         if (preSubmitCallbackResponse.getErrors().size() == 0) {
                             setConfidentialCaseFields(sscsCaseData);
                         }
+                    }
+
+                    //Check Warning for bundle addition
+                    if (!ignoreWarnings && !isBundleAdditionSelectedForActionType(sscsCaseData, scannedDocument)) {
+                        preSubmitCallbackResponse.addWarning(
+                            "No documents have been ticked to be added as an addition. These document(s) will NOT be added to the bundle. Are you sure?");
+                        return;
                     }
 
                     buildSscsDocuments(sscsCaseData, scannedDocument, caseState);
@@ -424,6 +448,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         YesNo evidenceIssued = isEvidenceIssuedAndShouldNotBeSentToBulkPrint(sscsCaseData.getFurtherEvidenceAction()) ? YesNo.YES : YesNo.NO;
 
+        String originalSenderOtherPartyId = scannedDocument.getValue().getOriginalSenderOtherPartyId();
+        String originalSenderOtherPartyName = scannedDocument.getValue().getOriginalSenderOtherPartyName();
+
+        if (originalSenderOtherPartyId == null) {
+            originalSenderOtherPartyId = findOriginalSenderOtherPartyId(documentType, sscsCaseData.getOriginalSender().getValue().getCode());
+            originalSenderOtherPartyName = getOtherPartyName(sscsCaseData, originalSenderOtherPartyId);
+        }
+
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentType(documentType.getValue())
                 .documentFileName(fileName)
@@ -434,9 +466,20 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 .documentDateAdded(scannedDate)
                 .controlNumber(scannedDocument.getValue().getControlNumber())
                 .evidenceIssued(evidenceIssued.getValue())
+                .originalSenderOtherPartyId(originalSenderOtherPartyId)
+                .originalSenderOtherPartyName(originalSenderOtherPartyName)
                 .documentTranslationStatus(
                         sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null)
                 .build()).build();
+    }
+
+    private String findOriginalSenderOtherPartyId(DocumentType documentType, String originalSender) {
+
+        if (OTHER_PARTY_EVIDENCE.equals(documentType) || OTHER_PARTY_REPRESENTATIVE_EVIDENCE.equals(documentType)) {
+            String originalSenderOtherPartyId = originalSender.replaceAll("[A-Za-z]", "");
+            return !originalSenderOtherPartyId.equals("") && originalSenderOtherPartyId != null ? originalSenderOtherPartyId : null;
+        }
+        return null;
     }
 
     public static boolean isEvidenceIssuedAndShouldNotBeSentToBulkPrint(DynamicList furtherEvidenceActionList) {
@@ -447,12 +490,33 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         return false;
     }
 
+    private boolean isBundleAdditionSelectedForActionType(SscsCaseData sscsCaseData, ScannedDocument scannedDocument) {
+        return isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), ISSUE_FURTHER_EVIDENCE.getCode())
+            || ((isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL.getCode())
+            || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
+            SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode())
+            || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
+            SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode())
+            || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
+            INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode())
+            || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
+            INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode()))
+            && (YES.equalsIgnoreCase(scannedDocument.getValue().getIncludeInBundle())
+            || NO.equalsIgnoreCase(scannedDocument.getValue().getIncludeInBundle())));
+    }
+
     private boolean isCorrectActionTypeForBundleAddition(SscsCaseData sscsCaseData, ScannedDocument scannedDocument) {
         return (isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), ISSUE_FURTHER_EVIDENCE.getCode())
-                || ((isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL.getCode())
-                || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode())
-                || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode()))
-                && YES.equalsIgnoreCase(scannedDocument.getValue().getIncludeInBundle())));
+            || ((isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL.getCode())
+            || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
+            SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode())
+            || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
+            SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode())
+            || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
+            INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode())
+            || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
+            INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode()))
+            && YES.equalsIgnoreCase(scannedDocument.getValue().getIncludeInBundle())));
     }
 
     private Boolean isCaseStateAdditionValid(State caseState) {
@@ -473,8 +537,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             return POSTPONEMENT_REQUEST;
         }
 
+        String originalSenderStripped  = originalSenderCode.replaceAll("\\d","");
+
         final Optional<DocumentType> optionalDocumentType = stream(PartyItemList.values())
-                .filter(f -> f.getCode().equals(originalSenderCode))
+                .filter(f -> f.getCode().startsWith(originalSenderStripped))
                 .findFirst()
                 .map(PartyItemList::getDocumentType);
         if (optionalDocumentType.isPresent()) {

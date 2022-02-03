@@ -57,7 +57,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaAllDetailsTest() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, regionalProcessingCenter.getName(),
-            regionalProcessingCenter);
+            regionalProcessingCenter, false);
         assertJsonEquals(ALL_DETAILS_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -65,7 +65,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaAppellantNoContactDetailsTest() {
         SyaCaseWrapper syaCaseWrapper = APPELLANT_NO_CONTACT_DETAILS.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertJsonEquals(APPELLANT_NO_CONTACT_DETAILS_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -81,7 +81,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         syaCaseWrapper.getBenefitType().setCode(beneiftCode);
         syaCaseWrapper.getMrn().setDwpIssuingOffice(actIssuingOffice);
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertEquals(expectedIssuing, String.valueOf(caseData.getAppeal().getMrnDetails().getDwpIssuingOffice()));
     }
 
@@ -92,7 +92,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         syaCaseWrapper.setBenefitType(uc);
         syaCaseWrapper.setMrn(null);
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter);
+                regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertNull(caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
     }
 
@@ -106,7 +106,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         mrn.setDwpIssuingOffice(mrnOffice);
         syaCaseWrapper.setMrn(mrn);
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertEquals(expectedOffice, caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
     }
 
@@ -128,7 +128,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         syaCaseWrapper.getBenefitType().setCode(benefitCode);
 
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, regionalProcessingCenter.getName(),
-            regionalProcessingCenter);
+            regionalProcessingCenter, false);
 
         assertEquals(expectedDwpRegionalCenter, caseData.getDwpRegionalCentre());
     }
@@ -145,7 +145,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         RegionalProcessingCenter rpc = regionalProcessingCenter.toBuilder().name(dwpIssuingOfficeName).build();
 
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, rpc.getName(),
-                rpc);
+                rpc, false);
 
         assertEquals(null, caseData.getIsScottishCase());
     }
@@ -155,7 +155,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         syaCaseWrapper.setMrn(null);
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertNull(caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
         assertNull(caseData.getAppeal().getMrnDetails().getMrnDate());
         assertNull(caseData.getAppeal().getMrnDetails().getMrnLateReason());
@@ -168,7 +168,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         syaCaseWrapper.setMrn(null);
         syaCaseWrapper.getBenefitType().setCode("UC");
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter);
+                regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertNull(caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
         assertNull(caseData.getAppeal().getMrnDetails().getMrnDate());
         assertNull(caseData.getAppeal().getMrnDetails().getMrnLateReason());
@@ -179,7 +179,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaWithoutNotificationTest() {
         SyaCaseWrapper syaCaseWrapper = WITHOUT_NOTIFICATION.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertJsonEquals(WITHOUT_NOTIFICATION_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -187,7 +187,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaWithoutEmailNotificationTest() {
         SyaCaseWrapper syaCaseWrapper = WITHOUT_EMAIL_NOTIFICATION.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertJsonEquals(WITHOUT_EMAIL_NOTIFICATION_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -195,7 +195,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaWithoutSmsNotificationTest() {
         SyaCaseWrapper syaCaseWrapper = WITHOUT_SMS_NOTIFICATION.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertJsonEquals(WITHOUT_SMS_NOTIFICATION_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -203,7 +203,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaWithoutRepresentativeTestShouldGenerateAnEmptySubscriptionForRep() {
         SyaCaseWrapper syaCaseWrapper = WITHOUT_REPRESENTATIVE.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         Subscription representativeSubscription = caseData.getSubscriptions().getRepresentativeSubscription();
         assertNotNull(representativeSubscription);
         assertTrue(StringUtils.isNotEmpty(representativeSubscription.getTya()));
@@ -219,7 +219,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaWithoutHearingTest() {
         SyaCaseWrapper syaCaseWrapper = WITHOUT_HEARING.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertJsonEquals(WITHOUT_HEARING_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -227,7 +227,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaWithoutWantsSupportTest() {
         SyaCaseWrapper syaCaseWrapper = WITHOUT_WANTS_SUPPORT.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertJsonEquals(WITHOUT_WANTS_SUPPORT_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -235,7 +235,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaWantsSupportWithoutArrangementsTest() {
         SyaCaseWrapper syaCaseWrapper = WANTS_SUPPORT_WITHOUT_ARRANGEMENTS.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertJsonEquals(WANTS_SUPPORT_WITHOUT_ARRANGEMENTS_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -243,7 +243,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaWantsSupportWithoutScheduleTest() {
         SyaCaseWrapper syaCaseWrapper = WANTS_SUPPORT_WITHOUT_SCHEDULE.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertJsonEquals(WANTS_SUPPORT_WITHOUT_SCHEDULE_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -251,7 +251,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaHearingWithoutSupportAndScheduleHearingTest() {
         SyaCaseWrapper syaCaseWrapper = HEARING_WITHOUT_SUPPORT_AND_SCHEDULE_HEARING.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertJsonEquals(HEARING_WITHOUT_SUPPORT_AND_SCHEDULE_HEARING_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -259,7 +259,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaHearingWithoutSupportWithScheduleHearingTest() {
         SyaCaseWrapper syaCaseWrapper = HEARING_WITHOUT_SUPPORT_WITH_SCHEDULE_HEARING.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertJsonEquals(HEARING_WITHOUT_SUPPORT_WITH_SCHEDULE_HEARING_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -267,7 +267,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaHearingWithSupportWithoutScheduleHearingTest() {
         SyaCaseWrapper syaCaseWrapper = HEARING_WITH_SUPPORT_WITHOUT_SCHEDULE_HEARING.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertJsonEquals(HEARING_WITH_SUPPORT_WITHOUT_SCHEDULE_HEARING_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -276,7 +276,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         syaCaseWrapper.setSyaHearingOptions(null);
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertNull(caseData.getAppeal().getHearingOptions());
     }
 
@@ -284,7 +284,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaWithHearingOptions() {
         SyaCaseWrapper syaCaseWrapper = HEARING_WITH_OPTIONS.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter);
+                regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertJsonEquals(HEARING_WITH_OPTIONS_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -292,7 +292,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaWithEmptyHearing() {
         SyaCaseWrapper syaCaseWrapper = HEARING_WITH_SUPPORT_EMPTY.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertJsonEquals(HEARING_WITH_SUPPORT_EMPTY_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -300,7 +300,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void shouldAddEvidenceDocumentDetailsIfPresent() {
         SyaCaseWrapper syaCaseWrapper = EVIDENCE_DOCUMENT.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertJsonEquals(EVIDENCE_DOCUMENT_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -308,7 +308,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void shouldAddEvidenceDocumentDetailsIfPresentLanguagePreferenceWelsh() {
         SyaCaseWrapper syaCaseWrapper = EVIDENCE_DOCUMENT_LANGUAGE_PREFERENCE_WELSH.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter);
+                regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertJsonEquals(EVIDENCE_DOCUMENT_LANGUAGE_PREFERENCE_WELSH_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -316,7 +316,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void shouldRemoveSpacesFromAppellantPhoneNumbers() {
         final SyaCaseWrapper syaCaseWrapper = APPELLANT_PHONE_WITH_SPACES.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertJsonEquals(APPELLANT_PHONE_WITHOUT_SPACES_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -324,14 +324,14 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void shouldRemoveSpacesFromNino() {
         final SyaCaseWrapper syaCaseWrapper = NINO_WITH_SPACES.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertJsonEquals(NINO_WITHOUT_SPACES_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
     @Test
     public void syaWithNoRpc() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
-        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, false);
         assertJsonEquals(WITHOUT_REGIONAL_PROCESSING_CENTER.getSerializedMessage(), removeTyaNumber(caseData));
         assertEquals(null, caseData.getIsScottishCase());
     }
@@ -340,14 +340,14 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void draftSyaWithNoRpc() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         syaCaseWrapper.setCaseType("draft");
-        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, false);
         assertNull(caseData.getIsScottishCase());
     }
 
     @Test
     public void willAddTyaNumberForAppointee() {
         final SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS.getDeserializeMessage();
-        final SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
+        final SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, false);
         assertEquals("Tya number should have a size of 10", 10, caseData.getSubscriptions().getAppointeeSubscription().getTya().length());
     }
 
@@ -360,7 +360,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         reason.setWhatYouDisagreeWith("whatYouDisagreeWith");
         syaCaseWrapper.getReasonsForAppealing().setReasons(Collections.singletonList(reason));
 
-        final SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
+        final SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, false);
         assertEquals(1, caseData.getAppeal().getAppealReasons().getReasons().size());
         assertEquals(reason.getReasonForAppealing(), caseData.getAppeal().getAppealReasons().getReasons().get(0).getValue().getDescription());
         assertEquals(reason.getWhatYouDisagreeWith(), caseData.getAppeal().getAppealReasons().getReasons().get(0).getValue().getReason());
@@ -370,7 +370,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaWithAppointeeAtSameAddress() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
 
         assertJsonEquals(ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
@@ -379,7 +379,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaWithAppointeeAtDifferentAddress() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_DIFFERENT_ADDRESS.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertJsonEquals(ALL_DETAILS_WITH_APPOINTEE_AND_DIFFERENT_ADDRESS_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -387,7 +387,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaWithAppointeeAtSameAddressButNoAppointeeContactDetails() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertJsonEquals(ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -397,7 +397,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
             .getDeserializeMessage();
         syaCaseWrapper.getRepresentative().getContactDetails().setPhoneNumber("0203 444 4432");
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertFalse("rep should be not sms subscribed",
             caseData.getSubscriptions().getRepresentativeSubscription().isSmsSubscribed());
     }
@@ -408,7 +408,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
             .getDeserializeMessage();
         syaCaseWrapper.getRepresentative().getContactDetails().setPhoneNumber("07404621944");
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertTrue(caseData.getSubscriptions().getRepresentativeSubscription().isSmsSubscribed());
         assertEquals("mobile numbers should be equal", "+447404621944",
             caseData.getSubscriptions().getRepresentativeSubscription().getMobile());
@@ -420,9 +420,27 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
                 .getDeserializeMessage();
         syaCaseWrapper.getRepresentative().setFirstName("Undefined");
         syaCaseWrapper.getRepresentative().setLastName("Undefined");
-        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, regionalProcessingCenter.getName(), regionalProcessingCenter);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertNull(caseData.getAppeal().getRep().getName().getFirstName());
         assertNull(caseData.getAppeal().getRep().getName().getLastName());
+    }
+
+    @Test
+    public void syaWithAppellantNameSetsWorkAllocationFields() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        syaCaseWrapper.getAppellant().setFirstName("George");
+        syaCaseWrapper.getAppellant().setLastName("Foreman");
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, regionalProcessingCenter.getName(), regionalProcessingCenter, true);
+        assertEquals("George Foreman", caseData.getWorkAllocationFields().getCaseNameHmctsInternal());
+        assertEquals("George Foreman", caseData.getWorkAllocationFields().getCaseNameHmctsRestricted());
+        assertEquals("George Foreman", caseData.getWorkAllocationFields().getCaseNamePublic());
+
+        assertEquals("Personal Independence Payment", caseData.getWorkAllocationFields().getCaseAccessCategory());
+        assertEquals("DWP", caseData.getWorkAllocationFields().getOgdType());
+        assertEquals("Personal Independence Payment", caseData.getWorkAllocationFields().getCaseManagementCategory().getValue().getLabel());
+        assertEquals("PIP", caseData.getWorkAllocationFields().getCaseManagementCategory().getValue().getCode());
+
+
     }
 
 }

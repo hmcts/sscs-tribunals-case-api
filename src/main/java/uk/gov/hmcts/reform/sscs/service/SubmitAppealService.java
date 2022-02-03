@@ -8,6 +8,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService.getFirstHalfOfPostcode;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -19,6 +21,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -49,6 +52,7 @@ public class SubmitAppealService {
     private final ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
     private final AirLookupService airLookupService;
     private final EvidenceManagementSecureDocStoreService secureDocStoreService;
+    private final boolean workAllocationFeature;
 
     @SuppressWarnings("squid:S107")
     @Autowired
@@ -58,7 +62,8 @@ public class SubmitAppealService {
                         IdamService idamService,
                         ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
                         AirLookupService airLookupService,
-                        EvidenceManagementSecureDocStoreService secureDocStoreService) {
+                        EvidenceManagementSecureDocStoreService secureDocStoreService,
+                        @Value("${feature.work-allocation.enabled}")  boolean workAllocationFeature) {
 
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
@@ -67,6 +72,7 @@ public class SubmitAppealService {
         this.convertAIntoBService = convertAIntoBService;
         this.airLookupService = airLookupService;
         this.secureDocStoreService = secureDocStoreService;
+        this.workAllocationFeature = workAllocationFeature;
     }
 
     public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
@@ -96,7 +102,7 @@ public class SubmitAppealService {
         }
 
         try {
-            return Optional.of(saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal), idamTokens, forceCreate));
+            return Optional.of(saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal, workAllocationFeature), idamTokens, forceCreate));
         } catch (FeignException e) {
             if (e.status() == HttpStatus.SC_CONFLICT) {
                 logError(appeal, idamTokens);
@@ -117,7 +123,7 @@ public class SubmitAppealService {
         }
 
         try {
-            SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal);
+            SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal, workAllocationFeature);
             
             CaseDetails caseDetails = citizenCcdService.updateCase(sscsCaseData, EventType.UPDATE_DRAFT.getCcdType(), "Update draft",
                     "Update draft in CCD", idamTokens, appeal.getCcdCaseId());
@@ -159,7 +165,7 @@ public class SubmitAppealService {
         }
 
         try {
-            SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal);
+            SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal, workAllocationFeature);
             citizenCcdService.archiveDraft(sscsCaseData, idamTokens, ccdCaseId);
 
             return Optional.of(SaveCaseResult.builder()
@@ -245,9 +251,16 @@ public class SubmitAppealService {
 
         SscsCaseData sscsCaseData;
         if (rpc == null) {
-            sscsCaseData = convertSyaToCcdCaseData(appeal);
+            sscsCaseData = convertSyaToCcdCaseData(appeal, workAllocationFeature);
         } else {
-            sscsCaseData = convertSyaToCcdCaseData(appeal, rpc.getName(), rpc);
+            sscsCaseData = convertSyaToCcdCaseData(appeal, rpc.getName(), rpc, workAllocationFeature);
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            log.info("sscsCaseData" + objectMapper.writeValueAsString(sscsCaseData));
+        } catch (JsonProcessingException e) {
+            log.error("error with json", e);
         }
 
         sscsCaseData.setCreatedInGapsFrom(READY_TO_LIST.getId());

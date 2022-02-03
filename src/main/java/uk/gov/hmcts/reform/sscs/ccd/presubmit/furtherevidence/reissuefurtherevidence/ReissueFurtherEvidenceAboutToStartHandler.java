@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.reissuefurtherevi
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.userFriendlyName;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
+import static uk.gov.hmcts.reform.sscs.util.ReissueUtils.setUpOtherPartyOptions;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +31,7 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_START)
-            && callback.getEvent() == EventType.REISSUE_FURTHER_EVIDENCE;
+                && callback.getEvent() == EventType.REISSUE_FURTHER_EVIDENCE;
     }
 
     @Override
@@ -41,23 +43,21 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-
         List<? extends AbstractDocument> allSscsDocs = Stream.of(sscsCaseData.getSscsDocument(), sscsCaseData.getSscsWelshDocuments()).flatMap(x -> x == null ? null : x.stream()).filter(doc -> StringUtils.isNotBlank(doc.getValue().getDocumentType())).collect(Collectors.toList());
 
         ArrayList<? extends AbstractDocument> availableDocumentsToReIssue =
-            Optional.ofNullable(allSscsDocs).map(Collection::stream)
-                .orElse(Stream.empty()).filter(f ->
-                APPELLANT_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
-                    || REPRESENTATIVE_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
-                    || DWP_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
-            ).collect(Collectors.toCollection(ArrayList::new));
-
+                Optional.ofNullable(allSscsDocs).map(Collection::stream)
+                        .orElse(Stream.empty()).filter(f ->
+                                APPELLANT_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
+                                        || REPRESENTATIVE_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
+                                        || OTHER_PARTY_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
+                                        || OTHER_PARTY_REPRESENTATIVE_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
+                                        || DWP_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
+                        ).collect(Collectors.toCollection(ArrayList::new));
 
         if (CollectionUtils.isNotEmpty(availableDocumentsToReIssue)) {
+            sscsCaseData.setReissueArtifactUi(null);
             setDocumentDropdown(sscsCaseData, availableDocumentsToReIssue);
-            sscsCaseData.setResendToAppellant(null);
-            sscsCaseData.setResendToRepresentative(null);
-            sscsCaseData.setResendToDwp(null);
             sscsCaseData.setOriginalSender(null);
         }
 
@@ -65,6 +65,11 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
         if (CollectionUtils.isEmpty(availableDocumentsToReIssue)) {
             response.addError("There are no evidence documents in the appeal. Cannot reissue further evidence.");
         }
+
+        if (isOtherPartyPresent(sscsCaseData)) {
+            setUpOtherPartyOptions(sscsCaseData);
+        }
+
         return response;
     }
 
@@ -78,7 +83,7 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
             }
         }
 
-        sscsCaseData.setReissueFurtherEvidenceDocument(new DynamicList(listCostOptions.get(0), listCostOptions));
+        sscsCaseData.getReissueArtifactUi().setReissueFurtherEvidenceDocument(new DynamicList(listCostOptions.get(0), listCostOptions));
     }
 
     private String buildFormattedLabel(AbstractDocument doc) {

@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.util.DataFixtures.someStatement;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.service.pdf.MyaEventActionContext;
 import uk.gov.hmcts.reform.sscs.service.pdf.StoreAppellantStatementService;
@@ -45,7 +46,8 @@ public class AppellantStatementServiceTest {
     @Test
     public void findsOnlineHearing() {
         long id = 1234L;
-        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearing)).thenReturn(Optional.of(SscsCaseDetails.builder().id(id).build()));
+        SscsCaseDetails caseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).id(id).build();
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearing)).thenReturn(Optional.of(caseDetails));
         when(storeAppellantStatementService.storePdfAndUpdate(eq(id), eq(someOnlineHearing), any(AppellantStatementPdfData.class)))
                 .thenReturn(mock(MyaEventActionContext.class));
         Optional handled = appellantStatementService.handleAppellantStatement(someOnlineHearing, someStatement());
@@ -56,7 +58,8 @@ public class AppellantStatementServiceTest {
     @Test
     public void generatesAndSavesPdf() {
         long id = 1234L;
-        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearing)).thenReturn(Optional.of(SscsCaseDetails.builder().id(id).build()));
+        SscsCaseDetails caseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).id(id).build();
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearing)).thenReturn(Optional.of(caseDetails));
         MyaEventActionContext myaEventActionContext = mock(MyaEventActionContext.class);
         when(storeAppellantStatementService.storePdfAndUpdate(eq(id), eq(someOnlineHearing), any(AppellantStatementPdfData.class)))
                 .thenReturn(myaEventActionContext);

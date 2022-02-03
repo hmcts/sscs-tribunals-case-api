@@ -7,21 +7,23 @@ public class PdfAppealDetails {
     private final String nino;
     private final String caseReference;
     private final String dateCreated;
+    private final boolean hideNino;
     private String welshDateCreated;
 
     public PdfAppealDetails(String title, String firstName, String surname, String nino, String caseReference,
-                            String dateCreated, String welshDateCreated) {
-        this(title, firstName, surname, nino, caseReference, dateCreated);
+                            String dateCreated, boolean hideNino, String welshDateCreated) {
+        this(title, firstName, surname, nino, caseReference, dateCreated, hideNino);
         this.welshDateCreated = welshDateCreated;
     }
 
-    public PdfAppealDetails(String title, String firstName, String surname, String nino, String caseReference, String dateCreated) {
+    public PdfAppealDetails(String title, String firstName, String surname, String nino, String caseReference, String dateCreated, boolean hideNino) {
         this.title = title;
         this.firstName = firstName;
         this.surname = surname;
         this.nino = nino;
         this.caseReference = caseReference;
         this.dateCreated = dateCreated;
+        this.hideNino = hideNino;
     }
 
     public String getTitle() {
@@ -50,6 +52,10 @@ public class PdfAppealDetails {
 
     public String getWelshDateCreated() {
         return welshDateCreated;
+    }
+
+    public boolean getHideNino() {
+        return hideNino;
     }
 
     @Override

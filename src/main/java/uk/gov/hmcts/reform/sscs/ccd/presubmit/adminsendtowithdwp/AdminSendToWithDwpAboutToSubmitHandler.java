@@ -52,7 +52,7 @@ public class AdminSendToWithDwpAboutToSubmitHandler implements PreSubmitCallback
         caseData.setDateSentToDwp(LocalDate.now().toString());
         caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate(getResponseDueDays(caseData)));
 
-        if (InterlocReferralReason.PHME_REQUEST.getId().equals(caseData.getInterlocReferralReason())) {
+        if (InterlocReferralReason.PHE_REQUEST.getId().equals(caseData.getInterlocReferralReason())) {
             caseData.setInterlocReviewState(InterlocReviewState.NONE.getId());
             caseData.setInterlocReferralReason(InterlocReferralReason.NONE.getId());
         }
