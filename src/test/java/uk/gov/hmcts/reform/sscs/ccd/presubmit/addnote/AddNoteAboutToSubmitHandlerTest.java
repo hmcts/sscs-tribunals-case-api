@@ -149,7 +149,7 @@ public class AddNoteAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"timeExtension, Time extension",
-                 "phmeRequest, PHME request",
+                 "phmeRequest, PHE request",
                  "over300Pages, Over 300 pages",
                  "over13months, Over 13 months",
                  "other, Other",

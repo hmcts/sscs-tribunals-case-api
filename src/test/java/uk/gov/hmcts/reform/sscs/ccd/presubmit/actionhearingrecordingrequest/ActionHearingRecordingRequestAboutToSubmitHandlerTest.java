@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -64,6 +65,16 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
                 .jointParty(new DynamicList(jointItem, Collections.emptyList()))
                 .rep(new DynamicList(repItem, Collections.emptyList()))
                 .hearingId(hearingId).build();
+    }
+
+    public static List<OtherPartyHearingRecordingReqUi> getOtherPartyHearingRecordingReqUi(RequestStatus status, String otherPartyId, String party) {
+        return List.of(OtherPartyHearingRecordingReqUi.builder()
+            .value(OtherPartyHearingRecordingReqUiDetails.builder()
+                .otherPartyId(otherPartyId)
+                .hearingRecordingStatus(new DynamicList(new DynamicListItem(status.getValue(), status.getValue()), Collections.emptyList()))
+                .requestingParty(party)
+                .build())
+            .build());
     }
 
     @Test
@@ -229,6 +240,36 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    @Parameters({"otherParty", "otherPartyRep"})
+    public void givenAGrantedFromVoidCitizenHearingRecordingAndOtherPartyRequest_thenAddToReleasedList(String party) {
+        SscsHearingRecording recording1 = getHearingRecording();
+
+        sscsCaseData.getSscsHearingRecordingCaseData().setSscsHearingRecordings(Arrays.asList(recording1));
+        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(
+                getProcessHearingRecordingRequest(RequestStatus.GRANTED, "an_id1", party));
+        sscsCaseData.getSscsHearingRecordingCaseData().setOtherPartyHearingRecordingReqUi(
+                getOtherPartyHearingRecordingReqUi(RequestStatus.GRANTED, "op_id1", party));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        SscsHearingRecordingCaseData sscsHearingRecordingCaseDataResponse = response.getData()
+                .getSscsHearingRecordingCaseData();
+        assertThat("Check RequestedHearings is empty",
+                sscsHearingRecordingCaseDataResponse.getRequestedHearings(), is(empty()));
+        assertThat("Check DwpReleasedHearings is populated",
+                sscsHearingRecordingCaseDataResponse.getCitizenReleasedHearings(), is(not(empty())));
+        assertThat("Check DwpReleasedHearings has the correct Hearing",
+                sscsHearingRecordingCaseDataResponse.getCitizenReleasedHearings().get(0).getValue()
+                        .getSscsHearingRecording().getHearingId(), is("an_id1"));
+        assertThat("Check DwpReleasedHearings has the correct approved date",
+                sscsHearingRecordingCaseDataResponse.getCitizenReleasedHearings().get(0).getValue()
+                        .getDateApproved(), is(LocalDate.now().toString()));
+        assertThat("Check DwpReleasedHearings has the correct other party id",
+                sscsHearingRecordingCaseDataResponse.getCitizenReleasedHearings().get(0).getValue()
+                        .getOtherPartyId(), is("op_id1"));
+    }
+
+    @Test
     @Parameters({"appellant", "representative", "jointParty"})
     public void givenAGrantedFromRequestedCitizenHearingRecording_thenRemoveFromRequestedListAndAddToReleasedList(String party) {
         SscsHearingRecordingDetails recording1 = SscsHearingRecordingDetails.builder().hearingId("an_id1").build();
@@ -256,6 +297,39 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    @Parameters({"otherParty", "otherPartyRep"})
+    public void givenAGrantedFromRequestedCitizenHearingRecordingForOtherPartyRequest_thenRemoveFromRequestedListAndAddToReleasedList(String party) {
+        SscsHearingRecordingDetails recording1 = SscsHearingRecordingDetails.builder().hearingId("an_id1").build();
+        HearingRecordingRequest request1 = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails
+                .builder().sscsHearingRecording(recording1)
+                .requestingParty(party)
+                .otherPartyId("op_id1").build()).build();
+        sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(new ArrayList<>(Arrays.asList(request1)));
+        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(
+                getProcessHearingRecordingRequest(RequestStatus.GRANTED, "an_id1", party));
+        sscsCaseData.getSscsHearingRecordingCaseData().setOtherPartyHearingRecordingReqUi(
+                getOtherPartyHearingRecordingReqUi(RequestStatus.GRANTED, "op_id1", party));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        SscsHearingRecordingCaseData sscsHearingRecordingCaseDataResponse = response.getData()
+                .getSscsHearingRecordingCaseData();
+        assertThat("Check RequestedHearings has been reduced",
+                sscsHearingRecordingCaseDataResponse.getRequestedHearings(), is(empty()));
+        assertThat("Check DwpReleasedHearings is populated",
+                sscsHearingRecordingCaseDataResponse.getCitizenReleasedHearings(), is(not(empty())));
+        assertThat("Check DwpReleasedHearings has the correct Hearing",
+                sscsHearingRecordingCaseDataResponse.getCitizenReleasedHearings().get(0).getValue()
+                        .getSscsHearingRecording().getHearingId(), is("an_id1"));
+        assertThat("Check DwpReleasedHearings has the correct approved date",
+                sscsHearingRecordingCaseDataResponse.getCitizenReleasedHearings().get(0).getValue()
+                        .getDateApproved(), is(LocalDate.now().toString()));
+        assertThat("Check DwpReleasedHearings has the correct other party id",
+                sscsHearingRecordingCaseDataResponse.getCitizenReleasedHearings().get(0).getValue()
+                        .getOtherPartyId(), is("op_id1"));
+    }
+
+    @Test
     @Parameters({"appellant", "representative", "jointParty"})
     public void givenARefusedFromRequestedCitizenHearingRecording_thenRemoveFromRequestedListAndDoNotAddToReleasedList(String party) {
         SscsHearingRecordingDetails recording1 = SscsHearingRecordingDetails.builder().hearingId("an_id1").build();
@@ -279,6 +353,38 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
         assertThat("Check RefusedHearings has no approved date",
                 sscsHearingRecordingCaseDataResponse.getRefusedHearings().get(0).getValue()
                         .getDateApproved(), is(nullValue()));
+    }
+
+    @Test
+    @Parameters({"otherParty", "otherPartyRep"})
+    public void givenARefusedFromRequestedCitizenHearingRecordingForOtherPartyRequest_thenRemoveFromRequestedListAndDoNotAddToReleasedList(String party) {
+        SscsHearingRecordingDetails recording1 = SscsHearingRecordingDetails.builder().hearingId("an_id1").build();
+        HearingRecordingRequest request1 = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails
+                .builder().sscsHearingRecording(recording1)
+                .requestingParty(party)
+                .otherPartyId("op_id1").build()).build();
+        sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(new ArrayList<>(Arrays.asList(request1)));
+        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(
+                getProcessHearingRecordingRequest(RequestStatus.REFUSED, "an_id1", party));
+        sscsCaseData.getSscsHearingRecordingCaseData().setOtherPartyHearingRecordingReqUi(
+                getOtherPartyHearingRecordingReqUi(RequestStatus.REFUSED, "op_id1", party));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        SscsHearingRecordingCaseData sscsHearingRecordingCaseDataResponse = response.getData()
+                .getSscsHearingRecordingCaseData();
+        assertThat("Check RequestedHearings has been reduced",
+                sscsHearingRecordingCaseDataResponse.getRequestedHearings(), is(empty()));
+        assertThat("Check ReleasedHearings has not been populated",
+                sscsHearingRecordingCaseDataResponse.getCitizenReleasedHearings(), is(empty()));
+        assertThat("Check RefusedHearings was populated",
+                sscsHearingRecordingCaseDataResponse.getRefusedHearings(), is(not(empty())));
+        assertThat("Check RefusedHearings has no approved date",
+                sscsHearingRecordingCaseDataResponse.getRefusedHearings().get(0).getValue()
+                        .getDateApproved(), is(nullValue()));
+        assertThat("Check RefusedHearings has the correct other party id",
+                sscsHearingRecordingCaseDataResponse.getRefusedHearings().get(0).getValue()
+                        .getOtherPartyId(), is("op_id1"));
     }
 
     @Test
@@ -309,6 +415,39 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    @Parameters({"otherParty", "otherPartyRep"})
+    public void givenARefusedFromGrantedCitizenHearingRecordingForOtherPartyRequest_thenRemoveFromReleasedList(String party) {
+        SscsHearingRecordingDetails recording1 = SscsHearingRecordingDetails.builder().hearingId("an_id1").build();
+        HearingRecordingRequest request1 = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails
+                .builder().dateApproved(LocalDate.now().toString()).sscsHearingRecording(recording1)
+                .requestingParty(party)
+                .otherPartyId("op_id1").build()).build();
+        sscsCaseData.getSscsHearingRecordingCaseData().setCitizenReleasedHearings(new ArrayList<>(Arrays.asList(request1)));
+        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(
+                getProcessHearingRecordingRequest(RequestStatus.REFUSED, "an_id1", party));
+        sscsCaseData.getSscsHearingRecordingCaseData().setOtherPartyHearingRecordingReqUi(
+                getOtherPartyHearingRecordingReqUi(RequestStatus.REFUSED, "op_id1", party));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        SscsHearingRecordingCaseData sscsHearingRecordingCaseDataResponse = response.getData()
+                .getSscsHearingRecordingCaseData();
+        assertThat("Check RequestedHearings has been reduced",
+                sscsHearingRecordingCaseDataResponse.getCitizenReleasedHearings(), is(empty()));
+        assertThat("Check DwpRefusedHearings is not populated",
+                sscsHearingRecordingCaseDataResponse.getRefusedHearings(), is(not(empty())));
+        assertThat("Check RefusedHearings has the correct Hearing",
+                sscsHearingRecordingCaseDataResponse.getRefusedHearings().get(0).getValue()
+                        .getSscsHearingRecording().getHearingId(), is("an_id1"));
+        assertThat("Check RefusedHearings has no approved date",
+                sscsHearingRecordingCaseDataResponse.getRefusedHearings().get(0).getValue()
+                        .getDateApproved(), is(nullValue()));
+        assertThat("Check RefusedHearings has the correct other party id",
+                sscsHearingRecordingCaseDataResponse.getRefusedHearings().get(0).getValue()
+                        .getOtherPartyId(), is("op_id1"));
+    }
+
+    @Test
     @Parameters({"appellant", "representative", "jointParty"})
     public void givenAGrantedFromRefusedCitizenHearingRecording_thenRemoveFromRequestedListAndAddToReleasedList(String party) {
         SscsHearingRecordingDetails recording1 = SscsHearingRecordingDetails.builder().hearingId("an_id1").build();
@@ -330,6 +469,37 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
         assertThat("Check DwpReleasedHearings has the correct Hearing",
                 sscsHearingRecordingCaseDataResponse.getCitizenReleasedHearings().get(0).getValue()
                         .getSscsHearingRecording().getHearingId(), is("an_id1"));
+    }
+
+    @Test
+    @Parameters({"otherParty", "otherPartyRep"})
+    public void givenAGrantedFromRefusedCitizenHearingRecordingForOtherPartyRequest_thenRemoveFromRequestedListAndAddToReleasedList(String party) {
+        SscsHearingRecordingDetails recording1 = SscsHearingRecordingDetails.builder().hearingId("an_id1").build();
+        HearingRecordingRequest request1 = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails
+                .builder().sscsHearingRecording(recording1)
+                .requestingParty(party)
+                .otherPartyId("op_id1").build()).build();
+        sscsCaseData.getSscsHearingRecordingCaseData().setRefusedHearings(new ArrayList<>(Arrays.asList(request1)));
+        sscsCaseData.getSscsHearingRecordingCaseData().setProcessHearingRecordingRequest(
+                getProcessHearingRecordingRequest(RequestStatus.GRANTED, "an_id1", party));
+        sscsCaseData.getSscsHearingRecordingCaseData().setOtherPartyHearingRecordingReqUi(
+                getOtherPartyHearingRecordingReqUi(RequestStatus.GRANTED, "op_id1", party));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        SscsHearingRecordingCaseData sscsHearingRecordingCaseDataResponse = response.getData()
+                .getSscsHearingRecordingCaseData();
+        assertThat("Check RefusedHearings has been reduced",
+                sscsHearingRecordingCaseDataResponse.getRefusedHearings(), is(empty()));
+        assertThat("Check DwpReleasedHearings is populated",
+                sscsHearingRecordingCaseDataResponse.getCitizenReleasedHearings(), is(not(empty())));
+        assertThat("Check DwpReleasedHearings has the correct Hearing",
+                sscsHearingRecordingCaseDataResponse.getCitizenReleasedHearings().get(0).getValue()
+                        .getSscsHearingRecording().getHearingId(), is("an_id1"));
+        assertThat("Check RefusedHearings has the correct other party id",
+                sscsHearingRecordingCaseDataResponse.getCitizenReleasedHearings().get(0).getValue()
+                        .getOtherPartyId(), is("op_id1"));
+
     }
 
     @Test

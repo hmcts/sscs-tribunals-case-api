@@ -47,7 +47,7 @@ public class CaseUpdatedIt extends AbstractEventIt {
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
-        assertEquals("Basildon Combined Court", result.getData().getProcessingVenue());
+        assertEquals("Basildon CC", result.getData().getProcessingVenue());
     }
 
 }

@@ -6,14 +6,14 @@ import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.stripUrl;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -72,18 +72,19 @@ public class CitizenRequestService {
             return new HearingRecordingResponse();
         } else {
             PartyItemList party = workRequestedParty(sscsCaseData, idamEmail);
+            Optional<String> otherPartyId = getOtherPartyIdBySubscriptionEmail(sscsCaseData, idamEmail);
 
             List<HearingRecordingRequest> releasedHearingRecordings = sscsCaseData.getSscsHearingRecordingCaseData().getCitizenReleasedHearings();
             List<CitizenHearingRecording> releasedRecordings = CollectionUtils.isEmpty(releasedHearingRecordings) ? List.of() :
                     releasedHearingRecordings.stream()
-                    .filter(request -> party.getCode().equals(request.getValue().getRequestingParty()))
+                    .filter(hasRequestedByParty(party, otherPartyId))
                     .map(request -> populateCitizenHearingRecordings(request.getValue().getSscsHearingRecording()))
                     .collect(Collectors.toList());
 
             List<HearingRecordingRequest> requestedHearingRecordings = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();
             List<CitizenHearingRecording> requestedRecordings = CollectionUtils.isEmpty(requestedHearingRecordings) ? List.of() :
                     requestedHearingRecordings.stream()
-                    .filter(request -> party.getCode().equals(request.getValue().getRequestingParty()))
+                    .filter(hasRequestedByParty(party, otherPartyId))
                     .map(request -> populateCitizenHearingRecordings(request.getValue().getSscsHearingRecording()))
                     .collect(Collectors.toList());
 
@@ -102,6 +103,29 @@ public class CitizenRequestService {
         }
     }
 
+    private Predicate<? super HearingRecordingRequest> hasRequestedByParty(PartyItemList party, Optional<String> otherPartyId) {
+        return request -> party.getCode().equals(request.getValue().getRequestingParty())
+                && (otherPartyId.isEmpty() || otherPartyId.get().equals(request.getValue().getOtherPartyId()));
+    }
+
+    private Optional<String> getOtherPartyIdBySubscriptionEmail(SscsCaseData sscsCaseData, String idamEmail) {
+        return Stream.ofNullable(sscsCaseData.getOtherParties()).flatMap(Collection::stream)
+                .map(CcdValue::getValue)
+                .flatMap(op -> Stream.of((op.hasAppointee()) ? Pair.of(op.getId(), getSubscriptionEmail(op.getOtherPartyAppointeeSubscription())) : null,
+                        Pair.of(op.getId(), getSubscriptionEmail(op.getOtherPartySubscription())),
+                        (op.hasRepresentative()) ? Pair.of(op.getRep().getId(), getSubscriptionEmail(op.getOtherPartyRepresentativeSubscription())) : null))
+                .filter(Objects::nonNull)
+                .filter(p -> p.getLeft() != null && p.getRight() != null)
+                .filter(p -> idamEmail.equals(p.getRight()))
+                .map(Pair::getLeft)
+                .findFirst();
+    }
+
+    @Nullable
+    private String getSubscriptionEmail(Subscription subscription) {
+        return subscription != null ? subscription.getEmail() : null;
+    }
+
     private boolean submitHearingRecordingRequest(SscsCaseData sscsCaseData, Long ccdCaseId, List<String> hearingIds, String idamEmail) {
 
         List<HearingRecordingRequest> newHearingRequests = new ArrayList<>();
@@ -110,10 +134,12 @@ public class CitizenRequestService {
                     .stream().filter(r -> hearingId.equals(r.getValue().getHearingId())).findFirst();
 
             PartyItemList party = workRequestedParty(sscsCaseData, idamEmail);
+            Optional<String> otherPartyId = getOtherPartyIdBySubscriptionEmail(sscsCaseData, idamEmail);
 
             if (sscsHearingRecording.isPresent()) {
                 HearingRecordingRequest hearingRecordingRequest = HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder()
                         .requestingParty(party.getCode())
+                        .otherPartyId(otherPartyId.orElse(null))
                         .dateRequested(LocalDateTime.now().format(DateTimeFormatter.ofPattern(UPLOAD_DATE_FORMATTER)))
                         .sscsHearingRecording(sscsHearingRecording.get().getValue()).build()).build();
                 newHearingRequests.add(hearingRecordingRequest);
@@ -181,6 +207,20 @@ public class CitizenRequestService {
                 party = PartyItemList.JOINT_PARTY;
             }
         }
-        return party;
+
+        Optional<PartyItemList> otherParty = findOtherPartyUserSubscriptionForUserEmail(caseData, idamEmail);
+
+        return otherParty.orElse(party);
+    }
+
+    private Optional<PartyItemList> findOtherPartyUserSubscriptionForUserEmail(SscsCaseData sscsCaseData, String idamEmail) {
+        return Stream.ofNullable(sscsCaseData.getOtherParties()).flatMap(Collection::stream)
+                .map(CcdValue::getValue)
+                .flatMap(o -> Stream.of(Pair.of(PartyItemList.OTHER_PARTY, getSubscriptionEmail(o.getOtherPartySubscription())),
+                                Pair.of(PartyItemList.OTHER_PARTY, getSubscriptionEmail(o.getOtherPartyAppointeeSubscription())),
+                                Pair.of(PartyItemList.OTHER_PARTY_REPRESENTATIVE, getSubscriptionEmail(o.getOtherPartyRepresentativeSubscription()))))
+                .filter(p -> idamEmail.equalsIgnoreCase(p.getRight()))
+                .map(Pair::getLeft)
+                .findAny();
     }
 }
