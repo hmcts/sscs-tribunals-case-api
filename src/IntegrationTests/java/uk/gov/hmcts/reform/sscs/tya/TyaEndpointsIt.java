@@ -34,7 +34,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:config/application_it.properties")
 @AutoConfigureMockMvc
 public class TyaEndpointsIt {

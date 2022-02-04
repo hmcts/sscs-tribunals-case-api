@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import uk.gov.hmcts.reform.sscs.service.MessageAuthenticationService;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:config/application_it.properties")
 @AutoConfigureMockMvc
 public class SubscriptionsControllerIt {
