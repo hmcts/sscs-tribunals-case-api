@@ -127,22 +127,13 @@ public class EvidenceUploadService {
                         return false;
                     }
 
-                    MultipartFile convertedFile = fileToPdfConversionService.convert(singletonList(file)).get(0);
+                    List<MultipartFile> convertedFiles = fileToPdfConversionService.convert(singletonList(file));
 
-                    SscsDocument sscsDocument = null;
-                    try {
-                        sscsDocument = pdfStoreService.storeDocument(convertedFile.getBytes(), convertedFile.getOriginalFilename(), "Other evidence");
-                    } catch (IOException e) {
-                        log.error(e.getMessage()
-                                + ". Something has gone wrong for caseId: ", caseDetails.getId()
-                                + " when logging uploadEvidence for file (" + filename
-                                + ") with a checksum of (" + sha512HashChecksum + ")");
-                        return false;
-                    }
+                    Document document = evidenceManagementService.upload(convertedFiles, idamService.getIdamTokens()).getDocuments().get(0);
 
                     List<SscsDocument> currentDocuments = draftHearingDocumentExtractor.getDocuments().apply(caseDetails.getData());
                     ArrayList<SscsDocument> newDocuments = (currentDocuments == null) ? new ArrayList<>() : new ArrayList<>(currentDocuments);
-                    newDocuments.add(sscsDocument);
+                    newDocuments.add(new SscsDocument(createNewDocumentDetails(document)));
 
                     draftHearingDocumentExtractor.setDocuments().accept(caseDetails.getData(), newDocuments);
 
