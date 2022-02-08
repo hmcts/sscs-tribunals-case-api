@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -32,12 +33,17 @@ public class DwpDocumentService {
                     .addError("Potential harmful evidence is not a valid selection for child support cases");
         }
 
-        if (!sscsCaseData.isBenefitType(CHILD_SUPPORT) && editedEvidenceReason != null
+        if (!sscsCaseData.isBenefitType(CHILD_SUPPORT) && !isBenefitTypeSscs5(sscsCaseData.getBenefitType()) && editedEvidenceReason != null
                 && editedEvidenceReason.equals("childSupportConfidentiality")) {
             preSubmitCallbackResponse
                     .addError("Child support - Confidentiality is not a valid selection for this case");
         }
     }
+
+    private boolean isBenefitTypeSscs5(Optional<Benefit> benefitType) {
+        return benefitType.filter(benefit -> SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
+    }
+
 
     public void addToDwpDocumentsWithEditedDoc(SscsCaseData sscsCaseData, DwpResponseDocument dwpDocument, DwpDocumentType docType, DocumentLink editedDocumentLink, String editedReason) {
 

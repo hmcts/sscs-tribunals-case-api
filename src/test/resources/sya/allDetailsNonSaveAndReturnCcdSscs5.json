@@ -1,25 +1,26 @@
 {
   "caseCreated" : "${json-unit.ignore}",
-  "caseAccessCategory": "Personal Independence Payment",
+
+  "caseAccessCategory": "Tax Credit",
   "caseManagementCategory": {
     "value": {
-      "code": "PIP",
-      "label": "Personal Independence Payment"
+      "code": "taxCredit",
+      "label": "Tax Credit"
     },
     "list_items": [
       {
-        "code": "PIP",
-        "label": "Personal Independence Payment"
+        "code": "taxCredit",
+        "label": "Tax Credit"
       }
     ]
   },
   "caseNameHmctsInternal": "Joe Bloggs",
   "caseNameHmctsRestricted": "Joe Bloggs",
   "caseNamePublic": "Joe Bloggs",
-  "ogdType": "DWP",
-  "benefitCode" : "002",
+  "ogdType": "HMRC",
+  "benefitCode" : "053",
   "issueCode" : "DD",
-  "caseCode" : "002DD",
+  "caseCode" : "053DD",
   "region": "BRADFORD",
   "regionalProcessingCenter": {
     "name" : "BRADFORD",
@@ -35,8 +36,8 @@
   },
   "appeal": {
     "mrnDetails": {
-      "dwpIssuingOffice": "DWP PIP (1)",
-      "mrnDate": null,
+      "dwpIssuingOffice": "TCO Preston Appeals Team",
+      "mrnDate": "2018-02-01",
       "mrnLateReason": null,
       "mrnMissingReason": null
     },
@@ -62,12 +63,11 @@
         "dob": "1990-02-26",
         "nino": "AB877533C"
       },
-      "role": {},
       "isAppointee": "No",
+      "role":{},
       "confidentialityRequired": null,
       "isAddressSameAsAppointee": "No",
       "appointee": {
-        "id": null,
         "name": {
           "title": "Mrs",
           "firstName": "Mary",
@@ -87,12 +87,13 @@
         "identity": {
           "dob": "1991-03-31",
           "nino": null
-        }
+        },
+        "id": null
       }
     },
     "benefitType": {
-      "code": "PIP",
-      "description": "Personal Independence Payment"
+      "code": "taxCredit",
+      "description": "Tax Credit"
     },
     "hearingOptions": {
       "wantsToAttend": "Yes",
@@ -151,7 +152,6 @@
       "otherReasons": "Another reason"
     },
     "rep": {
-      "id": null,
       "hasRepresentative": "Yes",
       "name": {
         "title": "Mr",
@@ -170,7 +170,8 @@
         "phone": null,
         "mobile": "07411999999"
       },
-      "organisation": "HP Ltd"
+      "organisation": "HP Ltd",
+      "id": null
     },
     "signer": "Joe Bloggs",
     "hearingSubtype": {},
@@ -231,7 +232,7 @@
   },
   "evidencePresent" : "No",
   "sscsDocument":[],
-  "dwpRegionalCentre": "Newcastle",
+  "dwpRegionalCentre": "TCO Preston Appeals Team",
   "pcqId": "12345678",
   "languagePreferenceWelsh" : "No",
   "createdInGapsFrom": "readyToList",

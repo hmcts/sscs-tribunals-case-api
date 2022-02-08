@@ -1,12 +1,11 @@
 {
   "benefitType": {
-    "code": "BENEFIT_TYPE",
-    "description": null
+    "description": "Tax Credit",
+    "code": "taxCredit"
   },
   "mrn": {
-    "dwpIssuingOffice": "ISSUING_OFFICE",
-    "date": "01-01-2023",
-    "reasonForBeingLate": "Lost my paperwork"
+    "dwpIssuingOffice": "Tax Credit Office",
+    "date": "01-02-2018"
   },
   "isAppointee": false,
   "evidenceProvide": "false",
@@ -23,12 +22,28 @@
       "county": "Kent",
       "postCode": "TN32 6PL",
       "phoneNumber": "07411222222",
-      "emailAddress": "joe@bloggs.com"
+      "emailAddress": "sscstest+notify@greencroftconsulting.com"
+    },
+    "isAddressSameAsAppointee": false
+  },
+  "appointee": {
+    "title": "Mrs",
+    "firstName": "Mary",
+    "lastName": "Bloggs",
+    "dob": "31-03-1991",
+    "contactDetails": {
+      "addressLine1": "999 Another Street",
+      "townCity": "Another Town",
+      "county": "Newcastle",
+      "postCode": "NE1 1AW",
+      "phoneNumber": "01234567810",
+      "emailAddress": "sscsappointee@greencroftconsulting.com"
     }
   },
   "smsNotify": {
     "wantsSMSNotifications": true,
-    "smsNumber": "07411333333"
+    "smsNumber": "07398785050",
+    "useSameNumber": false
   },
   "hasRepresentative": true,
   "representative": {
@@ -67,8 +82,8 @@
     "wantsToAttend": true,
     "wantsSupport": true,
     "anythingElse": "Yes, this...",
-    "interpreterLanguageType": "An interpreter language",
-    "signLanguageType": "A sign language",
+    "interpreterLanguageType": "Telugu",
+    "signLanguageType": "Sign language",
     "arrangements": {
       "languageInterpreter": true,
       "signLanguageInterpreter": true,
@@ -78,13 +93,14 @@
     },
     "scheduleHearing": true,
     "datesCantAttend": [
-      "04-04-2020",
-      "05-04-2020",
-      "06-04-2020"
+      "04-04-2018",
+      "05-04-2018",
+      "06-04-2018"
     ]
   },
   "signAndSubmit": {
     "signer": "Joe Bloggs"
   },
-  "isSaveAndReturn": "No"
+  "pcqId": "12345678",
+  "languagePreferenceWelsh" : false
 }

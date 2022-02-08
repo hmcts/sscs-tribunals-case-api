@@ -82,9 +82,9 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
 
-        checkSscs2Confidentiality(preSubmitCallbackResponse, sscsCaseData);
+        checkSscs2AndSscs5Confidentiality(preSubmitCallbackResponse, sscsCaseData);
 
-        if (Benefit.CHILD_SUPPORT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())
+        if (isValidBenefitTypeForConfidentiality(sscsCaseData)
                 && sscsCaseData.getOtherParties() != null) {
             assignNewOtherPartyData(sscsCaseData.getOtherParties(), DWP_UPLOAD_RESPONSE);
             updateOtherPartyUcb(sscsCaseData);
@@ -97,8 +97,8 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         return preSubmitCallbackResponse;
     }
 
-    private void checkSscs2Confidentiality(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, SscsCaseData sscsCaseData) {
-        if (Benefit.CHILD_SUPPORT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())) {
+    private void checkSscs2AndSscs5Confidentiality(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, SscsCaseData sscsCaseData) {
+        if (isValidBenefitTypeForConfidentiality(sscsCaseData)) {
             if (sscsCaseData.getDwpEditedEvidenceReason() == null) {
                 if (otherPartyHasConfidentiality(sscsCaseData)) {
                     preSubmitCallbackResponse.addError("Other Party requires confidentiality, upload edited and unedited responses");
@@ -260,9 +260,9 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
 
             if (StringUtils.equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "phme")) {
-                sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHME_REQUEST.getId());
+                sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHE_REQUEST.getId());
                 sscsCaseData.setInterlocReferralDate(LocalDate.now().toString());
-                String note = "Referred to interloc for review by judge - PHME request";
+                String note = "Referred to interloc for review by judge - PHE request";
                 addNoteService.addNote(userAuthorisation, sscsCaseData, note);
             }
 
