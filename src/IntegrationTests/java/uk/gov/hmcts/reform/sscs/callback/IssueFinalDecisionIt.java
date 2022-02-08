@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.callback;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
@@ -22,11 +23,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
-import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -39,7 +38,7 @@ public class IssueFinalDecisionIt extends AbstractEventIt {
     private AuthTokenGenerator authTokenGenerator;
 
     @MockBean
-    private EvidenceManagementSecureDocStoreService evidenceManagementService;
+    private PdfStoreService pdfStoreService;
 
     @Before
     public void setup() throws IOException {
@@ -50,10 +49,9 @@ public class IssueFinalDecisionIt extends AbstractEventIt {
     @Test
     public void callToAboutToSubmitHandlerForDescriptorGenerateRoute_willMoveDraftDecisionToDecisionNotice() throws Exception {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
-        when(evidenceManagementService.download(any(), IdamTokens.builder().build())).thenReturn(pdfBytes);
+        when(pdfStoreService.download(any())).thenReturn(pdfBytes);
 
-        UploadResponse uploadResponse = createUploadResponse();
-        when(evidenceManagementService.upload(any(), IdamTokens.builder().build())).thenReturn(uploadResponse);
+        when(pdfStoreService.storeDocument(any(), any())).thenReturn(createSscsDocument());
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -74,10 +72,9 @@ public class IssueFinalDecisionIt extends AbstractEventIt {
     @Test
     public void callToAboutToSubmitHandlerForNonDescriptorGenerateRoute_willMoveDraftDecisionToDecisionNotice() throws Exception {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
-        when(evidenceManagementService.download(any(), IdamTokens.builder().build())).thenReturn(pdfBytes);
+        when(pdfStoreService.download(any())).thenReturn(pdfBytes);
 
-        UploadResponse uploadResponse = createUploadResponse();
-        when(evidenceManagementService.upload(any(), IdamTokens.builder().build())).thenReturn(uploadResponse);
+        when(pdfStoreService.storeDocument(any(), any())).thenReturn(createSscsDocument());
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -98,10 +95,9 @@ public class IssueFinalDecisionIt extends AbstractEventIt {
     @Test
     public void callToAboutToSubmitHandlerForNonDescriptorUploadRoute_willMoveDraftDecisionToDecisionNotice() throws Exception {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
-        when(evidenceManagementService.download(any(), IdamTokens.builder().build())).thenReturn(pdfBytes);
+        when(pdfStoreService.download(any())).thenReturn(pdfBytes);
 
-        UploadResponse uploadResponse = createUploadResponse();
-        when(evidenceManagementService.upload(any(), IdamTokens.builder().build())).thenReturn(uploadResponse);
+        when(pdfStoreService.storeDocument(any(), any())).thenReturn(createSscsDocument());
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -122,10 +118,9 @@ public class IssueFinalDecisionIt extends AbstractEventIt {
     @Test
     public void callToAboutToSubmitHandlerForDescriptorUploadRoute_willMoveDraftDecisionToDecisionNotice() throws Exception {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
-        when(evidenceManagementService.download(any(), IdamTokens.builder().build())).thenReturn(pdfBytes);
+        when(pdfStoreService.download(any())).thenReturn(pdfBytes);
 
-        UploadResponse uploadResponse = createUploadResponse();
-        when(evidenceManagementService.upload(any(), IdamTokens.builder().build())).thenReturn(uploadResponse);
+        when(pdfStoreService.storeDocument(any(), any())).thenReturn(createSscsDocument());
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -140,7 +135,6 @@ public class IssueFinalDecisionIt extends AbstractEventIt {
         assertEquals("Addition B - Final Decision Notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("B", result.getData().getSscsDocument().get(0).getValue().getBundleAddition());
         assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
-
     }
 
 

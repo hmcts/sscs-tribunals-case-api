@@ -14,6 +14,9 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
 public class IntegrationTestHelper {
@@ -62,6 +65,13 @@ public class IntegrationTestHelper {
         link.href = "some location";
         links.self = link;
         document.links = links;
+        return document;
+    }
+
+    public static SscsDocument createSscsDocument() {
+        SscsDocument document = SscsDocument.builder().value(
+                SscsDocumentDetails.builder().documentLink(
+                        DocumentLink.builder().documentUrl("some location").documentBinaryUrl("some location").build()).build()).build();
         return document;
     }
 
