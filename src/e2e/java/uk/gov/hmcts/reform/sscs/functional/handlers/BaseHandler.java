@@ -59,6 +59,8 @@ public class BaseHandler {
         baseURI = testUrl;
         useRelaxedHTTPSValidation();
         idamTokens = idamService.getIdamTokens();
+        log.info("Oauth." + idamTokens.getIdamOauth2Token());
+        log.info("Service." + idamTokens.getIdamOauth2Token());
     }
 
     protected SscsCaseDetails addDocumentsToCase(SscsCaseData sscsCaseData, List<UploadDocument> docs) {
