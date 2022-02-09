@@ -88,7 +88,7 @@ public class SubmitAppealService {
 
         IdamTokens idamTokens = idamService.getIdamTokens();
         log.info("Oauth." + idamTokens.getIdamOauth2Token());
-        log.info("Service." + idamTokens.getIdamOauth2Token());
+        log.info("Service." + idamTokens.getServiceAuthorization());
 
         Long caseId = appeal.getCcdCaseId() != null ? Long.valueOf(appeal.getCcdCaseId()) : null;
 
