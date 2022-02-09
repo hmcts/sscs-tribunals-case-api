@@ -87,6 +87,8 @@ public class SubmitAppealService {
     public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
 
         IdamTokens idamTokens = idamService.getIdamTokens();
+        log.info("Oauth." + idamTokens.getIdamOauth2Token());
+        log.info("Service." + idamTokens.getIdamOauth2Token());
 
         Long caseId = appeal.getCcdCaseId() != null ? Long.valueOf(appeal.getCcdCaseId()) : null;
 
