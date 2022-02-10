@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyName
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -362,6 +363,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             }
 
             addTimeValueToDocuments(sscsCaseData.getSscsDocument());
+
             documents.add(sscsDocument);
 
             if (sscsCaseData.isLanguagePreferenceWelsh()) {
@@ -382,16 +384,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private void addTimeValueToDocuments( List<SscsDocument> sscsDocument ) {
-        DateTimeFormatter formatterDateTime = DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm");
-        DateTimeFormatter formatterDate = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
         sscsDocument.stream().forEach(s -> {
             try {
-                LocalDateTime.parse(s.getValue().getDateApproved(), formatterDateTime);
-                //System.out.println("The string is a date and time: " + dateTime);
+                LocalDateTime.parse(s.getValue().getDocumentDateAdded(), DateTimeFormatter.ISO_DATE_TIME);
             } catch (DateTimeParseException dtpe) {
-                //System.out.println("The string is not a date and time: " + dtpe.getMessage());
-                LocalDate dt = LocalDate.parse(s.getValue().getDateApproved(), formatterDate);
-                s.getValue().setDateApproved(dt.format(formatterDateTime));
+                LocalDateTime dt = LocalDateTime.of(LocalDate.parse(s.getValue().getDocumentDateAdded()), LocalTime.MIN);
+                s.getValue().setDocumentDateAdded(dt.format(DateTimeFormatter.ISO_DATE_TIME));
             }
         });
     }
@@ -429,7 +427,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         String scannedDate = null;
         if (scannedDocument.getValue().getScannedDate() != null) {
-            scannedDate = LocalDateTime.parse(scannedDocument.getValue().getScannedDate()).toString();
+            scannedDate = LocalDateTime.parse(scannedDocument.getValue().getScannedDate())
+                    .format(DateTimeFormatter.ISO_DATE_TIME);
         }
 
         DocumentLink url = scannedDocument.getValue().getUrl();

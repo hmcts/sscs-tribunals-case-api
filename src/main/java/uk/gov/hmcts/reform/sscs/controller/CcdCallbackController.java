@@ -63,7 +63,12 @@ public class CcdCallbackController {
         log.info("About to submit sscs case callback `{}` received for Case ID `{}`", callback.getEvent(),
             callback.getCaseDetails().getId());
         authorisationService.authorise(serviceAuthHeader);
-        return performRequest(ABOUT_TO_SUBMIT, callback, userAuthorisation);
+        ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> resp = performRequest(ABOUT_TO_SUBMIT, callback, userAuthorisation);
+//        resp.getBody().getData().getSscsDocument().forEach(s->{
+//            System.out.println("documentDateAdded : " + s.getValue().getDocumentDateAdded());
+//            System.out.println("Document : " + s.getValue());
+//        });
+        return resp;
     }
 
     @PostMapping(path = "/ccdMidEvent")
