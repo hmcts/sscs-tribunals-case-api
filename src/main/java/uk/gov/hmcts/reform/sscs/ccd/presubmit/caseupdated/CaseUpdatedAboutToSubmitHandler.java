@@ -104,6 +104,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
         final boolean hasSystemUserRole = userDetails.hasRole(SYSTEM_USER);
 
+        updateHearingTypeForNonSscs1Case(sscsCaseData, preSubmitCallbackResponse, hasSystemUserRole);
+
         //validate benefit type and dwp issuing office for updateCaseData event triggered by user, which is not by CaseLoader
         if (!hasSystemUserRole) {
             validateAndUpdateDwpHandlingOffice(sscsCaseData, preSubmitCallbackResponse);
@@ -136,6 +138,26 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             response.addWarning("There is a mismatch between the hearing type and the wants to attend field, "
                 + "all hearing options will be cleared please check if this is correct");
         }
+    }
+
+    private void updateHearingTypeForNonSscs1Case(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response, boolean hasSystemUserRole) {
+        if (sscsCaseData.getAppeal().getHearingType() != null
+            && sscsCaseData.getAppeal().getHearingOptions() != null
+            && HearingType.PAPER.getValue().equals(sscsCaseData.getAppeal().getHearingType())
+            && isBenefitTypeValidForHearingTypeValidation(response.getData().getBenefitType())
+            && sscsCaseData.getAppeal().getHearingOptions().isWantsToAttendHearing().equals(Boolean.TRUE)) {
+
+            response.getData().getAppeal().setHearingType(HearingType.ORAL.getValue());
+            if (!hasSystemUserRole) {
+                response.addWarning("The hearing type will be changed from Paper to Oral as at least one of the"
+                    + " parties to the case would like to attend the hearing");
+            }
+        }
+    }
+
+    private boolean isBenefitTypeValidForHearingTypeValidation(Optional<Benefit> benefitType) {
+        return benefitType.filter(benefit -> SscsType.SSCS2.equals(benefit.getSscsType())
+            || SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
     }
 
     private boolean validateBenefitType(BenefitType benefitType, PreSubmitCallbackResponse<SscsCaseData> response) {

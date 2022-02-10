@@ -106,7 +106,7 @@ public class RestoreCasesService2Test {
         Assert.assertEquals("DD", sscsCaseDataCaptor.getAllValues().get(0).getIssueCode());
         Assert.assertEquals("002DD", sscsCaseDataCaptor.getAllValues().get(0).getCaseCode());
         Assert.assertEquals("No", sscsCaseDataCaptor.getAllValues().get(0).getIsScottishCase());
-        Assert.assertEquals("Basildon Combined Court", sscsCaseDataCaptor.getAllValues().get(0).getProcessingVenue());
+        Assert.assertEquals("Basildon CC", sscsCaseDataCaptor.getAllValues().get(0).getProcessingVenue());
         Assert.assertEquals("Jeff Smith", sscsCaseDataCaptor.getAllValues().get(0).getAppeal().getSigner());
         Assert.assertEquals(UNREGISTERED.getId(), sscsCaseDataCaptor.getAllValues().get(0).getDwpState());
 
@@ -146,7 +146,7 @@ public class RestoreCasesService2Test {
         Assert.assertEquals("DD", sscsCaseDataCaptor.getAllValues().get(0).getIssueCode());
         Assert.assertEquals("002DD", sscsCaseDataCaptor.getAllValues().get(0).getCaseCode());
         Assert.assertEquals("No", sscsCaseDataCaptor.getAllValues().get(0).getIsScottishCase());
-        Assert.assertEquals("Basildon Combined Court", sscsCaseDataCaptor.getAllValues().get(0).getProcessingVenue());
+        Assert.assertEquals("Basildon CC", sscsCaseDataCaptor.getAllValues().get(0).getProcessingVenue());
         Assert.assertEquals("Jeff Smith", sscsCaseDataCaptor.getAllValues().get(0).getAppeal().getSigner());
         Assert.assertNull(sscsCaseDataCaptor.getAllValues().get(0).getDwpState());
 

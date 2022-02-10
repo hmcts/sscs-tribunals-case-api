@@ -788,4 +788,82 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         assertEquals(1, response.getErrors().size());
     }
+
+    @Test
+    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
+        "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+    public void givenNonSscs1PaperCaseAppellantWantsToAttendYes_thenCaseIsOralAndWarningShown(String shortName) {
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        otherPartyList.add(buildOtherParty("No",null));
+        otherPartyList.add(buildOtherParty("No", NO));
+        callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingType(HearingType.PAPER.getValue());
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(
+            HearingOptions.builder().wantsToAttend("Yes").build()
+        );
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getWarnings().size());
+        assertTrue(response.getWarnings().stream().anyMatch(m -> m.contains(
+            "The hearing type will be changed from Paper to Oral as at least one of the"
+            + " parties to the case would like to attend the hearing")));
+        assertEquals(HearingType.ORAL.getValue(), response.getData().getAppeal().getHearingType());
+    }
+
+    @Test
+    public void givenNonSscs1PaperCaseAppellantWantsToAttendYesCaseLoader_thenCaseIsOralAndNoWarningShown() {
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        otherPartyList.add(buildOtherParty("No",null));
+        otherPartyList.add(buildOtherParty("No", NO));
+        callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingType(HearingType.PAPER.getValue());
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(
+            HearingOptions.builder().wantsToAttend("Yes").build()
+        );
+        when(idamService.getUserDetails(any())).thenReturn(UserDetails.builder().roles(List.of("caseworker-sscs-systemupdate")).build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(HearingType.ORAL.getValue(), response.getData().getAppeal().getHearingType());
+    }
+
+    @Test
+    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
+        "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+    public void givenNonSscs1PaperCaseAppelllantWantsToAttendNo_thenCaseIsNotChangedAndNoWarningShown(String shortName) {
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(
+            HearingOptions.builder().wantsToAttend("No").build()
+        );
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingType(HearingType.PAPER.getValue());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(HearingType.PAPER.getValue(), response.getData().getAppeal().getHearingType());
+    }
+
+    @Test
+    @Parameters({"paper,Yes", "oral,Yes", "online,No"})
+    public void givenSscs1CaseOtherPartyWantsToAttendYes_thenHearingTypeNotChangedAndNoWarningShown(
+        String hearingType, String appellantWantsToAttend) {
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("PIP");
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingType(hearingType);
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(
+            HearingOptions.builder().wantsToAttend(appellantWantsToAttend).build()
+        );
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(hearingType, response.getData().getAppeal().getHearingType());
+    }
+
+    private CcdValue<OtherParty> buildOtherParty(String wantsToAttend, YesNo confidentiality) {
+        return CcdValue.<OtherParty>builder().value(OtherParty.builder()
+            .confidentialityRequired(confidentiality != null ? confidentiality : NO)
+            .hearingOptions(HearingOptions.builder().wantsToAttend(wantsToAttend).build())
+            .build()).build();
+    }
+
 }
