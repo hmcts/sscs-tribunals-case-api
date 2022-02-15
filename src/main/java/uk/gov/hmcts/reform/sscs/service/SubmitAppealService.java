@@ -255,14 +255,7 @@ public class SubmitAppealService {
         } else {
             sscsCaseData = convertSyaToCcdCaseData(appeal, rpc.getName(), rpc, workAllocationFeature);
         }
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            log.info("sscsCaseData" + objectMapper.writeValueAsString(sscsCaseData));
-        } catch (JsonProcessingException e) {
-            log.error("error with json", e);
-        }
-
+        
         sscsCaseData.setCreatedInGapsFrom(READY_TO_LIST.getId());
         sscsCaseData.setProcessingVenue(airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType()));
 
