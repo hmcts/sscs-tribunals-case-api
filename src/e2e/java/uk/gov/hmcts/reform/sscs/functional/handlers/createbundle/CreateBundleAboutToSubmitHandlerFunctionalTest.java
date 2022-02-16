@@ -70,7 +70,7 @@ public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler 
 
     private void validateBundleFolder(List<BundleFolder> bundleFolders) {
         assertThat(bundleFolders.size(), is(2));
-        assertThat(bundleFolders.get(0).getValue().getName(), is("FTA"));
+        assertThat(bundleFolders.get(0).getValue().getName(), is("DWP"));
         assertThat(bundleFolders.get(0).getValue().getDocuments().size(), is(2));
         assertThat(bundleFolders.get(1).getValue().getName(), is("Further additions"));
         assertThat(bundleFolders.get(1).getValue().getDocuments().size(), is(0));
@@ -105,7 +105,7 @@ public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler 
         assertThat(updatedCaseDetails.getData().getCaseBundles().size(), is(1));
         final List<BundleFolder> folders = updatedCaseDetails.getData().getCaseBundles().get(0).getValue().getFolders();
         assertThat(folders.size(), is(2));
-        assertThat(folders.get(0).getValue().getName(), is("FTA"));
+        assertThat(folders.get(0).getValue().getName(), is("DWP"));
         assertThat(folders.get(0).getValue().getDocuments().size(), is(2));
         assertThat(folders.get(1).getValue().getName(), is("Further additions"));
         assertThat(folders.get(1).getValue().getDocuments().size(), is(1));
