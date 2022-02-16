@@ -224,7 +224,7 @@ ccd:
       - sscs-citizen2@hmcts.net|SSCS|Benefit|appealCreated
 
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.13.9-9872nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.14.8-9872nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: https://ccd-admin-web-${SERVICE_FQDN}/oauth2redirect
     environment:

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service.evidence;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
@@ -7,13 +8,14 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.collections4.ListUtils.union;
 import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DRAFT_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty.OTHER_PARTY;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty.OTHER_PARTY_APPOINTEE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty.OTHER_PARTY_REP;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService.TEMP_UNIQUE_ID;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.withEmailPredicate;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,9 +28,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -83,7 +86,7 @@ public class EvidenceUploadService {
                                  IdamService idamService, OnlineHearingService onlineHearingService,
                                  StoreEvidenceDescriptionService storeEvidenceDescriptionService,
                                  FileToPdfConversionService fileToPdfConversionService,
-                                 EvidenceManagementService evidenceManagementService, 
+                                 EvidenceManagementService evidenceManagementService,
                                  PdfStoreService pdfStoreService, AddedDocumentsUtil addedDocumentsUtil) {
         this.documentManagementService = documentManagementService;
         this.ccdService = ccdService;
@@ -174,9 +177,8 @@ public class EvidenceUploadService {
                                                   String summary) {
         return onlineHearingService.getCcdCaseByIdentifier(identifier)
                 .map(caseDetails -> {
-
                     List<MultipartFile> convertedFiles = fileToPdfConversionService.convert(singletonList(file));
-
+                    addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(caseDetails.getData());
                     Document document = evidenceManagementService.upload(convertedFiles, DM_STORE_USER_ID).getEmbedded().getDocuments().get(0);
 
                     List<E> currentDocuments = documentExtract.getDocuments().apply(caseDetails.getData());
@@ -207,6 +209,7 @@ public class EvidenceUploadService {
         return onlineHearingService.getCcdCaseByIdentifier(identifier)
                 .map(caseDetails -> {
                     SscsCaseData sscsCaseData = caseDetails.getData();
+                    addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(sscsCaseData);
                     Long ccdCaseId = caseDetails.getId();
                     EvidenceDescriptionPdfData data = new EvidenceDescriptionPdfData(caseDetails, description,
                             getFileNames(sscsCaseData),
@@ -253,7 +256,7 @@ public class EvidenceUploadService {
         appendEvidenceUploadsToStatementAndStoreIt(sscsCaseData, storePdfContext,
                 filename, idamEmail);
 
-        sscsCaseData.setDraftSscsDocument(Collections.emptyList());
+        sscsCaseData.setDraftSscsDocument(emptyList());
         sscsCaseData.setEvidenceHandled("No");
         ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_DOCUMENT.getCcdType(),
                 "SSCS - upload evidence from MYA",
