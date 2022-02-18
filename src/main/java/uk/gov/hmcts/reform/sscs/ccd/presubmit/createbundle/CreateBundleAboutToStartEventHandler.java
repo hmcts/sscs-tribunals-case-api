@@ -88,9 +88,9 @@ public class CreateBundleAboutToStartEventHandler implements PreSubmitCallbackHa
             final boolean hasSuperUserRole = userDetails.hasRole(SUPER_USER);
 
             if (!hasSuperUserRole) {
-                response.addError("The bundle cannot be created as mandatory DWP documents are missing");
+                response.addError("The bundle cannot be created as mandatory FTA documents are missing");
             } else {
-                response.addWarning("The bundle cannot be created as mandatory DWP documents are missing, do you want to proceed?");
+                response.addWarning("The bundle cannot be created as mandatory FTA documents are missing, do you want to proceed?");
             }
         }
         return response;
@@ -134,8 +134,8 @@ public class CreateBundleAboutToStartEventHandler implements PreSubmitCallbackHa
     }
 
     private void moveDocsToDwpCollectionIfOldPattern(SscsCaseData sscsCaseData) {
-        //Before we moved to the new DWP document collection, we stored DWP documents within their own fields. This would break bundling with the new config that
-        //looks at the new DWP document collection. Therefore, if the DWP fields are populated, then assume old pattern and move to the DWP document collection.
+        //Before we moved to the new DWP document collection, we stored FTA documents within their own fields. This would break bundling with the new config that
+        //looks at the new DWP document collection. Therefore, if the FTA fields are populated, then assume old pattern and move to the DWP document collection.
         if (sscsCaseData.getDwpResponseDocument() != null) {
             dwpDocumentService.moveDwpResponseDocumentToDwpDocumentCollection(sscsCaseData);
         }
