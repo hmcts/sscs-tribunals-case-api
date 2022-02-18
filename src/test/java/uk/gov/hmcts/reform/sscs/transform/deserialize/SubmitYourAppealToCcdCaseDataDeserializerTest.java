@@ -435,7 +435,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         assertEquals("George Foreman", caseData.getWorkAllocationFields().getCaseNameHmctsRestricted());
         assertEquals("George Foreman", caseData.getWorkAllocationFields().getCaseNamePublic());
 
-        assertEquals("Personal Independence Payment", caseData.getWorkAllocationFields().getCaseAccessCategory());
+        assertEquals("personalIndependencePayment", caseData.getWorkAllocationFields().getCaseAccessCategory());
         assertEquals("DWP", caseData.getWorkAllocationFields().getOgdType());
         assertEquals("Personal Independence Payment", caseData.getWorkAllocationFields().getCaseManagementCategory().getValue().getLabel());
         assertEquals("PIP", caseData.getWorkAllocationFields().getCaseManagementCategory().getValue().getCode());
