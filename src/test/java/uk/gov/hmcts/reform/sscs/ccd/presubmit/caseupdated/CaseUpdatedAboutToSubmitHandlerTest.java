@@ -442,7 +442,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(2, response.getWarnings().size());
-        assertThat(response.getWarnings(), hasItems("Benefit type code is empty", "DWP issuing office is empty"));
+        assertThat(response.getWarnings(), hasItems("Benefit type code is empty", "FTA issuing office is empty"));
     }
 
     @Test
@@ -455,7 +455,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         assertEquals(1, response.getWarnings().size());
         assertEquals(1, response.getErrors().size());
 
-        assertThat(response.getWarnings(), hasItems("DWP issuing office is empty"));
+        assertThat(response.getWarnings(), hasItems("FTA issuing office is empty"));
         assertThat(response.getErrors(), hasItems("Benefit type code is invalid, should be one of: ESA, JSA, PIP, DLA, UC, carersAllowance, attendanceAllowance, "
                         + "bereavementBenefit, industrialInjuriesDisablement, maternityAllowance, socialFund, incomeSupport, bereavementSupportPaymentScheme, "
                         + "industrialDeathBenefit, pensionCredit, retirementPension, childSupport, taxCredit, guardiansAllowance, taxFreeChildcare, "
