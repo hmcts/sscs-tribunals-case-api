@@ -25,6 +25,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.idam.UserRole;
 
 
 @RunWith(JUnitParamsRunner.class)
@@ -41,12 +44,16 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private IdamService idamService;
+
     private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new UpdateOtherPartyAboutToSubmitHandler();
+        handler = new UpdateOtherPartyAboutToSubmitHandler(idamService);
+        when(idamService.getUserDetails(any())).thenReturn(UserDetails.builder().roles(Arrays.asList(UserRole.SUPER_USER.getValue())).build());
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
 
@@ -279,11 +286,92 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         assertEquals(0, response.getErrors().size());
     }
 
+    @Test
+    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
+        "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+    public void givenNonSscs1PaperCaseOtherPartyWantsToAttendYes_thenCaseIsOralAndWarningShown(String shortName) {
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code(shortName).build())
+                .hearingType(HearingType.PAPER.getValue())
+                .build())
+            .otherParties(Arrays.asList(buildOtherParty("No",null), buildOtherParty("Yes", NO)))
+            .build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getWarnings().size());
+        assertTrue(response.getWarnings().stream().anyMatch(m -> m.contains(
+            "The hearing type will be changed from Paper to Oral as at least one of the"
+                + " parties to the case would like to attend the hearing")));
+        assertEquals(HearingType.ORAL.getValue(), response.getData().getAppeal().getHearingType());
+    }
+
+    @Test
+    public void givenNonSscs1PaperCaseOtherPartyWantsToAttendYesCaseLoader_thenCaseIsOralAndNoWarningShown() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code("taxCredit").build())
+                .hearingType(HearingType.PAPER.getValue())
+                .build())
+            .otherParties(Arrays.asList(buildOtherParty("No",null), buildOtherParty("Yes", NO)))
+            .build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(idamService.getUserDetails(any())).thenReturn(UserDetails.builder().roles(List.of("caseworker-sscs-systemupdate")).build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(HearingType.ORAL.getValue(), response.getData().getAppeal().getHearingType());
+    }
+
+    @Test
+    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
+        "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+    public void givenNonSscs1PaperCaseOtherPartyWantsToAttendNo_thenCaseIsNotChangedAndNoWarningShown(String shortName) {
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code(shortName).build())
+                .hearingType(HearingType.PAPER.getValue())
+                .build())
+            .otherParties(Arrays.asList(buildOtherParty("No",null), buildOtherParty("No", NO)))
+            .build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(HearingType.PAPER.getValue(), response.getData().getAppeal().getHearingType());
+    }
+
+    @Test
+    @Parameters({"paper,No,Yes", "oral,No,No", "online,Yes,Yes"})
+    public void givenSscs1CaseOtherPartyWantsToAttendYes_thenHearingTypeNotChangedAndNoWarningShown(
+        String hearingType, String wantsToAttend1, String wantsToAttend2) {
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code("PIP").build())
+                .hearingType(hearingType)
+                .build())
+            .otherParties(Arrays.asList(buildOtherParty(wantsToAttend1,null), buildOtherParty(wantsToAttend2, NO)))
+            .build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(hearingType, response.getData().getAppeal().getHearingType());
+    }
+
     private boolean isSscs5CaseValidated(List<CcdValue<OtherParty>> otherParties) {
         return emptyIfNull(otherParties).stream()
             .filter(otherPartyCcdValue -> otherPartyCcdValue.getValue() != null)
             .map(otherPartyCcdValue -> otherPartyCcdValue.getValue())
             .allMatch(otherParty -> otherParty.getShowRole().equals(NO) && otherParty.getRole() == null);
+    }
+
+    private CcdValue<OtherParty> buildOtherParty(String wantsToAttend, YesNo confidentiality) {
+        return CcdValue.<OtherParty>builder().value(OtherParty.builder()
+            .confidentialityRequired(confidentiality != null ? confidentiality : NO)
+            .hearingOptions(HearingOptions.builder().wantsToAttend(wantsToAttend).build())
+            .build()).build();
     }
 
     private CcdValue<OtherParty> buildOtherParty(String id) {

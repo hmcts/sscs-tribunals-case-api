@@ -8,11 +8,9 @@ import static uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil.cleanPhoneNumber
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -23,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
+@Slf4j
 public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
     private static final String YES = "Yes";
@@ -56,6 +55,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         String benefitCode = isDraft ? null : generateBenefitCode(appeal.getBenefitType().getCode(), addressName)
                 .orElseThrow(() -> BenefitMappingException.createException(appeal.getBenefitType().getCode()));
 
+
         String issueCode = isDraft ? null : generateIssueCode();
         String caseCode = isDraft ? null : generateCaseCode(benefitCode, issueCode);
 
@@ -63,6 +63,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
         List<SscsDocument> sscsDocuments = getEvidenceDocumentDetails(syaCaseWrapper);
 
+        log.info("workAllocationEnabled=" + workAllocationEnabled);
         if (workAllocationEnabled) {
             String caseName = null;
             if (appeal.getAppellant() != null && appeal.getAppellant().getName() != null) {
@@ -70,8 +71,18 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 caseName = name.getFullNameNoTitle();
             }
 
+            Benefit benefit = Benefit.getBenefitByCodeOrThrowException(appeal.getBenefitType().getCode());
+            WorkAllocationFields workAllocationFields = new WorkAllocationFields();
+            workAllocationFields.setCaseNames(caseName);
+            if (benefit.getSscsType().equals(SscsType.SSCS5)) {
+                workAllocationFields.setOgdType("HMRC");
+            } else {
+                workAllocationFields.setOgdType("DWP");
+            }
+            workAllocationFields.setCategories(benefit);
 
             return SscsCaseData.builder()
+                    .workAllocationFields(workAllocationFields)
                     .caseCreated(LocalDate.now().toString())
                     .isSaveAndReturn(syaCaseWrapper.getIsSaveAndReturn())
                     .appeal(appeal)
@@ -89,7 +100,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                             && syaCaseWrapper.getLanguagePreferenceWelsh() != null
                             && syaCaseWrapper.getLanguagePreferenceWelsh()))
                     .ccdCaseId(ccdCaseId)
-                    .caseName(caseName)
                     .build();
         } else {
             return SscsCaseData.builder()

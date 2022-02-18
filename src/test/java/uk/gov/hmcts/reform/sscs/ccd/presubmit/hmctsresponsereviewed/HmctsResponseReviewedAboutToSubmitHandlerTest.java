@@ -261,11 +261,11 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
         assertEquals("/evidenceurl", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
         assertEquals("/evidencebinaryurl", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentBinaryUrl());
-        assertEquals("DWP evidence received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentFilename());
+        assertEquals("FTA evidence received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentFilename());
 
         assertEquals("/responseurl", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
         assertEquals("/responsebinaryurl", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentBinaryUrl());
-        assertEquals("DWP response received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentFilename());
+        assertEquals("FTA response received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentFilename());
 
         assertEquals("/url", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentUrl());
         assertEquals("/binaryurl", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentBinaryUrl());

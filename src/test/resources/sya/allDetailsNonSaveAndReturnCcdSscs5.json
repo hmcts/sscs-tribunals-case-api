@@ -1,6 +1,23 @@
 {
   "caseCreated" : "${json-unit.ignore}",
-  "caseName":"Joe Bloggs",
+
+  "caseAccessCategory": "taxCredit",
+  "caseManagementCategory": {
+    "value": {
+      "code": "taxCredit",
+      "label": "Tax Credit"
+    },
+    "list_items": [
+      {
+        "code": "taxCredit",
+        "label": "Tax Credit"
+      }
+    ]
+  },
+  "caseNameHmctsInternal": "Joe Bloggs",
+  "caseNameHmctsRestricted": "Joe Bloggs",
+  "caseNamePublic": "Joe Bloggs",
+  "ogdType": "HMRC",
   "benefitCode" : "053",
   "issueCode" : "DD",
   "caseCode" : "053DD",

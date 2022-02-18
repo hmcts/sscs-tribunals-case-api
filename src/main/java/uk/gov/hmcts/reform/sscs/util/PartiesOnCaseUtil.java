@@ -52,7 +52,7 @@ public class PartiesOnCaseUtil {
             listOptions.add(new DynamicListItem(REPRESENTATIVE.getCode(), REPRESENTATIVE.getLabel()));
         }
 
-        if (isChildSupportAppeal(sscsCaseData) && isNotEmpty(sscsCaseData.getOtherParties())) {
+        if (isNotEmpty(sscsCaseData.getOtherParties())) {
             addOtherPartiesToListOptions(sscsCaseData, listOptions);
         }
 

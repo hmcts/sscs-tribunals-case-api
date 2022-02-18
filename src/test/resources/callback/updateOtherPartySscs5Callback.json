@@ -396,7 +396,7 @@
             "unacceptableCustomerBehaviour": "Yes",
             "sendNewOtherPartyNotification": null,
             "isAppointee": null,
-            "id": null,
+            "id": 2,
             "name": {
               "title": null,
               "firstName": "Dave",
@@ -2113,8 +2113,8 @@
           "mrnMissingReason": null
         },
         "benefitType": {
-          "code": "childSupport",
-          "description": "Child Support"
+          "code": "taxCredit",
+          "description": "Tax Credit"
         },
         "hearingType": "oral",
         "receivedVia": "Online",
@@ -2184,95 +2184,226 @@
       },
       "otherParties": [
         {
-          "id": "c516a1e8-c34b-4c82-84fe-e51b7b7c9008",
           "value": {
+            "confidentialityRequired": "Yes",
+            "unacceptableCustomerBehaviour": "Yes",
+            "sendNewOtherPartyNotification": "Yes",
+            "isAppointee": "Yes",
             "id": "1",
-            "rep": {
-              "name": {
-                "title": "Mr",
-                "lastName": "Rep",
-                "firstName": "Test"
-              },
-              "address": {
-                "town": "St, Albans",
-                "line1": "25",
-                "line2": "test",
-                "county": "Essex",
-                "postcode": "AL4 9UE"
-              },
-              "contact": {
-                "email": "",
-                "phone": "07534744128",
-                "mobile": null
-              },
-              "organisation": "HBO",
-              "hasRepresentative": "Yes"
-            },
             "name": {
               "title": "Mr",
+              "firstName": "John",
               "lastName": "Lewis",
-              "firstName": "John"
-            },
-            "role": {
-              "name": "receivingParent",
-              "description": "Papa"
+              "middleName": null
             },
             "address": {
-              "town": "Camden",
               "line1": "12, Highstreet, Test",
               "line2": "Highstreet",
+              "town": "Camden",
               "county": "Hertfordshire",
-              "postcode": "TS1 1ST"
+              "postcode": "TS1 1ST",
+              "line3": null,
+              "country": null,
+              "postcodeLookup": null,
+              "postcodeAddress": null
             },
             "contact": {
-              "email": null,
               "phone": "07534744199",
-              "mobile": null
+              "mobile": null,
+              "email": null
+            },
+            "role": {
+              "name": null,
+              "description": null
+            },
+            "hearingSubtype": {
+              "wantsHearingTypeTelephone": null,
+              "hearingTelephoneNumber": null,
+              "wantsHearingTypeVideo": null,
+              "hearingVideoEmail": null,
+              "wantsHearingTypeFaceToFace": null
+            },
+            "hearingOptions": {
+              "wantsToAttend": "Yes",
+              "wantsSupport": "No",
+              "languageInterpreter": null,
+              "languages": null,
+              "signLanguageType": null,
+              "other": null,
+              "agreeLessNotice": "Yes",
+              "scheduleHearing": "Yes",
+              "arrangements": [],
+              "excludeDates": [
+                {
+                  "value": {
+                    "start": "2022-12-12",
+                    "end": "2022-12-23"
+                  },
+                  "id": "b5e5a204-4784-429b-bbc9-ad6ae39dcfde"
+                }
+              ]
             },
             "appointee": {
               "name": {
                 "title": "Mr",
+                "firstName": "John",
                 "lastName": "Lewis",
-                "firstName": "John"
+                "middleName": null
               },
               "address": {
-                "town": "St. Albans",
                 "line1": "16, Wheatleys",
                 "line2": "test",
+                "town": "St. Albans",
                 "county": "Hertfordshire",
-                "postcode": "TS1 1ST"
+                "postcode": "TS1 1ST",
+                "line3": null,
+                "country": null,
+                "postcodeLookup": null,
+                "postcodeAddress": null
               },
               "contact": {
-                "email": "sscs-citizen2@hmcts.net",
                 "phone": "07534744199",
-                "mobile": null
+                "mobile": null,
+                "email": "sscs-citizen2@hmcts.net"
               },
               "identity": {
                 "dob": null,
                 "nino": null
               }
             },
-            "isAppointee": "Yes",
-            "hearingOptions": {
-              "arrangements": [],
-              "excludeDates": [
-                {
-                  "id": "b5e5a204-4784-429b-bbc9-ad6ae39dcfde",
-                  "value": {
-                    "end": "2022-12-23",
-                    "start": "2022-12-12"
-                  }
-                }
-              ],
-              "wantsSupport": "No",
-              "wantsToAttend": "Yes",
-              "agreeLessNotice": "Yes",
-              "scheduleHearing": "Yes"
+            "rep": {
+              "hasRepresentative": "Yes",
+              "organisation": "HBO",
+              "name": {
+                "title": "Mr",
+                "firstName": "Test",
+                "lastName": "Rep",
+                "middleName": null
+              },
+              "address": {
+                "line1": "25",
+                "line2": "test",
+                "town": "St, Albans",
+                "county": "Essex",
+                "postcode": "AL4 9UE",
+                "line3": null,
+                "country": null,
+                "postcodeLookup": null,
+                "postcodeAddress": null
+              },
+              "contact": {
+                "phone": "07534744128",
+                "mobile": null,
+                "email": null
+              }
+            }
+          },
+          "id": "c516a1e8-c34b-4c82-84fe-e51b7b7c9008"
+        },
+        {
+          "value": {
+            "confidentialityRequired": "No",
+            "unacceptableCustomerBehaviour": "Yes",
+            "sendNewOtherPartyNotification": null,
+            "isAppointee": null,
+            "id": 2,
+            "name": {
+              "title": null,
+              "firstName": "Dave",
+              "lastName": "Watmore",
+              "middleName": null
             },
-            "hearingSubtype": {},
-            "confidentialityRequired": "Yes",
-            "unacceptableCustomerBehaviour": "Yes"
-          }
+            "address": {
+              "line1": "25",
+              "line2": "Northend",
+              "town": "Hatfield",
+              "county": null,
+              "postcode": "TS1 1ST",
+              "line3": null,
+              "country": null,
+              "postcodeLookup": null,
+              "postcodeAddress": null
+            },
+            "contact": {
+              "phone": null,
+              "mobile": null,
+              "email": null
+            },
+            "hearingSubtype": {
+              "wantsHearingTypeTelephone": null,
+              "hearingTelephoneNumber": null,
+              "wantsHearingTypeVideo": null,
+              "hearingVideoEmail": null,
+              "wantsHearingTypeFaceToFace": null
+            },
+            "hearingOptions": {
+              "wantsToAttend": null,
+              "wantsSupport": null,
+              "languageInterpreter": null,
+              "languages": null,
+              "signLanguageType": null,
+              "other": null,
+              "agreeLessNotice": null,
+              "scheduleHearing": null,
+              "arrangements": [],
+              "excludeDates": []
+            },
+            "appointee": {
+              "name": {
+                "title": null,
+                "firstName": null,
+                "lastName": null,
+                "middleName": null
+              },
+              "address": {
+                "line1": null,
+                "line2": null,
+                "town": null,
+                "county": null,
+                "postcode": null,
+                "line3": null,
+                "country": null,
+                "postcodeLookup": null,
+                "postcodeAddress": null
+              },
+              "contact": {
+                "phone": null,
+                "mobile": null,
+                "email": null
+              },
+              "identity": {
+                "dob": null,
+                "nino": null
+              }
+            },
+            "rep": {
+              "hasRepresentative": null,
+              "organisation": null,
+              "name": {
+                "title": null,
+                "firstName": null,
+                "lastName": null,
+                "middleName": null
+              },
+              "address": {
+                "line1": null,
+                "line2": null,
+                "town": null,
+                "county": null,
+                "postcode": null,
+                "line3": null,
+                "country": null,
+                "postcodeLookup": null,
+                "postcodeAddress": null
+              },
+              "contact": {
+                "phone": null,
+                "mobile": null,
+                "email": null
+              }
+            }
+          },
+          "id": "8a2cc102-f949-433e-b281-2598cf1c574a"
         }
       ],
       "draftSscsDocument": [],

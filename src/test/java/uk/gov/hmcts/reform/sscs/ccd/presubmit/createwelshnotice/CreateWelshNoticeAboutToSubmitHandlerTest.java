@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DIRECTION_ISSUED_WELSH;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,19 +30,7 @@ import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.service.FooterDetails;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
@@ -117,6 +106,32 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
         Map<String, Object> placeholders = (Map<String, Object>) capture.getValue();
         assertEquals(expectedType, placeholders.get("en_notice_type"));
         assertEquals(expectedWelshType, placeholders.get("cy_notice_type"));
+        assertEquals(false, placeholders.get("should_hide_nino"));
+    }
+
+    @Test
+    @Parameters({"taxCredit", "childSupport"})
+    public void shouldHideNinoForSscs2AndSscs5(String benefitCode) {
+        byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
+
+        SscsDocument sscsDocument = createSscsDocument();
+        when(pdfStoreService.storeDocument(any(), anyString())).thenReturn(sscsDocument);
+        ArgumentCaptor<Object> capture = ArgumentCaptor.forClass(Object.class);
+        when(docmosisPdfService.createPdf(capture.capture(),any())).thenReturn(expectedPdf);
+        FooterDetails footerDetails = new FooterDetails(DocumentLink.builder().build(), "bundleAddition", "bundleFilename");
+        when(welshFooterService.addFooterToExistingToContentAndCreateNewUrl(any(),any(), any(), any(), any())).thenReturn(footerDetails);
+
+        Callback<SscsCaseData> callback = buildCallback(buildSscsDocuments(DocumentType.DIRECTION_NOTICE),
+                buildSscsWelshDocuments(DocumentType.DIRECTION_NOTICE.getValue()));
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(benefitCode);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertNull(response.getData().getEnglishBodyContent());
+        assertNull(response.getData().getWelshBodyContent());
+        assertEquals(DIRECTION_ISSUED_WELSH.getCcdType(), response.getData().getSscsWelshPreviewNextEvent());
+        assertEquals("No",response.getData().getTranslationWorkOutstanding());
+        assertEquals(ENGLISH_PDF,response.getData().getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
+        Map<String, Object> placeholders = (Map<String, Object>) capture.getValue();
+        assertEquals(true, placeholders.get("should_hide_nino"));
     }
 
     private Callback<SscsCaseData> buildCallback(List<SscsDocument> sscsDocuments, List<SscsWelshDocument> welshDocuments) {

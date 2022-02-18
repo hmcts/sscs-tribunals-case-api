@@ -6,11 +6,7 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -105,8 +101,7 @@ public class OtherPartyDataUtil {
     }
 
     public static void checkConfidentiality(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getAppeal().getBenefitType() != null
-                && Benefit.CHILD_SUPPORT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())) {
+        if (isValidBenefitTypeForConfidentiality(sscsCaseData)) {
             if ((sscsCaseData.getAppeal().getAppellant() != null
                     && sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired() != null
                     && YesNo.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired()))
@@ -116,6 +111,12 @@ public class OtherPartyDataUtil {
                 sscsCaseData.setIsConfidentialCase(null);
             }
         }
+    }
+
+    public static boolean isValidBenefitTypeForConfidentiality(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getAppeal().getBenefitType() != null
+                && (Arrays.stream(Benefit.values()).anyMatch(b -> (SscsType.SSCS2.equals(b.getSscsType()) || SscsType.SSCS5.equals(b.getSscsType()))
+                && b.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())));
     }
 
     public static boolean isOtherPartyPresent(SscsCaseData sscsCaseData) {
@@ -229,24 +230,32 @@ public class OtherPartyDataUtil {
     public static void validateOtherPartyForSscs5Case(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getOtherParties() != null && !sscsCaseData.getOtherParties().isEmpty()) {
             sscsCaseData.getOtherParties().stream()
-                .filter(otherPartyCcdValue -> otherPartyCcdValue.getValue() != null)
-                .map(otherPartyCcdValue -> otherPartyCcdValue.getValue())
+                .filter(otherPartyCcdValue -> nonNull(otherPartyCcdValue.getValue()))
+                .map(CcdValue::getValue)
                 .forEach(otherParty -> clearRoleForOtherParty(otherParty));
         }
     }
 
     public static boolean roleExistsForOtherParties(List<CcdValue<OtherParty>> otherParties) {
         return emptyIfNull(otherParties).stream()
-            .filter(otherPartyCcdValue -> otherPartyCcdValue.getValue() != null)
-            .map(otherPartyCcdValue -> otherPartyCcdValue.getValue())
+            .filter(otherPartyCcdValue -> nonNull(otherPartyCcdValue.getValue()))
+            .map(CcdValue::getValue)
             .anyMatch(otherParty -> otherParty.getRole() != null && otherParty.getRole().getName() != null);
     }
 
     public static boolean roleAbsentForOtherParties(List<CcdValue<OtherParty>> otherParties) {
         return emptyIfNull(otherParties).stream()
-            .filter(otherPartyCcdValue -> otherPartyCcdValue.getValue() != null)
-            .map(otherPartyCcdValue -> otherPartyCcdValue.getValue())
+            .filter(otherPartyCcdValue -> nonNull(otherPartyCcdValue.getValue()))
+            .map(CcdValue::getValue)
             .anyMatch(otherParty -> otherParty.getRole() == null || otherParty.getRole().getName() == null);
+    }
+
+    public static boolean otherPartyWantsToAttendHearing(List<CcdValue<OtherParty>> otherParties) {
+        return emptyIfNull(otherParties).stream()
+            .filter(otherPartyCcdValue -> nonNull(otherPartyCcdValue.getValue()))
+            .map(otherParty -> otherParty.getValue())
+            .filter(otherParty -> nonNull(otherParty.getHearingOptions()))
+            .anyMatch(otherPartyHearing -> otherPartyHearing.getHearingOptions().isWantsToAttendHearing().equals(Boolean.TRUE));
     }
 
     private static void clearRoleForOtherParty(OtherParty otherParty) {

@@ -139,7 +139,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         assertEquals(1, response.getErrors().size());
 
-        assertEquals("DWP response document cannot be empty.", response.getErrors().iterator().next());
+        assertEquals("FTA response document cannot be empty.", response.getErrors().iterator().next());
     }
 
     @Test
@@ -149,7 +149,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         assertEquals(1, response.getErrors().size());
 
-        assertEquals("DWP evidence bundle cannot be empty.", response.getErrors().iterator().next());
+        assertEquals("FTA evidence bundle cannot be empty.", response.getErrors().iterator().next());
     }
 
     @Test
@@ -422,7 +422,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(1, response.getErrors().size());
 
         for (String error : response.getErrors()) {
-            assertEquals("You must upload an edited DWP response document", error);
+            assertEquals("You must upload an edited FTA response document", error);
         }
     }
 
@@ -443,7 +443,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(1, response.getErrors().size());
 
         for (String error : response.getErrors()) {
-            assertEquals("You must upload an edited DWP evidence bundle", error);
+            assertEquals("You must upload an edited FTA evidence bundle", error);
         }
     }
 
@@ -762,7 +762,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(getMovieDocument());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("DWP response document must be a PDF."));
+        assertThat(response.getErrors().iterator().next(), is("FTA response document must be a PDF."));
     }
 
     @Test
@@ -770,7 +770,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(getMovieDocument());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("DWP evidence bundle must be a PDF."));
+        assertThat(response.getErrors().iterator().next(), is("FTA evidence bundle must be a PDF."));
     }
 
     @Test
@@ -778,7 +778,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpAT38Document(getMovieDocument());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("DWP AT38 document must be a PDF."));
+        assertThat(response.getErrors().iterator().next(), is("FTA AT38 document must be a PDF."));
     }
 
     @Test
@@ -788,7 +788,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(getMovieDocument());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("DWP edited response document must be a PDF."));
+        assertThat(response.getErrors().iterator().next(), is("FTA edited response document must be a PDF."));
     }
 
     @Test
@@ -798,7 +798,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(getMovieDocument());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("DWP edited evidence bundle must be a PDF."));
+        assertThat(response.getErrors().iterator().next(), is("FTA edited evidence bundle must be a PDF."));
     }
 
     @Test
@@ -1048,8 +1048,10 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenChildSupportCaseAppellantWantsConfidentialNoEditedDocs_thenShowError() {
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
+            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+    public void givenChildSupportCaseAppellantWantsConfidentialNoEditedDocs_thenShowError(String shortName) {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(shortName).build());
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequired(YES).build());
         sscsCaseData.setIsConfidentialCase(YES);
 
@@ -1086,8 +1088,10 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenChildSupportCaseOtherPartyWantsConfidentialNoEditedDocs_thenShowError() {
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
+            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+    public void givenChildSupportCaseOtherPartyWantsConfidentialNoEditedDocs_thenShowError(String shortName) {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(shortName).build());
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequired(NO).build());
         sscsCaseData.setIsConfidentialCase(NO);
 
@@ -1106,8 +1110,10 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenChildSupportCaseAppellantAndOtherPartyWantsConfidentialNoEditedDocs_thenShow2Error() {
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
+            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+    public void givenChildSupportCaseAppellantAndOtherPartyWantsConfidentialNoEditedDocs_thenShow2Error(String shortName) {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(shortName).build());
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequired(YES).build());
         sscsCaseData.setIsConfidentialCase(YES);
 
@@ -1128,8 +1134,10 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenChildSupportCaseThatIsNotConfidentialNoEditedDocs_thenNoWarning() {
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
+            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+    public void givenChildSupportCaseThatIsNotConfidentialNoEditedDocs_thenNoWarning(String shortName) {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(shortName).build());
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequired(NO).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
