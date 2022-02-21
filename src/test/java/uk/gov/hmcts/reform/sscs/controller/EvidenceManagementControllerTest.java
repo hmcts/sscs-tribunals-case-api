@@ -7,7 +7,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
-import static uk.gov.hmcts.reform.sscs.service.SubmitAppealService.DM_STORE_USER_ID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Collections;
@@ -18,24 +17,20 @@ import org.mockito.Mock;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
-import uk.gov.hmcts.reform.document.domain.Document;
-import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.ccd.document.am.model.Document;
+import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.sscs.exception.EvidenceDocumentsMissingException;
 import uk.gov.hmcts.reform.sscs.exception.FileToPdfConversionException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
 
 
 public class EvidenceManagementControllerTest {
 
     @Mock
-    private EvidenceManagementService evidenceManagementService;
-
-    @Mock
-    private EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService;
+    private EvidenceManagementSecureDocStoreService evidenceManagementService;
 
     @Mock
     private IdamService idamService;
@@ -48,7 +43,7 @@ public class EvidenceManagementControllerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        controller = new EvidenceManagementController(evidenceManagementService, evidenceManagementSecureDocStoreService, fileToPdfConversionService, false, null);
+        controller = new EvidenceManagementController(evidenceManagementService, fileToPdfConversionService, idamService);
     }
 
     @Test(expected = EvidenceDocumentsMissingException.class)
@@ -63,11 +58,7 @@ public class EvidenceManagementControllerTest {
 
     @Test
     public void shouldUploadEvidenceDocumentList() throws JsonProcessingException {
-        UploadResponse uploadResponse = mock(UploadResponse.class);
-        UploadResponse.Embedded uploadResponseEmbedded = mock(UploadResponse.Embedded.class);
-
-        when(uploadResponse.getEmbedded()).thenReturn(uploadResponseEmbedded);
-        Document document = new Document();
+        Document document = Document.builder().build();
         document.mimeType = "application/pdf";
         document.size = 656;
         document.originalDocumentName = "docname";
@@ -78,23 +69,24 @@ public class EvidenceManagementControllerTest {
         links.self.href = "selfURL";
         document.links = links;
 
-        when(uploadResponse.getEmbedded().getDocuments()).thenReturn(Collections.singletonList(document));
+        UploadResponse uploadResponse = mock(UploadResponse.class);
+        when(uploadResponse.getDocuments()).thenReturn(Collections.singletonList(document));
         MultipartFile file = mock(MultipartFile.class);
         List<MultipartFile> files = Collections.singletonList(file);
         when(fileToPdfConversionService.convert(files)).thenReturn(files);
-        when(evidenceManagementService.upload(files, DM_STORE_USER_ID)).thenReturn(uploadResponse);
+        when(evidenceManagementService.upload(files, IdamTokens.builder().build())).thenReturn(uploadResponse);
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
         ResponseEntity<String> actualUploadResponseEmbedded = controller.upload(files);
 
-        String json = "{\"documents\": [{\"classification\":null,\"size\":656,\"mimeType\":\"application/pdf\",\"originalDocumentName\":\"docname\",\"createdBy\":null,\"modifiedOn\":null,\"createdOn\":null,\"_links\":{\"self\":{\"href\":\"selfURL\"},\"binary\":{\"href\":\"binaryUrl\"}}}]}";
-
-        verify(evidenceManagementService, times(1)).upload(files, DM_STORE_USER_ID);
+        String json = "{\"documents\": [{\"classification\":null,\"size\":656,\"mimeType\":\"application/pdf\",\"originalDocumentName\":\"docname\",\"createdOn\":null,\"ttl\":null,\"hashToken\":null,\"metadata\":null,\"_links\":{\"self\":{\"href\":\"selfURL\"},\"binary\":{\"href\":\"binaryUrl\"}}}]}";
+        verify(evidenceManagementService, times(1)).upload(files, IdamTokens.builder().build());
         assertThat(actualUploadResponseEmbedded.getBody(), equalTo(json));
     }
 
     @Test
     public void shouldUploadEvidenceDocumentListSecureDocStore() throws JsonProcessingException {
-        controller = new EvidenceManagementController(evidenceManagementService, evidenceManagementSecureDocStoreService, fileToPdfConversionService, true, idamService);
+        controller = new EvidenceManagementController(evidenceManagementService, fileToPdfConversionService, idamService);
 
         uk.gov.hmcts.reform.ccd.document.am.model.Document.Links links = new uk.gov.hmcts.reform.ccd.document.am.model.Document.Links();;
         links.binary = new uk.gov.hmcts.reform.ccd.document.am.model.Document.Link();
@@ -121,13 +113,13 @@ public class EvidenceManagementControllerTest {
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        when(evidenceManagementSecureDocStoreService.upload(files, idamTokens)).thenReturn(uploadResponse);
+        when(evidenceManagementService.upload(files, idamTokens)).thenReturn(uploadResponse);
 
         ResponseEntity<String> actualUploadResponseEmbedded = controller.upload(files);
 
         String json = "{\"documents\": [{\"classification\":\"PUBLIC\",\"size\":656,\"mimeType\":\"application/pdf\",\"originalDocumentName\":\"docname\",\"createdOn\":null,\"ttl\":null,\"hashToken\":null,\"metadata\":null,\"_links\":{\"self\":{\"href\":\"selfURL\"},\"binary\":{\"href\":\"binaryUrl\"}}}]}";
 
-        verify(evidenceManagementSecureDocStoreService, times(1)).upload(files, idamTokens);
+        verify(evidenceManagementService, times(1)).upload(files, idamTokens);
         assertThat(actualUploadResponseEmbedded.getBody(), equalTo(json));
     }
 

@@ -47,8 +47,8 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.web.multipart.MultipartFile;
-import uk.gov.hmcts.reform.document.domain.Document;
-import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.ccd.document.am.model.Document;
+import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
@@ -57,7 +57,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.Evidence;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.EvidenceDescription;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 import uk.gov.hmcts.reform.sscs.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
@@ -94,7 +94,7 @@ public class EvidenceUploadServiceTest {
     private String someEvidenceId;
     private StoreEvidenceDescriptionService storeEvidenceDescriptionService;
     private EvidenceDescription someDescription;
-    private EvidenceManagementService evidenceManagementService;
+    private EvidenceManagementSecureDocStoreService evidenceManagementService;
     private PdfStoreService pdfStoreService;
     private IdamService idamService;
     private FileToPdfConversionService fileToPdfConversionService;
@@ -120,7 +120,7 @@ public class EvidenceUploadServiceTest {
 
         storeEvidenceDescriptionService = mock(StoreEvidenceDescriptionService.class);
         fileToPdfConversionService = mock(FileToPdfConversionService.class);
-        evidenceManagementService = mock(EvidenceManagementService.class);
+        evidenceManagementService = mock(EvidenceManagementSecureDocStoreService.class);
         pdfStoreService = mock(PdfStoreService.class);
 
         evidenceUploadService(new AddedDocumentsUtil(false));
@@ -234,7 +234,7 @@ public class EvidenceUploadServiceTest {
         )).thenReturn(new MyaEventActionContext(evidenceDescriptionPdf, sscsCaseDetails));
 
         byte[] dummyFileContentInBytes = getDummyFileContentInBytes();
-        when(evidenceManagementService.download(any(), eq("sscs"))).thenReturn(dummyFileContentInBytes);
+        when(evidenceManagementService.download(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(dummyFileContentInBytes);
         when(evidenceDescriptionPdf.getContent()).thenReturn(new ByteArrayResource(dummyFileContentInBytes));
 
         String otherEvidenceDocType = "Other evidence";
@@ -281,7 +281,7 @@ public class EvidenceUploadServiceTest {
         when(file.getBytes()).thenReturn(fileName.getBytes());
 
         byte[] dummyFileContentInBytes = getDummyFileContentInBytes();
-        when(evidenceManagementService.download(any(), eq("sscs"))).thenReturn(dummyFileContentInBytes);
+        when(evidenceManagementService.download(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(dummyFileContentInBytes);
         when(evidenceDescriptionPdf.getContent()).thenReturn(new ByteArrayResource(dummyFileContentInBytes));
 
         String otherEvidenceDocType = "Other evidence";
@@ -335,7 +335,7 @@ public class EvidenceUploadServiceTest {
         when(file.getBytes()).thenReturn(fileName.getBytes());
 
         byte[] dummyFileContentInBytes = getDummyFileContentInBytes();
-        when(evidenceManagementService.download(any(), eq("sscs"))).thenReturn(dummyFileContentInBytes);
+        when(evidenceManagementService.download(ArgumentMatchers.any(), eq(IdamTokens.builder().build()))).thenReturn(dummyFileContentInBytes);
         when(evidenceDescriptionPdf.getContent()).thenReturn(new ByteArrayResource(dummyFileContentInBytes));
 
         UploadResponse uploadResponse = createUploadResponse(avFileName);
@@ -928,16 +928,16 @@ public class EvidenceUploadServiceTest {
     }
 
     private UploadResponse createUploadResponse(String fileName) {
-        Document document = new Document();
+        Document document = Document.builder().build();
         document.createdOn = evidenceCreatedOn;
         document.links = new Document.Links();
         document.links.self = new Document.Link();
         document.links.self.href = documentUrl;
         document.originalDocumentName = fileName;
-        UploadResponse.Embedded embedded = mock(UploadResponse.Embedded.class);
-        when(embedded.getDocuments()).thenReturn(singletonList(document));
+
         UploadResponse uploadResponse = mock(UploadResponse.class);
-        when(uploadResponse.getEmbedded()).thenReturn(embedded);
+        when(uploadResponse.getDocuments()).thenReturn(singletonList(document));
+
         return uploadResponse;
     }
 
