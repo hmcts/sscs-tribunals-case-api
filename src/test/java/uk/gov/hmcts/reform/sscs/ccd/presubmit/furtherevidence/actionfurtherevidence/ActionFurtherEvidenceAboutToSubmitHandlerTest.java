@@ -375,7 +375,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         DynamicList representativeOriginalSender = buildOriginalSenderItemListForGivenOption("representative",
             "Representative");
         DynamicList dwpOriginalSender = buildOriginalSenderItemListForGivenOption("dwp",
-            "Dwp");
+            "Fta");
         DynamicList jointPartyOriginalSender = buildOriginalSenderItemListForGivenOption("jointParty",
             "Joint Party");
 
