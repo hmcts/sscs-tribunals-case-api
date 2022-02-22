@@ -218,7 +218,7 @@ def versions = [
 ]
 
 ext["rest-assured.version"] = '4.2.0'
-ext['spring-security.version']='5.3.8.RELEASE'
+ext['spring-security.version']='5.6.1'
 
 ext {
     springCloudVersion = 'Hoxton.SR12'
@@ -259,7 +259,7 @@ dependencyManagement {
         }
 
         //CVE-2021-22112
-        dependencySet(group: 'org.springframework.security', version: '5.4.7') {
+        dependencySet(group: 'org.springframework.security', version: '5.6.1') {
             entry 'spring-security-crypto'
             entry 'spring-security-config'
             entry 'spring-security-core'
