@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.callback;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.mock;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
@@ -31,16 +30,19 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.document.domain.Document;
-import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.ccd.document.am.model.Document;
+import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 
 @SpringBootTest
@@ -61,7 +63,10 @@ public class CreateBundleIt extends AbstractEventIt {
     private ResponseEntity responseEntity;
 
     @MockBean
-    private EvidenceManagementService evidenceManagementService;
+    private EvidenceManagementSecureDocStoreService evidenceManagementService;
+
+    @MockBean
+    private PdfStoreService pdfStoreService;
 
     @MockBean
     private DocmosisPdfService docmosisPdfService;
@@ -128,7 +133,8 @@ public class CreateBundleIt extends AbstractEventIt {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
 
         UploadResponse uploadResponse = createUploadResponse();
-        when(evidenceManagementService.upload(any(), anyString())).thenReturn(uploadResponse);
+        when(evidenceManagementService.upload(any(), any())).thenReturn(uploadResponse);
+        when(pdfStoreService.storeDocument(any(), any(), any())).thenReturn(SscsDocument.builder().build());
 
         when(docmosisPdfService.createPdf(any(),any())).thenReturn(pdfBytes);
 
@@ -169,17 +175,16 @@ public class CreateBundleIt extends AbstractEventIt {
 
     private UploadResponse createUploadResponse() {
         UploadResponse response = mock(UploadResponse.class);
-        UploadResponse.Embedded embedded = mock(UploadResponse.Embedded.class);
-        when(response.getEmbedded()).thenReturn(embedded);
-        uk.gov.hmcts.reform.document.domain.Document document = createDocument();
-        when(embedded.getDocuments()).thenReturn(Collections.singletonList(document));
+
+        Document document = createDocument();
+        when(response.getDocuments()).thenReturn(Collections.singletonList(document));
         return response;
     }
 
-    private uk.gov.hmcts.reform.document.domain.Document createDocument() {
-        uk.gov.hmcts.reform.document.domain.Document document = new uk.gov.hmcts.reform.document.domain.Document();
-        uk.gov.hmcts.reform.document.domain.Document.Links links = new uk.gov.hmcts.reform.document.domain.Document.Links();
-        uk.gov.hmcts.reform.document.domain.Document.Link link = new Document.Link();
+    private Document createDocument() {
+        Document document = Document.builder().build();
+        Document.Links links = new Document.Links();
+        Document.Link link = new Document.Link();
         link.href = "www.logo.com";
         links.self = link;
         document.links = links;

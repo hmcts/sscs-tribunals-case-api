@@ -32,7 +32,7 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -48,7 +48,7 @@ public abstract class WriteFinalDecisionItBase extends AbstractEventIt {
     protected AuthTokenGenerator authTokenGenerator;
 
     @MockBean
-    protected EvidenceManagementService evidenceManagementService;
+    protected EvidenceManagementSecureDocStoreService evidenceManagementService;
 
     @MockBean
     protected GenerateFile generateFile;

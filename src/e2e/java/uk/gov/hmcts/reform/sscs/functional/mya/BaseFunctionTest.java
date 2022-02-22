@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {TribunalsCaseApiApplication.class, CitizenIdamService.class})
@@ -46,7 +46,7 @@ public abstract class BaseFunctionTest {
     @Autowired
     protected CcdService ccdService;
     @Autowired
-    protected EvidenceManagementService evidenceManagementService;
+    protected EvidenceManagementSecureDocStoreService evidenceManagementService;
 
     @Value("${idam.url}")
     private String idamApiUrl;
