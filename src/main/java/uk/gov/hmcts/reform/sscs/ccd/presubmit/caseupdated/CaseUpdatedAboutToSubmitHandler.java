@@ -179,7 +179,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private boolean validateDwpIssuingOffice(MrnDetails mrnDetails, BenefitType benefitType, PreSubmitCallbackResponse<SscsCaseData> response) {
         if (mrnDetails != null) {
             if (StringUtils.isEmpty(mrnDetails.getDwpIssuingOffice())) {
-                response.addWarning("DWP issuing office is empty");
+                response.addWarning("FTA issuing office is empty");
                 return false;
             } else if (Benefit.findBenefitByShortName(benefitType.getCode()).isPresent()) {
                 if (!dwpAddressLookupService.validateIssuingOffice(benefitType.getCode(), mrnDetails.getDwpIssuingOffice())) {
