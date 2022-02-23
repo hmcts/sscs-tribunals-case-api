@@ -98,6 +98,16 @@ public abstract class WriteFinalDecisionTemplateContent {
             + (!setAside ? "confirmed." : "set aside.");
     }
 
+    public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate, boolean isHmrc) {
+        if (isHmrc) {
+            return "The decision made by the Respondent on " + DATEFORMATTER.format(LocalDate.parse(decisionDate)) + " is "
+                    + (!setAside ? "confirmed." : "set aside.");
+        } else {
+            return "The decision made by the Secretary of State on " + DATEFORMATTER.format(LocalDate.parse(decisionDate)) + " is "
+                    + (!setAside ? "confirmed." : "set aside.");
+        }
+    }
+
     public String getRecommendationSentence(String code, String appellantName) {
         final String firstSentence = "Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State.";
         final String secondSentence;

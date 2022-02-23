@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -134,9 +135,19 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
                             .collect(Collectors.joining(", ")));
         }
 
+        Optional<Benefit> benefit = caseData.getBenefitType();
+        if (benefit.isPresent()) {
+            if (benefit.get().getSscsType().equals(SscsType.SSCS5)) {
+                writeFinalDecisionBuilder.isHmrc(true);
+            } else {
+                writeFinalDecisionBuilder.isHmrc(false);
+            }
+        }
+
         WriteFinalDecisionTemplateBody payload = writeFinalDecisionBuilder.build();
 
         validateRequiredProperties(payload);
+
 
         if (showIssueDate) {
             builder.dateIssued(LocalDate.now());
