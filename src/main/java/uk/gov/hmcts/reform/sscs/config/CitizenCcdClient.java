@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.CaseAccessApi;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
@@ -55,7 +56,9 @@ public class CitizenCcdClient {
         );
     }
 
+    @Retryable
     public List<CaseDetails> searchForCitizen(IdamTokens idamTokens) {
+        log.info("Searching cases for citizen");
         Map<String, String> searchCriteria = new HashMap<>();
         searchCriteria.put("state", State.DRAFT.getId());
         searchCriteria.put("sortDirection", "desc");
