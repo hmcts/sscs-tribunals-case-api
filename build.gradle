@@ -103,8 +103,11 @@ task functional(type: Test) {
     setTestClassesDirs(sourceSets.e2e.output.classesDirs)
     setClasspath(sourceSets.e2e.runtimeClasspath)
     include "uk/gov/hmcts/reform/sscs/functional/**"
-    exclude "uk/gov/hmcts/reform/sscs/smoke/**"
+    //exclude "uk/gov/hmcts/reform/sscs/smoke/**"
+    exclude "uk/**"
 }
+
+
 
 task fortifyScan(type: JavaExec)  {
     main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
