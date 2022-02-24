@@ -182,16 +182,16 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
         boolean hasEditedDwpEvidenceBundleDocument = isHasEditedDwpEvidenceBundleDocument(sscsCaseData);
 
-        if (!hasPhmeRequestOrConfidentialityUnderReview(sscsCaseData, response, hasEditedDwpResponseDocument, hasEditedDwpEvidenceBundleDocument)) {
+        if (!hasPheRequestOrConfidentialityUnderReview(sscsCaseData, response, hasEditedDwpResponseDocument, hasEditedDwpEvidenceBundleDocument)) {
 
             sscsCaseData.setMultiBundleConfiguration(getMultiBundleConfigs(sscsCaseData));
         }
     }
 
-    private boolean hasPhmeRequestOrConfidentialityUnderReview(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response, boolean hasEditedDwpResponseDocument, boolean hasEditedDwpEvidenceBundleDocument) {
-        if (!sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) && isPhmeStatusUnderReview(sscsCaseData)
+    private boolean hasPheRequestOrConfidentialityUnderReview(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response, boolean hasEditedDwpResponseDocument, boolean hasEditedDwpEvidenceBundleDocument) {
+        if (!sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) && isPheStatusUnderReview(sscsCaseData)
                 && (hasEditedDwpResponseDocument || hasEditedDwpEvidenceBundleDocument)) {
-            response.addError("There is a pending PHME request on this case");
+            response.addError("There is a pending PHE request on this case");
         }
 
         if (isAtLeastOneRequestInProgress(sscsCaseData)) {
@@ -218,12 +218,12 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     }
 
     private List<MultiBundleConfig> getMultiBundleConfigs(SscsCaseData sscsCaseData) {
-        boolean requiresMultiBundleForPhme = isPhmeReviewGranted(sscsCaseData) && (isHasEditedDwpResponseDocument(sscsCaseData) || isHasEditedDwpEvidenceBundleDocument(sscsCaseData));
+        boolean requiresMultiBundleForPhe = isPheReviewGranted(sscsCaseData) && (isHasEditedDwpResponseDocument(sscsCaseData) || isHasEditedDwpEvidenceBundleDocument(sscsCaseData));
         boolean requiresMultiBundleForConfidentiality = isConfidentialCase(sscsCaseData) && hasEditedSscsDocuments(sscsCaseData);
-        boolean requiresMultiBundleForNonPhme = sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT)
+        boolean requiresMultiBundleForNonPhe = sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT)
                 && (hasEditedSscsDocuments(sscsCaseData) || isHasEditedDwpResponseDocument(sscsCaseData) || isHasEditedDwpEvidenceBundleDocument(sscsCaseData));
 
-        if (requiresMultiBundleForPhme || requiresMultiBundleForConfidentiality || requiresMultiBundleForNonPhme) {
+        if (requiresMultiBundleForPhe || requiresMultiBundleForConfidentiality || requiresMultiBundleForNonPhe) {
             return getEditedAndUneditedConfigs(sscsCaseData);
         }
         return getUneditedConfigs(sscsCaseData);
@@ -268,8 +268,8 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     }
 
     private void moveDocsToDwpCollectionIfOldPattern(SscsCaseData sscsCaseData) {
-        //Before we moved to the new DWP document collection, we stored DWP documents within their own fields. This would break bundling with the new config that
-        //looks at the new DWP document collection. Therefore, if the DWP fields are populated, then assume old pattern and move to the DWP document collection.
+        //Before we moved to the new FTA document collection, we stored FTA documents within their own fields. This would break bundling with the new config that
+        //looks at the new FTA document collection. Therefore, if the FTA fields are populated, then assume old pattern and move to the FTA document collection.
         if (sscsCaseData.getDwpResponseDocument() != null) {
             dwpDocumentService.moveDwpResponseDocumentToDwpDocumentCollection(sscsCaseData);
         }
@@ -278,11 +278,11 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         }
     }
 
-    protected boolean isPhmeStatusUnderReview(SscsCaseData sscsCaseData) {
+    protected boolean isPheStatusUnderReview(SscsCaseData sscsCaseData) {
         return isNull(sscsCaseData.getPhmeGranted());
     }
 
-    private boolean isPhmeReviewGranted(SscsCaseData sscsCaseData) {
+    private boolean isPheReviewGranted(SscsCaseData sscsCaseData) {
         return isYes(sscsCaseData.getPhmeGranted());
     }
 

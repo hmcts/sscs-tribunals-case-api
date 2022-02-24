@@ -261,11 +261,11 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
         assertEquals("/evidenceurl", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
         assertEquals("/evidencebinaryurl", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentBinaryUrl());
-        assertEquals("DWP evidence received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentFilename());
+        assertEquals("FTA evidence received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentFilename());
 
         assertEquals("/responseurl", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
         assertEquals("/responsebinaryurl", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentBinaryUrl());
-        assertEquals("DWP response received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentFilename());
+        assertEquals("FTA response received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentFilename());
 
         assertEquals("/url", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentUrl());
         assertEquals("/binaryurl", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentBinaryUrl());
@@ -334,7 +334,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenChildSupportCaseAndReferralReasonPhme_thenErrorIsShown() {
+    public void givenChildSupportCaseAndReferralReasonPhe_thenErrorIsShown() {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setBenefitCode("022");
         sscsCaseData.setInterlocReferralReason("phmeRequest");
@@ -342,6 +342,6 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors().iterator().next(), is("PHME request' is not a valid selection for child support cases"));
+        assertThat(response.getErrors().iterator().next(), is("PHE request' is not a valid selection for child support cases"));
     }
 }

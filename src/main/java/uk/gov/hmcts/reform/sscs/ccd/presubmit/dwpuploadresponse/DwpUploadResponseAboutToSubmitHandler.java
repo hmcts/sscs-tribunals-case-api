@@ -82,9 +82,9 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
 
-        checkSscs2Confidentiality(preSubmitCallbackResponse, sscsCaseData);
+        checkSscs2AndSscs5Confidentiality(preSubmitCallbackResponse, sscsCaseData);
 
-        if (Benefit.CHILD_SUPPORT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())
+        if (isValidBenefitTypeForConfidentiality(sscsCaseData)
                 && sscsCaseData.getOtherParties() != null) {
             assignNewOtherPartyData(sscsCaseData.getOtherParties(), DWP_UPLOAD_RESPONSE);
             updateOtherPartyUcb(sscsCaseData);
@@ -97,20 +97,25 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         return preSubmitCallbackResponse;
     }
 
-    private void checkSscs2Confidentiality(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, SscsCaseData sscsCaseData) {
-        if (Benefit.CHILD_SUPPORT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode()) && sscsCaseData.getIsConfidentialCase() != null && YesNo.isYes(sscsCaseData.getIsConfidentialCase())) {
+    private void checkSscs2AndSscs5Confidentiality(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, SscsCaseData sscsCaseData) {
+        if (isValidBenefitTypeForConfidentiality(sscsCaseData)) {
             if (sscsCaseData.getDwpEditedEvidenceReason() == null) {
-                if (!otherPartyHasConfidentiality(sscsCaseData)) {
-                    sscsCaseData.setIsConfidentialCase(null);
+                if (otherPartyHasConfidentiality(sscsCaseData)) {
+                    preSubmitCallbackResponse.addError("Other Party requires confidentiality, upload edited and unedited responses");
+                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
                 }
                 if (sscsCaseData.getAppeal().getAppellant() != null && YesNo.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired())) {
-                    sscsCaseData.getAppeal().getAppellant().setConfidentialityRequired(YesNo.NO);
+                    preSubmitCallbackResponse.addError("Appellant requires confidentiality, upload edited and unedited responses");
+                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
                 }
-                preSubmitCallbackResponse.addWarning("Are you sure you want change the Appellant confidentiality requirement?");
+            } else {
+                if (otherPartyHasConfidentiality(sscsCaseData)) {
+                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
+                }
+                if (sscsCaseData.getAppeal().getAppellant() != null && YesNo.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired())) {
+                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
+                }
             }
-        }
-        if (otherPartyHasConfidentiality(sscsCaseData)) {
-            sscsCaseData.setIsConfidentialCase(YesNo.YES);
         }
     }
 
@@ -204,39 +209,39 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     private void validateEditedDwpEvidenceBundle(DwpResponseDocument dwpResponseDocument, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (dwpResponseDocument == null || dwpResponseDocument.getDocumentLink() == null) {
-            preSubmitCallbackResponse.addError("You must upload an edited DWP evidence bundle");
+            preSubmitCallbackResponse.addError("You must upload an edited FTA evidence bundle");
         } else {
-            validateDocumentIsAPdf("DWP edited evidence bundle", dwpResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
+            validateDocumentIsAPdf("FTA edited evidence bundle", dwpResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
         }
     }
 
     private void validateEditedDwpResponseDocument(DwpResponseDocument dwpEditedResponseDocument, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (dwpEditedResponseDocument == null || dwpEditedResponseDocument.getDocumentLink() == null) {
-            preSubmitCallbackResponse.addError("You must upload an edited DWP response document");
+            preSubmitCallbackResponse.addError("You must upload an edited FTA response document");
         } else {
-            validateDocumentIsAPdf("DWP edited response document", dwpEditedResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
+            validateDocumentIsAPdf("FTA edited response document", dwpEditedResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
         }
     }
 
     private void validateDwpEvidenceBundle(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (sscsCaseData.getDwpEvidenceBundleDocument() == null || sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink() == null) {
-            preSubmitCallbackResponse.addError("DWP evidence bundle cannot be empty.");
+            preSubmitCallbackResponse.addError("FTA evidence bundle cannot be empty.");
         } else {
-            validateDocumentIsAPdf("DWP evidence bundle", sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink(), preSubmitCallbackResponse);
+            validateDocumentIsAPdf("FTA evidence bundle", sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink(), preSubmitCallbackResponse);
         }
     }
 
     private void validateDwpAt38Document(DwpResponseDocument dwpResponseDocument, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (dwpResponseDocument != null && dwpResponseDocument.getDocumentLink() != null) {
-            validateDocumentIsAPdf("DWP AT38 document", dwpResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
+            validateDocumentIsAPdf("FTA AT38 document", dwpResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
         }
     }
 
     private void validateDwpResponseDocument(DwpResponseDocument dwpResponseDocument, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (dwpResponseDocument == null || dwpResponseDocument.getDocumentLink() == null) {
-            preSubmitCallbackResponse.addError("DWP response document cannot be empty.");
+            preSubmitCallbackResponse.addError("FTA response document cannot be empty.");
         } else {
-            validateDocumentIsAPdf("DWP response document", dwpResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
+            validateDocumentIsAPdf("FTA response document", dwpResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
         }
     }
 
@@ -255,9 +260,9 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
 
             if (StringUtils.equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "phme")) {
-                sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHME_REQUEST.getId());
+                sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHE_REQUEST.getId());
                 sscsCaseData.setInterlocReferralDate(LocalDate.now().toString());
-                String note = "Referred to interloc for review by judge - PHME request";
+                String note = "Referred to interloc for review by judge - PHE request";
                 addNoteService.addNote(userAuthorisation, sscsCaseData, note);
             }
 

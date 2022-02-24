@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -77,6 +78,7 @@ public class CitizenCcdService {
         }
     }
 
+    @Retryable
     public SaveCaseResult createDraft(SscsCaseData caseData, IdamTokens idamTokens) {
 
         CaseDetails caseDetails;
@@ -105,6 +107,7 @@ public class CitizenCcdService {
         return caseDetails;
     }
 
+    @Retryable
     public CaseDetails updateCase(SscsCaseData caseData, String eventType, String summary, String description, IdamTokens idamTokens, String caseId) {
         log.info("Updating a draft with caseId {}.", caseId);
         CaseDetails caseDetails;
@@ -114,6 +117,7 @@ public class CitizenCcdService {
         return caseDetails;
     }
 
+    @Retryable
     public void associateCaseToCitizen(IdamTokens citizenIdamTokens, Long caseId, IdamTokens idamTokens) {
         SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(caseId, idamTokens);
         if (sscsCaseDetails != null && sscsCaseDetails.getData() != null) {

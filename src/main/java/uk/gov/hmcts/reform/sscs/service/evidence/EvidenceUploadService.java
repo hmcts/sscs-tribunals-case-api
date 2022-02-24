@@ -11,17 +11,15 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService.TEMP_UNIQUE_ID;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyId;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyName;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherParty;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyAppointee;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyRep;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.*;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.withEmailPredicate;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -36,13 +34,13 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.Evidence;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.EvidenceDescription;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
@@ -53,10 +51,12 @@ import uk.gov.hmcts.reform.sscs.service.exceptions.EvidenceUploadException;
 import uk.gov.hmcts.reform.sscs.service.pdf.MyaEventActionContext;
 import uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.EvidenceDescriptionPdfData;
+import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.DocumentManagementService;
 
 @Slf4j
 @Service
 public class EvidenceUploadService {
+    private final DocumentManagementService documentManagementService;
     private final CcdService ccdService;
     private final IdamService idamService;
     private final OnlineHearingService onlineHearingService;
@@ -65,17 +65,18 @@ public class EvidenceUploadService {
     private final EvidenceManagementService evidenceManagementService;
     private final PdfStoreService pdfStoreService;
 
-    private static final String UPDATED_SSCS = "Updated SSCS";
     public static final String DM_STORE_USER_ID = "sscs";
 
     private static final DraftHearingDocumentExtractor draftHearingDocumentExtractor = new DraftHearingDocumentExtractor();
 
     @Autowired
-    public EvidenceUploadService(CcdService ccdService,
+    public EvidenceUploadService(DocumentManagementService documentManagementService,
+                                 CcdService ccdService,
                                  IdamService idamService, OnlineHearingService onlineHearingService,
                                  StoreEvidenceDescriptionService storeEvidenceDescriptionService,
                                  FileToPdfConversionService fileToPdfConversionService,
                                  EvidenceManagementService evidenceManagementService, PdfStoreService pdfStoreService) {
+        this.documentManagementService = documentManagementService;
         this.ccdService = ccdService;
         this.idamService = idamService;
         this.onlineHearingService = onlineHearingService;
@@ -83,6 +84,12 @@ public class EvidenceUploadService {
         this.fileToPdfConversionService = fileToPdfConversionService;
         this.evidenceManagementService = evidenceManagementService;
         this.pdfStoreService = pdfStoreService;
+    }
+
+    public Optional<Evidence> uploadDraftEvidence(String identifier, MultipartFile file) {
+        return uploadEvidence(identifier, file, draftHearingDocumentExtractor,
+                document -> new SscsDocument(createNewDocumentDetails(document)), UPLOAD_DRAFT_DOCUMENT,
+                "SSCS - upload document from MYA");
     }
 
     private SscsDocumentDetails createNewDocumentDetails(Document document) {
@@ -106,23 +113,22 @@ public class EvidenceUploadService {
                 .format(DateTimeFormatter.ISO_DATE);
     }
 
-    public boolean submitHearingEvidence(String identifier, EvidenceDescription description, MultipartFile file) {
+    public boolean submitSingleHearingEvidence(String identifier, EvidenceDescription description, MultipartFile file) {
         return onlineHearingService.getCcdCaseByIdentifier(identifier)
                 .map(caseDetails -> {
-                    String md5Checksum = "";
+                    String sha512HashChecksum = "";
                     String filename = "";
                     try {
-                        md5Checksum = DigestUtils.md5DigestAsHex(file.getBytes()).toUpperCase();
+                        sha512HashChecksum = Arrays.toString(MessageDigest.getInstance("SHA-512").digest(file.getBytes())).toUpperCase();
                         filename = file.getOriginalFilename();
-                        log.info("uploadEvidence: for case ID Case({}): User has uploaded the file ({}) with a checksum of ({})", caseDetails.getId(), filename, md5Checksum);
-                    } catch (IOException ioException) {
-                        log.error(ioException.getMessage()
+                        log.info("uploadEvidence: for case ID Case({}): User has uploaded the file ({}) with a checksum of ({})", caseDetails.getId(), filename, sha512HashChecksum);
+                    } catch (IOException | NoSuchAlgorithmException e) {
+                        log.error(e.getMessage()
                                 + ". Something has gone wrong for caseId: ", caseDetails.getId()
                                 + " when logging uploadEvidence for file (" + filename
-                                + ") with a checksum of (" + md5Checksum + ")");
+                                + ") with a checksum of (" + sha512HashChecksum + ")");
                         return false;
                     }
-
 
                     List<MultipartFile> convertedFiles = fileToPdfConversionService.convert(singletonList(file));
 
@@ -141,13 +147,90 @@ public class EvidenceUploadService {
                             getOtherPartyId(sscsCaseData, withEmailPredicate(description.getIdamEmail())),
                             getOtherPartyName(sscsCaseData, withEmailPredicate(description.getIdamEmail())));
                     MyaEventActionContext storePdfContext = storeEvidenceDescriptionService.storePdf(
-                        ccdCaseId, identifier, data);
+                            ccdCaseId, identifier, data);
                     submitHearingWhenNoCoreCase(caseDetails, sscsCaseData, ccdCaseId, storePdfContext,
-                        data.getDescription().getIdamEmail());
+                            data.getDescription().getIdamEmail());
 
                     return true;
                 })
                 .orElse(false);
+    }
+
+    private <E> Optional<Evidence> uploadEvidence(String identifier, MultipartFile file,
+                                                  DocumentExtract<E> documentExtract,
+                                                  Function<Document, E> createNewDocument, EventType eventType,
+                                                  String summary) {
+        return onlineHearingService.getCcdCaseByIdentifier(identifier)
+                .map(caseDetails -> {
+
+                    List<MultipartFile> convertedFiles = fileToPdfConversionService.convert(singletonList(file));
+
+                    Document document = evidenceManagementService.upload(convertedFiles, DM_STORE_USER_ID).getEmbedded().getDocuments().get(0);
+
+                    List<E> currentDocuments = documentExtract.getDocuments().apply(caseDetails.getData());
+                    ArrayList<E> newDocuments = (currentDocuments == null) ? new ArrayList<>() : new ArrayList<>(currentDocuments);
+                    newDocuments.add(createNewDocument.apply(document));
+
+                    documentExtract.setDocuments().accept(caseDetails.getData(), newDocuments);
+
+                    ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), eventType.getCcdType(), summary, "Uploaded a further evidence document", idamService.getIdamTokens());
+                    String sha512HashChecksum = "";
+                    String filename = "";
+
+                    try {
+                        sha512HashChecksum = Arrays.toString(MessageDigest.getInstance("SHA-512").digest(file.getBytes())).toUpperCase();
+                        filename = file.getOriginalFilename();
+                        log.info("uploadEvidence: for case ID Case({}): User has uploaded the file ({}) with a checksum of ({})", caseDetails.getId(), filename, sha512HashChecksum);
+                    } catch (IOException | NoSuchAlgorithmException e) {
+                        log.error(e.getMessage()
+                                + ". Something has gone wrong for caseId: ", caseDetails.getId()
+                                + " when logging uploadEvidence for file (" + filename
+                                + ") with a checksum of (" + sha512HashChecksum + ")");
+                    }
+                    return new Evidence(document.links.self.href, document.originalDocumentName, getCreatedDate(document));
+                });
+    }
+
+    public boolean submitHearingEvidence(String identifier, EvidenceDescription description) {
+        return onlineHearingService.getCcdCaseByIdentifier(identifier)
+                .map(caseDetails -> {
+                    SscsCaseData sscsCaseData = caseDetails.getData();
+                    Long ccdCaseId = caseDetails.getId();
+                    EvidenceDescriptionPdfData data = new EvidenceDescriptionPdfData(caseDetails, description,
+                            getFileNames(sscsCaseData),
+                            getOtherPartyId(sscsCaseData, withEmailPredicate(description.getIdamEmail())),
+                            getOtherPartyName(sscsCaseData, withEmailPredicate(description.getIdamEmail())));
+                    MyaEventActionContext storePdfContext = storeEvidenceDescriptionService.storePdf(
+                            ccdCaseId, identifier, data);
+                    submitHearingWhenNoCoreCase(caseDetails, sscsCaseData, ccdCaseId, storePdfContext,
+                            data.getDescription().getIdamEmail());
+
+                    return true;
+                })
+                .orElse(false);
+    }
+
+    public boolean deleteDraftEvidence(String identifier, String evidenceId) {
+        return deleteEvidence(identifier, evidenceId, draftHearingDocumentExtractor);
+    }
+
+    private <E> boolean deleteEvidence(String identifier, String evidenceId, DocumentExtract<E> documentExtract) {
+        return onlineHearingService.getCcdCaseByIdentifier(identifier)
+                .map(caseDetails -> {
+                    List<E> documents = documentExtract.getDocuments().apply(caseDetails.getData());
+
+                    if (documents != null) {
+                        List<E> newDocuments = documents.stream()
+                                .filter(corDocument -> !documentExtract.findDocument().apply(corDocument).getDocumentLink().getDocumentUrl().endsWith(evidenceId))
+                                .collect(toList());
+                        documentExtract.setDocuments().accept(caseDetails.getData(), newDocuments);
+
+                        ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), UPLOAD_DRAFT_DOCUMENT.getCcdType(), "SSCS - evidence deleted", "Uploaded a draft evidence deleted", idamService.getIdamTokens());
+
+                        documentManagementService.delete(evidenceId);
+                    }
+                    return true;
+                }).orElse(false);
     }
 
     private void submitHearingWhenNoCoreCase(SscsCaseDetails caseDetails, SscsCaseData sscsCaseData, Long ccdCaseId,
@@ -156,13 +239,13 @@ public class EvidenceUploadService {
         String filename = getFilenameForTheNextUploadEvidence(caseDetails, ccdCaseId, storePdfContext, idamEmail);
 
         appendEvidenceUploadsToStatementAndStoreIt(sscsCaseData, storePdfContext,
-            filename, idamEmail);
+                filename, idamEmail);
 
         sscsCaseData.setDraftSscsDocument(Collections.emptyList());
         sscsCaseData.setEvidenceHandled("No");
         ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_DOCUMENT.getCcdType(),
-            "SSCS - upload evidence from MYA",
-            "Uploaded a further evidence document", idamService.getIdamTokens());
+                "SSCS - upload evidence from MYA",
+                "Uploaded a further evidence document", idamService.getIdamTokens());
     }
 
     private String getFilenameForTheNextUploadEvidence(SscsCaseDetails caseDetails, Long ccdCaseId,
@@ -300,21 +383,21 @@ public class EvidenceUploadService {
 
     private long getCountOfNextUploadDoc(List<ScannedDocument> scannedDocuments, List<SscsDocument> sscsDocument) {
         if ((scannedDocuments == null || scannedDocuments.isEmpty())
-            && (sscsDocument == null || sscsDocument.isEmpty())) {
+                && (sscsDocument == null || sscsDocument.isEmpty())) {
             return 1;
         }
         long statementNextCount = 0;
         if (scannedDocuments != null) {
             statementNextCount = scannedDocuments.stream()
-                .filter(doc -> doc.getValue() != null)
-                .filter(doc -> StringUtils.isNotBlank(doc.getValue().getFileName()))
-                .filter(doc -> isTheDocFileNameAUpload(doc.getValue().getFileName())).count();
+                    .filter(doc -> doc.getValue() != null)
+                    .filter(doc -> StringUtils.isNotBlank(doc.getValue().getFileName()))
+                    .filter(doc -> isTheDocFileNameAUpload(doc.getValue().getFileName())).count();
         }
         if (sscsDocument != null) {
             statementNextCount += sscsDocument.stream()
-                .filter(doc -> doc.getValue() != null)
-                .filter(doc -> StringUtils.isNotBlank(doc.getValue().getDocumentFileName()))
-                .filter(doc -> isTheDocFileNameAUpload(doc.getValue().getDocumentFileName())).count();
+                    .filter(doc -> doc.getValue() != null)
+                    .filter(doc -> StringUtils.isNotBlank(doc.getValue().getDocumentFileName()))
+                    .filter(doc -> isTheDocFileNameAUpload(doc.getValue().getDocumentFileName())).count();
         }
         return statementNextCount + 1;
     }
@@ -327,7 +410,7 @@ public class EvidenceUploadService {
     protected void buildUploadedDocumentByGivenSscsDoc(SscsCaseData sscsCaseData, SscsDocument draftSscsDocument,
                                                        List<SscsDocument> audioVideoMedia, String idamEmail) {
         LocalDate ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(),
-            DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
 
         if (audioVideoMedia != null && !audioVideoMedia.isEmpty()) {
@@ -427,6 +510,17 @@ public class EvidenceUploadService {
                 .collect(toList());
     }
 
+    public List<Evidence> listDraftHearingEvidence(String identifier) {
+        return loadEvidence(identifier)
+                .map(LoadedEvidence::getDraftHearingEvidence)
+                .orElse(emptyList());
+    }
+
+    private Optional<LoadedEvidence> loadEvidence(String identifier) {
+        return onlineHearingService.getCcdCaseByIdentifier(identifier)
+                .map(LoadedEvidence::new);
+    }
+
     private interface DocumentExtract<E> {
         Function<SscsCaseData, List<E>> getDocuments();
 
@@ -449,6 +543,44 @@ public class EvidenceUploadService {
         @Override
         public Function<SscsDocument, SscsDocumentDetails> findDocument() {
             return SscsDocument::getValue;
+        }
+    }
+
+    private static class LoadedEvidence {
+        private final SscsCaseDetails caseDetails;
+        private final List<Evidence> draftHearingEvidence;
+
+        LoadedEvidence(SscsCaseDetails caseDetails) {
+            this.caseDetails = caseDetails;
+            draftHearingEvidence = extractHearingEvidences(caseDetails.getData().getDraftSscsDocument());
+        }
+
+        public SscsCaseDetails getCaseDetails() {
+            return caseDetails;
+        }
+
+        public List<Evidence> getDraftHearingEvidence() {
+            return draftHearingEvidence;
+        }
+
+        private List<Evidence> extractHearingEvidences(List<SscsDocument> sscsDocuments) {
+            List<SscsDocument> hearingDocuments = emptyIfNull(sscsDocuments);
+            return hearingDocuments.stream().map(sscsDocumentToEvidence()).collect(toList());
+        }
+
+        private Function<SscsDocument, Evidence> sscsDocumentToEvidence() {
+            return sscsDocument -> {
+                SscsDocumentDetails sscsDocumentDetails = sscsDocument.getValue();
+                return extractEvidence(sscsDocumentDetails);
+            };
+        }
+
+        private Evidence extractEvidence(SscsDocumentDetails sscsDocumentDetails) {
+            DocumentLink documentLink = sscsDocumentDetails.getDocumentLink();
+            return new Evidence(
+                    documentLink != null ? documentLink.getDocumentUrl() : null,
+                    sscsDocumentDetails.getDocumentFileName(),
+                    sscsDocumentDetails.getDocumentDateAdded());
         }
     }
 }
