@@ -15,6 +15,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.CTSC_CLERK;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 
 import java.util.ArrayList;
@@ -951,6 +952,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @Test
     @Parameters({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
     public void givenSscs5CaseAndCaseCodeIsChangedToNonSscs5_thenShowError(String sscs5BenefitCode) {
+        when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(CTSC_CLERK.getValue())).build());
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         sscsCaseData.getAppeal().setBenefitType(
             BenefitType.builder().code("homeResponsibilitiesProtection")
@@ -969,7 +971,28 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
+    public void givenSscs5CaseAndCaseCodeIsChangedToNonSscs5SuperUser_thenShowError(String sscs5BenefitCode) {
+        when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(SUPER_USER.getValue())).build());
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+        sscsCaseData.getAppeal().setBenefitType(
+                BenefitType.builder().code("homeResponsibilitiesProtection")
+                        .description("Home Responsibilities Protection").build());
+        sscsCaseData.setBenefitCode("001");
+        sscsCaseDataBefore.setBenefitCode(sscs5BenefitCode);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(1));
+        assertEquals("Benefit code cannot be changed to the selected code",
+                response.getWarnings().stream().findFirst().get());
+    }
+
+    @Test
+    @Parameters({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
     public void givenNonSscs5CaseAndCaseCodeIsSetToSscs5Code_thenErrorIsShown(String sscs5BenefitCode) {
+        when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(CTSC_CLERK.getValue())).build());
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").description("test").build());
         sscsCaseData.setBenefitCode(sscs5BenefitCode);
@@ -985,6 +1008,24 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
+    @Parameters({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
+    public void givenNonSscs5CaseAndCaseCodeIsSetToSscs5CodeSuperUser_thenErrorIsShown(String sscs5BenefitCode) {
+        when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(SUPER_USER.getValue())).build());
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").description("test").build());
+        sscsCaseData.setBenefitCode(sscs5BenefitCode);
+        sscsCaseDataBefore.setBenefitCode("002");
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(1));
+        assertEquals("Benefit code cannot be changed to the selected code",
+                response.getWarnings().stream().findFirst().get());
+    }
+
+    @Test
     @Parameters({
         "guaranteedMinimumPension,Guaranteed Minimum Pension,054,0",
         "nationalInsuranceCredits,Bereavement Benefit,test,2",
@@ -993,6 +1034,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     })
     public void givenSscs5CaseBenefitCodeAndDescription_thenErrorIsShownForInvalidSet(String code, String description,
                                                                                       String benefitCode, int error) {
+        when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(CTSC_CLERK.getValue())).build());
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(code).description(description).build());
         sscsCaseData.setBenefitCode(benefitCode);
@@ -1002,6 +1044,30 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors().size(), is(error));
         assertThat(response.getWarnings().size(), is(0));
+        if (error > 0) {
+            assertTrue(response.getErrors().stream().anyMatch(e -> e.equals("Benefit type cannot be changed to the selected type")));
+        }
+    }
+
+    @Test
+    @Parameters({
+            "guaranteedMinimumPension,Guaranteed Minimum Pension,054,0,0",
+            "nationalInsuranceCredits,Bereavement Benefit,test,0,2",
+            "socialFund,30 Hours Free Childcare,002,0,1",
+            "childSupport,Child Support,002,0,0"
+    })
+    public void givenSscs5CaseBenefitCodeAndDescriptionSuperUser_thenErrorIsShownForInvalidSet(String code, String description,
+                                                                                      String benefitCode, int error, int warnings) {
+        when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(SUPER_USER.getValue())).build());
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(code).description(description).build());
+        sscsCaseData.setBenefitCode(benefitCode);
+        sscsCaseDataBefore.setBenefitCode(benefitCode);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(error));
+        assertThat(response.getWarnings().size(), is(warnings));
         if (error > 0) {
             assertTrue(response.getErrors().stream().anyMatch(e -> e.equals("Benefit type cannot be changed to the selected type")));
         }

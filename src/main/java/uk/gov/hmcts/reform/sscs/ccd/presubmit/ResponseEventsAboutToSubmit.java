@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsType.SSCS5;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
 import java.time.LocalDateTime;
@@ -57,7 +58,8 @@ public class ResponseEventsAboutToSubmit {
         sscsCaseData.getDwpDocuments().add(dwpDocument);
     }
 
-    public void setCaseCode(PreSubmitCallbackResponse<SscsCaseData> response, Callback<SscsCaseData> callback) {
+
+    public void setCaseCode(PreSubmitCallbackResponse<SscsCaseData> response, Callback<SscsCaseData> callback, boolean hasSuperUserRole) {
         SscsCaseData sscsCaseData = response.getData();
         if (!callback.getEvent().getCcdType().equals(EventType.CASE_UPDATED.getCcdType())
                 && sscsCaseData.getAppeal().getBenefitType() != null
@@ -66,7 +68,12 @@ public class ResponseEventsAboutToSubmit {
         } else if (sscsCaseData.getBenefitCode() != null && sscsCaseData.getIssueCode() != null) {
             sscsCaseData.setCaseCode(buildCaseCode(sscsCaseData));
         }
-        validateChangedCaseCode(response, callback);
+        validateChangedCaseCode(response, callback, hasSuperUserRole);
+    }
+
+
+    public void setCaseCode(PreSubmitCallbackResponse<SscsCaseData> response, Callback<SscsCaseData> callback) {
+        setCaseCode(response, callback, false);
     }
 
     private String buildCaseCode(SscsCaseData sscsCaseData) {
@@ -84,6 +91,10 @@ public class ResponseEventsAboutToSubmit {
     }
 
     private void validateChangedCaseCode(PreSubmitCallbackResponse<SscsCaseData> response, Callback<SscsCaseData> callback) {
+        validateChangedCaseCode(response, callback, false);
+    }
+
+    private void validateChangedCaseCode(PreSubmitCallbackResponse<SscsCaseData> response, Callback<SscsCaseData> callback, boolean hasSuperUserRole) {
         final Optional<CaseDetails<SscsCaseData>> caseDetailsBefore = callback.getCaseDetailsBefore();
 
         if (response.getData().getAppeal().getBenefitType() != null
@@ -96,8 +107,12 @@ public class ResponseEventsAboutToSubmit {
                 && !buildSscs5BenefitCaseLoaderKeyId().contains(response.getData().getBenefitCode()))
                 || (!isSscs5CaseData
                 && buildSscs5BenefitCaseLoaderKeyId().contains(response.getData().getBenefitCode()))) {
-                response.addError("Benefit code cannot be changed to the selected code");
-                hasErrors = true;
+                if (hasSuperUserRole) {
+                    response.addWarning("Benefit code cannot be changed to the selected code");
+                } else {
+                    response.addError("Benefit code cannot be changed to the selected code");
+                    hasErrors = true;
+                }
             }
 
             if (!caseDetailsBefore.get().getCaseData().getBenefitCode()
@@ -139,20 +154,30 @@ public class ResponseEventsAboutToSubmit {
 
     public void validateBenefitForCase(PreSubmitCallbackResponse<SscsCaseData> response,
                                        Callback<SscsCaseData> callback) {
+        validateBenefitForCase(response, callback, false);
+    }
+
+    public void validateBenefitForCase(PreSubmitCallbackResponse<SscsCaseData> response,
+                                       Callback<SscsCaseData> callback, boolean hasSuperUserRole) {
         if (callback.getCaseDetails().getCaseData().getAppeal().getBenefitType() != null) {
             String benefitCode = callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().getCode();
             String benefitDescription =
-                callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().getDescription();
+                    callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().getDescription();
 
             boolean isSscs5CaseData = isSscs5Case(response, callback);
             if ((isSscs5CaseData && (!buildSscs5BenefitCode().contains(benefitCode)
-                || !buildSscs5BenefitDescription().contains(benefitDescription)))
-                || (!isSscs5CaseData && (buildSscs5BenefitCode().contains(benefitCode)
-                || buildSscs5BenefitDescription().contains(benefitDescription)))) {
-                response.addError("Benefit type cannot be changed to the selected type");
+                    || !buildSscs5BenefitDescription().contains(benefitDescription)))
+                    || (!isSscs5CaseData && (buildSscs5BenefitCode().contains(benefitCode)
+                    || buildSscs5BenefitDescription().contains(benefitDescription)))) {
+                if (hasSuperUserRole) {
+                    response.addWarning("Benefit type cannot be changed to the selected type");
+                } else {
+                    response.addError("Benefit type cannot be changed to the selected type");
+                }
             }
         }
     }
+
 
     private List<String> buildSscs5BenefitCaseLoaderKeyId() {
         return Arrays.stream(Benefit.values())

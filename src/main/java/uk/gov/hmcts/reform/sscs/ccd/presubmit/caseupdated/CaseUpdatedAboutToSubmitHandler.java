@@ -3,7 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.sscs.idam.UserRole.SYSTEM_USER;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.checkConfidentiality;
 
 import java.util.Arrays;
@@ -76,8 +77,11 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        setCaseCode(preSubmitCallbackResponse, callback);
-        validateBenefitForCase(preSubmitCallbackResponse, callback);
+        final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
+        final boolean hasSuperUserRole = userDetails.hasRole(SUPER_USER);
+
+        setCaseCode(preSubmitCallbackResponse, callback, hasSuperUserRole);
+        validateBenefitForCase(preSubmitCallbackResponse, callback, hasSuperUserRole);
         if (!preSubmitCallbackResponse.getErrors().isEmpty()) {
             return preSubmitCallbackResponse;
         }
@@ -106,7 +110,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         updateCaseNameIfNameUpdated(callback, sscsCaseData);
         updateCaseCategoriesIfBenefitTypeUpdated(callback, sscsCaseData, preSubmitCallbackResponse);
 
-        final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
         final boolean hasSystemUserRole = userDetails.hasRole(SYSTEM_USER);
 
         updateHearingTypeForNonSscs1Case(sscsCaseData, preSubmitCallbackResponse, hasSystemUserRole);
