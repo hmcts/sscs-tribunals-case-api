@@ -13,6 +13,7 @@
       }
     ]
   },
+  "caseManagementLocation":{"baseLocation":"239985","region":"6"},
   "addedDocuments": null,
   "caseNameHmctsInternal": "Joe Bloggs",
   "caseNameHmctsRestricted": "Joe Bloggs",
