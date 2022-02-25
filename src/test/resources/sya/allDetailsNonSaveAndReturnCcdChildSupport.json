@@ -1,6 +1,6 @@
 {
   "caseCreated" : "${json-unit.ignore}",
-  "caseAccessCategory": "child Support",
+  "caseAccessCategory": "childSupport",
   "caseManagementCategory": {
     "value": {
       "code": "childSupport",
