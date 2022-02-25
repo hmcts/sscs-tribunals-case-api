@@ -8,6 +8,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService.getFirstHalfOfPostcode;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -273,6 +275,12 @@ public class SubmitAppealService {
 
         if (workAllocationFeature && !StringUtils.isEmpty(processingVenue)) {
             CourtVenue courtVenue = refDataService.getVenueRefData(processingVenue);
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                log.info("objectmapper" + objectMapper.writeValueAsString(courtVenue));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
             if (courtVenue != null) {
                 sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
                         .baseLocation(courtVenue.getEpimsId())
