@@ -1,6 +1,6 @@
 {
   "caseCreated" : "${json-unit.ignore}",
-  "caseAccessCategory": "personalIndependencePayment",
+  "caseAccessCategory": "Personal Independence Payment",
   "caseManagementCategory": {
     "value": {
       "code": "PIP",
