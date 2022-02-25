@@ -16,11 +16,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.DIRECTION_ACTION_REQU
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -530,6 +527,68 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertEquals(InterlocReferralReason.NONE.getId(), response.getData().getInterlocReferralReason());
         assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
         assertNull(response.getData().getAudioVideoEvidence());
+    }
+
+    @Test
+    public void removeEvidence_willClearAudioVideoEvidenceAndInterlocReviewState() {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(REMOVE_EVIDENCE.getCode()));
+        sscsCaseData.setNoteDetailRemoveAudioVideo("Temp reason");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertNull(response.getData().getPreviewDocument());
+        assertNull(response.getData().getSignedBy());
+        assertNull(response.getData().getSignedRole());
+        assertNull(response.getData().getGenerateNotice());
+        assertNull(response.getData().getDateAdded());
+        assertNull(response.getData().getReservedToJudge());
+
+        ArrayList<Note> notes = new ArrayList<>(Optional.ofNullable(sscsCaseData.getAppealNotePad()).flatMap(f -> Optional.ofNullable(f.getNotesCollection())).orElse(Collections.emptyList()));
+
+        assertEquals(1, notes.size());
+        assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
+        assertEquals("Temp reason", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
+        assertEquals(1, response.getData().getAudioVideoEvidence().size());
+    }
+
+    @Test
+    public void removeEvidenceeWithNoMoreAudioVideoEvidenceToProcess_willClearAudioVideoEvidenceCollectionAndInterlocReviewState() {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(REMOVE_EVIDENCE.getCode()));
+        sscsCaseData.getAudioVideoEvidence().remove(1);
+        sscsCaseData.setNoteDetailRemoveAudioVideo("Temp reason");
+
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertNull(response.getData().getPreviewDocument());
+        assertNull(response.getData().getSignedBy());
+        assertNull(response.getData().getSignedRole());
+        assertNull(response.getData().getGenerateNotice());
+        assertNull(response.getData().getDateAdded());
+        assertNull(response.getData().getReservedToJudge());
+        ArrayList<Note> notes = new ArrayList<>(Optional.ofNullable(sscsCaseData.getAppealNotePad()).flatMap(f -> Optional.ofNullable(f.getNotesCollection())).orElse(Collections.emptyList()));
+
+        assertEquals(1, notes.size());
+        assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
+        assertEquals("Temp reason", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
+        assertNull(response.getData().getAudioVideoEvidence());
+    }
+
+    @Test
+    public void givenRemoveEvidenceSelected_verifySetInterlocReviewState() {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(REMOVE_EVIDENCE.getCode()));
+        sscsCaseData.setProcessAudioVideoReviewState(ProcessAudioVideoReviewState.REVIEW_BY_JUDGE);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(response.getData().getInterlocReviewState(), InterlocReviewState.REVIEW_BY_JUDGE.getId());
+    }
+
+    @Test
+    public void givenRemoveEvidenceSelectedAndNoReviewStateSelected_verifyInterlocReviewStateStaysSame() {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(REMOVE_EVIDENCE.getCode()));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(sscsCaseData.getInterlocReviewState(), response.getData().getInterlocReviewState());
     }
 
     @Test
