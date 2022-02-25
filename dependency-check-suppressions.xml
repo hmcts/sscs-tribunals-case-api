@@ -52,4 +52,44 @@
         <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-core@.*$</packageUrl>
         <cve>CVE-2021-22096</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: log4j-api-2.16.0.jar
+   ]]></notes>
+        <cve>CVE-2021-44832</cve>
+        <cve>CVE-2021-45105</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: logback-classic-1.2.3.jar
+   ]]></notes>
+        <cve>CVE-2021-42550</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-core-5.2.15.RELEASE.jar
+   ]]></notes>
+        <cve>CVE-2021-22060</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: sscs-pdf-email-common-1.4.51.jar
+   ]]></notes>
+        <cve>CVE-2015-9251</cve>
+        <cve>CVE-2019-11358</cve>
+        <cve>CVE-2020-11022</cve>
+        <cve>CVE-2020-11023</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: tomcat-embed-core-9.0.54.jar
+   ]]></notes>
+        <cve>CVE-2022-23181</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+     file name: spring-security-core-5.5.1.jar
+     ]]></notes>
+        <vulnerabilityName>CWE-862: Missing Authorization</vulnerabilityName>
+    </suppress>
 </suppressions>
