@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.client;
 
+import java.util.Map;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,10 +14,6 @@ import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 
-import java.util.Map;
-import java.util.Set;
-
-import static org.junit.Assert.assertNotNull;
 
 @Slf4j
 @RunWith(SpringRunner.class)
@@ -40,7 +38,7 @@ public class RefDataClientFunctionalTest {
         for (String key:keys) {
             VenueDetails venueDetails = venues.get(key);
             log.info(venueDetails.getGapsVenName());
-            if (refDataService.getVenueRefData(venueDetails.getGapsVenName()) == null){
+            if (refDataService.getVenueRefData(venueDetails.getGapsVenName()) == null) {
                 log.info("Not in API " + venueDetails.getGapsVenName());
             }
         }
