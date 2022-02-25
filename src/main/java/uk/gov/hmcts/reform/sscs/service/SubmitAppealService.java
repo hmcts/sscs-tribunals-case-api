@@ -279,7 +279,7 @@ public class SubmitAppealService {
             try {
                 log.info("objectmapper" + objectMapper.writeValueAsString(courtVenue));
             } catch (JsonProcessingException e) {
-                e.printStackTrace();
+                log.error("Error in json", e);
             }
             if (courtVenue != null) {
                 sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
