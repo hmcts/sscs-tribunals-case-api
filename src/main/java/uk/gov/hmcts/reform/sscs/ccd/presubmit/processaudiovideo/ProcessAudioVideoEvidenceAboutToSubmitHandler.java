@@ -258,7 +258,6 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), REMOVE_EVIDENCE.getCode())) {
             noteDetails =  caseData.getNoteDetailRemoveAudioVideo();
         }
-        System.out.println(noteDetails);
         if (StringUtils.isNoneBlank(noteDetails)) {
             ArrayList<Note> notes = new ArrayList<>(Optional.ofNullable(caseData.getAppealNotePad()).flatMap(f -> Optional.ofNullable(f.getNotesCollection())).orElse(Collections.emptyList()));
             final NoteDetails noteDetail = NoteDetails.builder().noteDetail(noteDetails).noteDate(LocalDate.now().toString()).author(userDetailsService.buildLoggedInUserName(userAuthorisation)).build();
