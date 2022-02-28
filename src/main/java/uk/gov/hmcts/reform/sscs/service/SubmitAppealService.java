@@ -96,8 +96,7 @@ public class SubmitAppealService {
 
     private void checkHasValidRole(IdamTokens idamTokens){
         if (hasValidCaseworkerRole(idamTokens)) {
-            log.info("IDAM ID {} with caseworker roles have attempted to use save and return",
-                    idamTokens != null ? idamTokens.getUserId() : null);
+            log.info("IDAM ID {} with caseworker roles have attempted to use save and return", idamTokens.getUserId());
             throw new CaseAccessException("User has a Caseworker role");
         }
         if (!hasValidCitizenRole(idamTokens)) {
@@ -132,7 +131,6 @@ public class SubmitAppealService {
 
         try {
             SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal, workAllocationFeature);
-
             CaseDetails caseDetails = citizenCcdService.updateCase(sscsCaseData, EventType.UPDATE_DRAFT.getCcdType(), "Update draft",
                     "Update draft in CCD", idamTokens, appeal.getCcdCaseId());
 
@@ -163,24 +161,19 @@ public class SubmitAppealService {
         }
     }
 
-    public Optional<SaveCaseResult> archiveDraftAppeal(String oauth2Token, SyaCaseWrapper appeal, Long ccdCaseId) {
+    public Optional<SaveCaseResult> archiveDraftAppeal(String oauth2Token, SyaCaseWrapper appeal, Long ccdCaseId) throws FeignException{
         appeal.setCaseType("draft");
 
         IdamTokens idamTokens = getUserTokens(oauth2Token);
         checkHasValidRole(idamTokens);
 
-        try {
-            SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal, workAllocationFeature);
-            citizenCcdService.archiveDraft(sscsCaseData, idamTokens, ccdCaseId);
+        SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal, workAllocationFeature);
+        citizenCcdService.archiveDraft(sscsCaseData, idamTokens, ccdCaseId);
 
-            return Optional.of(SaveCaseResult.builder()
-                    .caseDetailsId(ccdCaseId)
-                    .saveCaseOperation(SaveCaseOperation.ARCHIVE)
-                    .build());
-
-        } catch (FeignException e) {
-            throw e;
-        }
+        return Optional.of(SaveCaseResult.builder()
+                .caseDetailsId(ccdCaseId)
+                .saveCaseOperation(SaveCaseOperation.ARCHIVE)
+                .build());
     }
 
     public Optional<SessionDraft> getDraftAppeal(String oauth2Token) {
