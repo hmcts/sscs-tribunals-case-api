@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -480,6 +481,7 @@ public class EvidenceUploadService {
 
         addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, audioVideoEvidence.stream()
             .map(evidence -> evidence.getValue().getDocumentType())
+            .filter(Objects::nonNull)
             .collect(Collectors.toUnmodifiableList()), EVENT_TYPE);
 
         if (!audioVideoEvidence.isEmpty()) {

@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
@@ -146,6 +147,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
 
         addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, newAudioVideoEvidence.stream()
             .map(audioVideoEvidence -> audioVideoEvidence.getValue().getDocumentType())
+            .filter(Objects::nonNull)
             .collect(Collectors.toUnmodifiableList()), EVENT_TYPE);
 
         if (!newAudioVideoEvidence.isEmpty()) {
