@@ -89,8 +89,6 @@ public class SubmitAppealService {
     public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
 
         IdamTokens idamTokens = idamService.getIdamTokens();
-        log.info("Oauth." + idamTokens.getIdamOauth2Token());
-        log.info("Service." + idamTokens.getServiceAuthorization());
 
         Long caseId = appeal.getCcdCaseId() != null ? Long.valueOf(appeal.getCcdCaseId()) : null;
 
@@ -275,12 +273,6 @@ public class SubmitAppealService {
 
         if (workAllocationFeature && !StringUtils.isEmpty(processingVenue)) {
             CourtVenue courtVenue = refDataService.getVenueRefData(processingVenue);
-            ObjectMapper objectMapper = new ObjectMapper();
-            try {
-                log.info("objectmapper" + objectMapper.writeValueAsString(courtVenue));
-            } catch (JsonProcessingException e) {
-                log.error("Error in json", e);
-            }
             if (courtVenue != null) {
                 sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
                         .baseLocation(courtVenue.getEpimsId())
