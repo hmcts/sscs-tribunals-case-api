@@ -205,14 +205,7 @@ public class SubmitAppealService {
 
     public List<SessionDraft> getDraftAppeals(String oauth2Token) {
         IdamTokens idamTokens = getUserTokens(oauth2Token);
-        if (hasValidCaseworkerRole(idamTokens)) {
-            log.info("IDAM ID {} with caseworker roles have attempted to use save and return",
-                idamTokens != null ? idamTokens.getUserId() : null);
-            throw new CaseAccessException("User has a Caseworker role");
-        }
-        if (!hasValidCitizenRole(idamTokens)) {
-            throw new ApplicationErrorException(new Exception("User has a invalid role"));
-        }
+        checkHasValidRole(idamTokens);
         List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(idamTokens);
 
         log.info("GET all Draft cases with IDAM Id {} and roles {}", idamTokens.getUserId(), idamTokens.getRoles());
