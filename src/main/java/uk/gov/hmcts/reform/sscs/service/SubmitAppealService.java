@@ -94,7 +94,7 @@ public class SubmitAppealService {
         return caseDetails.getId();
     }
 
-    private void checkHasValidRole(IdamTokens idamTokens){
+    private void checkHasValidRole(IdamTokens idamTokens) {
         if (hasValidCaseworkerRole(idamTokens)) {
             log.info("IDAM ID {} with caseworker roles have attempted to use save and return", idamTokens.getUserId());
             throw new CaseAccessException("User has a Caseworker role");
@@ -161,7 +161,7 @@ public class SubmitAppealService {
         }
     }
 
-    public Optional<SaveCaseResult> archiveDraftAppeal(String oauth2Token, SyaCaseWrapper appeal, Long ccdCaseId) throws FeignException{
+    public Optional<SaveCaseResult> archiveDraftAppeal(String oauth2Token, SyaCaseWrapper appeal, Long ccdCaseId) throws FeignException {
         appeal.setCaseType("draft");
 
         IdamTokens idamTokens = getUserTokens(oauth2Token);
