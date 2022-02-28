@@ -9,7 +9,8 @@ public enum ProcessAudioVideoActionDynamicListItems {
     ADMIT_EVIDENCE("admitEvidence", "Admit audio/video evidence"),
     EXCLUDE_EVIDENCE("excludeEvidence", "Exclude audio/video evidence"),
     SEND_TO_JUDGE("sendToJudge", "Send to judge"),
-    SEND_TO_ADMIN("sendToAdmin", "Send to admin");
+    SEND_TO_ADMIN("sendToAdmin", "Send to admin"),
+    REMOVE_EVIDENCE("removeEvidence", "Remove audio/video evidence");
 
     String code;
     String label;
