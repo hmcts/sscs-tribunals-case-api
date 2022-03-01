@@ -282,13 +282,6 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         }
     }
 
-    private void processIfRemoveEvidence(SscsCaseData caseData, String userAuthorisation) {
-        if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), REMOVE_EVIDENCE.getCode())) {
-            addToNotesIfNoteExists(caseData, userAuthorisation);
-            caseData.getAudioVideoEvidence().removeIf(evidence -> isSelectedEvidence(evidence, caseData));
-        }
-    }
-
     private void processIfSendToJudge(SscsCaseData caseData, String userAuthorisation) {
         if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), SEND_TO_JUDGE.getCode())) {
             if (caseData.isLanguagePreferenceWelsh()) {
