@@ -88,7 +88,6 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         processIfIssueDirectionNotice(caseData);
         processIfAdmitEvidence(caseData, response);
         processIfExcludeEvidence(caseData);
-        processIfRemoveEvidence(caseData, userAuthorisation);
         processIfSendToJudge(caseData, userAuthorisation);
         processIfSendToAdmin(caseData, userAuthorisation);
         overrideInterlocReviewStateIfSelected(caseData);
@@ -257,13 +256,9 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     }
 
     private void addToNotesIfNoteExists(SscsCaseData caseData, String userAuthorisation)  {
-        String noteDetails  = caseData.getTempNoteDetail();
-        if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), REMOVE_EVIDENCE.getCode())) {
-            noteDetails =  caseData.getNoteDetailRemoveAudioVideo();
-        }
-        if (StringUtils.isNoneBlank(noteDetails)) {
+        if (StringUtils.isNoneBlank(caseData.getTempNoteDetail())) {
             ArrayList<Note> notes = new ArrayList<>(Optional.ofNullable(caseData.getAppealNotePad()).flatMap(f -> Optional.ofNullable(f.getNotesCollection())).orElse(Collections.emptyList()));
-            final NoteDetails noteDetail = NoteDetails.builder().noteDetail(noteDetails).noteDate(LocalDate.now().toString()).author(userDetailsService.buildLoggedInUserName(userAuthorisation)).build();
+            final NoteDetails noteDetail = NoteDetails.builder().noteDetail(caseData.getTempNoteDetail()).noteDate(LocalDate.now().toString()).author(userDetailsService.buildLoggedInUserName(userAuthorisation)).build();
             notes.add(Note.builder().value(noteDetail).build());
             caseData.setAppealNotePad(NotePad.builder().notesCollection(notes).build());
         }
@@ -274,13 +269,6 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
             caseData.setInterlocReviewState(null);
             caseData.setInterlocReferralReason(InterlocReferralReason.NONE.getId());
             caseData.setDwpState(DIRECTION_ACTION_REQUIRED.getId());
-            caseData.getAudioVideoEvidence().removeIf(evidence -> isSelectedEvidence(evidence, caseData));
-        }
-    }
-
-    private void processIfRemoveEvidence(SscsCaseData caseData, String userAuthorisation) {
-        if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), REMOVE_EVIDENCE.getCode())) {
-            addToNotesIfNoteExists(caseData, userAuthorisation);
             caseData.getAudioVideoEvidence().removeIf(evidence -> isSelectedEvidence(evidence, caseData));
         }
     }
