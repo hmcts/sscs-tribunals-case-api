@@ -255,7 +255,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         }
     }
 
-    private void addToNotesIfNoteExists(SscsCaseData caseData, String userAuthorisation)  {
+    private void addToNotesIfNoteExists(SscsCaseData caseData, String userAuthorisation) {
         if (StringUtils.isNoneBlank(caseData.getTempNoteDetail())) {
             ArrayList<Note> notes = new ArrayList<>(Optional.ofNullable(caseData.getAppealNotePad()).flatMap(f -> Optional.ofNullable(f.getNotesCollection())).orElse(Collections.emptyList()));
             final NoteDetails noteDetail = NoteDetails.builder().noteDetail(caseData.getTempNoteDetail()).noteDate(LocalDate.now().toString()).author(userDetailsService.buildLoggedInUserName(userAuthorisation)).build();

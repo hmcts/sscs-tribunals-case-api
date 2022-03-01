@@ -34,7 +34,6 @@ public final class ProcessAudioVideoActionHelper {
         }
 
         if (hasTcwRole || hasJudgeRole || hasSuperUserRole) {
-            populateActionListWithItems(listOptions, REMOVE_EVIDENCE);
             populateActionListWithItems(listOptions, SEND_TO_ADMIN);
         }
 
