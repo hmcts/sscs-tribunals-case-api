@@ -43,11 +43,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 import uk.gov.hmcts.reform.sscs.service.WelshFooterService;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 public class CreateWelshNoticeIt extends AbstractEventIt {
 
@@ -64,6 +67,9 @@ public class CreateWelshNoticeIt extends AbstractEventIt {
     private IdamClient idamClient;
 
     @MockBean
+    private IdamService idamService;
+
+    @MockBean
     private AuthTokenGenerator authTokenGenerator;
 
     @MockBean
@@ -75,6 +81,8 @@ public class CreateWelshNoticeIt extends AbstractEventIt {
     @Before
     public void setup() throws IOException {
         setup("callback/createWelshNotice.json");
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+        when(idamService.getUserDetails(any())).thenReturn(UserDetails.builder().id("16").roles(Arrays.asList("caseworker", "citizen")).build());
     }
 
     @Test

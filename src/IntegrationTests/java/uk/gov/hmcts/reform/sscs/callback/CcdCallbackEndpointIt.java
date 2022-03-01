@@ -51,10 +51,12 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @RunWith(JUnitParamsRunner.class)
 public class CcdCallbackEndpointIt extends AbstractEventIt {
@@ -75,11 +77,15 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
     private EvidenceManagementSecureDocStoreService evidenceManagementService;
 
     @MockBean
+    private IdamService idamService;
+
+    @MockBean
     UploadResponse uploadResponse;
 
     @Before
     public void setup() throws IOException {
         setup("callback/actionFurtherEvidenceCallback.json");
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
     }
 
     private Document createDocument() {
@@ -163,13 +169,13 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
     @Test
     public void givenFurtherEvidenceIssueToAllParties_onSubmitted_willStart_IssueFurtherEvidenceEvent() throws Exception {
         mockIdam();
-        given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
-                eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+        given(coreCaseDataApi.startEventForCaseWorker(any(), any(),
+                any(), eq("SSCS"), eq("Benefit"), eq("12345656789"),
                 eq("issueFurtherEvidence")))
                 .willReturn(StartEventResponse.builder().build());
 
-        given(coreCaseDataApi.submitEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
-                eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+        given(coreCaseDataApi.submitEventForCaseWorker(any(), any(),
+                any(), eq("SSCS"), eq("Benefit"), eq("12345656789"),
                 eq(true), any(CaseDataContent.class)))
                 .willReturn(CaseDetails.builder()
                         .id(123L)
@@ -187,7 +193,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
 
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
-        verify(coreCaseDataApi).startEventForCaseWorker(any(), anyString(), anyString(), anyString(),
+        verify(coreCaseDataApi).startEventForCaseWorker(any(), any(), any(), anyString(),
                 anyString(), eq("12345656789"), eq("issueFurtherEvidence"));
     }
 
@@ -208,15 +214,15 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
     }
 
     private void mockCcd() {
-        given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
-            eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+        given(coreCaseDataApi.startEventForCaseWorker(any(), any(),
+            any(), eq("SSCS"), eq("Benefit"), eq("12345656789"),
             eq("interlocInformationReceivedActionFurtherEvidence")))
             .willReturn(StartEventResponse.builder().build());
 
         Map<String, Object> data = new HashMap<>();
         data.put("interlocReviewState", "interlocutoryReview");
-        given(coreCaseDataApi.submitEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
-            eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+        given(coreCaseDataApi.submitEventForCaseWorker(any(), any(),
+            any(), eq("SSCS"), eq("Benefit"), eq("12345656789"),
             eq(true), any(CaseDataContent.class)))
             .willReturn(CaseDetails.builder()
                 .id(123L)

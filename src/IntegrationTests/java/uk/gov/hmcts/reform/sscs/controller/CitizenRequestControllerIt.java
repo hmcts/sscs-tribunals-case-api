@@ -34,7 +34,7 @@ import uk.gov.hmcts.reform.sscs.service.OnlineHearingService;
 
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc(addFilters = false)
 public class CitizenRequestControllerIt {
 

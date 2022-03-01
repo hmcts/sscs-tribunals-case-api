@@ -34,9 +34,7 @@ import uk.gov.hmcts.reform.ccd.document.am.model.Document;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -45,7 +43,7 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @RunWith(JUnitParamsRunner.class)
 public class CreateBundleIt extends AbstractEventIt {
@@ -134,7 +132,10 @@ public class CreateBundleIt extends AbstractEventIt {
 
         UploadResponse uploadResponse = createUploadResponse();
         when(evidenceManagementService.upload(any(), any())).thenReturn(uploadResponse);
-        when(pdfStoreService.storeDocument(any(), any(), any())).thenReturn(SscsDocument.builder().build());
+        when(pdfStoreService.storeDocument(any(), any(), any())).thenReturn(
+                SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentUrl("url").documentBinaryUrl("url/binary")
+                .documentFilename("filename").build()).build()).build());
 
         when(docmosisPdfService.createPdf(any(),any())).thenReturn(pdfBytes);
 

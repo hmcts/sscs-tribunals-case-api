@@ -25,9 +25,11 @@ import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 public class IssueFinalDecisionIt extends AbstractEventIt {
 
@@ -40,10 +42,14 @@ public class IssueFinalDecisionIt extends AbstractEventIt {
     @MockBean
     private EvidenceManagementSecureDocStoreService evidenceManagementService;
 
+    @MockBean
+    private IdamService idamService;
+
     @Before
     public void setup() throws IOException {
         json = getJson("callback/issueFinalDecisionDescriptorCallback.json");
         super.setup();
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
     }
 
     @Test

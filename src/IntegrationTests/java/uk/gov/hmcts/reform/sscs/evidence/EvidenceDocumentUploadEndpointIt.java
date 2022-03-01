@@ -1,14 +1,13 @@
 package uk.gov.hmcts.reform.sscs.evidence;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.document.domain.UploadResponse.Embedded;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.junit.Before;
@@ -26,12 +25,14 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
-import uk.gov.hmcts.reform.document.domain.Classification;
-import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClient;
+import uk.gov.hmcts.reform.ccd.document.am.model.Document;
+import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:config/application_it.properties")
 @AutoConfigureMockMvc
 public class EvidenceDocumentUploadEndpointIt {
@@ -48,22 +49,22 @@ public class EvidenceDocumentUploadEndpointIt {
     private AuthTokenGenerator authTokenGenerator;
 
     @MockBean
-    private DocumentUploadClientApi documentUploadClientApi;
+    private CaseDocumentClient documentUploadClientApi;
+
+    @MockBean
+    IdamService idamService;
 
     @Mock
     private UploadResponse uploadResponse;
 
-    @Mock
-    private Embedded value;
-
     @Before
     public void setUp() throws Exception {
-        given(authTokenGenerator.generate()).willReturn(AUTH_TOKEN);
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder()
+                .idamOauth2Token(DUMMY_OAUTH_2_TOKEN).serviceAuthorization(AUTH_TOKEN).build());
     }
 
     @Test
     public void shouldThrow404ErrorIfNotEvidenceDocumentSubmitted() throws Exception {
-
         MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         mockMvc.perform(MockMvcRequestBuilders.multipart("/evidence/upload"))
             .andExpect(status().is(404));
@@ -72,11 +73,13 @@ public class EvidenceDocumentUploadEndpointIt {
 
     @Test
     public void shouldStoreTheEvidenceDocumentAndReturnMetadata() throws Exception {
-        given(documentUploadClientApi.upload(eq(DUMMY_OAUTH_2_TOKEN), eq(AUTH_TOKEN), eq("sscs"),
-            eq(Arrays.asList("caseworker", "citizen")), eq(Classification.RESTRICTED), any()))
-            .willReturn(uploadResponse);
-        Embedded embedded = new Embedded();
-        when(uploadResponse.getEmbedded()).thenReturn(embedded);
+        List<Document> documents = new ArrayList<>();
+        when(uploadResponse.getDocuments()).thenReturn(documents);
+
+        when(documentUploadClientApi.uploadDocuments(any(), any(), eq("Benefit"), eq("SSCS"),
+             any()))
+            .thenReturn(uploadResponse);
+
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             PDDocument doc = new PDDocument();
             doc.addPage(new PDPage());

@@ -30,11 +30,13 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 public class DecisionIssuedIt extends AbstractEventIt {
 
@@ -50,9 +52,13 @@ public class DecisionIssuedIt extends AbstractEventIt {
     @MockBean
     private GenerateFile generateFile;
 
+    @MockBean
+    private IdamService idamService;
+
     @Before
     public void setup() throws IOException {
         setup("callback/decisionIssuedForPreview.json");
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
     }
 
     @Test

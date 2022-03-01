@@ -31,11 +31,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 public class DirectionIssuedIt extends AbstractEventIt {
 
@@ -51,9 +53,13 @@ public class DirectionIssuedIt extends AbstractEventIt {
     @MockBean
     private GenerateFile generateFile;
 
+    @MockBean
+    private IdamService idamService;
+
     @Before
     public void setup() throws IOException {
         setup("callback/directionIssuedForPreview.json");
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
     }
 
     @Test

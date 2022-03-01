@@ -57,7 +57,7 @@ import uk.gov.hmcts.reform.sscs.idam.Authorize;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:config/application_it.properties")
 @AutoConfigureMockMvc(addFilters = false)
 @RunWith(JUnitParamsRunner.class)
