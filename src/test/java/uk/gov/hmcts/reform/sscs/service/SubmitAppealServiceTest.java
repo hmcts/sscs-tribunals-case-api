@@ -2,8 +2,14 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
@@ -16,9 +22,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Rule;
@@ -32,12 +43,21 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaAppointee;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaContactDetails;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaMrn;
 import uk.gov.hmcts.reform.sscs.exception.ApplicationErrorException;
 import uk.gov.hmcts.reform.sscs.exception.DuplicateCaseException;
@@ -603,6 +623,63 @@ public class SubmitAppealServiceTest {
         RegionalProcessingCenter expectedRpcObject = getRpcObjectForGivenJsonRpc(expectedRpc);
         assertThat(actualRpc, is(expectedRpcObject));
         assertEquals(expectedRpcObject.getName(), caseData.getRegion());
+    }
+
+    @Test
+    public void givenAppointeePostCode_shouldSetRegionAndRpcToAppointee()
+        throws JsonProcessingException {
+        SyaContactDetails appointeeContactDetails = new SyaContactDetails();
+        appointeeContactDetails.setPostCode("B1 1AA");
+
+        SyaCaseWrapper appealData = getSyaWrapperWithAppointee(appointeeContactDetails);
+
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
+
+        assertRpc(caseData, BIRMINGHAM_RPC);
+    }
+
+    @Test
+    @Parameters({"", "null"})
+    public void givenAppointeeWithNoPostCode_shouldSetRegionAndRpcToAppellant(@Nullable String postCode)
+        throws JsonProcessingException {
+        SyaContactDetails appointeeContactDetails = new SyaContactDetails();
+        appointeeContactDetails.setPostCode(postCode);
+
+        SyaCaseWrapper appealData = getSyaWrapperWithAppointee(appointeeContactDetails);
+
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
+
+        assertRpc(caseData, BRADFORD_RPC);
+    }
+
+    @Test
+    public void givenAppointeeWithNoContactData_shouldSetRegionAndRpcToAppellant()
+        throws JsonProcessingException {
+        SyaCaseWrapper appealData = getSyaWrapperWithAppointee(null);
+        appealData.setIsAppointee(false);
+
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
+
+        assertRpc(caseData, BRADFORD_RPC);
+    }
+
+    private void assertRpc(SscsCaseData caseData, String expectedRpc) throws JsonProcessingException {
+        RegionalProcessingCenter actualRpc = caseData.getRegionalProcessingCenter();
+        RegionalProcessingCenter expectedRpcObject = getRpcObjectForGivenJsonRpc(expectedRpc);
+        assertThat(actualRpc, is(expectedRpcObject));
+        assertEquals(expectedRpcObject.getName(), caseData.getRegion());
+    }
+
+    private SyaCaseWrapper getSyaWrapperWithAppointee(SyaContactDetails appointeeContact) {
+        SyaAppointee appointee = new SyaAppointee();
+        appointee.setContactDetails(appointeeContact);
+
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+        appealData.getAppellant().getContactDetails().setPostCode("TN32 6PL");
+        appealData.setAppointee(appointee);
+        appealData.setIsAppointee(true);
+
+        return appealData;
     }
 
     private RegionalProcessingCenter getRpcObjectForGivenJsonRpc(String jsonRpc) throws JsonProcessingException {
