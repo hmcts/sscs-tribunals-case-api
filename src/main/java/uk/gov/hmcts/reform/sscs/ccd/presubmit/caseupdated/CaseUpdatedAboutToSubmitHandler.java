@@ -82,8 +82,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                 && sscsCaseData.getAppeal().getAppellant().getAddress() != null
                 && isNotBlank(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode())) {
 
-            RegionalProcessingCenter newRpc =
-                    regionalProcessingCenterService.getByPostcode(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
+
+            String postCode = resolvePostCode(sscsCaseData);
+            RegionalProcessingCenter newRpc = regionalProcessingCenterService.getByPostcode(postCode);
 
             maybeChangeIsScottish(sscsCaseData.getRegionalProcessingCenter(), newRpc, sscsCaseData);
 
@@ -204,13 +205,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private void updateProcessingVenueIfRequired(CaseDetails<SscsCaseData> caseDetails) {
 
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
-
-        String postCode = "yes".equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())
-            && null != sscsCaseData.getAppeal().getAppellant().getAppointee()
-            && null != sscsCaseData.getAppeal().getAppellant().getAppointee().getAddress()
-            && null != sscsCaseData.getAppeal().getAppellant().getAppointee().getAddress().getPostcode()
-                ? sscsCaseData.getAppeal().getAppellant().getAppointee().getAddress().getPostcode()
-                : sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
+        String postCode = resolvePostCode(sscsCaseData);
 
         String venue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
 
@@ -221,7 +216,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
 
     }
-
 
     private void updateCaseNameIfNameUpdated(Callback<SscsCaseData> callback, SscsCaseData caseData) {
         if (workAllocationFeature) {
@@ -272,6 +266,22 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         } else {
             return oldCaseDetails.getCaseData().getBenefitType();
         }
+    }
+
+    private String resolvePostCode(SscsCaseData sscsCaseData) {
+        String postCode;
+
+        if ("yes".equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())) {
+            postCode = Optional.ofNullable(sscsCaseData.getAppeal().getAppellant().getAppointee())
+                .map(Appointee::getAddress)
+                .map(Address::getPostcode)
+                .filter(appointeePostCode -> !"".equals(appointeePostCode))
+                .orElse(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
+        } else {
+            postCode = sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
+        }
+        
+        return postCode;
     }
 
 }

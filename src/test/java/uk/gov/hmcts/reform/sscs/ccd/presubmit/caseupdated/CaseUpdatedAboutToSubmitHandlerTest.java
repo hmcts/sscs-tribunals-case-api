@@ -3,8 +3,14 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
@@ -266,16 +272,58 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAnAppealWithNewAppointeeButEmptyPostcode_thenUpdateProcessingVenueWithAppellantVenue() {
+    @Parameters({"", "null"})
+    public void givenAnAppealWithNewAppointeeButEmptyPostcode_thenUpdateProcessingVenueWithAppellantVenue(@Nullable String postCode) {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB1200B");
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().address(Address.builder().postcode(null).build()).build());
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder()
+            .address(Address.builder()
+                .postcode(postCode)
+                .build())
+            .build());
 
         when(airLookupService.lookupAirVenueNameByPostCode("AB1200B", sscsCaseData.getAppeal().getBenefitType())).thenReturn("VenueB");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("VenueB", response.getData().getProcessingVenue());
+    }
+
+    @Test
+    public void givenAnAppealWithNewAppointee_thenUpdateRpcWithAppointeeVenue() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB1200B");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder()
+            .address(Address.builder().postcode("APP EEE").build()).build());
+
+        when(regionalProcessingCenterService.getByPostcode("APP EEE")).thenReturn(RegionalProcessingCenter.builder()
+            .name("AppointeeVenue")
+            .address1("Line1")
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("AppointeeVenue", response.getData().getRegionalProcessingCenter().getName());
+    }
+
+    @Test
+    public void givenAnAppealWithNoAppointee_thenUpdateRpcWithAppellantVenue() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB1200B");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("No");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder()
+            .address(Address.builder()
+                .postcode("APP_EEE")
+                .build())
+            .build());
+
+        when(regionalProcessingCenterService.getByPostcode("AB1200B")).thenReturn(RegionalProcessingCenter.builder()
+            .name("AppellantVenue")
+            .address1("Line1")
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("AppellantVenue", response.getData().getRegionalProcessingCenter().getName());
     }
 
     @Ignore("commented out as case loader is failing on this validation checks, we need to do another data exercise to clean the data")
