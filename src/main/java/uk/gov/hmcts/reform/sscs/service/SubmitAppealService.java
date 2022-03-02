@@ -22,18 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLinkDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
-import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaAppointee;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaContactDetails;
 import uk.gov.hmcts.reform.sscs.exception.ApplicationErrorException;
 import uk.gov.hmcts.reform.sscs.exception.DuplicateCaseException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -129,7 +122,7 @@ public class SubmitAppealService {
 
         try {
             SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal, workAllocationFeature);
-
+            
             CaseDetails caseDetails = citizenCcdService.updateCase(sscsCaseData, EventType.UPDATE_DRAFT.getCcdType(), "Update draft",
                     "Update draft in CCD", idamTokens, appeal.getCcdCaseId());
 
@@ -250,7 +243,7 @@ public class SubmitAppealService {
 
     SscsCaseData convertAppealToSscsCaseData(SyaCaseWrapper appeal) {
 
-        String postCode = resolvePostCode(appeal);
+        String postCode = appeal.getContactDetails().getPostCode();
         String firstHalfOfPostcode = getFirstHalfOfPostcode(postCode);
         RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);
 
@@ -267,20 +260,6 @@ public class SubmitAppealService {
         log.info("{} - setting venue name to {}", sscsCaseData.getAppeal().getAppellant().getIdentity().getNino(), sscsCaseData.getProcessingVenue());
 
         return sscsCaseData;
-    }
-
-    private String resolvePostCode(SyaCaseWrapper appeal) {
-        String apellantPostCode = appeal.getAppellant().getContactDetails().getPostCode();
-
-        if (appeal.getIsAppointee()) {
-            return Optional.ofNullable(appeal.getAppointee())
-                .map(SyaAppointee::getContactDetails)
-                .map(SyaContactDetails::getPostCode)
-                .filter(appointeePostCode -> !"".equals(appointeePostCode))
-                .orElse(apellantPostCode);
-        }
-
-        return apellantPostCode;
     }
 
     private SscsCaseDetails createOrUpdateCase(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
