@@ -856,11 +856,15 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         assertEquals(1, response.getErrors().size());
     }
 
+
     @Test
-    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
-        "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
-    public void givenNonSscs1PaperCaseAppellantWantsToAttendYes_thenCaseIsOralAndWarningShown(String shortName) {
+    @Parameters({"childSupport,Child Support", "taxCredit,Tax Credit", "guardiansAllowance,Guardians Allowance",
+            "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
+            "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare","guaranteedMinimumPension,Guaranteed Minimum Pension",
+            "nationalInsuranceCredits,National Insurance Credits"})
+    public void givenNonSscs1PaperCaseAppellantWantsToAttendYes_thenCaseIsOralAndWarningShown(String shortName, String description) {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(description);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         otherPartyList.add(buildOtherParty("No",null));
         otherPartyList.add(buildOtherParty("No", NO));
@@ -897,10 +901,13 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
-        "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
-    public void givenNonSscs1PaperCaseAppelllantWantsToAttendNo_thenCaseIsNotChangedAndNoWarningShown(String shortName) {
+    @Parameters({"childSupport,Child Support", "taxCredit,Tax Credit", "guardiansAllowance,Guardians Allowance",
+            "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
+        "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare","guaranteedMinimumPension,Guaranteed Minimum Pension",
+            "nationalInsuranceCredits,National Insurance Credits"})
+    public void givenNonSscs1PaperCaseAppelllantWantsToAttendNo_thenCaseIsNotChangedAndNoWarningShown(String shortName, String description) {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(description);
         callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(
             HearingOptions.builder().wantsToAttend("No").build()
         );
