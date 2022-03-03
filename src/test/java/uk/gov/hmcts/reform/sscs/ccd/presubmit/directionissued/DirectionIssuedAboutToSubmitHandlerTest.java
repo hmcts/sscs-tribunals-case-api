@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.DIRECTION_ACTION_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REJECT_HEARING_RECORDING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
@@ -94,7 +95,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         docs.add(document);
 
         sscsCaseData = SscsCaseData.builder()
-                .generateNotice("Yes")
+                .generateNotice(YES)
                 .signedBy("User")
                 .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
                 .signedRole("Judge")
@@ -419,7 +420,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setInterlocReviewState(null);
         callback.getCaseDetails().getCaseData().setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
-        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("yes");
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(YES);
 
 
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.GRANT_REINSTATEMENT.toString()));
@@ -429,7 +430,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertTrue(response.getData().getReinstatementOutcome().equals(RequestOutcome.IN_PROGRESS));
         assertEquals(DwpState.LAPSED.getId(), response.getData().getDwpState());
         assertEquals(InterlocReviewState.WELSH_TRANSLATION.getId(), response.getData().getInterlocReviewState());
-        assertEquals("Yes", response.getData().getTranslationWorkOutstanding());
+        assertEquals(YES, response.getData().getTranslationWorkOutstanding());
     }
 
     @Test
@@ -440,7 +441,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setInterlocReviewState(null);
         callback.getCaseDetails().getCaseData().setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
-        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("yes");
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(YES);
 
 
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_REINSTATEMENT.toString()));
@@ -450,7 +451,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertTrue(response.getData().getReinstatementOutcome().equals(RequestOutcome.IN_PROGRESS));
         assertEquals(DwpState.LAPSED.getId(), response.getData().getDwpState());
         assertEquals(InterlocReviewState.WELSH_TRANSLATION.getId(), response.getData().getInterlocReviewState());
-        assertEquals("Yes", response.getData().getTranslationWorkOutstanding());
+        assertEquals(YES, response.getData().getTranslationWorkOutstanding());
     }
 
     @Test
@@ -479,7 +480,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setInterlocReviewState(null);
         callback.getCaseDetails().getCaseData().setUrgentHearingOutcome(RequestOutcome.IN_PROGRESS.getValue());
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
-        callback.getCaseDetails().getCaseData().setUrgentCase("Yes");
+        callback.getCaseDetails().getCaseData().setUrgentCase(YES);
 
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_URGENT_HEARING.toString()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -487,7 +488,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertTrue(response.getData().getState().equals(State.DORMANT_APPEAL_STATE));
         assertTrue(response.getData().getUrgentHearingOutcome().equals(RequestOutcome.REFUSED.getValue()));
         assertTrue(response.getData().getInterlocReviewState().equals(NONE.getId()));
-        assertTrue("No".equalsIgnoreCase(response.getData().getUrgentCase()));
+        assertTrue(isNoOrNull(response.getData().getUrgentCase()));
         assertEquals(DIRECTION_ACTION_REQUIRED.getId(), response.getData().getDwpState());
     }
 
@@ -554,14 +555,14 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     public void givenDecisionIssuedEventAndCaseIsWelsh_SetFieldsAndCallServicesCorrectly() {
         when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
-        sscsCaseData.setLanguagePreferenceWelsh("Yes");
+        sscsCaseData.setLanguagePreferenceWelsh(YES);
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_EXTENSION.toString()));
         callback.getCaseDetails().getCaseData().setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("welshTranslation", response.getData().getInterlocReviewState());
-        assertEquals("Yes", response.getData().getTranslationWorkOutstanding());
+        assertEquals(YES, response.getData().getTranslationWorkOutstanding());
         assertNull(response.getData().getDwpState());
         assertNull(response.getData().getTimeExtensionRequested());
         assertNotNull(response.getData().getDirectionTypeDl());
@@ -590,13 +591,13 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED_WELSH);
         when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
-        sscsCaseData.setLanguagePreferenceWelsh("Yes");
+        sscsCaseData.setLanguagePreferenceWelsh(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNotNull(response.getData().getInterlocReviewState());
         assertEquals(DIRECTION_ACTION_REQUIRED.getId(), response.getData().getDwpState());
-        assertEquals("No", response.getData().getTimeExtensionRequested());
+        assertEquals(NO, response.getData().getTimeExtensionRequested());
 
         verifyNoInteractions(footerService);
     }
@@ -609,7 +610,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefitType).build());
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED_WELSH);
-        sscsCaseData.setLanguagePreferenceWelsh("Yes");
+        sscsCaseData.setLanguagePreferenceWelsh(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -624,7 +625,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefitType).build());
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED_WELSH);
-        sscsCaseData.setLanguagePreferenceWelsh("Yes");
+        sscsCaseData.setLanguagePreferenceWelsh(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

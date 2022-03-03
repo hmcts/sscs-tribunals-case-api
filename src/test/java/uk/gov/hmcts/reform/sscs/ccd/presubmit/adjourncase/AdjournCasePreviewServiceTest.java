@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -175,7 +177,7 @@ public class AdjournCasePreviewServiceTest {
         setCommonPreviewParams(sscsCaseData, endDate);
         sscsCaseData.setAdjournCaseReasons(new ArrayList<>());
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -211,7 +213,7 @@ public class AdjournCasePreviewServiceTest {
         final String endDate = "10-10-2020";
 
         setCommonPreviewParams(sscsCaseData, endDate);
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -247,10 +249,10 @@ public class AdjournCasePreviewServiceTest {
         final String endDate = "10-10-2020";
 
         setCommonPreviewParams(sscsCaseData, endDate);
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
-        sscsCaseData.setAdjournCaseInterpreterRequired("Yes");
+        sscsCaseData.setAdjournCaseInterpreterRequired(YES);
         sscsCaseData.setAdjournCaseInterpreterLanguage("french");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
@@ -287,10 +289,10 @@ public class AdjournCasePreviewServiceTest {
         final String endDate = "10-10-2020";
 
         setCommonPreviewParams(sscsCaseData, endDate);
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
-        sscsCaseData.setAdjournCaseInterpreterRequired("Yes");
+        sscsCaseData.setAdjournCaseInterpreterRequired(YES);
 
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
@@ -305,10 +307,10 @@ public class AdjournCasePreviewServiceTest {
         final String endDate = "10-10-2020";
 
         setCommonPreviewParams(sscsCaseData, endDate);
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
-        sscsCaseData.setAdjournCaseInterpreterRequired("No");
+        sscsCaseData.setAdjournCaseInterpreterRequired(NO);
         sscsCaseData.setAdjournCaseInterpreterLanguage("french");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
@@ -345,7 +347,7 @@ public class AdjournCasePreviewServiceTest {
         final String endDate = "10-10-2020";
 
         setCommonPreviewParams(sscsCaseData, endDate);
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
         sscsCaseData.setAdjournCaseInterpreterLanguage("french");
@@ -382,7 +384,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenSignedInJudgeNameNotSet_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -402,7 +404,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenSignedInJudgeUserDetailsNotSet_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
         when(userDetailsService.buildLoggedInUserName("Bearer token")).thenThrow(new IllegalStateException("Unable to obtain signed in user details"));
@@ -433,7 +435,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenCaseWithMultipleHearingsWithVenues_thenCorrectlySetHeldAtUsingTheFirstHearingInList(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -467,7 +469,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoVenueName_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(null);;
@@ -492,7 +494,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoVenue_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -517,7 +519,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayAnErrorAndDoNotGenerateDocument(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -540,7 +542,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDetails_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -564,7 +566,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenCaseWithEmptyHearingsList_thenDefaultHearingData(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -589,7 +591,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenCaseWithNullHearingsList_thenDefaultHearingData(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -611,7 +613,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenCaseWithMultipleHearingsWithHearingDates_thenCorrectlySetTheHeldOnUsingTheFirstHearingInList(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -646,7 +648,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDate_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -671,7 +673,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayTwoErrorsAndDoNotGenerateDocument(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -699,7 +701,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenCaseWithNoDurationParameters_thenCorrectlySetTheNextHearingTimeslot(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -733,7 +735,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "oralNextHearingTypeParameters")
     public void givenCaseWithDurationParameterButMissingUnitsWhenOralHearing_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
         sscsCaseData.setAdjournCaseNextHearingListingDuration("2");
@@ -752,7 +754,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "paperNextHearingTypeParameters")
     public void givenCaseWithDurationParameterButMissingUnitsWhenPaperHearing_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
         sscsCaseData.setAdjournCaseNextHearingListingDuration("2");
@@ -781,7 +783,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenCaseWithTwoHourDuration_thenCorrectlySetTheNextHearingTimeslot(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -820,7 +822,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenCaseWithOneHourDuration_thenCorrectlySetTheNextHearingTimeslot(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -859,7 +861,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenCaseWithTwoSessionDuration_thenCorrectlySetTheNextHearingTimeslot(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -898,7 +900,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenCaseWithOneSessionDuration_thenCorrectlySetTheNextHearingTimeslot(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -937,7 +939,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenCaseWithThreePanelMembers_thenCorrectlySetTheHeldBefore(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -970,7 +972,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenCaseWithTwoPanelMembers_thenCorrectlySetTheHeldBefore(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -1002,7 +1004,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenCaseWithOnePanelMember_thenCorrectlySetTheHeldBefore(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -1035,7 +1037,7 @@ public class AdjournCasePreviewServiceTest {
 
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -1062,7 +1064,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenCaseWithNoPanelMembersWithEmptyValues_thenCorrectlySetTheHeldBefore(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
         sscsCaseData.setAdjournCaseMedicallyQualifiedPanelMemberName("");
@@ -1092,7 +1094,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "faceToFaceNextHearingTypeParameter")
     public void givenCaseWithNoSelectedVenueNotSetForFaceToFace_thenCorrectlySetTheVenueToBeTheExistingVenue(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -1109,7 +1111,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "nonFaceToFaceNextHearingTypeParameters")
     public void givenCaseWithNoSelectedVenueNotSetForNonFaceToFace_thenCorrectlySetTheVenueToBeNull(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
 
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
@@ -1126,7 +1128,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAndFirstOnSessionAndMorningSessionSelected_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -1146,7 +1148,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAndFirstOnSessionAndAfternoonSessionSelected_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -1166,7 +1168,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAndFirstOnSessionNotSelectedAndNoTimeProvided_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -1185,7 +1187,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAndFirstOnSessionSelectedAndNoTimeProvided_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -1205,7 +1207,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAfterAndFirstOnSessionAndMorningSessionSelected_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
         sscsCaseData.setAdjournCaseNextHearingDateOrPeriod("provideDate");
@@ -1227,7 +1229,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAfterAndFirstOnSessionAndAfternoonSessionSelected_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
         sscsCaseData.setAdjournCaseNextHearingDateOrPeriod("provideDate");
@@ -1249,7 +1251,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAfterAndFirstOnSessionAndNoTimeProvided_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
         sscsCaseData.setAdjournCaseNextHearingDateOrPeriod("provideDate");
@@ -1271,7 +1273,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAfterAndNoFirstOnSessionAndMorningSessionSelected_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
         sscsCaseData.setAdjournCaseNextHearingDateOrPeriod("provideDate");
@@ -1291,7 +1293,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAfterAndNoFirstOnSessionAndAfternoonSessionSelected_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
         sscsCaseData.setAdjournCaseNextHearingDateOrPeriod("provideDate");
@@ -1311,7 +1313,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAfterAndNoFirstOnSessionAndNoTimeProvided_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
         sscsCaseData.setAdjournCaseNextHearingDateOrPeriod("provideDate");
@@ -1331,7 +1333,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAfterPeriodAndFirstOnSessionAndMorningSessionSelected_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
         sscsCaseData.setAdjournCaseNextHearingDateOrPeriod("providePeriod");
@@ -1355,7 +1357,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAfterPeriodAndFirstOnSessionAndAfternoonSessionSelected_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
         sscsCaseData.setAdjournCaseNextHearingDateOrPeriod("providePeriod");
@@ -1379,7 +1381,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAfterPeriodAndFirstOnSessionAndNoTimeProvided_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
         sscsCaseData.setAdjournCaseNextHearingDateOrPeriod("providePeriod");
@@ -1403,7 +1405,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAfterPeriodAndNoFirstOnSessionAndMorningSessionSelected_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
         sscsCaseData.setAdjournCaseNextHearingDateOrPeriod("providePeriod");
@@ -1425,7 +1427,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAfterPeriodAndNoFirstOnSessionAndAfternoonSessionSelected_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
         sscsCaseData.setAdjournCaseNextHearingDateOrPeriod("providePeriod");
@@ -1447,7 +1449,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAfterPeriodAndNoFirstOnSessionAndNoTimeProvided_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
         sscsCaseData.setAdjournCaseNextHearingDateOrPeriod("providePeriod");
@@ -1469,7 +1471,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithDateToBeFixedAndNoFirstOnSessionAndNoTimeProvided_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("dateToBeFixed");
 
@@ -1487,7 +1489,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithDateToBeFixedAndFirstOnSessionAndMorningSessionProvided_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("dateToBeFixed");
 
@@ -1507,7 +1509,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithDateToBeFixedAndFirstOnSessionAndAfternoonSessionProvided_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("dateToBeFixed");
 
@@ -1527,7 +1529,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithDateToBeFixedAndNotFirstOnSessionAndMorningSessionProvided_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("dateToBeFixed");
 
@@ -1545,7 +1547,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithDateToBeFixedAndNotFirstOnSessionAndAfternoonSessionProvided_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("dateToBeFixed");
 
@@ -1563,7 +1565,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAndNotFirstOnSessionAndNoAfternoonSessionProvided_thenCorrectlyDisplayTheFirstAvailableDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
         sscsCaseData.setAdjournCaseTime(AdjournCaseTime.builder().build());
@@ -1580,7 +1582,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAfterAndNotFirstOnSessionAndNoAfternoonSessionProvided_thenCorrectlyDisplayTheFirstAvailableDateAfterDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
         sscsCaseData.setAdjournCaseNextHearingDateOrPeriod("provideDate");
@@ -1599,7 +1601,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithDateToBeFixedAndNotFirstOnSessionAndNoAfternoonSessionProvided_thenCorrectlyDisplayTheFixedDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("dateToBeFixed");
         sscsCaseData.setAdjournCaseTime(AdjournCaseTime.builder().build());
@@ -1616,7 +1618,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAndNotAdjournCaseTimeAndNoAfternoonSessionProvided_thenCorrectlyDisplayTheFirstAvailableDateAfterDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
         sscsCaseData.setAdjournCaseTime(null);
@@ -1633,7 +1635,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithDateToBeFixedAndFirstOnSessionAndNoTimeProvided_thenCorrectlyDisplayTheNextHearingDateString() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("dateToBeFixed");
 
@@ -1653,7 +1655,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAfterWithNoDateOrPeriodIndicator_ThenDisplayErrorAndDoNotDisplayTheDocument() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
         sscsCaseData.setAdjournCaseNextHearingFirstAvailableDateAfterDate("2020-01-01");
@@ -1672,7 +1674,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAfterWithProvideDateAndNoDateSpecified_ThenDisplayErrorAndDoNotDisplayTheDocument() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
         sscsCaseData.setAdjournCaseNextHearingDateOrPeriod("provideDate");
@@ -1691,7 +1693,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAfterWithProvidePeriodAndNoPeriodSpecified_ThenDisplayErrorAndDoNotDisplayTheDocument() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
         sscsCaseData.setAdjournCaseNextHearingDateOrPeriod("providePeriod");
@@ -1710,7 +1712,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstAvailableDateAfterWithNeitherProvideDateOrPeriodSpecified_ThenDisplayErrorAndDoNotDisplayTheDocument() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
 
@@ -1728,7 +1730,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     public void givenCaseWithFirstWithInvalidDateTime_thenDisplayAnErrorAndDoNotDisplayTheDocument() {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("unknownDateType");
 
@@ -1745,7 +1747,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     @Parameters(named = "faceToFaceNextHearingTypeParameter")
     public void givenCaseWithSameVenueSetForFaceToFace_thenCorrectlySetTheVenueToBeThePreviousVenue(String nextHearingType, String nextHearingTypeText) {
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -1767,7 +1769,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     @Parameters(named = "faceToFaceNextHearingTypeParameter")
     public void givenCaseWithSelectedVenueSetForFaceToFace_thenCorrectlySetTheVenueToBeTheNewVenue(String nextHearingType, String nextHearingTypeText) {
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -1789,7 +1791,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     @Parameters(named = "nonFaceToFaceNextHearingTypeParameters")
     public void givenCaseWithSelectedVenueSetForNonFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(String nextHearingType, String nextHearingTypeText) {
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -1812,7 +1814,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     @Parameters(named = "faceToFaceNextHearingTypeParameter")
     public void givenCaseWithSelectedVenueSetIncorrectlyForFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(String nextHearingType, String nextHearingTypeText) {
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -1835,7 +1837,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     @Parameters(named = "faceToFaceNextHearingTypeParameter")
     public void givenCaseWithSelectedVenueMissingListItemForFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(String nextHearingType, String nextHearingTypeText) {
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -1858,7 +1860,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     @Parameters(named = "faceToFaceNextHearingTypeParameter")
     public void givenCaseWithSelectedVenueMissingListItemCodeForFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(String nextHearingType, String nextHearingTypeText) {
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -1881,7 +1883,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     @Parameters(named = "nonFaceToFaceNextHearingTypeParameters")
     public void givenCaseWithSelectedVenueSetIncorrectlyForNonFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(String nextHearingType, String nextHearingTypeText) {
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -1905,7 +1907,7 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void scottishRpcWillShowAScottishImage(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -1923,10 +1925,10 @@ public class AdjournCasePreviewServiceTest {
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenCaseWithAppointee_thenCorrectlySetTheNoticeNameWithAppellantAndAppointeeAppended(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
-        sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
+        sscsCaseData.getAppeal().getAppellant().setIsAppointee(YES);
         sscsCaseData.getAppeal().getAppellant().setAppointee(Appointee.builder()
             .name(Name.builder().firstName("APPOINTEE")
                 .lastName("SurNamE")
@@ -1945,7 +1947,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenDateIssuedParameterIsTrue_thenShowIssuedDateOnDocument(String nextHearingType, String nextHearingTypeText) {
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
@@ -1959,7 +1961,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenGeneratedDateIsAlreadySetForGeneratedFlow_thenDoSetNewGeneratedDate(String nextHearingType, String nextHearingTypeText) {
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseGenerateNotice(YES);
         sscsCaseData.setAdjournCaseGeneratedDate("2018-10-10");
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
@@ -1974,7 +1976,7 @@ public class AdjournCasePreviewServiceTest {
     @Test
     @Parameters(named = "allNextHearingTypeParameters")
     public void givenGeneratedDateIsAlreadySetNonGeneratedFlow_thenDoSetNewGeneratedDate(String nextHearingType, String nextHearingTypeText) {
-        sscsCaseData.setAdjournCaseGenerateNotice("no");
+        sscsCaseData.setAdjournCaseGenerateNotice(NO);
         sscsCaseData.setAdjournCaseGeneratedDate("2018-10-10");
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");

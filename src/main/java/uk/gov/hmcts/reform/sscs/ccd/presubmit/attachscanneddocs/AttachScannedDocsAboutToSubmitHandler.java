@@ -29,7 +29,7 @@ public class AttachScannedDocsAboutToSubmitHandler implements PreSubmitCallbackH
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        sscsCaseData.setEvidenceHandled(NO.getValue());
+        sscsCaseData.setEvidenceHandled(NO);
         setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);

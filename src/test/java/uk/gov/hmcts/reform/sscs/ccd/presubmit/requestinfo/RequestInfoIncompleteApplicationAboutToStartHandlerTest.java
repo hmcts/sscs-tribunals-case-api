@@ -7,6 +7,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
 
 import java.util.ArrayList;
@@ -67,7 +68,7 @@ public class RequestInfoIncompleteApplicationAboutToStartHandlerTest {
 
     @Test
     public void givenARequestInfoIncompleteApplicationRequestWithRep_thenPopulateDropdownWithPartiesOnCase() {
-        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("Yes").build());
+        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative(YES).build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         DynamicList result = response.getData().getInformationFromPartySelected();
@@ -84,7 +85,7 @@ public class RequestInfoIncompleteApplicationAboutToStartHandlerTest {
 
     @Test
     public void givenARequestInfoIncompleteApplicationRequestWithJointParty_thenPopulateDropdownWithPartiesOnCase() {
-        sscsCaseData.setJointParty("Yes");
+        sscsCaseData.setJointParty(YES);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         DynamicList result = response.getData().getInformationFromPartySelected();
@@ -101,8 +102,8 @@ public class RequestInfoIncompleteApplicationAboutToStartHandlerTest {
 
     @Test
     public void givenARequestInfoIncompleteApplicationRequestWithJointPartyAndRep_thenPopulateDropdownWithPartiesOnCase() {
-        sscsCaseData.setJointParty("Yes");
-        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("Yes").build());
+        sscsCaseData.setJointParty(YES);
+        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative(YES).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 

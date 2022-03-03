@@ -168,7 +168,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
     @Test
     public void givenUcbSelectedAndNoUcbDocument_displayAnError() {
-        sscsCaseData.setDwpUcb(YES.getValue());
+        sscsCaseData.setDwpUcb(YES);
         sscsCaseData.setDwpUcbEvidenceDocument(null);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -178,7 +178,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
     @Test
     public void givenUcbSelectedIsNo_thenTheFieldsAreCleared() {
-        sscsCaseData.setDwpUcb(NO.getValue());
+        sscsCaseData.setDwpUcb(NO);
         sscsCaseData.setDwpUcbEvidenceDocument(DocumentLink.builder().documentUrl("121").documentFilename("1.pdf").build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -190,12 +190,12 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
     @Test
     public void givenUcbSelectedAndUploadedUcbDoc_thenNoErrors() {
-        sscsCaseData.setDwpUcb(YES.getValue());
+        sscsCaseData.setDwpUcb(YES);
         sscsCaseData.setDwpUcbEvidenceDocument(DocumentLink.builder().documentUrl("11").documentFilename("file.pdf").build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
-        assertThat(sscsCaseData.getDwpUcb(), is(YES.getValue()));
+        assertThat(sscsCaseData.getDwpUcb(), is(YES));
         assertThat(sscsCaseData.getDwpUcbEvidenceDocument(), is(nullValue()));
         assertThat(sscsCaseData.getDwpDocuments().size(), is(1));
     }

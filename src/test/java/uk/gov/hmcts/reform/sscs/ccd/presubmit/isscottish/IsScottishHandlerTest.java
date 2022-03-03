@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
 import junitparams.JUnitParamsRunner;
@@ -72,7 +73,7 @@ public class IsScottishHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(expectedIsScottish, response.getData().getIsScottishCase());
+        assertEquals(isYesOrNo(expectedIsScottish), response.getData().getIsScottishCase());
     }
 
     @Test
@@ -92,7 +93,7 @@ public class IsScottishHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("No", response.getData().getIsScottishCase());
+        assertEquals(NO, response.getData().getIsScottishCase());
     }
 
     @Test
@@ -107,7 +108,7 @@ public class IsScottishHandlerTest {
 
         sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("1234")
-                .isScottishCase(existingIsScottish)
+                .isScottishCase(isYesOrNo(existingIsScottish))
                 .regionalProcessingCenter(updatedRpc)
                 .appeal(Appeal.builder().build())
                 .build();
@@ -120,6 +121,6 @@ public class IsScottishHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(expectedIsScottish, response.getData().getIsScottishCase());
+        assertEquals(isYesOrNo(expectedIsScottish), response.getData().getIsScottishCase());
     }
 }

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwprequesttimeextension;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -50,7 +51,7 @@ public class DwpRequestTimeExtensionAboutToSubmitHandler implements PreSubmitCal
 
         caseData.setDwpState(DwpState.EXTENSION_REQUESTED.getId());
         caseData.setInterlocReferralReason(InterlocReferralReason.TIME_EXTENSION.getId());
-        caseData.setTimeExtensionRequested("Yes");
+        caseData.setTimeExtensionRequested(YES);
 
         DwpResponseDocument tl1Form = caseData.getTl1Form();
         dwpDocumentService.addToDwpDocuments(caseData, tl1Form, DwpDocumentType.TL1_FORM);

@@ -10,6 +10,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.DocumentType.*;
 
@@ -90,7 +91,7 @@ public class UploadDocumentFurtherEvidenceIt extends AbstractEventIt {
 
     @Test
     public void midEventGivenOneHearingRecordingRequestDocumentIsUploaded_thenShowHearingsPageAndSetPartiesListForAppellantAndRep() throws Exception {
-        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("yes").build());
+        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative(YES).build());
         SscsFurtherEvidenceDoc furtherEvidenceDoc = SscsFurtherEvidenceDoc.builder().value(
                 SscsFurtherEvidenceDocDetails.builder().documentType(REQUEST_FOR_HEARING_RECORDING.getId()).documentLink(DocumentLink.builder().documentUrl("url.com").documentFilename("file.pdf").build()).build()).build();
         sscsCaseData.setDraftSscsFurtherEvidenceDocument(List.of(furtherEvidenceDoc));
@@ -98,7 +99,7 @@ public class UploadDocumentFurtherEvidenceIt extends AbstractEventIt {
 
         PreSubmitCallbackResponse<SscsCaseData> response = assertResponseOkAndGetResult(MID_EVENT);
 
-        assertThat(response.getData().getSscsHearingRecordingCaseData().getShowRequestingPartyPage(), is(YesNo.YES));
+        assertThat(response.getData().getSscsHearingRecordingCaseData().getShowRequestingPartyPage(), is(YES));
         assertEquals(2, response.getData().getSscsHearingRecordingCaseData().getRequestingParty().getListItems().size());
         assertEquals("appellant", response.getData().getSscsHearingRecordingCaseData().getRequestingParty().getListItems().get(0).getCode());
         assertEquals("representative", response.getData().getSscsHearingRecordingCaseData().getRequestingParty().getListItems().get(1).getCode());
@@ -107,7 +108,7 @@ public class UploadDocumentFurtherEvidenceIt extends AbstractEventIt {
 
     @Test
     public void midEventGivenOneHearingRecordingRequestDocumentIsUploadedAndRepIsSelectedToRequestHearing_thenBuildHearingRequestUi() throws Exception {
-        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("yes").build());
+        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative(YES).build());
         SscsFurtherEvidenceDoc furtherEvidenceDoc = SscsFurtherEvidenceDoc.builder().value(
                 SscsFurtherEvidenceDocDetails.builder().documentType(REQUEST_FOR_HEARING_RECORDING.getId()).documentLink(DocumentLink.builder().documentUrl("url.com").documentFilename("file.pdf").build()).build()).build();
         sscsCaseData.setDraftSscsFurtherEvidenceDocument(List.of(furtherEvidenceDoc));
@@ -117,7 +118,7 @@ public class UploadDocumentFurtherEvidenceIt extends AbstractEventIt {
 
         PreSubmitCallbackResponse<SscsCaseData> response = assertResponseOkAndGetResult(MID_EVENT);
 
-        assertThat(response.getData().getSscsHearingRecordingCaseData().getShowRequestingPartyPage(), is(YesNo.YES));
+        assertThat(response.getData().getSscsHearingRecordingCaseData().getShowRequestingPartyPage(), is(YES));
         assertEquals(5, response.getData().getSscsHearingRecordingCaseData().getRequestableHearingDetails().getListItems().size());
         assertEquals("5", response.getData().getSscsHearingRecordingCaseData().getRequestableHearingDetails().getListItems().get(0).getCode());
         assertEquals("No hearing recordings have been released to Representative on this case", response.getData().getSscsHearingRecordingCaseData().getReleasedHearingsTextList());
@@ -127,7 +128,7 @@ public class UploadDocumentFurtherEvidenceIt extends AbstractEventIt {
 
     @Test
     public void midEventGivenOneHearingRecordingRequestDocumentIsUploadedAndRepIsSelectedToRequestHearingAndOutstandingHearingRecordingExists_thenBuildHearingRequestUi() throws Exception {
-        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("yes").build());
+        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative(YES).build());
         SscsFurtherEvidenceDoc furtherEvidenceDoc = SscsFurtherEvidenceDoc.builder().value(
                 SscsFurtherEvidenceDocDetails.builder().documentType(REQUEST_FOR_HEARING_RECORDING.getId()).documentLink(DocumentLink.builder().documentUrl("url.com").documentFilename("file.pdf").build()).build()).build();
         sscsCaseData.setDraftSscsFurtherEvidenceDocument(List.of(furtherEvidenceDoc));
@@ -141,7 +142,7 @@ public class UploadDocumentFurtherEvidenceIt extends AbstractEventIt {
 
         PreSubmitCallbackResponse<SscsCaseData> response = assertResponseOkAndGetResult(MID_EVENT);
 
-        assertThat(response.getData().getSscsHearingRecordingCaseData().getShowRequestingPartyPage(), is(YesNo.YES));
+        assertThat(response.getData().getSscsHearingRecordingCaseData().getShowRequestingPartyPage(), is(YES));
         assertEquals(4, response.getData().getSscsHearingRecordingCaseData().getRequestableHearingDetails().getListItems().size());
         assertEquals("5", response.getData().getSscsHearingRecordingCaseData().getRequestableHearingDetails().getListItems().get(0).getCode());
         assertEquals("No hearing recordings have been released to Representative on this case", response.getData().getSscsHearingRecordingCaseData().getReleasedHearingsTextList());
@@ -151,7 +152,7 @@ public class UploadDocumentFurtherEvidenceIt extends AbstractEventIt {
 
     @Test
     public void midEventGivenOneHearingRecordingRequestDocumentIsUploadedAndRepIsSelectedToRequestHearingAndOutstandingHearingRecordingExistsAndReleasedHearingRecordingExists_thenBuildHearingRequestUi() throws Exception {
-        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("yes").build());
+        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative(YES).build());
         SscsFurtherEvidenceDoc furtherEvidenceDoc = SscsFurtherEvidenceDoc.builder().value(
                 SscsFurtherEvidenceDocDetails.builder().documentType(REQUEST_FOR_HEARING_RECORDING.getId()).documentLink(DocumentLink.builder().documentUrl("url.com").documentFilename("file.pdf").build()).build()).build();
         sscsCaseData.setDraftSscsFurtherEvidenceDocument(List.of(furtherEvidenceDoc));
@@ -169,7 +170,7 @@ public class UploadDocumentFurtherEvidenceIt extends AbstractEventIt {
 
         PreSubmitCallbackResponse<SscsCaseData> response = assertResponseOkAndGetResult(MID_EVENT);
 
-        assertThat(response.getData().getSscsHearingRecordingCaseData().getShowRequestingPartyPage(), is(YesNo.YES));
+        assertThat(response.getData().getSscsHearingRecordingCaseData().getShowRequestingPartyPage(), is(YES));
         assertEquals(3, response.getData().getSscsHearingRecordingCaseData().getRequestableHearingDetails().getListItems().size());
         assertEquals("5", response.getData().getSscsHearingRecordingCaseData().getRequestableHearingDetails().getListItems().get(0).getCode());
         assertEquals("The Basement 21-12-2021", response.getData().getSscsHearingRecordingCaseData().getReleasedHearingsTextList());
@@ -179,7 +180,7 @@ public class UploadDocumentFurtherEvidenceIt extends AbstractEventIt {
 
     @Test
     public void midEventGivenOneHearingRecordingRequestDocumentIsUploadedAndRepIsSelectedToRequestHearingAndMultipleOutstandingHearingRecordingExistsAndMultipleReleasedHearingRecordingExists_thenBuildHearingRequestUi() throws Exception {
-        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("yes").build());
+        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative(YES).build());
         SscsFurtherEvidenceDoc furtherEvidenceDoc = SscsFurtherEvidenceDoc.builder().value(
                 SscsFurtherEvidenceDocDetails.builder().documentType(REQUEST_FOR_HEARING_RECORDING.getId()).documentLink(DocumentLink.builder().documentUrl("url.com").documentFilename("file.pdf").build()).build()).build();
         sscsCaseData.setDraftSscsFurtherEvidenceDocument(List.of(furtherEvidenceDoc));
@@ -205,7 +206,7 @@ public class UploadDocumentFurtherEvidenceIt extends AbstractEventIt {
 
         PreSubmitCallbackResponse<SscsCaseData> response = assertResponseOkAndGetResult(MID_EVENT);
 
-        assertThat(response.getData().getSscsHearingRecordingCaseData().getShowRequestingPartyPage(), is(YesNo.YES));
+        assertThat(response.getData().getSscsHearingRecordingCaseData().getShowRequestingPartyPage(), is(YES));
         assertEquals(1, response.getData().getSscsHearingRecordingCaseData().getRequestableHearingDetails().getListItems().size());
         assertEquals("5", response.getData().getSscsHearingRecordingCaseData().getRequestableHearingDetails().getListItems().get(0).getCode());
         assertEquals("The Basement 21-12-2021, The Old Bailey 22-12-2021", response.getData().getSscsHearingRecordingCaseData().getReleasedHearingsTextList());
@@ -233,7 +234,7 @@ public class UploadDocumentFurtherEvidenceIt extends AbstractEventIt {
         assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), response.getData().getInterlocReferralReason());
         assertNull(response.getData().getDwpState());
         assertNull(response.getData().getDraftSscsFurtherEvidenceDocument());
-        assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
+        assertEquals(YES, response.getData().getHasUnprocessedAudioVideoEvidence());
     }
 
 

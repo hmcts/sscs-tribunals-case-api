@@ -5,6 +5,8 @@ import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated.CaseUpdatedSubmittedHandler.isANewJointParty;
 
 import java.util.Optional;
@@ -47,7 +49,7 @@ public class CaseUpdatedSubmittedHandlerTest {
         handler = new CaseUpdatedSubmittedHandler(ccdService, idamService);
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         sscsCaseData = SscsCaseData.builder()
-                .ccdCaseId("1563382899630221").jointParty("Yes").createdInGapsFrom(READY_TO_LIST.getId())
+                .ccdCaseId("1563382899630221").jointParty(YES).createdInGapsFrom(READY_TO_LIST.getId())
                 .appeal(Appeal.builder().benefitType(new BenefitType("UC", "Universal credit")).build())
                 .build();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -64,7 +66,7 @@ public class CaseUpdatedSubmittedHandlerTest {
     @Test
     public void givenACaseUpdatedEventNotDigital_thenReturnFalse() {
         sscsCaseData = SscsCaseData.builder()
-                .ccdCaseId("1563382899630221").jointParty("Yes").createdInGapsFrom(VALID_APPEAL.getId())
+                .ccdCaseId("1563382899630221").jointParty(YES).createdInGapsFrom(VALID_APPEAL.getId())
                 .appeal(Appeal.builder().benefitType(new BenefitType("UC", "Universal credit")).build())
                 .build();
 
@@ -113,7 +115,7 @@ public class CaseUpdatedSubmittedHandlerTest {
     @Parameters({"ESA,ESA", "PIP,Personal Independence Payment"})
     public void givenACaseUpdatedWithJointPartyNotUc_dontRunJointPartyAddedEvent(String benefitCode, String benefitDescription) {
         sscsCaseData = SscsCaseData.builder()
-                .ccdCaseId("1563382899630221").jointParty("Yes").createdInGapsFrom(READY_TO_LIST.getId())
+                .ccdCaseId("1563382899630221").jointParty(YES).createdInGapsFrom(READY_TO_LIST.getId())
                 .appeal(Appeal.builder().benefitType(new BenefitType(benefitCode, benefitDescription)).build())
                 .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -131,7 +133,7 @@ public class CaseUpdatedSubmittedHandlerTest {
     @Test
     public void givenACaseUpdatedWithNoJointPartyUc_dontRunJointPartyAddedEvent() {
         sscsCaseData = SscsCaseData.builder()
-                .ccdCaseId("1563382899630221").jointParty("No").createdInGapsFrom(READY_TO_LIST.getId())
+                .ccdCaseId("1563382899630221").jointParty(NO).createdInGapsFrom(READY_TO_LIST.getId())
                 .appeal(Appeal.builder().benefitType(new BenefitType("UC", "Universal credit")).build())
                 .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -150,7 +152,7 @@ public class CaseUpdatedSubmittedHandlerTest {
     @Test
     public void givenAJointPartyIsNew_thenReturnTrue() {
         SscsCaseData caseData = SscsCaseData.builder()
-                .ccdCaseId("1563382899630221").jointParty("Yes")
+                .ccdCaseId("1563382899630221").jointParty(YES)
                 .appeal(Appeal.builder().build())
                 .build();
 
@@ -160,7 +162,7 @@ public class CaseUpdatedSubmittedHandlerTest {
     @Test
     public void givenAJointPartyIsExisting_thenReturnFalse() {
         SscsCaseData oldCaseData = SscsCaseData.builder()
-                .ccdCaseId("1563382899630221").jointParty("Yes")
+                .ccdCaseId("1563382899630221").jointParty(YES)
                 .appeal(Appeal.builder().build())
                 .build();
 
@@ -168,7 +170,7 @@ public class CaseUpdatedSubmittedHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(oldCaseData);
 
         SscsCaseData caseData = SscsCaseData.builder()
-                .ccdCaseId("1563382899630221").jointParty("Yes")
+                .ccdCaseId("1563382899630221").jointParty(YES)
                 .appeal(Appeal.builder().build())
                 .build();
 
@@ -179,7 +181,7 @@ public class CaseUpdatedSubmittedHandlerTest {
     @Test
     public void givenAJointPartyWasNoIsYes_thenReturnTrue() {
         SscsCaseData oldCaseData = SscsCaseData.builder()
-                .ccdCaseId("1563382899630221").jointParty("No")
+                .ccdCaseId("1563382899630221").jointParty(NO)
                 .appeal(Appeal.builder().build())
                 .build();
 
@@ -187,7 +189,7 @@ public class CaseUpdatedSubmittedHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(oldCaseData);
 
         SscsCaseData caseData = SscsCaseData.builder()
-                .ccdCaseId("1563382899630221").jointParty("Yes")
+                .ccdCaseId("1563382899630221").jointParty(YES)
                 .appeal(Appeal.builder().build())
                 .build();
 

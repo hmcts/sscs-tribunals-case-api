@@ -216,7 +216,8 @@ def versions = [
         pact: '4.1.7',
         junitJupiter: '5.7.2',
         lombok: '1.18.22',
-        sscsCommon: '4.6.42'
+        sscsCommon: '4.6.42-RC-SSCS-10056-5',
+        sscsPdfEmailCommon: '1.4.53-RC-SSCS-10056',
 ]
 
 ext["rest-assured.version"] = '4.2.0'
@@ -350,7 +351,7 @@ dependencies {
     compile group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
     compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.3'
 
-    compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
+    compile group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.3'
 
     // Safe to remove once Spring update their dependencies - see CVE-2019-14439 and add 'com.fasterxml.jackson.core' configurations.all above
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
@@ -363,26 +364,29 @@ dependencies {
     compile group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.7'
     compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.2'
 
-    compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.4'
-    compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
+    compile group: 'com.github.hmcts', name: 'auth-checker-lib', version: '2.1.4'
+    compile group: 'com.github.hmcts', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
     compile group: 'com.github.hmcts', name: 'java-logging', version: versions.reformLogging
-    compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.07'
-    compile("com.github.hmcts:ccd-case-document-am-client:1.7.2")
+    compile group: 'com.github.hmcts', name: 'doc-assembly-client', version: '1.07'
+    compile group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.2'
     //remove when secure doc store is live
-    compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
+    compile group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
 
     compile group: 'com.github.hmcts', name: 'sscs-common', version: versions.sscsCommon
-    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.51'
-
+    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: versions.sscsPdfEmailCommon
 
     compile group:'org.overviewproject', name: 'mime-types', version: '1.0.2'
 
-    compile 'javax.xml.bind:jaxb-api:2.3.1'
+    compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     testCompile group: 'io.rest-assured', name: 'rest-assured'
-    testCompile 'com.github.hmcts:fortify-client:1.2.1:all'
+    testCompile group: 'com.github.hmcts', name: 'fortify-client', version: '1.2.2', classifier: 'all'
 
-    compile "org.projectlombok:lombok:$versions.lombok"
-    annotationProcessor "org.projectlombok:lombok:$versions.lombok"
+    compile group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+    e2eCompile group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+    e2eAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '4.0.0'
@@ -392,22 +396,17 @@ dependencies {
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.28.0'
     testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
-    testCompile 'pl.pragmatists:JUnitParams:1.1.1'
+    testCompile group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
 
-    testCompileOnly "org.projectlombok:lombok:$versions.lombok"
-    testAnnotationProcessor "org.projectlombok:lombok:$versions.lombok"
-    e2eCompile "org.projectlombok:lombok:$versions.lombok"
-    e2eAnnotationProcessor "org.projectlombok:lombok:$versions.lombok"
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junitJupiter
+    testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junitJupiter
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junitJupiter
 
-    testCompile "org.junit.jupiter:junit-jupiter-api:$versions.junitJupiter"
-    testRuntime "org.junit.jupiter:junit-jupiter-engine:$versions.junitJupiter"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:$versions.junitJupiter"
-
-    e2eRuntime "org.junit.platform:junit-platform-commons:1.8.2"
+    e2eRuntime group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.8.2'
 
     compile group: 'org.pitest', name: 'pitest', version: versions.pitest
-    compile group:'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
-    compile group:'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: versions.sonarPitest
+    compile group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
+    compile group: 'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: versions.sonarPitest
 
     //pact contract testing
     contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact
@@ -423,7 +422,7 @@ dependencies {
     contractTestRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junitJupiter
 
     contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junitJupiter
-    contractTestRuntime "org.junit.platform:junit-platform-commons:1.8.1"
+    contractTestRuntime group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.8.2'
 
     contractTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.30') {
         force = true

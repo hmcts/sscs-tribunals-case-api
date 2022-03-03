@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
+import static java.util.Objects.nonNull;
 import static org.mockito.MockitoAnnotations.openMocks;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -228,10 +228,10 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                             doesRegulation35Apply, supportGroupOnly);
 
                     List<String> schedule3Activities = null;
-                    String schedule3ActivitesApply = null;
+                    YesNo schedule3ActivitesApply = null;
                     if (schedule3ActivitiesSelected != null) {
                         schedule3Activities = schedule3ActivitiesSelected.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>();
-                        schedule3ActivitesApply = schedule3ActivitiesSelected.booleanValue() ? "Yes" : "No";
+                        schedule3ActivitesApply = isYesOrNo(schedule3ActivitiesSelected.booleanValue());
                     } else {
                         schedule3ActivitesApply = null;
                     }
@@ -242,10 +242,10 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
 
                         caseData = SscsCaseData.builder()
                             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
-                                .writeFinalDecisionGenerateNotice("Yes")
+                                .writeFinalDecisionGenerateNotice(YES)
                                 .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
                                 .build())
-                            .supportGroupOnlyAppeal(supportGroupOnly == null ? null : supportGroupOnly ? "Yes" : "No")
+                            .supportGroupOnlyAppeal(nonNull(supportGroupOnly) ? isYesOrNo(supportGroupOnly) : null)
                             .dwpReassessTheAward(null)
                             .wcaAppeal(YES)
                             .sscsEsaCaseData(
@@ -256,10 +256,10 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                     } else {
                         caseData = SscsCaseData.builder()
                             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
-                                .writeFinalDecisionGenerateNotice("Yes")
+                                .writeFinalDecisionGenerateNotice(YES)
                                 .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
                                 .build())
-                            .supportGroupOnlyAppeal(supportGroupOnly == null ? null : supportGroupOnly ? "Yes" : "No")
+                            .supportGroupOnlyAppeal(nonNull(supportGroupOnly) ? isYesOrNo(supportGroupOnly) : null)
                             .wcaAppeal(NO)
                             .sscsEsaCaseData(
                                 SscsEsaCaseData.builder().esaWriteFinalDecisionSchedule3ActivitiesApply(schedule3ActivitesApply)

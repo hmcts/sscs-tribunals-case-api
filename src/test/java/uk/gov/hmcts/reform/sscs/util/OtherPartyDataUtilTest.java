@@ -7,8 +7,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,14 +25,14 @@ public class OtherPartyDataUtilTest {
     public void givenUcbIsYesForOneOtherParty_thenSetCaseDataOtherPartyUcb() {
         SscsCaseData data = SscsCaseData.builder().otherParties(Arrays.asList(buildOtherParty("1", true), buildOtherParty("2", false))).build();
         OtherPartyDataUtil.updateOtherPartyUcb(data);
-        assertEquals(YesNo.YES.getValue(), data.getOtherPartyUcb());
+        assertEquals(YES, data.getOtherPartyUcb());
     }
 
     @Test
     public void givenUcbIsNoForAllOtherParty_thenSetCaseDataOtherPartyUcb() {
         SscsCaseData data = SscsCaseData.builder().otherParties(Arrays.asList(buildOtherParty("1", false), buildOtherParty("2", false))).build();
         OtherPartyDataUtil.updateOtherPartyUcb(data);
-        assertEquals(YesNo.NO.getValue(), data.getOtherPartyUcb());
+        assertEquals(NO, data.getOtherPartyUcb());
     }
 
     @Test
@@ -47,7 +46,7 @@ public class OtherPartyDataUtilTest {
         assertEquals("1", otherParties.get(0).getValue().getId());
         assertEquals("2", otherParties.get(0).getValue().getAppointee().getId());
         assertEquals("3", otherParties.get(0).getValue().getRep().getId());
-        assertTrue(YesNo.isYes(otherParties.get(0).getValue().getSendNewOtherPartyNotification()));
+        assertTrue(isYes(otherParties.get(0).getValue().getSendNewOtherPartyNotification()));
     }
 
     @Test
@@ -60,9 +59,9 @@ public class OtherPartyDataUtilTest {
         assertEquals("3", otherParties.get(2).getValue().getId());
         assertEquals("4", otherParties.get(2).getValue().getAppointee().getId());
         assertEquals("5", otherParties.get(2).getValue().getRep().getId());
-        assertTrue(YesNo.isYes(otherParties.get(2).getValue().getSendNewOtherPartyNotification()));
-        assertFalse(YesNo.isYes(otherParties.get(1).getValue().getSendNewOtherPartyNotification()));
-        assertFalse(YesNo.isYes(otherParties.get(0).getValue().getSendNewOtherPartyNotification()));
+        assertTrue(isYes(otherParties.get(2).getValue().getSendNewOtherPartyNotification()));
+        assertFalse(isYes(otherParties.get(1).getValue().getSendNewOtherPartyNotification()));
+        assertFalse(isYes(otherParties.get(0).getValue().getSendNewOtherPartyNotification()));
     }
 
     @Test
@@ -75,9 +74,9 @@ public class OtherPartyDataUtilTest {
         assertEquals("3", otherParties.get(2).getValue().getId());
         assertEquals("4", otherParties.get(2).getValue().getAppointee().getId());
         assertEquals("5", otherParties.get(2).getValue().getRep().getId());
-        assertTrue(YesNo.isYes(otherParties.get(2).getValue().getSendNewOtherPartyNotification()));
-        assertTrue(YesNo.isYes(otherParties.get(1).getValue().getSendNewOtherPartyNotification()));
-        assertFalse(YesNo.isYes(otherParties.get(0).getValue().getSendNewOtherPartyNotification()));
+        assertTrue(isYes(otherParties.get(2).getValue().getSendNewOtherPartyNotification()));
+        assertTrue(isYes(otherParties.get(1).getValue().getSendNewOtherPartyNotification()));
+        assertFalse(isYes(otherParties.get(0).getValue().getSendNewOtherPartyNotification()));
     }
 
     @Test
@@ -89,7 +88,7 @@ public class OtherPartyDataUtilTest {
 
         assertEquals(3, otherParties.size());
         assertEquals("5", otherParties.get(2).getValue().getId());
-        assertTrue(YesNo.isYes(otherParties.get(2).getValue().getSendNewOtherPartyNotification()));
+        assertTrue(isYes(otherParties.get(2).getValue().getSendNewOtherPartyNotification()));
         assertEquals("6", otherParties.get(2).getValue().getAppointee().getId());
         assertEquals("7", otherParties.get(2).getValue().getRep().getId());
     }
@@ -134,7 +133,7 @@ public class OtherPartyDataUtilTest {
                 .value(OtherParty.builder()
                         .id(id)
                         .name(name("OtherParty", id))
-                        .unacceptableCustomerBehaviour(ucb ? YesNo.YES : YesNo.NO)
+                        .unacceptableCustomerBehaviour(ucb ? YES : NO)
                         .build())
                 .build();
     }
@@ -153,9 +152,9 @@ public class OtherPartyDataUtilTest {
                 .value(OtherParty.builder()
                         .id(id)
                         .name(name("OtherParty", id))
-                        .isAppointee(YES.getValue())
+                        .isAppointee(YES)
                         .appointee(Appointee.builder().id(appointeeId).name(name("Appointee", appointeeId)).build())
-                        .rep(Representative.builder().id(repId).hasRepresentative(YES.getValue()).name(name("Rep", repId)).build())
+                        .rep(Representative.builder().id(repId).hasRepresentative(YES).name(name("Rep", repId)).build())
                         .build())
                 .build();
     }

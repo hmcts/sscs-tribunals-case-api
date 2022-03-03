@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
+import static java.util.Objects.nonNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +19,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerTestBase;
@@ -33,7 +34,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Override
     protected void setValidPointsAndActivitiesScenario(SscsCaseData caseData, String descriptorFlowValue) {
-        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(NO);
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(
                 Arrays.asList("mobilisingUnaided"));
 
@@ -72,7 +73,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertEquals("Yes", sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply());
+        assertEquals(YES, sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply());
 
         assertTrue(response.getErrors().isEmpty());
     }
@@ -82,7 +83,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply(YES);
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided"));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -95,7 +96,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply(YES);
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -109,7 +110,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply(YES);
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -123,38 +124,39 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply(NO);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertEquals("No", sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply());
+        assertEquals(NO, sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply());
 
         assertTrue(response.getErrors().isEmpty());
     }
 
     @Test
     @Parameters({
-            "YES, NO",
-            "NO,YES",
-            "null, NO"
+            "Yes,No",
+            "No,Yes",
+            "null,No"
     })
     public void givenEsaCaseWithWcaAppealFlow_thenSetShowSummaryOfOutcomePage(
-            @Nullable YesNo wcaFlow, YesNo expectedShowResult) {
+            @Nullable String wcaFlow, String expectedShowResult) {
 
-        sscsCaseData.setWcaAppeal(wcaFlow);
+        sscsCaseData.setWcaAppeal(nonNull(wcaFlow) ?  isYesOrNo(wcaFlow) : null);
+        System.out.println(sscsCaseData.getWcaAppeal());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getPageId()).thenReturn("workCapabilityAssessment");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertEquals(expectedShowResult, response.getData().getShowFinalDecisionNoticeSummaryOfOutcomePage());
+        assertEquals(isYesOrNo(expectedShowResult), response.getData().getShowFinalDecisionNoticeSummaryOfOutcomePage());
     }
 
     @Test
     public void givenEsaCaseWithWcaAppealFlowAndNotOnWorkCapabilityAssessmentPage_thenDoNotSetShowSummaryOfOutcomePage() {
 
-        sscsCaseData.setWcaAppeal(YesNo.YES);
+        sscsCaseData.setWcaAppeal(YES);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getPageId()).thenReturn("somethingElse");
@@ -175,10 +177,10 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
             "null, null, NO",
     })
     public void givenEsaCaseWithWcaAppealFlowAndAllowedFlow_thenSetShowDwpReassessAwardPage(
-            @Nullable YesNo wcaFlow, @Nullable String allowedFlow, YesNo expectedShowResult) {
+            @Nullable String wcaFlow, @Nullable String allowedFlow, String expectedShowResult) {
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.setWcaAppeal(wcaFlow);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.setWcaAppeal(isYesOrNo(wcaFlow));
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused(allowedFlow);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -186,13 +188,13 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertEquals(expectedShowResult, response.getData().getShowDwpReassessAwardPage());
+        assertEquals(isYesOrNo(expectedShowResult), response.getData().getShowDwpReassessAwardPage());
     }
 
     @Test
     public void givenEsaCaseWithWcaAppealFlowAndNotOnWorkCapabilityAssessmentPage_thenDoNotSetShowDwpReassessAwardPage() {
 
-        sscsCaseData.setWcaAppeal(YesNo.YES);
+        sscsCaseData.setWcaAppeal(YES);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getPageId()).thenReturn("somethingElse");
@@ -207,7 +209,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     @Override
     public void shouldExhibitBenefitSpecificBehaviourWhenAnAnAwardIsGivenAndNoActivitiesSelected(AwardType dailyLiving, AwardType mobility) {
 
-        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        setValidPointsAndActivitiesScenario(sscsCaseData, YES.getValue());
         setEmptyActivitiesListScenario(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -218,7 +220,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     @Test
     public void shouldExhibitBenefitSpecificBehaviourWhenNoAwardsAreGivenAndNoActivitiesAreSelected() {
 
-        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        setValidPointsAndActivitiesScenario(sscsCaseData, YES.getValue());
         setNoAwardsScenario(sscsCaseData);
         setEmptyActivitiesListScenario(sscsCaseData);
 
@@ -231,7 +233,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     @Test
     public void shouldNotDisplayErrorWhenNoAwardIsGivenAndEitherDailyLivingOrMobilityIsNotConsideredAndNoActivitiesAreSelected() {
 
-        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        setValidPointsAndActivitiesScenario(sscsCaseData, YES.getValue());
         setNoAwardsScenario(sscsCaseData);
         setEmptyActivitiesListScenario(sscsCaseData);
 
@@ -244,7 +246,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     @Test
     public void shouldExhibitBenefitSpecificBehaviourWhenNoAwardsAreGivenAndNoActivitiesAreSelectedAndEndDateTypeIsSetEndDate() {
 
-        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        setValidPointsAndActivitiesScenario(sscsCaseData, YES.getValue());
         setNoAwardsScenario(sscsCaseData);
         setEmptyActivitiesListScenario(sscsCaseData);
 
@@ -262,7 +264,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     @Test
     public void shouldExhibitBenefitSpecificBehaviourWhenNoAwardsAreGivenAndNoActivitiesAreSelectedAndEndDateTypeIsIndefinite() {
 
-        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        setValidPointsAndActivitiesScenario(sscsCaseData, YES.getValue());
         setEmptyActivitiesListScenario(sscsCaseData);
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("indefinite");
@@ -278,12 +280,12 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Test
     @Parameters({"Yes, YES", "No, NO"})
-    public void givenGenerateNoticeValueAndCaseIsEsa_thenShouldSetShowWorkCapabilityAssessment(String isGenerateNotice, @Nullable YesNo showWorkCapabilityPage) {
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(isGenerateNotice);
+    public void givenGenerateNoticeValueAndCaseIsEsa_thenShouldSetShowWorkCapabilityAssessment(String isGenerateNotice, @Nullable String showWorkCapabilityPage) {
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(isYesOrNo(isGenerateNotice));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertEquals(showWorkCapabilityPage, response.getData().getShowWorkCapabilityAssessmentPage());
+        assertEquals(isYesOrNo(showWorkCapabilityPage), response.getData().getShowWorkCapabilityAssessmentPage());
     }
 
 }

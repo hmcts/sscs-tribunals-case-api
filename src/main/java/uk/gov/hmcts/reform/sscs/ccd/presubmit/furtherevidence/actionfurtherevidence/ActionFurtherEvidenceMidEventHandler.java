@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toUnmodifiableList;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.ActionFurtherEvidenceAboutToSubmitHandler.checkWarningsAndErrors;
 import static uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState.PASSWORD_ENCRYPTED;
 import static uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState.UNREADABLE;
@@ -70,7 +71,7 @@ public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHa
                 preSubmitCallbackResponse);
 
         if (showPostponementDetailsPage(preSubmitCallbackResponse)) {
-            sscsCaseData.getPostponementRequest().setShowPostponementDetailsPage(YesNo.YES);
+            sscsCaseData.getPostponementRequest().setShowPostponementDetailsPage(YES);
         }
 
         validatePostponementRequests(caseDetails, sscsCaseData, preSubmitCallbackResponse);

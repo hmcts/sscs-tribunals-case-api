@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYesOrNo;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -77,7 +78,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     @Parameters({"YES", "NO"})
     public void givenFqpmRequiredYesOrNoAndInterlocByJudge_thenClearInterloc(String isFqpmRequired) {
 
-        sscsCaseData.setIsFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YesNo.YES : YesNo.NO);
+        sscsCaseData.setIsFqpmRequired(isYesOrNo(isFqpmRequired));
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.NONE.getId());
 
@@ -92,7 +93,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     @Parameters({"YES", "NO"})
     public void givenFqpmRequiredYesOrNoAndNoInterlocByJudge_thenInterlocNotChanged(String isFqpmRequired) {
 
-        sscsCaseData.setIsFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YesNo.YES : YesNo.NO);
+        sscsCaseData.setIsFqpmRequired(isYesOrNo(isFqpmRequired));
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId());
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.NONE.getId());
 

@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -434,7 +436,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
     @Test
     public void givenUniversalCreditCaseWithFurtherInfoSetToYesAndNoAT38Document_thenShowError() {
         sscsCaseData.getAppeal().getBenefitType().setCode("UC");
-        sscsCaseData.setDwpFurtherInfo("Yes");
+        sscsCaseData.setDwpFurtherInfo(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -445,7 +447,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
     @Test
     public void givenUniversalCreditCaseWithFurtherInfoSetToYesAndNoAT38DocumentWithCollection_thenShowError() {
         sscsCaseData.getAppeal().getBenefitType().setCode("UC");
-        sscsCaseData.setDwpFurtherInfo("Yes");
+        sscsCaseData.setDwpFurtherInfo(YES);
         sscsCaseData.setDwpDocuments(Collections.singletonList(DwpDocument.builder().value(
                 DwpDocumentDetails.builder().documentType(DocumentType.DWP_RESPONSE.getValue()).build()
         ).build()));
@@ -459,7 +461,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
     @Test
     public void givenUniversalCreditCaseWithFurtherInfoSetToYesAndNoAT38DocumentWithCollectionFieldSet_thenShowError() {
         sscsCaseData.getAppeal().getBenefitType().setCode("UC");
-        sscsCaseData.setDwpFurtherInfo("Yes");
+        sscsCaseData.setDwpFurtherInfo(YES);
         sscsCaseData.setDwpDocuments(Collections.singletonList(DwpDocument.builder().value(
                 DwpDocumentDetails.builder().documentType(DocumentType.DWP_RESPONSE.getValue()).build()
         ).build()));
@@ -473,7 +475,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
     @Test
     public void givenUniversalCreditCaseWithFurtherInfoSetToYesAndNoAT38DocumentOld_thenShowError() {
         sscsCaseData.getAppeal().getBenefitType().setCode("UC");
-        sscsCaseData.setDwpFurtherInfo("Yes");
+        sscsCaseData.setDwpFurtherInfo(YES);
         sscsCaseData.setDwpAT38Document(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -485,7 +487,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
     @Test
     public void givenUniversalCreditCaseWithFurtherInfoSetToNoAndAT38DocumentExists_thenDoNotShowError() {
         sscsCaseData.getAppeal().getBenefitType().setCode("UC");
-        sscsCaseData.setDwpFurtherInfo("No");
+        sscsCaseData.setDwpFurtherInfo(NO);
         sscsCaseData.setDwpAT38Document(DwpResponseDocument.builder().build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);

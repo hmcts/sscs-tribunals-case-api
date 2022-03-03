@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -14,10 +16,7 @@ import junitparams.NamedParameters;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceTestBase;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
@@ -109,7 +108,7 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     }
 
     @Override
-    protected void setDescriptorFlowIndicator(String value, SscsCaseData sscsCaseData) {
+    protected void setDescriptorFlowIndicator(YesNo value, SscsCaseData sscsCaseData) {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow(value);
     }
 
@@ -124,16 +123,16 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         // set the common parameters instead
         setCommonNonDescriptorRoutePreviewParams(caseData);
         caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-        setDescriptorFlowIndicator("no", sscsCaseData);
+        setDescriptorFlowIndicator(NO, sscsCaseData);
     }
 
     @Override
     public void givenGeneratedDateIsAlreadySetGeneratedNonDescriptorFlow_thenSetNewGeneratedDate() {
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGeneratedDate("2018-10-10");
-        setDescriptorFlowIndicator("no", sscsCaseData);
+        setDescriptorFlowIndicator(NO, sscsCaseData);
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
@@ -150,9 +149,9 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
     @Override
     public void givenGeneratedDateIsAlreadySetNonGeneratedNonDescriptorFlow_thenDoSetNewGeneratedDate() {
-        setDescriptorFlowIndicator("no", sscsCaseData);
+        setDescriptorFlowIndicator(NO, sscsCaseData);
         setCommonNonDescriptorRoutePreviewParams(sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("no");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGeneratedDate("2018-10-10");
@@ -175,8 +174,8 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         setCommonNonDescriptorRoutePreviewParams(sscsCaseData);
 
-        setDescriptorFlowIndicator("no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(NO, sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -228,8 +227,8 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         setCommonNonDescriptorRoutePreviewParams(sscsCaseData);
 
-        setDescriptorFlowIndicator("no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(NO, sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -282,8 +281,8 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         setCommonNonDescriptorRoutePreviewParams(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionReasons(new ArrayList<>());
 
-        setDescriptorFlowIndicator("no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(NO, sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 

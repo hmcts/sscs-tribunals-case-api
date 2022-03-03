@@ -8,6 +8,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION_INFORMATION_REQUESTED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
 
 import junitparams.JUnitParamsRunner;
@@ -76,7 +77,7 @@ public class RequestInfoIncompleteApplicationAboutToSubmitHandlerTest {
 
     @Test
     public void givenResponseRequired_thenSetInterlocStateToAwaitingInfo() {
-        sscsCaseData.setResponseRequired("yes");
+        sscsCaseData.setResponseRequired(YES);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -85,7 +86,7 @@ public class RequestInfoIncompleteApplicationAboutToSubmitHandlerTest {
 
     @Test
     public void givenResponseNotRequired_thenDoNotSetInterlocState() {
-        sscsCaseData.setResponseRequired("no");
+        sscsCaseData.setResponseRequired(NO);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

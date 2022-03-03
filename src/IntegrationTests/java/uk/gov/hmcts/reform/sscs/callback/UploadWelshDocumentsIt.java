@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -90,7 +91,7 @@ public class UploadWelshDocumentsIt extends AbstractEventIt {
                 .forEach(data -> assertEquals(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE,
                         data.getValue().getDocumentTranslationStatus()));
         // As only one document can be processed at a given time
-        assertEquals("Yes", result.getData().getTranslationWorkOutstanding());
+        assertEquals(YES, result.getData().getTranslationWorkOutstanding());
         assertEquals("sendToDwp", result.getData().getSscsWelshPreviewNextEvent());
     }
 

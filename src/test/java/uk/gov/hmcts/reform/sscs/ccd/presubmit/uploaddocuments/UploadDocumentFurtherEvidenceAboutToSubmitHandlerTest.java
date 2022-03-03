@@ -4,6 +4,7 @@ import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.junit.Assert.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.DocumentType.APPELLANT_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.DocumentType.REQUEST_FOR_HEARING_RECORDING;
@@ -100,7 +101,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
         assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), actualCaseData.getData().getInterlocReferralReason());
         assertNull(actualCaseData.getData().getDwpState());
         assertNull(actualCaseData.getData().getDraftSscsFurtherEvidenceDocument());
-        assertEquals(YesNo.YES, actualCaseData.getData().getHasUnprocessedAudioVideoEvidence());
+        assertEquals(YES, actualCaseData.getData().getHasUnprocessedAudioVideoEvidence());
     }
 
     @Test
@@ -149,7 +150,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
         assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), actualCaseData.getData().getInterlocReferralReason());
         assertNull(actualCaseData.getData().getDwpState());
         assertNull(actualCaseData.getData().getDraftSscsFurtherEvidenceDocument());
-        assertEquals(YesNo.YES, actualCaseData.getData().getHasUnprocessedAudioVideoEvidence());
+        assertEquals(YES, actualCaseData.getData().getHasUnprocessedAudioVideoEvidence());
     }
 
     @Test
@@ -216,7 +217,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
         assertEquals("appellant", hearingRecordingRequest.getValue().getRequestingParty());
         assertEquals(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), hearingRecordingRequest.getValue().getDateRequested());
 
-        assertEquals(YesNo.YES, actualCaseData.getData().getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding());
+        assertEquals(YES, actualCaseData.getData().getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding());
     }
 
     @Test
@@ -248,7 +249,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
         assertEquals(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), hearingRecordingRequest.getValue().getDateRequested());
         assertEquals("an_id11", hearingRecordingRequest.getValue().getSscsHearingRecording().getHearingId());
 
-        assertEquals(YesNo.YES, actualCaseData.getData().getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding());
+        assertEquals(YES, actualCaseData.getData().getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding());
     }
 
     @Test

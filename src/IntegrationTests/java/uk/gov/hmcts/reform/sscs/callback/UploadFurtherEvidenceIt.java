@@ -8,6 +8,8 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 
 import java.io.IOException;
@@ -50,7 +52,7 @@ public class UploadFurtherEvidenceIt extends AbstractEventIt {
         final List<DraftSscsDocument> draftDocs = getDraftSscsDocuments(format("document.%s", fileType));
         sscsCaseData.setDraftFurtherEvidenceDocuments(draftDocs);
         setJson(sscsCaseData, UPLOAD_FURTHER_EVIDENCE);
-        
+
         PreSubmitCallbackResponse<SscsCaseData> result = assertResponseOkAndGetResult(ABOUT_TO_SUBMIT);
 
         assertThat(result.getErrors().size(), is(0));
@@ -58,13 +60,13 @@ public class UploadFurtherEvidenceIt extends AbstractEventIt {
         if (fileType.equalsIgnoreCase("pdf")) {
             assertThat(result.getData().getSscsDocument().size(), is(1));
             assertThat(result.getData().getAudioVideoEvidence(), is(nullValue()));
-            assertEquals(YesNo.NO, result.getData().getHasUnprocessedAudioVideoEvidence());
+            assertEquals(NO, result.getData().getHasUnprocessedAudioVideoEvidence());
         } else {
             assertThat(result.getData().getSscsDocument(), is(nullValue()));
             assertThat(result.getData().getAudioVideoEvidence().size(), is(1));
             assertThat(result.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded(), is(UploadParty.CTSC));
             assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), result.getData().getInterlocReferralReason());
-            assertEquals(YesNo.YES, result.getData().getHasUnprocessedAudioVideoEvidence());
+            assertEquals(YES, result.getData().getHasUnprocessedAudioVideoEvidence());
         }
     }
 

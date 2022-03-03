@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.abatecase;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -35,7 +36,7 @@ public class AbateCaseAboutToStartHandler implements PreSubmitCallbackHandler<Ss
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if (null != sscsCaseData.getAppeal().getAppellant()
-                && "yes".equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())) {
+                && isYes(sscsCaseData.getAppeal().getAppellant().getIsAppointee())) {
             preSubmitCallbackResponse.addError("Error: There is an appointee on this case and therefore the appeal cannot be abated");
         }
         return preSubmitCallbackResponse;

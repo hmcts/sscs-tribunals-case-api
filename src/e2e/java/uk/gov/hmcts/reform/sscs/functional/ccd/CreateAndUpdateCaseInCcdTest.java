@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.functional.ccd;
 
 import static org.junit.Assert.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_TEST_CASE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
@@ -79,25 +81,25 @@ public class CreateAndUpdateCaseInCcdTest {
 
         caseData.setPanel(Panel.builder().assignedTo("Bill").disabilityQualifiedMember("Bob").medicalMember("Gary").build());
 
-        EvidenceReceivedInformation evidenceReceivedInformation = new EvidenceReceivedInformation(new EvidenceReceivedInformationDetails("Yes", "2019-07-10"));
+        EvidenceReceivedInformation evidenceReceivedInformation = new EvidenceReceivedInformation(new EvidenceReceivedInformationDetails(YES, "2019-07-10"));
         List<EvidenceReceivedInformation> evidence = new ArrayList<>();
         evidence.add(evidenceReceivedInformation);
         caseData.setEvidenceReceived(EvidenceReceived.builder().appellantInfoRequestCollection(evidence).build());
 
         caseData.setCreatedInGapsFrom("readyToList");
-        caseData.setUrgentCase("Yes");
-        caseData.setDocumentSentToDwp("Yes");
+        caseData.setUrgentCase(YES);
+        caseData.setDocumentSentToDwp(YES);
         caseData.setDirectionDueDate("2019-10-10");
         caseData.setReservedToJudge("Judge Rinder");
 
-        caseData.setIsWaiverNeeded("Yes");
+        caseData.setIsWaiverNeeded(YES);
         caseData.setWaiverDeclaration(Arrays.asList(new String[]{"waiverDeclarationText"}));
         caseData.setWaiverReason(Arrays.asList(new String[]{"nonCompliantOther", "nonCompliantNoMRN"}));
         caseData.setWaiverReasonOther("Not sure");
         caseData.setClerkDelegatedAuthority(Arrays.asList(new String[]{"delegatedAuthorityText"}));
         caseData.setClerkAppealSatisfactionText(Arrays.asList(new String[]{"appealSatisfactionText"}));
-        caseData.setClerkConfirmationOfMrn("No");
-        caseData.setClerkOtherReason("No");
+        caseData.setClerkConfirmationOfMrn(NO);
+        caseData.setClerkOtherReason(NO);
         caseData.setClerkConfirmationOther("No idea");
 
         SscsCaseData updatedCaseData = ccdService.updateCase(caseData, caseDetails.getId(),
@@ -106,21 +108,21 @@ public class CreateAndUpdateCaseInCcdTest {
         assertEquals("Bill", updatedCaseData.getPanel().getAssignedTo());
         assertEquals("Bob", updatedCaseData.getPanel().getDisabilityQualifiedMember());
         assertEquals("Gary", updatedCaseData.getPanel().getMedicalMember());
-        assertEquals("Yes", updatedCaseData.getEvidenceReceived().getAppellantInfoRequestCollection().get(0).getValue().getEvidenceReceivedBoolean());
+        assertEquals(YES, updatedCaseData.getEvidenceReceived().getAppellantInfoRequestCollection().get(0).getValue().getEvidenceReceivedBoolean());
         assertEquals("2019-07-10", updatedCaseData.getEvidenceReceived().getAppellantInfoRequestCollection().get(0).getValue().getEvidenceReceivedDate());
-        assertEquals("Yes", updatedCaseData.getUrgentCase());
-        assertEquals("Yes", updatedCaseData.getDocumentSentToDwp());
+        assertEquals(YES, updatedCaseData.getUrgentCase());
+        assertEquals(YES, updatedCaseData.getDocumentSentToDwp());
         assertEquals("2019-10-10", updatedCaseData.getDirectionDueDate());
         assertEquals("Judge Rinder", updatedCaseData.getReservedToJudge());
-        assertEquals("Yes", updatedCaseData.getIsWaiverNeeded());
+        assertEquals(YES, updatedCaseData.getIsWaiverNeeded());
         assertEquals("waiverDeclarationText", updatedCaseData.getWaiverDeclaration().get(0));
         assertEquals("nonCompliantOther", updatedCaseData.getWaiverReason().get(0));
         assertEquals("nonCompliantNoMRN", updatedCaseData.getWaiverReason().get(1));
         assertEquals("Not sure", updatedCaseData.getWaiverReasonOther());
         assertEquals("delegatedAuthorityText", updatedCaseData.getClerkDelegatedAuthority().get(0));
         assertEquals("appealSatisfactionText", updatedCaseData.getClerkAppealSatisfactionText().get(0));
-        assertEquals("No", updatedCaseData.getClerkConfirmationOfMrn());
-        assertEquals("No", updatedCaseData.getClerkOtherReason());
+        assertEquals(NO, updatedCaseData.getClerkConfirmationOfMrn());
+        assertEquals(NO, updatedCaseData.getClerkOtherReason());
         assertEquals("No idea", updatedCaseData.getClerkConfirmationOther());
     }
 

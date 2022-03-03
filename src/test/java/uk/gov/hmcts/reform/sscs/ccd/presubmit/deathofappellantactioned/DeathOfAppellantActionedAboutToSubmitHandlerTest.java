@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 
 import junitparams.JUnitParamsRunner;
@@ -37,7 +38,7 @@ public class DeathOfAppellantActionedAboutToSubmitHandlerTest {
         handler = new DeathOfAppellantActionedAboutToSubmitHandler();
 
         when(callback.getEvent()).thenReturn(EventType.DEATH_OF_APPELLANT_ACTIONED);
-        sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").interlocReviewState(AWAITING_ADMIN_ACTION.getId()).appeal(Appeal.builder().appellant(Appellant.builder().build()).build()).dwpUcb("yes").build();
+        sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").interlocReviewState(AWAITING_ADMIN_ACTION.getId()).appeal(Appeal.builder().appellant(Appellant.builder().build()).build()).dwpUcb(YES).build();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }

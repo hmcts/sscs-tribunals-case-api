@@ -44,8 +44,8 @@
           "email": "test5093049@hmcts.net",
           "mobile": null,
           "reason": null,
-          "subscribeSms": "no",
-          "subscribeEmail": "yes",
+          "subscribeSms": "No",
+          "subscribeEmail": "Yes",
           "lastLoggedIntoMya": null,
           "wantSmsNotifications": null
         },
@@ -74,8 +74,8 @@
           "email": "test5093049@hmcts.net",
           "mobile": null,
           "reason": null,
-          "subscribeSms": "no",
-          "subscribeEmail": "yes",
+          "subscribeSms": "No",
+          "subscribeEmail": "Yes",
           "lastLoggedIntoMya": null,
           "wantSmsNotifications": null
         },
@@ -884,8 +884,8 @@
           "email": "test5093049@hmcts.net",
           "mobile": null,
           "reason": null,
-          "subscribeSms": "no",
-          "subscribeEmail": "yes",
+          "subscribeSms": "No",
+          "subscribeEmail": "Yes",
           "lastLoggedIntoMya": null,
           "wantSmsNotifications": null
         },
@@ -914,8 +914,8 @@
           "email": "test5093049@hmcts.net",
           "mobile": null,
           "reason": null,
-          "subscribeSms": "no",
-          "subscribeEmail": "yes",
+          "subscribeSms": "No",
+          "subscribeEmail": "Yes",
           "lastLoggedIntoMya": null,
           "wantSmsNotifications": null
         },

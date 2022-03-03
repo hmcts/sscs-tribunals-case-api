@@ -13,6 +13,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.RIP1;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.DIRECTION_ACTION_REQUIRED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.*;
 
 import java.time.LocalDate;
@@ -216,7 +218,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyName());
         assertNull(response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyId());
         assertEquals("New doc with footer", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentFilename());
-        assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
+        assertEquals(YES, response.getData().getHasUnprocessedAudioVideoEvidence());
     }
 
     @Test
@@ -388,7 +390,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertEquals("video.mp4", response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
         assertEquals("videoDocument", response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
         assertEquals("DWP", response.getData().getDwpDocuments().get(0).getValue().getPartyUploaded().getLabel());
-        assertEquals(YesNo.NO, response.getData().getHasUnprocessedAudioVideoEvidence());
+        assertEquals(NO, response.getData().getHasUnprocessedAudioVideoEvidence());
     }
 
     @Test
@@ -549,7 +551,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     @Test
     public void processIssueDirectionNoticeForWelshAppeal_shouldSetWelshInterlocReviewState_toAwaitingInformation() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(ISSUE_DIRECTIONS_NOTICE.getCode()));
-        sscsCaseData.setLanguagePreferenceWelsh(YesNo.YES.getValue());
+        sscsCaseData.setLanguagePreferenceWelsh(YES);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -566,7 +568,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     @Test
     public void sendToJudgeForWelshAppeal_shouldSetWelshInterlocReviewState_toReviewByJudge() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(SEND_TO_JUDGE.getCode()));
-        sscsCaseData.setLanguagePreferenceWelsh(YesNo.YES.getValue());
+        sscsCaseData.setLanguagePreferenceWelsh(YES);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -591,7 +593,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     @Test
     public void givenSendToAdminEventSelectedForWelshAppeal_verifySetWelshInterlocNextReviewState() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(SEND_TO_ADMIN.getCode()));
-        sscsCaseData.setLanguagePreferenceWelsh(YesNo.YES.getValue());
+        sscsCaseData.setLanguagePreferenceWelsh(YES);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -634,7 +636,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     @Test
     public void givenAdmitEvidenceFromDwpWithRip1DocumentForWelshCase_willSetInterlocReviewStateAndDocumentTranslationStatus() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.ADMIT_EVIDENCE.getCode()));
-        sscsCaseData.setLanguagePreferenceWelsh("Yes");
+        sscsCaseData.setLanguagePreferenceWelsh(YES);
 
         AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
                 .documentLink(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
@@ -733,6 +735,6 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertEquals("New doc with footer", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentFilename());
         assertEquals("Other Party", response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyName());
         assertEquals("1", response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyId());
-        assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
+        assertEquals(YES, response.getData().getHasUnprocessedAudioVideoEvidence());
     }
 }

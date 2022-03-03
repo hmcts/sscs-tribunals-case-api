@@ -4,8 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -67,19 +66,19 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
 
         if (schedule7Activities != null) {
-            sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(schedule7Activities.booleanValue() ? "Yes" : "No");
+            sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(isYesOrNo(schedule7Activities.booleanValue()));
             sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(schedule7Activities.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>());
         } else {
             sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(null);
         }
         if (schedule9Paragraph4 != null) {
-            sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(schedule9Paragraph4.booleanValue() ? YES : NO);
+            sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(isYesOrNo(schedule9Paragraph4.booleanValue()));
         }
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -139,14 +138,14 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
 
         if (schedule7Activities != null) {
-            sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(schedule7Activities.booleanValue() ? "Yes" : "No");
+            sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(isYesOrNo(schedule7Activities.booleanValue()));
             sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(schedule7Activities.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>());
         } else {
             sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(null);
@@ -213,9 +212,9 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
         if (schedule7Activities != null) {
@@ -243,11 +242,11 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
         if (schedule7Activities != null) {
             sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(schedule7Activities.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>());
         }
@@ -269,13 +268,13 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
         if (schedule7Activities != null) {
-            sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(schedule7Activities.booleanValue() ? "Yes" : "No");
+            sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(isYesOrNo(schedule7Activities.booleanValue()));
             sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(schedule7Activities.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>());
         } else {
             sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(null);
@@ -317,14 +316,14 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(YES);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("someQuestion"));
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -341,13 +340,13 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(YES);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("someQuestion"));
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -369,13 +368,13 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(YES);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("someQuestion"));
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -397,15 +396,15 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(NO);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -423,15 +422,15 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(NO);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -450,10 +449,10 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(NO);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(new ArrayList<>());
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -474,12 +473,12 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(YES);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("someQuestion"));
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -496,12 +495,12 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(YES);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("someQuestion"));
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -522,12 +521,12 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(YES);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("someQuestion"));
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -549,14 +548,14 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(NO);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -577,14 +576,14 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(NO);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -603,10 +602,10 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(NO);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(new ArrayList<>());
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -631,9 +630,9 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(
             Arrays.asList("mobilisingUnaided"));
-        sscsCaseData.setWcaAppeal("no".equalsIgnoreCase(descriptorFlowValue) ? NO : YES);
-        if ("Yes".equalsIgnoreCase(descriptorFlowValue)) {
-            sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setWcaAppeal(isYesOrNo(descriptorFlowValue));
+        if (isYes(descriptorFlowValue)) {
+            sscsCaseData.setSupportGroupOnlyAppeal(NO);
         }
 
         // < 15 points - correct for these fields
@@ -647,7 +646,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         docs.add(doc);
         callback.getCaseDetails().getCaseData().setSscsDocument(docs);
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         // Why do we not need to set valid scenario ?
 
@@ -664,12 +663,12 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
 
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -690,10 +689,10 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
 
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -718,10 +717,10 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
 
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("Yes");
+        sscsCaseData.setSupportGroupOnlyAppeal(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -744,15 +743,15 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("Yes");
+        sscsCaseData.setSupportGroupOnlyAppeal(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
 
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(NO);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -771,15 +770,15 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("Yes");
+        sscsCaseData.setSupportGroupOnlyAppeal(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(NO);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -803,15 +802,15 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
 
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(NO);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -836,14 +835,14 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("Yes");
+        sscsCaseData.setSupportGroupOnlyAppeal(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
 
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(NO);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -862,14 +861,14 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("Yes");
+        sscsCaseData.setSupportGroupOnlyAppeal(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(NO);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -893,14 +892,14 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
 
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(NO);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -923,15 +922,15 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(NO);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
 
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -950,14 +949,14 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(NO);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
 
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -980,12 +979,12 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(NO);
 
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -1008,14 +1007,14 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(YES);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided"));
 
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -1034,14 +1033,14 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(YES);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided"));
 
         sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setSupportGroupOnlyAppeal(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -1064,13 +1063,13 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(NO);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList(""));
 
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 

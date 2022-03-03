@@ -7,6 +7,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -232,9 +234,9 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
 
         SessionDraft sessionDraftExpectedWhenHaveNoMrnAndHaveContactedDwp = SessionDraft.builder()
             .mrnDate(null)
-            .haveAMrn(new SessionHaveAMrn("no"))
+            .haveAMrn(new SessionHaveAMrn(NO))
             .noMrn(new SessionNoMrn("reason for no Mrn"))
-            .haveContactedDwp(new SessionHaveContactedDwp("yes"))
+            .haveContactedDwp(new SessionHaveContactedDwp(YES))
             .build();
 
         return new Object[]{
@@ -290,8 +292,8 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .email("appellant@gmail.com")
                         .build()
                     )
-                    .isAppointee("No")
-                    .isAddressSameAsAppointee("No")
+                    .isAppointee(NO)
+                    .isAddressSameAsAppointee(NO)
                     .build()
                 )
                 .mrnDetails(MrnDetails.builder()
@@ -322,28 +324,28 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             )
             .subscriptions(Subscriptions.builder()
                 .appellantSubscription(Subscription.builder()
-                    .subscribeEmail("Yes")
+                    .subscribeEmail(YES)
                     .email("appellant@gmail.com")
-                    .subscribeSms("Yes")
+                    .subscribeSms(YES)
                     .mobile("07911123456")
                     .build()
                 )
                 .build()
             )
             .sscsDocument(Collections.emptyList())
-            .evidencePresent("no")
+            .evidencePresent(NO)
             .ccdCaseId("123456")
             .build();
 
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("Personal Independence Payment (PIP)", actual.getBenefitType().getBenefitType());
-        assertEquals("yes", actual.getCreateAccount().getCreateAccount());
-        assertEquals("yes", actual.getHaveAMrn().getHaveAMrn());
+        assertEquals(YES, actual.getCreateAccount().getCreateAccount());
+        assertEquals(YES, actual.getHaveAMrn().getHaveAMrn());
         assertEquals("1", actual.getMrnDate().getMrnDateDetails().getDay());
         assertEquals("2", actual.getMrnDate().getMrnDateDetails().getMonth());
         assertEquals("2010", actual.getMrnDate().getMrnDateDetails().getYear());
         assertEquals("1", actual.getDwpIssuingOffice().getPipNumber());
-        assertEquals("no", actual.getAppointee().getIsAppointee());
+        assertEquals(NO, actual.getAppointee().getIsAppointee());
         assertEquals("Mrs.", actual.getAppellantName().getTitle());
         assertEquals("Ap", actual.getAppellantName().getFirstName());
         assertEquals("Pellant", actual.getAppellantName().getLastName());
@@ -358,14 +360,14 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("TS1 1ST", actual.getAppellantContactDetails().getPostCode());
         assertEquals("07911123456", actual.getAppellantContactDetails().getPhoneNumber());
         assertEquals("appellant@gmail.com", actual.getAppellantContactDetails().getEmailAddress());
-        assertEquals("no", actual.getSameAddress().getIsAddressSameAsAppointee());
-        assertEquals("yes", actual.getTextReminders().getDoYouWantTextMsgReminders());
-        assertEquals("yes", actual.getSendToNumber().getUseSameNumber());
+        assertEquals(NO, actual.getSameAddress().getIsAddressSameAsAppointee());
+        assertEquals(YES, actual.getTextReminders().getDoYouWantTextMsgReminders());
+        assertEquals(YES, actual.getSendToNumber().getUseSameNumber());
         assertNull("no", actual.getRepresentative());
         assertEquals("I think I should get more", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getReasonForAppealing());
         assertEquals("Underpayment", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getWhatYouDisagreeWith());
         assertEquals("I can't think of anything else", actual.getOtherReasonForAppealing().getOtherReasonForAppealing());
-        assertEquals("no", actual.getEvidenceProvide().getEvidenceProvide());
+        assertEquals(NO, actual.getEvidenceProvide().getEvidenceProvide());
         assertEquals("123456", actual.getCcdCaseId());
         assertNull(actual.getRepresentativeDetails());
     }
@@ -403,8 +405,8 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .email("appellant@gmail.com")
                         .build()
                     )
-                    .isAppointee("No")
-                    .isAddressSameAsAppointee("No")
+                    .isAppointee(NO)
+                    .isAddressSameAsAppointee(NO)
                     .build()
                 )
                 .mrnDetails(MrnDetails.builder()
@@ -435,22 +437,22 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             )
             .subscriptions(Subscriptions.builder()
                 .appellantSubscription(Subscription.builder()
-                    .subscribeEmail("Yes")
+                    .subscribeEmail(YES)
                     .email("appellant@gmail.com")
-                    .subscribeSms("Yes")
+                    .subscribeSms(YES)
                     .mobile("07911123999")
                     .build()
                 )
                 .build()
             )
             .sscsDocument(Collections.emptyList())
-            .evidencePresent("no")
+            .evidencePresent(NO)
             .build();
 
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("07911123456", actual.getAppellantContactDetails().getPhoneNumber());
-        assertEquals("yes", actual.getTextReminders().getDoYouWantTextMsgReminders());
-        assertEquals("no", actual.getSendToNumber().getUseSameNumber());
+        assertEquals(YES, actual.getTextReminders().getDoYouWantTextMsgReminders());
+        assertEquals(NO, actual.getSendToNumber().getUseSameNumber());
     }
 
     @Test
@@ -486,7 +488,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .email("appellant@gmail.com")
                         .build()
                     )
-                    .isAppointee("No")
+                    .isAppointee(NO)
                     .build()
                 )
                 .mrnDetails(MrnDetails.builder()
@@ -515,24 +517,24 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             )
             .subscriptions(Subscriptions.builder()
                 .appellantSubscription(Subscription.builder()
-                    .subscribeEmail("Yes")
+                    .subscribeEmail(YES)
                     .email("appellant@gmail.com")
-                    .subscribeSms("Yes")
+                    .subscribeSms(YES)
                     .mobile("07911123456")
                     .build()
                 )
                 .build()
             )
             .sscsDocument(Collections.emptyList())
-            .evidencePresent("no")
+            .evidencePresent(NO)
             .build();
 
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("Personal Independence Payment (PIP)", actual.getBenefitType().getBenefitType());
-        assertEquals("yes", actual.getCreateAccount().getCreateAccount());
-        assertEquals("no", actual.getHaveAMrn().getHaveAMrn());
+        assertEquals(YES, actual.getCreateAccount().getCreateAccount());
+        assertEquals(NO, actual.getHaveAMrn().getHaveAMrn());
         assertEquals("I can't find the letter.", actual.getNoMrn().getReasonForNoMrn());
-        assertEquals("no", actual.getAppointee().getIsAppointee());
+        assertEquals(NO, actual.getAppointee().getIsAppointee());
         assertEquals("Mrs.", actual.getAppellantName().getTitle());
         assertEquals("Ap", actual.getAppellantName().getFirstName());
         assertEquals("Pellant", actual.getAppellantName().getLastName());
@@ -547,13 +549,13 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("TS1 1ST", actual.getAppellantContactDetails().getPostCode());
         assertEquals("07911123456", actual.getAppellantContactDetails().getPhoneNumber());
         assertEquals("appellant@gmail.com", actual.getAppellantContactDetails().getEmailAddress());
-        assertEquals("yes", actual.getTextReminders().getDoYouWantTextMsgReminders());
-        assertEquals("yes", actual.getSendToNumber().getUseSameNumber());
+        assertEquals(YES, actual.getTextReminders().getDoYouWantTextMsgReminders());
+        assertEquals(YES, actual.getSendToNumber().getUseSameNumber());
         assertNull("no", actual.getRepresentative());
         assertEquals("I think I should get more", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getReasonForAppealing());
         assertEquals("Underpayment", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getWhatYouDisagreeWith());
         assertEquals("I can't think of anything else", actual.getOtherReasonForAppealing().getOtherReasonForAppealing());
-        assertEquals("no", actual.getEvidenceProvide().getEvidenceProvide());
+        assertEquals(NO, actual.getEvidenceProvide().getEvidenceProvide());
         assertNull(actual.getRepresentativeDetails());
     }
 
@@ -583,8 +585,8 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                             .build())
                         .build()
                     )
-                    .isAppointee("Yes")
-                    .isAddressSameAsAppointee("No")
+                    .isAppointee(YES)
+                    .isAddressSameAsAppointee(NO)
                     .build()
                 )
                 .mrnDetails(MrnDetails.builder()
@@ -599,7 +601,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .build();
 
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
-        assertEquals("yes", actual.getAppointee().getIsAppointee());
+        assertEquals(YES, actual.getAppointee().getIsAppointee());
         assertEquals("Mr.", actual.getAppointeeName().getTitle());
         assertEquals("Ap", actual.getAppointeeName().getFirstName());
         assertEquals("Pointee", actual.getAppointeeName().getLastName());
@@ -613,7 +615,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("TS2 2ST", actual.getAppointeeContactDetails().getPostCode());
         assertEquals("07111111111", actual.getAppointeeContactDetails().getPhoneNumber());
         assertEquals("appointee@test.com", actual.getAppointeeContactDetails().getEmailAddress());
-        assertEquals("no", actual.getSameAddress().getIsAddressSameAsAppointee());
+        assertEquals(NO, actual.getSameAddress().getIsAddressSameAsAppointee());
     }
 
     @Test
@@ -641,8 +643,8 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                             .build())
                         .build()
                     )
-                    .isAppointee("Yes")
-                    .isAddressSameAsAppointee("Yes")
+                    .isAppointee(YES)
+                    .isAddressSameAsAppointee(YES)
                     .build()
                 )
                 .mrnDetails(MrnDetails.builder()
@@ -657,7 +659,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .build();
 
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
-        assertEquals("yes", actual.getAppointee().getIsAppointee());
+        assertEquals(YES, actual.getAppointee().getIsAppointee());
         assertEquals("Mr.", actual.getAppointeeName().getTitle());
         assertEquals("Ap", actual.getAppointeeName().getFirstName());
         assertEquals("Pointee", actual.getAppointeeName().getLastName());
@@ -671,7 +673,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("TS2 2ST", actual.getAppointeeContactDetails().getPostCode());
         assertEquals("07111111111", actual.getAppointeeContactDetails().getPhoneNumber());
         assertEquals("appointee@test.com", actual.getAppointeeContactDetails().getEmailAddress());
-        assertEquals("yes", actual.getSameAddress().getIsAddressSameAsAppointee());
+        assertEquals(YES, actual.getSameAddress().getIsAddressSameAsAppointee());
     }
 
     @Test
@@ -730,7 +732,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
 
     private Object[] getDifferentRepsScenarios() {
         Representative repWithNoLookupData = Representative.builder()
-            .hasRepresentative("Yes")
+            .hasRepresentative(YES)
             .name(Name.builder()
                 .title("Miss.")
                 .firstName("Re")
@@ -749,7 +751,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .build();
 
         Representative repWithAutoLookupData = Representative.builder()
-            .hasRepresentative("Yes")
+            .hasRepresentative(YES)
             .name(Name.builder()
                 .title("Miss.")
                 .firstName("Re")
@@ -770,7 +772,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .build();
 
         Representative repWithManualLookupData = Representative.builder()
-            .hasRepresentative("Yes")
+            .hasRepresentative(YES)
             .name(Name.builder()
                 .title("Miss.")
                 .firstName("Re")
@@ -830,7 +832,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .email("appellant@gmail.com")
                         .build()
                     )
-                    .isAppointee("No")
+                    .isAppointee(NO)
                     .build()
                 )
                 .mrnDetails(MrnDetails.builder()
@@ -857,7 +859,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 )
                 .hearingOptions(null)
                 .rep(Representative.builder()
-                    .hasRepresentative("Yes")
+                    .hasRepresentative(YES)
                     .name(Name.builder().title("Miss.").firstName("Re").lastName("Presentative").build())
                     .contact(Contact.builder().mobile("07333333333").email("rep@gmail.com").build())
                     .address(Address.builder()
@@ -871,27 +873,27 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             )
             .subscriptions(Subscriptions.builder()
                 .appellantSubscription(Subscription.builder()
-                    .subscribeEmail("Yes")
+                    .subscribeEmail(YES)
                     .email("appellant@gmail.com")
-                    .subscribeSms("Yes")
+                    .subscribeSms(YES)
                     .mobile("07911123456")
                     .build()
                 )
                 .build()
             )
             .sscsDocument(Collections.emptyList())
-            .evidencePresent("no")
+            .evidencePresent(NO)
             .build();
 
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("Personal Independence Payment (PIP)", actual.getBenefitType().getBenefitType());
-        assertEquals("yes", actual.getCreateAccount().getCreateAccount());
-        assertEquals("yes", actual.getHaveAMrn().getHaveAMrn());
+        assertEquals(YES, actual.getCreateAccount().getCreateAccount());
+        assertEquals(YES, actual.getHaveAMrn().getHaveAMrn());
         assertEquals("1", actual.getMrnDate().getMrnDateDetails().getDay());
         assertEquals("2", actual.getMrnDate().getMrnDateDetails().getMonth());
         assertEquals("2010", actual.getMrnDate().getMrnDateDetails().getYear());
         assertEquals("1", actual.getDwpIssuingOffice().getPipNumber());
-        assertEquals("no", actual.getAppointee().getIsAppointee());
+        assertEquals(NO, actual.getAppointee().getIsAppointee());
         assertEquals("Mrs.", actual.getAppellantName().getTitle());
         assertEquals("Ap", actual.getAppellantName().getFirstName());
         assertEquals("Pellant", actual.getAppellantName().getLastName());
@@ -906,16 +908,16 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("TS1 1ST", actual.getAppellantContactDetails().getPostCode());
         assertEquals("07911123456", actual.getAppellantContactDetails().getPhoneNumber());
         assertEquals("appellant@gmail.com", actual.getAppellantContactDetails().getEmailAddress());
-        assertEquals("yes", actual.getTextReminders().getDoYouWantTextMsgReminders());
-        assertEquals("yes", actual.getSendToNumber().getUseSameNumber());
-        assertEquals("yes", actual.getRepresentative().getHasRepresentative());
+        assertEquals(YES, actual.getTextReminders().getDoYouWantTextMsgReminders());
+        assertEquals(YES, actual.getSendToNumber().getUseSameNumber());
+        assertEquals(YES, actual.getRepresentative().getHasRepresentative());
         assertEquals("Miss.", actual.getRepresentativeDetails().getName().getTitle());
         assertEquals("Re", actual.getRepresentativeDetails().getName().getFirst());
         assertEquals("Presentative", actual.getRepresentativeDetails().getName().getLast());
         assertEquals("I think I should get more", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getReasonForAppealing());
         assertEquals("Underpayment", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getWhatYouDisagreeWith());
         assertEquals("I can't think of anything else", actual.getOtherReasonForAppealing().getOtherReasonForAppealing());
-        assertEquals("no", actual.getEvidenceProvide().getEvidenceProvide());
+        assertEquals(NO, actual.getEvidenceProvide().getEvidenceProvide());
         assertEquals("Miss.", actual.getRepresentativeDetails().getName().getTitle());
         assertEquals("Re", actual.getRepresentativeDetails().getName().getFirst());
         assertEquals("Presentative", actual.getRepresentativeDetails().getName().getLast());
@@ -961,7 +963,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .email("appellant@gmail.com")
                         .build()
                     )
-                    .isAppointee("No")
+                    .isAppointee(NO)
                     .build()
                 )
                 .mrnDetails(MrnDetails.builder()
@@ -988,7 +990,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 )
                 .hearingOptions(null)
                 .rep(Representative.builder()
-                    .hasRepresentative("Yes")
+                    .hasRepresentative(YES)
                     .name(Name.builder().title("Miss.").firstName("Re").lastName("Presentative").build())
                     .contact(Contact.builder().mobile("07333333333").email("rep@gmail.com").build())
                     .address(null)
@@ -997,16 +999,16 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             )
             .subscriptions(Subscriptions.builder()
                 .appellantSubscription(Subscription.builder()
-                    .subscribeEmail("Yes")
+                    .subscribeEmail(YES)
                     .email("appellant@gmail.com")
-                    .subscribeSms("Yes")
+                    .subscribeSms(YES)
                     .mobile("07911123456")
                     .build()
                 )
                 .build()
             )
             .sscsDocument(Collections.emptyList())
-            .evidencePresent("no")
+            .evidencePresent(NO)
             .build();
 
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
@@ -1050,7 +1052,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .email("appellant@gmail.com")
                         .build()
                     )
-                    .isAppointee("No")
+                    .isAppointee(NO)
                     .build()
                 )
                 .mrnDetails(MrnDetails.builder()
@@ -1077,7 +1079,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 )
                 .hearingOptions(null)
                 .rep(Representative.builder()
-                    .hasRepresentative("Yes")
+                    .hasRepresentative(YES)
                     .name(Name.builder().title("Miss.").firstName("Re").lastName("Presentative").build())
                     .contact(null)
                     .address(Address.builder()
@@ -1091,16 +1093,16 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             )
             .subscriptions(Subscriptions.builder()
                 .appellantSubscription(Subscription.builder()
-                    .subscribeEmail("Yes")
+                    .subscribeEmail(YES)
                     .email("appellant@gmail.com")
-                    .subscribeSms("Yes")
+                    .subscribeSms(YES)
                     .mobile("07911123456")
                     .build()
                 )
                 .build()
             )
             .sscsDocument(Collections.emptyList())
-            .evidencePresent("no")
+            .evidencePresent(NO)
             .build();
 
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
@@ -1141,7 +1143,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .email("appellant@gmail.com")
                         .build()
                     )
-                    .isAppointee("No")
+                    .isAppointee(NO)
                     .build()
                 )
                 .mrnDetails(MrnDetails.builder()
@@ -1168,21 +1170,21 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 )
                 .hearingOptions(
                     HearingOptions.builder()
-                        .wantsToAttend("Yes")
-                        .scheduleHearing("Yes")
-                        .wantsSupport("No")
+                        .wantsToAttend(YES)
+                        .scheduleHearing(YES)
+                        .wantsSupport(NO)
                         .build()
                 )
-                .hearingSubtype(new HearingSubtype("Yes", "999", null, null, "No"))
+                .hearingSubtype(new HearingSubtype(YES, "999", null, null, NO))
                 .build()
             )
-            .evidencePresent("no")
+            .evidencePresent(NO)
             .build();
 
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
-        assertEquals("yes", actual.getTheHearing().getAttendHearing());
-        assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
-        assertEquals("no", actual.getHearingSupport().getArrangements());
+        assertEquals(YES, actual.getTheHearing().getAttendHearing());
+        assertEquals(YES, actual.getHearingAvailability().getScheduleHearing());
+        assertEquals(NO, actual.getHearingSupport().getArrangements());
         assertEquals(Boolean.valueOf("true"), actual.getHearingOptions().getSelectOptions().getTelephone().getRequested());
         assertEquals(Boolean.valueOf("false"), actual.getHearingOptions().getSelectOptions().getVideo().getRequested());
         assertEquals(Boolean.valueOf("false"), actual.getHearingOptions().getSelectOptions().getFaceToFace().getRequested());
@@ -1222,7 +1224,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .email("appellant@gmail.com")
                         .build()
                     )
-                    .isAppointee("No")
+                    .isAppointee(NO)
                     .build()
                 )
                 .mrnDetails(MrnDetails.builder()
@@ -1249,10 +1251,10 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 )
                 .hearingOptions(
                     HearingOptions.builder()
-                        .wantsToAttend("Yes")
-                        .scheduleHearing("Yes")
-                        .wantsSupport("Yes")
-                        .languageInterpreter("Yes")
+                        .wantsToAttend(YES)
+                        .scheduleHearing(YES)
+                        .wantsSupport(YES)
+                        .languageInterpreter(YES)
                         .languages("Spanish")
                         .signLanguageType("British Sign Language (BSL)")
                         .other("Help with stairs")
@@ -1268,13 +1270,13 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 )
                 .build()
             )
-            .evidencePresent("no")
+            .evidencePresent(NO)
             .build();
 
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
-        assertEquals("yes", actual.getTheHearing().getAttendHearing());
-        assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
-        assertEquals("yes", actual.getHearingSupport().getArrangements());
+        assertEquals(YES, actual.getTheHearing().getAttendHearing());
+        assertEquals(YES, actual.getHearingAvailability().getScheduleHearing());
+        assertEquals(YES, actual.getHearingSupport().getArrangements());
         assertTrue(actual.getHearingArrangements().getSelection().getInterpreterLanguage().getRequested());
         assertEquals(
             "Spanish",
@@ -1327,7 +1329,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .email("appellant@gmail.com")
                         .build()
                     )
-                    .isAppointee("No")
+                    .isAppointee(NO)
                     .build()
                 )
                 .mrnDetails(MrnDetails.builder()
@@ -1354,10 +1356,10 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 )
                 .hearingOptions(
                     HearingOptions.builder()
-                        .wantsToAttend("Yes")
-                        .scheduleHearing("Yes")
-                        .wantsSupport("Yes")
-                        .languageInterpreter("No")
+                        .wantsToAttend(YES)
+                        .scheduleHearing(YES)
+                        .wantsSupport(YES)
+                        .languageInterpreter(NO)
                         .signLanguageType("British Sign Language (BSL)")
                         .other("Help with stairs")
                         .arrangements(Arrays.asList(
@@ -1368,13 +1370,13 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 )
                 .build()
             )
-            .evidencePresent("no")
+            .evidencePresent(NO)
             .build();
 
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
-        assertEquals("yes", actual.getTheHearing().getAttendHearing());
-        assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
-        assertEquals("yes", actual.getHearingSupport().getArrangements());
+        assertEquals(YES, actual.getTheHearing().getAttendHearing());
+        assertEquals(YES, actual.getHearingAvailability().getScheduleHearing());
+        assertEquals(YES, actual.getHearingSupport().getArrangements());
         assertFalse(actual.getHearingArrangements().getSelection().getInterpreterLanguage().getRequested());
         assertNull(actual.getHearingArrangements().getSelection().getInterpreterLanguage().getLanguage());
         assertTrue(actual.getHearingArrangements().getSelection().getSignLanguage().getRequested());
@@ -1397,22 +1399,22 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .appeal(Appeal.builder()
                 .hearingOptions(
                     HearingOptions.builder()
-                        .wantsToAttend("Yes")
-                        .scheduleHearing("Yes")
-                        .wantsSupport("Yes")
-                        .languageInterpreter("No")
+                        .wantsToAttend(YES)
+                        .scheduleHearing(YES)
+                        .wantsSupport(YES)
+                        .languageInterpreter(NO)
                         .signLanguageType("British Sign Language (BSL)")
                         .other("Help with stairs")
                         .arrangements(Collections.emptyList())
                         .build())
                 .build())
-            .evidencePresent("no")
+            .evidencePresent(NO)
             .build();
 
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
-        assertEquals("yes", actual.getTheHearing().getAttendHearing());
-        assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
-        assertEquals("yes", actual.getHearingSupport().getArrangements());
+        assertEquals(YES, actual.getTheHearing().getAttendHearing());
+        assertEquals(YES, actual.getHearingAvailability().getScheduleHearing());
+        assertEquals(YES, actual.getHearingSupport().getArrangements());
         assertFalse(actual.getHearingArrangements().getSelection().getInterpreterLanguage().getRequested());
         assertNull(actual.getHearingArrangements().getSelection().getInterpreterLanguage().getLanguage());
         assertFalse(actual.getHearingArrangements().getSelection().getSignLanguage().getRequested());
@@ -1426,9 +1428,9 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .appeal(Appeal.builder()
                 .hearingOptions(
                     HearingOptions.builder()
-                        .wantsToAttend("Yes")
-                        .scheduleHearing("Yes")
-                        .wantsSupport("Yes")
+                        .wantsToAttend(YES)
+                        .scheduleHearing(YES)
+                        .wantsSupport(YES)
                         .languageInterpreter(null)
                         .signLanguageType(null)
                         .other("Help with stairs")
@@ -1437,13 +1439,13 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 )
                 .build()
             )
-            .evidencePresent("no")
+            .evidencePresent(NO)
             .build();
 
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
-        assertEquals("yes", actual.getTheHearing().getAttendHearing());
-        assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
-        assertEquals("yes", actual.getHearingSupport().getArrangements());
+        assertEquals(YES, actual.getTheHearing().getAttendHearing());
+        assertEquals(YES, actual.getHearingAvailability().getScheduleHearing());
+        assertEquals(YES, actual.getHearingSupport().getArrangements());
         assertNull(actual.getHearingArrangements());
     }
 
@@ -1466,25 +1468,25 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
     @SuppressWarnings("unused")
     private Object[] getHearingOptionsScenarios() {
         HearingOptions hearingOptionsWithNullArrangement = HearingOptions.builder()
-            .wantsToAttend("Yes")
-            .wantsSupport("Yes")
+            .wantsToAttend(YES)
+            .wantsSupport(YES)
             .build();
 
         HearingOptions hearingOptionsWithEmptyArrangement = HearingOptions.builder()
-            .wantsToAttend("Yes")
-            .wantsSupport("Yes")
+            .wantsToAttend(YES)
+            .wantsSupport(YES)
             .arrangements(Collections.emptyList())
             .build();
 
         HearingOptions hearingOptionsWithNoValidArrangement = HearingOptions.builder()
-            .wantsToAttend("Yes")
-            .wantsSupport("Yes")
+            .wantsToAttend(YES)
+            .wantsSupport(YES)
             .arrangements(Collections.singletonList("any invalid arrangement"))
             .build();
 
         HearingOptions hearingOptionsWithValidArrangement = HearingOptions.builder()
-            .wantsToAttend("Yes")
-            .wantsSupport("Yes")
+            .wantsToAttend(YES)
+            .wantsSupport(YES)
             .arrangements(Arrays.asList(
                 HearingOptionArrangements.HEARING_LOOP.getValue(),
                 HearingOptionArrangements.DISABLE_ACCESS.getValue()))
@@ -1514,9 +1516,9 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .appeal(Appeal.builder()
                 .hearingOptions(
                     HearingOptions.builder()
-                        .wantsToAttend("Yes")
-                        .scheduleHearing("Yes")
-                        .wantsSupport("Yes")
+                        .wantsToAttend(YES)
+                        .scheduleHearing(YES)
+                        .wantsSupport(YES)
                         .languageInterpreter(null)
                         .signLanguageType(null)
                         .other("Help with stairs")
@@ -1525,13 +1527,13 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 )
                 .build()
             )
-            .evidencePresent("no")
+            .evidencePresent(NO)
             .build();
 
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
-        assertEquals("yes", actual.getTheHearing().getAttendHearing());
-        assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
-        assertEquals("yes", actual.getHearingSupport().getArrangements());
+        assertEquals(YES, actual.getTheHearing().getAttendHearing());
+        assertEquals(YES, actual.getHearingAvailability().getScheduleHearing());
+        assertEquals(YES, actual.getHearingSupport().getArrangements());
         assertNull(actual.getHearingArrangements());
     }
 
@@ -1541,10 +1543,10 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .appeal(Appeal.builder()
                 .hearingOptions(
                     HearingOptions.builder()
-                        .wantsToAttend("Yes")
-                        .scheduleHearing("Yes")
-                        .wantsSupport("Yes")
-                        .languageInterpreter("No")
+                        .wantsToAttend(YES)
+                        .scheduleHearing(YES)
+                        .wantsSupport(YES)
+                        .languageInterpreter(NO)
                         .signLanguageType("British Sign Language (BSL)")
                         .other("Help with stairs")
                         .arrangements(null)
@@ -1552,13 +1554,13 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 )
                 .build()
             )
-            .evidencePresent("no")
+            .evidencePresent(NO)
             .build();
 
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
-        assertEquals("yes", actual.getTheHearing().getAttendHearing());
-        assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
-        assertEquals("yes", actual.getHearingSupport().getArrangements());
+        assertEquals(YES, actual.getTheHearing().getAttendHearing());
+        assertEquals(YES, actual.getHearingAvailability().getScheduleHearing());
+        assertEquals(YES, actual.getHearingSupport().getArrangements());
         assertFalse(actual.getHearingArrangements().getSelection().getInterpreterLanguage().getRequested());
         assertNull(actual.getHearingArrangements().getSelection().getInterpreterLanguage().getLanguage());
         assertFalse(actual.getHearingArrangements().getSelection().getSignLanguage().getRequested());
@@ -1599,7 +1601,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .email("appellant@gmail.com")
                         .build()
                     )
-                    .isAppointee("No")
+                    .isAppointee(NO)
                     .build()
                 )
                 .mrnDetails(MrnDetails.builder()
@@ -1626,9 +1628,9 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 )
                 .hearingOptions(
                     HearingOptions.builder()
-                        .wantsToAttend("Yes")
-                        .scheduleHearing("Yes")
-                        .wantsSupport("No")
+                        .wantsToAttend(YES)
+                        .scheduleHearing(YES)
+                        .wantsSupport(NO)
                         .excludeDates(
                             Arrays.asList(
                                 ExcludeDate.builder()
@@ -1653,13 +1655,13 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 )
                 .build()
             )
-            .evidencePresent("no")
+            .evidencePresent(NO)
             .build();
 
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
-        assertEquals("yes", actual.getTheHearing().getAttendHearing());
-        assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
-        assertEquals("no", actual.getHearingSupport().getArrangements());
+        assertEquals(YES, actual.getTheHearing().getAttendHearing());
+        assertEquals(YES, actual.getHearingAvailability().getScheduleHearing());
+        assertEquals(NO, actual.getHearingSupport().getArrangements());
         assertNotNull(actual.getDatesCantAttend());
         assertNotNull(actual.getDatesCantAttend().getDatesCantAttend());
         assertEquals(2, actual.getDatesCantAttend().getDatesCantAttend().size());
@@ -1685,9 +1687,9 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 .appeal(Appeal.builder()
                         .hearingOptions(
                                 HearingOptions.builder()
-                                        .wantsToAttend("Yes")
-                                        .scheduleHearing("Yes")
-                                        .wantsSupport("Yes")
+                                        .wantsToAttend(YES)
+                                        .scheduleHearing(YES)
+                                        .wantsSupport(YES)
                                         .languageInterpreter(null)
                                         .signLanguageType(null)
                                         .other("Help with stairs")
@@ -1696,11 +1698,11 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         )
                         .build()
                 )
-                .evidencePresent("no")
-                .languagePreferenceWelsh("yes")
+                .evidencePresent(NO)
+                .languagePreferenceWelsh(YES)
                 .build();
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
-        assertEquals("yes", actual.getLanguagePreferenceWelsh().getLanguagePreferenceWelsh());
+        assertEquals(YES, actual.getLanguagePreferenceWelsh().getLanguagePreferenceWelsh());
     }
 
     @Test
@@ -1709,9 +1711,9 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 .appeal(Appeal.builder()
                         .hearingOptions(
                                 HearingOptions.builder()
-                                        .wantsToAttend("Yes")
-                                        .scheduleHearing("Yes")
-                                        .wantsSupport("Yes")
+                                        .wantsToAttend(YES)
+                                        .scheduleHearing(YES)
+                                        .wantsSupport(YES)
                                         .languageInterpreter(null)
                                         .signLanguageType(null)
                                         .other("Help with stairs")
@@ -1720,7 +1722,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         )
                         .build()
                 )
-                .evidencePresent("no")
+                .evidencePresent(NO)
                 .languagePreferenceWelsh(null)
                 .build();
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);

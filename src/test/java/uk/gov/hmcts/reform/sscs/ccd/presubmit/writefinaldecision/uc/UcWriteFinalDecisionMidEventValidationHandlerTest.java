@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +34,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
 
     @Override
     protected void setValidPointsAndActivitiesScenario(SscsCaseData caseData, String descriptorFlowValue) {
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.NO);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(
                 Arrays.asList("mobilisingUnaided"));
 
@@ -72,7 +73,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertEquals("Yes", sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply());
+        assertEquals(YES, sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply());
 
         assertTrue(response.getErrors().isEmpty());
     }
@@ -82,7 +83,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(YES);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided"));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -95,7 +96,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(YES);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -109,7 +110,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(YES);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(new ArrayList<>());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -123,11 +124,11 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(NO);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertEquals("No", sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply());
+        assertEquals(NO, sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply());
 
         assertTrue(response.getErrors().isEmpty());
     }
@@ -154,7 +155,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     @Test
     public void givenUcCaseWithWcaAppealFlowAndNotOnWorkCapabilityAssessmentPage_thenDoNotSetShowSummaryOfOutcomePageOrShowShowDwpReassessAwardPage() {
 
-        sscsCaseData.setWcaAppeal(YesNo.YES);
+        sscsCaseData.setWcaAppeal(YES);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getPageId()).thenReturn("somethingElse");
@@ -177,7 +178,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     public void givenUcCaseWithWcaAppealFlowAndAllowedFlow_thenSetShowDwpReassessAwardPage(
             @Nullable YesNo wcaFlow, @Nullable String allowedFlow, YesNo expectedShowResult) {
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.setWcaAppeal(wcaFlow);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused(allowedFlow);
 
@@ -192,7 +193,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     @Test
     public void givenUcCaseWithWcaAppealFlowAndNotOnWorkCapabilityAssessmentPage_thenDoNotSetShowDwpReassessAwardPage() {
 
-        sscsCaseData.setWcaAppeal(YesNo.YES);
+        sscsCaseData.setWcaAppeal(YES);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getPageId()).thenReturn("somethingElse");
@@ -207,7 +208,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     @Override
     public void shouldExhibitBenefitSpecificBehaviourWhenAnAnAwardIsGivenAndNoActivitiesSelected(AwardType dailyLiving, AwardType mobility) {
 
-        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        setValidPointsAndActivitiesScenario(sscsCaseData, YES.getValue());
         setEmptyActivitiesListScenario(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -218,7 +219,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     @Test
     public void shouldExhibitBenefitSpecificBehaviourWhenNoAwardsAreGivenAndNoActivitiesAreSelected() {
 
-        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        setValidPointsAndActivitiesScenario(sscsCaseData, YES.getValue());
         setNoAwardsScenario(sscsCaseData);
         setEmptyActivitiesListScenario(sscsCaseData);
 
@@ -231,7 +232,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     @Test
     public void shouldExhibitBenefitSpecificBehaviourWhenNoAwardsAreGivenAndNoActivitiesAreSelectedAndEndDateTypeIsSetEndDate() {
 
-        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        setValidPointsAndActivitiesScenario(sscsCaseData, YES.getValue());
         setNoAwardsScenario(sscsCaseData);
         setEmptyActivitiesListScenario(sscsCaseData);
 
@@ -249,7 +250,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     @Test
     public void shouldExhibitBenefitSpecificBehaviourWhenNoAwardsAreGivenAndNoActivitiesAreSelectedAndEndDateTypeIsIndefinite() {
 
-        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        setValidPointsAndActivitiesScenario(sscsCaseData, YES.getValue());
         setEmptyActivitiesListScenario(sscsCaseData);
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("indefinite");
@@ -266,7 +267,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     @Test
     @Parameters({"Yes, YES", "No, NO"})
     public void givenGenerateNoticeValueAndCaseIsUc_thenShouldSetShowWorkCapabilityAssessment(String isGenerateNotice, @Nullable YesNo showWorkCapabilityPage) {
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(isGenerateNotice);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(isYesOrNo(isGenerateNotice));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 

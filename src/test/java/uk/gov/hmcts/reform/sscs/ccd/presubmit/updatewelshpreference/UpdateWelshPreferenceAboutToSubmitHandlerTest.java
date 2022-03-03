@@ -5,6 +5,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_WELSH_PREFERENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.WELSH_TRANSLATION;
 
 import java.time.LocalDateTime;
@@ -67,27 +69,27 @@ public class UpdateWelshPreferenceAboutToSubmitHandlerTest {
     public void handleWhenLanguagePreferenceIsEnglish() {
         Callback<SscsCaseData> callback = buildCallback();
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals("No",result.getData().getTranslationWorkOutstanding());
-        assertEquals("No",result.getData().getLanguagePreferenceWelsh());
+        assertEquals(NO,result.getData().getTranslationWorkOutstanding());
+        assertEquals(NO,result.getData().getLanguagePreferenceWelsh());
     }
 
     @Test
     public void handleWhenLanguagePreferenceIsWelsh() {
         Callback<SscsCaseData> callback = buildCallback();
-        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("Yes");
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(YES);
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals("Yes",result.getData().getLanguagePreferenceWelsh());
-        assertEquals("Yes",result.getData().getTranslationWorkOutstanding());
+        assertEquals(YES,result.getData().getLanguagePreferenceWelsh());
+        assertEquals(YES,result.getData().getTranslationWorkOutstanding());
     }
 
     @Test
     public void givenWelshTransaltionsInterlocStateAddNote() {
         Callback<SscsCaseData> callback = buildCallback();
-        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("No");
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(NO);
         callback.getCaseDetails().getCaseData().setInterlocReviewState(WELSH_TRANSLATION.getId());
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals("No",result.getData().getLanguagePreferenceWelsh());
-        assertEquals("No",result.getData().getTranslationWorkOutstanding());
+        assertEquals(NO,result.getData().getLanguagePreferenceWelsh());
+        assertEquals(NO,result.getData().getTranslationWorkOutstanding());
         assertEquals(1,result.getData().getAppealNotePad().getNotesCollection().size());
         assertEquals("Assigned to admin - Case no longer Welsh. Please cancel any Welsh translations",
                 result.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
@@ -96,11 +98,11 @@ public class UpdateWelshPreferenceAboutToSubmitHandlerTest {
     @Test
     public void handleWhenLanguagePreferenceIsWelshAndNoTranslationWorkOutstandingShouldStaySame() {
         Callback<SscsCaseData> callback = buildCallback();
-        callback.getCaseDetails().getCaseData().setTranslationWorkOutstanding("No");
-        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("Yes");
+        callback.getCaseDetails().getCaseData().setTranslationWorkOutstanding(NO);
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(YES);
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals("Yes",result.getData().getLanguagePreferenceWelsh());
-        assertEquals("No",result.getData().getTranslationWorkOutstanding());
+        assertEquals(YES,result.getData().getLanguagePreferenceWelsh());
+        assertEquals(NO,result.getData().getTranslationWorkOutstanding());
     }
 
     private Callback<SscsCaseData> buildCallback() {
@@ -133,8 +135,8 @@ public class UpdateWelshPreferenceAboutToSubmitHandlerTest {
 
         SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .sscsDocument(oneDoc)
-                .translationWorkOutstanding("Yes")
-                .languagePreferenceWelsh("No")
+                .translationWorkOutstanding(YES)
+                .languagePreferenceWelsh(NO)
                 .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
                 State.VALID_APPEAL, sscsCaseData, LocalDateTime.now(), "Benefit");

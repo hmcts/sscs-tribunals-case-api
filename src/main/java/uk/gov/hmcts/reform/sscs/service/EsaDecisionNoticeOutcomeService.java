@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +10,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsEsaCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaAllowedOrRefusedCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsRegulationsAndSchedule3ActivitiesCondition;
@@ -28,7 +30,7 @@ public class EsaDecisionNoticeOutcomeService extends DecisionNoticeOutcomeServic
     @Override
     public void performPreOutcomeIntegrityAdjustments(SscsCaseData sscsCaseData) {
 
-        if ("Yes".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
+        if (isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
 
             SscsEsaCaseData esaCaseData = sscsCaseData.getSscsEsaCaseData();
 
@@ -57,7 +59,7 @@ public class EsaDecisionNoticeOutcomeService extends DecisionNoticeOutcomeServic
                         esaCaseData.setDoesRegulation35Apply(esaCaseData.getRegulation35Selection());
                         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(esaCaseData.getSchedule3Selections());
                     } else if (EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
-                        if (YesNo.NO.equals(esaCaseData.getDoesRegulation29Apply())) {
+                        if (isNoOrNull(esaCaseData.getDoesRegulation29Apply())) {
                             sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
                             esaCaseData.setDoesRegulation35Apply(null);
                             sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(null);
@@ -83,7 +85,7 @@ public class EsaDecisionNoticeOutcomeService extends DecisionNoticeOutcomeServic
     @Override
     public Outcome determineOutcomeWithValidation(SscsCaseData sscsCaseData) {
         Outcome outcome = determineOutcome(sscsCaseData);
-        if ("Yes".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
+        if (isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             Optional<EsaAllowedOrRefusedCondition> passingAllowedOrRefusedCondition = EsaPointsRegulationsAndSchedule3ActivitiesCondition.getPassingAllowedOrRefusedCondition(questionService, sscsCaseData);
             if (passingAllowedOrRefusedCondition.isEmpty()) {
                 throw new IllegalStateException("No matching allowed or refused condition");

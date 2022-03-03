@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.callback;
 import static java.lang.Long.parseLong;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
@@ -70,7 +71,7 @@ public class SupplementaryResponseIt extends AbstractEventIt {
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
-        assertThat(result.getData().getEvidenceHandled(), is(YesNo.NO.getValue()));
+        assertThat(result.getData().getEvidenceHandled(), is(NO));
         assertThat(result.getData().getDwpState(), is(DwpState.SUPPLEMENTARY_RESPONSE.getId()));
         assertThat(result.getData().getScannedDocuments().size(), is(1));
         assertThat(result.getData().getScannedDocuments().get(0).getValue().getFileName(), is(SUP_RESPONSE_DOC_PDF_NAME));
@@ -87,7 +88,7 @@ public class SupplementaryResponseIt extends AbstractEventIt {
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
-        assertThat(result.getData().getEvidenceHandled(), is(YesNo.NO.getValue()));
+        assertThat(result.getData().getEvidenceHandled(), is(NO));
         assertThat(result.getData().getDwpState(), is(DwpState.SUPPLEMENTARY_RESPONSE.getId()));
         assertThat(result.getData().getScannedDocuments().size(), is(2));
         assertThat(result.getData().getScannedDocuments().stream()
@@ -108,7 +109,7 @@ public class SupplementaryResponseIt extends AbstractEventIt {
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
-        assertThat(result.getData().getEvidenceHandled(), is(YesNo.NO.getValue()));
+        assertThat(result.getData().getEvidenceHandled(), is(NO));
         assertThat(result.getData().getDwpState(), is(DwpState.SUPPLEMENTARY_RESPONSE.getId()));
         assertThat(result.getData().getScannedDocuments().size(), is(1));
         assertThat(result.getData().getScannedDocuments().get(0).getValue().getFileName(), is(SUP_RESPONSE_DOC_PDF_NAME));
@@ -130,7 +131,7 @@ public class SupplementaryResponseIt extends AbstractEventIt {
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
-        assertThat(result.getData().getEvidenceHandled(), is(YesNo.NO.getValue()));
+        assertThat(result.getData().getEvidenceHandled(), is(NO));
         assertThat(result.getData().getDwpState(), is(DwpState.SUPPLEMENTARY_RESPONSE.getId()));
         assertThat(result.getData().getScannedDocuments().size(), is(1));
         assertThat(result.getData().getScannedDocuments().get(0).getValue().getFileName(), is(SUP_RESPONSE_DOC_PDF_NAME));

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CARERS_ALLOWANCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.*;
 import static uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator.generateAppealNumber;
 import static uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil.cleanPhoneNumber;
@@ -23,10 +24,6 @@ import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 @Slf4j
 public final class SubmitYourAppealToCcdCaseDataDeserializer {
-
-    private static final String YES = "Yes";
-    private static final String NO = "No";
-
 
     private SubmitYourAppealToCcdCaseDataDeserializer() {
         // Empty
@@ -146,18 +143,18 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         return syaCaseWrapper.getCaseType().equals("draft");
     }
 
-    private static String booleanToYesNo(Boolean flag) {
+    private static YesNo booleanToYesNo(Boolean flag) {
         if (flag == null) {
             return null;
         }
-        return flag ? "Yes" : "No";
+        return flag ? YES : NO;
     }
 
-    private static String booleanToYesNull(Boolean flag) {
+    private static YesNo booleanToYesNull(Boolean flag) {
         if (flag == null) {
             return null;
         }
-        return flag ? "Yes" : null;
+        return flag ? YES : null;
     }
 
     private static Subscriptions getSubscriptions(SyaCaseWrapper syaCaseWrapper) {
@@ -202,7 +199,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         if (hearingOptions == null || hearingOptions.getWantsToAttend() == null) {
             return null;
         }
-        return YES.equals(hearingOptions.getWantsToAttend()) ? HearingType.ORAL.getValue() :
+        return isYes(hearingOptions.getWantsToAttend()) ? HearingType.ORAL.getValue() :
                 HearingType.PAPER.getValue();
     }
 
@@ -293,7 +290,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
         Identity identity = buildAppellantIdentity(syaAppellant);
 
-        String isAppointee = buildAppellantIsAppointee(syaCaseWrapper);
+        YesNo isAppointee = buildAppellantIsAppointee(syaCaseWrapper);
 
 
         Appointee appointee = getAppointee(syaCaseWrapper);
@@ -313,9 +310,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                     .build();
         }
 
-        String useSameAddress = null;
+        YesNo useSameAddress = null;
         if (syaAppellant != null && syaAppellant.getIsAddressSameAsAppointee() != null) {
-            useSameAddress = !syaAppellant.getIsAddressSameAsAppointee() ? "No" : "Yes";
+            useSameAddress = syaAppellant.getIsAddressSameAsAppointee() ? YES : NO;
         }
 
         return Appellant.builder()
@@ -341,12 +338,12 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         return identity;
     }
 
-    private static String buildAppellantIsAppointee(SyaCaseWrapper syaCaseWrapper) {
+    private static YesNo buildAppellantIsAppointee(SyaCaseWrapper syaCaseWrapper) {
         if (syaCaseWrapper.getIsAppointee() == null) {
             return null;
         }
 
-        return syaCaseWrapper.getIsAppointee() ? "Yes" : "No";
+        return syaCaseWrapper.getIsAppointee() ? YES : NO;
     }
 
     private static Name getName(SyaAppellant syaAppellant) {
@@ -464,9 +461,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                         .build();
             }
 
-            String languageInterpreter = null;
+            YesNo languageInterpreter = null;
             List<String> arrangements = null;
-            String wantsSupport = syaHearingOptions.getWantsSupport() ? YES : NO;
+            YesNo wantsSupport = syaHearingOptions.getWantsSupport() ? YES : NO;
             if (syaHearingOptions.getWantsSupport()) {
                 if (syaHearingOptions.getArrangements() == null) {
                     return HearingOptions.builder()
@@ -485,7 +482,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                         .wantsSupport(wantsSupport)
                         .arrangements(arrangements)
                         .languageInterpreter(languageInterpreter)
-                        .languages(languageInterpreter != null && languageInterpreter.equals(YES)
+                        .languages(isYes(languageInterpreter)
                                 ? syaHearingOptions.getInterpreterLanguageType() : null)
                         .scheduleHearing(null)
                         .signLanguageType(syaHearingOptions.getSignLanguageType())
@@ -493,7 +490,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                         .build();
             }
 
-            String scheduleHearing = syaHearingOptions.getScheduleHearing() ? YES : NO;
+            YesNo scheduleHearing = syaHearingOptions.getScheduleHearing() ? YES : NO;
             List<ExcludeDate> excludedDates = null;
             if (syaHearingOptions.getScheduleHearing()) {
                 excludedDates = getExcludedDates(syaHearingOptions.getDatesCantAttend());
@@ -517,7 +514,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         }
     }
 
-    private static String getLanguageInterpreter(Boolean languageInterpreter) {
+    private static YesNo getLanguageInterpreter(Boolean languageInterpreter) {
         if (languageInterpreter == null) {
             return null;
         }
@@ -573,10 +570,10 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         if (syaCaseWrapper.getContactDetails() != null) {
             final SyaSmsNotify smsNotify = syaCaseWrapper.getSmsNotify();
 
-            final String subscribeSms = getSubscribeSms(smsNotify);
+            final YesNo subscribeSms = getSubscribeSms(smsNotify);
 
             final String email = syaCaseWrapper.getContactDetails().getEmailAddress();
-            final String wantEmailNotifications = isNotBlank(email) ? YES : NO;
+            final YesNo wantEmailNotifications = isNotBlank(email) ? YES : NO;
 
             final String mobile = getMobile(syaCaseWrapper, smsNotify);
 
@@ -600,7 +597,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         return getPhoneNumberWithOutSpaces(getNotificationSmsNumber(smsNotify, syaCaseWrapper.getContactDetails()));
     }
 
-    private static String getSubscribeSms(SyaSmsNotify smsNotify) {
+    private static YesNo getSubscribeSms(SyaSmsNotify smsNotify) {
         if (smsNotify == null || smsNotify.isWantsSmsNotifications() == null) {
             return null;
         }
@@ -645,10 +642,10 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         if (null != syaCaseWrapper.getAppointee() && null != syaCaseWrapper.getSmsNotify()) {
             SyaSmsNotify smsNotify = syaCaseWrapper.getSmsNotify();
 
-            String subscribeSms = getSubscribeSms(smsNotify);
+            YesNo subscribeSms = getSubscribeSms(smsNotify);
 
             String email = syaCaseWrapper.getAppointee().getContactDetails().getEmailAddress();
-            String wantEmailNotifications = isNotBlank(email) ? YES : NO;
+            YesNo wantEmailNotifications = isNotBlank(email) ? YES : NO;
             String mobile = getPhoneNumberWithOutSpaces(
                     getNotificationSmsNumber(smsNotify, syaCaseWrapper.getAppointee().getContactDetails()));
 
@@ -771,9 +768,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         return phoneNumber;
     }
 
-    private static String hasEvidence(String evidenceProvide) {
+    private static YesNo hasEvidence(String evidenceProvide) {
         if (StringUtils.isEmpty(evidenceProvide)) {
-            return StringUtils.EMPTY;
+            return null;
         }
         return Boolean.TRUE.toString().equals(evidenceProvide) ? YES : NO;
     }

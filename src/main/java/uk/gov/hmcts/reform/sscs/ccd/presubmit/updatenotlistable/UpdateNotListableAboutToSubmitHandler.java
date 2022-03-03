@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatenotlistable;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+
 import java.time.LocalDate;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -32,23 +35,23 @@ public class UpdateNotListableAboutToSubmitHandler implements PreSubmitCallbackH
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        if ("yes".equalsIgnoreCase(sscsCaseData.getUpdateNotListableDirectionsFulfilled())) {
+        if (isYes(sscsCaseData.getUpdateNotListableDirectionsFulfilled())) {
             sscsCaseData.setState(State.READY_TO_LIST);
             sscsCaseData.setNotListableProvideReasons(null);
             sscsCaseData.setDirectionDueDate(null);
         }
 
-        if ("yes".equalsIgnoreCase(sscsCaseData.getUpdateNotListableInterlocReview())) {
+        if (isYes(sscsCaseData.getUpdateNotListableInterlocReview())) {
             sscsCaseData.setInterlocReviewState(sscsCaseData.getUpdateNotListableWhoReviewsCase());
             sscsCaseData.setInterlocReferralDate(LocalDate.now().toString());
             sscsCaseData.setDirectionDueDate(null);
         }
 
-        if ("yes".equalsIgnoreCase(sscsCaseData.getUpdateNotListableSetNewDueDate())) {
+        if (isYes(sscsCaseData.getUpdateNotListableSetNewDueDate())) {
             sscsCaseData.setDirectionDueDate(sscsCaseData.getUpdateNotListableDueDate());
         }
 
-        if ("no".equalsIgnoreCase(sscsCaseData.getUpdateNotListableSetNewDueDate())) {
+        if (isNoOrNull(sscsCaseData.getUpdateNotListableSetNewDueDate())) {
             sscsCaseData.setDirectionDueDate(null);
         }
 

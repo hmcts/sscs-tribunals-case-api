@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_WELSH_DOCUMENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -89,7 +90,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
         assertEquals("english.pdf", caseData.getOriginalDocuments().getListItems().get(0).getCode());
         assertEquals(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE.getId(),
             caseData.getSscsDocument().get(0).getValue().getDocumentTranslationStatus().getId());
-        assertEquals("No", caseData.getTranslationWorkOutstanding());
+        assertEquals(NO, caseData.getTranslationWorkOutstanding());
         assertEquals("english.pdf",
             caseData.getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
         assertEquals("welsh",
@@ -109,7 +110,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
         assertEquals("english.pdf", caseData.getOriginalDocuments().getListItems().get(0).getCode());
         assertEquals(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE.getId(),
             caseData.getSscsDocument().get(0).getValue().getDocumentTranslationStatus().getId());
-        assertEquals("Yes", caseData.getTranslationWorkOutstanding());
+        assertEquals(YES, caseData.getTranslationWorkOutstanding());
         assertEquals("english.pdf",
             caseData.getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
         assertEquals("welsh",
@@ -130,7 +131,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
         assertEquals("rip1.pdf", caseData.getOriginalDocuments().getListItems().get(0).getCode());
         assertEquals(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE.getId(),
                 caseData.getDwpDocuments().get(0).getValue().getDocumentTranslationStatus().getId());
-        assertEquals("No", caseData.getTranslationWorkOutstanding());
+        assertEquals(NO, caseData.getTranslationWorkOutstanding());
         assertEquals("rip1.pdf",
                 caseData.getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
         assertEquals("welsh",
@@ -224,7 +225,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
             sscsWelshDocumentDetails.getBundleAddition());
         assertEquals("Addition WEL-A - my filename.pdf",
             sscsWelshDocumentDetails.getDocumentFileName());
-        assertEquals("No",
+        assertEquals(NO,
             sscsWelshDocumentDetails.getEvidenceIssued());
 
     }

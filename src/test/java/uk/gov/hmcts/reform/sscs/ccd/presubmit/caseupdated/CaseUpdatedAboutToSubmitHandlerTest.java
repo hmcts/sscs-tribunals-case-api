@@ -9,6 +9,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYesOrNo;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 
 import java.util.ArrayList;
@@ -176,14 +177,14 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(2, response.getData().getAssociatedCase().size());
-        assertEquals("Yes", response.getData().getLinkedCasesBoolean());
+        assertEquals(YES, response.getData().getLinkedCasesBoolean());
         assertEquals("56765676", response.getData().getAssociatedCase().get(0).getValue().getCaseReference());
         assertEquals("12345678", response.getData().getAssociatedCase().get(1).getValue().getCaseReference());
 
-        assertEquals("Yes", matchingCase1.getData().getLinkedCasesBoolean());
+        assertEquals(YES, matchingCase1.getData().getLinkedCasesBoolean());
         assertEquals("ccdId", matchingCase1.getData().getAssociatedCase().get(0).getValue().getCaseReference());
 
-        assertEquals("Yes", matchingCase2.getData().getLinkedCasesBoolean());
+        assertEquals(YES, matchingCase2.getData().getLinkedCasesBoolean());
         assertEquals("ccdId", matchingCase2.getData().getAssociatedCase().get(0).getValue().getCaseReference());
     }
 
@@ -192,13 +193,13 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     public void givenChangeInRpcChangeIsScottish(String oldRpcName, String newRpcName, String expected) {
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        caseData.setIsScottishCase("No");
+        caseData.setIsScottishCase(NO);
         RegionalProcessingCenter oldRpc = RegionalProcessingCenter.builder().name(oldRpcName).build();
         RegionalProcessingCenter newRpc = RegionalProcessingCenter.builder().name(newRpcName).build();
 
         handler.maybeChangeIsScottish(oldRpc, newRpc, caseData);
 
-        assertEquals(expected, caseData.getIsScottishCase());
+        assertEquals(isYesOrNo(expected), caseData.getIsScottishCase());
     }
 
     @Test
@@ -206,13 +207,13 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     public void givenChangeInNullRpcChangeIsScottish(String newRpcName, String expected) {
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        caseData.setIsScottishCase("No");
+        caseData.setIsScottishCase(NO);
         RegionalProcessingCenter oldRpc = null;
         RegionalProcessingCenter newRpc = RegionalProcessingCenter.builder().name(newRpcName).build();
 
         handler.maybeChangeIsScottish(oldRpc, newRpc, caseData);
 
-        assertEquals(expected, caseData.getIsScottishCase());
+        assertEquals(isYesOrNo(expected), caseData.getIsScottishCase());
     }
 
     @Test
@@ -223,7 +224,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(newRpcName, response.getData().getRegionalProcessingCenter().getName());
-        assertEquals(expectedIsScottish, response.getData().getIsScottishCase());
+        assertEquals(isYesOrNo(expectedIsScottish), response.getData().getIsScottishCase());
     }
 
     @Test
@@ -239,7 +240,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnAppealWithNewAppointeePostcode_thenUpdateProcessingVenueWithAppointeeVenue() {
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee(YES);
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().address(Address.builder().postcode("AB1200B").build()).build());
 
         when(airLookupService.lookupAirVenueNameByPostCode("AB1200B", sscsCaseData.getAppeal().getBenefitType())).thenReturn("VenueB");
@@ -253,7 +254,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @Parameters({"null", " ", ""})
     public void givenAnAppealWithNullOrEmptyPostcode_thenDoNotUpdateProcessingVenue(@Nullable String postcode) {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB1200B");
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee(YES);
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode(postcode);
         callback.getCaseDetails().getCaseData().setRegionalProcessingCenter(RegionalProcessingCenter.builder().name("rpc1").build());
         callback.getCaseDetails().getCaseData().setProcessingVenue("VenueA");
@@ -268,7 +269,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @Test
     public void givenAnAppealWithNewAppointeeButEmptyPostcode_thenUpdateProcessingVenueWithAppellantVenue() {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB1200B");
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee(YES);
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().address(Address.builder().postcode(null).build()).build());
 
         when(airLookupService.lookupAirVenueNameByPostCode("AB1200B", sscsCaseData.getAppeal().getBenefitType())).thenReturn("VenueB");
@@ -359,7 +360,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         numberOfExpectedError = getNumberOfExpectedError(response);
         assertEquals(0, numberOfExpectedError);
 
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().toBuilder().appointee(Appointee.builder().address(address).build()).build();
+        Appointee appointee = Appointee.builder().address(address).build();
+        callback.getCaseDetails().getCaseData().getAppeal().toBuilder().appellant(Appellant.builder().appointee(appointee).build()).build();
         response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         numberOfExpectedError = getNumberOfExpectedError(response);
         assertEquals(0, numberOfExpectedError);
@@ -531,7 +533,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     })
     public void givenHearingTypeOralAndWantsToAttendHearingNo_thenAddWarningMessage(String idamUserRole, int warnings) {
         callback.getCaseDetails().getCaseData().getAppeal().setHearingType(HearingType.ORAL.getValue());
-        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend("No").build());
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend(NO).build());
         when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(idamUserRole)).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -795,12 +797,12 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     public void givenNonSscs1PaperCaseAppellantWantsToAttendYes_thenCaseIsOralAndWarningShown(String shortName) {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
-        otherPartyList.add(buildOtherParty("No",null));
-        otherPartyList.add(buildOtherParty("No", NO));
+        otherPartyList.add(buildOtherParty(NO,null));
+        otherPartyList.add(buildOtherParty(NO, NO));
         callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
         callback.getCaseDetails().getCaseData().getAppeal().setHearingType(HearingType.PAPER.getValue());
         callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(
-            HearingOptions.builder().wantsToAttend("Yes").build()
+            HearingOptions.builder().wantsToAttend(YES).build()
         );
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -815,12 +817,12 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     public void givenNonSscs1PaperCaseAppellantWantsToAttendYesCaseLoader_thenCaseIsOralAndNoWarningShown() {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
-        otherPartyList.add(buildOtherParty("No",null));
-        otherPartyList.add(buildOtherParty("No", NO));
+        otherPartyList.add(buildOtherParty(NO,null));
+        otherPartyList.add(buildOtherParty(NO, NO));
         callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
         callback.getCaseDetails().getCaseData().getAppeal().setHearingType(HearingType.PAPER.getValue());
         callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(
-            HearingOptions.builder().wantsToAttend("Yes").build()
+            HearingOptions.builder().wantsToAttend(YES).build()
         );
         when(idamService.getUserDetails(any())).thenReturn(UserDetails.builder().roles(List.of("caseworker-sscs-systemupdate")).build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -835,7 +837,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     public void givenNonSscs1PaperCaseAppelllantWantsToAttendNo_thenCaseIsNotChangedAndNoWarningShown(String shortName) {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
         callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(
-            HearingOptions.builder().wantsToAttend("No").build()
+            HearingOptions.builder().wantsToAttend(NO).build()
         );
         callback.getCaseDetails().getCaseData().getAppeal().setHearingType(HearingType.PAPER.getValue());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -851,7 +853,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("PIP");
         callback.getCaseDetails().getCaseData().getAppeal().setHearingType(hearingType);
         callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(
-            HearingOptions.builder().wantsToAttend(appellantWantsToAttend).build()
+            HearingOptions.builder().wantsToAttend(isYesOrNo(appellantWantsToAttend)).build()
         );
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -859,7 +861,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         assertEquals(hearingType, response.getData().getAppeal().getHearingType());
     }
 
-    private CcdValue<OtherParty> buildOtherParty(String wantsToAttend, YesNo confidentiality) {
+    private CcdValue<OtherParty> buildOtherParty(YesNo wantsToAttend, YesNo confidentiality) {
         return CcdValue.<OtherParty>builder().value(OtherParty.builder()
             .confidentialityRequired(confidentiality != null ? confidentiality : NO)
             .hearingOptions(HearingOptions.builder().wantsToAttend(wantsToAttend).build())

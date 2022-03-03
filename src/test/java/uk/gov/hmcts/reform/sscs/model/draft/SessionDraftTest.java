@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.model.draft;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_ESA;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_WITH_APPOINTEE;
@@ -20,13 +22,13 @@ public class SessionDraftTest {
         SessionDraft sessionDraft = SessionDraft.builder()
             .benefitType(new SessionBenefitType("Personal Independence Payment (PIP)"))
             .postcode(new SessionPostcodeChecker("n29ed"))
-            .createAccount(new SessionCreateAccount("yes"))
-            .haveAMrn(new SessionHaveAMrn("yes"))
+            .createAccount(new SessionCreateAccount(YES))
+            .haveAMrn(new SessionHaveAMrn(YES))
             .mrnDate(new SessionMrnDate(new SessionDate("10", "10", "1990")))
-            .checkMrn(new SessionCheckMrn("yes"))
+            .checkMrn(new SessionCheckMrn(YES))
             .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("aassas dasdsa dasdasda das"))
             .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
-            .appointee(new SessionAppointee("no"))
+            .appointee(new SessionAppointee(NO))
             .appellantName(new SessionName("Mrs.", "Ap", "Pellant"))
             .appellantDob(new SessionDob(new SessionDate("31", "12", "1998")))
             .appellantNino(new SessionAppellantNino("SC 94 27 06 A"))
@@ -44,10 +46,10 @@ public class SessionDraftTest {
                     null
                 )
             )
-            .sameAddress(new SessionSameAddress("no"))
-            .textReminders(new SessionTextReminders("yes"))
-            .sendToNumber(new SessionSendToNumber("yes"))
-            .representative(new SessionRepresentative("no"))
+            .sameAddress(new SessionSameAddress(NO))
+            .textReminders(new SessionTextReminders(YES))
+            .sendToNumber(new SessionSendToNumber(YES))
+            .representative(new SessionRepresentative(NO))
             .reasonForAppealing(
                 new SessionReasonForAppealing(
                     Collections.singletonList(
@@ -58,10 +60,10 @@ public class SessionDraftTest {
                 )
             )
             .otherReasonForAppealing(new SessionOtherReasonForAppealing("I can't think of anything else"))
-            .evidenceProvide(new SessionEvidenceProvide("no"))
-            .theHearing(new SessionTheHearing("yes"))
-            .hearingSupport(new SessionHearingSupport("yes"))
-            .hearingAvailability(new SessionHearingAvailability("no"))
+            .evidenceProvide(new SessionEvidenceProvide(NO))
+            .theHearing(new SessionTheHearing(YES))
+            .hearingSupport(new SessionHearingSupport(YES))
+            .hearingAvailability(new SessionHearingAvailability(NO))
             .hearingArrangements(
                 new SessionHearingArrangements(
                     new SessionHearingArrangementsSelection(
@@ -83,12 +85,12 @@ public class SessionDraftTest {
         SessionDraft sessionDraft = SessionDraft.builder()
             .benefitType(new SessionBenefitType("Personal Independence Payment (PIP)"))
             .postcode(new SessionPostcodeChecker("n29ed"))
-            .createAccount(new SessionCreateAccount("yes"))
-            .haveAMrn(new SessionHaveAMrn("no"))
-            .haveContactedDwp(new SessionHaveContactedDwp("yes"))
+            .createAccount(new SessionCreateAccount(YES))
+            .haveAMrn(new SessionHaveAMrn(NO))
+            .haveContactedDwp(new SessionHaveContactedDwp(YES))
             .noMrn(new SessionNoMrn("I can't find my letter."))
             .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
-            .appointee(new SessionAppointee("no"))
+            .appointee(new SessionAppointee(NO))
             .appellantName(new SessionName("Mrs.", "Ap", "Pellant"))
             .appellantDob(new SessionDob(new SessionDate("31", "12", "1998")))
             .appellantNino(new SessionAppellantNino("SC 94 27 06 A"))
@@ -106,9 +108,9 @@ public class SessionDraftTest {
                     null
                 )
             )
-            .textReminders(new SessionTextReminders("yes"))
-            .sendToNumber(new SessionSendToNumber("yes"))
-            .representative(new SessionRepresentative("no"))
+            .textReminders(new SessionTextReminders(YES))
+            .sendToNumber(new SessionSendToNumber(YES))
+            .representative(new SessionRepresentative(NO))
             .reasonForAppealing(
                 new SessionReasonForAppealing(
                     Collections.singletonList(
@@ -119,9 +121,9 @@ public class SessionDraftTest {
                 )
             )
             .otherReasonForAppealing(new SessionOtherReasonForAppealing("I can't think of anything else"))
-            .evidenceProvide(new SessionEvidenceProvide("no"))
-            .theHearing(new SessionTheHearing("yes"))
-            .hearingSupport(new SessionHearingSupport("yes"))
+            .evidenceProvide(new SessionEvidenceProvide(NO))
+            .theHearing(new SessionTheHearing(YES))
+            .hearingSupport(new SessionHearingSupport(YES))
             .hearingArrangements(
                 new SessionHearingArrangements(
                     new SessionHearingArrangementsSelection(
@@ -143,13 +145,13 @@ public class SessionDraftTest {
         SessionDraft sessionDraft = SessionDraft.builder()
             .benefitType(new SessionBenefitType("Personal Independence Payment (PIP)"))
             .postcode(new SessionPostcodeChecker("n29ed"))
-            .createAccount(new SessionCreateAccount("yes"))
-            .haveAMrn(new SessionHaveAMrn("yes"))
+            .createAccount(new SessionCreateAccount(YES))
+            .haveAMrn(new SessionHaveAMrn(YES))
             .mrnDate(new SessionMrnDate(new SessionDate("10", "10", "1990")))
-            .checkMrn(new SessionCheckMrn("yes"))
+            .checkMrn(new SessionCheckMrn(YES))
             .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("aassas dasdsa dasdasda das"))
             .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
-            .appointee(new SessionAppointee("no"))
+            .appointee(new SessionAppointee(NO))
             .appellantName(new SessionName("Mrs.", "Ap", "Pellant"))
             .appellantDob(new SessionDob(new SessionDate("31", "12", "1998")))
             .appellantNino(new SessionAppellantNino("SC 94 27 06 A"))
@@ -167,9 +169,9 @@ public class SessionDraftTest {
                     null
                 )
             )
-            .textReminders(new SessionTextReminders("yes"))
-            .sendToNumber(new SessionSendToNumber("yes"))
-            .representative(new SessionRepresentative("yes"))
+            .textReminders(new SessionTextReminders(YES))
+            .sendToNumber(new SessionSendToNumber(YES))
+            .representative(new SessionRepresentative(YES))
             .representativeDetails(
                 new SessionRepresentativeDetails(
                     new SessionRepName(
@@ -201,13 +203,13 @@ public class SessionDraftTest {
         SessionDraft sessionDraft = SessionDraft.builder()
             .benefitType(new SessionBenefitType("Personal Independence Payment (PIP)"))
             .postcode(new SessionPostcodeChecker("n29ed"))
-            .createAccount(new SessionCreateAccount("yes"))
-            .haveAMrn(new SessionHaveAMrn("yes"))
+            .createAccount(new SessionCreateAccount(YES))
+            .haveAMrn(new SessionHaveAMrn(YES))
             .mrnDate(new SessionMrnDate(new SessionDate("10", "10", "1990")))
-            .checkMrn(new SessionCheckMrn("yes"))
+            .checkMrn(new SessionCheckMrn(YES))
             .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("aassas dasdsa dasdasda das"))
             .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
-            .appointee(new SessionAppointee("yes"))
+            .appointee(new SessionAppointee(YES))
             .appointeeName(new SessionName("Mr.","Ap","Pointee"))
             .appointeeDob(new SessionDob(new SessionDate("1", "1", "1999")))
             .appointeeContactDetails(
@@ -241,10 +243,10 @@ public class SessionDraftTest {
                     null
                 )
             )
-            .sameAddress(new SessionSameAddress("no"))
-            .textReminders(new SessionTextReminders("yes"))
-            .sendToNumber(new SessionSendToNumber("yes"))
-            .representative(new SessionRepresentative("no"))
+            .sameAddress(new SessionSameAddress(NO))
+            .textReminders(new SessionTextReminders(YES))
+            .sendToNumber(new SessionSendToNumber(YES))
+            .representative(new SessionRepresentative(NO))
             .reasonForAppealing(
                 new SessionReasonForAppealing(
                     Collections.singletonList(
@@ -255,8 +257,8 @@ public class SessionDraftTest {
                 )
             )
             .otherReasonForAppealing(new SessionOtherReasonForAppealing("I can't think of anything else"))
-            .evidenceProvide(new SessionEvidenceProvide("no"))
-            .theHearing(new SessionTheHearing("yes"))
+            .evidenceProvide(new SessionEvidenceProvide(NO))
+            .theHearing(new SessionTheHearing(YES))
             .build();
 
         assertThatJson(SESSION_SAMPLE_WITH_APPOINTEE.getSerializedMessage())
@@ -270,13 +272,13 @@ public class SessionDraftTest {
         SessionDraft sessionDraft = SessionDraft.builder()
             .benefitType(new SessionBenefitType("Personal Independence Payment (PIP)"))
             .postcode(new SessionPostcodeChecker("n29ed"))
-            .createAccount(new SessionCreateAccount("yes"))
-            .haveAMrn(new SessionHaveAMrn("yes"))
+            .createAccount(new SessionCreateAccount(YES))
+            .haveAMrn(new SessionHaveAMrn(YES))
             .mrnDate(new SessionMrnDate(new SessionDate("10", "10", "1990")))
-            .checkMrn(new SessionCheckMrn("yes"))
+            .checkMrn(new SessionCheckMrn(YES))
             .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("aassas dasdsa dasdasda das"))
             .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
-            .appointee(new SessionAppointee("yes"))
+            .appointee(new SessionAppointee(YES))
             .appointeeName(new SessionName("Mr.","Ap","Pointee"))
             .appointeeDob(new SessionDob(new SessionDate("1", "1", "1999")))
             .appointeeContactDetails(
@@ -296,10 +298,10 @@ public class SessionDraftTest {
             .appellantName(new SessionName("Mrs.", "Ap", "Pellant"))
             .appellantDob(new SessionDob(new SessionDate("31", "12", "1998")))
             .appellantNino(new SessionAppellantNino("SC 94 27 06 A"))
-            .sameAddress(new SessionSameAddress("yes"))
-            .textReminders(new SessionTextReminders("yes"))
-            .sendToNumber(new SessionSendToNumber("yes"))
-            .representative(new SessionRepresentative("no"))
+            .sameAddress(new SessionSameAddress(YES))
+            .textReminders(new SessionTextReminders(YES))
+            .sendToNumber(new SessionSendToNumber(YES))
+            .representative(new SessionRepresentative(NO))
             .reasonForAppealing(
                 new SessionReasonForAppealing(
                     Collections.singletonList(
@@ -310,8 +312,8 @@ public class SessionDraftTest {
                 )
             )
             .otherReasonForAppealing(new SessionOtherReasonForAppealing("I can't think of anything else"))
-            .evidenceProvide(new SessionEvidenceProvide("no"))
-            .theHearing(new SessionTheHearing("yes"))
+            .evidenceProvide(new SessionEvidenceProvide(NO))
+            .theHearing(new SessionTheHearing(YES))
             .build();
 
         assertThatJson(SESSION_SAMPLE_WITH_APPOINTEE_AT_SAME_ADDRESS.getSerializedMessage())
@@ -325,13 +327,13 @@ public class SessionDraftTest {
         SessionDraft sessionDraft = SessionDraft.builder()
             .benefitType(new SessionBenefitType("Employment and Support Allowance (ESA)"))
             .postcode(new SessionPostcodeChecker("n29ed"))
-            .createAccount(new SessionCreateAccount("yes"))
-            .haveAMrn(new SessionHaveAMrn("yes"))
+            .createAccount(new SessionCreateAccount(YES))
+            .haveAMrn(new SessionHaveAMrn(YES))
             .mrnDate(new SessionMrnDate(new SessionDate("10", "10", "1990")))
-            .checkMrn(new SessionCheckMrn("yes"))
+            .checkMrn(new SessionCheckMrn(YES))
             .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("aassas dasdsa dasdasda das"))
             .dwpIssuingOfficeEsa(new SessionDwpIssuingOfficeEsa("Chesterfield DRT"))
-            .appointee(new SessionAppointee("no"))
+            .appointee(new SessionAppointee(NO))
             .appellantName(new SessionName("Mrs.", "Ap", "Pellant"))
             .appellantDob(new SessionDob(new SessionDate("31", "12", "1998")))
             .appellantNino(new SessionAppellantNino("SC 94 27 06 A"))
@@ -349,9 +351,9 @@ public class SessionDraftTest {
                     null
                 )
             )
-            .textReminders(new SessionTextReminders("yes"))
-            .sendToNumber(new SessionSendToNumber("yes"))
-            .representative(new SessionRepresentative("no"))
+            .textReminders(new SessionTextReminders(YES))
+            .sendToNumber(new SessionSendToNumber(YES))
+            .representative(new SessionRepresentative(NO))
             .reasonForAppealing(
                 new SessionReasonForAppealing(
                     Collections.singletonList(
@@ -362,8 +364,8 @@ public class SessionDraftTest {
                 )
             )
             .otherReasonForAppealing(new SessionOtherReasonForAppealing("I can't think of anything else"))
-            .evidenceProvide(new SessionEvidenceProvide("no"))
-            .theHearing(new SessionTheHearing("yes"))
+            .evidenceProvide(new SessionEvidenceProvide(NO))
+            .theHearing(new SessionTheHearing(YES))
             .build();
 
         assertThatJson(SESSION_SAMPLE_ESA.getSerializedMessage())
@@ -376,13 +378,13 @@ public class SessionDraftTest {
         SessionDraft sessionDraft = SessionDraft.builder()
             .benefitType(new SessionBenefitType("Personal Independence Payment (PIP)"))
             .postcode(new SessionPostcodeChecker("n29ed"))
-            .createAccount(new SessionCreateAccount("yes"))
-            .haveAMrn(new SessionHaveAMrn("yes"))
+            .createAccount(new SessionCreateAccount(YES))
+            .haveAMrn(new SessionHaveAMrn(YES))
             .mrnDate(new SessionMrnDate(new SessionDate("10", "10", "1990")))
-            .checkMrn(new SessionCheckMrn("yes"))
+            .checkMrn(new SessionCheckMrn(YES))
             .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("aassas dasdsa dasdasda das"))
             .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
-            .appointee(new SessionAppointee("no"))
+            .appointee(new SessionAppointee(NO))
             .appellantName(new SessionName("Mrs.", "Ap", "Pellant"))
             .appellantDob(new SessionDob(new SessionDate("31", "12", "1998")))
             .appellantNino(new SessionAppellantNino("SC 94 27 06 A"))
@@ -400,9 +402,9 @@ public class SessionDraftTest {
                     null
                 )
             )
-            .textReminders(new SessionTextReminders("yes"))
-            .sendToNumber(new SessionSendToNumber("yes"))
-            .representative(new SessionRepresentative("no"))
+            .textReminders(new SessionTextReminders(YES))
+            .sendToNumber(new SessionSendToNumber(YES))
+            .representative(new SessionRepresentative(NO))
             .reasonForAppealing(
                 new SessionReasonForAppealing(
                     Collections.singletonList(
@@ -413,10 +415,10 @@ public class SessionDraftTest {
                 )
             )
             .otherReasonForAppealing(new SessionOtherReasonForAppealing("I can't think of anything else"))
-            .evidenceProvide(new SessionEvidenceProvide("no"))
-            .theHearing(new SessionTheHearing("yes"))
-            .hearingSupport(new SessionHearingSupport("yes"))
-            .hearingAvailability(new SessionHearingAvailability("yes"))
+            .evidenceProvide(new SessionEvidenceProvide(NO))
+            .theHearing(new SessionTheHearing(YES))
+            .hearingSupport(new SessionHearingSupport(YES))
+            .hearingAvailability(new SessionHearingAvailability(YES))
             .hearingArrangements(
                 new SessionHearingArrangements(
                     new SessionHearingArrangementsSelection(

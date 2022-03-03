@@ -5,6 +5,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYesOrNo;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -64,7 +66,7 @@ public class AbateCaseAboutToStartHandlerTest {
 
     @Test
     public void givenCaseWithAppointee_thenShowErrorMessage() {
-        callback.getCaseDetails().getCaseData().setAppeal(Appeal.builder().appellant(Appellant.builder().isAppointee("Yes").build()).build());
+        callback.getCaseDetails().getCaseData().setAppeal(Appeal.builder().appellant(Appellant.builder().isAppointee(YES).build()).build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
         if (response.getErrors().stream().findAny().isPresent()) {
@@ -76,7 +78,7 @@ public class AbateCaseAboutToStartHandlerTest {
     @Test
     @Parameters({"null", "no"})
     public void givenCaseWithNoAppointee_thenDoNotShowErrorMessage(@Nullable String isAppointee) {
-        callback.getCaseDetails().getCaseData().setAppeal(Appeal.builder().appellant(Appellant.builder().isAppointee(isAppointee).build()).build());
+        callback.getCaseDetails().getCaseData().setAppeal(Appeal.builder().appellant(Appellant.builder().isAppointee(isYesOrNo(isAppointee)).build()).build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
     }

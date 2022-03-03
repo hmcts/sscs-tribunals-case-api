@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service.venue;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -26,6 +28,6 @@ public class VenueRpcDetailsService {
     }
 
     private boolean isActiveVenue(VenueDetails venueDetails) {
-        return venueDetails != null && "Yes".equalsIgnoreCase(venueDetails.getActive());
+        return venueDetails != null && isYes(venueDetails.getActive());
     }
 }

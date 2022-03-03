@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.supplementaryresponse;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.collections4.ListUtils.union;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
@@ -77,7 +78,7 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
 
         if (responseDocuments.size() > 0) {
             sscsCaseData.setScannedDocuments(buildScannedDocsList(sscsCaseData, responseDocuments));
-            sscsCaseData.setEvidenceHandled(YesNo.NO.getValue());
+            sscsCaseData.setEvidenceHandled(NO);
             sscsCaseData.setDwpState(DwpState.SUPPLEMENTARY_RESPONSE.getId());
         }
 

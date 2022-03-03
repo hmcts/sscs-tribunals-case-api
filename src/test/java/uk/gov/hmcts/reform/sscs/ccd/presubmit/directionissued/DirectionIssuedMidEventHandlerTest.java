@@ -10,6 +10,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -80,7 +82,7 @@ public class DirectionIssuedMidEventHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
         sscsCaseData = SscsCaseData.builder()
-                .generateNotice("Yes")
+                .generateNotice(YES)
                 .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
                 .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
                 .appeal(Appeal.builder()
@@ -114,7 +116,7 @@ public class DirectionIssuedMidEventHandlerTest {
 
     @Test
     public void givenGenerateNoticeIsNo_thenReturnFalse() {
-        sscsCaseData.setGenerateNotice("No");
+        sscsCaseData.setGenerateNotice(NO);
         assertFalse(handler.canHandle(MID_EVENT, callback));
     }
 
@@ -153,7 +155,7 @@ public class DirectionIssuedMidEventHandlerTest {
 
     @Test
     public void givenCaseWithAppointee_thenCorrectlySetTheNoticeNameWithAppellantAndAppointeeAppended() {
-        sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
+        sscsCaseData.getAppeal().getAppellant().setIsAppointee(YES);
         sscsCaseData.getAppeal().getAppellant().setAppointee(Appointee.builder()
                 .name(Name.builder().firstName("APPOINTEE")
                         .lastName("SurNamE")
@@ -170,8 +172,8 @@ public class DirectionIssuedMidEventHandlerTest {
 
     @Test
     public void givenWelsh_CaseWithAppointee_thenCorrectlySetTheNoticeNameWithAppellantAndAppointeeAppended() {
-        sscsCaseData.setLanguagePreferenceWelsh("yes");
-        sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
+        sscsCaseData.setLanguagePreferenceWelsh(YES);
+        sscsCaseData.getAppeal().getAppellant().setIsAppointee(YES);
         sscsCaseData.getAppeal().getAppellant().setAppointee(Appointee.builder()
                 .name(Name.builder().firstName("APPOINTEE")
                         .lastName("SurNamE")

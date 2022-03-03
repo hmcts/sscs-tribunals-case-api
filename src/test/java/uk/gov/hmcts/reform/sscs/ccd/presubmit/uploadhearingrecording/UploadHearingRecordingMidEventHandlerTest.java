@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadhearingrecording.HearingTypeForRecording.FINAL;
 
 import java.util.ArrayList;
@@ -201,7 +202,7 @@ public class UploadHearingRecordingMidEventHandlerTest {
 
         assertNotNull(response.getData().getSscsHearingRecordingCaseData().getExistingHearingRecordings());
         assertEquals("2222", response.getData().getSscsHearingRecordingCaseData().getExistingHearingRecordings().getHearingId());
-        assertEquals("Yes", response.getData().getSscsHearingRecordingCaseData().getHearingRecordingExist().getValue());
+        assertEquals(YES, response.getData().getSscsHearingRecordingCaseData().getHearingRecordingExist());
     }
 
     @Test
@@ -216,7 +217,7 @@ public class UploadHearingRecordingMidEventHandlerTest {
                 response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getSscsHearingRecordingCaseData().getExistingHearingRecordings());
-        assertNotEquals(YesNo.YES, response.getData().getSscsHearingRecordingCaseData().getHearingRecordingExist());
+        assertNotEquals(YES, response.getData().getSscsHearingRecordingCaseData().getHearingRecordingExist());
     }
 
     private void assertNoErrors() {

@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.ADJOURNMENT_NOTICE_ISSUED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -69,7 +71,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
                 if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
                     sscsCaseData.setDwpState(ADJOURNMENT_NOTICE_ISSUED.getId());
-                    if ("yes".equalsIgnoreCase(sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties())) {
+                    if (isYes(sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties())) {
                         sscsCaseData.setState(State.NOT_LISTABLE);
                     } else {
                         sscsCaseData.setState(State.READY_TO_LIST);
@@ -79,7 +81,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
                     clearBasicTransientFields(sscsCaseData);
                     sscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
                     log.info("Set the InterlocReviewState to {},  for case id : {}", sscsCaseData.getInterlocReviewState(), sscsCaseData.getCcdCaseId());
-                    sscsCaseData.setTranslationWorkOutstanding("Yes");
+                    sscsCaseData.setTranslationWorkOutstanding(YES);
                 }
 
                 AdjournCaseService.clearTransientFields(sscsCaseData);

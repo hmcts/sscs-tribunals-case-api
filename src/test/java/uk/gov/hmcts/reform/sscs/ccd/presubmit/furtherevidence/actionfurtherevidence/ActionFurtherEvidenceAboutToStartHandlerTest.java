@@ -91,7 +91,7 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
     @Test
     public void populateOriginalSenderDropdown_whenCaseHasRep() {
-        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().rep(Representative.builder().hasRepresentative(YES.getValue()).build()).build()).build();
+        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().rep(Representative.builder().hasRepresentative(YES).build()).build()).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -105,7 +105,7 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
     @Test
     public void populateOriginalSenderDropdown_whenCaseHasNoRep() {
-        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().rep(Representative.builder().hasRepresentative(NO.getValue()).build()).build()).build();
+        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().rep(Representative.builder().hasRepresentative(NO).build()).build()).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -118,7 +118,7 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
     @Test
     public void populateOriginalSenderDropdown_whenCaseHasRepIsNullAndThereIsAJointParty() {
-        sscsCaseData = SscsCaseData.builder().jointParty(YES.getValue()).appeal(Appeal.builder().rep(Representative.builder().hasRepresentative(null).build()).build()).build();
+        sscsCaseData = SscsCaseData.builder().jointParty(YES).appeal(Appeal.builder().rep(Representative.builder().hasRepresentative(null).build()).build()).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -132,7 +132,7 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
     @Test
     public void populateOriginalSenderDropdown_whenCaseHasRepAndJointParty() {
-        sscsCaseData = SscsCaseData.builder().jointParty(YES.getValue()).appeal(Appeal.builder().rep(Representative.builder().hasRepresentative(YES.getValue()).build()).build()).build();
+        sscsCaseData = SscsCaseData.builder().jointParty(YES).appeal(Appeal.builder().rep(Representative.builder().hasRepresentative(YES).build()).build()).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);

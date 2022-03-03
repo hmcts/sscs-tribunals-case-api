@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -78,7 +79,7 @@ public class OnlineHearingService {
                 sscsCaseDetails.getData().getCaseReference(),
                 sscsCaseDetails.getId(),
                 new HearingArrangements(
-                        "yes".equalsIgnoreCase(hearingOptions.getLanguageInterpreter()),
+                        isYes(hearingOptions.getLanguageInterpreter()),
                         hearingOptions.getLanguages(),
                         arrangements.contains("signLanguageInterpreter"),
                         hearingOptions.getSignLanguageType(),

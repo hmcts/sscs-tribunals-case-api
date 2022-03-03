@@ -10,6 +10,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -154,7 +155,7 @@ public class CreateWelshNoticeIt extends AbstractEventIt {
         assertEquals(2, documentList.size());
         assertEquals("Direction Notice", documentList.get(0).getValue().getDocumentType());
         assertEquals("22222.pdf", documentList.get(0).getValue().getDocumentFileName());
-        assertEquals("No", result.getData().getTranslationWorkOutstanding());
+        assertEquals(NO, result.getData().getTranslationWorkOutstanding());
         assertEquals("directionIssuedWelsh", result.getData().getSscsWelshPreviewNextEvent());
         assertEquals("Direction Notice", documentList.get(1).getValue().getDocumentType());
         assertNotNull(documentList.get(1).getValue().getDocumentFileName());

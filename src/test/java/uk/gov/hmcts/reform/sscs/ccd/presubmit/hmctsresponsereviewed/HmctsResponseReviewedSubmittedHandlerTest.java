@@ -11,6 +11,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.Collections;
 import junitparams.JUnitParamsRunner;
@@ -77,7 +79,7 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
     @Test
     public void givenAHmctsResponseReviewedSubmittedEventAndInterlocIsRequiredForJudge_thenTriggerValidSendToInterlocEvent() {
 
-        sscsCaseData = sscsCaseData.toBuilder().isInterlocRequired("Yes").selectWhoReviewsCase(new DynamicList(new DynamicListItem("reviewByJudge", "Review by Judge"), null)).build();
+        sscsCaseData = sscsCaseData.toBuilder().isInterlocRequired(YES).selectWhoReviewsCase(new DynamicList(new DynamicListItem("reviewByJudge", "Review by Judge"), null)).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
@@ -89,7 +91,7 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
     @Test
     public void givenAHmctsResponseReviewedSubmittedEventAndInterlocIsRequiredForTcw_thenTriggerValidSendToInterlocEvent() {
 
-        sscsCaseData = sscsCaseData.toBuilder().isInterlocRequired("Yes").selectWhoReviewsCase(new DynamicList(new DynamicListItem("reviewByTcw", "Review by TCW"), null)).build();
+        sscsCaseData = sscsCaseData.toBuilder().isInterlocRequired(YES).selectWhoReviewsCase(new DynamicList(new DynamicListItem("reviewByTcw", "Review by TCW"), null)).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
@@ -101,7 +103,7 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
     @Test
     public void givenAHmctsResponseReviewedSubmittedEventAndInterlocIsNotRequired_thenTriggerReadyToListEvent() {
 
-        sscsCaseData = sscsCaseData.toBuilder().isInterlocRequired("No").build();
+        sscsCaseData = sscsCaseData.toBuilder().isInterlocRequired(NO).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);

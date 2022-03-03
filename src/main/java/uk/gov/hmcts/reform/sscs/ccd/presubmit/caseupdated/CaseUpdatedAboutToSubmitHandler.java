@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SYSTEM_USER;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.checkConfidentiality;
 
@@ -196,7 +197,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     public void maybeChangeIsScottish(RegionalProcessingCenter oldRpc, RegionalProcessingCenter newRpc, SscsCaseData caseData) {
         if (oldRpc != newRpc) {
-            String isScottishCase = IsScottishHandler.isScottishCase(newRpc, caseData);
+            YesNo isScottishCase = IsScottishHandler.isScottishCase(newRpc, caseData);
             caseData.setIsScottishCase(isScottishCase);
         }
     }
@@ -205,7 +206,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        String postCode = "yes".equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())
+        String postCode = isYes(sscsCaseData.getAppeal().getAppellant().getIsAppointee())
             && null != sscsCaseData.getAppeal().getAppellant().getAppointee()
             && null != sscsCaseData.getAppeal().getAppellant().getAppointee().getAddress()
             && null != sscsCaseData.getAppeal().getAppellant().getAppointee().getAddress().getPostcode()

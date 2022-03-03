@@ -8,6 +8,7 @@ import static org.apache.commons.collections4.ListUtils.union;
 import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService.TEMP_UNIQUE_ID;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
@@ -242,7 +243,7 @@ public class EvidenceUploadService {
                 filename, idamEmail);
 
         sscsCaseData.setDraftSscsDocument(Collections.emptyList());
-        sscsCaseData.setEvidenceHandled("No");
+        sscsCaseData.setEvidenceHandled(NO);
         ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_DOCUMENT.getCcdType(),
                 "SSCS - upload evidence from MYA",
                 "Uploaded a further evidence document", idamService.getIdamTokens());

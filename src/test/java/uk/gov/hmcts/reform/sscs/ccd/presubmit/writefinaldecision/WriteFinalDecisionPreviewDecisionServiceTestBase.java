@@ -10,6 +10,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -129,8 +130,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAnythingElse("Something else.");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionTypeOfHearing("telephone");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPageSectionReference("A1");
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAppellantAttendedQuestion("Yes");
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPresentingOfficerAttendedQuestion("No");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAppellantAttendedQuestion(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPresentingOfficerAttendedQuestion(NO);
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").address(Address.builder().postcode("postcode").build()).build()).build()).build()));
 
@@ -142,8 +143,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAnythingElse("Something else.");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionTypeOfHearing("telephone");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPageSectionReference("A1");
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAppellantAttendedQuestion("Yes");
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPresentingOfficerAttendedQuestion("No");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAppellantAttendedQuestion(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPresentingOfficerAttendedQuestion(NO);
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").address(Address.builder().postcode("postcode").build()).build()).build()).build()));
 
@@ -202,8 +203,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenDateOfDecisionNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(null);
 
@@ -222,8 +223,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenSignedInJudgeNameNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenThrow(new IllegalStateException("Unable to obtain signed in user details"));
@@ -242,8 +243,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenSignedInJudgeUserDetailsNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenThrow(new IllegalStateException("Unable to obtain signed in user details"));
@@ -262,8 +263,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenComparedToDwpMobilityQuestionNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
@@ -281,8 +282,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenComparedToDwpDailyLivingSetIncorrectly_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("someValue");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -302,8 +303,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenComparedToDwpMobilityQuestionSetIncorrectly_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("someValue");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -330,8 +331,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithMultipleHearingsWithVenues_thenCorrectlySetHeldAtUsingTheFirstHearingInList() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
@@ -366,8 +367,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoVenueName_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "Yes" : "No", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
@@ -391,8 +392,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoVenue_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes"  : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
@@ -416,8 +417,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayAnErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
@@ -439,8 +440,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDetails_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
@@ -463,8 +464,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithEmptyHearingsList_thenDefaultHearingData() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
@@ -489,8 +490,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithNullHearingsList_thenDefaultHearingData() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setHearings(null);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -514,8 +515,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithMultipleHearingsWithHearingDates_thenCorrectlySetTheHeldOnUsingTheFirstHearingInList() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
@@ -550,8 +551,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDate_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
@@ -575,8 +576,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayTwoErrorsAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
@@ -603,8 +604,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithMultiplePanelMembers_thenCorrectlySetTheHeldBefore() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
@@ -637,8 +638,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithOnePanelMember_thenCorrectlySetTheHeldBefore() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
@@ -670,8 +671,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithNoPanelMembersWithNullValues_thenCorrectlySetTheHeldBefore() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
@@ -701,8 +702,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenValidCase_WhenNoTemplatesForEnglishLanguageRegisteredThenDisplayError() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
@@ -724,8 +725,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenValidCase_WhenNoTemplatesForEventRegisteredThenDisplayError() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
@@ -746,8 +747,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithNoPanelMembersWithEmptyValues_thenCorrectlySetTheHeldBefore() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionMedicallyQualifiedPanelMemberName("");
@@ -778,8 +779,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void scottishRpcWillShowAScottishImage() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
@@ -794,7 +795,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             "2018-10-10", true, true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
     }
 
-    protected abstract void setDescriptorFlowIndicator(String value, SscsCaseData sscsCaseData);
+    protected abstract void setDescriptorFlowIndicator(YesNo value, SscsCaseData sscsCaseData);
 
     protected abstract boolean getDescriptorFlowIndicator(WriteFinalDecisionTemplateBody body);
 
@@ -803,11 +804,11 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithAppointee_thenCorrectlySetTheNoticeNameWithAppellantAndAppointeeAppendedAndAppointeeFullNameSet() {
 
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
+        sscsCaseData.getAppeal().getAppellant().setIsAppointee(YES);
         sscsCaseData.getAppeal().getAppellant().setAppointee(Appointee.builder()
             .name(Name.builder().firstName("APPOINTEE")
                 .lastName("SurNamE")
@@ -826,8 +827,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
     @Test
     public void givenDateIssuedParameterIsTrue_thenShowIssuedDateOnDocument() {
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
@@ -841,8 +842,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
     @Test
     public void givenGeneratedDateIsAlreadySetGeneratedDescriptorFlow_thenSetNewGeneratedDate() {
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(isYesOrNo(isDescriptorFlowSupported()), sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGeneratedDate("2018-10-10");
@@ -866,9 +867,9 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
     @Test
     public void givenWelsh_GeneratedDateIsAlreadySet_thenDoNotSetNewGeneratedDate() {
-        sscsCaseData.setLanguagePreferenceWelsh("yes");
-        setDescriptorFlowIndicator("no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("no");
+        sscsCaseData.setLanguagePreferenceWelsh(YES);
+        setDescriptorFlowIndicator(NO, sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGeneratedDate("2018-10-10");

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.decisionissued;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DecisionType.STRIKE_OUT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
 import java.time.LocalDate;
@@ -93,7 +94,7 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
             clearBasicTransientFields(caseData);
             caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
             log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
-            caseData.setTranslationWorkOutstanding("Yes");
+            caseData.setTranslationWorkOutstanding(YES);
 
         }
 

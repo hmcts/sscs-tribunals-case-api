@@ -4,6 +4,7 @@ import static io.restassured.RestAssured.baseURI;
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static net.javacrumbs.jsonunit.JsonAssert.whenIgnoringPaths;
 import static org.junit.Assert.assertEquals;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
@@ -206,7 +207,7 @@ public class SubmitAppealTest {
         log.info("Duplicate case " + secondCaseSscsCaseDetails.getId() + " has been found");
 
         assertEquals(1, secondCaseSscsCaseDetails.getData().getAssociatedCase().size());
-        assertEquals("Yes", secondCaseSscsCaseDetails.getData().getLinkedCasesBoolean());
+        assertEquals(YES, secondCaseSscsCaseDetails.getData().getLinkedCasesBoolean());
         log.info(secondCaseSscsCaseDetails.toString());
 
         // check duplicate returns 409

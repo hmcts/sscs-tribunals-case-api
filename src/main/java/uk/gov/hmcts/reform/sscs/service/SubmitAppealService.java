@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import static uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService.getFirstHalfOfPostcode;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
@@ -122,7 +123,7 @@ public class SubmitAppealService {
 
         try {
             SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal, workAllocationFeature);
-            
+
             CaseDetails caseDetails = citizenCcdService.updateCase(sscsCaseData, EventType.UPDATE_DRAFT.getCcdType(), "Update draft",
                     "Update draft in CCD", idamTokens, appeal.getCcdCaseId());
 
@@ -350,9 +351,9 @@ public class SubmitAppealService {
         }
 
         if (!matchedByNinoCases.isEmpty()) {
-            return caseData.toBuilder().associatedCase(associatedCases).linkedCasesBoolean("Yes").build();
+            return caseData.toBuilder().associatedCase(associatedCases).linkedCasesBoolean(YES).build();
         } else {
-            return caseData.toBuilder().linkedCasesBoolean("No").build();
+            return caseData.toBuilder().linkedCasesBoolean(NO).build();
         }
     }
 

@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -214,7 +215,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("faceToFace", payload.getHearingType());
         assertEquals("something else", payload.getAdditionalDirections().get(0));
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
-        assertEquals("yes", payload.getPanelMembersExcluded());
+        assertEquals(YES.getValue(), payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
         assertEquals(true, payload.isNextHearingAtVenue());
         assertNull(payload.getInterpreterDescription());
@@ -265,7 +266,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("faceToFace", payload.getHearingType());
         assertEquals("something else", payload.getAdditionalDirections().get(0));
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
-        assertEquals("yes", payload.getPanelMembersExcluded());
+        assertEquals(YES.getValue(), payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
         assertEquals(true, payload.isNextHearingAtVenue());
         assertEquals("an interpreter in French", payload.getInterpreterDescription());
@@ -341,7 +342,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("faceToFace", payload.getHearingType());
         assertEquals("something else", payload.getAdditionalDirections().get(0));
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
-        assertEquals("yes", payload.getPanelMembersExcluded());
+        assertEquals(YES.getValue(), payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
         assertEquals(true, payload.isNextHearingAtVenue());
         assertNull(payload.getInterpreterDescription());
@@ -392,7 +393,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("telephone", payload.getHearingType());
         assertEquals("something else", payload.getAdditionalDirections().get(0));
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
-        assertEquals("yes", payload.getPanelMembersExcluded());
+        assertEquals(YES.getValue(), payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
         assertEquals(false, payload.isNextHearingAtVenue());
     }
@@ -442,7 +443,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("video", payload.getHearingType());
         assertEquals("something else", payload.getAdditionalDirections().get(0));
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
-        assertEquals("yes", payload.getPanelMembersExcluded());
+        assertEquals(YES.getValue(), payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
         assertEquals(false, payload.isNextHearingAtVenue());
     }
@@ -492,7 +493,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("paper", payload.getHearingType());
         assertEquals("something else", payload.getAdditionalDirections().get(0));
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
-        assertEquals("yes", payload.getPanelMembersExcluded());
+        assertEquals(YES.getValue(), payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
         assertEquals(false, payload.isNextHearingAtVenue());
 

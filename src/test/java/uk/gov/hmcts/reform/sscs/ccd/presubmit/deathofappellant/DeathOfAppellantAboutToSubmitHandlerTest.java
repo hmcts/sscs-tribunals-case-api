@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -53,12 +54,12 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
         handler = new DeathOfAppellantAboutToSubmitHandler(validator);
 
         when(callback.getEvent()).thenReturn(EventType.DEATH_OF_APPELLANT);
-        sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().appellant(Appellant.builder().build()).build()).dwpUcb("yes").build();
+        sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().appellant(Appellant.builder().build()).build()).dwpUcb(YES).build();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-        sscsCaseDataBefore = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().appellant(Appellant.builder().build()).build()).dwpUcb("yes").build();
+        sscsCaseDataBefore = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().appellant(Appellant.builder().build()).build()).dwpUcb(YES).build();
         when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
     }
 
@@ -90,14 +91,14 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
     @Test
     public void givenADeathOfAppellantEventThatIsSubscribedToEmailAndSms_thenUnsubscribeFromEmailAndSms() {
-        callback.getCaseDetails().getCaseData().setSubscriptions(Subscriptions.builder().appellantSubscription(Subscription.builder().subscribeEmail("Yes").subscribeSms("Yes").build()).build());
+        callback.getCaseDetails().getCaseData().setSubscriptions(Subscriptions.builder().appellantSubscription(Subscription.builder().subscribeEmail(YES).subscribeSms(YES).build()).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
-        assertEquals("No", response.getData().getSubscriptions().getAppellantSubscription().getSubscribeEmail());
-        assertEquals("No", response.getData().getSubscriptions().getAppellantSubscription().getSubscribeSms());
-        assertEquals("No", response.getData().getSubscriptions().getAppellantSubscription().getWantSmsNotifications());
+        assertEquals(NO, response.getData().getSubscriptions().getAppellantSubscription().getSubscribeEmail());
+        assertEquals(NO, response.getData().getSubscriptions().getAppellantSubscription().getSubscribeSms());
+        assertEquals(NO, response.getData().getSubscriptions().getAppellantSubscription().getWantSmsNotifications());
     }
 
     @Test
@@ -124,7 +125,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
     public void givenADeathOfAppellantEventThatHasNoAppointeeBeforeAndHasAppointeeAfter_thenSetInterlocReviewState() {
 
         caseDetailsBefore.getCaseData().getAppeal().getAppellant().setAppointee(null);
-        caseDetails.getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
+        caseDetails.getCaseData().getAppeal().getAppellant().setIsAppointee(YES);
         caseDetails.getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().name(Name.builder().firstName("Tester").build()).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -136,9 +137,9 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
     @Test
     public void givenADeathOfAppellantEventThatHasAppointeeBeforeAndItHasNowChanged_thenSetInterlocReviewState() {
 
-        caseDetailsBefore.getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
+        caseDetailsBefore.getCaseData().getAppeal().getAppellant().setIsAppointee(YES);
         caseDetailsBefore.getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().name(Name.builder().firstName("Fred").build()).build());
-        caseDetails.getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
+        caseDetails.getCaseData().getAppeal().getAppellant().setIsAppointee(YES);
         caseDetails.getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().name(Name.builder().firstName("Tester").build()).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -163,9 +164,9 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
     @Parameters({"null, null", "no, null", "null, no", "no, no"})
     public void givenADeathOfAppellantEventThatHasWithAppointeeNoBeforeAndWithAppointeeNoAfter_thenSetInterlocReviewStateAndDwpState(@Nullable String isAppointeeBefore, @Nullable String isAppointeeAfter) {
 
-        caseDetailsBefore.getCaseData().getAppeal().getAppellant().setIsAppointee(isAppointeeBefore);
+        caseDetailsBefore.getCaseData().getAppeal().getAppellant().setIsAppointee(isYesOrNo(isAppointeeBefore));
         caseDetailsBefore.getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().build());
-        caseDetails.getCaseData().getAppeal().getAppellant().setIsAppointee(isAppointeeAfter);
+        caseDetails.getCaseData().getAppeal().getAppellant().setIsAppointee(isYesOrNo(isAppointeeAfter));
         caseDetails.getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -176,9 +177,9 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
     @Test
     public void givenADeathOfAppellantEventThatHasAppointeeBeforeAndAppointeeAfterWithNoChange_thenDoNotSetInterlocReviewStateOrDwpState() {
 
-        caseDetailsBefore.getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
+        caseDetailsBefore.getCaseData().getAppeal().getAppellant().setIsAppointee(YES);
         caseDetailsBefore.getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().name(Name.builder().firstName("Fred").build()).build());
-        caseDetails.getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
+        caseDetails.getCaseData().getAppeal().getAppellant().setIsAppointee(YES);
         caseDetails.getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().name(Name.builder().firstName("Fred").build()).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -216,20 +217,20 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
     @Test
     public void givenADeathOfAppellantWithNoJointPartyOnCase_thenClearConfidentialFlags() {
-        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YesNo.YES);
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
         callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeAppellant(
                 DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(RequestOutcome.GRANTED).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getIsConfidentialCase());
-        assertEquals(YesNo.YES, response.getData().getIsAppellantDeceased());
+        assertEquals(YES, response.getData().getIsAppellantDeceased());
         assertNull(response.getData().getConfidentialityRequestOutcomeAppellant());
     }
 
     @Test
     public void givenADeathOfAppellantWithJointPartyConfidentialRequestNotGranted_thenClearConfidentialFlagsForAppellant() {
-        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YesNo.YES);
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
         callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeAppellant(
                 DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(RequestOutcome.GRANTED).build());
         callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeJointParty(
@@ -238,14 +239,14 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getIsConfidentialCase());
-        assertEquals(YesNo.YES, response.getData().getIsAppellantDeceased());
+        assertEquals(YES, response.getData().getIsAppellantDeceased());
         assertNull(response.getData().getConfidentialityRequestOutcomeAppellant());
         assertEquals(RequestOutcome.IN_PROGRESS, response.getData().getConfidentialityRequestOutcomeJointParty().getRequestOutcome());
     }
 
     @Test
     public void givenADeathOfAppellantWithJointPartyOnCaseAndConfidentialRequestGranted_thenClearConfidentialFlagForAppellantAndDoNotClearConfidentialFlagOnCase() {
-        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YesNo.YES);
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
         callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeAppellant(
                 DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(RequestOutcome.GRANTED).build());
         callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeJointParty(
@@ -253,8 +254,8 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(YesNo.YES, response.getData().getIsConfidentialCase());
-        assertEquals(YesNo.YES, response.getData().getIsAppellantDeceased());
+        assertEquals(YES, response.getData().getIsConfidentialCase());
+        assertEquals(YES, response.getData().getIsAppellantDeceased());
         assertNull(response.getData().getConfidentialityRequestOutcomeAppellant());
         assertEquals(RequestOutcome.GRANTED, response.getData().getConfidentialityRequestOutcomeJointParty().getRequestOutcome());
     }

@@ -6,6 +6,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 
 import java.util.List;
@@ -63,7 +65,7 @@ public class SscsPdfServiceTest {
     public void createValidWelshPdfAndSendEmailAndStoreInDocumentStore(String benefitCode, String expectedWelshBenefitName, String expectedEnglishBenefitName) {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
-        caseData.setLanguagePreferenceWelsh("Yes");
+        caseData.setLanguagePreferenceWelsh(YES);
         caseData.getAppeal().getAppellant().getIdentity().setDob("2000-12-31");
         caseData.setCaseCreated("2020-12-31");
         caseData.getAppeal().getBenefitType().setCode(benefitCode);
@@ -115,7 +117,7 @@ public class SscsPdfServiceTest {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
         caseData.getAppeal().getMrnDetails().setMrnDate(null);
-        caseData.setLanguagePreferenceWelsh("yes");
+        caseData.setLanguagePreferenceWelsh(YES);
         service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");
 
         verify(pdfServiceClient).generateFromHtml(any(), any());
@@ -126,7 +128,7 @@ public class SscsPdfServiceTest {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
 
-        caseData.getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend("No").build());
+        caseData.getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend(NO).build());
 
         service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");
 
@@ -141,7 +143,7 @@ public class SscsPdfServiceTest {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
 
-        caseData.getAppeal().setRep(Representative.builder().hasRepresentative("No").build());
+        caseData.getAppeal().setRep(Representative.builder().hasRepresentative(NO).build());
 
         service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");
 
@@ -155,8 +157,8 @@ public class SscsPdfServiceTest {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
 
-        caseData.getAppeal().setRep(Representative.builder().hasRepresentative("No").build());
-        caseData.setLanguagePreferenceWelsh("Yes");
+        caseData.getAppeal().setRep(Representative.builder().hasRepresentative(NO).build());
+        caseData.setLanguagePreferenceWelsh(YES);
 
         service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");
 

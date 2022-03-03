@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 import static java.util.Optional.empty;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +50,7 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         WriteFinalDecisionTemplateBody payload) {
 
 
-        if ("Yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
+        if (isYes(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
 
             // Validate here for ESA instead of only validating on submit.
             // This ensures that we know we can obtain a valid allowed or refused condition below
@@ -75,7 +76,7 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
     @Override
     protected void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
 
-        if ("Yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
+        if (isYes(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             builder.esaIsEntited(false);
             builder.esaAwardRate(null);
             Optional<AwardType> esaAwardTypeOptional = caseData.isWcaAppeal() ? EsaPointsRegulationsAndSchedule3ActivitiesCondition

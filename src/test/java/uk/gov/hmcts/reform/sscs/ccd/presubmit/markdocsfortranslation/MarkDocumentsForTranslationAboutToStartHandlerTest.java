@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
@@ -53,7 +55,7 @@ public class MarkDocumentsForTranslationAboutToStartHandlerTest {
     @Test
     public void handleNonWelshCase() {
         sscsCaseData = CaseDataUtils.buildMinimalCaseData();
-        sscsCaseData.setLanguagePreferenceWelsh("No");
+        sscsCaseData.setLanguagePreferenceWelsh(NO);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
@@ -66,7 +68,7 @@ public class MarkDocumentsForTranslationAboutToStartHandlerTest {
     @Test
     public void handleWelshCase() {
         sscsCaseData = CaseDataUtils.buildMinimalCaseData();
-        sscsCaseData.setLanguagePreferenceWelsh("Yes");
+        sscsCaseData.setLanguagePreferenceWelsh(YES);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());

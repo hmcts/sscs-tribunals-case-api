@@ -7,6 +7,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import javax.validation.Validation;
@@ -77,7 +79,7 @@ public class IssueFinalDecisionMidEventHandlerTest {
 
     @Test
     public void givenIssueFinalDecisionEventWithDeathOfAppellant_thenDisplayWarning() {
-        sscsCaseData.setIsAppellantDeceased(YesNo.YES);
+        sscsCaseData.setIsAppellantDeceased(YES);
         when(callback.isIgnoreWarnings()).thenReturn(false);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -90,7 +92,7 @@ public class IssueFinalDecisionMidEventHandlerTest {
     @Test
     public void givenIssueFinalDecisionEventWithDeathOfAppellantWithIgnoreWarnings_thenDoNotDisplayWarning() {
         when(callback.isIgnoreWarnings()).thenReturn(true);
-        sscsCaseData.setIsAppellantDeceased(YesNo.YES);
+        sscsCaseData.setIsAppellantDeceased(YES);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -102,7 +104,7 @@ public class IssueFinalDecisionMidEventHandlerTest {
     public void givenIssueFinalDecisionEventWithDeathOfAppellantButNotOnTheCorrectPage_thenDoNotDisplayWarning() {
         when(callback.getPageId()).thenReturn("incorrectPage");
         when(callback.isIgnoreWarnings()).thenReturn(false);
-        sscsCaseData.setIsAppellantDeceased(YesNo.YES);
+        sscsCaseData.setIsAppellantDeceased(YES);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -112,7 +114,7 @@ public class IssueFinalDecisionMidEventHandlerTest {
 
     @Test
     public void givenIssueFinalDecisionEventWithNoDeathOfAppellant_thenDoNotDisplayWarning() {
-        sscsCaseData.setIsAppellantDeceased(YesNo.NO);
+        sscsCaseData.setIsAppellantDeceased(NO);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);

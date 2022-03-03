@@ -21,7 +21,7 @@
   "subscriptions": {
     "appellantSubscription": {
       "tya": "abcde12345",
-      "subscribeEmail": "yes",
+      "subscribeEmail": "Yes",
       "email": "appellant@example.com"
     }
   }

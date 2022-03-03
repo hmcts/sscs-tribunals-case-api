@@ -8,6 +8,8 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -44,8 +46,8 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.UPDATE_NOT_LISTABLE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
-            .appeal(Appeal.builder().build()).directionDueDate(LocalDate.now().toString())
-            .build();
+                .appeal(Appeal.builder().build()).directionDueDate(LocalDate.now().toString())
+                .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
@@ -59,7 +61,7 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
     public void givenUpdateNotListableWithDirectionsFulfilledYes_thenClearNotListableReasonsAndSetStateToReadyToList() {
         sscsCaseData.setNotListableProvideReasons("reason1");
         sscsCaseData.setState(NOT_LISTABLE);
-        sscsCaseData.setUpdateNotListableDirectionsFulfilled("Yes");
+        sscsCaseData.setUpdateNotListableDirectionsFulfilled(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -72,7 +74,7 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
     public void givenUpdateNotListableWithDirectionsFulfilledNo_thenDoNotClearNotListableReasonsAndDoNotChangeState() {
         sscsCaseData.setNotListableProvideReasons("reason1");
         sscsCaseData.setState(NOT_LISTABLE);
-        sscsCaseData.setUpdateNotListableDirectionsFulfilled("No");
+        sscsCaseData.setUpdateNotListableDirectionsFulfilled(NO);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -82,7 +84,7 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
 
     @Test
     public void givenUpdateNotListableWithInterlocReviewTcw_thenSetInterlocFields() {
-        sscsCaseData.setUpdateNotListableInterlocReview("yes");
+        sscsCaseData.setUpdateNotListableInterlocReview(YES);
         sscsCaseData.setUpdateNotListableWhoReviewsCase("reviewByTcw");
         sscsCaseData.setDirectionDueDate(LocalDate.now().toString());
 
@@ -95,7 +97,7 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
 
     @Test
     public void givenUpdateNotListableWithInterlocReviewJudge_thenSetInterlocFields() {
-        sscsCaseData.setUpdateNotListableInterlocReview("yes");
+        sscsCaseData.setUpdateNotListableInterlocReview(YES);
         sscsCaseData.setUpdateNotListableWhoReviewsCase("reviewByJudge");
         sscsCaseData.setDirectionDueDate(LocalDate.now().toString());
 
@@ -109,7 +111,7 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
     @Test
     public void givenUpdateNotListableSetNewDueDateYes_thenWriteToDirectionDueDateField() {
         String tomorrowDate = LocalDate.now().plus(1, ChronoUnit.DAYS).toString();
-        sscsCaseData.setUpdateNotListableSetNewDueDate("Yes");
+        sscsCaseData.setUpdateNotListableSetNewDueDate(YES);
         sscsCaseData.setUpdateNotListableDueDate(tomorrowDate);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -120,7 +122,7 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
     @Test
     public void givenUpdateNotListableSetNewDueDateNo_thenDirectionDueDateFieldIsNull() {
         String tomorrowDate = LocalDate.now().plus(1, ChronoUnit.DAYS).toString();
-        sscsCaseData.setUpdateNotListableSetNewDueDate("No");
+        sscsCaseData.setUpdateNotListableSetNewDueDate(NO);
         sscsCaseData.setUpdateNotListableDueDate(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -145,9 +147,9 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
         sscsCaseData.setUpdateNotListableDueDate(LocalDate.now().toString());
         sscsCaseData.setUpdateNotListableWhereShouldCaseMoveTo("withDwp");
         sscsCaseData.setNotListableProvideReasons("reason1");
-        sscsCaseData.setUpdateNotListableSetNewDueDate("No");
+        sscsCaseData.setUpdateNotListableSetNewDueDate(NO);
         sscsCaseData.setUpdateNotListableWhoReviewsCase("reviewByJudge");
-        sscsCaseData.setUpdateNotListableDirectionsFulfilled("Yes");
+        sscsCaseData.setUpdateNotListableDirectionsFulfilled(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

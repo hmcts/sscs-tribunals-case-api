@@ -6,10 +6,10 @@
     "postcode": "n29ed"
   },
   "CreateAccount": {
-    "createAccount": "yes"
+    "createAccount": "Yes"
   },
   "HaveAMRN": {
-    "haveAMRN": "yes"
+    "haveAMRN": "Yes"
   },
   "MRNDate": {
     "mrnDate": {
@@ -19,7 +19,7 @@
     }
   },
   "CheckMRN": {
-    "checkedMRN": "yes"
+    "checkedMRN": "Yes"
   },
   "MRNOverThirteenMonthsLate": {
     "reasonForBeingLate": "aassas dasdsa dasdasda das"
@@ -28,7 +28,7 @@
     "pipNumber": "1"
   },
   "Appointee": {
-    "isAppointee": "no"
+    "isAppointee": "No"
   },
   "AppellantName": {
     "title": "Mrs.",
@@ -55,16 +55,16 @@
     "emailAddress": "appellant@gmail.com"
   },
   "TextReminders": {
-    "doYouWantTextMsgReminders": "yes"
+    "doYouWantTextMsgReminders": "Yes"
   },
   "SendToNumber": {
-    "useSameNumber": "yes"
+    "useSameNumber": "Yes"
   },
   "SmsConfirmation": {
 
   },
   "Representative": {
-    "hasRepresentative": "yes"
+    "hasRepresentative": "Yes"
   },
   "RepresentativeDetails": {
     "name": {
@@ -92,13 +92,13 @@
     "otherReasonForAppealing": "disagree with disagree with"
   },
   "EvidenceProvide": {
-    "evidenceProvide": "no"
+    "evidenceProvide": "No"
   },
   "TheHearing": {
-    "attendHearing": "yes"
+    "attendHearing": "Yes"
   },
   "HearingSupport": {
-    "arrangements": "yes"
+    "arrangements": "Yes"
   },
   "HearingArrangements": {
     "selection": {

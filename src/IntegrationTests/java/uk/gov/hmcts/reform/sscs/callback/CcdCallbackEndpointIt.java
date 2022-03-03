@@ -12,6 +12,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.createUploadResponse;
@@ -254,7 +256,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
         assertNull(result.getData().getInterlocReviewState());
         assertNull(result.getData().getScannedDocuments());
         assertNull(result.getData().getSscsDocument());
-        assertEquals("Yes", result.getData().getEvidenceHandled());
+        assertEquals(YES, result.getData().getEvidenceHandled());
     }
 
     @Test
@@ -268,7 +270,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
 
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
 
-        assertEquals("No", result.getData().getLinkedCasesBoolean());
+        assertEquals(NO, result.getData().getLinkedCasesBoolean());
         assertNull(result.getData().getDirectionDueDate());
     }
 

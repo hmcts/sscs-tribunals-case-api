@@ -62,7 +62,7 @@ public class ActionHearingRecordingRequestServiceTest {
                 .build();
 
         SscsCaseData sscsCaseData = SscsCaseData.builder()
-                .jointParty(YES.getValue())
+                .jointParty(YES)
                 .sscsHearingRecordingCaseData(sscsHearingRecordingCaseData)
                 .hearings(newArrayList(HEARING)).build();
         final Optional<RequestStatus> requestStatus = service.getRequestStatus(party, null, HEARING, sscsCaseData);
@@ -80,7 +80,7 @@ public class ActionHearingRecordingRequestServiceTest {
                 .build();
 
         SscsCaseData sscsCaseData = SscsCaseData.builder()
-                .jointParty(YES.getValue())
+                .jointParty(YES)
                 .sscsHearingRecordingCaseData(sscsHearingRecordingCaseData)
                 .hearings(newArrayList(HEARING)).build();
         final Optional<RequestStatus> requestStatus = service.getRequestStatus(party, null, HEARING, sscsCaseData);

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -79,7 +80,7 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
                 .builder()
                 .sscsCaseData(caseData)
                 .ccdCaseId(caseId)
-                .evidencePresent(caseData.getEvidencePresent())
+                .evidencePresent(isYes(caseData.getEvidencePresent()) ? "Yes" : "No")
                 .state(caseState).build();
 
         JSONObject roboticsJson = toJsonObject(roboticsWrapper);

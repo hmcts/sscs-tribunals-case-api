@@ -32,7 +32,7 @@ public class PartiesOnCaseUtilTest {
 
     @Test
     public void givenCaseWithRep_thenGetPartiesOnCaseWithAppellantAndRep() {
-        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("yes").build());
+        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative(YES).build());
 
         List<DynamicListItem> response = PartiesOnCaseUtil.getPartiesOnCase(sscsCaseData);
 
@@ -43,7 +43,7 @@ public class PartiesOnCaseUtilTest {
 
     @Test
     public void givenCaseWithJointParty_thenGetPartiesOnCaseWithAppellantAndJointParty() {
-        sscsCaseData.setJointParty("Yes");
+        sscsCaseData.setJointParty(YES);
 
         List<DynamicListItem> response = PartiesOnCaseUtil.getPartiesOnCase(sscsCaseData);
 
@@ -70,7 +70,7 @@ public class PartiesOnCaseUtilTest {
                 .name(Name.builder().firstName("Bo").lastName("Surname").title("Mr").build())
                 .rep(Representative.builder()
                         .id("2")
-                        .hasRepresentative(YES.getValue())
+                        .hasRepresentative(YES)
                         .name(Name.builder().firstName("Harry").lastName("Rep").build())
                         .build())
                 .build();
@@ -90,14 +90,14 @@ public class PartiesOnCaseUtilTest {
         OtherParty otherParty = OtherParty.builder()
                 .id("1")
                 .name(Name.builder().firstName("Bo").lastName("Surname").title("Mr").build())
-                .isAppointee(YES.getValue())
+                .isAppointee(YES)
                 .appointee(Appointee.builder()
                         .id("2")
                         .name(Name.builder().firstName("Silva").lastName("Lining").build())
                         .build())
                 .rep(Representative.builder()
                         .id("3")
-                        .hasRepresentative(YES.getValue())
+                        .hasRepresentative(YES)
                         .name(Name.builder().firstName("Harry").lastName("Rep").build())
                         .build())
                 .build();
@@ -137,14 +137,14 @@ public class PartiesOnCaseUtilTest {
         OtherParty otherParty1 = OtherParty.builder()
                 .id("1")
                 .name(Name.builder().firstName("Bo").lastName("Surname").title("Mr").build())
-                .isAppointee(YES.getValue())
+                .isAppointee(YES)
                 .appointee(Appointee.builder()
                         .id("2")
                         .name(Name.builder().firstName("Silva").lastName("Lining").build())
                         .build())
                 .rep(Representative.builder()
                         .id("3")
-                        .hasRepresentative(YES.getValue())
+                        .hasRepresentative(YES)
                         .name(Name.builder().firstName("Harry").lastName("Rep").build())
                         .build())
                 .build();
@@ -154,7 +154,7 @@ public class PartiesOnCaseUtilTest {
                 .name(Name.builder().firstName("Cat").lastName("Snack").title("Mrs").build())
                 .rep(Representative.builder()
                         .id("5")
-                        .hasRepresentative(YES.getValue())
+                        .hasRepresentative(YES)
                         .name(Name.builder().firstName("Peter").lastName("Rep").build())
                         .build())
                 .build();

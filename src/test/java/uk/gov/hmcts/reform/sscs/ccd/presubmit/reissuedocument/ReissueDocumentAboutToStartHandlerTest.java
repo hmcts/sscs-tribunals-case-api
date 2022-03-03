@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -152,7 +153,7 @@ public class ReissueDocumentAboutToStartHandlerTest extends ReissueArtifactHandl
 
         sscsCaseData.setSscsWelshDocuments(sscsWelshDocuments);
 
-        sscsCaseData.setLanguagePreferenceWelsh("Yes");
+        sscsCaseData.setLanguagePreferenceWelsh(YES);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);

@@ -6,13 +6,13 @@
     "postcode": "n29ed"
   },
   "CreateAccount": {
-    "createAccount": "yes"
+    "createAccount": "Yes"
   },
   "HaveAMRN": {
-    "haveAMRN": "no"
+    "haveAMRN": "No"
   },
   "HaveContactedDWP": {
-    "haveContactedDWP": "yes"
+    "haveContactedDWP": "Yes"
   },
   "NoMRN": {
     "reasonForNoMRN": "I can't find my letter."
@@ -21,7 +21,7 @@
     "pipNumber": "1"
   },
   "Appointee": {
-    "isAppointee": "no"
+    "isAppointee": "No"
   },
   "AppellantName": {
     "title": "Mrs.",
@@ -47,13 +47,13 @@
     "emailAddress": "appellant@gmail.com"
   },
   "TextReminders": {
-    "doYouWantTextMsgReminders": "yes"
+    "doYouWantTextMsgReminders": "Yes"
   },
   "SendToNumber": {
-    "useSameNumber": "yes"
+    "useSameNumber": "Yes"
   },
   "Representative": {
-    "hasRepresentative": "no"
+    "hasRepresentative": "No"
   },
   "ReasonForAppealing": {
     "items": [
@@ -67,13 +67,13 @@
     "otherReasonForAppealing": "I can't think of anything else"
   },
   "EvidenceProvide": {
-    "evidenceProvide": "no"
+    "evidenceProvide": "No"
   },
   "TheHearing": {
-    "attendHearing": "yes"
+    "attendHearing": "Yes"
   },
   "HearingSupport": {
-    "arrangements": "yes"
+    "arrangements": "Yes"
   },
   "HearingArrangements": {
     "selection": {

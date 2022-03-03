@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.makecaseurgent;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,7 +32,7 @@ public class MakeCaseUrgentAboutToSubmitHandler implements PreSubmitCallbackHand
             && callback.getEvent() == EventType.MAKE_CASE_URGENT
             && Objects.nonNull(callback.getCaseDetails())
             && Objects.nonNull(callback.getCaseDetails().getCaseData())
-            && !"Yes".equalsIgnoreCase(callback.getCaseDetails().getCaseData().getUrgentCase());
+            && isNoOrNull(callback.getCaseDetails().getCaseData().getUrgentCase());
     }
 
     @Override
@@ -40,7 +43,7 @@ public class MakeCaseUrgentAboutToSubmitHandler implements PreSubmitCallbackHand
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        sscsCaseData.setUrgentCase("Yes");
+        sscsCaseData.setUrgentCase(YES);
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
         sscsCaseData.setUrgentHearingRegistered(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE));
         sscsCaseData.setUrgentHearingOutcome(RequestOutcome.IN_PROGRESS.getValue());

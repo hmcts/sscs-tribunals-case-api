@@ -327,7 +327,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     }
 
     private void clearEmptyAudioVideoList(SscsCaseData caseData) {
-        if (caseData.getAudioVideoEvidence() != null && caseData.getAudioVideoEvidence().size() == 0) {
+        if (caseData.getAudioVideoEvidence() != null && caseData.getAudioVideoEvidence().isEmpty()) {
             caseData.setAudioVideoEvidence(null);
         }
     }

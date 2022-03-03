@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
@@ -37,7 +40,7 @@ public class IsScottishHandler implements PreSubmitCallbackHandler<SscsCaseData>
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        String isScotCase = isScottishCase(caseData.getRegionalProcessingCenter(), caseData);
+        YesNo isScotCase = isScottishCase(caseData.getRegionalProcessingCenter(), caseData);
 
         if (! isScotCase.equals(caseData.getIsScottishCase())) {
             log.info("Setting isScottishCase field to " + isScotCase + " for case " + caseData.getCcdCaseId());
@@ -51,13 +54,13 @@ public class IsScottishHandler implements PreSubmitCallbackHandler<SscsCaseData>
         return sscsCaseDataPreSubmitCallbackResponse;
     }
 
-    public static String isScottishCase(RegionalProcessingCenter rpc, SscsCaseData caseData) {
+    public static YesNo isScottishCase(RegionalProcessingCenter rpc, SscsCaseData caseData) {
 
         if (isNull(rpc) || isNull(rpc.getName())) {
             log.info("Calculated isScottishCase field to No for empty RPC for case " + caseData.getCcdCaseId());
-            return "No";
+            return NO;
         } else {
-            String isScotCase = rpc.getName().equalsIgnoreCase("GLASGOW") ? "Yes" : "No";
+            YesNo isScotCase = rpc.getName().equalsIgnoreCase("GLASGOW") ? YES : NO;
             log.info("Calculated isScottishCase field to " + isScotCase + " for RPC " + rpc.getName() + " for case " + caseData.getCcdCaseId());
             return isScotCase;
         }

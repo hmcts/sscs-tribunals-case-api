@@ -64,9 +64,9 @@ public class IssueAdjournmentNoticeWelshAboutToSubmitHandlerTest {
 
         sscsCaseData = SscsCaseData.builder()
                 .state(State.HEARING)
-                .languagePreferenceWelsh(YES.getValue())
+                .languagePreferenceWelsh(YES)
                 .interlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId())
-                .generateNotice("Yes")
+                .generateNotice(YES)
                 .signedBy("User")
                 .signedRole("Judge")
                 .dateAdded(LocalDate.now().minusDays(1))
@@ -112,7 +112,7 @@ public class IssueAdjournmentNoticeWelshAboutToSubmitHandlerTest {
 
     @Test
     public void should_ReturnAnErrorIfNotWelshAppeal() {
-        sscsCaseData.setLanguagePreferenceWelsh(NO.getValue());
+        sscsCaseData.setLanguagePreferenceWelsh(NO);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
         assertThat(response.getErrors().iterator().next(), is("Error: This action is only available for Welsh cases."));
@@ -123,7 +123,7 @@ public class IssueAdjournmentNoticeWelshAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getData().getInterlocReviewState(), is(NONE.getId()));
-        assertThat(response.getData().getTranslationWorkOutstanding(), is(NO.getValue()));
+        assertThat(response.getData().getTranslationWorkOutstanding(), is(NO));
     }
 
 }

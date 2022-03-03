@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -150,7 +151,7 @@ public class IssueDocumentHandler {
 
     protected String buildFullName(SscsCaseData caseData) {
         StringBuilder fullNameText = new StringBuilder();
-        if (caseData.getAppeal().getAppellant().getIsAppointee() != null && caseData.getAppeal().getAppellant().getIsAppointee().equalsIgnoreCase("Yes") && caseData.getAppeal().getAppellant().getAppointee().getName() != null) {
+        if (caseData.getAppeal().getAppellant().getIsAppointee() != null && isYes(caseData.getAppeal().getAppellant().getIsAppointee()) && caseData.getAppeal().getAppellant().getAppointee().getName() != null) {
             fullNameText.append(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle(), ' ', '.'));
             fullNameText.append(", appointee for ");
         }
@@ -161,7 +162,7 @@ public class IssueDocumentHandler {
     }
 
     protected Optional<String> buildAppointeeName(SscsCaseData caseData) {
-        if (caseData.getAppeal().getAppellant().getIsAppointee() != null && caseData.getAppeal().getAppellant().getIsAppointee().equalsIgnoreCase("Yes") && caseData.getAppeal().getAppellant().getAppointee().getName() != null) {
+        if (caseData.getAppeal().getAppellant().getIsAppointee() != null && isYes(caseData.getAppeal().getAppellant().getIsAppointee()) && caseData.getAppeal().getAppellant().getAppointee().getName() != null) {
             return Optional.of(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle(), ' ', '.'));
         } else {
             return Optional.empty();

@@ -6,6 +6,8 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.*;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_UPLOAD_RESPONSE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
@@ -102,18 +104,18 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             if (sscsCaseData.getDwpEditedEvidenceReason() == null) {
                 if (otherPartyHasConfidentiality(sscsCaseData)) {
                     preSubmitCallbackResponse.addError("Other Party requires confidentiality, upload edited and unedited responses");
-                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
+                    sscsCaseData.setIsConfidentialCase(YES);
                 }
                 if (sscsCaseData.getAppeal().getAppellant() != null && YesNo.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired())) {
                     preSubmitCallbackResponse.addError("Appellant requires confidentiality, upload edited and unedited responses");
-                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
+                    sscsCaseData.setIsConfidentialCase(YES);
                 }
             } else {
                 if (otherPartyHasConfidentiality(sscsCaseData)) {
-                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
+                    sscsCaseData.setIsConfidentialCase(YES);
                 }
                 if (sscsCaseData.getAppeal().getAppellant() != null && YesNo.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired())) {
-                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
+                    sscsCaseData.setIsConfidentialCase(YES);
                 }
             }
         }
@@ -276,7 +278,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                     todayDate,
                     sscsCaseData.getDwpEditedEvidenceBundleDocument().getDocumentLink()));
 
-            if (!StringUtils.equalsIgnoreCase(sscsCaseData.getDwpFurtherInfo(), "Yes")) {
+            if (isNoOrNull(sscsCaseData.getDwpFurtherInfo())) {
                 DynamicListItem reviewByJudgeItem = new DynamicListItem("reviewByJudge", null);
 
                 if (sscsCaseData.getSelectWhoReviewsCase() == null) {

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.CTSC_CLERK;
@@ -60,9 +61,9 @@ public class UpdateSscs5OtherPartyDataIt extends AbstractEventIt {
         assertNull(result.getData().getOtherParties().get(1).getValue().getAppointee().getId());
         assertNull(result.getData().getOtherParties().get(1).getValue().getRep().getId());
         assertNull(result.getData().getOtherParties().get(0).getValue().getRole());
-        assertEquals(YesNo.NO, result.getData().getOtherParties().get(0).getValue().getShowRole());
+        assertEquals(NO, result.getData().getOtherParties().get(0).getValue().getShowRole());
         assertNull(result.getData().getOtherParties().get(1).getValue().getRole());
-        assertEquals(YesNo.NO, result.getData().getOtherParties().get(1).getValue().getShowRole());
+        assertEquals(NO, result.getData().getOtherParties().get(1).getValue().getShowRole());
     }
 
 }

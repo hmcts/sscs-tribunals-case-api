@@ -4,6 +4,8 @@ import static java.util.stream.Collectors.joining;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.created;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.controller.SyaController.logBadRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -116,8 +118,8 @@ public class CreateCaseController {
                                             Subscription.builder()
                                                     .email(email)
                                                     .mobile(mobile)
-                                                    .subscribeEmail("yes")
-                                                    .subscribeSms((mobile != null) ? "yes" : "no")
+                                                    .subscribeEmail(YES)
+                                                    .subscribeSms((mobile != null) ? YES : NO)
                                                     .tya(UUID.randomUUID().toString())
                                                     .build()
                                     )
@@ -125,8 +127,8 @@ public class CreateCaseController {
                                             Subscription.builder()
                                                     .email(email)
                                                     .mobile(mobile)
-                                                    .subscribeEmail("yes")
-                                                    .subscribeSms((mobile != null) ? "yes" : "no")
+                                                    .subscribeEmail(YES)
+                                                    .subscribeSms((mobile != null) ? YES : NO)
                                                     .tya(UUID.randomUUID().toString())
                                                     .build()
                                     )
@@ -134,8 +136,8 @@ public class CreateCaseController {
                                             Subscription.builder()
                                                     .email(email)
                                                     .mobile(mobile)
-                                                    .subscribeEmail("yes")
-                                                    .subscribeSms((mobile != null) ? "yes" : "no")
+                                                    .subscribeEmail(YES)
+                                                    .subscribeSms((mobile != null) ? YES : NO)
                                                     .tya(UUID.randomUUID().toString())
                                                     .build()
                                     )

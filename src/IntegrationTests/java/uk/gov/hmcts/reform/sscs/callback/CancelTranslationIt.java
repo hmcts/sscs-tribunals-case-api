@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -84,7 +85,7 @@ public class CancelTranslationIt extends AbstractEventIt {
                         .equals(sd.getValue().getDocumentTranslationStatus()) || SscsDocumentTranslationStatus.TRANSLATION_REQUESTED
                         .equals(sd.getValue().getDocumentTranslationStatus()))
                 .forEach(data -> assertNull(data.getValue().getDocumentTranslationStatus()));
-        assertEquals("No", result.getData().getTranslationWorkOutstanding());
+        assertEquals(NO, result.getData().getTranslationWorkOutstanding());
         assertEquals("sendToDwp", result.getData().getSscsWelshPreviewNextEvent());
     }
 

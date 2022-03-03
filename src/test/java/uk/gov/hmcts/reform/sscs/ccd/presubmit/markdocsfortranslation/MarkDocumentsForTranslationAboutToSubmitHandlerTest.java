@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.MARK_DOCS_FOR_TRANSATION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -97,7 +98,7 @@ public class MarkDocumentsForTranslationAboutToSubmitHandlerTest {
                 response.getData().getSscsDocument().get(0).getValue().getDocumentTranslationStatus());
         assertEquals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED,
                 response.getData().getSscsDocument().get(1).getValue().getDocumentTranslationStatus());
-        assertEquals("Yes",
+        assertEquals(YES,
                 response.getData().getTranslationWorkOutstanding());
     }
 
@@ -116,7 +117,7 @@ public class MarkDocumentsForTranslationAboutToSubmitHandlerTest {
 
         SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .sscsDocument(docs)
-                .languagePreferenceWelsh("Yes")
+                .languagePreferenceWelsh(YES)
                 .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
                 State.VALID_APPEAL, sscsCaseData, LocalDateTime.now(), "Benefit");

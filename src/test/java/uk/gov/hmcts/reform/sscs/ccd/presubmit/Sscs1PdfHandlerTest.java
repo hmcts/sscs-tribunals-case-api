@@ -6,6 +6,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -134,7 +136,7 @@ public class Sscs1PdfHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = sscs1PdfHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("No", response.getData().getEvidencePresent());
+        assertEquals(NO, response.getData().getEvidencePresent());
 
         verify(emailHelper).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
         verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());
@@ -150,7 +152,7 @@ public class Sscs1PdfHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = sscs1PdfHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("Yes", response.getData().getEvidencePresent());
+        assertEquals(YES, response.getData().getEvidencePresent());
 
         verify(emailHelper).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
         verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.*;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
 
@@ -48,11 +49,11 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
 
-        if (YesNo.YES.equals(sscsCaseData.getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding())) {
+        if (isYes(sscsCaseData.getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding())) {
             listOptions.add(new DynamicListItem(REFUSE_HEARING_RECORDING_REQUEST.toString(), REFUSE_HEARING_RECORDING_REQUEST.getLabel()));
         }
 
-        if ("Yes".equalsIgnoreCase(sscsCaseData.getTimeExtensionRequested())) {
+        if (isYes(sscsCaseData.getTimeExtensionRequested())) {
             listOptions.add(new DynamicListItem(GRANT_EXTENSION.toString(), GRANT_EXTENSION.getLabel()));
             listOptions.add(new DynamicListItem(REFUSE_EXTENSION.toString(), REFUSE_EXTENSION.getLabel()));
         }
@@ -62,7 +63,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
             listOptions.add(new DynamicListItem(REFUSE_REINSTATEMENT.toString(), REFUSE_REINSTATEMENT.getLabel()));
         }
 
-        if ("Yes".equalsIgnoreCase(sscsCaseData.getUrgentCase())) {
+        if (isYes(sscsCaseData.getUrgentCase())) {
             listOptions.add(new DynamicListItem(GRANT_URGENT_HEARING.toString(), GRANT_URGENT_HEARING.getLabel()));
             listOptions.add(new DynamicListItem(REFUSE_URGENT_HEARING.toString(), REFUSE_URGENT_HEARING.getLabel()));
         }

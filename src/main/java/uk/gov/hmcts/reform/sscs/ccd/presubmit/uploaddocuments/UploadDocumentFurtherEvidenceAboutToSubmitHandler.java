@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.DocumentType.REQUEST_FOR_HEARING_RECORDING;
@@ -48,7 +50,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
 
         moveDraftsToSscsDocs(caseData);
         moveDraftsToAudioVideoEvidence(caseData);
-        caseData.setEvidenceHandled("No");
+        caseData.setEvidenceHandled(NO);
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
@@ -170,7 +172,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
                     hearingRecordingRequests.add(hearingRecordingRequest);
 
                     sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(hearingRecordingRequests);
-                    sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YesNo.YES);
+                    sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YES);
                 } else {
                     response.addError("Hearing record not found");
                 }

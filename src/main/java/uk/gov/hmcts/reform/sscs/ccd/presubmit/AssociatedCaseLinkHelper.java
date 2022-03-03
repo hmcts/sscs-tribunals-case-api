@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
@@ -62,10 +65,10 @@ public class AssociatedCaseLinkHelper {
 
         if (!matchedByNinoCases.isEmpty()) {
             caseData.setAssociatedCase(new ArrayList<>(associatedCases));
-            caseData.setLinkedCasesBoolean("Yes");
+            caseData.setLinkedCasesBoolean(YES);
             addLinkToOtherAssociatedCases(matchedByNinoCases, caseData.getCcdCaseId());
         } else {
-            caseData.setLinkedCasesBoolean("No");
+            caseData.setLinkedCasesBoolean(NO);
         }
         return caseData;
     }
@@ -79,7 +82,7 @@ public class AssociatedCaseLinkHelper {
                         CaseLinkDetails.builder().caseReference(caseId).build()).build());
                 Set<CaseLink> uniqueLinkSet = new HashSet<>(linkList);
                 sscsCaseData.setAssociatedCase(new ArrayList<>(uniqueLinkSet));
-                sscsCaseData.setLinkedCasesBoolean("Yes");
+                sscsCaseData.setLinkedCasesBoolean(YES);
                 ccdService.updateCase(sscsCaseData, Long.valueOf(sscsCaseData.getCcdCaseId()), EventType.UPDATE_CASE_ONLY.getCcdType(), "updated case only", "Auto linked case added", idamService.getIdamTokens());
             }
         }

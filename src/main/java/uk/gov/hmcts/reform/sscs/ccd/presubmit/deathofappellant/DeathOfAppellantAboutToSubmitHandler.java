@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.deathofappellant;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.APPOINTEE_DETAILS_NEEDED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome.GRANTED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 
 import java.util.Optional;
@@ -57,9 +58,9 @@ public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHa
 
         if (null != preSubmitCallbackResponse.getData().getSubscriptions()
             && null != preSubmitCallbackResponse.getData().getSubscriptions().getAppellantSubscription()) {
-            preSubmitCallbackResponse.getData().getSubscriptions().getAppellantSubscription().setSubscribeEmail("No");
-            preSubmitCallbackResponse.getData().getSubscriptions().getAppellantSubscription().setSubscribeSms("No");
-            preSubmitCallbackResponse.getData().getSubscriptions().getAppellantSubscription().setWantSmsNotifications("No");
+            preSubmitCallbackResponse.getData().getSubscriptions().getAppellantSubscription().setSubscribeEmail(NO);
+            preSubmitCallbackResponse.getData().getSubscriptions().getAppellantSubscription().setSubscribeSms(NO);
+            preSubmitCallbackResponse.getData().getSubscriptions().getAppellantSubscription().setWantSmsNotifications(NO);
         }
 
 
@@ -83,13 +84,13 @@ public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHa
             preSubmitCallbackResponse.getData().setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
         }
 
-        if ((appointeeBefore == null || "no".equalsIgnoreCase(caseDataBefore.getCaseData().getAppeal().getAppellant().getIsAppointee()) || null == caseDataBefore.getCaseData().getAppeal().getAppellant().getIsAppointee())
-                && appointeeAfter == null || "no".equalsIgnoreCase(caseDataAfter.getCaseData().getAppeal().getAppellant().getIsAppointee()) || null == caseDataAfter.getCaseData().getAppeal().getAppellant().getIsAppointee()) {
+        if ((appointeeBefore == null || isNoOrNull(caseDataBefore.getCaseData().getAppeal().getAppellant().getIsAppointee()))
+                && appointeeAfter == null || isNoOrNull(caseDataAfter.getCaseData().getAppeal().getAppellant().getIsAppointee())) {
             preSubmitCallbackResponse.getData().setDwpState(APPOINTEE_DETAILS_NEEDED.getId());
         }
 
         preSubmitCallbackResponse.getData().setConfidentialityRequestOutcomeAppellant(null);
-        preSubmitCallbackResponse.getData().setIsAppellantDeceased(YesNo.YES);
+        preSubmitCallbackResponse.getData().setIsAppellantDeceased(YES);
 
         if (!shouldKeepConfidentialCaseFlag(caseDataAfter)) {
             preSubmitCallbackResponse.getData().setIsConfidentialCase(null);

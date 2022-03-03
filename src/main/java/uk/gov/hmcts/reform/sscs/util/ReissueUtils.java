@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 
@@ -15,7 +15,7 @@ public class ReissueUtils {
     }
 
     public static void validateSelectedPartyOptions(SscsCaseData sscsCaseData, ArrayList<String> errors, boolean checkOtherParty) {
-        boolean caseHasARepresentative = StringUtils.equalsIgnoreCase("YES", Optional.ofNullable(sscsCaseData.getAppeal().getRep()).map(Representative::getHasRepresentative).orElse("No"));
+        boolean caseHasARepresentative = isYes(Optional.ofNullable(sscsCaseData.getAppeal().getRep()).map(Representative::getHasRepresentative).orElse(NO));
 
         if (!isAnyPartySelectedToResend(sscsCaseData, checkOtherParty)) {
             errors.add("Select a party to reissue.");
@@ -42,7 +42,7 @@ public class ReissueUtils {
     }
 
     public static void setUpOtherPartyOptions(SscsCaseData sscsCaseData) {
-        sscsCaseData.getReissueArtifactUi().setShowReissueToOtherPartyUiSection(YesNo.YES);
+        sscsCaseData.getReissueArtifactUi().setShowReissueToOtherPartyUiSection(YES);
         sscsCaseData.getReissueArtifactUi().setOtherPartyOptions(getOtherPartyOptions(sscsCaseData));
     }
 
@@ -69,11 +69,11 @@ public class ReissueUtils {
     }
 
     private static boolean isOtherPartyWithRepresentative(OtherParty otherPartyDetail) {
-        return otherPartyDetail.getRep() != null && "Yes".equals(otherPartyDetail.getRep().getHasRepresentative());
+        return isYes(otherPartyDetail.getRep().getHasRepresentative());
     }
 
     private static boolean isOtherPartyWithAppointee(OtherParty otherPartyDetail) {
-        return otherPartyDetail.getAppointee() != null && "Yes".equals(otherPartyDetail.getIsAppointee());
+        return isYes(otherPartyDetail.getIsAppointee());
     }
 
     private static OtherPartyOption getOtherPartyElement(String name, String id) {

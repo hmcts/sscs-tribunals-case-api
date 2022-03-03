@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_RE
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
@@ -87,7 +88,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         sscsCaseData.setInterlocReviewState(null);
         sscsCaseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
         addDirectionNotice(sscsCaseData);
-        sscsCaseData.setPostponementRequest(PostponementRequest.builder().unprocessedPostponementRequest(YesNo.NO)
+        sscsCaseData.setPostponementRequest(PostponementRequest.builder().unprocessedPostponementRequest(NO)
                 .build());
     }
 
@@ -100,7 +101,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
                         sscsCaseData.getPostponementRequest().getPostponementRequestDetails()));
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId());
-        sscsCaseData.setPostponementRequest(PostponementRequest.builder().unprocessedPostponementRequest(YesNo.YES)
+        sscsCaseData.setPostponementRequest(PostponementRequest.builder().unprocessedPostponementRequest(YES)
                 .build());
     }
 
@@ -114,7 +115,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         if (documentTranslationStatus != null) {
             caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
             log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
-            caseData.setTranslationWorkOutstanding(YES.getValue());
+            caseData.setTranslationWorkOutstanding(YES);
         }
     }
 
