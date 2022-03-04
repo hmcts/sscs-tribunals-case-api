@@ -216,7 +216,7 @@ def versions = [
         pact            : '4.1.7',
         junitJupiter    : '5.7.2',
         lombok          : '1.18.22',
-        sscsCommon      : '4.6.43',
+        sscsCommon      : '4.6.44-RC-SSCS-9904',
         assertj         : '3.21.0',
 ]
 

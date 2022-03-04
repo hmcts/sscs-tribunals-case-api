@@ -270,6 +270,7 @@ public class SubmitAppealService {
         sscsCaseData.setProcessingVenue(processingVenue);
 
         if (workAllocationFeature && !StringUtils.isEmpty(processingVenue)) {
+            log.info("Getting venue details for " + processingVenue);
             CourtVenue courtVenue = refDataService.getVenueRefData(processingVenue);
             if (courtVenue != null) {
                 sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
