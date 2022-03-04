@@ -103,10 +103,8 @@ public class ResponseEventsAboutToSubmit {
 
             boolean hasErrors = false;
             boolean isSscs5CaseData = isSscs5Case(response, callback);
-            if ((isSscs5CaseData
-                && !buildSscs5BenefitCaseLoaderKeyId().contains(response.getData().getBenefitCode()))
-                || (!isSscs5CaseData
-                && buildSscs5BenefitCaseLoaderKeyId().contains(response.getData().getBenefitCode()))) {
+            if (wasSscs5NowGettingChangedToNonSscs5(isSscs5CaseData, response.getData().getBenefitCode())
+                || nonSscs5NowGettingchangedToSscs5(isSscs5CaseData, response.getData().getBenefitCode())) {
                 if (hasSuperUserRole) {
                     response.addWarning("Benefit code cannot be changed to the selected code");
                 } else {
@@ -123,14 +121,22 @@ public class ResponseEventsAboutToSubmit {
                     if (response.getData().getOtherParties() != null
                         && response.getData().getOtherParties().size() > 0) {
                         response.addError("Benefit code cannot be changed on cases with registered 'Other Party'");
-                    } else {
-                        if (!hasErrors) {
-                            response.addWarning("The benefit code will be changed to a non-child support benefit code");
-                        }
+                    } else if (!hasErrors) {
+                        response.addWarning("The benefit code will be changed to a non-child support benefit code");
                     }
                 }
             }
         }
+    }
+
+    private boolean nonSscs5NowGettingchangedToSscs5(boolean isSscs5CaseData, String newBenefitCode) {
+        return !isSscs5CaseData
+                && buildSscs5BenefitCaseLoaderKeyId().contains(newBenefitCode);
+    }
+
+    private boolean wasSscs5NowGettingChangedToNonSscs5(boolean isSscs5CaseData, String newBenefitCode) {
+        return isSscs5CaseData
+                && !buildSscs5BenefitCaseLoaderKeyId().contains(newBenefitCode);
     }
 
     private boolean isSscs5Case(PreSubmitCallbackResponse<SscsCaseData> response, Callback<SscsCaseData> callback) {
@@ -148,13 +154,8 @@ public class ResponseEventsAboutToSubmit {
     private boolean isSscs5Case(String benefitTypeCode) {
         return Optional.ofNullable(benefitTypeCode)
             .filter(b -> Benefit.findBenefitByShortName(b)
-                .filter(benefit -> benefit.getSscsType().equals(SSCS5)).isPresent())
+            .filter(benefit -> benefit.getSscsType().equals(SSCS5)).isPresent())
             .isPresent();
-    }
-
-    public void validateBenefitForCase(PreSubmitCallbackResponse<SscsCaseData> response,
-                                       Callback<SscsCaseData> callback) {
-        validateBenefitForCase(response, callback, false);
     }
 
     public void validateBenefitForCase(PreSubmitCallbackResponse<SscsCaseData> response,
@@ -165,10 +166,8 @@ public class ResponseEventsAboutToSubmit {
                     callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().getDescription();
 
             boolean isSscs5CaseData = isSscs5Case(response, callback);
-            if ((isSscs5CaseData && (!buildSscs5BenefitCode().contains(benefitCode)
-                    || !buildSscs5BenefitDescription().contains(benefitDescription)))
-                    || (!isSscs5CaseData && (buildSscs5BenefitCode().contains(benefitCode)
-                    || buildSscs5BenefitDescription().contains(benefitDescription)))) {
+            if (wasSscs5NowgettingChangedToNonSscs5WithDescription(isSscs5CaseData, benefitCode,benefitDescription)
+                    || notSscs5NowGettingChangedToSscs5WithDescription(isSscs5CaseData, benefitCode, benefitDescription)) {
                 if (hasSuperUserRole) {
                     response.addWarning("Benefit type cannot be changed to the selected type");
                 } else {
@@ -176,6 +175,16 @@ public class ResponseEventsAboutToSubmit {
                 }
             }
         }
+    }
+
+    private boolean notSscs5NowGettingChangedToSscs5WithDescription(boolean isSscs5CaseData, String benefitCode, String benefitDescription) {
+        return !isSscs5CaseData && (buildSscs5BenefitCode().contains(benefitCode)
+                || buildSscs5BenefitDescription().contains(benefitDescription));
+    }
+
+    private boolean wasSscs5NowgettingChangedToNonSscs5WithDescription(boolean isSscs5CaseData, String benefitCode, String benefitDescription) {
+        return isSscs5CaseData && (!buildSscs5BenefitCode().contains(benefitCode)
+                || !buildSscs5BenefitDescription().contains(benefitDescription));
     }
 
 
