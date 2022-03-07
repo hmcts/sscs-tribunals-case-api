@@ -41,7 +41,7 @@ public class EvidenceUploadController {
 
     @ApiOperation(value = "Upload evidence",
             notes = "Uploads evidence for an appeal which will be held in a draft state against the case that is not "
-                    + "visible by a caseworker in CCD. You will need to submit the evidence for it to be visbale in CCD "
+                    + "visible by a caseworker in CCD. You will need to submit the evidence for it to be visible in CCD "
                     + "by a caseworker. You need to have an appeal in CCD."
     )
     @ApiResponses(value = {

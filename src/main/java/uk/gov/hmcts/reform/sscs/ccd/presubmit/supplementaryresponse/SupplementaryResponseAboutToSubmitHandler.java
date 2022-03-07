@@ -11,23 +11,33 @@ import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnproce
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
+import uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil;
 import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
 
-@Service
+@Component
 @Slf4j
 public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-
+    private static final Enum<EventType> EVENT_TYPE = EventType.DWP_SUPPLEMENTARY_RESPONSE;
     public static final String SUPPLEMENTARY_RESPONSE_DOCUMENT_CANNOT_BE_EMPTY = "Supplementary response document cannot be empty";
+    private final AddedDocumentsUtil addedDocumentsUtil;
+
+    @Autowired
+    public SupplementaryResponseAboutToSubmitHandler(AddedDocumentsUtil addedDocumentsUtil) {
+        this.addedDocumentsUtil = addedDocumentsUtil;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -36,7 +46,7 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
 
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.DWP_SUPPLEMENTARY_RESPONSE;
+            && callback.getEvent() == EVENT_TYPE;
     }
 
     @Override
@@ -58,6 +68,8 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
         } else {
             callbackResponse.addError(SUPPLEMENTARY_RESPONSE_DOCUMENT_CANNOT_BE_EMPTY);
         }
+
+        addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(sscsCaseData);
 
         if (sscsCaseData.getDwpOtherDoc() != null && sscsCaseData.getDwpOtherDoc().getDocumentLink() != null) {
             if (DocumentUtil.isFileAMedia(sscsCaseData.getDwpOtherDoc().getDocumentLink())) {
@@ -86,20 +98,25 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private void addAudioVideoEvidence(SscsCaseData sscsCaseData) {
+        String fileName = sscsCaseData.getDwpOtherDoc().getDocumentLink().getDocumentFilename();
         AudioVideoEvidence audioVideoEvidence = AudioVideoEvidence.builder()
-                .value(AudioVideoEvidenceDetails.builder()
-                        .documentLink(sscsCaseData.getDwpOtherDoc().getDocumentLink())
-                        .fileName(sscsCaseData.getDwpOtherDoc().getDocumentLink().getDocumentFilename())
-                        .rip1Document(sscsCaseData.getRip1Doc())
-                        .dateAdded(LocalDate.now())
-                        .partyUploaded(UploadParty.DWP)
-                        .build())
-                .build();
+            .value(AudioVideoEvidenceDetails.builder()
+                    .documentLink(sscsCaseData.getDwpOtherDoc().getDocumentLink())
+                    .fileName(fileName)
+                    .rip1Document(sscsCaseData.getRip1Doc())
+                    .documentType(AudioVideoEvidenceUtil.getDocumentTypeValue(fileName))
+                    .dateAdded(LocalDate.now())
+                    .partyUploaded(UploadParty.DWP)
+                    .build())
+            .build();
 
         if (sscsCaseData.getAudioVideoEvidence() == null) {
             sscsCaseData.setAudioVideoEvidence(new ArrayList<>());
         }
         sscsCaseData.getAudioVideoEvidence().add(audioVideoEvidence);
+
+        addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, Collections.singletonList(audioVideoEvidence
+            .getValue().getDocumentType()), EVENT_TYPE);
     }
 
     private List<ScannedDocument> buildScannedDocsList(SscsCaseData sscsCaseData, List<DwpResponseDocument> responseDocuments) {
