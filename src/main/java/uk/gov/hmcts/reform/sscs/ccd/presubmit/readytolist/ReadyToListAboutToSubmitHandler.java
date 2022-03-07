@@ -2,12 +2,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist;
 
 import static java.util.Objects.requireNonNull;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.File;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,8 +13,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.HearingObject;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StateOfHearing;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 
@@ -29,6 +24,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
     private boolean schedulingAndListingFeature;
     @Autowired
     private RegionalProcessingCenterService regionalProcessingCenterService;
+
     private StateOfHearing stateOfHearing;
 
     @Override
@@ -51,6 +47,8 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         if(schedulingAndListingFeature){
             boolean listAssist = checkIfListAssist(sscsCaseData);
             if(listAssist){
+                sscsCaseData.setHearingRoute("ListAssist");
+                sscsCaseData.setHearingState(StateOfHearing.HEARING_CREATED);
                 PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData); //Placeholder
                 return callbackResponse;
             }else{
@@ -72,6 +70,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
     }
 
     private PreSubmitCallbackResponse<SscsCaseData> handleCallbackResponse(SscsCaseData sscsCaseData){
+        sscsCaseData.setHearingRoute("Gaps");
         PreSubmitCallbackResponse<uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
         log.info(String.format("createdInGapsFrom is %s for caseId %s", sscsCaseData.getCreatedInGapsFrom(), sscsCaseData.getCcdCaseId()));
         if (sscsCaseData.getCreatedInGapsFrom() == null
