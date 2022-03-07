@@ -1,6 +1,5 @@
 {
   "caseCreated" : "${json-unit.ignore}",
-
   "caseAccessCategory": "taxCredit",
   "caseManagementCategory": {
     "value": {
