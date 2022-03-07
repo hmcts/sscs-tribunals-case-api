@@ -180,8 +180,8 @@
         "tya": "",
         "email": "supporter@email.com",
         "mobile": "07700 900555",
-        "subscribeEmail": "",
-        "subscribeSms": "",
+        "subscribeEmail": "No",
+        "subscribeSms": "No",
         "reason": ""
       },
       "representativeSubscription": {

@@ -141,7 +141,7 @@ public class SscsMyaBackendRequests {
     public void uploadAppellantStatement(String hearingId, String statement) throws IOException {
         String uri = "/api/continuous-online-hearings/" + hearingId + "/statement";
         String stringEntity = "{\n"
-                + "  \"body\": \"statement\",\n"
+                + "  \"body\": \"" + statement + "\",\n"
                 + "  \"tya\": \"Q9jE2FQuRR\"\n"
                 + "}";
         HttpResponse getQuestionResponse = postRequest(uri, new StringEntity(stringEntity, APPLICATION_JSON));

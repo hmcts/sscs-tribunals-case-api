@@ -250,7 +250,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
             .actionPostponementRequestSelected("refuse")
             .build());
 
-        sscsCaseData.setLanguagePreferenceWelsh(YES.getValue());
+        sscsCaseData.setLanguagePreferenceWelsh(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -259,7 +259,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
                 eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(TRANSLATION_REQUIRED));
 
         assertThat(response.getData().getInterlocReviewState()).isEqualTo(WELSH_TRANSLATION.getId());
-        assertThat(response.getData().getTranslationWorkOutstanding()).isEqualTo(YES.getValue());
+        assertThat(response.getData().getTranslationWorkOutstanding()).isEqualTo(YES);
         System.out.println(response.getData().getSscsDocument());
         assertThat(response.getData().getDirectionNoticeContent()).isNull();
     }

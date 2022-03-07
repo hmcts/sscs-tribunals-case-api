@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -139,7 +140,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     }
 
     private void setIntepreterDescriptionIfRequired(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData) {
-        if ("yes".equalsIgnoreCase(caseData.getAdjournCaseInterpreterRequired())) {
+        if (isYes(caseData.getAdjournCaseInterpreterRequired())) {
             if (caseData.getAdjournCaseInterpreterLanguage() != null) {
                 adjournCaseBuilder.interpreterDescription(
                     languageService.getInterpreterDescriptionForLanguageKey(

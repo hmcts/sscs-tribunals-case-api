@@ -125,7 +125,7 @@ public class UploadDocumentFurtherEvidenceMidEventHandlerTest extends BaseHandle
 
     @Test
     public void givenOneHearingRecordingRequestDocumentIsUploaded_thenShowHearingsPageAndSetPartiesListForAppellantAndRep() {
-        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("yes").build());
+        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative(YES).build());
         SscsFurtherEvidenceDoc furtherEvidenceDoc = SscsFurtherEvidenceDoc.builder().value(SscsFurtherEvidenceDocDetails.builder()
                 .documentType(REQUEST_FOR_HEARING_RECORDING.getId()).documentLink(DocumentLink.builder().documentUrl("url.com").documentFilename("file.pdf").build()).build()).build();
 

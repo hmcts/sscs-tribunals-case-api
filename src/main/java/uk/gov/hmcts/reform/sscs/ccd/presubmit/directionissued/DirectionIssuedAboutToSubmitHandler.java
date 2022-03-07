@@ -6,6 +6,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REJECT_HEARING_RECORDING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
@@ -235,7 +237,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private SscsCaseData updateCaseAfterUrgentHearingRefused(SscsCaseData caseData) {
 
         caseData.setUrgentHearingOutcome(RequestOutcome.REFUSED.getValue());
-        caseData.setUrgentCase("No");
+        caseData.setUrgentCase(NO);
         caseData.setInterlocReviewState(NONE.getId());
         log.info("Case ID {} urgent hearing refused on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
         return caseData;
@@ -308,7 +310,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
             }
 
-            caseData.setTimeExtensionRequested("No");
+            caseData.setTimeExtensionRequested(NO);
 
             if (caseDetails.getState().equals(State.INTERLOCUTORY_REVIEW_STATE) && caseData.getDirectionTypeDl() != null && StringUtils.equals(DirectionType.APPEAL_TO_PROCEED.toString(), caseData.getDirectionTypeDl().getValue().getCode())) {
                 PreSubmitCallbackResponse<SscsCaseData> response = serviceRequestExecutor.post(callback, bulkScanEndpoint);
@@ -316,7 +318,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             }
         } else {
             caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
-            caseData.setTranslationWorkOutstanding("Yes");
+            caseData.setTranslationWorkOutstanding(YES);
             clearBasicTransientFields(caseData);
             log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
 

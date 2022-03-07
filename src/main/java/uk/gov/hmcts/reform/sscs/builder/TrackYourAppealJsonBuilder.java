@@ -4,6 +4,7 @@ import static java.time.LocalDateTime.of;
 import static java.time.LocalDateTime.parse;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADDRESS_LINE_1;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADDRESS_LINE_2;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADDRESS_LINE_3;
@@ -246,7 +247,7 @@ public class TrackYourAppealJsonBuilder {
     private boolean isHearingAdjourned(Map<Event, Hearing> eventHearingMap) {
         List<Hearing> hearing = new ArrayList<>(eventHearingMap.values());
         hearing.sort(Comparator.reverseOrder());
-        return !hearing.isEmpty() && YES.equalsIgnoreCase(hearing.get(0).getValue().getAdjourned());
+        return !hearing.isEmpty() && isYes(hearing.get(0).getValue().getAdjourned());
     }
 
     private ObjectNode getContactNode(SscsCaseData caseData) {
@@ -299,12 +300,7 @@ public class TrackYourAppealJsonBuilder {
         }
 
         if (null != caseData.getAppeal().getHearingOptions()) {
-
-            String wantsToAttend = caseData.getAppeal().getHearingOptions().getWantsToAttend();
-
-            if (null != wantsToAttend) {
-                return wantsToAttend.equals(YES) ? ORAL : PAPER;
-            }
+            return isYes(caseData.getAppeal().getHearingOptions().getWantsToAttend()) ? ORAL : PAPER;
         }
         return ORAL;
     }

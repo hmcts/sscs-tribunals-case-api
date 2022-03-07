@@ -1,13 +1,13 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerBase;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
@@ -28,8 +28,8 @@ public class PipWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setDefaultFields(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType() == null && "yes"
-            .equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow())) {
+        if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType() == null
+                && isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow())) {
             if (bothDailyLivingAndMobilityQuestionsAnswered(sscsCaseData)
                 && isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
                 && isNoAwardOrNotConsideredForMobility(sscsCaseData)) {
@@ -95,8 +95,7 @@ public class PipWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
             preSubmitCallbackResponse.addError("At least one of Mobility or Daily Living must be considered");
         }
 
-        if ("yes"
-            .equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow())
+        if (isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow())
             && bothDailyLivingAndMobilityQuestionsAnswered(sscsCaseData)) {
             if (isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
                 && isNoAwardOrNotConsideredForMobility(sscsCaseData)) {
@@ -116,16 +115,9 @@ public class PipWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData, String pageId) {
-        if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow() != null
-            && sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow()
-                .equalsIgnoreCase(YesNo.NO.getValue())
-            && sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice() != null
-            && sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice()
-                .equalsIgnoreCase(YesNo.YES.getValue())) {
-            sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES);
-            return;
-        }
-        sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.NO);
+        sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(
+                isYesOrNo(isNo(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow())
+                && isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())));
     }
 
     @Override
@@ -135,7 +127,7 @@ public class PipWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData, String pageId) {
-        sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
+        sscsCaseData.setShowDwpReassessAwardPage(NO);
     }
 
     private boolean isNoAwardOrNotConsideredForMobility(SscsCaseData sscsCaseData) {

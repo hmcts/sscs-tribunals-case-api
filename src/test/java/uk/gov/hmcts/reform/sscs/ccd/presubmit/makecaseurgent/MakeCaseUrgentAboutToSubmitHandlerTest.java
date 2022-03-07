@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import junitparams.JUnitParamsRunner;
@@ -58,7 +59,7 @@ public class MakeCaseUrgentAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setUrgentHearingOutcome(null);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("Yes", response.getData().getUrgentCase());
+        assertEquals(YES, response.getData().getUrgentCase());
         assertNotNull(response.getData().getUrgentHearingRegistered());
         assertEquals(RequestOutcome.IN_PROGRESS.getValue(), response.getData().getUrgentHearingOutcome());
 

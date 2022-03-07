@@ -68,7 +68,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.WorkAllocationFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
@@ -121,7 +120,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             .ccdCaseId("1234")
             .benefitCode("002")
             .issueCode("CC")
-            .dwpFurtherInfo("Yes")
+            .dwpFurtherInfo(YES)
             .dwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("a.pdf").documentFilename("a.pdf").build()).build())
             .dwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("b.pdf").documentFilename("b.pdf").build()).build())
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
@@ -202,7 +201,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     public void givenADwpUploadResponseEventWithDwpFurtherInfoIsNo_assertNoErrors() {
-        callback.getCaseDetails().getCaseData().setDwpFurtherInfo("No");
+        callback.getCaseDetails().getCaseData().setDwpFurtherInfo(NO);
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -398,7 +397,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                                 .documentFilename("testEditedResponseDocument.pdf")
                                 .build()
                 ).build());
-        callback.getCaseDetails().getCaseData().setDwpFurtherInfo("No");
+        callback.getCaseDetails().getCaseData().setDwpFurtherInfo(NO);
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -431,7 +430,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                                 .documentFilename("testEditedResponseDocument.pdf")
                                 .build()
                 ).build());
-        callback.getCaseDetails().getCaseData().setDwpFurtherInfo("No");
+        callback.getCaseDetails().getCaseData().setDwpFurtherInfo(NO);
 
         DynamicListItem reviewByJudgeItem = new DynamicListItem("reviewByJudge", null);
         sscsCaseData.setSelectWhoReviewsCase(new DynamicList(reviewByJudgeItem, null));
@@ -467,7 +466,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                                 .build()
                 ).build());
 
-        callback.getCaseDetails().getCaseData().setDwpFurtherInfo("Yes");
+        callback.getCaseDetails().getCaseData().setDwpFurtherInfo(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -573,7 +572,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     public void givenUcbSelectedAndNoUcbDocument_displayAnError() {
-        sscsCaseData.setDwpUcb(YES.getValue());
+        sscsCaseData.setDwpUcb(YES);
         sscsCaseData.setDwpUcbEvidenceDocument(null);
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -583,7 +582,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     public void givenUcbSelectedIsNo_thenTheFieldsAreCleared() {
-        sscsCaseData.setDwpUcb(NO.getValue());
+        sscsCaseData.setDwpUcb(NO);
         sscsCaseData.setDwpUcbEvidenceDocument(getPdfDocument().getDocumentLink());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -595,12 +594,12 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     public void givenUcbSelectedAndUploadedUcbDoc_thenNoErrors() {
-        sscsCaseData.setDwpUcb(YES.getValue());
+        sscsCaseData.setDwpUcb(YES);
         sscsCaseData.setDwpUcbEvidenceDocument(getPdfDocument().getDocumentLink());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
-        assertThat(sscsCaseData.getDwpUcb(), is(YES.getValue()));
+        assertThat(sscsCaseData.getDwpUcb(), is(YES));
         assertThat(sscsCaseData.getDwpUcbEvidenceDocument(), is(nullValue()));
         assertThat(sscsCaseData.getDwpDocuments().size(), is(3));
     }
@@ -1019,7 +1018,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     public void ucbEvidenceDocument_mustBeAPdf() {
-        sscsCaseData.setDwpUcb(YES.getValue());
+        sscsCaseData.setDwpUcb(YES);
         sscsCaseData.setDwpUcbEvidenceDocument(getMovieDocument().getDocumentLink());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -1159,7 +1158,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.getAppeal().getBenefitType().setCode("childSupport");
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(YesNo.YES.getValue(), response.getData().getOtherPartyUcb());
+        assertEquals(YES, response.getData().getOtherPartyUcb());
     }
 
     @Test
@@ -1297,9 +1296,9 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         return CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder()
                         .id(id)
-                        .isAppointee(YES.getValue())
+                        .isAppointee(YES)
                         .appointee(Appointee.builder().id(appointeeId).build())
-                        .rep(Representative.builder().id(repId).hasRepresentative(YES.getValue()).build())
+                        .rep(Representative.builder().id(repId).hasRepresentative(YES).build())
                         .build())
                 .build();
     }

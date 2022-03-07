@@ -73,7 +73,7 @@ public class ActionHearingRecordingIt extends AbstractEventIt {
                 .appeal(Appeal.builder()
                         .mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build())
                         .rep(Representative.builder()
-                                .hasRepresentative(YES.getValue())
+                                .hasRepresentative(YES)
                                 .organisation("org")
                                 .build())
                         .build())

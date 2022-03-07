@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service.admin;
 
 import static org.mockito.ArgumentMatchers.any;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,8 +52,8 @@ public class RestoreCasesServiceTest {
     @Test
     public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditions() {
         List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo(NO).build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo(NO).build()).build());
 
         Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
 
@@ -84,8 +85,8 @@ public class RestoreCasesServiceTest {
     @Test
     public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditionsWillNotBeAffectedWhenOneHasUnexpectedCaseDataState() {
         List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.DORMANT_APPEAL_STATE).dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.DORMANT_APPEAL_STATE).dwpFurtherInfo(NO).build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo(NO).build()).build());
 
         Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
 
@@ -143,8 +144,8 @@ public class RestoreCasesServiceTest {
     @Test
     public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditionsAndUpdateCaseThrowsUnprocessableEntityExceptionForOne() {
         List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo(NO).build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo(NO).build()).build());
 
         Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
 
@@ -182,8 +183,8 @@ public class RestoreCasesServiceTest {
     @Test
     public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditionsAndUpdateCaseThrowsRuntimeExceptionForOne() {
         List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo(NO).build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo(NO).build()).build());
 
         Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
 
@@ -218,8 +219,8 @@ public class RestoreCasesServiceTest {
     @Test
     public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditionsButOneIsNonDigital() {
         List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("somethingElse").dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo(NO).build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("somethingElse").dwpFurtherInfo(NO).build()).build());
 
         Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
 
@@ -247,7 +248,7 @@ public class RestoreCasesServiceTest {
     public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditionsButOneHasNoCaseData() {
         List<SscsCaseDetails> cases = new ArrayList<>();
         cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo(NO).build()).build());
 
         Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
 
@@ -274,8 +275,8 @@ public class RestoreCasesServiceTest {
     @Test
     public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditionsButOneHasNoCreatedInGapsFrom() {
         List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo(NO).build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().dwpFurtherInfo(NO).build()).build());
 
         Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
 
@@ -304,9 +305,9 @@ public class RestoreCasesServiceTest {
         final String date = "2020-08-28";
 
         List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(3L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("Something else").build()).build());
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo(NO).build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo(NO).build()).build());
+        cases.add(SscsCaseDetails.builder().id(3L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo(null).build()).build());
 
         Map<String, String> searchCriteria = new HashMap<>();
         searchCriteria.put("last_state_modified_date", date);
@@ -324,9 +325,9 @@ public class RestoreCasesServiceTest {
         final String date = "2020-08-28";
 
         List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(3L).state("somethingElse").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo(NO).build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo(NO).build()).build());
+        cases.add(SscsCaseDetails.builder().id(3L).state("somethingElse").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo(NO).build()).build());
 
         Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
 

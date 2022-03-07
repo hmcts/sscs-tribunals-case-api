@@ -6,10 +6,10 @@
     "postcode": "n29ed"
   },
   "CreateAccount": {
-    "createAccount": "yes"
+    "createAccount": "Yes"
   },
   "HaveAMRN": {
-    "haveAMRN": "yes"
+    "haveAMRN": "Yes"
   },
   "MRNDate": {
     "mrnDate": {
@@ -19,7 +19,7 @@
     }
   },
   "CheckMRN": {
-    "checkedMRN": "yes"
+    "checkedMRN": "Yes"
   },
   "MRNOverThirteenMonthsLate": {
     "reasonForBeingLate": "aassas dasdsa dasdasda das"
@@ -49,7 +49,7 @@
     "emailAddress": "appointee@test.com"
   },
   "Appointee": {
-    "isAppointee": "yes"
+    "isAppointee": "Yes"
   },
   "AppellantName": {
     "title": "Mrs.",
@@ -76,19 +76,19 @@
     "emailAddress": "appellant@gmail.com"
   },
   "SameAddress": {
-    "isAddressSameAsAppointee": "no"
+    "isAddressSameAsAppointee": "No"
   },
   "TextReminders": {
-    "doYouWantTextMsgReminders": "yes"
+    "doYouWantTextMsgReminders": "Yes"
   },
   "SendToNumber": {
-    "useSameNumber": "yes"
+    "useSameNumber": "Yes"
   },
   "SmsConfirmation": {
 
   },
   "Representative": {
-    "hasRepresentative": "no"
+    "hasRepresentative": "No"
   },
   "ReasonForAppealing": {
     "items": [
@@ -102,13 +102,13 @@
     "otherReasonForAppealing": "I can't think of anything else"
   },
   "EvidenceProvide": {
-    "evidenceProvide": "no"
+    "evidenceProvide": "No"
   },
   "TheHearing": {
-    "attendHearing": "yes"
+    "attendHearing": "Yes"
   },
   "HearingSupport": {
-    "arrangements": "yes"
+    "arrangements": "Yes"
   },
   "HearingArrangements": {
     "selection": {

@@ -10,6 +10,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DIRECTION_ISSUED_WELSH;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -101,7 +102,7 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
         assertNull(response.getData().getEnglishBodyContent());
         assertNull(response.getData().getWelshBodyContent());
         assertEquals(eventType.getCcdType(), response.getData().getSscsWelshPreviewNextEvent());
-        assertEquals("No",response.getData().getTranslationWorkOutstanding());
+        assertEquals(NO,response.getData().getTranslationWorkOutstanding());
         assertEquals(ENGLISH_PDF,response.getData().getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
         Map<String, Object> placeholders = (Map<String, Object>) capture.getValue();
         assertEquals(expectedType, placeholders.get("en_notice_type"));
@@ -128,7 +129,7 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
         assertNull(response.getData().getEnglishBodyContent());
         assertNull(response.getData().getWelshBodyContent());
         assertEquals(DIRECTION_ISSUED_WELSH.getCcdType(), response.getData().getSscsWelshPreviewNextEvent());
-        assertEquals("No",response.getData().getTranslationWorkOutstanding());
+        assertEquals(NO,response.getData().getTranslationWorkOutstanding());
         assertEquals(ENGLISH_PDF,response.getData().getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
         Map<String, Object> placeholders = (Map<String, Object>) capture.getValue();
         assertEquals(true, placeholders.get("should_hide_nino"));

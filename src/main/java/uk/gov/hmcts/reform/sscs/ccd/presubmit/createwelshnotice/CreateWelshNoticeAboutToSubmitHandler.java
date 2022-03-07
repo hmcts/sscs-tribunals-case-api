@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.createwelshnotice;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -161,7 +162,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
 
     private String buildFullName(SscsCaseData caseData) {
         StringBuilder fullNameText = new StringBuilder();
-        if (caseData.getAppeal().getAppellant().getIsAppointee() != null && caseData.getAppeal().getAppellant().getIsAppointee().equalsIgnoreCase("Yes") && caseData.getAppeal().getAppellant().getAppointee().getName() != null) {
+        if (caseData.getAppeal().getAppellant().getIsAppointee() != null && isYes(caseData.getAppeal().getAppellant().getIsAppointee()) && caseData.getAppeal().getAppellant().getAppointee().getName() != null) {
             fullNameText.append(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle(), ' ', '.'));
             fullNameText.append(", appointee for ");
         }

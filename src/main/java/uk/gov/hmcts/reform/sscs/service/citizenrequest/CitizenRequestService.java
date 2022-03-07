@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service.citizenrequest;
 
 import static org.apache.commons.io.FilenameUtils.getExtension;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.stripUrl;
 
 import java.time.LocalDateTime;
@@ -111,9 +112,11 @@ public class CitizenRequestService {
     private Optional<String> getOtherPartyIdBySubscriptionEmail(SscsCaseData sscsCaseData, String idamEmail) {
         return Stream.ofNullable(sscsCaseData.getOtherParties()).flatMap(Collection::stream)
                 .map(CcdValue::getValue)
-                .flatMap(op -> Stream.of((op.hasAppointee()) ? Pair.of(op.getId(), getSubscriptionEmail(op.getOtherPartyAppointeeSubscription())) : null,
+                .flatMap(op -> Stream.of((op.hasAppointee()) ? Pair.of(op.getId(),
+                        getSubscriptionEmail(op.getOtherPartyAppointeeSubscription())) : null,
                         Pair.of(op.getId(), getSubscriptionEmail(op.getOtherPartySubscription())),
-                        (op.hasRepresentative()) ? Pair.of(op.getRep().getId(), getSubscriptionEmail(op.getOtherPartyRepresentativeSubscription())) : null))
+                        (op.hasRepresentative()) ? Pair.of(op.getRep().getId(),
+                            getSubscriptionEmail(op.getOtherPartyRepresentativeSubscription())) : null))
                 .filter(Objects::nonNull)
                 .filter(p -> p.getLeft() != null && p.getRight() != null)
                 .filter(p -> idamEmail.equals(p.getRight()))
@@ -153,7 +156,7 @@ public class CitizenRequestService {
         hearingRecordingRequests.addAll(newHearingRequests);
 
         sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(hearingRecordingRequests);
-        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YesNo.YES);
+        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YES);
 
         ccdService.updateCase(sscsCaseData, ccdCaseId, CITIZEN_REQUEST_HEARING_RECORDING.getCcdType(),
                 "SSCS - hearing recording request from MYA",

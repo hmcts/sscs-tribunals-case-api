@@ -67,14 +67,14 @@ public class UpdateUcbAboutToSubmitHandlerTest {
 
     @Test
     public void givenUpdateUcb_setToYes_thenNoChange() {
-        sscsCaseData.setDwpUcb(YES.getValue());
+        sscsCaseData.setDwpUcb(YES);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(response.getData().getDwpUcb(), is(YES.getValue()));
+        assertThat(response.getData().getDwpUcb(), is(YES));
     }
 
     @Test
     public void givenUpdateUcb_setToNo_thenSetToNull() {
-        sscsCaseData.setDwpUcb(NO.getValue());
+        sscsCaseData.setDwpUcb(NO);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getData().getDwpUcb(), is(nullValue()));
     }

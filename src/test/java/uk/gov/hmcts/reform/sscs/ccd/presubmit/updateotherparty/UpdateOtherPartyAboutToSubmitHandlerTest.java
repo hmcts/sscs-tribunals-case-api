@@ -12,6 +12,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYesOrNo;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_1;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_2;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_3;
@@ -107,7 +109,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty(ID_2), buildOtherParty(ID_1)));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(response.getData().getOtherPartyUcb(), is(YesNo.YES.getValue()));
+        assertThat(response.getData().getOtherPartyUcb(), is(YES));
         assertEquals(0, response.getErrors().size());
     }
 
@@ -375,7 +377,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
                 .benefitType(BenefitType.builder().code(shortName).build())
                 .hearingType(HearingType.PAPER.getValue())
                 .build())
-            .otherParties(Arrays.asList(buildOtherParty("No",null), buildOtherParty("Yes", NO)))
+            .otherParties(Arrays.asList(buildOtherParty(NO,null), buildOtherParty(YES, NO)))
             .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -394,7 +396,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
                 .benefitType(BenefitType.builder().code("taxCredit").build())
                 .hearingType(HearingType.PAPER.getValue())
                 .build())
-            .otherParties(Arrays.asList(buildOtherParty("No",null), buildOtherParty("Yes", NO)))
+            .otherParties(Arrays.asList(buildOtherParty(NO,null), buildOtherParty(YES, NO)))
             .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(idamService.getUserDetails(any())).thenReturn(UserDetails.builder().roles(List.of("caseworker-sscs-systemupdate")).build());
@@ -413,7 +415,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
                 .benefitType(BenefitType.builder().code(shortName).build())
                 .hearingType(HearingType.PAPER.getValue())
                 .build())
-            .otherParties(Arrays.asList(buildOtherParty("No",null), buildOtherParty("No", NO)))
+            .otherParties(Arrays.asList(buildOtherParty(NO,null), buildOtherParty(NO, NO)))
             .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -431,7 +433,8 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
                 .benefitType(BenefitType.builder().code("PIP").build())
                 .hearingType(hearingType)
                 .build())
-            .otherParties(Arrays.asList(buildOtherParty(wantsToAttend1,null), buildOtherParty(wantsToAttend2, NO)))
+            .otherParties(Arrays.asList(buildOtherParty(isYesOrNo(wantsToAttend1),null),
+                buildOtherParty(isYesOrNo(wantsToAttend2), NO)))
             .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -444,10 +447,10 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         return emptyIfNull(otherParties).stream()
             .filter(otherPartyCcdValue -> otherPartyCcdValue.getValue() != null)
             .map(otherPartyCcdValue -> otherPartyCcdValue.getValue())
-            .allMatch(otherParty -> otherParty.getShowRole().equals(NO) && otherParty.getRole() == null);
+            .allMatch(otherParty -> isNoOrNull(otherParty.getShowRole()));
     }
 
-    private CcdValue<OtherParty> buildOtherParty(String wantsToAttend, YesNo confidentiality) {
+    private CcdValue<OtherParty> buildOtherParty(YesNo wantsToAttend, YesNo confidentiality) {
         return CcdValue.<OtherParty>builder().value(OtherParty.builder()
             .confidentialityRequired(confidentiality != null ? confidentiality : NO)
             .hearingOptions(HearingOptions.builder().wantsToAttend(wantsToAttend).build())
@@ -458,7 +461,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         return CcdValue.<OtherParty>builder()
             .value(OtherParty.builder()
                 .id(id)
-                .unacceptableCustomerBehaviour(YesNo.YES)
+                .unacceptableCustomerBehaviour(YES)
                 .role(Role.builder().name("PayingParent").build())
                 .build())
             .build();
@@ -468,7 +471,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         return CcdValue.<OtherParty>builder()
             .value(OtherParty.builder()
                 .id(id)
-                .unacceptableCustomerBehaviour(YesNo.NO)
+                .unacceptableCustomerBehaviour(NO)
                 .confidentialityRequired(NO)
                 .role(Role.builder().name(role).build())
                 .build())
@@ -479,9 +482,9 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         return CcdValue.<OtherParty>builder()
             .value(OtherParty.builder()
                 .id(id)
-                .isAppointee(YES.getValue())
+                .isAppointee(YES)
                 .appointee(Appointee.builder().id(appointeeId).build())
-                .rep(Representative.builder().id(repId).hasRepresentative(YES.getValue()).build())
+                .rep(Representative.builder().id(repId).hasRepresentative(YES).build())
                 .role(Role.builder().name("ReceivingParent").build())
                 .build())
             .build();

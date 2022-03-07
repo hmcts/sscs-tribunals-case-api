@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DecisionType.STRIKE_OUT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.STRUCK_OUT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -99,7 +100,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         sscsCaseData = SscsCaseData.builder()
                 .state(State.INTERLOCUTORY_REVIEW_STATE)
-                .generateNotice("Yes")
+                .generateNotice(YES)
                 .signedBy("User")
                 .signedRole("Judge")
                 .dateAdded(LocalDate.now().minusDays(1))
@@ -245,12 +246,12 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     @Test
     public void givenDecisionIssuedAndCaseIsWelsh_DoNotSetDwpStateAndOutcomeToStruckOut() {
         when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
-        sscsCaseData.setLanguagePreferenceWelsh("Yes");
+        sscsCaseData.setLanguagePreferenceWelsh(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("welshTranslation", response.getData().getInterlocReviewState());
-        assertEquals("Yes", response.getData().getTranslationWorkOutstanding());
+        assertEquals(YES, response.getData().getTranslationWorkOutstanding());
         assertNull(response.getData().getDwpState());
         assertNull(response.getData().getOutcome());
         assertEquals(response.getData().getState(), (State.INTERLOCUTORY_REVIEW_STATE));
@@ -276,7 +277,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         when(callback.getEvent()).thenReturn(EventType.DECISION_ISSUED_WELSH);
         when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
-        sscsCaseData.setLanguagePreferenceWelsh("Yes");
+        sscsCaseData.setLanguagePreferenceWelsh(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

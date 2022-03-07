@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -55,7 +56,7 @@ public class SyaCaseWrapper {
     private String evidenceProvide;
 
     @JsonProperty("isSaveAndReturn")
-    private String isSaveAndReturn;
+    private YesNo isSaveAndReturn;
 
     @JsonProperty("languagePreferenceWelsh")
     private Boolean languagePreferenceWelsh;

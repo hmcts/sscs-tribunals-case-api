@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.ISSUE_DIRECTIONS_NOTICE;
 
 import java.time.LocalDate;
@@ -72,7 +73,7 @@ public class ActionPostponementRequestMidEventHandlerTest {
         handler = new ActionPostponementRequestMidEventHandler(generateFile, documentConfiguration);
 
         sscsCaseData = SscsCaseData.builder()
-                .generateNotice("Yes").appeal(Appeal.builder().appellant(Appellant.builder()
+                .generateNotice(YES).appeal(Appeal.builder().appellant(Appellant.builder()
                         .name(Name.builder().firstName("APPELLANT").lastName("LastNamE").build())
                         .identity(Identity.builder().build()).build()).build())
                 .directionDueDate(LocalDate.now().plusDays(1).toString())

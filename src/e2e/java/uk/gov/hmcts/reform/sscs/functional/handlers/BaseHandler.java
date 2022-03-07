@@ -4,7 +4,7 @@ import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import feign.FeignException;
 import io.restassured.RestAssured;
@@ -194,8 +194,8 @@ public class BaseHandler {
                 .tya("")
                 .email("sscstest+notify@greencroftconsulting.com")
                 .mobile("07398785050")
-                .subscribeEmail("")
-                .subscribeSms("")
+                .subscribeEmail(null)
+                .subscribeSms(null)
                 .reason("")
                 .build();
         Subscription representativeSubscription = Subscription.builder()

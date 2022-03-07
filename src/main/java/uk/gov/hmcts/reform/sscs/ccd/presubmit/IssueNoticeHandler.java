@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.WordUtils;
@@ -50,7 +52,7 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
 
 
     protected String buildName(SscsCaseData caseData, boolean displayAppointeeName) {
-        if (displayAppointeeName && "yes".equalsIgnoreCase(caseData.getAppeal().getAppellant().getIsAppointee())
+        if (displayAppointeeName && isYes(caseData.getAppeal().getAppellant().getIsAppointee())
             && null != caseData.getAppeal().getAppellant().getAppointee()) {
             return WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getAppointee().getName()
                     .getFullNameNoTitle(), ' ', '.');

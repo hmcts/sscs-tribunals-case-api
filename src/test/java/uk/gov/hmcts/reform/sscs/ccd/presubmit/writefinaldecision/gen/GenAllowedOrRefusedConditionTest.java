@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen;
 
 import static org.mockito.MockitoAnnotations.openMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.NamedParameters;
@@ -43,19 +44,19 @@ public class GenAllowedOrRefusedConditionTest {
     @Test
     @Parameters(named = "allowedOrRefusedConditions")
     public void testThatAtExactlyOneConditionIsApplicableForAllAllowedAndRefusedConditions(
-        String allowedOrRefused) {
+            String allowedOrRefused) {
 
         int conditionApplicableCount = 0;
 
         final boolean isValidCombinationExpected =
-            isValidAllowedOrRefusedCombinationExpected(allowedOrRefused);
+                isValidAllowedOrRefusedCombinationExpected(allowedOrRefused);
 
         SscsCaseData caseData = SscsCaseData.builder()
-            .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
-                .writeFinalDecisionGenerateNotice("Yes")
-                .writeFinalDecisionAllowedOrRefused(allowedOrRefused)
-                .build())
-            .dwpReassessTheAward(null).build();
+                .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
+                        .writeFinalDecisionGenerateNotice(YES)
+                        .writeFinalDecisionAllowedOrRefused(allowedOrRefused)
+                        .build())
+                .dwpReassessTheAward(null).build();
 
         GenAllowedOrRefusedCondition matchingCondition = null;
 
@@ -70,15 +71,15 @@ public class GenAllowedOrRefusedConditionTest {
         if (isValidCombinationExpected) {
 
             Assert.assertEquals(
-                "Expected 1 condition to be satisfied for points:" + allowedOrRefused + " but "
-                    + conditionApplicableCount + " were satisfied",
-                1, conditionApplicableCount);
+                    "Expected 1 condition to be satisfied for points:" + allowedOrRefused + " but "
+                            + conditionApplicableCount + " were satisfied",
+                    1, conditionApplicableCount);
 
         } else {
             Assert.assertEquals(
-                "Expected 0 conditions to be satisfied for points:" + allowedOrRefused + " but "
-                    + conditionApplicableCount + " were satisfied",
-                0, conditionApplicableCount);
+                    "Expected 0 conditions to be satisfied for points:" + allowedOrRefused + " but "
+                            + conditionApplicableCount + " were satisfied",
+                    0, conditionApplicableCount);
         }
 
         if ("allowed".equals(allowedOrRefused)) {

@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.FURTHER_EVIDENCE_HANDLED_OFFLINE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -51,13 +52,13 @@ public class FeHandledOfflineHandlerTest {
     private final SscsDocument noIssuedDoc = SscsDocument.builder()
         .value(SscsDocumentDetails.builder()
             .documentType("Appellant evidence")
-            .evidenceIssued("No")
+            .evidenceIssued(NO)
             .build())
         .build();
     private final SscsDocument issuedDoc = SscsDocument.builder()
         .value(SscsDocumentDetails.builder()
             .documentType("Representative evidence")
-            .evidenceIssued("Yes")
+            .evidenceIssued(YES)
             .build())
         .build();
     private final SscsDocument dl16Doc = SscsDocument.builder()
@@ -187,7 +188,7 @@ public class FeHandledOfflineHandlerTest {
 
     private void verifyEvidenceDocs(List<SscsDocument> sscsDocuments) {
         List<SscsDocument> evidenceDocs = sscsDocuments.stream()
-            .filter(doc -> "Yes".equals(doc.getValue().getEvidenceIssued()))
+            .filter(doc -> isYes(doc.getValue().getEvidenceIssued()))
             .collect(Collectors.toList());
 
         assertThat(evidenceDocs, hasItems(issuedDoc));
@@ -195,13 +196,13 @@ public class FeHandledOfflineHandlerTest {
 
     private void verifyEvidenceIssuedIsYesAndDl6WasNotModified(List<SscsDocument> sscsDocuments) {
         List<SscsDocument> evidenceDocs = sscsDocuments.stream()
-            .filter(doc -> "Yes".equals(doc.getValue().getEvidenceIssued()))
+            .filter(doc -> isYes(doc.getValue().getEvidenceIssued()))
             .collect(Collectors.toList());
 
         SscsDocument expectedDoc = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentType("Appellant evidence")
-                .evidenceIssued("Yes")
+                .evidenceIssued(YES)
                 .build())
             .build();
         assertThat(evidenceDocs, hasItems(expectedDoc, issuedDoc));

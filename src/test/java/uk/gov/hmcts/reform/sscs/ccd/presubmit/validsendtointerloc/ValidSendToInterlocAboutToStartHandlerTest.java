@@ -100,7 +100,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
 
     @Test
     public void givenAValidSendToInterlocRequestWithRep_thenPopulateDropdownWithPartiesOnCase() {
-        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("Yes").build());
+        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative(YES).build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         DynamicList result = response.getData().getOriginalSender();
@@ -135,7 +135,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
     @Test
     public void givenAValidSendToInterlocRequestWithJointPartyAndRep_thenPopulateDropdownWithPartiesOnCase() {
         sscsCaseData.getJointParty().setHasJointParty(YES);
-        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("Yes").build());
+        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative(YES).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 

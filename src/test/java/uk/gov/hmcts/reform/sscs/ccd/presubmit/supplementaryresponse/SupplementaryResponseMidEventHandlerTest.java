@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -66,7 +68,7 @@ public class SupplementaryResponseMidEventHandlerTest {
         sscsCaseData.setDwpOtherDoc(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("test2.mp3").documentUrl("myurl2").build()).build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertEquals(YesNo.YES, response.getData().getShowRip1DocPage());
+        assertEquals(YES, response.getData().getShowRip1DocPage());
     }
 
     @Test
@@ -75,7 +77,7 @@ public class SupplementaryResponseMidEventHandlerTest {
         sscsCaseData.setDwpOtherDoc(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("test2.pdf").documentUrl("myurl2").build()).build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertEquals(YesNo.NO, response.getData().getShowRip1DocPage());
+        assertEquals(NO, response.getData().getShowRip1DocPage());
     }
 
     @Test
@@ -83,6 +85,6 @@ public class SupplementaryResponseMidEventHandlerTest {
         sscsCaseData.setDwpSupplementaryResponseDoc(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("test1.doc").documentUrl("myurl1").build()).build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertEquals(YesNo.NO, response.getData().getShowRip1DocPage());
+        assertEquals(NO, response.getData().getShowRip1DocPage());
     }
 }

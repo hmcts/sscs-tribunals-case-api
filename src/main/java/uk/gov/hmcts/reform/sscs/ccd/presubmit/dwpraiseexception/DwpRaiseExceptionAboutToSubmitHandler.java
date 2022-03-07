@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpraiseexception;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,7 +37,7 @@ public class DwpRaiseExceptionAboutToSubmitHandler implements PreSubmitCallbackH
             sscsCaseData.setInterlocReviewState(InterlocReviewState.NONE.getId());
         }
 
-        sscsCaseData.setIsProgressingViaGaps("Yes");
+        sscsCaseData.setIsProgressingViaGaps(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.mutableEmptyListIfNull;
 
 import java.time.LocalDate;
@@ -49,7 +50,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
         processPartyRequests(sscsCaseData, sscsHearingRecordingCaseData, sscsHearingRecordingCaseData.getProcessHearingRecordingRequest());
 
         if (mutableEmptyListIfNull(sscsHearingRecordingCaseData.getRequestedHearings()).isEmpty()) {
-            sscsHearingRecordingCaseData.setHearingRecordingRequestOutstanding(YesNo.NO);
+            sscsHearingRecordingCaseData.setHearingRecordingRequestOutstanding(NO);
         }
 
         sscsHearingRecordingCaseData.setProcessHearingRecordingRequest(null);

@@ -7,6 +7,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
@@ -31,7 +32,6 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaMrn;
 @RunWith(JUnitParamsRunner.class)
 public class SubmitYourAppealToCcdCaseDataDeserializerTest {
 
-    private static final String NO = "No";
     public static final String[] IGNORED_PATHS = {
         "jointPartyId",
         "appeal.appellant.appointee.id",

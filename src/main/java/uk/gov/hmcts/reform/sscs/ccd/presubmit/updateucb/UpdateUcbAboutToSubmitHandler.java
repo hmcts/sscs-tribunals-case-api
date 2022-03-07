@@ -34,10 +34,10 @@ public class UpdateUcbAboutToSubmitHandler extends ResponseEventsAboutToSubmit i
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        if (NO.getValue().equals(sscsCaseData.getDwpUcb())) {
+        if (isNoOrNull(sscsCaseData.getDwpUcb())) {
             sscsCaseData.setDwpUcb(null);
         }
-        
+
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 

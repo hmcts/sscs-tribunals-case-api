@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.requesthearingrecording;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -59,7 +60,7 @@ public class RequestHearingRecordingAboutToSubmitHandler implements PreSubmitCal
             hearingRecordingRequests.add(hearingRecordingRequest);
 
             sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(hearingRecordingRequests);
-            sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YesNo.YES);
+            sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YES);
         } else {
             response.addError("Hearing record not found");
         }

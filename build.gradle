@@ -146,6 +146,17 @@ dependencyCheck {
     // range of 7-10 fails the build, anything lower and it doesn't fail the build
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 7.0 : 11
     suppressionFile = 'dependency-check-suppressions.xml'
+
+    cveValidForHours = 4 // on Jenkins we have 24, so if you get more vulnerabilities locally, try to normalize this value with Jenkins
+
+    analyzers {
+        retirejs {
+            enabled = false
+        }
+        ossIndex {
+            enabled = false
+        }
+    }
 }
 
 repositories {
@@ -345,6 +356,17 @@ dependencyManagement {
             entry 'snakeyaml'
         }
 
+        //CVE-2022-2048
+        dependencySet(group: 'org.eclipse.jetty', version: '9.4.49+') {
+            entry 'jetty-http'
+            entry 'jetty-io'
+            entry 'jetty-security'
+            entry 'jetty-server'
+            entry 'jetty-servlet'
+            entry 'jetty-util'
+            entry 'jetty-util-ajax'
+        }
+
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
         }
@@ -391,8 +413,8 @@ dependencies {
     //remove when secure doc store is live
     compile group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.17.1'
-    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.56'
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.17.1-RC-SSCS-10240'
+    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.5.0-RC-SSCS-10240'
 
     compile group: 'com.azure', name: 'azure-core', version: versions.azureCore
     compile group: 'com.azure', name: 'azure-messaging-servicebus', version: versions.azureMessagingServiceBus

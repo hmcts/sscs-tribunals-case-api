@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadwelshdocument;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -138,7 +139,7 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         String fileName = buildWelshFileNameFromOriginal(sscsDocument.getValue().getDocumentFileName());
         sscsWelshPreviewDocument.getValue().setDocumentFileName(fileName);
         sscsWelshPreviewDocument.getValue().setDocumentLink(newUrl);
-        sscsWelshPreviewDocument.getValue().setEvidenceIssued("No");
+        sscsWelshPreviewDocument.getValue().setEvidenceIssued(NO);
         sscsWelshPreviewDocument.getValue().setBundleAddition(bundleAddition);
     }
 

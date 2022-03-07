@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen;
 import static org.junit.Assert.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYesOrNo;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +34,7 @@ public class GenWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Override
     protected void setValidPointsAndActivitiesScenario(SscsCaseData caseData, String descriptorFlowValue) {
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow(descriptorFlowValue);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow(isYesOrNo(descriptorFlowValue));
     }
 
     @Override
@@ -95,9 +96,9 @@ public class GenWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
                 .value(OtherParty.builder()
                         .id(id)
                         .name(Name.builder().firstName("Harry").lastName("Kane").build())
-                        .isAppointee(YES.getValue())
+                        .isAppointee(YES)
                         .appointee(Appointee.builder().id(appointeeId).name(Name.builder().firstName("Henry").lastName("Smith").build()).build())
-                        .rep(Representative.builder().id(repId).name(Name.builder().firstName("Wendy").lastName("Smith").build()).hasRepresentative(YES.getValue()).build())
+                        .rep(Representative.builder().id(repId).name(Name.builder().firstName("Wendy").lastName("Smith").build()).hasRepresentative(YES).build())
                         .build())
                 .build();
     }

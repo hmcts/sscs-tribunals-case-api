@@ -6,6 +6,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.UNREGISTERED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -118,7 +120,7 @@ public class RestoreCasesService2Test {
         Assert.assertEquals("002", sscsCaseDataCaptor.getAllValues().get(0).getBenefitCode());
         Assert.assertEquals("DD", sscsCaseDataCaptor.getAllValues().get(0).getIssueCode());
         Assert.assertEquals("002DD", sscsCaseDataCaptor.getAllValues().get(0).getCaseCode());
-        Assert.assertEquals("No", sscsCaseDataCaptor.getAllValues().get(0).getIsScottishCase());
+        Assert.assertEquals(NO, sscsCaseDataCaptor.getAllValues().get(0).getIsScottishCase());
         Assert.assertEquals("Basildon CC", sscsCaseDataCaptor.getAllValues().get(0).getProcessingVenue());
         Assert.assertEquals("Jeff Smith", sscsCaseDataCaptor.getAllValues().get(0).getAppeal().getSigner());
         Assert.assertEquals(UNREGISTERED.getId(), sscsCaseDataCaptor.getAllValues().get(0).getDwpState());
@@ -128,7 +130,7 @@ public class RestoreCasesService2Test {
         Assert.assertEquals("051", sscsCaseDataCaptor.getAllValues().get(1).getBenefitCode());
         Assert.assertEquals("DD", sscsCaseDataCaptor.getAllValues().get(1).getIssueCode());
         Assert.assertEquals("051DD", sscsCaseDataCaptor.getAllValues().get(1).getCaseCode());
-        Assert.assertEquals("Yes", sscsCaseDataCaptor.getAllValues().get(1).getIsScottishCase());
+        Assert.assertEquals(YES, sscsCaseDataCaptor.getAllValues().get(1).getIsScottishCase());
         Assert.assertEquals("Glasgow", sscsCaseDataCaptor.getAllValues().get(1).getProcessingVenue());
         Assert.assertEquals("Mary Berry", sscsCaseDataCaptor.getAllValues().get(1).getAppeal().getSigner());
         Assert.assertEquals(UNREGISTERED.getId(), sscsCaseDataCaptor.getAllValues().get(1).getDwpState());
@@ -161,7 +163,7 @@ public class RestoreCasesService2Test {
         Assert.assertEquals("002", sscsCaseDataCaptor.getAllValues().get(0).getBenefitCode());
         Assert.assertEquals("DD", sscsCaseDataCaptor.getAllValues().get(0).getIssueCode());
         Assert.assertEquals("002DD", sscsCaseDataCaptor.getAllValues().get(0).getCaseCode());
-        Assert.assertEquals("No", sscsCaseDataCaptor.getAllValues().get(0).getIsScottishCase());
+        Assert.assertEquals(NO, sscsCaseDataCaptor.getAllValues().get(0).getIsScottishCase());
         Assert.assertEquals("Basildon CC", sscsCaseDataCaptor.getAllValues().get(0).getProcessingVenue());
         Assert.assertEquals("Jeff Smith", sscsCaseDataCaptor.getAllValues().get(0).getAppeal().getSigner());
         Assert.assertNull(sscsCaseDataCaptor.getAllValues().get(0).getDwpState());
@@ -171,7 +173,7 @@ public class RestoreCasesService2Test {
         Assert.assertEquals("051", sscsCaseDataCaptor.getAllValues().get(1).getBenefitCode());
         Assert.assertEquals("DD", sscsCaseDataCaptor.getAllValues().get(1).getIssueCode());
         Assert.assertEquals("051DD", sscsCaseDataCaptor.getAllValues().get(1).getCaseCode());
-        Assert.assertEquals("Yes", sscsCaseDataCaptor.getAllValues().get(1).getIsScottishCase());
+        Assert.assertEquals(YES, sscsCaseDataCaptor.getAllValues().get(1).getIsScottishCase());
         Assert.assertEquals("Glasgow", sscsCaseDataCaptor.getAllValues().get(1).getProcessingVenue());
         Assert.assertEquals("Mary Berry", sscsCaseDataCaptor.getAllValues().get(1).getAppeal().getSigner());
         Assert.assertNull(sscsCaseDataCaptor.getAllValues().get(1).getDwpState());

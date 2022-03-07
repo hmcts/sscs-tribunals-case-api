@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import java.util.function.Function;
@@ -50,7 +52,7 @@ public abstract class IssueNoticeHandlerTestBase {
                                 .name(Name.builder().firstName("APPELLANT")
                                         .lastName("LastNamE")
                                         .build())
-                                .identity(Identity.builder().build()).isAppointee("Yes")
+                                .identity(Identity.builder().build()).isAppointee(YES)
                                 .appointee(Appointee.builder()
                                         .name(Name.builder().firstName("APPOINTEE").lastName("Test").build()).build())
                                 .build())
@@ -72,7 +74,7 @@ public abstract class IssueNoticeHandlerTestBase {
 
     @Test
     public void givenBuildNameWhenDisplayAppointeeNameIsTrueAndHasAppointeeIsNo() {
-        sscsCaseData.getAppeal().getAppellant().setIsAppointee("No");
+        sscsCaseData.getAppeal().getAppellant().setIsAppointee(NO);
         String actual = service.buildName(sscsCaseData, true);
         assertEquals("Appellant Lastname", actual);
     }

@@ -5,6 +5,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,7 +83,7 @@ public class EditBundleAboutToSubmitHandlerTest {
 
     @Test
     public void givenABundleSelectedToBeStitched_thenSetDefaultConfigDetails() {
-        Bundle bundle = Bundle.builder().value(BundleDetails.builder().eligibleForStitching("Yes").stitchedDocument(DocumentLink.builder().documentFilename("9876-myBundle.pdf").build()).build()).build();
+        Bundle bundle = Bundle.builder().value(BundleDetails.builder().eligibleForStitching(YES).stitchedDocument(DocumentLink.builder().documentFilename("9876-myBundle.pdf").build()).build()).build();
         List<Bundle> bundles = new ArrayList<>();
         bundles.add(bundle);
 
@@ -90,8 +92,8 @@ public class EditBundleAboutToSubmitHandlerTest {
 
         assertEquals("9876-myBundle.pdf", bundleResult.getFileName());
         assertEquals("SSCS-cover-page.docx", bundleResult.getCoverpageTemplate());
-        assertEquals("Yes", bundleResult.getHasTableOfContents());
-        assertEquals("Yes", bundleResult.getHasCoversheets());
+        assertEquals(YES, bundleResult.getHasTableOfContents());
+        assertEquals(YES, bundleResult.getHasCoversheets());
         assertEquals(null, bundleResult.getPaginationStyle());
         assertEquals("numberOfPages", bundleResult.getPageNumberFormat());
         assertNull(bundleResult.getStitchStatus());
@@ -99,19 +101,19 @@ public class EditBundleAboutToSubmitHandlerTest {
 
     @Test
     public void givenWelsh_ABundleSelectedToBeStitched_thenSetDefaultConfigDetails() {
-        Bundle bundle = Bundle.builder().value(BundleDetails.builder().eligibleForStitching("Yes").stitchedDocument(DocumentLink.builder().documentFilename("9876-myBundle.pdf").build()).build()).build();
+        Bundle bundle = Bundle.builder().value(BundleDetails.builder().eligibleForStitching(YES).stitchedDocument(DocumentLink.builder().documentFilename("9876-myBundle.pdf").build()).build()).build();
         List<Bundle> bundles = new ArrayList<>();
         bundles.add(bundle);
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setCaseBundles(bundles);
-        caseData.setLanguagePreferenceWelsh("Yes");
+        caseData.setLanguagePreferenceWelsh(YES);
         BundleDetails bundleResult = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION).getData().getCaseBundles().get(0).getValue();
 
         assertEquals("9876-myBundle.pdf", bundleResult.getFileName());
         assertEquals(coverPage.get(LanguagePreference.WELSH), bundleResult.getCoverpageTemplate());
-        assertEquals("Yes", bundleResult.getHasTableOfContents());
-        assertEquals("Yes", bundleResult.getHasCoversheets());
+        assertEquals(YES, bundleResult.getHasTableOfContents());
+        assertEquals(YES, bundleResult.getHasCoversheets());
         assertEquals(null, bundleResult.getPaginationStyle());
         assertEquals("numberOfPages", bundleResult.getPageNumberFormat());
         assertNull(bundleResult.getStitchStatus());
@@ -119,8 +121,8 @@ public class EditBundleAboutToSubmitHandlerTest {
 
     @Test
     public void givenACaseWithMultipleBundles_thenSetDefaultConfigDetailsForSelectedBundle() {
-        Bundle bundle1 = Bundle.builder().value(BundleDetails.builder().eligibleForStitching("Yes").build()).build();
-        Bundle bundle2 = Bundle.builder().value(BundleDetails.builder().eligibleForStitching("No").build()).build();
+        Bundle bundle1 = Bundle.builder().value(BundleDetails.builder().eligibleForStitching(YES).build()).build();
+        Bundle bundle2 = Bundle.builder().value(BundleDetails.builder().eligibleForStitching(NO).build()).build();
         List<Bundle> bundles = new ArrayList<>();
         bundles.add(bundle1);
         bundles.add(bundle2);
@@ -131,8 +133,8 @@ public class EditBundleAboutToSubmitHandlerTest {
 
         assertEquals("54321-SscsBundle", bundleResult1.getFileName());
         assertEquals("SSCS-cover-page.docx", bundleResult1.getCoverpageTemplate());
-        assertEquals("Yes", bundleResult1.getHasTableOfContents());
-        assertEquals("Yes", bundleResult1.getHasCoversheets());
+        assertEquals(YES, bundleResult1.getHasTableOfContents());
+        assertEquals(YES, bundleResult1.getHasCoversheets());
         assertEquals(null, bundleResult1.getPaginationStyle());
         assertEquals("numberOfPages", bundleResult1.getPageNumberFormat());
         assertNull(bundleResult1.getStitchStatus());
@@ -149,22 +151,22 @@ public class EditBundleAboutToSubmitHandlerTest {
 
     @Test
     public void givenWelsh_ACaseWithMultipleBundles_thenSetDefaultConfigDetailsForSelectedBundle() {
-        Bundle bundle1 = Bundle.builder().value(BundleDetails.builder().eligibleForStitching("Yes").build()).build();
-        Bundle bundle2 = Bundle.builder().value(BundleDetails.builder().eligibleForStitching("No").build()).build();
+        Bundle bundle1 = Bundle.builder().value(BundleDetails.builder().eligibleForStitching(YES).build()).build();
+        Bundle bundle2 = Bundle.builder().value(BundleDetails.builder().eligibleForStitching(NO).build()).build();
         List<Bundle> bundles = new ArrayList<>();
         bundles.add(bundle1);
         bundles.add(bundle2);
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setCaseBundles(bundles);
-        caseData.setLanguagePreferenceWelsh("Yes");
+        caseData.setLanguagePreferenceWelsh(YES);
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         BundleDetails bundleResult1 = result.getData().getCaseBundles().get(0).getValue();
 
         assertEquals("54321-SscsBundle", bundleResult1.getFileName());
         assertEquals(coverPage.get(LanguagePreference.WELSH), bundleResult1.getCoverpageTemplate());
-        assertEquals("Yes", bundleResult1.getHasTableOfContents());
-        assertEquals("Yes", bundleResult1.getHasCoversheets());
+        assertEquals(YES, bundleResult1.getHasTableOfContents());
+        assertEquals(YES, bundleResult1.getHasCoversheets());
         assertEquals(null, bundleResult1.getPaginationStyle());
         assertEquals("numberOfPages", bundleResult1.getPageNumberFormat());
         assertNull(bundleResult1.getStitchStatus());
@@ -181,7 +183,7 @@ public class EditBundleAboutToSubmitHandlerTest {
 
     @Test
     public void givenEditBundleEvent_thenTriggerTheExternalEditBundleEvent() {
-        Bundle bundle = Bundle.builder().value(BundleDetails.builder().eligibleForStitching("Yes").build()).build();
+        Bundle bundle = Bundle.builder().value(BundleDetails.builder().eligibleForStitching(YES).build()).build();
         List<Bundle> bundles = new ArrayList<>();
         bundles.add(bundle);
 
@@ -193,7 +195,7 @@ public class EditBundleAboutToSubmitHandlerTest {
 
     @Test
     public void givenEditBundleEventWithNoAmendedBundleOptionSelectedAndIgnoreWarningsFalse_thenReturnAWarningToCaseworker() {
-        Bundle bundle = Bundle.builder().value(BundleDetails.builder().eligibleForStitching("No").build()).build();
+        Bundle bundle = Bundle.builder().value(BundleDetails.builder().eligibleForStitching(NO).build()).build();
         List<Bundle> bundles = new ArrayList<>();
         bundles.add(bundle);
 
@@ -211,7 +213,7 @@ public class EditBundleAboutToSubmitHandlerTest {
 
     @Test
     public void givenEditBundleEventWithNoAmendedBundleOptionSelectedAndIgnoreWarningsTrue_thenTriggerTheExternalEditBundleEvent() {
-        Bundle bundle = Bundle.builder().value(BundleDetails.builder().eligibleForStitching("No").build()).build();
+        Bundle bundle = Bundle.builder().value(BundleDetails.builder().eligibleForStitching(NO).build()).build();
         List<Bundle> bundles = new ArrayList<>();
         bundles.add(bundle);
 

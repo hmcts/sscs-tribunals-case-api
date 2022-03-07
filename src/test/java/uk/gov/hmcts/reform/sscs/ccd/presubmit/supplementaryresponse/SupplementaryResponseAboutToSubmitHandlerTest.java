@@ -7,6 +7,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -85,7 +87,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         assertEquals(DocumentSubtype.DWP_EVIDENCE.getValue(), response.getData().getScannedDocuments().get(0).getValue().getSubtype());
 
         assertEquals("supplementaryResponse", response.getData().getDwpState());
-        assertEquals("No", response.getData().getEvidenceHandled());
+        assertEquals(NO, response.getData().getEvidenceHandled());
         assertNull(response.getData().getDwpSupplementaryResponseDoc());
     }
 
@@ -101,7 +103,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         assertEquals(DocumentSubtype.DWP_EVIDENCE.getValue(), response.getData().getScannedDocuments().get(0).getValue().getSubtype());
 
         assertEquals("supplementaryResponse", response.getData().getDwpState());
-        assertEquals("No", response.getData().getEvidenceHandled());
+        assertEquals(NO, response.getData().getEvidenceHandled());
         assertNull(response.getData().getDwpOtherDoc());
     }
 
@@ -133,7 +135,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         assertEquals(DocumentSubtype.DWP_EVIDENCE.getValue(), response.getData().getScannedDocuments().get(0).getValue().getSubtype());
 
         assertEquals("supplementaryResponse", response.getData().getDwpState());
-        assertEquals("No", response.getData().getEvidenceHandled());
+        assertEquals(NO, response.getData().getEvidenceHandled());
         assertNull(response.getData().getDwpOtherDoc());
     }
 
@@ -160,7 +162,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         assertEquals(DocumentSubtype.DWP_EVIDENCE.getValue(), response.getData().getScannedDocuments().get(2).getValue().getSubtype());
 
         assertEquals("supplementaryResponse", response.getData().getDwpState());
-        assertEquals("No", response.getData().getEvidenceHandled());
+        assertEquals(NO, response.getData().getEvidenceHandled());
         assertNull(response.getData().getDwpOtherDoc());
     }
 
@@ -183,10 +185,10 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         assertEquals("supplementaryResponse", response.getData().getDwpState());
         assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), response.getData().getInterlocReviewState());
         assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), response.getData().getInterlocReferralReason());
-        assertEquals("No", response.getData().getEvidenceHandled());
+        assertEquals(NO, response.getData().getEvidenceHandled());
         assertNull(response.getData().getDwpOtherDoc());
         assertNull(response.getData().getShowRip1DocPage());
-        assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
+        assertEquals(YES, response.getData().getHasUnprocessedAudioVideoEvidence());
     }
 
     @Test
@@ -313,7 +315,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         assertEquals("supplementaryResponse", response.getData().getDwpState());
         assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), response.getData().getInterlocReviewState());
         assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), response.getData().getInterlocReferralReason());
-        assertEquals("No", response.getData().getEvidenceHandled());
+        assertEquals(NO, response.getData().getEvidenceHandled());
         assertNull(response.getData().getDwpOtherDoc());
         assertNull(response.getData().getRip1Doc());
         assertNull(response.getData().getShowRip1DocPage());

@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.AT_38;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_EVIDENCE_BUNDLE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_RESPONSE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.UCB;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_TCW;
 
@@ -119,16 +120,16 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
 
     public void setDefaultFieldValues(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getDwpIsOfficerAttending() == null) {
-            sscsCaseData.setDwpIsOfficerAttending("No");
+            sscsCaseData.setDwpIsOfficerAttending(NO);
         }
         if (sscsCaseData.getDwpUcb() == null) {
-            sscsCaseData.setDwpUcb("No");
+            sscsCaseData.setDwpUcb(NO);
         }
         if (sscsCaseData.getDwpPhme() == null) {
-            sscsCaseData.setDwpPhme("No");
+            sscsCaseData.setDwpPhme(NO);
         }
         if (sscsCaseData.getDwpComplexAppeal() == null) {
-            sscsCaseData.setDwpComplexAppeal("No");
+            sscsCaseData.setDwpComplexAppeal(NO);
         }
     }
 

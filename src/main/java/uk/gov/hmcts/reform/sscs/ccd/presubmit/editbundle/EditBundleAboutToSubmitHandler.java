@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.editbundle;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +10,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Bundle;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
@@ -62,7 +60,7 @@ public class EditBundleAboutToSubmitHandler implements PreSubmitCallbackHandler<
         if (sscsCaseData.getCaseBundles() != null) {
             boolean eligibleForStitching = false;
             for (Bundle bundle : sscsCaseData.getCaseBundles()) {
-                if ("Yes".equals(bundle.getValue().getEligibleForStitching())) {
+                if (isYes(bundle.getValue().getEligibleForStitching())) {
 
                     final String bundleName = null != bundle.getValue().getStitchedDocument()
                             ? bundle.getValue().getStitchedDocument().getDocumentFilename() : sscsCaseData.getCcdCaseId() + "-SscsBundle";
@@ -72,8 +70,8 @@ public class EditBundleAboutToSubmitHandler implements PreSubmitCallbackHandler<
                     eligibleForStitching = true;
                     bundle.getValue().setFileName(bundleName);
                     bundle.getValue().setCoverpageTemplate(template);
-                    bundle.getValue().setHasTableOfContents("Yes");
-                    bundle.getValue().setHasCoversheets("Yes");
+                    bundle.getValue().setHasTableOfContents(YES);
+                    bundle.getValue().setHasCoversheets(YES);
                     bundle.getValue().setPageNumberFormat("numberOfPages");
                     bundle.getValue().setStitchedDocument(null);
                 }

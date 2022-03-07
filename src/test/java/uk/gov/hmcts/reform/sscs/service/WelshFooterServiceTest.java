@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -68,7 +69,7 @@ public class WelshFooterServiceTest {
         docs.add(document);
 
         sscsCaseData = SscsCaseData.builder()
-                .generateNotice("Yes")
+                .generateNotice(YES)
                 .signedBy("User")
                 .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
                 .signedRole("Judge")

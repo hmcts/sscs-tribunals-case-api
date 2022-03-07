@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.ActionFurtherEvidenceAboutToSubmitHandlerTest.buildOriginalSenderItemListForGivenOption;
 
 import java.util.*;
@@ -368,7 +369,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
         docs.add(scannedDocument);
 
         sscsCaseData.setScannedDocuments(docs);
-        sscsCaseData.setIsConfidentialCase(YesNo.NO);
+        sscsCaseData.setIsConfidentialCase(NO);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 

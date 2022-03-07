@@ -4,6 +4,7 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.net.URISyntaxException;
 import org.junit.Before;
@@ -85,7 +86,7 @@ public class StorePdfServiceTest {
     @Test
     public void storeWelshPdf() {
         SscsCaseDetails caseDetails = createCaseDetails();
-        caseDetails.getData().setLanguagePreferenceWelsh("Yes");
+        caseDetails.getData().setLanguagePreferenceWelsh(YES);
         byte[] expectedPdfBytes = {2, 4, 6, 0, 1};
         when(pdfService.createPdf(pdfContent, "sometemplate")).thenReturn(expectedPdfBytes);
         String expectedCaseId = "expectedCcdCaseId";

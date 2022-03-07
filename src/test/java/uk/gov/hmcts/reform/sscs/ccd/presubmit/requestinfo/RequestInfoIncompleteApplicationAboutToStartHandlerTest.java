@@ -68,7 +68,7 @@ public class RequestInfoIncompleteApplicationAboutToStartHandlerTest {
 
     @Test
     public void givenARequestInfoIncompleteApplicationRequestWithRep_thenPopulateDropdownWithPartiesOnCase() {
-        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("Yes").build());
+        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative(YES).build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         DynamicList result = response.getData().getInformationFromPartySelected();
@@ -103,7 +103,7 @@ public class RequestInfoIncompleteApplicationAboutToStartHandlerTest {
     @Test
     public void givenARequestInfoIncompleteApplicationRequestWithJointPartyAndRep_thenPopulateDropdownWithPartiesOnCase() {
         sscsCaseData.getJointParty().setHasJointParty(YES);
-        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("Yes").build());
+        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative(YES).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 

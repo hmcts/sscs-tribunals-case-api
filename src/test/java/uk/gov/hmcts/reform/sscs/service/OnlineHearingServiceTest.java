@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -192,7 +193,7 @@ public class OnlineHearingServiceTest {
                                         .code("PIP")
                                         .build())
                                 .hearingOptions(HearingOptions.builder()
-                                        .languageInterpreter("yes")
+                                        .languageInterpreter(YES)
                                         .languages("french")
                                         .arrangements(asList("signLanguageInterpreter", "hearingLoop", "disabledAccess"))
                                         .signLanguageType("BSL")

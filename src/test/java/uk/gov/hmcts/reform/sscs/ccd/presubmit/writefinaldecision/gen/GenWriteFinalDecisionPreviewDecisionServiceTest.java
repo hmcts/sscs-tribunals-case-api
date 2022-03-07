@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -107,7 +109,7 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     }
 
     @Override
-    protected void setDescriptorFlowIndicator(String value, SscsCaseData sscsCaseData) {
+    protected void setDescriptorFlowIndicator(YesNo value, SscsCaseData sscsCaseData) {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow(value);
     }
 
@@ -122,16 +124,16 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         // set the common parameters instead
         setCommonNonDescriptorRoutePreviewParams(caseData);
         caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-        setDescriptorFlowIndicator("no", sscsCaseData);
+        setDescriptorFlowIndicator(NO, sscsCaseData);
     }
 
     @Override
     public void givenGeneratedDateIsAlreadySetGeneratedNonDescriptorFlow_thenSetNewGeneratedDate() {
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGeneratedDate("2018-10-10");
-        setDescriptorFlowIndicator("no", sscsCaseData);
+        setDescriptorFlowIndicator(NO, sscsCaseData);
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
@@ -148,9 +150,9 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
     @Override
     public void givenGeneratedDateIsAlreadySetNonGeneratedNonDescriptorFlow_thenDoSetNewGeneratedDate() {
-        setDescriptorFlowIndicator("no", sscsCaseData);
+        setDescriptorFlowIndicator(NO, sscsCaseData);
         setCommonNonDescriptorRoutePreviewParams(sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("no");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGeneratedDate("2018-10-10");
@@ -173,8 +175,8 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         setCommonNonDescriptorRoutePreviewParams(sscsCaseData);
 
-        setDescriptorFlowIndicator("no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(NO, sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -226,7 +228,7 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         setCommonNonDescriptorRoutePreviewParams(sscsCaseData);
 
-        setDescriptorFlowIndicator("no", sscsCaseData);
+        setDescriptorFlowIndicator(NO, sscsCaseData);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childsupport").build());
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         CcdValue<OtherParty> otherPartyCcdValue1 = CcdValue.<OtherParty>builder().value(OtherParty.builder().name(Name.builder().firstName("otherPartyFirstName1").lastName("otherPartyLastName1").build()).build()).build();
@@ -240,7 +242,7 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         otherPartyAttendedQuestionList.add(otherPartyAttendedQuestion1);
         otherPartyAttendedQuestionList.add(otherPartyAttendedQuestion2);
         sscsCaseData.getSscsFinalDecisionCaseData().setOtherPartyAttendedQuestions(otherPartyAttendedQuestionList);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -292,8 +294,8 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         setCommonNonDescriptorRoutePreviewParams(sscsCaseData);
 
-        setDescriptorFlowIndicator("no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(NO, sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -346,8 +348,8 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         setCommonNonDescriptorRoutePreviewParams(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionReasons(new ArrayList<>());
 
-        setDescriptorFlowIndicator("no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setDescriptorFlowIndicator(NO, sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 

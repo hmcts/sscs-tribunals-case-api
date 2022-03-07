@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
 
 import java.util.ArrayList;
@@ -52,11 +53,11 @@ public class GenWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData, String pageId) {
-        if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice() != null && sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice().equalsIgnoreCase(YesNo.YES.getValue())) {
-            sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES);
+        if (isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
+            sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YES);
             return;
         }
-        sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.NO);
+        sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(NO);
     }
 
     @Override
@@ -66,6 +67,6 @@ public class GenWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData, String pageId) {
-        sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
+        sscsCaseData.setShowDwpReassessAwardPage(NO);
     }
 }

@@ -12,6 +12,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -154,14 +156,14 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
         if (fileType.equalsIgnoreCase("pdf")) {
             assertThat(response.getData().getSscsDocument().size(), is(1));
             assertThat(response.getData().getAudioVideoEvidence(), is(nullValue()));
-            assertEquals(YesNo.NO, response.getData().getHasUnprocessedAudioVideoEvidence());
+            assertEquals(NO, response.getData().getHasUnprocessedAudioVideoEvidence());
         } else {
             assertThat(response.getData().getSscsDocument(), is(nullValue()));
             assertThat(response.getData().getAudioVideoEvidence().size(), is(1));
             assertThat(response.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded(), is(UploadParty.CTSC));
             assertThat(response.getData().getAudioVideoEvidence().get(0).getValue().getOriginalPartySender(), is("Appellant"));
             assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), response.getData().getInterlocReferralReason());
-            assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
+            assertEquals(YES, response.getData().getHasUnprocessedAudioVideoEvidence());
         }
     }
 

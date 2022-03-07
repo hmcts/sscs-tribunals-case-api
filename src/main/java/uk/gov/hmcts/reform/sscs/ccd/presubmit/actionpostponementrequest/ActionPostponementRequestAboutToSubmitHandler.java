@@ -160,7 +160,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         if (documentTranslationStatus != null) {
             caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
             log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
-            caseData.setTranslationWorkOutstanding(YES.getValue());
+            caseData.setTranslationWorkOutstanding(YES);
         }
     }
 

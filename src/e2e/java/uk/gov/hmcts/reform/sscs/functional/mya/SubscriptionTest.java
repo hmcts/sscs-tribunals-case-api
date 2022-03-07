@@ -2,14 +2,14 @@ package uk.gov.hmcts.reform.sscs.functional.mya;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 
 public class SubscriptionTest extends BaseFunctionTest {
-    private static final String YES = "yes";
-    private static final String NO = "no";
 
     @Test
     public void shouldUpdateSubscription() throws IOException, InterruptedException {

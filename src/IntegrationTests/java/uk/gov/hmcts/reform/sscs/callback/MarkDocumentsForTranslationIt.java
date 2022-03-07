@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.callback;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -58,7 +59,7 @@ public class MarkDocumentsForTranslationIt extends AbstractEventIt {
                 .filter(data -> data.getValue().getDocumentType()
                         .equalsIgnoreCase("appellantEvidence") || data.getValue().getDocumentType().equalsIgnoreCase("sscs1"))
                 .forEach(data -> assertEquals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED, data.getValue().getDocumentTranslationStatus()));
-        assertEquals("Yes", result.getData().getTranslationWorkOutstanding());
+        assertEquals(YES, result.getData().getTranslationWorkOutstanding());
     }
 }
 

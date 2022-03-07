@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.*;
 
 import java.time.LocalDate;
@@ -108,10 +109,10 @@ public class HmctsResponseReviewedAboutToStartTest {
     public void defaultTheDwpOptionsToNo() {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals("No", response.getData().getDwpIsOfficerAttending());
-        assertEquals("No", response.getData().getDwpUcb());
-        assertEquals("No", response.getData().getDwpPhme());
-        assertEquals("No", response.getData().getDwpComplexAppeal());
+        assertEquals(NO, response.getData().getDwpIsOfficerAttending());
+        assertEquals(NO, response.getData().getDwpUcb());
+        assertEquals(NO, response.getData().getDwpPhme());
+        assertEquals(NO, response.getData().getDwpComplexAppeal());
     }
 
     @Test

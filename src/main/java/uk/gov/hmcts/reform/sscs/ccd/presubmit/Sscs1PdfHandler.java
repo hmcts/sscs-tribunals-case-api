@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -106,14 +109,14 @@ public class Sscs1PdfHandler implements PreSubmitCallbackHandler<SscsCaseData> {
         }
     }
 
-    private String hasEvidence(SscsCaseData caseData, String fileName) {
+    private YesNo hasEvidence(SscsCaseData caseData, String fileName) {
         if (caseData.getSscsDocument() != null) {
             for (SscsDocument document : caseData.getSscsDocument()) {
                 if (!fileName.equals(document.getValue().getDocumentFileName())) {
-                    return "Yes";
+                    return YES;
                 }
             }
         }
-        return "No";
+        return NO;
     }
 }

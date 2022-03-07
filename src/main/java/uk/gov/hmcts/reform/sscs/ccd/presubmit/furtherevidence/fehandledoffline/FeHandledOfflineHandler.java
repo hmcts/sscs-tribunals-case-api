@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.fehandledoffline;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,7 +32,7 @@ public class FeHandledOfflineHandler implements PreSubmitCallbackHandler<SscsCas
     private boolean thereIsAnyDocumentToIssue(List<SscsDocument> sscsDocuments) {
         return null != sscsDocuments && sscsDocuments.stream()
             .filter(doc -> doc.getValue() != null)
-            .anyMatch(doc -> "No".equals(doc.getValue().getEvidenceIssued()));
+            .anyMatch(doc -> isNo(doc.getValue().getEvidenceIssued()));
     }
 
     @Override
@@ -47,7 +49,7 @@ public class FeHandledOfflineHandler implements PreSubmitCallbackHandler<SscsCas
     private void setEvidenceIssuedFlag(Callback<SscsCaseData> callback) {
         List<SscsDocument> sscsDocument = callback.getCaseDetails().getCaseData().getSscsDocument();
         List<SscsDocument> noIssuedEvidenceDocs = getNoIssuedEvidenceDocs(sscsDocument);
-        noIssuedEvidenceDocs.forEach(doc -> doc.getValue().setEvidenceIssued("Yes"));
+        noIssuedEvidenceDocs.forEach(doc -> doc.getValue().setEvidenceIssued(YES));
     }
 
     @NotNull
@@ -56,7 +58,7 @@ public class FeHandledOfflineHandler implements PreSubmitCallbackHandler<SscsCas
             return Collections.emptyList();
         }
         return sscsDocument.stream()
-            .filter(doc -> "No".equals(doc.getValue().getEvidenceIssued()))
+            .filter(doc -> isNo(doc.getValue().getEvidenceIssued()))
             .collect(Collectors.toList());
 
     }

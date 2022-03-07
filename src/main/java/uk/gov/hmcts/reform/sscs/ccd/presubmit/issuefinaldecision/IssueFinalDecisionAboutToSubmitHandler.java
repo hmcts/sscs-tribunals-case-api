@@ -158,7 +158,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         if (documentTranslationStatus != null) {
             sscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
             log.info("Set the InterlocReviewState to {},  for case id : {}", sscsCaseData.getInterlocReviewState(), sscsCaseData.getCcdCaseId());
-            sscsCaseData.setTranslationWorkOutstanding(YES.getValue());
+            sscsCaseData.setTranslationWorkOutstanding(YES);
         }
     }
 

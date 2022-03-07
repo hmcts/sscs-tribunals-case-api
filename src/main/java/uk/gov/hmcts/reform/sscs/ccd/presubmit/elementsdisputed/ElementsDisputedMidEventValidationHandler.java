@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.elementsdisputed;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse.ElementsDisputed.*;
 
 import java.util.List;
@@ -73,7 +74,7 @@ public class ElementsDisputedMidEventValidationHandler implements PreSubmitCallb
         if ((!"uc".equalsIgnoreCase(sscsCaseData.getAppeal().getBenefitType().getCode())
                 && sscsCaseData.getDwpAT38Document() == null)
             || ("uc".equalsIgnoreCase(sscsCaseData.getAppeal().getBenefitType().getCode())
-                && "yes".equalsIgnoreCase(sscsCaseData.getDwpFurtherInfo())
+                && isYes(sscsCaseData.getDwpFurtherInfo())
                 && sscsCaseData.getDwpAT38Document() == null)) {
 
             preSubmitCallbackResponse.addError("AT38 document is missing");

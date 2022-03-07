@@ -62,7 +62,7 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
                 .appeal(Appeal.builder()
                         .mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build())
                         .rep(Representative.builder()
-                                .hasRepresentative(YES.getValue())
+                                .hasRepresentative(YES)
                                 .organisation("org")
                                 .build())
                         .build())
@@ -298,9 +298,9 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
                 .value(OtherParty.builder()
                         .id(id)
                         .name(Name.builder().firstName("Harry").lastName("Kane").build())
-                        .isAppointee(YES.getValue())
+                        .isAppointee(YES)
                         .appointee(Appointee.builder().id(appointeeId).name(Name.builder().firstName("Henry").lastName("Smith").build()).build())
-                        .rep(Representative.builder().id(repId).name(Name.builder().firstName("Wendy").lastName("Smith").build()).hasRepresentative(YES.getValue()).build())
+                        .rep(Representative.builder().id(repId).name(Name.builder().firstName("Wendy").lastName("Smith").build()).hasRepresentative(YES).build())
                         .build())
                 .build();
     }

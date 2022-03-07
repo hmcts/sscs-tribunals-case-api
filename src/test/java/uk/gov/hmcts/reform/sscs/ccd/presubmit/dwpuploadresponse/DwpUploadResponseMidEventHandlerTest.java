@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
@@ -70,7 +71,7 @@ public class DwpUploadResponseMidEventHandlerTest {
                 .ccdCaseId("1234")
                 .benefitCode("002")
                 .issueCode("CC")
-                .dwpFurtherInfo("Yes")
+                .dwpFurtherInfo(YES)
                 .dwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("a.pdf").documentFilename("a.pdf").build()).build())
                 .dwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("b.pdf").documentFilename("b.pdf").build()).build())
                 .appeal(Appeal.builder().benefitType(BenefitType.builder().code("taxCredit").build()).build())

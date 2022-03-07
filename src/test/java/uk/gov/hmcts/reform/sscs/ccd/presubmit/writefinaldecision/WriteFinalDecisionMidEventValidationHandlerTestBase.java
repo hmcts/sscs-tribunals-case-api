@@ -7,6 +7,7 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.time.LocalDate;
 import javax.validation.Validation;
@@ -142,7 +143,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
         LocalDate tomorrow = LocalDate.now().plusDays(1);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(tomorrow.toString());
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow(descriptorFlowValue);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow(isYesOrNo(descriptorFlowValue));
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -220,7 +221,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     public void givenAnEndDateIsSameAsStartDate_thenDisplayAnError(String descriptorFlowValue) {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionStartDate("2020-01-01");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate("2020-01-01");
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow(descriptorFlowValue);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow(isYesOrNo(descriptorFlowValue));
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -250,7 +251,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     @Parameters(named = "descriptorFlowValues")
     public void givenANonPdfDecisionNotice_thenDisplayAnError(String descriptorFlowValue) {
 
-        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        setValidPointsAndActivitiesScenario(sscsCaseData, YES.getValue());
 
         DocumentLink docLink = DocumentLink.builder().documentUrl("test.doc").build();
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
@@ -266,7 +267,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     @Test
     @Parameters({"typeOfAppeal", "previewDecisionNotice"})
     public void givenDeathOfAppellant_thenDisplayWarning(String pageId) {
-        sscsCaseData.setIsAppellantDeceased(YesNo.YES);
+        sscsCaseData.setIsAppellantDeceased(YES);
         when(callback.isIgnoreWarnings()).thenReturn(false);
         when(callback.getPageId()).thenReturn(pageId);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -281,7 +282,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     public void givenDeathOfAppellantButNotOnTheCorrectPage_thenDoNotDisplayWarning() {
         when(callback.getPageId()).thenReturn("incorrectPage");
         when(callback.isIgnoreWarnings()).thenReturn(false);
-        sscsCaseData.setIsAppellantDeceased(YesNo.YES);
+        sscsCaseData.setIsAppellantDeceased(YES);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -293,7 +294,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     public void givenDeathOfAppellantWithIgnoreWarnings_thenDoNotDisplayWarning() {
         when(callback.isIgnoreWarnings()).thenReturn(true);
         when(callback.getPageId()).thenReturn("typeOfAppeal");
-        sscsCaseData.setIsAppellantDeceased(YesNo.YES);
+        sscsCaseData.setIsAppellantDeceased(YES);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -304,7 +305,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     @Test
     public void givenNoDeathOfAppellant_thenDoNotDisplayWarning() {
         when(callback.getPageId()).thenReturn("typeOfAppeal");
-        sscsCaseData.setIsAppellantDeceased(YesNo.NO);
+        sscsCaseData.setIsAppellantDeceased(NO);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -329,11 +330,11 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     @Test
     public void shouldExhibitBenefitSpecificBehaviourWhenNoAwardsAreGivenAndNoActivitiesAreSelectedAndEndDateTypeIsNA() {
 
-        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        setValidPointsAndActivitiesScenario(sscsCaseData, YES.getValue());
         setNoAwardsScenario(sscsCaseData);
         setEmptyActivitiesListScenario(sscsCaseData);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("na");
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 

@@ -17,6 +17,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -80,10 +82,10 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
             .appeal(Appeal.builder().build())
             .sscsDocument(documentList)
             .state(HEARING)
-            .adjournCaseGenerateNotice("")
+            .adjournCaseGenerateNotice(null)
             .adjournCaseTypeOfHearing("")
-            .adjournCaseCanCaseBeListedRightAway("")
-            .adjournCaseAreDirectionsBeingMadeToParties("")
+            .adjournCaseCanCaseBeListedRightAway(null)
+            .adjournCaseAreDirectionsBeingMadeToParties(null)
             .adjournCaseDirectionsDueDateDaysOffset("")
             .adjournCaseDirectionsDueDate("")
             .adjournCaseTypeOfNextHearing("")
@@ -96,7 +98,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
             .adjournCaseNextHearingListingDurationType("")
             .adjournCaseNextHearingListingDuration("")
             .adjournCaseNextHearingListingDurationUnits("")
-            .adjournCaseInterpreterRequired("")
+            .adjournCaseInterpreterRequired(null)
             .adjournCaseInterpreterLanguage("")
             .adjournCaseNextHearingDateType("")
             .adjournCaseNextHearingDateOrPeriod("")
@@ -169,7 +171,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         callback.getCaseDetails().getCaseData().setAdjournCasePreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().setAdjournCaseDirectionsDueDate(LocalDate.now().plusDays(1).toString());
-        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("yes");
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(YES);
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -178,7 +180,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
 
         assertEquals(null, sscsCaseData.getDwpState());
         assertEquals(InterlocReviewState.WELSH_TRANSLATION.getId(), sscsCaseData.getInterlocReviewState());
-        assertEquals("Yes", sscsCaseData.getTranslationWorkOutstanding());
+        assertEquals(YES, sscsCaseData.getTranslationWorkOutstanding());
     }
 
     @Test
@@ -205,7 +207,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
     public void givenAnIssueAdjournmentEventWithDirectionsToAllParties_thenSetStateToNotListable() {
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         callback.getCaseDetails().getCaseData().setAdjournCasePreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().setAdjournCaseAreDirectionsBeingMadeToParties("Yes");
+        callback.getCaseDetails().getCaseData().setAdjournCaseAreDirectionsBeingMadeToParties(YES);
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -216,7 +218,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
     public void givenAnIssueAdjournmentEventWithNoDirections_thenSetStateToReadyToList() {
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         callback.getCaseDetails().getCaseData().setAdjournCasePreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().setAdjournCaseAreDirectionsBeingMadeToParties("No");
+        callback.getCaseDetails().getCaseData().setAdjournCaseAreDirectionsBeingMadeToParties(NO);
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -227,7 +229,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
     public void givenAnIssueAdjournmentEventForWelshCase0_thenTheCaseStateShoyleStayUnchanged() {
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         callback.getCaseDetails().getCaseData().setAdjournCasePreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("yes");
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(YES);
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

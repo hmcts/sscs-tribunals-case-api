@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatewelshpreference;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.WELSH_TRANSLATION;
 
@@ -45,7 +46,7 @@ public class UpdateWelshPreferenceAboutToSubmitHandler implements PreSubmitCallb
                 String note = "Assigned to admin - Case no longer Welsh. Please cancel any Welsh translations";
                 addNoteService.addNote(userAuthorisation, caseData, note);
             }
-            caseData.setTranslationWorkOutstanding("No");
+            caseData.setTranslationWorkOutstanding(NO);
         }
         return new PreSubmitCallbackResponse<>(caseData);
     }

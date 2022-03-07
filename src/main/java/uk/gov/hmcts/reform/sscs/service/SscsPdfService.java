@@ -1,8 +1,13 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -87,11 +92,8 @@ public class SscsPdfService {
             }
             placeholders.put("welshCurrentDate", LocalDateToWelshStringConverter.convert(sscsCaseData.getCaseCreated()));
             placeholders.put("welshBenefitType", Benefit.getLongBenefitNameDescriptionWithOptionalAcronym(sscsCaseData.getAppeal().getBenefitType().getCode(), false));
-            placeholders.put("welshEvidencePresent",
-                    sscsCaseData.getEvidencePresent() != null && sscsCaseData.getEvidencePresent().equalsIgnoreCase(
-                            "Yes") ? "ydw" : "nac ydw");
-            placeholders.put("welshWantsToAttend", sscsCaseData.getAppeal().getHearingOptions().getWantsToAttend().equalsIgnoreCase(
-                    "Yes") ? "ydw" : "nac ydw");
+            placeholders.put("welshEvidencePresent", isYes(sscsCaseData.getEvidencePresent()) ? "ydw" : "nac ydw");
+            placeholders.put("welshWantsToAttend", isYes(sscsCaseData.getAppeal().getHearingOptions().getWantsToAttend()) ? "ydw" : "nac ydw");
         }
         return pdfServiceClient.generateFromHtml(template, placeholders);
     }

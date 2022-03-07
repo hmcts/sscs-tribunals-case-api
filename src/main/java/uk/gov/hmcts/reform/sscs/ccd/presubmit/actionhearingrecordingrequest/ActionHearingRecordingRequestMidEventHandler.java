@@ -86,7 +86,7 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
 
             otherPartyHearingRecordingReqUi.add(buildOtherPartyElement(sscsCaseData, hearing, otherParty.getValue().getId(), otherParty.getValue().getName(), PartyItemList.OTHER_PARTY));
 
-            if (null != otherParty.getValue().getRep() && "Yes".equals(otherParty.getValue().getRep().getHasRepresentative())) {
+            if (null != otherParty.getValue().getRep() && isYes(otherParty.getValue().getRep().getHasRepresentative())) {
                 otherPartyHearingRecordingReqUi.add(buildOtherPartyElement(sscsCaseData, hearing, otherParty.getValue().getRep().getId(), otherParty.getValue().getRep().getName(), PartyItemList.OTHER_PARTY_REPRESENTATIVE));
             }
         }
@@ -172,7 +172,7 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
         if (response.getData().isThereAJointParty()) {
             validateParty(PartyItemList.JOINT_PARTY, processHearingRecordingRequest, response);
         }
-        boolean caseHasARepresentative = isYes(ofNullable(response.getData().getAppeal().getRep()).map(Representative::getHasRepresentative).orElse(NO.getValue()));
+        boolean caseHasARepresentative = isYes(ofNullable(response.getData().getAppeal().getRep()).map(Representative::getHasRepresentative).orElse(NO));
 
         if (caseHasARepresentative) {
             validateParty(PartyItemList.REPRESENTATIVE, processHearingRecordingRequest, response);
@@ -188,7 +188,7 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
             validateParty(PartyItemList.OTHER_PARTY, processHearingRecordingRequest, otherParty.getValue().getId(), otherPartyHearingRecordingReqUi, response);
             numberOfParties++;
 
-            if (null != otherParty.getValue().getRep() && "Yes".equals(otherParty.getValue().getRep().getHasRepresentative())) {
+            if (null != otherParty.getValue().getRep() && isYes(otherParty.getValue().getRep().getHasRepresentative())) {
                 validateParty(PartyItemList.OTHER_PARTY_REPRESENTATIVE, processHearingRecordingRequest, otherParty.getValue().getRep().getId(), otherPartyHearingRecordingReqUi, response);
                 numberOfParties++;
             }

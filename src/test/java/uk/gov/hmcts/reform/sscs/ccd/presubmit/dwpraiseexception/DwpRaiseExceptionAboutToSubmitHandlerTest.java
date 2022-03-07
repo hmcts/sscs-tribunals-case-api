@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import junitparams.JUnitParamsRunner;
@@ -75,7 +76,7 @@ public class DwpRaiseExceptionAboutToSubmitHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("Yes", response.getData().getIsProgressingViaGaps());
+        assertEquals(YES, response.getData().getIsProgressingViaGaps());
     }
 
     @Test
@@ -86,7 +87,7 @@ public class DwpRaiseExceptionAboutToSubmitHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("Yes", response.getData().getIsProgressingViaGaps());
+        assertEquals(YES, response.getData().getIsProgressingViaGaps());
         assertEquals(InterlocReviewState.NONE.getId(), response.getData().getInterlocReviewState());
     }
 

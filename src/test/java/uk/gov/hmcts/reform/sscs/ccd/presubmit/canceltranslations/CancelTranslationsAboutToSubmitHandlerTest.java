@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CANCEL_TRANSLATIONS;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -90,7 +92,7 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
         assertNull(response.getData().getSscsDocument().get(4).getValue().getDocumentTranslationStatus());
         assertNull(response.getData().getSscsDocument().get(5).getValue().getDocumentTranslationStatus());
         assertNull(response.getData().getSscsDocument().get(6).getValue().getDocumentTranslationStatus());
-        assertEquals("No", response.getData().getTranslationWorkOutstanding());
+        assertEquals(NO, response.getData().getTranslationWorkOutstanding());
 
         assertEquals(EventType.DECISION_ISSUED_WELSH.getCcdType(), response.getData().getSscsWelshPreviewNextEvent());
     }
@@ -109,7 +111,7 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
         assertNull(response.getData().getSscsDocument().get(4).getValue().getDocumentTranslationStatus());
         assertNull(response.getData().getSscsDocument().get(5).getValue().getDocumentTranslationStatus());
         assertNull(response.getData().getSscsDocument().get(6).getValue().getDocumentTranslationStatus());
-        assertEquals("No", response.getData().getTranslationWorkOutstanding());
+        assertEquals(NO, response.getData().getTranslationWorkOutstanding());
 
         assertEquals("reviewByTcw", response.getData().getInterlocReviewState());
     }
@@ -153,7 +155,7 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .sscsDocument(docs)
                 .state(State.VALID_APPEAL)
-                .languagePreferenceWelsh("Yes")
+                .languagePreferenceWelsh(YES)
                 .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
                 state, sscsCaseData, LocalDateTime.now(), "Benefit");

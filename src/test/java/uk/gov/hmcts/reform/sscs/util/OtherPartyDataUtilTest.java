@@ -5,8 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,7 +33,7 @@ public class OtherPartyDataUtilTest {
             buildOtherParty(ID_1, true),
             buildOtherParty(ID_2, false))).build();
         OtherPartyDataUtil.updateOtherPartyUcb(data);
-        assertEquals(YesNo.YES.getValue(), data.getOtherPartyUcb());
+        assertEquals(YES, data.getOtherPartyUcb());
     }
 
     @Test
@@ -43,14 +42,12 @@ public class OtherPartyDataUtilTest {
             buildOtherParty(ID_1, false),
             buildOtherParty(ID_2, false))).build();
         OtherPartyDataUtil.updateOtherPartyUcb(data);
-        assertEquals(YesNo.NO.getValue(), data.getOtherPartyUcb());
+        assertEquals(NO, data.getOtherPartyUcb());
     }
 
     @Test
     @Parameters({"UPDATE_OTHER_PARTY_DATA", "DWP_UPLOAD_RESPONSE"})
     public void givenNewOtherPartyAdded_thenAssignAnIdAndNotificationFlag(EventType eventType) {
-
-
         List<CcdValue<OtherParty>> otherParties = Arrays.asList(
             buildOtherPartyWithAppointeeAndRep(null, null, null));
 
@@ -191,7 +188,7 @@ public class OtherPartyDataUtilTest {
                 .value(OtherParty.builder()
                         .id(id)
                         .name(name("OtherParty", id))
-                        .unacceptableCustomerBehaviour(ucb ? YesNo.YES : YesNo.NO)
+                        .unacceptableCustomerBehaviour(ucb ? YES : NO)
                         .build())
                 .build();
     }
@@ -210,9 +207,9 @@ public class OtherPartyDataUtilTest {
                 .value(OtherParty.builder()
                         .id(id)
                         .name(name("OtherParty", id))
-                        .isAppointee(YES.getValue())
+                        .isAppointee(YES)
                         .appointee(Appointee.builder().id(appointeeId).name(name("Appointee", appointeeId)).build())
-                        .rep(Representative.builder().id(repId).hasRepresentative(YES.getValue()).name(name("Rep", repId)).build())
+                        .rep(Representative.builder().id(repId).hasRepresentative(YES).name(name("Rep", repId)).build())
                         .build())
                 .build();
     }

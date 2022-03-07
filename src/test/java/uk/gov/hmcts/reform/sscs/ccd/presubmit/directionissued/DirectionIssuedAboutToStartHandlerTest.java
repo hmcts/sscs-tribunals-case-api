@@ -5,6 +5,8 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.*;
 
 import java.util.ArrayList;
@@ -119,7 +121,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
     public void givenAppealWithTimeExtension_populateDirectionTypeDropdown() {
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
-        sscsCaseData.setTimeExtensionRequested("Yes");
+        sscsCaseData.setTimeExtensionRequested(YES);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
@@ -161,7 +163,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
-        callback.getCaseDetails().getCaseData().setUrgentCase("Yes");
+        callback.getCaseDetails().getCaseData().setUrgentCase(YES);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
@@ -181,7 +183,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
-        callback.getCaseDetails().getCaseData().setUrgentCase("No");
+        callback.getCaseDetails().getCaseData().setUrgentCase(NO);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
@@ -198,7 +200,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
     public void givenValidAppealWithTimeExtensionAndDirectionTypeDropdownAlreadyPopulated_thenAutomaticallySelectDirectionTypeDropdownValue() {
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
 
-        sscsCaseData = SscsCaseData.builder().timeExtensionRequested("Yes").directionTypeDl(new DynamicList(GRANT_EXTENSION.toString())).appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
+        sscsCaseData = SscsCaseData.builder().timeExtensionRequested(YES).directionTypeDl(new DynamicList(GRANT_EXTENSION.toString())).appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
 
@@ -237,7 +239,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
-        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YesNo.YES);
+        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YES);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
@@ -257,7 +259,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
-        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YesNo.NO);
+        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(NO);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));

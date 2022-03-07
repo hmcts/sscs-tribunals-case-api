@@ -60,9 +60,9 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandlerTest {
                         .build())
                 .otherParties(emptyList())
                 .appeal(Appeal.builder().appellant(
-                        Appellant.builder().isAppointee(NO.getValue())
+                        Appellant.builder().isAppointee(NO)
                                 .appointee(Appointee.builder().build()).build())
-                        .rep(Representative.builder().hasRepresentative(YES.getValue()).build())
+                        .rep(Representative.builder().hasRepresentative(YES).build())
                         .build()
                 )
                 .jointParty(JointParty.builder().hasJointParty(YES).build())
@@ -104,7 +104,7 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandlerTest {
 
     @Test
     public void givenAppointeeUpdateReasonableAdjustment_thenClearAlternativeLetterFieldsSetToNo() {
-        sscsCaseData.getAppeal().setAppellant(Appellant.builder().isAppointee(YES.getValue()).appointee(
+        sscsCaseData.getAppeal().setAppellant(Appellant.builder().isAppointee(YES).appointee(
                 Appointee.builder().build()
         ).build());
         sscsCaseData.getReasonableAdjustments().setAppointee(ReasonableAdjustmentDetails.builder().wantsReasonableAdjustment(YES).reasonableAdjustmentRequirements(RED_FONT).build());
@@ -121,7 +121,7 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandlerTest {
     @Test
     public void givenRepresentativeUpdateReasonableAdjustment_thenClearAlternativeLetterFieldsSetToNo() {
 
-        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative(YES.getValue()).build());
+        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative(YES).build());
         sscsCaseData.getReasonableAdjustments().getRepresentative().setWantsReasonableAdjustment(YES);
         sscsCaseData.getReasonableAdjustments().getAppellant().setWantsReasonableAdjustment(NO);
 
@@ -137,8 +137,8 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandlerTest {
 
     @Test
     public void givenJointPartyUpdateReasonableAdjustment_thenClearAlternativeLetterFieldsSetToNo() {
-        sscsCaseData.getAppeal().setAppellant(Appellant.builder().isAppointee(YES.getValue()).appointee(Appointee.builder().build()).build());
-        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative(YES.getValue()).build());
+        sscsCaseData.getAppeal().setAppellant(Appellant.builder().isAppointee(YES).appointee(Appointee.builder().build()).build());
+        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative(YES).build());
         sscsCaseData.getJointParty().setHasJointParty(YES);
         sscsCaseData.getReasonableAdjustments().getAppellant().setWantsReasonableAdjustment(NO);
         sscsCaseData.getReasonableAdjustments().getJointParty().setWantsReasonableAdjustment(YES);

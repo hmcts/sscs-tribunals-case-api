@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.removelinkforcase;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -55,9 +57,9 @@ public class RemoveLinkForCaseAboutToSubmitHandler implements PreSubmitCallbackH
         if (preSubmitCallbackResponse.getErrors().isEmpty()) {
             sscsCaseData.setAssociatedCase(associatedCasesAfter);
             if (!associatedCasesAfter.isEmpty()) {
-                sscsCaseData.setLinkedCasesBoolean("Yes");
+                sscsCaseData.setLinkedCasesBoolean(YES);
             } else {
-                sscsCaseData.setLinkedCasesBoolean("No");
+                sscsCaseData.setLinkedCasesBoolean(NO);
             }
         }
 

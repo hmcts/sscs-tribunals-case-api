@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.functional.handlers.PdfHelper.getPdf;
 
 import java.util.List;
@@ -45,7 +46,7 @@ public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler 
                         .build()
         );
         caseDetails = addDocumentsToCase(caseDetails.getData(), docs);
-        caseDetails.getData().setPhmeGranted(YesNo.YES);
+        caseDetails.getData().setPhmeGranted(YES);
 
         runEvent(caseDetails.getData(), EventType.CREATE_BUNDLE);
 

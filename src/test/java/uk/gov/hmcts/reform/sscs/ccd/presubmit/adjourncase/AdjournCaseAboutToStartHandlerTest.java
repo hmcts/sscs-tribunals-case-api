@@ -44,10 +44,10 @@ public class AdjournCaseAboutToStartHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
                 .appeal(Appeal.builder().build())
-                .adjournCaseGenerateNotice("")
+                .adjournCaseGenerateNotice(null)
                 .adjournCaseTypeOfHearing("")
-                .adjournCaseCanCaseBeListedRightAway("")
-                .adjournCaseAreDirectionsBeingMadeToParties("")
+                .adjournCaseCanCaseBeListedRightAway(null)
+                .adjournCaseAreDirectionsBeingMadeToParties(null)
                 .adjournCaseDirectionsDueDateDaysOffset("")
                 .adjournCaseDirectionsDueDate("")
                 .adjournCaseTypeOfNextHearing("")
@@ -60,7 +60,7 @@ public class AdjournCaseAboutToStartHandlerTest {
                 .adjournCaseNextHearingListingDurationType("")
                 .adjournCaseNextHearingListingDuration("")
                 .adjournCaseNextHearingListingDurationUnits("")
-                .adjournCaseInterpreterRequired("")
+                .adjournCaseInterpreterRequired(null)
                 .adjournCaseInterpreterLanguage("")
                 .adjournCaseNextHearingDateType("")
                 .adjournCaseNextHearingDateOrPeriod("")
@@ -130,10 +130,10 @@ public class AdjournCaseAboutToStartHandlerTest {
 
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals("", sscsCaseData.getAdjournCaseGenerateNotice());
+        assertEquals(null, sscsCaseData.getAdjournCaseGenerateNotice());
         assertEquals("", sscsCaseData.getAdjournCaseTypeOfHearing());
-        assertEquals("", sscsCaseData.getAdjournCaseCanCaseBeListedRightAway());
-        assertEquals("", sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties());
+        assertEquals(null, sscsCaseData.getAdjournCaseCanCaseBeListedRightAway());
+        assertEquals(null, sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties());
         assertEquals("", sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset());
         assertEquals("", sscsCaseData.getAdjournCaseDirectionsDueDate());
         assertEquals("", sscsCaseData.getAdjournCaseTypeOfNextHearing());
@@ -146,7 +146,7 @@ public class AdjournCaseAboutToStartHandlerTest {
         assertEquals("", sscsCaseData.getAdjournCaseNextHearingListingDurationType());
         assertEquals("", sscsCaseData.getAdjournCaseNextHearingListingDuration());
         assertEquals("", sscsCaseData.getAdjournCaseNextHearingListingDurationUnits());
-        assertEquals("", sscsCaseData.getAdjournCaseInterpreterRequired());
+        assertEquals(null, sscsCaseData.getAdjournCaseInterpreterRequired());
         assertEquals("", sscsCaseData.getAdjournCaseInterpreterLanguage());
         assertEquals("", sscsCaseData.getAdjournCaseNextHearingDateType());
         assertEquals("", sscsCaseData.getAdjournCaseNextHearingDateOrPeriod());

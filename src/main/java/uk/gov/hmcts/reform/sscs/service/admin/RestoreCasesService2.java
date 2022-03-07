@@ -155,7 +155,7 @@ public class RestoreCasesService2 {
             caseData.setDwpState(DwpState.UNREGISTERED.getId());
         }
 
-        String isScotCase = isScottishCase(caseData.getRegionalProcessingCenter(), caseData);
+        YesNo isScotCase = isScottishCase(caseData.getRegionalProcessingCenter(), caseData);
 
         if (!isScotCase.equals(caseData.getIsScottishCase())) {
             caseData.setIsScottishCase(isScotCase);

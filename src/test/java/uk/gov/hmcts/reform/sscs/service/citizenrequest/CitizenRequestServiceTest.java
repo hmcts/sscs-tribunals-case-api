@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CITIZEN_REQUEST_HEARING_RECORDING;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -721,7 +722,7 @@ public class CitizenRequestServiceTest {
         boolean response = citizenRequestService.requestHearingRecordings(IDENTIFIER, List.of("id_1"), AUTHORISATION);
         assertThat(response, is(true));
         assertThat(caseData.getSscsHearingRecordingCaseData().getRequestedHearings().size(), is(1));
-        assertThat(caseData.getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding(), is(YesNo.YES));
+        assertThat(caseData.getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding(), is(YES));
         HearingRecordingRequest hearingRecordingRequest = caseData.getSscsHearingRecordingCaseData().getRequestedHearings().get(0);
         assertThat(hearingRecordingRequest.getValue().getRequestingParty(), is(PartyItemList.JOINT_PARTY.getCode()));
         assertThat(hearingRecordingRequest.getValue().getDateRequested(), is(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))));
@@ -753,7 +754,7 @@ public class CitizenRequestServiceTest {
         boolean response = citizenRequestService.requestHearingRecordings(IDENTIFIER, List.of("id_1"), AUTHORISATION);
         assertThat(response, is(true));
         assertThat(caseData.getSscsHearingRecordingCaseData().getRequestedHearings().size(), is(1));
-        assertThat(caseData.getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding(), is(YesNo.YES));
+        assertThat(caseData.getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding(), is(YES));
         HearingRecordingRequest hearingRecordingRequest = caseData.getSscsHearingRecordingCaseData().getRequestedHearings().get(0);
         assertThat(hearingRecordingRequest.getValue().getRequestingParty(), is(code));
         assertThat(hearingRecordingRequest.getValue().getOtherPartyId(), is(otherPartyId));
@@ -772,14 +773,14 @@ public class CitizenRequestServiceTest {
             new Object[]{CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder()
                     .id("1")
-                    .isAppointee(YesNo.YES.getValue())
+                    .isAppointee(YES)
                     .appointee(Appointee.builder().id("2").build())
                     .otherPartyAppointeeSubscription(Subscription.builder().email(E_MAIL).build()).build())
                 .build(), "1", PartyItemList.OTHER_PARTY.getCode()},
             new Object[]{CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder()
                     .id("1")
-                    .rep(Representative.builder().id("2").hasRepresentative(YesNo.YES.getValue()).build())
+                    .rep(Representative.builder().id("2").hasRepresentative(YES).build())
                     .otherPartyRepresentativeSubscription(Subscription.builder().email(E_MAIL).build()).build())
                 .build(), "2", PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode()}
         };
@@ -819,7 +820,7 @@ public class CitizenRequestServiceTest {
         boolean response = citizenRequestService.requestHearingRecordings(IDENTIFIER, List.of("id_1"), AUTHORISATION);
         assertThat(response, is(true));
         assertThat(caseData.getSscsHearingRecordingCaseData().getRequestedHearings().size(), is(1));
-        assertThat(caseData.getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding(), is(YesNo.YES));
+        assertThat(caseData.getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding(), is(YES));
 
         verify(ccdService).updateCase(
                 argThat(argument -> argument.getSscsHearingRecordingCaseData().getRequestedHearings().size() == 1),

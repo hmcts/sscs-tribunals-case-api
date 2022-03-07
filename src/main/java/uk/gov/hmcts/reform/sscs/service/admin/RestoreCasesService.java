@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service.admin;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import static uk.gov.hmcts.reform.sscs.ccd.service.SscsQueryBuilder.findCaseByResponseReceivedStateAndNoDwpFurtherInfoAndLastModifiedDateQuery;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -18,10 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -33,10 +31,10 @@ public class RestoreCasesService {
     private final CcdService ccdService;
 
     private final IdamService idamService;
-    
+
     private final ObjectMapper objectMapper;
 
-    private static final String DWP_FURTHER_INFO_REQUIRED_VALUE = "No";
+    private static final YesNo DWP_FURTHER_INFO_REQUIRED_VALUE = NO;
     private static final State REQUIRED_PRE_STATE = State.RESPONSE_RECEIVED;
     private static final EventType POST_STATE_EVENT_TYPE = EventType.READY_TO_LIST;
 
@@ -121,7 +119,7 @@ public class RestoreCasesService {
         }
         return false;
     }
-    
+
     private List<SscsCaseDetails> getMatchedCasesForDate(IdamTokens idamTokens, String date) {
         SearchSourceBuilder searchBuilder = findCaseByResponseReceivedStateAndNoDwpFurtherInfoAndLastModifiedDateQuery(date);
 
@@ -131,7 +129,7 @@ public class RestoreCasesService {
     private boolean validateCasesMatchStateAndDwpFurtherInfoCriteria(List<SscsCaseDetails> cases) {
         return cases.stream().allMatch(this::caseMatchesStateAndFurtherInfoCriteria);
     }
-    
+
     private boolean caseMatchesStateAndFurtherInfoCriteria(SscsCaseDetails caseDetails) {
         boolean matchesCriteria = (DWP_FURTHER_INFO_REQUIRED_VALUE.equals(caseDetails.getData().getDwpFurtherInfo())
             && REQUIRED_PRE_STATE.getId().equals(caseDetails.getState()));

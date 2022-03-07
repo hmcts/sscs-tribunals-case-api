@@ -14,6 +14,7 @@ import static org.mockito.Mockito.times;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -208,7 +209,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         Callback<SscsCaseData> callback = buildCallback(FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL.code, ACTION_FURTHER_EVIDENCE);
 
         callback.getCaseDetails().getCaseData().setSscsDocument(List.of(sscsDocument));
-        callback.getCaseDetails().getCaseData().setUrgentCase("Yes");
+        callback.getCaseDetails().getCaseData().setUrgentCase(YES);
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
         ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);

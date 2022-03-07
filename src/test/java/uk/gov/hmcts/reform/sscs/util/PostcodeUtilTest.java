@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.util;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.List;
 import org.junit.Before;
@@ -68,7 +69,7 @@ public class PostcodeUtilTest {
     public void willMatchAndOtherPartyPostcodeOnOtherPartyAppointeeEmail() {
         String otherPartyPostCode = "W1 1LA";
         OtherParty otherParty = OtherParty.builder()
-                .isAppointee("Yes")
+                .isAppointee(YES)
                 .appointee(Appointee.builder().address(Address.builder().postcode("w2 2la").build()).build())
                 .otherPartyAppointeeSubscription(Subscription.builder().email(EMAIL).build())
                 .otherPartySubscription(Subscription.builder().email("otherParty@example.com").build())
@@ -81,7 +82,7 @@ public class PostcodeUtilTest {
     public void willMatchAndOtherPartyPostcodeOnOtherPartyRepEmail() {
         String otherPartyPostCode = "W1 1LA";
         OtherParty otherParty = OtherParty.builder()
-                .rep(Representative.builder().hasRepresentative("Yes")
+                .rep(Representative.builder().hasRepresentative(YES)
                         .address(Address.builder().postcode("w2 2la").build()).build())
                 .otherPartyRepresentativeSubscription(Subscription.builder().email(EMAIL).build())
                 .otherPartySubscription(Subscription.builder().email("otherParty@example.com").build())

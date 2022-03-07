@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.requestinfo;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
 
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +39,7 @@ public class RequestInfoIncompleteApplicationAboutToSubmitHandler implements Pre
 
         log.info(String.format("Handling request info incomplete application event for caseId %s", sscsCaseData.getCcdCaseId()));
 
-        if ("yes".equalsIgnoreCase(sscsCaseData.getResponseRequired())) {
+        if (isYes(sscsCaseData.getResponseRequired())) {
             sscsCaseData.setInterlocReviewState(AWAITING_INFORMATION.getId());
         }
 

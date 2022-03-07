@@ -19,6 +19,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
@@ -295,7 +296,7 @@ public class EvidenceUploadServiceTest {
 
         verify(ccdService).updateCase(
                 and(hasSscsScannedDocumentAndSscsDocuments(expectedEvidenceUploadFilename),
-                        doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo(YesNo.NO)),
+                        doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo(NO)),
                 eq(someCcdCaseId),
                 eq(UPLOAD_DOCUMENT.getCcdType()),
                 eq("SSCS - upload evidence from MYA"),
@@ -357,7 +358,7 @@ public class EvidenceUploadServiceTest {
                         doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo()),
                         argThat(argument -> argument.getInterlocReviewState().equals(expectedInterlocReviewState.getId()))),
                         argThat(argument ->  argument.getInterlocReferralReason().equals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE.getId()))),
-                        argThat(argument ->  argument.getHasUnprocessedAudioVideoEvidence().equals(YesNo.YES))),
+                        argThat(argument ->  isYes(argument.getHasUnprocessedAudioVideoEvidence()))),
                 eq(someCcdCaseId),
                 eq(UPLOAD_DOCUMENT.getCcdType()),
                 eq("SSCS - upload evidence from MYA"),
@@ -853,7 +854,7 @@ public class EvidenceUploadServiceTest {
                 .name(Name.builder().firstName("John").lastName("Smith").build())
                 .rep(Representative.builder()
                         .id("2")
-                        .hasRepresentative(YesNo.YES.getValue())
+                        .hasRepresentative(YES)
                         .name(Name.builder().firstName("Myles").lastName("Smith").build())
                         .build())
                 .otherPartySubscription(Subscription.builder().email("op@email.com").build())
@@ -883,7 +884,7 @@ public class EvidenceUploadServiceTest {
         sscsCaseDetails.getData().setOtherParties(List.of(new CcdValue<>(OtherParty.builder()
                 .id("1")
                 .name(Name.builder().firstName("John").lastName("Smith").build())
-                .isAppointee(YesNo.YES.getValue())
+                .isAppointee(YES)
                 .appointee(Appointee.builder()
                         .id("2")
                         .name(Name.builder().firstName("Trinity").lastName("Smith").build())
@@ -1009,14 +1010,14 @@ public class EvidenceUploadServiceTest {
     private SscsCaseData doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo() {
         return argThat(argument -> {
             List<SscsDocument> sscsDocument = argument.getDraftSscsDocument();
-            return sscsDocument.isEmpty() && argument.getEvidenceHandled().equals("No");
+            return isNoOrNull(argument.getEvidenceHandled());
         });
     }
 
     private SscsCaseData doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo(YesNo hasUnprocessedAudioVideoEvidence) {
         return argThat(argument -> {
             List<SscsDocument> sscsDocument = argument.getDraftSscsDocument();
-            return sscsDocument.isEmpty() && argument.getEvidenceHandled().equals("No")
+            return isNoOrNull(argument.getEvidenceHandled())
                     && argument.getHasUnprocessedAudioVideoEvidence().equals(hasUnprocessedAudioVideoEvidence);
         });
     }
@@ -1071,14 +1072,14 @@ public class EvidenceUploadServiceTest {
                         .rep(Representative.builder()
                                 .id("2")
                                 .name(Name.builder().firstName("Raj").lastName("Smith").build())
-                                .hasRepresentative(YesNo.YES.getValue())
+                                .hasRepresentative(YES)
                                 .build())
                         .otherPartyRepresentativeSubscription(Subscription.builder().email(OTHER_PARTY_REP_EMAIL).build())
                         .build()),
                         new CcdValue<>(OtherParty.builder()
                                 .id("3")
                                 .name(Name.builder().firstName("Orange").lastName("Smith").build())
-                                .isAppointee(YesNo.YES.getValue())
+                                .isAppointee(YES)
                                 .appointee(Appointee.builder()
                                         .id("4")
                                         .name(Name.builder().firstName("Apple").lastName("Smith").build())

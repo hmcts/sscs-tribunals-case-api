@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.reissuefurtherevi
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
 import static uk.gov.hmcts.reform.sscs.util.ReissueUtils.validateSelectedPartyOptions;
@@ -63,7 +64,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandler implements PreSubmitCall
                 errors.add(String.format("Could not find the selected document with url '%s' to re-issue further evidence in the appeal with id '%s'.", selectedDocumentUrl.get(), sscsCaseData.getCcdCaseId()));
             } else {
                 AbstractDocumentDetails documentDetails = optionalSelectedDocument.get().getValue();
-                documentDetails.setEvidenceIssued("No");
+                documentDetails.setEvidenceIssued(NO);
                 String documentType = originalSenderToDocumentType.get(
                         Optional.ofNullable(sscsCaseData.getOriginalSender())
                                 .map(f -> Optional.ofNullable(f.getValue())

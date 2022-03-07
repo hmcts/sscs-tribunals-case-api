@@ -44,9 +44,9 @@ public class OtherPartyDataUtil {
         if (sscsCaseData.getOtherParties() != null) {
             sscsCaseData.setOtherPartyUcb(sscsCaseData.getOtherParties().stream()
                     .filter(o -> isYes(o.getValue().getUnacceptableCustomerBehaviour()))
-                    .map(o -> o.getValue().getUnacceptableCustomerBehaviour().getValue())
+                    .map(o -> o.getValue().getUnacceptableCustomerBehaviour())
                     .findAny()
-                    .orElse(NO.getValue()));
+                    .orElse(NO));
         }
     }
 
@@ -159,7 +159,10 @@ public class OtherPartyDataUtil {
     public static String getOtherPartyName(SscsCaseData sscsCaseData, String otherPartyId) {
         return emptyIfNull(sscsCaseData.getOtherParties()).stream()
                 .map(CcdValue::getValue)
-                .flatMap(op -> Stream.of((op.hasAppointee()) ? Pair.of(op.getAppointee().getName(), op.getAppointee().getId()) : Pair.of(op.getName(), op.getId()), (op.hasRepresentative()) ? Pair.of(op.getRep().getName(), op.getRep().getId()) : null))
+                .flatMap(op -> Stream.of((op.hasAppointee())
+                        ? Pair.of(op.getAppointee().getName(), op.getAppointee().getId()) :
+                        Pair.of(op.getName(), op.getId()), (op.hasRepresentative())
+                        ? Pair.of(op.getRep().getName(), op.getRep().getId()) : null))
                 .filter(Objects::nonNull)
                 .filter(p -> nonNull(p.getLeft()))
                 .filter(p -> nonNull(p.getRight()))
@@ -174,7 +177,10 @@ public class OtherPartyDataUtil {
     public static String getOtherPartyName(SscsCaseData sscsCaseData, Predicate<Subscription> predicate) {
         return emptyIfNull(sscsCaseData.getOtherParties()).stream()
                 .map(CcdValue::getValue)
-                .flatMap(op -> Stream.of((op.hasAppointee()) ? Pair.of(op.getOtherPartyAppointeeSubscription(), op.getAppointee().getName()) : Pair.of(op.getOtherPartySubscription(), op.getName()), (op.hasRepresentative()) ? Pair.of(op.getOtherPartyRepresentativeSubscription(), op.getRep().getName()) : null))
+                .flatMap(op -> Stream.of((op.hasAppointee()) ? Pair.of(op.getOtherPartyAppointeeSubscription(),
+                    op.getAppointee().getName()) : Pair.of(op.getOtherPartySubscription(), op.getName()),
+                    (op.hasRepresentative()) ? Pair.of(op.getOtherPartyRepresentativeSubscription(),
+                        op.getRep().getName()) : null))
                 .filter(Objects::nonNull)
                 .filter(p -> nonNull(p.getLeft()))
                 .filter(p -> nonNull(p.getLeft().getEmail()))
@@ -189,7 +195,10 @@ public class OtherPartyDataUtil {
     public static String getOtherPartyId(SscsCaseData sscsCaseData, Predicate<Subscription> predicate) {
         return emptyIfNull(sscsCaseData.getOtherParties()).stream()
                 .map(CcdValue::getValue)
-                .flatMap(op -> Stream.of((op.hasAppointee()) ? Pair.of(op.getOtherPartyAppointeeSubscription(), op.getAppointee().getId()) : Pair.of(op.getOtherPartySubscription(), op.getId()), (op.hasRepresentative()) ? Pair.of(op.getOtherPartyRepresentativeSubscription(), op.getRep().getId()) : null))
+                .flatMap(op -> Stream.of((op.hasAppointee()) ? Pair.of(op.getOtherPartyAppointeeSubscription(),
+                    op.getAppointee().getId()) : Pair.of(op.getOtherPartySubscription(), op.getId()),
+                    (op.hasRepresentative()) ? Pair.of(op.getOtherPartyRepresentativeSubscription(),
+                        op.getRep().getId()) : null))
                 .filter(Objects::nonNull)
                 .filter(p -> nonNull(p.getLeft()))
                 .filter(p -> nonNull(p.getRight()))

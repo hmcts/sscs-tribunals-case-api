@@ -6,6 +6,8 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ASSOCIATE_CASE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -65,14 +67,14 @@ public class AssociatedCaseLinkHelperTest {
         SscsCaseData result = associatedCaseLinkHelper.linkCaseByNino(caseData, previousSscsCaseDataCaseDetails);
 
         assertEquals(2, result.getAssociatedCase().size());
-        assertEquals("Yes", result.getLinkedCasesBoolean());
+        assertEquals(YES, result.getLinkedCasesBoolean());
         assertEquals("56765676", result.getAssociatedCase().get(0).getValue().getCaseReference());
         assertEquals("12345678", result.getAssociatedCase().get(1).getValue().getCaseReference());
 
-        assertEquals("Yes", matchingCase1.getData().getLinkedCasesBoolean());
+        assertEquals(YES, matchingCase1.getData().getLinkedCasesBoolean());
         assertEquals("33333333", matchingCase1.getData().getAssociatedCase().get(0).getValue().getCaseReference());
 
-        assertEquals("Yes", matchingCase2.getData().getLinkedCasesBoolean());
+        assertEquals(YES, matchingCase2.getData().getLinkedCasesBoolean());
         assertEquals("33333333", matchingCase2.getData().getAssociatedCase().get(0).getValue().getCaseReference());
     }
 
@@ -116,7 +118,7 @@ public class AssociatedCaseLinkHelperTest {
         SscsCaseData result = associatedCaseLinkHelper.linkCaseByNino(caseData, Optional.empty());
 
         assertEquals(2, result.getAssociatedCase().size());
-        assertEquals("Yes", result.getLinkedCasesBoolean());
+        assertEquals(YES, result.getLinkedCasesBoolean());
         assertEquals("56765676", result.getAssociatedCase().get(0).getValue().getCaseReference());
         assertEquals("12345678", result.getAssociatedCase().get(1).getValue().getCaseReference());
 
@@ -140,14 +142,14 @@ public class AssociatedCaseLinkHelperTest {
                 matchedByNinoCases);
 
         assertEquals(2, caseData.getAssociatedCase().size());
-        assertEquals("Yes", caseData.getLinkedCasesBoolean());
+        assertEquals(YES, caseData.getLinkedCasesBoolean());
         assertEquals("56765676", caseData.getAssociatedCase().get(0).getValue().getCaseReference());
         assertEquals("12345678", caseData.getAssociatedCase().get(1).getValue().getCaseReference());
 
-        assertEquals("Yes", matchingCase1.getData().getLinkedCasesBoolean());
+        assertEquals(YES, matchingCase1.getData().getLinkedCasesBoolean());
         assertEquals("33333333", matchingCase1.getData().getAssociatedCase().get(0).getValue().getCaseReference());
 
-        assertEquals("Yes", matchingCase2.getData().getLinkedCasesBoolean());
+        assertEquals(YES, matchingCase2.getData().getLinkedCasesBoolean());
         assertEquals("33333333", matchingCase2.getData().getAssociatedCase().get(0).getValue().getCaseReference());
     }
 
@@ -160,7 +162,7 @@ public class AssociatedCaseLinkHelperTest {
                 matchedByNinoCases);
 
         assertNull(caseData.getAssociatedCase());
-        assertEquals("No", caseData.getLinkedCasesBoolean());
+        assertEquals(NO, caseData.getLinkedCasesBoolean());
         verify(ccdService, times(0)).updateCase(any(), any(), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any());
     }
 

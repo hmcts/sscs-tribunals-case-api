@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerBase;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 
@@ -27,7 +26,7 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
     @Override
     protected void setDefaultFields(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply() == null) {
-            sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
+            sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(YES);
         }
     }
 
@@ -37,9 +36,9 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
 
         if (isWcaNotSupportGroupOnly(sscsCaseData) && UcPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
             sscsCaseData.getSscsUcCaseData().setShowSchedule8Paragraph4Page(YES);
-            if (YES.equals(sscsCaseData.getSscsUcCaseData().getDoesSchedule8Paragraph4Apply())) {
+            if (isYes(sscsCaseData.getSscsUcCaseData().getDoesSchedule8Paragraph4Apply())) {
                 sscsCaseData.getSscsUcCaseData().setShowSchedule7ActivitiesPage(YES);
-            } else if (NO.equals(sscsCaseData.getSscsUcCaseData().getDoesSchedule8Paragraph4Apply())) {
+            } else if (isNo(sscsCaseData.getSscsUcCaseData().getDoesSchedule8Paragraph4Apply())) {
                 sscsCaseData.getSscsUcCaseData().setShowSchedule7ActivitiesPage(NO);
             }
         } else {
@@ -54,7 +53,7 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
 
     @Override
     protected void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if ("Yes".equalsIgnoreCase(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply())) {
+        if (isYes(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply())) {
             if (sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesQuestion() == null
                 || sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesQuestion().isEmpty()) {
                 preSubmitCallbackResponse.addError("Please select the Schedule 7 Activities that apply, or indicate that none apply");
@@ -70,7 +69,7 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
         // coming back from the summary page (instead of YES originally). This means the page show condition related to the showFinalDecisionNoticeSummaryOfOutcomePage is set to NO and any fields lost.
         // Therefore, we need to always skip setting this value, unless the pageId matches what we expect.
         if (pageId != null && pageId.equals("workCapabilityAssessment")) {
-            if (sscsCaseData.getWcaAppeal() != null && NO.equals(sscsCaseData.getWcaAppeal())) {
+            if (isNo(sscsCaseData.getWcaAppeal())) {
                 sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YES);
                 return;
             }
@@ -80,23 +79,19 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
 
     @Override
     protected void setShowWorkCapabilityAssessmentPage(SscsCaseData sscsCaseData) {
-        if (YES.getValue().equals(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
-            sscsCaseData.setShowWorkCapabilityAssessmentPage(YES);
-        } else if (NO.getValue().equals(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
-            sscsCaseData.setShowWorkCapabilityAssessmentPage(NO);
-        }
+        sscsCaseData.setShowWorkCapabilityAssessmentPage(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice());
     }
 
     @Override
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData, String pageId) {
         if (pageId != null && pageId.equals("workCapabilityAssessment")) {
-            if (YesNo.YES.getValue().equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())
+            if (isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())
                     && sscsCaseData.isWcaAppeal()
                     && "allowed".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused())) {
-                sscsCaseData.setShowDwpReassessAwardPage(YesNo.YES);
+                sscsCaseData.setShowDwpReassessAwardPage(YES);
                 return;
             }
-            sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
+            sscsCaseData.setShowDwpReassessAwardPage(NO);
         }
     }
 }

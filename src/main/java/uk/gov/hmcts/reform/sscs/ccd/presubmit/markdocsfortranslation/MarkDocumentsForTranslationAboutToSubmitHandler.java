@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.markdocsfortranslation;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,7 @@ public class MarkDocumentsForTranslationAboutToSubmitHandler implements PreSubmi
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         setTranslationRequiredStatus.accept(caseData);
         log.info("Set the TranslationWorkOutstanding flag to YES,  for case id : {}", caseData.getCcdCaseId());
-        caseData.setTranslationWorkOutstanding("Yes");
+        caseData.setTranslationWorkOutstanding(YES);
         return new PreSubmitCallbackResponse<>(caseData);
     }
 

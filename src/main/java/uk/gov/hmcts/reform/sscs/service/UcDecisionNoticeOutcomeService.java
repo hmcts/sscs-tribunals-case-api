@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +10,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsUcCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcAllowedOrRefusedCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcPointsCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcPointsRegulationsAndSchedule7ActivitiesCondition;
@@ -28,7 +30,7 @@ public class UcDecisionNoticeOutcomeService extends DecisionNoticeOutcomeService
     @Override
     public void performPreOutcomeIntegrityAdjustments(SscsCaseData sscsCaseData) {
 
-        if ("Yes".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
+        if (isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
 
             SscsUcCaseData ucCaseData = sscsCaseData.getSscsUcCaseData();
 
@@ -57,7 +59,7 @@ public class UcDecisionNoticeOutcomeService extends DecisionNoticeOutcomeService
                         ucCaseData.setDoesSchedule9Paragraph4Apply(ucCaseData.getSchedule9Paragraph4Selection());
                         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(ucCaseData.getSchedule7Selections());
                     } else if (UcPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
-                        if (YesNo.NO.equals(ucCaseData.getDoesSchedule8Paragraph4Apply())) {
+                        if (isNoOrNull(ucCaseData.getDoesSchedule8Paragraph4Apply())) {
                             sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(null);
                             ucCaseData.setDoesSchedule9Paragraph4Apply(null);
                             sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(null);
@@ -83,7 +85,7 @@ public class UcDecisionNoticeOutcomeService extends DecisionNoticeOutcomeService
     @Override
     public Outcome determineOutcomeWithValidation(SscsCaseData sscsCaseData) {
         Outcome outcome = determineOutcome(sscsCaseData);
-        if ("Yes".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
+        if (isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             Optional<UcAllowedOrRefusedCondition> passingAllowedOrRefusedCondition = UcPointsRegulationsAndSchedule7ActivitiesCondition
                 .getPassingAllowedOrRefusedCondition(questionService, sscsCaseData);
             if (passingAllowedOrRefusedCondition.isEmpty()) {

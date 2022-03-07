@@ -6,6 +6,8 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -73,24 +75,24 @@ public class AdjournCaseAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnAdjournmentEventWithLanguageInterpreterRequiredAndCaseHasExistingInterpreter_thenOverwriteExistingInterpreterInHearingOptions() {
-        callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterRequired("Yes");
+        callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterRequired(YES);
         callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterLanguage("Spanish");
-        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").languages("French").build());
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter(NO).languages("French").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("Yes", response.getData().getAppeal().getHearingOptions().getLanguageInterpreter());
+        assertEquals(YES, response.getData().getAppeal().getHearingOptions().getLanguageInterpreter());
         assertEquals("Spanish", response.getData().getAppeal().getHearingOptions().getLanguages());
     }
 
     @Test
     public void givenAnAdjournmentEventWithLanguageInterpreterRequiredAndIntepreterLanguageSet_thenDoNotDisplayError() {
-        callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterRequired("Yes");
+        callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterRequired(YES);
         callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterLanguage("Spanish");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("Yes", response.getData().getAppeal().getHearingOptions().getLanguageInterpreter());
+        assertEquals(YES, response.getData().getAppeal().getHearingOptions().getLanguageInterpreter());
         assertEquals("Spanish", response.getData().getAppeal().getHearingOptions().getLanguages());
     }
 
@@ -129,7 +131,7 @@ public class AdjournCaseAboutToSubmitHandlerTest {
 
         assertEquals(LocalDate.now().toString(), callback.getCaseDetails().getCaseData().getAdjournCaseGeneratedDate());
     }
-    
+
     @Test
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
