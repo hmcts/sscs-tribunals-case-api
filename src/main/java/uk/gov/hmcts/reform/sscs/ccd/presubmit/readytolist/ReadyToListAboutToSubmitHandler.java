@@ -4,9 +4,11 @@ import static java.util.Objects.requireNonNull;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -18,15 +20,16 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.HearingObject;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StateOfHearing;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
+
 @Service
 @Slf4j
 public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Value("${feature.scheduling-and-listing.enabled}")
     private boolean schedulingAndListingFeature;
+    @Autowired
     private RegionalProcessingCenterService regionalProcessingCenterService;
     private StateOfHearing stateOfHearing;
-    private RegionalProcessingCenter regionalProcessingCenter;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -45,36 +48,27 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData(); //Maybe handle in each method instead of HEAD
-
         if(schedulingAndListingFeature){
             boolean listAssist = checkIfListAssist(sscsCaseData);
             if(listAssist){
-                try{
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    HearingObject hearingObject = new HearingObject(sscsCaseData.getCcdCaseId(), stateOfHearing.HEARING_CREATED);
-                    objectMapper.writeValue(new File("json/jsonData.json"), hearingObject);
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
                 PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData); //Placeholder
                 return callbackResponse;
             }else{
-                return handleCallbackResponse(sscsCaseData); //Return back to old method
+                return handleCallbackResponse(sscsCaseData);
             }
         }else{
-            return handleCallbackResponse(sscsCaseData); //Return back to old method
+            return handleCallbackResponse(sscsCaseData);
         }
     }
 
     private boolean checkIfListAssist(SscsCaseData sscsCaseData){
-        String region = sscsCaseData.getRegion();
-        System.out.println(region);
-        regionalProcessingCenter.getName();
-        //Read file rpc-data from JSON
-        //Map out JSON object
-        //filter and then return if true or false below on listAssist
-        //boolean isListAssist = object.getListAssist : true : false
-        return true;
+        String region = "SSCS " + sscsCaseData.getRegion();
+        String getIsListAssist = regionalProcessingCenterService.getRegionalProcessingCenterMap().entrySet().stream().
+                        filter(value -> region.equalsIgnoreCase(value.getKey())).
+                        map(map -> map.getValue().getListAssist()).
+                        collect(Collectors.joining());
+        boolean isListAssist = Boolean.getBoolean(getIsListAssist);
+        return isListAssist;
     }
 
     private PreSubmitCallbackResponse<SscsCaseData> handleCallbackResponse(SscsCaseData sscsCaseData){
