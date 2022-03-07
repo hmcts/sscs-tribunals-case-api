@@ -94,16 +94,6 @@ public class SubmitAppealService {
         return caseDetails.getId();
     }
 
-    private void checkHasValidRole(IdamTokens idamTokens) {
-        if (hasValidCaseworkerRole(idamTokens)) {
-            log.info("IDAM ID {} with caseworker roles have attempted to use save and return", idamTokens.getUserId());
-            throw new CaseAccessException("User has a Caseworker role");
-        }
-        if (!hasValidCitizenRole(idamTokens)) {
-            throw new ApplicationErrorException(new Exception("User has a invalid role"));
-        }
-    }
-
     public Optional<SaveCaseResult> submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal, Boolean forceCreate) {
         appeal.setCaseType("draft");
 
@@ -217,6 +207,16 @@ public class SubmitAppealService {
             .roles(userDetails.getRoles())
             .email(userDetails.getEmail())
             .build();
+    }
+
+    private void checkHasValidRole(IdamTokens idamTokens) {
+        if (hasValidCaseworkerRole(idamTokens)) {
+            log.info("IDAM ID {} with caseworker roles have attempted to use save and return", idamTokens.getUserId());
+            throw new CaseAccessException("User has a Caseworker role");
+        }
+        if (!hasValidCitizenRole(idamTokens)) {
+            throw new ApplicationErrorException(new Exception("User has a invalid role"));
+        }
     }
 
     private boolean hasValidCitizenRole(IdamTokens idamTokens) {
