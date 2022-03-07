@@ -43,11 +43,13 @@ import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 import uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil;
 
 @Component
 @Slf4j
 public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+    private static final Enum<EventType> EVENT_TYPE = EventType.ACTION_FURTHER_EVIDENCE;
     public static final String YES = YesNo.YES.getValue();
     public static final String NO = YesNo.NO.getValue();
     public static final String POSTPONEMENT_DETAILS_IS_MANDATORY = "Postponement Details is mandatory for postponement requests.";
@@ -63,15 +65,17 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private final FooterService footerService;
     private final BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder;
     private final UserDetailsService userDetailsService;
-
+    private final AddedDocumentsUtil addedDocumentsUtil;
 
     @Autowired
     public ActionFurtherEvidenceAboutToSubmitHandler(FooterService footerService,
                                                      BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder,
-                                                     UserDetailsService userDetailsService) {
+                                                     UserDetailsService userDetailsService,
+                                                     AddedDocumentsUtil addedDocumentsUtil) {
         this.footerService = footerService;
         this.bundleAdditionFilenameBuilder = bundleAdditionFilenameBuilder;
         this.userDetailsService = userDetailsService;
+        this.addedDocumentsUtil = addedDocumentsUtil;
     }
 
     public static void checkWarningsAndErrors(SscsCaseData sscsCaseData, ScannedDocument scannedDocument, String caseId,
@@ -181,6 +185,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         if (!callback.isIgnoreWarnings()) {
             checkForWarnings(preSubmitCallbackResponse);
         }
+
+        addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(sscsCaseData);
 
         if (isFurtherEvidenceActionCode(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction(),
                 ISSUE_FURTHER_EVIDENCE.getCode())) {
@@ -310,7 +316,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private void buildSscsDocumentFromScan(SscsCaseData sscsCaseData, State caseState, Boolean ignoreWarnings,
                                            PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-
+        List<String> documentsAddedThisEvent = new ArrayList<>();
         if (sscsCaseData.getScannedDocuments() != null) {
             for (ScannedDocument scannedDocument : sscsCaseData.getScannedDocuments()) {
                 if (scannedDocument != null && scannedDocument.getValue() != null) {
@@ -318,21 +324,22 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     checkWarningsAndErrors(sscsCaseData, scannedDocument, sscsCaseData.getCcdCaseId(), ignoreWarnings,
                             preSubmitCallbackResponse);
 
-                    if (ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue()
-                            .equals(scannedDocument.getValue().getType())) {
-                        if (preSubmitCallbackResponse.getErrors().size() == 0) {
-                            setConfidentialCaseFields(sscsCaseData);
-                        }
-                    }
+                    setCofidentialCaseFields(sscsCaseData, preSubmitCallbackResponse, scannedDocument);
 
-                    //Check Warning for bundle addition
-                    if (!ignoreWarnings && !isBundleAdditionSelectedForActionType(sscsCaseData, scannedDocument)) {
-                        preSubmitCallbackResponse.addWarning(
-                            "No documents have been ticked to be added as an addition. These document(s) will NOT be added to the bundle. Are you sure?");
+                    if (warningAddedForBundleAddition(sscsCaseData, ignoreWarnings, preSubmitCallbackResponse,
+                        scannedDocument)) {
                         return;
                     }
 
-                    buildSscsDocuments(sscsCaseData, scannedDocument, caseState);
+                    if (!equalsIgnoreCase(scannedDocument.getValue().getType(), COVERSHEET)) {
+                        SscsDocument sscsDocument = buildSscsDocument(sscsCaseData, scannedDocument, caseState);
+                        documentsAddedThisEvent.add(sscsDocument.getValue().getDocumentType());
+                        addSscsDocumentToCaseData(sscsCaseData, sscsDocument);
+                        setReinstateCaseFieldsIfReinstatementRequest(sscsCaseData, sscsDocument);
+                        setTranslationWorkOutstanding(sscsCaseData);
+                    }
+
+                    sscsCaseData.setEvidenceHandled(YES);
 
                 } else {
                     log.info(
@@ -344,39 +351,58 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             preSubmitCallbackResponse.addError("No further evidence to process");
         }
 
+        addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, documentsAddedThisEvent, EVENT_TYPE);
         sscsCaseData.setScannedDocuments(null);
     }
 
-    private void buildSscsDocuments(SscsCaseData sscsCaseData, ScannedDocument scannedDocument, State caseState) {
+    private void addSscsDocumentToCaseData(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
         List<SscsDocument> documents = new ArrayList<>();
+        documents.add(sscsDocument);
 
-        if (!equalsIgnoreCase(scannedDocument.getValue().getType(), COVERSHEET)) {
-
-            SscsDocument sscsDocument = buildSscsDocument(sscsCaseData, scannedDocument, caseState);
-
-            if (REINSTATEMENT_REQUEST.getValue().equals(sscsDocument.getValue().getDocumentType())) {
-                if (isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL.getCode())) {
-                    setReinstateCaseFields(sscsCaseData);
-                }
-            }
-
-            documents.add(sscsDocument);
-
-            if (sscsCaseData.isLanguagePreferenceWelsh()) {
-                sscsCaseData.setTranslationWorkOutstanding(YES);
-                log.info("Set the TranslationWorkOutstanding flag to YES,  for case id : {}",
-                        sscsCaseData.getCcdCaseId());
-            }
-        }
         if (sscsCaseData.getSscsDocument() != null) {
             documents.addAll(sscsCaseData.getSscsDocument());
         }
 
-        if (!documents.isEmpty()) {
-            sscsCaseData.setSscsDocument(documents);
-        }
+        sscsCaseData.setSscsDocument(documents);
+    }
 
-        sscsCaseData.setEvidenceHandled(YES);
+    private boolean warningAddedForBundleAddition(SscsCaseData sscsCaseData, Boolean ignoreWarnings,
+                                                  PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
+                                                  ScannedDocument scannedDocument) {
+        //check warning for bundle addition
+        if (!ignoreWarnings && !isBundleAdditionSelectedForActionType(sscsCaseData, scannedDocument)) {
+            preSubmitCallbackResponse.addWarning(
+                "No documents have been ticked to be added as an addition. These document(s) will NOT be added to "
+                    + "the bundle. Are you sure?");
+            return true;
+        }
+        return false;
+    }
+
+    private void setReinstateCaseFieldsIfReinstatementRequest(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
+        if (REINSTATEMENT_REQUEST.getValue().equals(sscsDocument.getValue().getDocumentType())) {
+            if (isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL.getCode())) {
+                setReinstateCaseFields(sscsCaseData);
+            }
+        }
+    }
+
+    private void setTranslationWorkOutstanding(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.isLanguagePreferenceWelsh()) {
+            sscsCaseData.setTranslationWorkOutstanding(YES);
+            log.info("Set the TranslationWorkOutstanding flag to YES,  for case id : {}",
+                sscsCaseData.getCcdCaseId());
+        }
+    }
+
+    private void setCofidentialCaseFields(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData>
+        preSubmitCallbackResponse, ScannedDocument scannedDocument) {
+        if (ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue()
+            .equals(scannedDocument.getValue().getType())) {
+            if (preSubmitCallbackResponse.getErrors().size() == 0) {
+                setConfidentialCaseFields(sscsCaseData);
+            }
+        }
     }
 
     private void setConfidentialCaseFields(SscsCaseData sscsCaseData) {

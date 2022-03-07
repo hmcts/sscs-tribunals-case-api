@@ -1,6 +1,5 @@
 {
   "caseCreated" : "${json-unit.ignore}",
-
   "caseAccessCategory": "taxCredit",
   "caseManagementCategory": {
     "value": {
@@ -14,6 +13,7 @@
       }
     ]
   },
+  "addedDocuments": null,
   "caseNameHmctsInternal": "Joe Bloggs",
   "caseNameHmctsRestricted": "Joe Bloggs",
   "caseNamePublic": "Joe Bloggs",

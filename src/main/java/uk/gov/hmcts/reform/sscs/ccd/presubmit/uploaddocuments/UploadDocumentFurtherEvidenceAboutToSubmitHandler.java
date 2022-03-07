@@ -14,27 +14,42 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
+import uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil;
 import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
 
-@Service
+@Component
 public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private static final String UPLOAD_DATE_FORMATTER = "yyyy-MM-dd";
+
+    private final AddedDocumentsUtil addedDocumentsUtil;
+
+    private static final Enum<EventType> EVENT_TYPE = EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE;
+
+    @Autowired
+    public UploadDocumentFurtherEvidenceAboutToSubmitHandler(AddedDocumentsUtil addedDocumentsUtil) {
+        this.addedDocumentsUtil = addedDocumentsUtil;
+    }
+
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType != null && callback != null
             && callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent().equals(EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE);
+            && callback.getEvent().equals(EVENT_TYPE);
     }
 
     @Override
@@ -46,6 +61,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
+        addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(caseData);
         moveDraftsToSscsDocs(caseData);
         moveDraftsToAudioVideoEvidence(caseData);
         caseData.setEvidenceHandled("No");
@@ -117,13 +133,22 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
             .filter(doc -> DocumentUtil.isFileAMedia(doc.getValue().getDocumentLink()))
             .map(doc ->
                 AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
-                    .documentLink(doc.getValue().getDocumentLink())
-                    .fileName(doc.getValue().getDocumentFileName() != null ? doc.getValue().getDocumentFileName() :
-                        doc.getValue().getDocumentLink().getDocumentFilename())
-                    .dateAdded(LocalDate.now())
-                    .partyUploaded(UploadParty.CTSC)
-                    .originalPartySender(getOriginalSender(doc.getValue().getDocumentType()))
-                    .build()).build()).collect(toList());
+                        .documentLink(doc.getValue().getDocumentLink())
+                        .fileName(doc.getValue().getDocumentFileName() != null ? doc.getValue().getDocumentFileName() :
+                            doc.getValue().getDocumentLink().getDocumentFilename())
+                        .dateAdded(LocalDate.now())
+                        .partyUploaded(UploadParty.CTSC)
+                        .originalPartySender(getOriginalSender(doc.getValue().getDocumentType()))
+                        .documentType(AudioVideoEvidenceUtil.getDocumentTypeValue(doc.getValue().getDocumentLink()
+                            .getDocumentFilename()))
+                        .build())
+                    .build())
+            .collect(toList());
+
+        addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, newAudioVideoEvidence.stream()
+            .map(audioVideoEvidence -> audioVideoEvidence.getValue().getDocumentType())
+            .filter(Objects::nonNull)
+            .collect(Collectors.toUnmodifiableList()), EVENT_TYPE);
 
         if (!newAudioVideoEvidence.isEmpty()) {
             if (sscsCaseData.getAudioVideoEvidence() == null) {
@@ -141,7 +166,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
 
         if (sscsCaseData.getDraftSscsFurtherEvidenceDocument() != null) {
             List<SscsFurtherEvidenceDoc> sscsFurtherEvidenceDocList = sscsCaseData.getDraftSscsFurtherEvidenceDocument().stream()
-                    .filter(draftDoc -> REQUEST_FOR_HEARING_RECORDING.getId().equals(draftDoc.getValue().getDocumentType())).collect(toList());
+                .filter(draftDoc -> REQUEST_FOR_HEARING_RECORDING.getId().equals(draftDoc.getValue().getDocumentType())).collect(toList());
 
             if (sscsCaseData.getSscsHearingRecordingCaseData() != null
                 && sscsCaseData.getSscsHearingRecordingCaseData().getRequestingParty() != null
