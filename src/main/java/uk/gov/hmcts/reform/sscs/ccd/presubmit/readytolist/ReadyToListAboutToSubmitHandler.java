@@ -2,7 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +23,9 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
     @Value("${feature.scheduling-and-listing.enabled}")
     private boolean schedulingAndListingFeature;
+
     @Autowired
     private RegionalProcessingCenterService regionalProcessingCenterService;
-
-    private StateOfHearing stateOfHearing;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -33,7 +33,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.READY_TO_LIST;
+            && callback.getEvent() == EventType.READY_TO_LIST;
     }
 
     @Override
@@ -42,35 +42,30 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
             throw new IllegalStateException("Cannot handle callback.");
         }
 
-        final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        final SscsCaseData sscsCaseData = caseDetails.getCaseData(); //Maybe handle in each method instead of HEAD
-        if(schedulingAndListingFeature){
-            boolean listAssist = checkIfListAssist(sscsCaseData);
-            if(listAssist){
-                sscsCaseData.setHearingRoute("ListAssist");
-                sscsCaseData.setHearingState(StateOfHearing.HEARING_CREATED);
-                PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData); //Placeholder
-                return callbackResponse;
-            }else{
-                return handleCallbackResponse(sscsCaseData);
-            }
-        }else{
+        final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+
+        if (schedulingAndListingFeature && checkIfListAssist(sscsCaseData)) {
+            sscsCaseData.setHearingRoute(HearingRoute.LIST_ASSIST);
+            sscsCaseData.setHearingState(StateOfHearing.HEARING_CREATED);
+            return new PreSubmitCallbackResponse<>(sscsCaseData);
+        } else {
             return handleCallbackResponse(sscsCaseData);
         }
     }
 
-    private boolean checkIfListAssist(SscsCaseData sscsCaseData){
-        String region = "SSCS " + sscsCaseData.getRegion();
-        String getIsListAssist = regionalProcessingCenterService.getRegionalProcessingCenterMap().entrySet().stream().
-                        filter(value -> region.equalsIgnoreCase(value.getKey())).
-                        map(map -> map.getValue().getListAssist()).
-                        collect(Collectors.joining());
-        boolean isListAssist = Boolean.getBoolean(getIsListAssist);
-        return isListAssist;
+    private boolean checkIfListAssist(SscsCaseData sscsCaseData) {
+        String region = sscsCaseData.getRegion();
+        Map<String, RegionalProcessingCenter> regionalProcessingCenterMap =  regionalProcessingCenterService
+            .getRegionalProcessingCenterMap();
+        Optional<Boolean> isListAssistOptional = regionalProcessingCenterMap.values().stream()
+            .filter(rpc -> rpc.getName().equalsIgnoreCase(region))
+            .map(RegionalProcessingCenter::isListAssist)
+            .findFirst();
+        return isListAssistOptional.orElse(true);
     }
 
-    private PreSubmitCallbackResponse<SscsCaseData> handleCallbackResponse(SscsCaseData sscsCaseData){
-        sscsCaseData.setHearingRoute("Gaps");
+    private PreSubmitCallbackResponse<SscsCaseData> handleCallbackResponse(SscsCaseData sscsCaseData) {
+        sscsCaseData.setHearingRoute(HearingRoute.GAPS);
         PreSubmitCallbackResponse<uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
         log.info(String.format("createdInGapsFrom is %s for caseId %s", sscsCaseData.getCreatedInGapsFrom(), sscsCaseData.getCcdCaseId()));
         if (sscsCaseData.getCreatedInGapsFrom() == null
@@ -79,6 +74,5 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
             log.warn(String.format("Case already created in GAPS at valid appeal for caseId %s.", sscsCaseData.getCcdCaseId()));
         }
         return callbackResponse;
-
     }
 }
