@@ -21,26 +21,45 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidenceDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DraftSscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
+import uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil;
 import uk.gov.hmcts.reform.sscs.util.DocumentUtil;
 
-@Service
+@Component
 @Slf4j
 public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final boolean uploadAudioVideoEvidenceEnabled;
 
+    private final AddedDocumentsUtil addedDocumentsUtil;
+
+    private static final Enum<EventType> EVENT_TYPE = EventType.UPLOAD_FURTHER_EVIDENCE;
+
     @Autowired
-    public UploadFurtherEvidenceAboutToSubmitHandler(@Value("${feature.upload-audio-video-evidence.enabled}") boolean uploadAudioVideoEvidenceEnabled) {
+    public UploadFurtherEvidenceAboutToSubmitHandler(@Value("${feature.upload-audio-video-evidence.enabled}")
+                                                         boolean uploadAudioVideoEvidenceEnabled,
+                                                     AddedDocumentsUtil addedDocumentsUtil) {
         this.uploadAudioVideoEvidenceEnabled = uploadAudioVideoEvidenceEnabled;
+        this.addedDocumentsUtil = addedDocumentsUtil;
     }
 
     @Override
@@ -61,6 +80,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         log.info("About to submit Upload Further Evidence caseID:  {}", sscsCaseData.getCcdCaseId());
         final PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+        addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(sscsCaseData);
         if (isNotEmpty(sscsCaseData.getDraftFurtherEvidenceDocuments())) {
             sscsCaseData.getDraftFurtherEvidenceDocuments().forEach(doc -> {
                 if (isBlank(doc.getValue().getDocumentType())) {
@@ -129,15 +149,23 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private void addToAudioVideoEvidence(SscsCaseData sscsCaseData) {
         List<AudioVideoEvidence> newAudioVideoEvidence = sscsCaseData.getDraftFurtherEvidenceDocuments().stream()
-                .filter(doc -> DocumentUtil.isFileAMedia(doc.getValue().getDocumentLink()))
-                .map(doc ->
-                        AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
-                                .documentLink(doc.getValue().getDocumentLink())
-                                .fileName(doc.getValue().getDocumentFileName())
-                                .dateAdded(LocalDate.now())
-                                .partyUploaded(UploadParty.CTSC)
-                                .originalPartySender(getOriginalSender(doc.getValue().getDocumentType()))
-                                .build()).build()).collect(toList());
+            .filter(doc -> DocumentUtil.isFileAMedia(doc.getValue().getDocumentLink()))
+            .map(doc ->
+                AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
+                    .documentLink(doc.getValue().getDocumentLink())
+                    .fileName(doc.getValue().getDocumentFileName())
+                    .dateAdded(LocalDate.now())
+                    .partyUploaded(UploadParty.CTSC)
+                    .originalPartySender(getOriginalSender(doc.getValue().getDocumentType()))
+                    .documentType(AudioVideoEvidenceUtil.getDocumentTypeValue(
+                        doc.getValue().getDocumentLink().getDocumentFilename()))
+                    .build()).build()).collect(toList());
+
+        addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, newAudioVideoEvidence.stream()
+            .map(audioVideoEvidence -> audioVideoEvidence.getValue().getDocumentType())
+                .filter(Objects::nonNull)
+            .collect(Collectors.toUnmodifiableList()), EVENT_TYPE);
+
         if (!newAudioVideoEvidence.isEmpty()) {
             List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>(ofNullable(sscsCaseData.getAudioVideoEvidence()).orElse(emptyList()));
             audioVideoEvidence.addAll(newAudioVideoEvidence);

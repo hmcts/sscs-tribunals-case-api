@@ -6,15 +6,20 @@ import static java.util.Collections.unmodifiableList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -32,6 +37,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 
 @RunWith(JUnitParamsRunner.class)
 public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
@@ -53,10 +59,14 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
+    private AddedDocumentsUtil addedDocumentsUtil;
+
     @Before
     public void setUp() {
+        addedDocumentsUtil = new AddedDocumentsUtil(false);
+
         MockitoAnnotations.openMocks(this);
-        handler = new UploadFurtherEvidenceAboutToSubmitHandler(true);
+        handler = new UploadFurtherEvidenceAboutToSubmitHandler(true, addedDocumentsUtil);
         when(callback.getEvent()).thenReturn(EventType.UPLOAD_FURTHER_EVIDENCE);
         sscsCaseData = SscsCaseData.builder().state(State.VALID_APPEAL).interlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId()).appeal(Appeal.builder().build()).build();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -156,7 +166,116 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"audio.mp3","video.mp4"})
+    public void givenAMixtureOfAudioVideoAndDocumentEvidence_onlyAudioVideoShouldBeInsertedIntoAddedDocuments()
+        throws JsonProcessingException {
+        handler = new UploadFurtherEvidenceAboutToSubmitHandler(true,
+            new AddedDocumentsUtil(true));
+
+        List<DraftSscsDocument> draftDocuments = new ArrayList<>();
+        draftDocuments.add(DraftSscsDocument.builder()
+            .value(DraftSscsDocumentDetails.builder()
+                .documentLink(DocumentLink.builder()
+                    .documentUrl("testurl")
+                    .documentFilename("test.mp4").build())
+                .documentType("appellantEvidence")
+                .documentFileName("test.mp4")
+                .build())
+            .build());
+
+        draftDocuments.add(DraftSscsDocument.builder()
+            .value(DraftSscsDocumentDetails.builder()
+                .documentLink(DocumentLink.builder()
+                    .documentUrl("testurl1")
+                    .documentFilename("test1.mp3").build())
+                .documentType("appellantEvidence")
+                .documentFileName("test1.mp3")
+                .build())
+            .build());
+
+        draftDocuments.add(DraftSscsDocument.builder()
+            .value(DraftSscsDocumentDetails.builder()
+                .documentLink(DocumentLink.builder()
+                    .documentUrl("testurl2")
+                    .documentFilename("test2.pdf").build())
+                .documentType("postponementRequest")
+                .documentFileName("test2.pdf")
+                .build())
+            .build());
+
+        sscsCaseData.setDraftFurtherEvidenceDocuments(draftDocuments);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
+            .readValue(response.getData().getWorkAllocationFields().getAddedDocuments());
+
+        org.assertj.core.api.Assertions.assertThat(addedDocuments)
+            .as("Only audio video evidence should be inserted into added documents map.")
+            .containsOnly(org.assertj.core.api.Assertions.entry("audioDocument", 1),
+                org.assertj.core.api.Assertions.entry("videoDocument", 1));
+    }
+
+    @Test
+    public void givenASupplementaryResponseWithAudioVideoEvidenceSentMultipleTimes_shouldInsertMostRecentIntoAddedDocuments()
+        throws JsonProcessingException {
+        handler = new UploadFurtherEvidenceAboutToSubmitHandler(true,
+            new AddedDocumentsUtil(true));
+
+        List<DraftSscsDocument> draftDocuments = new ArrayList<>();
+        draftDocuments.add(DraftSscsDocument.builder()
+            .value(DraftSscsDocumentDetails.builder()
+                .documentLink(DocumentLink.builder()
+                    .documentUrl("testurl")
+                    .documentFilename("test.mp4").build())
+                .documentType("appellantEvidence")
+                .documentFileName("test.mp4")
+                .build())
+            .build());
+
+        sscsCaseData.setDraftFurtherEvidenceDocuments(draftDocuments);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        draftDocuments = new ArrayList<>();
+        draftDocuments.add(DraftSscsDocument.builder()
+            .value(DraftSscsDocumentDetails.builder()
+                .documentLink(DocumentLink.builder()
+                    .documentUrl("testurl1")
+                    .documentFilename("test1.mp3").build())
+                .documentType("appellantEvidence")
+                .documentFileName("test1.mp3")
+                .build())
+            .build());
+
+        sscsCaseData.setDraftFurtherEvidenceDocuments(draftDocuments);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
+            .readValue(response.getData().getWorkAllocationFields().getAddedDocuments());
+
+        org.assertj.core.api.Assertions.assertThat(addedDocuments)
+            .as("Added documents should only contain evidence added in the most recent event.")
+            .containsOnly(org.assertj.core.api.Assertions.entry("audioDocument", 1));
+    }
+
+    @Test
+    public void givenASupplementaryResponseWitNoAudioVideoEvidence_shouldClearAddedDocuments() {
+        handler = new UploadFurtherEvidenceAboutToSubmitHandler(true,
+            new AddedDocumentsUtil(true));
+
+        sscsCaseData.setDraftFurtherEvidenceDocuments(new ArrayList<>());
+        sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder()
+            .addedDocuments("{audioEvidence=1}")
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        org.assertj.core.api.Assertions.assertThat(response.getData().getWorkAllocationFields().getAddedDocuments())
+            .as("Added documents should be cleared regardless of whether audio video evidence has been added.")
+            .isNull();
+    }
+
+    @Test
+    @Parameters({"audio.mp3", "video.mp4"})
     public void shouldGiveErrorIfAudioVideoEvidenceHasIncorrectDocumentType(String filename) {
         List<DraftSscsDocument> draftDocuments = Collections.singletonList(DraftSscsDocument.builder()
                 .value(DraftSscsDocumentDetails.builder()
@@ -164,9 +283,8 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
                         .documentType("incorrectType")
                         .documentLink(DocumentLink.builder()
                                 .documentUrl("http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655")
-                                .documentFilename(filename).build())
-                        .build())
-                .build());
+                                .documentFilename(filename).build()).build())
+                        .build());
         sscsCaseData.setDraftFurtherEvidenceDocuments(draftDocuments);
         sscsCaseData.setSscsDocument(null);
 
@@ -251,7 +369,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
     @Test
     @Parameters({"doc.mp4", "doc.mp3"})
     public void shouldOnlyUploadPdfFilesWhenFeatureFlagIsFalse(String fileName) {
-        handler = new UploadFurtherEvidenceAboutToSubmitHandler(false);
+        handler = new UploadFurtherEvidenceAboutToSubmitHandler(false, addedDocumentsUtil);
         final List<DraftSscsDocument> draftDocs = getDraftSscsDocuments("", fileName);
         sscsCaseData.setDraftFurtherEvidenceDocuments(draftDocs);
 
