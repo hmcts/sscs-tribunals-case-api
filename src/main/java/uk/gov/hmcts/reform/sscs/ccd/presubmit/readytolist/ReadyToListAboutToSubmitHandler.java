@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.Map;
 import java.util.Optional;
@@ -57,15 +59,17 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         String region = sscsCaseData.getRegion();
         Map<String, RegionalProcessingCenter> regionalProcessingCenterMap =  regionalProcessingCenterService
             .getRegionalProcessingCenterMap();
-        Optional<Boolean> isListAssistOptional = regionalProcessingCenterMap.values().stream()
+        YesNo isListAssistOptional = regionalProcessingCenterMap.values().stream()
             .filter(rpc -> rpc.getName().equalsIgnoreCase(region))
-            .map(RegionalProcessingCenter::isListAssist)
-            .findFirst();
-        return isListAssistOptional.orElse(true);
+            .map(RegionalProcessingCenter::getListAssist)
+            .findFirst()
+            .orElse(YES);
+        return isYes(isListAssistOptional);
     }
 
     private PreSubmitCallbackResponse<SscsCaseData> handleCallbackResponse(SscsCaseData sscsCaseData) {
         sscsCaseData.setHearingRoute(HearingRoute.GAPS);
+        sscsCaseData.setHearingState(StateOfHearing.HEARING_CREATED);
         PreSubmitCallbackResponse<uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
         log.info(String.format("createdInGapsFrom is %s for caseId %s", sscsCaseData.getCreatedInGapsFrom(), sscsCaseData.getCcdCaseId()));
         if (sscsCaseData.getCreatedInGapsFrom() == null
