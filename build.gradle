@@ -14,7 +14,7 @@ plugins {
     id 'jacoco'
     id 'org.springframework.boot' version '2.3.5.RELEASE'
     id 'uk.gov.hmcts.java' version '0.12.12'
-    id 'com.gorylenko.gradle-git-properties' version '2.3.1'
+    id 'com.gorylenko.gradle-git-properties' version '2.4.0'
     id 'com.github.ben-manes.versions' version '0.39.0'
     id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.7.0'
@@ -270,7 +270,7 @@ dependencyManagement {
         }
 
         //CVE-2021-27807
-        dependencySet(group: 'org.apache.pdfbox', version: '2.0.24') {
+        dependencySet(group: 'org.apache.pdfbox', version: '2.0.25') {
             entry 'pdfbox-tools'
             entry 'preflight'
         }
@@ -280,14 +280,14 @@ dependencyManagement {
         }
 
         //CVE-2021-27807
-        dependencySet(group: 'org.apache.pdfbox', version: '2.0.24') {
+        dependencySet(group: 'org.apache.pdfbox', version: '2.0.25') {
             entry 'pdfbox'
             entry 'pdfbox-tools'
             entry 'preflight'
         }
 
         //CVE-2021-22118
-        dependencySet(group: 'org.springframework', version: '5.2.15.RELEASE') {
+        dependencySet(group: 'org.springframework', version: '5.3.16') {
             entry 'spring-aop'
             entry 'spring-aspects'
             entry 'spring-beans'
@@ -310,7 +310,7 @@ dependencyManagement {
         }
 
         //CVE-2021-30468
-        dependencySet(group: 'org.apache.cxf', version: '3.4.5') {
+        dependencySet(group: 'org.apache.cxf', version: '3.5.1') {
             entry 'cxf-core'
             entry 'cxf-rt-frontend-jaxrs'
             entry 'cxf-rt-rs-client'
@@ -361,8 +361,8 @@ dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
-    compile group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.7'
-    compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.2'
+    compile group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.8'
+    compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.3'
 
     compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.4'
     compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
@@ -386,11 +386,11 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:$versions.lombok"
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '4.0.0'
-    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.28.0'
-    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.0.0'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '4.4.0'
+    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.32.0'
+    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.4.0'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
-    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.28.0'
+    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.32.0'
     testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
     testCompile 'pl.pragmatists:JUnitParams:1.1.1'
