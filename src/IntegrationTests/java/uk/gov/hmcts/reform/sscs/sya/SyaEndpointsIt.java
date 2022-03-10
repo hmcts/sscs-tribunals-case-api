@@ -57,7 +57,7 @@ import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_it.properties")
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @RunWith(JUnitParamsRunner.class)
 public class SyaEndpointsIt extends AbstractEventIt {
 
