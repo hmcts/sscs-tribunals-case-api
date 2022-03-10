@@ -6,21 +6,27 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
+import java.util.HashMap;
+import java.util.Map;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 @RunWith(JUnitParamsRunner.class)
 public class ReadyToListAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
+    @InjectMocks
     private ReadyToListAboutToSubmitHandler handler;
 
     @Mock
@@ -29,12 +35,15 @@ public class ReadyToListAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private RegionalProcessingCenterService regionalProcessingCenterService;
+
+
     private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new ReadyToListAboutToSubmitHandler();
 
         when(callback.getEvent()).thenReturn(EventType.READY_TO_LIST);
 
@@ -46,6 +55,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(regionalProcessingCenterService.getRegionalProcessingCenterMap()).thenReturn(new HashMap<>());
     }
 
     @Test
@@ -64,7 +74,8 @@ public class ReadyToListAboutToSubmitHandlerTest {
 
     @Test
     public void returnAnErrorIfCreatedInGapsFromIsAtValidAppeal() {
-        sscsCaseData = sscsCaseData.toBuilder().createdInGapsFrom(State.VALID_APPEAL.getId()).build();
+        buildRegionalProcessingCentreMap(HearingRoute.GAPS);
+        sscsCaseData = sscsCaseData.toBuilder().region("TEST").createdInGapsFrom(State.VALID_APPEAL.getId()).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -73,11 +84,22 @@ public class ReadyToListAboutToSubmitHandlerTest {
 
     @Test
     public void returnAnErrorIfCreatedInGapsFromIsNull() {
-        sscsCaseData = sscsCaseData.toBuilder().createdInGapsFrom(null).build();
+        buildRegionalProcessingCentreMap(HearingRoute.GAPS);
+        sscsCaseData = sscsCaseData.toBuilder().region("TEST").createdInGapsFrom(null).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("Case already created in GAPS at valid appeal.", response.getErrors().toArray()[0]);
+    }
+
+    private void buildRegionalProcessingCentreMap(HearingRoute route) {
+        Map<String, RegionalProcessingCenter> rpcMap = new HashMap<>();
+        rpcMap.put("SSCS TEST", RegionalProcessingCenter.builder().hearingRoute(route).
+            name("TEST")
+            .build());
+        when(regionalProcessingCenterService.getRegionalProcessingCenterMap()).thenReturn(rpcMap);
     }
 
     @Test
