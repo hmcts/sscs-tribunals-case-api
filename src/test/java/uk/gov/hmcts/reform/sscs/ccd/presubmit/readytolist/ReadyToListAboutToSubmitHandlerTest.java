@@ -94,6 +94,28 @@ public class ReadyToListAboutToSubmitHandlerTest {
         assertEquals("Case already created in GAPS at valid appeal.", response.getErrors().toArray()[0]);
     }
 
+    @Test
+    public void returnAnErrorIfCreatedInListAssistFromIsAtValidAppeal() {
+        buildRegionalProcessingCentreMap(HearingRoute.LIST_ASSIST);
+        sscsCaseData = sscsCaseData.toBuilder().region("TEST").createdInGapsFrom(State.VALID_APPEAL.getId()).build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("Case already created in LIST ASSIST at valid appeal.", response.getErrors().toArray()[0]);
+    }
+
+    @Test
+    public void returnAnErrorIfCreatedInListAssistFromIsNull() {
+        buildRegionalProcessingCentreMap(HearingRoute.LIST_ASSIST);
+        sscsCaseData = sscsCaseData.toBuilder().region("TEST").createdInGapsFrom(null).build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("Case already created in LIST ASSIST at valid appeal.", response.getErrors().toArray()[0]);
+    }
+
     private void buildRegionalProcessingCentreMap(HearingRoute route) {
         Map<String, RegionalProcessingCenter> rpcMap = new HashMap<>();
         rpcMap.put("SSCS TEST", RegionalProcessingCenter.builder().hearingRoute(route).
