@@ -44,39 +44,19 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
             throw new IllegalStateException("Cannot handle callback.");
         }
 
-        final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        if (schedulingAndListingFeature && checkIfListAssist(sscsCaseData)) {
-            sscsCaseData.setHearingRoute(HearingRoute.LIST_ASSIST);
-            sscsCaseData.setHearingState(StateOfHearing.HEARING_CREATED);
-            return new PreSubmitCallbackResponse<>(sscsCaseData);
-        } else {
-            return handleCallbackResponse(sscsCaseData);
-        }
-    }
-
-    private boolean checkIfListAssist(SscsCaseData sscsCaseData) {
         String region = sscsCaseData.getRegion();
+
         Map<String, RegionalProcessingCenter> regionalProcessingCenterMap =  regionalProcessingCenterService
             .getRegionalProcessingCenterMap();
-        YesNo isListAssistOptional = regionalProcessingCenterMap.values().stream()
+
+        HearingRoute route = regionalProcessingCenterMap.values().stream()
             .filter(rpc -> rpc.getName().equalsIgnoreCase(region))
-            .map(RegionalProcessingCenter::getListAssist)
-            .findFirst()
-            .orElse(YES);
-        return isYes(isListAssistOptional);
+            .map(RegionalProcessingCenter::getHearingRoute)
+            .findFirst().orElse(HearingRoute.LIST_ASSIST);
+
+        return HearingHandler.valueOf(route.name()).handle(sscsCaseData);
     }
 
-    private PreSubmitCallbackResponse<SscsCaseData> handleCallbackResponse(SscsCaseData sscsCaseData) {
-        sscsCaseData.setHearingRoute(HearingRoute.GAPS);
-        sscsCaseData.setHearingState(StateOfHearing.HEARING_CREATED);
-        PreSubmitCallbackResponse<uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-        log.info(String.format("createdInGapsFrom is %s for caseId %s", sscsCaseData.getCreatedInGapsFrom(), sscsCaseData.getCcdCaseId()));
-        if (sscsCaseData.getCreatedInGapsFrom() == null
-            || StringUtils.equalsIgnoreCase(sscsCaseData.getCreatedInGapsFrom(), State.VALID_APPEAL.getId())) {
-            callbackResponse.addError("Case already created in GAPS at valid appeal.");
-            log.warn(String.format("Case already created in GAPS at valid appeal for caseId %s.", sscsCaseData.getCcdCaseId()));
-        }
-        return callbackResponse;
-    }
 }
