@@ -1,13 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.Map;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -48,7 +44,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         String region = sscsCaseData.getRegion();
 
-        Map<String, RegionalProcessingCenter> regionalProcessingCenterMap =  regionalProcessingCenterService
+        Map<String, RegionalProcessingCenter> regionalProcessingCenterMap = regionalProcessingCenterService
             .getRegionalProcessingCenterMap();
 
         HearingRoute route = regionalProcessingCenterMap.values().stream()

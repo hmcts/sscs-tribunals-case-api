@@ -4,15 +4,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 
 @Slf4j
 public enum HearingHandler {
     GAPS {
         @Override
-        public PreSubmitCallbackResponse<SscsCaseData> handle (SscsCaseData sscsCaseData) {
+        public PreSubmitCallbackResponse<SscsCaseData> handle(SscsCaseData sscsCaseData) {
             sscsCaseData.setHearingRoute(HearingRoute.GAPS);
             sscsCaseData.setHearingState(HearingState.HEARING_CREATED);
             PreSubmitCallbackResponse<uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
@@ -27,7 +27,7 @@ public enum HearingHandler {
     },
     LIST_ASSIST {
         @Override
-        public PreSubmitCallbackResponse<SscsCaseData> handle (SscsCaseData sscsCaseData) {
+        public PreSubmitCallbackResponse<SscsCaseData> handle(SscsCaseData sscsCaseData) {
             sscsCaseData.setHearingRoute(HearingRoute.LIST_ASSIST);
             sscsCaseData.setHearingState(HearingState.HEARING_CREATED);
             return new PreSubmitCallbackResponse<>(sscsCaseData);
