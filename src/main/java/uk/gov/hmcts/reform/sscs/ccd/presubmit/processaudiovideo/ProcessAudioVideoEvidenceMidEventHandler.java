@@ -127,7 +127,7 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
     }
 
     private void setDocumentType(AudioVideoEvidenceDetails evidence) {
-        DocumentType documentType = getDocumentType(evidence);
+        DocumentType documentType = getDocumentType(evidence.getDocumentLink().getDocumentFilename());
 
         String documentTypeLabel = null;
 
