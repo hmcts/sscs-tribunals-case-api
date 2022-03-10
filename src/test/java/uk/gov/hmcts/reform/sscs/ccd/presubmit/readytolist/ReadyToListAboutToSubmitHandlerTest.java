@@ -15,7 +15,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -118,8 +117,8 @@ public class ReadyToListAboutToSubmitHandlerTest {
 
     private void buildRegionalProcessingCentreMap(HearingRoute route) {
         Map<String, RegionalProcessingCenter> rpcMap = new HashMap<>();
-        rpcMap.put("SSCS TEST", RegionalProcessingCenter.builder().hearingRoute(route).
-            name("TEST")
+        rpcMap.put("SSCS TEST", RegionalProcessingCenter.builder().hearingRoute(route)
+            .name("TEST")
             .build());
         when(regionalProcessingCenterService.getRegionalProcessingCenterMap()).thenReturn(rpcMap);
     }
