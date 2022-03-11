@@ -30,14 +30,7 @@ public enum HearingHandler {
         public PreSubmitCallbackResponse<SscsCaseData> handle(SscsCaseData sscsCaseData) {
             sscsCaseData.setHearingRoute(HearingRoute.LIST_ASSIST);
             sscsCaseData.setHearingState(HearingState.HEARING_CREATED);
-            PreSubmitCallbackResponse<uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-            log.info(String.format("createdInListAssistFrom is %s for caseId %s", sscsCaseData.getCreatedInGapsFrom(), sscsCaseData.getCcdCaseId()));
-            if (sscsCaseData.getCreatedInGapsFrom() == null
-                || StringUtils.equalsIgnoreCase(sscsCaseData.getCreatedInGapsFrom(), State.VALID_APPEAL.getId())) {
-                callbackResponse.addError("Case already created in LIST ASSIST at valid appeal.");
-                log.warn(String.format("Case already created in LIST ASSIST at valid appeal for caseId %s.", sscsCaseData.getCcdCaseId()));
-            }
-            return callbackResponse;
+            return new PreSubmitCallbackResponse<>(sscsCaseData);
 
         }
     };

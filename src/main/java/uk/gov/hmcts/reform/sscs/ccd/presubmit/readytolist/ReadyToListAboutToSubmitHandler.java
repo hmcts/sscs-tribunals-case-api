@@ -19,11 +19,15 @@ import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 @Slf4j
 public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    @Value("${feature.scheduling-and-listing.enabled}")
     private boolean schedulingAndListingFeature;
 
-    @Autowired
     private RegionalProcessingCenterService regionalProcessingCenterService;
+
+    public ReadyToListAboutToSubmitHandler(@Value("${feature.scheduling-and-listing.enabled}") boolean schedulingAndListingFeature,
+                                           @Autowired RegionalProcessingCenterService regionalProcessingCenterService) {
+        this.schedulingAndListingFeature = schedulingAndListingFeature;
+        this.regionalProcessingCenterService = regionalProcessingCenterService;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -41,6 +45,10 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         }
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+
+        if (!schedulingAndListingFeature) {
+            return HearingHandler.GAPS.handle(sscsCaseData);
+        }
 
         String region = sscsCaseData.getRegion();
 

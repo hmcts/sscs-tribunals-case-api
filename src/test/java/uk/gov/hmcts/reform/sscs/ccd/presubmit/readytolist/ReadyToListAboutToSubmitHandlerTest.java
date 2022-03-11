@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 public class ReadyToListAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    @InjectMocks
     private ReadyToListAboutToSubmitHandler handler;
 
     @Mock
@@ -42,8 +41,8 @@ public class ReadyToListAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
+        handler = new ReadyToListAboutToSubmitHandler(false, regionalProcessingCenterService);
         openMocks(this);
-
         when(callback.getEvent()).thenReturn(EventType.READY_TO_LIST);
 
         sscsCaseData = SscsCaseData.builder()
@@ -94,25 +93,16 @@ public class ReadyToListAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void returnAnErrorIfCreatedInListAssistFromIsAtValidAppeal() {
+    public void givenHearingCreatedAndListAssistIfTypeListAssist() {
         buildRegionalProcessingCentreMap(HearingRoute.LIST_ASSIST);
-        sscsCaseData = sscsCaseData.toBuilder().region("TEST").createdInGapsFrom(State.VALID_APPEAL.getId()).build();
+        handler = new ReadyToListAboutToSubmitHandler(true, regionalProcessingCenterService);
+
+        sscsCaseData = sscsCaseData.toBuilder().region("TEST").build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("Case already created in LIST ASSIST at valid appeal.", response.getErrors().toArray()[0]);
-    }
-
-    @Test
-    public void returnAnErrorIfCreatedInListAssistFromIsNull() {
-        buildRegionalProcessingCentreMap(HearingRoute.LIST_ASSIST);
-        sscsCaseData = sscsCaseData.toBuilder().region("TEST").createdInGapsFrom(null).build();
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals("Case already created in LIST ASSIST at valid appeal.", response.getErrors().toArray()[0]);
+        assertEquals(HearingRoute.LIST_ASSIST, sscsCaseData.getHearingRoute());
+        assertEquals(HearingState.HEARING_CREATED, sscsCaseData.getHearingState());
     }
 
     private void buildRegionalProcessingCentreMap(HearingRoute route) {
