@@ -23,7 +23,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
     private RegionalProcessingCenterService regionalProcessingCenterService;
 
-    public ReadyToListAboutToSubmitHandler(@Value("${feature.scheduling-and-listing.enabled}") boolean schedulingAndListingFeature,
+    public ReadyToListAboutToSubmitHandler(@Value("${feature.gaps-switchover.enabled}") boolean schedulingAndListingFeature,
                                            @Autowired RegionalProcessingCenterService regionalProcessingCenterService) {
         this.schedulingAndListingFeature = schedulingAndListingFeature;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
