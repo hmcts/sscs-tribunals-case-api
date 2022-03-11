@@ -118,7 +118,8 @@ public class SubmitAppealServiceTest {
         + "    \"postcode\" : \"B16 6FR\",\n"
         + "    \"phoneNumber\" : \"0300 123 1142\",\n"
         + "    \"faxNumber\" : \"0126 434 7983\",\n"
-        + "    \"email\" : \"Birmingham-SYA-Receipts@justice.gov.uk\"\n"
+        + "    \"email\" : \"Birmingham-SYA-Receipts@justice.gov.uk\",\n"
+        + "    \"hearingRoute\" : \"GAPS\"\n"
         + "  }";
 
     public static final String BRADFORD_RPC = "{\n"
@@ -131,7 +132,8 @@ public class SubmitAppealServiceTest {
         + "    \"postcode\": \"BD3 7BH\",\n"
         + "    \"phoneNumber\" : \"0300 123 1142\",\n"
         + "    \"faxNumber\" : \"0126 434 7983\",\n"
-        + "    \"email\" : \"SSCS_Bradford@justice.gov.uk\"\n"
+        + "    \"email\" : \"SSCS_Bradford@justice.gov.uk\",\n"
+        + "    \"hearingRoute\" : \"GAPS\"\n"
         + "  }";
 
     public static final String SUTTON_RPC = "{\n"
@@ -144,7 +146,8 @@ public class SubmitAppealServiceTest {
         + "    \"postcode\" : \"SM1 1DA\",\n"
         + "    \"phoneNumber\" : \"0300 123 1142\",\n"
         + "    \"faxNumber\" : \"0870 739 4229\",\n"
-        + "    \"email\" : \"Sutton_SYA_Respons@justice.gov.uk\"\n"
+        + "    \"email\" : \"Sutton_SYA_Respons@justice.gov.uk\",\n"
+        + "    \"hearingRoute\" : \"GAPS\"\n"
         + "  }";
 
     @Before

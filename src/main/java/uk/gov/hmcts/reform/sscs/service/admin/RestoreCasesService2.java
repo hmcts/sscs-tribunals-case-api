@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
+import com.opencsv.exceptions.CsvValidationException;
 import feign.FeignException;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -114,8 +115,12 @@ public class RestoreCasesService2 {
                 allCasesToRestore.add(line[0])
             );
 
-        } catch (IOException | CsvException e) {
+        } catch (IOException e) {
             log.error("IOException from RestoreCasesService2: ", e);
+        } catch (CsvValidationException e) {
+            log.error("CsvValidationException from RestoreCasesService2: ", e);
+        } catch (CsvException e) {
+            log.error("CsvException from RestoreCasesService2: ", e);
         } finally {
             try {
                 if (reader != null) {

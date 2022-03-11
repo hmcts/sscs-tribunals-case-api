@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.thirdparty.pdfservice;
 
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.util.IOUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.model.InputStreamWrapper;
 
@@ -19,7 +18,7 @@ public class ResourceManager {
          * the original exception will propagate
          */
         try (InputStreamWrapper inputStreamWrapper = new InputStreamWrapper(log, getClass().getResourceAsStream(file))) {
-            return inputStreamWrapper.get() != null ?  IOUtils.toByteArray(inputStreamWrapper.get()) : null;
+            return inputStreamWrapper.get() != null ?  inputStreamWrapper.get().readAllBytes() : null;
         }
     }
 }
