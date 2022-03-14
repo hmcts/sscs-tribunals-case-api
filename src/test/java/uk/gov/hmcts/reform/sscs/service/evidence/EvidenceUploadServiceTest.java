@@ -471,7 +471,7 @@ public class EvidenceUploadServiceTest {
         sscsCaseData.setOtherParties(List.of(new CcdValue<>(OtherParty.builder()
                 .id("1")
                 .name(Name.builder().firstName("John").lastName("Smith").build())
-                .otherPartySubscription(Subscription.builder().email("op@email.com").build())
+                .subscription(Subscription.builder().email("op@email.com").build())
                 .build())));
         SscsDocument evidenceDescriptionDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentDateAdded("2021-01-30")
                 .documentLink(DocumentLink.builder().documentBinaryUrl("url/binary").documentFilename("description.pdf").documentUrl("url").build()).build()).build();
@@ -828,7 +828,7 @@ public class EvidenceUploadServiceTest {
         sscsCaseDetails.getData().setOtherParties(List.of(new CcdValue<>(OtherParty.builder()
                 .id("1")
                 .name(Name.builder().firstName("John").lastName("Smith").build())
-                .otherPartySubscription(Subscription.builder().email("op@email.com").build())
+                .subscription(Subscription.builder().email("op@email.com").build())
                 .build())));
         sscsCaseDetails.getData().setScannedDocuments(getScannedDocuments());
         sscsCaseDetails.getData().setSscsDocument(buildSscsDocumentList());
@@ -858,9 +858,9 @@ public class EvidenceUploadServiceTest {
                         .id("2")
                         .hasRepresentative(YesNo.YES.getValue())
                         .name(Name.builder().firstName("Myles").lastName("Smith").build())
+                        .subscription(Subscription.builder().email("opRep@email.com").build())
                         .build())
-                .otherPartySubscription(Subscription.builder().email("op@email.com").build())
-                .otherPartyRepresentativeSubscription(Subscription.builder().email("opRep@email.com").build())
+                .subscription(Subscription.builder().email("op@email.com").build())
                 .build())));
         sscsCaseDetails.getData().setScannedDocuments(getScannedDocuments());
         sscsCaseDetails.getData().setSscsDocument(buildSscsDocumentList());
@@ -890,8 +890,8 @@ public class EvidenceUploadServiceTest {
                 .appointee(Appointee.builder()
                         .id("2")
                         .name(Name.builder().firstName("Trinity").lastName("Smith").build())
+                        .subscription(Subscription.builder().email("opAppointee@email.com").build())
                         .build())
-                .otherPartyAppointeeSubscription(Subscription.builder().email("opAppointee@email.com").build())
                 .build())));
         sscsCaseDetails.getData().setScannedDocuments(getScannedDocuments());
         sscsCaseDetails.getData().setSscsDocument(buildSscsDocumentList());
@@ -1070,13 +1070,13 @@ public class EvidenceUploadServiceTest {
                 .otherParties(List.of(new CcdValue<>(OtherParty.builder()
                         .id("1")
                         .name(Name.builder().firstName("Oyster").lastName("Smith").build())
-                        .otherPartySubscription(Subscription.builder().email(OTHER_PARTY_EMAIL).build())
+                        .subscription(Subscription.builder().email(OTHER_PARTY_EMAIL).build())
                         .rep(Representative.builder()
                                 .id("2")
                                 .name(Name.builder().firstName("Raj").lastName("Smith").build())
                                 .hasRepresentative(YesNo.YES.getValue())
+                                .subscription(Subscription.builder().email(OTHER_PARTY_REP_EMAIL).build())
                                 .build())
-                        .otherPartyRepresentativeSubscription(Subscription.builder().email(OTHER_PARTY_REP_EMAIL).build())
                         .build()),
                         new CcdValue<>(OtherParty.builder()
                                 .id("3")
@@ -1085,8 +1085,8 @@ public class EvidenceUploadServiceTest {
                                 .appointee(Appointee.builder()
                                         .id("4")
                                         .name(Name.builder().firstName("Apple").lastName("Smith").build())
+                                        .subscription(Subscription.builder().email(OTHER_PARTY_APPOINTEE_EMAIL).build())
                                         .build())
-                                .otherPartyAppointeeSubscription(Subscription.builder().email(OTHER_PARTY_APPOINTEE_EMAIL).build())
                                 .build())))
                 .build())
                 .build();

@@ -143,7 +143,7 @@ public class OtherPartyDataUtilTest {
         return CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder()
                         .id(id)
-                        .sendNewOtherPartyNotification(sendNotification ? YES : NO)
+                        .sendNotification(sendNotification ? YES : NO)
                         .build())
                 .build();
     }

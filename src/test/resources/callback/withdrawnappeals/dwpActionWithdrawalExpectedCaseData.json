@@ -50,9 +50,34 @@
         "identity": {
           "dob": null,
           "nino": null
-        }
+        },
+        "cftOrganisationId": null,
+        "confidentialityRequired": null,
+        "organisation": null,
+        "organisationType": null,
+        "subscription": null,
+        "reasonableAdjustment": null,
+        "relatedParties": null,
+        "role": null,
+        "showRole": null,
+        "unacceptableCustomerBehaviour": null,
+        "vulnerabilityDetails": null,
+        "vulnerableFlag": null
       },
-      "isAddressSameAsAppointee": null
+      "isAddressSameAsAppointee": null,
+      "cftOrganisationId": null,
+      "id": null,
+      "organisation": null,
+      "organisationType": null,
+      "subscription": null,
+      "reasonableAdjustment": null,
+      "relatedParties": null,
+      "rep": null,
+      "sendNotification": null,
+      "showRole": null,
+      "unacceptableCustomerBehaviour": null,
+      "vulnerabilityDetails": null,
+      "vulnerableFlag": null
     },
     "benefitType": {
       "code": "PIP",
@@ -83,7 +108,19 @@
         "email": "harry.potter@wizards.com",
         "phone": null,
         "mobile": "07411999999"
-      }
+      },
+      "cftOrganisationId": null,
+      "confidentialityRequired": null,
+      "identity": null,
+      "organisationType": null,
+      "subscription": null,
+      "reasonableAdjustment": null,
+      "relatedParties": null,
+      "role": null,
+      "showRole": null,
+      "unacceptableCustomerBehaviour": null,
+      "vulnerabilityDetails": null,
+      "vulnerableFlag": null
     },
     "signer": null,
     "hearingSubtype":null,

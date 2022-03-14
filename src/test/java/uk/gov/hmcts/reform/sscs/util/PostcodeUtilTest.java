@@ -58,7 +58,7 @@ public class PostcodeUtilTest {
     public void willMatchAndOtherPartyPostcode() {
         String otherPartyPostCode = "W1 1LA";
         OtherParty otherParty = OtherParty.builder()
-                .otherPartySubscription(Subscription.builder().email(EMAIL).build())
+                .subscription(Subscription.builder().email(EMAIL).build())
                 .address(Address.builder().postcode(otherPartyPostCode).build()).build();
         sscsCaseDetails.getData().setOtherParties(List.of(new CcdValue<>(otherParty)));
         assertThat(new PostcodeUtil().hasAppellantOrOtherPartyPostcode(sscsCaseDetails, "w1 1lA", EMAIL), is(true));
@@ -69,9 +69,9 @@ public class PostcodeUtilTest {
         String otherPartyPostCode = "W1 1LA";
         OtherParty otherParty = OtherParty.builder()
                 .isAppointee("Yes")
-                .appointee(Appointee.builder().address(Address.builder().postcode("w2 2la").build()).build())
-                .otherPartyAppointeeSubscription(Subscription.builder().email(EMAIL).build())
-                .otherPartySubscription(Subscription.builder().email("otherParty@example.com").build())
+                .appointee(Appointee.builder().address(Address.builder().postcode("w2 2la").build())
+                        .subscription(Subscription.builder().email(EMAIL).build()).build())
+                .subscription(Subscription.builder().email("otherParty@example.com").build())
                 .address(Address.builder().postcode(otherPartyPostCode).build()).build();
         sscsCaseDetails.getData().setOtherParties(List.of(new CcdValue<>(otherParty)));
         assertThat(new PostcodeUtil().hasAppellantOrOtherPartyPostcode(sscsCaseDetails, "w1 1lA", EMAIL), is(true));
@@ -82,9 +82,9 @@ public class PostcodeUtilTest {
         String otherPartyPostCode = "W1 1LA";
         OtherParty otherParty = OtherParty.builder()
                 .rep(Representative.builder().hasRepresentative("Yes")
-                        .address(Address.builder().postcode("w2 2la").build()).build())
-                .otherPartyRepresentativeSubscription(Subscription.builder().email(EMAIL).build())
-                .otherPartySubscription(Subscription.builder().email("otherParty@example.com").build())
+                        .address(Address.builder().postcode("w2 2la").build())
+                        .subscription(Subscription.builder().email(EMAIL).build()).build())
+                .subscription(Subscription.builder().email("otherParty@example.com").build())
                 .address(Address.builder().postcode(otherPartyPostCode).build()).build();
         sscsCaseDetails.getData().setOtherParties(List.of(new CcdValue<>(otherParty)));
         assertThat(new PostcodeUtil().hasAppellantOrOtherPartyPostcode(sscsCaseDetails, "w1 1lA", EMAIL), is(true));
@@ -94,10 +94,10 @@ public class PostcodeUtilTest {
     public void willNotMatchAndOtherPartyPostcodeIfEmailDoesNotMatch() {
         String otherPartyPostCode = "W1 1LA";
         OtherParty otherParty1 = OtherParty.builder()
-                .otherPartySubscription(Subscription.builder().email("otherParty@example.com").build())
+                .subscription(Subscription.builder().email("otherParty@example.com").build())
                 .address(Address.builder().postcode(otherPartyPostCode).build()).build();
         OtherParty otherParty2 = OtherParty.builder()
-                .otherPartySubscription(Subscription.builder().email(EMAIL).build())
+                .subscription(Subscription.builder().email(EMAIL).build())
                 .address(Address.builder().postcode("W2 2LA").build()).build();
         sscsCaseDetails.getData().setOtherParties(List.of(new CcdValue<>(otherParty1), new CcdValue<>(otherParty2)));
         assertThat(new PostcodeUtil().hasAppellantOrOtherPartyPostcode(sscsCaseDetails, "w1 1lA", EMAIL), is(false));

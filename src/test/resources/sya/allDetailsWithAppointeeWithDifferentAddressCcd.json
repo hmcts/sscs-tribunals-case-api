@@ -49,6 +49,19 @@
       "confidentialityRequired": null,
       "role": null,
       "isAddressSameAsAppointee": "No",
+      "cftOrganisationId": null,
+      "id": null,
+      "organisation": null,
+      "organisationType": null,
+      "subscription": null,
+      "reasonableAdjustment": null,
+      "relatedParties": null,
+      "rep": null,
+      "sendNotification": null,
+      "showRole": null,
+      "unacceptableCustomerBehaviour": null,
+      "vulnerabilityDetails": null,
+      "vulnerableFlag": null,
       "appointee": {
         "id": null,
         "name": {
@@ -70,7 +83,19 @@
         "identity": {
           "dob": "1991-03-31",
           "nino": null
-        }
+        },
+        "cftOrganisationId": null,
+        "confidentialityRequired": null,
+        "organisation": null,
+        "organisationType": null,
+        "subscription": null,
+        "reasonableAdjustment": null,
+        "relatedParties": null,
+        "role": null,
+        "showRole": null,
+        "unacceptableCustomerBehaviour": null,
+        "vulnerabilityDetails": null,
+        "vulnerableFlag": null
       }
     },
     "benefitType": {
@@ -153,7 +178,19 @@
         "phone": null,
         "mobile": "07411999999"
       },
-      "organisation": "HP Ltd"
+      "organisation": "HP Ltd",
+      "cftOrganisationId": null,
+      "confidentialityRequired": null,
+      "identity": null,
+      "organisationType": null,
+      "subscription": null,
+      "reasonableAdjustment": null,
+      "relatedParties": null,
+      "role": null,
+      "showRole": null,
+      "unacceptableCustomerBehaviour": null,
+      "vulnerabilityDetails": null,
+      "vulnerableFlag": null
     },
     "signer": "Joe Bloggs",
     "hearingSubtype": {},

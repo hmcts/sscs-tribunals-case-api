@@ -49,7 +49,20 @@
       "confidentialityRequired": null,
       "role": null,
       "isAddressSameAsAppointee": "No",
-      "appointee": null
+      "appointee": null,
+      "cftOrganisationId": null,
+      "id": null,
+      "organisation": null,
+      "organisationType": null,
+      "subscription": null,
+      "reasonableAdjustment": null,
+      "relatedParties": null,
+      "rep": null,
+      "sendNotification": null,
+      "showRole": null,
+      "unacceptableCustomerBehaviour": null,
+      "vulnerabilityDetails": null,
+      "vulnerableFlag": null
     },
     "benefitType": {
       "code": "PIP",
@@ -100,7 +113,19 @@
         "phone": null,
         "mobile": "07411999999"
       },
-      "organisation": "HP Ltd"
+      "organisation": "HP Ltd",
+      "cftOrganisationId": null,
+      "confidentialityRequired": null,
+      "identity": null,
+      "organisationType": null,
+      "subscription": null,
+      "reasonableAdjustment": null,
+      "relatedParties": null,
+      "role": null,
+      "showRole": null,
+      "unacceptableCustomerBehaviour": null,
+      "vulnerabilityDetails": null,
+      "vulnerableFlag": null
     },
     "signer": "Joe Bloggs",
     "hearingSubtype": {},

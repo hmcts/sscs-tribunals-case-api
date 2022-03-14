@@ -227,9 +227,11 @@ public class SubscriptionUpdatedAboutToSubmitHandlerTest {
         List<CcdValue<OtherParty>> otherParties =
                 Arrays.asList(CcdValue.<OtherParty>builder().value(
                         OtherParty.builder().id("other_party_1")
-                                .otherPartySubscription(Subscription.builder().email("user1@email.com").build())
-                                .otherPartyAppointeeSubscription(Subscription.builder().email("user2@email.com").build())
-                                .otherPartyRepresentativeSubscription(Subscription.builder().email("user3@email.com").build())
+                                .subscription(Subscription.builder().email("user1@email.com").build())
+                                .appointee(Appointee.builder()
+                                        .subscription(Subscription.builder().email("user2@email.com").build()).build())
+                                .rep(Representative.builder()
+                                        .subscription(Subscription.builder().email("user3@email.com").build()).build())
                                 .build()).build());
 
         sscsCaseData.setOtherParties(otherParties);

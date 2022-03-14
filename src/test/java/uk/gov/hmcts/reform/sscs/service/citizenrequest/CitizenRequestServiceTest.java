@@ -494,7 +494,7 @@ public class CitizenRequestServiceTest {
         when(caseData.getOtherParties()).thenReturn(List.of(CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder()
                         .id("1")
-                        .otherPartySubscription(Subscription.builder().email(E_MAIL).build()).build())
+                        .subscription(Subscription.builder().email(E_MAIL).build()).build())
                         .build()));
         when(caseData.getSscsHearingRecordingCaseData()).thenReturn(SscsHearingRecordingCaseData.builder()
                 .sscsHearingRecordings(List.of(SscsHearingRecording.builder()
@@ -525,8 +525,9 @@ public class CitizenRequestServiceTest {
         when(caseData.getOtherParties()).thenReturn(List.of(CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder()
                         .id("1")
-                        .rep(Representative.builder().id("2").build())
-                        .otherPartyRepresentativeSubscription(Subscription.builder().email(E_MAIL).build()).build())
+                        .rep(Representative.builder().id("2")
+                                .subscription(Subscription.builder().email(E_MAIL).build()).build())
+                        .build())
                 .build()));
         when(caseData.getSscsHearingRecordingCaseData()).thenReturn(SscsHearingRecordingCaseData.builder()
                 .sscsHearingRecordings(List.of(SscsHearingRecording.builder()
@@ -557,8 +558,9 @@ public class CitizenRequestServiceTest {
         when(caseData.getOtherParties()).thenReturn(List.of(CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder()
                         .id("1")
-                        .appointee(Appointee.builder().id("2").build())
-                        .otherPartyAppointeeSubscription(Subscription.builder().email(E_MAIL).build()).build())
+                        .appointee(Appointee.builder().id("2")
+                                .subscription(Subscription.builder().email(E_MAIL).build()).build())
+                        .build())
                 .build()));
         when(caseData.getSscsHearingRecordingCaseData()).thenReturn(SscsHearingRecordingCaseData.builder()
                 .sscsHearingRecordings(List.of(SscsHearingRecording.builder()
@@ -589,7 +591,7 @@ public class CitizenRequestServiceTest {
         when(caseData.getOtherParties()).thenReturn(List.of(CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder()
                         .id("1")
-                        .otherPartySubscription(Subscription.builder().email(E_MAIL).build()).build())
+                        .subscription(Subscription.builder().email(E_MAIL).build()).build())
                 .build()));
         when(caseData.getSscsHearingRecordingCaseData()).thenReturn(SscsHearingRecordingCaseData.builder()
                 .requestedHearings(List.of(HearingRecordingRequest.builder()
@@ -767,20 +769,22 @@ public class CitizenRequestServiceTest {
             new Object[]{CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder()
                     .id("1")
-                    .otherPartySubscription(Subscription.builder().email(E_MAIL).build()).build())
+                    .subscription(Subscription.builder().email(E_MAIL).build()).build())
                 .build(), "1", PartyItemList.OTHER_PARTY.getCode()},
             new Object[]{CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder()
                     .id("1")
                     .isAppointee(YesNo.YES.getValue())
-                    .appointee(Appointee.builder().id("2").build())
-                    .otherPartyAppointeeSubscription(Subscription.builder().email(E_MAIL).build()).build())
+                    .appointee(Appointee.builder().id("2")
+                            .subscription(Subscription.builder().email(E_MAIL).build()).build())
+                        .build())
                 .build(), "1", PartyItemList.OTHER_PARTY.getCode()},
             new Object[]{CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder()
                     .id("1")
-                    .rep(Representative.builder().id("2").hasRepresentative(YesNo.YES.getValue()).build())
-                    .otherPartyRepresentativeSubscription(Subscription.builder().email(E_MAIL).build()).build())
+                    .rep(Representative.builder().id("2").hasRepresentative(YesNo.YES.getValue())
+                            .subscription(Subscription.builder().email(E_MAIL).build()).build())
+                        .build())
                 .build(), "2", PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode()}
         };
     }

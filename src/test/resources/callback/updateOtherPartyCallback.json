@@ -394,7 +394,7 @@
           "value": {
             "confidentialityRequired": "No",
             "unacceptableCustomerBehaviour": "Yes",
-            "sendNewOtherPartyNotification": null,
+            "sendNotification": null,
             "isAppointee": null,
             "id": null,
             "name": {
