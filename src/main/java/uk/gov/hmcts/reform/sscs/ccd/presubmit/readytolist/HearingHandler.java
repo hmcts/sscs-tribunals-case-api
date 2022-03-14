@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
@@ -11,10 +12,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 @Slf4j
 public enum HearingHandler {
     GAPS {
+        @Value("${feature.gaps-switchover.enabled}") boolean gapsSwitchOverFeature;
         @Override
         public PreSubmitCallbackResponse<SscsCaseData> handle(SscsCaseData sscsCaseData) {
-            sscsCaseData.setHearingRoute(HearingRoute.GAPS);
-            sscsCaseData.setHearingState(HearingState.HEARING_CREATED);
+            if(gapsSwitchOverFeature){
+                sscsCaseData.setHearingRoute(HearingRoute.GAPS);
+                sscsCaseData.setHearingState(HearingState.HEARING_CREATED);
+            }
             PreSubmitCallbackResponse<uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
             log.info(String.format("createdInGapsFrom is %s for caseId %s", sscsCaseData.getCreatedInGapsFrom(), sscsCaseData.getCcdCaseId()));
             if (sscsCaseData.getCreatedInGapsFrom() == null
