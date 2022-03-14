@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
@@ -12,10 +11,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 @Slf4j
 public enum HearingHandler {
     GAPS {
-        @Value("${feature.gaps-switchover.enabled}") boolean gapsSwitchOverFeature;
         @Override
-        public PreSubmitCallbackResponse<SscsCaseData> handle(SscsCaseData sscsCaseData) {
-            if(gapsSwitchOverFeature){
+        public PreSubmitCallbackResponse<SscsCaseData> handle(SscsCaseData sscsCaseData, boolean gapsSwitchOverFeature) {
+            if (gapsSwitchOverFeature){
                 sscsCaseData.setHearingRoute(HearingRoute.GAPS);
                 sscsCaseData.setHearingState(HearingState.HEARING_CREATED);
             }
@@ -31,13 +29,15 @@ public enum HearingHandler {
     },
     LIST_ASSIST {
         @Override
-        public PreSubmitCallbackResponse<SscsCaseData> handle(SscsCaseData sscsCaseData) {
-            sscsCaseData.setHearingRoute(HearingRoute.LIST_ASSIST);
-            sscsCaseData.setHearingState(HearingState.HEARING_CREATED);
+        public PreSubmitCallbackResponse<SscsCaseData> handle(SscsCaseData sscsCaseData, boolean gapsSwitchOverFeature) {
+            if (gapsSwitchOverFeature) {
+                sscsCaseData.setHearingRoute(HearingRoute.LIST_ASSIST);
+                sscsCaseData.setHearingState(HearingState.HEARING_CREATED);
+            }
             return new PreSubmitCallbackResponse<>(sscsCaseData);
 
         }
     };
 
-    public abstract PreSubmitCallbackResponse<SscsCaseData> handle(SscsCaseData caseData);
+    public abstract PreSubmitCallbackResponse<SscsCaseData> handle(SscsCaseData caseData, boolean gapsSwitchOverFeature);
 }

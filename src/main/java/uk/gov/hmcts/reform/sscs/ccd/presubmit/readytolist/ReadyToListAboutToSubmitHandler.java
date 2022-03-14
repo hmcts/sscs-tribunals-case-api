@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,12 +17,17 @@ import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 @Service
 @Slf4j
-@AllArgsConstructor
 public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    @Value("${feature.gaps-switchover.enabled}") private final boolean gapsSwitchOverFeature;
+    private final boolean gapsSwitchOverFeature;
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
+
+    public ReadyToListAboutToSubmitHandler(@Value("${feature.gaps-switchover.enabled}")  boolean gapsSwitchOverFeature,
+                                           @Autowired RegionalProcessingCenterService regionalProcessingCenterService) {
+        this.gapsSwitchOverFeature = gapsSwitchOverFeature;
+        this.regionalProcessingCenterService = regionalProcessingCenterService;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -43,7 +47,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         if (!gapsSwitchOverFeature) {
-            return HearingHandler.GAPS.handle(sscsCaseData);
+            return HearingHandler.GAPS.handle(sscsCaseData, gapsSwitchOverFeature);
         }
 
         String region = sscsCaseData.getRegion();
@@ -56,7 +60,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
             .map(RegionalProcessingCenter::getHearingRoute)
             .findFirst().orElse(HearingRoute.LIST_ASSIST);
 
-        return HearingHandler.valueOf(route.name()).handle(sscsCaseData);
+        return HearingHandler.valueOf(route.name()).handle(sscsCaseData, gapsSwitchOverFeature);
     }
 
 }
