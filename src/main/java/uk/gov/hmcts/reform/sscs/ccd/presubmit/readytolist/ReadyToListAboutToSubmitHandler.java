@@ -19,13 +19,13 @@ import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 @Slf4j
 public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private boolean schedulingAndListingFeature;
+    private final boolean gapsSwitchOverFeature;
 
-    private RegionalProcessingCenterService regionalProcessingCenterService;
+    private final RegionalProcessingCenterService regionalProcessingCenterService;
 
-    public ReadyToListAboutToSubmitHandler(@Value("${feature.gaps-switchover.enabled}") boolean schedulingAndListingFeature,
+    public ReadyToListAboutToSubmitHandler(@Value("${feature.gaps-switchover.enabled}") boolean gapsSwitchOverFeature,
                                            @Autowired RegionalProcessingCenterService regionalProcessingCenterService) {
-        this.schedulingAndListingFeature = schedulingAndListingFeature;
+        this.gapsSwitchOverFeature = gapsSwitchOverFeature;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
     }
 
@@ -46,7 +46,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        if (!schedulingAndListingFeature) {
+        if (!gapsSwitchOverFeature) {
             return HearingHandler.GAPS.handle(sscsCaseData);
         }
 

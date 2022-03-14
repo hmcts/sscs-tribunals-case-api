@@ -92,7 +92,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenHearingCreatedAndListAssistIfTypeListAssist() {
+    public void givenHearingCreated_withListAssist_thenCheckIfHearingType_isListAssist() {
         buildRegionalProcessingCentreMap(HearingRoute.LIST_ASSIST);
         handler = new ReadyToListAboutToSubmitHandler(true, regionalProcessingCenterService);
 
