@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,17 +18,12 @@ import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final boolean gapsSwitchOverFeature;
+    @Value("${feature.gaps-switchover.enabled}") private final boolean gapsSwitchOverFeature;
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
-
-    public ReadyToListAboutToSubmitHandler(@Value("${feature.gaps-switchover.enabled}") boolean gapsSwitchOverFeature,
-                                           @Autowired RegionalProcessingCenterService regionalProcessingCenterService) {
-        this.gapsSwitchOverFeature = gapsSwitchOverFeature;
-        this.regionalProcessingCenterService = regionalProcessingCenterService;
-    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
