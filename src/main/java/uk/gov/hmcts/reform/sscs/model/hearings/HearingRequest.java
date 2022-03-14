@@ -1,19 +1,32 @@
 package uk.gov.hmcts.reform.sscs.model.hearings;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 
 @Data
-@Builder(toBuilder = true)
-@AllArgsConstructor
-@NoArgsConstructor
-public class HearingRequest {
+@Builder(builderMethodName = "internalBuilder")
+@RequiredArgsConstructor
+public class HearingRequest implements SessionAwareRequest {
 
-    private String ccdCaseId;
+    @NonNull
+    private final String ccdCaseId;
 
-    private HearingRoute hearingRoute;
+    private final HearingRoute hearingRoute;
 
+    private final HearingState hearingState;
+
+    public static HearingRequestBuilder builder(String ccdCaseId) {
+        return internalBuilder().ccdCaseId(ccdCaseId);
+    }
+
+    @Override
+    @JsonIgnore
+    public String getSessionId() {
+        return ccdCaseId;
+    }
 }
