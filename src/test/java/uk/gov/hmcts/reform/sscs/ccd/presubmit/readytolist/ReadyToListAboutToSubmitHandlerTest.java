@@ -101,7 +101,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(HearingRoute.LIST_ASSIST, sscsCaseData.getHearingRoute());
-        assertEquals(HearingState.HEARING_CREATED, sscsCaseData.getHearingState());
+        assertEquals(HearingState.CREATE_HEARING, sscsCaseData.getHearingState());
     }
 
     private void buildRegionalProcessingCentreMap(HearingRoute route) {

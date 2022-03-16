@@ -13,9 +13,9 @@ public enum HearingHandler {
     GAPS {
         @Override
         public PreSubmitCallbackResponse<SscsCaseData> handle(SscsCaseData sscsCaseData, boolean gapsSwitchOverFeature) {
-            if (gapsSwitchOverFeature){
+            if (gapsSwitchOverFeature) {
                 sscsCaseData.setHearingRoute(HearingRoute.GAPS);
-                sscsCaseData.setHearingState(HearingState.HEARING_CREATED);
+                sscsCaseData.setHearingState(HearingState.CREATE_HEARING);
             }
             PreSubmitCallbackResponse<uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
             log.info(String.format("createdInGapsFrom is %s for caseId %s", sscsCaseData.getCreatedInGapsFrom(), sscsCaseData.getCcdCaseId()));
@@ -32,10 +32,9 @@ public enum HearingHandler {
         public PreSubmitCallbackResponse<SscsCaseData> handle(SscsCaseData sscsCaseData, boolean gapsSwitchOverFeature) {
             if (gapsSwitchOverFeature) {
                 sscsCaseData.setHearingRoute(HearingRoute.LIST_ASSIST);
-                sscsCaseData.setHearingState(HearingState.HEARING_CREATED);
+                sscsCaseData.setHearingState(HearingState.CREATE_HEARING);
             }
             return new PreSubmitCallbackResponse<>(sscsCaseData);
-
         }
     };
 
