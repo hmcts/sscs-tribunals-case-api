@@ -218,9 +218,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
         String postCode = resolvePostCode(sscsCaseData);
-
+        log.info("updateProcessingVenueIfRequired for post code " + postCode);
         String venue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
 
+        log.info("venue i s {}", venue);
         if (venue != null && !venue.equalsIgnoreCase(sscsCaseData.getProcessingVenue())) {
             log.info("Case id: {} - setting venue name to {} from {}", caseDetails.getId(), venue, sscsCaseData.getProcessingVenue());
 
