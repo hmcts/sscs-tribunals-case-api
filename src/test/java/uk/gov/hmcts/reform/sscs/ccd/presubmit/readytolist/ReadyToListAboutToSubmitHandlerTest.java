@@ -22,10 +22,10 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
+import uk.gov.hmcts.reform.sscs.model.servicebus.SessionAwareServiceBusMessagingService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.servicebus.HearingMessagingServiceFactory;
 import uk.gov.hmcts.reform.sscs.service.servicebus.NoOpMessagingService;
-import uk.gov.hmcts.reform.sscs.service.servicebus.SessionAwareServiceBusMessagingService;
 
 @RunWith(JUnitParamsRunner.class)
 public class ReadyToListAboutToSubmitHandlerTest {
@@ -128,7 +128,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
         verifyMessagingServiceCalled();
 
         assertThat(response.getData().getHearingRoute()).isEqualTo(HearingRoute.LIST_ASSIST);
-        assertThat(response.getData().getHearingState()).isEqualTo(HearingState.HEARING_CREATED);
+        assertThat(response.getData().getHearingState()).isEqualTo(HearingState.CREATE_HEARING);
 
         assertThat(response.getErrors())
             .as("A successfully sent message should not result in any errors.").isEmpty();
@@ -162,7 +162,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
     private void verifyMessagingServiceCalled() {
         verify(sessionAwareServiceBusMessagingService).sendMessage(HearingRequest.builder(CASE_ID)
             .hearingRoute(HearingRoute.LIST_ASSIST)
-            .hearingState(HearingState.HEARING_CREATED)
+            .hearingState(HearingState.CREATE_HEARING)
             .build());
     }
 
