@@ -106,7 +106,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenHearingCreated_withListAssist_thenCheckIfHearingType_isGAPS() {
+    public void givenHearingCreated_withListAssist_thenCheckIfHearingType_isGaps() {
         buildRegionalProcessingCentreMap(HearingRoute.GAPS);
         handler = new ReadyToListAboutToSubmitHandler(true, regionalProcessingCenterService);
 
