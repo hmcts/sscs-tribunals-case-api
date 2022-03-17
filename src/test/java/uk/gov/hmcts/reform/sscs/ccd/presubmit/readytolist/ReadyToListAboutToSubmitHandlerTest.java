@@ -105,6 +105,22 @@ public class ReadyToListAboutToSubmitHandlerTest {
         assertEquals(HearingState.CREATE_HEARING, response.getData().getHearingState());
     }
 
+    @Test
+    public void givenHearingCreated_withListAssist_thenCheckIfHearingType_isGAPS() {
+        buildRegionalProcessingCentreMap(HearingRoute.GAPS);
+        handler = new ReadyToListAboutToSubmitHandler(true, regionalProcessingCenterService);
+
+        sscsCaseData = sscsCaseData.toBuilder().region("TEST").build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(regionalProcessingCenterService.getHearingRoute(caseDetails.getCaseData().getRegion())).thenReturn(HearingRoute.GAPS);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(HearingRoute.GAPS, sscsCaseData.getHearingRoute());
+        assertEquals(HearingRoute.GAPS, response.getData().getHearingRoute());
+        assertEquals(HearingState.CREATE_HEARING, sscsCaseData.getHearingState());
+        assertEquals(HearingState.CREATE_HEARING, response.getData().getHearingState());
+    }
+
     private void buildRegionalProcessingCentreMap(HearingRoute route) {
         Map<String, RegionalProcessingCenter> rpcMap = new HashMap<>();
         rpcMap.put("SSCS TEST", RegionalProcessingCenter.builder().hearingRoute(route)
