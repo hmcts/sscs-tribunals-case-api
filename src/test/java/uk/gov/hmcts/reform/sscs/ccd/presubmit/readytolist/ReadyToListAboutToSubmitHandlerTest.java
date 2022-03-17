@@ -24,8 +24,6 @@ import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 public class ReadyToListAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private ReadyToListAboutToSubmitHandler handler;
-
     @Mock
     private Callback<SscsCaseData> callback;
 
@@ -35,24 +33,24 @@ public class ReadyToListAboutToSubmitHandlerTest {
     @Mock
     private RegionalProcessingCenterService regionalProcessingCenterService;
 
+    private ReadyToListAboutToSubmitHandler handler;
 
     private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() {
-        handler = new ReadyToListAboutToSubmitHandler(false, regionalProcessingCenterService);
         openMocks(this);
+        handler = new ReadyToListAboutToSubmitHandler(false, regionalProcessingCenterService);
         when(callback.getEvent()).thenReturn(EventType.READY_TO_LIST);
 
         sscsCaseData = SscsCaseData.builder()
-                .ccdCaseId("1234")
-                .createdInGapsFrom(State.READY_TO_LIST.getId())
-                .appeal(Appeal.builder().build())
-                .build();
+            .ccdCaseId("1234")
+            .createdInGapsFrom(State.READY_TO_LIST.getId())
+            .appeal(Appeal.builder().build())
+            .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(regionalProcessingCenterService.getRegionalProcessingCenterMap()).thenReturn(new HashMap<>());
     }
 
     @Test
@@ -98,10 +96,13 @@ public class ReadyToListAboutToSubmitHandlerTest {
 
         sscsCaseData = sscsCaseData.toBuilder().region("TEST").build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(regionalProcessingCenterService.getHearingRoute(caseDetails.getCaseData().getRegion())).thenReturn(HearingRoute.LIST_ASSIST);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(HearingRoute.LIST_ASSIST, sscsCaseData.getHearingRoute());
+        assertEquals(HearingRoute.LIST_ASSIST, response.getData().getHearingRoute());
         assertEquals(HearingState.CREATE_HEARING, sscsCaseData.getHearingState());
+        assertEquals(HearingState.CREATE_HEARING, response.getData().getHearingState());
     }
 
     private void buildRegionalProcessingCentreMap(HearingRoute route) {
