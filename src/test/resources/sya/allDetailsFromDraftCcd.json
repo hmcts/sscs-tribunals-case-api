@@ -251,5 +251,6 @@
   "languagePreferenceWelsh": "No",
   "createdInGapsFrom": "readyToList",
   "processingVenue": "Ashford",
-  "isScottishCase" : "No"
+  "isScottishCase" : "No",
+  "hearingRoute":  null
 }
