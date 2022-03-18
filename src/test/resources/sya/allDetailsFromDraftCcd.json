@@ -32,7 +32,8 @@
     "postcode" : "BD3 7BH",
     "phoneNumber" : "0300 123 1142",
     "faxNumber" : "0126 434 7983",
-    "email": "SSCS_Bradford@justice.gov.uk"
+    "email": "SSCS_Bradford@justice.gov.uk",
+    "hearingRoute": null
   },
   "appeal": {
     "mrnDetails": {
@@ -251,6 +252,5 @@
   "languagePreferenceWelsh": "No",
   "createdInGapsFrom": "readyToList",
   "processingVenue": "Ashford",
-  "isScottishCase" : "No",
-  "hearingRoute":  null
+  "isScottishCase" : "No"
 }
