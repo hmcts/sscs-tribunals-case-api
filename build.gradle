@@ -17,6 +17,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.7.0'
     id 'org.owasp.dependencycheck' version '6.2.2'
     id 'au.com.dius.pact' version '4.2.14'
+    id 'com.github.hmcts.rse-cft-lib' version '0.15.18'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -566,4 +567,18 @@ run {
     if (debug == 'true') {
         jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
     }
+}
+
+
+task generateXls(type: Exec) {
+    commandLine project.file('sscs-ccd-definitions/bin/create-xlsx.sh').path, 'benefit', 'dev', 'prod'
+    inputs.dir project.file('sscs-ccd-definitions/benefit')
+    outputs.dir project.file('sscs-ccd-definitions/releases')
+    environment "CCD_DEF_CASE_SERVICE_BASE_URL", "http://localhost:8080"
+    workingDir project.file('sscs-ccd-definitions').path
+}
+
+bootWithCCD {
+    dependsOn generateXls
+    authMode = uk.gov.hmcts.rse.AuthMode.Local
 }

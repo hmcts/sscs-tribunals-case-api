@@ -1,0 +1,3 @@
+[submodule "sscs-ccd-definitions"]
+	path = sscs-ccd-definitions
+	url = git@github.com:banderous/sscs-ccd-definitions.git
