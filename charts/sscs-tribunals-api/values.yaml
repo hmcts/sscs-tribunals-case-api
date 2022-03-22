@@ -26,11 +26,8 @@ java:
         - docmosis-endpoint
         - docmosis-api-key
         - AppInsightsInstrumentationKey
-  secrets:
-    HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING:
-      secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
-      key: connectionString
-      disabled: true
+        - name: sscs-asb-connection-string
+          alias: HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING
   environment:
     SERVER_PORT: 8080
     REFORM_TEAM: sscs
@@ -81,11 +78,3 @@ ccd:
   enabled: false
 em-ccdorc:
   enabled: false
-servicebus:
-  enabled: false
-  teamName: sscs
-  serviceplan: premium
-  resourceGroup: sscs-{{ .Values.global.environment }}
-  setup:
-    queues:
-      - name: tribunals-to-hearing-api
