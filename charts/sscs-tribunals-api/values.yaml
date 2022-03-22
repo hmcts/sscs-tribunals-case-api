@@ -26,6 +26,10 @@ java:
         - docmosis-endpoint
         - docmosis-api-key
         - AppInsightsInstrumentationKey
+  secrets:
+    HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING:
+      secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
+      key: connectionString
   environment:
     SERVER_PORT: 8080
     REFORM_TEAM: sscs
@@ -55,6 +59,7 @@ java:
     CASE_DOCUMENT_AM_URL: "http://ccd-case-document-am-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     SECURE_DOC_STORE_FEATURE: true
     WORK_ALLOCATION_FEATURE: true
+    HEARINGS_EVENT_QUEUE_NAME: tribunals-to-hearing-api-{{ .Values.global.environment }}
 
 idam-pr:
   enabled: false
@@ -74,3 +79,11 @@ ccd:
   enabled: false
 em-ccdorc:
   enabled: false
+servicebus:
+  enabled: false
+  teamName: sscs
+  serviceplan: premium
+  resourceGroup: sscs-{{ .Values.global.environment }}
+  setup:
+    queues:
+      - name: tribunals-to-hearing-api
