@@ -30,6 +30,7 @@ java:
     HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING:
       secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
       key: connectionString
+      disabled: true
   environment:
     SERVER_PORT: 8080
     REFORM_TEAM: sscs
