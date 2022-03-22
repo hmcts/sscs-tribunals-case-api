@@ -380,7 +380,7 @@ dependencies {
 
     compile 'javax.xml.bind:jaxb-api:2.3.1'
     testCompile group: 'io.rest-assured', name: 'rest-assured'
-    integrationTestCompile group: 'com.github.hmcts', name: 'fortify-client', version: '1.2.2', classifier: 'all', {
+    testCompile group: 'com.github.hmcts', name: 'fortify-client', version: '1.2.2', classifier: 'all', {
         exclude group: 'commons-io', module: 'commons-io'
     }
     compile group: 'commons-io', name: 'commons-io', version: '2.11.0'
