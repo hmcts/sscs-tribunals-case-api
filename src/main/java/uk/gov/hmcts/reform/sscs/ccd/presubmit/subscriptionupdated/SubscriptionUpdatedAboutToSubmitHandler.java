@@ -69,33 +69,31 @@ public class SubscriptionUpdatedAboutToSubmitHandler implements PreSubmitCallbac
 
         clearOtherPartyIfEmpty(response.getData());
 
-        updateChildSupportOtherParties(callback, response);
+        updateOtherParties(callback, response);
         return response;
     }
 
-    private void updateChildSupportOtherParties(Callback<SscsCaseData> callback, PreSubmitCallbackResponse<SscsCaseData> response) {
+    private void updateOtherParties(Callback<SscsCaseData> callback, PreSubmitCallbackResponse<SscsCaseData> response) {
         final SscsCaseData sscsCaseData = response.getData();
-        if (Benefit.CHILD_SUPPORT.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode())) {
-            Optional<CaseDetails<SscsCaseData>> beforeData = callback.getCaseDetailsBefore();
-            if (beforeData.isPresent() && OtherPartyDataUtil.haveOtherPartiesChanged(beforeData.get().getCaseData().getOtherParties(),
-                    sscsCaseData.getOtherParties())) {
-                response.addError("The other parties have changed, they cannot be changed within this event");
-            }
+        Optional<CaseDetails<SscsCaseData>> beforeData = callback.getCaseDetailsBefore();
+        if (beforeData.isPresent() && OtherPartyDataUtil.haveOtherPartiesChanged(beforeData.get().getCaseData().getOtherParties(),
+                sscsCaseData.getOtherParties())) {
+            response.addError("The other parties have changed, they cannot be changed within this event");
+        }
 
-            List<CcdValue<OtherParty>> otherParties = emptyIfNull(sscsCaseData.getOtherParties());
-            for (CcdValue<OtherParty> otherParty : otherParties) {
-                Subscription opAppellantSubscription = otherParty.getValue().getOtherPartySubscription();
-                if (opAppellantSubscription != null && !opAppellantSubscription.isEmpty()) {
-                    opAppellantSubscription.setTya(getTyaNumber(opAppellantSubscription));
-                }
-                Subscription opAppointeeSubscription = otherParty.getValue().getOtherPartyAppointeeSubscription();
-                if (opAppointeeSubscription != null && !opAppointeeSubscription.isEmpty()) {
-                    opAppointeeSubscription.setTya(getTyaNumber(opAppointeeSubscription));
-                }
-                Subscription opRepSubscription = otherParty.getValue().getOtherPartyRepresentativeSubscription();
-                if (opRepSubscription != null && !opRepSubscription.isEmpty()) {
-                    opRepSubscription.setTya(getTyaNumber(opRepSubscription));
-                }
+        List<CcdValue<OtherParty>> otherParties = emptyIfNull(sscsCaseData.getOtherParties());
+        for (CcdValue<OtherParty> otherParty : otherParties) {
+            Subscription opAppellantSubscription = otherParty.getValue().getOtherPartySubscription();
+            if (opAppellantSubscription != null && !opAppellantSubscription.isEmpty()) {
+                opAppellantSubscription.setTya(getTyaNumber(opAppellantSubscription));
+            }
+            Subscription opAppointeeSubscription = otherParty.getValue().getOtherPartyAppointeeSubscription();
+            if (opAppointeeSubscription != null && !opAppointeeSubscription.isEmpty()) {
+                opAppointeeSubscription.setTya(getTyaNumber(opAppointeeSubscription));
+            }
+            Subscription opRepSubscription = otherParty.getValue().getOtherPartyRepresentativeSubscription();
+            if (opRepSubscription != null && !opRepSubscription.isEmpty()) {
+                opRepSubscription.setTya(getTyaNumber(opRepSubscription));
             }
         }
     }

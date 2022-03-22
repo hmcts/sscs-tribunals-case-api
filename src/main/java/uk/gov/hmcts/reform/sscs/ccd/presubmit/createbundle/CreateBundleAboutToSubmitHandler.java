@@ -268,8 +268,8 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     }
 
     private void moveDocsToDwpCollectionIfOldPattern(SscsCaseData sscsCaseData) {
-        //Before we moved to the new DWP document collection, we stored DWP documents within their own fields. This would break bundling with the new config that
-        //looks at the new DWP document collection. Therefore, if the DWP fields are populated, then assume old pattern and move to the DWP document collection.
+        //Before we moved to the new FTA document collection, we stored FTA documents within their own fields. This would break bundling with the new config that
+        //looks at the new FTA document collection. Therefore, if the FTA fields are populated, then assume old pattern and move to the FTA document collection.
         if (sscsCaseData.getDwpResponseDocument() != null) {
             dwpDocumentService.moveDwpResponseDocumentToDwpDocumentCollection(sscsCaseData);
         }

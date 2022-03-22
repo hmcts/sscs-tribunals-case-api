@@ -1,6 +1,6 @@
 {
   "caseCreated" : "${json-unit.ignore}",
-  "caseAccessCategory": "Child Support",
+  "caseAccessCategory": "childSupport",
   "caseManagementCategory": {
     "value": {
       "code": "childSupport",
@@ -13,6 +13,7 @@
       }
     ]
   },
+  "addedDocuments": null,
   "caseNameHmctsInternal": "Joe Bloggs",
   "caseNameHmctsRestricted": "Joe Bloggs",
   "caseNamePublic": "Joe Bloggs",
