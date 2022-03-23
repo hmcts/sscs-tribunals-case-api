@@ -26,13 +26,15 @@ import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonValidator;
 public class ResendToGapsAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-    private static final String CASE_ID = "12345678";
 
-    private ResendToGapsAboutToSubmitHandler handler;
+    @Mock
+    private RoboticsJsonValidator jsonValidator;
 
-    @Mock RoboticsJsonValidator jsonValidator;
+    @Mock
+    private RoboticsJsonMapper jsonMapper;
 
-    @Mock RoboticsJsonMapper jsonMapper;
+    @Mock
+    private ResendToGapsMessageHandler messageHandler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -45,13 +47,13 @@ public class ResendToGapsAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    private JSONObject jsonObj = new JSONObject();
+    private ResendToGapsAboutToSubmitHandler handler;
 
     @Before
     public void setUp() {
         openMocks(this);
 
-        handler = new ResendToGapsAboutToSubmitHandler(jsonMapper, jsonValidator);
+        handler = new ResendToGapsAboutToSubmitHandler(jsonMapper, jsonValidator, messageHandler);
         when(callback.getEvent()).thenReturn(EventType.RESEND_CASE_TO_GAPS2);
 
         sscsCaseData = SscsCaseData.builder()
@@ -64,8 +66,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-
-        when(jsonMapper.map(any())).thenReturn(jsonObj);
+        when(jsonMapper.map(any())).thenReturn(new JSONObject());
 
         when(validationMessage.getMessage()).thenReturn("Invalid field");
     }
@@ -86,12 +87,10 @@ public class ResendToGapsAboutToSubmitHandlerTest {
 
     @Test
     public void givenValidJsonReturnNoErrors() {
-
-        ResendToGapsAboutToSubmitHandler resendHandler = new ResendToGapsAboutToSubmitHandler(jsonMapper, jsonValidator);
-
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = resendHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
         assertEquals(0, response.getErrors().size());
         assertEquals("sentToRobotics", response.getData().getHmctsDwpState());
         verify(jsonValidator, atLeastOnce()).validate(any(), any());
@@ -110,36 +109,32 @@ public class ResendToGapsAboutToSubmitHandlerTest {
         when(validationMessage.getPath()).thenReturn(path);
         when(validationMessage.getArguments()).thenReturn(new String[]{field});
 
-        Set<ValidationMessage> errors = new HashSet<ValidationMessage>();
-        errors.add(validationMessage);
-
         Set<String> errorSet = new HashSet<>();
         errorSet.add(expectedError);
         when(jsonValidator.validate(any(), any())).thenReturn(errorSet);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        ResendToGapsAboutToSubmitHandler resendHandler = new ResendToGapsAboutToSubmitHandler(jsonMapper, jsonValidator);
-        PreSubmitCallbackResponse<SscsCaseData> response = resendHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
         assertEquals(1, response.getErrors().size());
 
         String firstError = response.getErrors().iterator().next();
-
         assertTrue(firstError.contains(expectedError));
+
         assertEquals("failedRobotics", response.getData().getHmctsDwpState());
         verify(jsonValidator, atLeastOnce()).validate(any(), any());
     }
 
     @Test
     public void jsonMapperFailsReturnErrors() {
-
         doThrow(new NullPointerException("Use an option dude")).when(jsonMapper).map(any());
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        ResendToGapsAboutToSubmitHandler resendHandler = new ResendToGapsAboutToSubmitHandler(jsonMapper, jsonValidator);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = resendHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
         assertEquals("failedRobotics", response.getData().getHmctsDwpState());
-        assertTrue(response.getErrors().iterator().next().contains("Json Mapper Unable to build robotics json due to missing fields"));
+        assertTrue(response.getErrors().iterator().next().contains("Json Mapper unable to build robotics json due to missing fields"));
         verify(jsonMapper, atLeastOnce()).map(any());
     }
 }
