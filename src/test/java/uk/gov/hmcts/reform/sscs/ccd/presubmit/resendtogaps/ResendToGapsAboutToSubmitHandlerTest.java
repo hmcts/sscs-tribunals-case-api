@@ -94,6 +94,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
         assertEquals(0, response.getErrors().size());
         assertEquals("sentToRobotics", response.getData().getHmctsDwpState());
         verify(jsonValidator, atLeastOnce()).validate(any(), any());
+        verify(messageHandler, atMostOnce()).sendMessage("1234");
     }
 
     @Test
@@ -123,6 +124,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
 
         assertEquals("failedRobotics", response.getData().getHmctsDwpState());
         verify(jsonValidator, atLeastOnce()).validate(any(), any());
+        verifyNoInteractions(messageHandler);
     }
 
     @Test
@@ -136,5 +138,6 @@ public class ResendToGapsAboutToSubmitHandlerTest {
         assertEquals("failedRobotics", response.getData().getHmctsDwpState());
         assertTrue(response.getErrors().iterator().next().contains("Json Mapper unable to build robotics json due to missing fields"));
         verify(jsonMapper, atLeastOnce()).map(any());
+        verifyNoInteractions(messageHandler);
     }
 }

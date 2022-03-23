@@ -28,11 +28,12 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
 
     private final RoboticsJsonMapper roboticsJsonMapper;
     private final RoboticsJsonValidator roboticsJsonValidator;
+    private final ResendToGapsMessageHandler messageHandler;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
-        requireNonNull(callbackType, "callbacktype must not be null");
+        requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
             && callback.getEvent() == EventType.RESEND_CASE_TO_GAPS2;
@@ -49,7 +50,7 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+        final PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         try {
             Set<String> errorSet = isValid(sscsCaseData, caseDetails.getId(), caseDetails.getState());
@@ -57,6 +58,7 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
                 preSubmitCallbackResponse.addErrors(errorSet);
             } else {
                 sscsCaseData.setHmctsDwpState("sentToRobotics");
+                messageHandler.sendMessage(sscsCaseData.getCcdCaseId());
             }
         } catch (RoboticsValidationException roboticsValidationException) {
             preSubmitCallbackResponse.addError(roboticsValidationException.getMessage());
