@@ -165,6 +165,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         assertEquals("telephone", body.getHearingType());
         assertEquals("A1", body.getPageNumber());
         assertTrue(body.isAttendedHearing());
+        assertNull(body.getOtherPartyNamesAttendedHearing());
         assertFalse(body.isPresentingOfficerAttended());
     }
 
@@ -184,6 +185,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         assertEquals("telephone", body.getHearingType());
         assertEquals("A1", body.getPageNumber());
         assertTrue(body.isAttendedHearing());
+        assertNull(body.getOtherPartyNamesAttendedHearing());
         assertFalse(body.isPresentingOfficerAttended());
     }
 

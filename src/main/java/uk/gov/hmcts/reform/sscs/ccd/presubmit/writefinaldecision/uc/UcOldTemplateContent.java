@@ -72,10 +72,10 @@ public abstract class UcOldTemplateContent extends UcTemplateContent {
         if (appellantAttended) {
             if (StringUtils.equalsIgnoreCase("faceToFace", hearingType)) {
                 return "This has been an oral (face to face) hearing. "
-                    + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage);
+                    + getAppellantAndOtherPartyAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage, null);
             } else {
                 return "This has been a remote hearing in the form of a " + hearingType + " hearing. "
-                    + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage);
+                    + getAppellantAndOtherPartyAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage, null);
             }
         } else {
             return "This has been a remote hearing in the form of a " + hearingType + " hearing. " + appellantName + " did not attend the hearing today. "
