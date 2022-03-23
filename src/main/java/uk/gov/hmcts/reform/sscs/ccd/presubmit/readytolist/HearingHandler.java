@@ -30,6 +30,7 @@ public enum HearingHandler {
     LIST_ASSIST {
         @Override
         public PreSubmitCallbackResponse<SscsCaseData> handle(SscsCaseData sscsCaseData, boolean gapsSwitchOverFeature) {
+            log.info("Case has went down List Assist route.");
             if (gapsSwitchOverFeature) {
                 sscsCaseData.setHearingRoute(HearingRoute.LIST_ASSIST);
                 sscsCaseData.setHearingState(HearingState.CREATE_HEARING);
