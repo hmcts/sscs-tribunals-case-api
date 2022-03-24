@@ -400,6 +400,7 @@ dependencies {
     testCompile group: 'com.github.hmcts', name: 'fortify-client', version: '1.2.2', classifier: 'all', {
         exclude group: 'commons-io', module: 'commons-io'
     }
+
     compile group: 'commons-io', name: 'commons-io', version: versions.commonsIo
 
     integrationTestCompile group: 'commons-io', name: 'commons-io', version: versions.commonsIo
