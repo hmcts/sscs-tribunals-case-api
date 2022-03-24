@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
@@ -35,12 +36,14 @@ public class ResendToGapsMessageHandlerTest {
     @Before
     public void setup() {
         openMocks(this);
-        handler = new ResendToGapsMessageHandler(hearingMessagingServiceFactory);
-        when(hearingMessagingServiceFactory.getMessagingService(LIST_ASSIST)).thenReturn(sessionAwareServiceBusMessagingService);
     }
 
     @Test
-    public void shouldSendExpectedMessage() {
+    public void shouldSendExpectedMessage_givenGapsSwitchoverEnabled() {
+        boolean gapsSwitchoverEnabled = true;
+        handler = new ResendToGapsMessageHandler(gapsSwitchoverEnabled, hearingMessagingServiceFactory);
+        when(hearingMessagingServiceFactory.getMessagingService(LIST_ASSIST)).thenReturn(sessionAwareServiceBusMessagingService);
+
         handler.sendMessage("1234");
 
         verify(sessionAwareServiceBusMessagingService).sendMessage(hearingRequestCaptor.capture());
@@ -49,6 +52,17 @@ public class ResendToGapsMessageHandlerTest {
         assertEquals("1234", actualRequest.getCcdCaseId());
         assertEquals(LIST_ASSIST, actualRequest.getHearingRoute());
         assertEquals(CANCEL_HEARING, actualRequest.getHearingState());
+    }
+
+    @Test
+    public void shouldNotSendMessage_givenGapsSwitchoverNotEnabled() {
+        boolean gapsSwitchoverEnabled = false;
+        handler = new ResendToGapsMessageHandler(gapsSwitchoverEnabled, hearingMessagingServiceFactory);
+
+        handler.sendMessage("1234");
+
+        verifyNoInteractions(hearingMessagingServiceFactory);
+        verifyNoInteractions(sessionAwareServiceBusMessagingService);
     }
 
 }
