@@ -92,4 +92,10 @@
      ]]></notes>
         <vulnerabilityName>CWE-862: Missing Authorization</vulnerabilityName>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jackson-databind-2.11.3.jar
+   ]]></notes>
+        <cve>CVE-2020-36518</cve>
+    </suppress>
 </suppressions>

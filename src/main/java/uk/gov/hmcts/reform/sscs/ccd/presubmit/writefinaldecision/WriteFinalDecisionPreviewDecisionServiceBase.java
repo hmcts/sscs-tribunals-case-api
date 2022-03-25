@@ -1,22 +1,19 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
@@ -131,10 +128,26 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         writeFinalDecisionBuilder.hearingType(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionTypeOfHearing());
         writeFinalDecisionBuilder.attendedHearing("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion()));
         writeFinalDecisionBuilder.presentingOfficerAttended("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPresentingOfficerAttendedQuestion()));
+        if (isOtherPartyPresent(caseData) && CollectionUtils.isNotEmpty(caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions())) {
+            writeFinalDecisionBuilder.otherPartyNamesAttendedHearing(caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions().stream()
+                            .filter(aq -> YesNo.YES.equals(aq.getValue().getAttendedOtherParty()))
+                            .map(aq -> aq.getValue().getOtherPartyName())
+                            .collect(Collectors.joining(", ")));
+        }
+
+        Optional<Benefit> benefit = caseData.getBenefitType();
+        if (benefit.isPresent()) {
+            if (benefit.get().getSscsType().equals(SscsType.SSCS5)) {
+                writeFinalDecisionBuilder.isHmrc(true);
+            } else {
+                writeFinalDecisionBuilder.isHmrc(false);
+            }
+        }
 
         WriteFinalDecisionTemplateBody payload = writeFinalDecisionBuilder.build();
 
         validateRequiredProperties(payload);
+
 
         if (showIssueDate) {
             builder.dateIssued(LocalDate.now());
