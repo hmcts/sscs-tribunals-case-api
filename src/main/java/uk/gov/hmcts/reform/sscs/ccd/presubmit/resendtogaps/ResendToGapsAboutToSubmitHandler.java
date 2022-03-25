@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.CANCEL_HEARING;
 
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -58,7 +62,7 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
                 preSubmitCallbackResponse.addErrors(errorSet);
             } else {
                 sscsCaseData.setHmctsDwpState("sentToRobotics");
-                messageHandler.sendMessage(sscsCaseData.getCcdCaseId());
+                messageHandler.sendMessage(sscsCaseData.getCcdCaseId(), LIST_ASSIST, CANCEL_HEARING);
             }
         } catch (RoboticsValidationException roboticsValidationException) {
             preSubmitCallbackResponse.addError(roboticsValidationException.getMessage());

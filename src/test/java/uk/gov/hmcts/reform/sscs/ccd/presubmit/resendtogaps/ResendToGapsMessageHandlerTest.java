@@ -44,7 +44,7 @@ public class ResendToGapsMessageHandlerTest {
         handler = new ResendToGapsMessageHandler(gapsSwitchoverEnabled, hearingMessagingServiceFactory);
         when(hearingMessagingServiceFactory.getMessagingService(LIST_ASSIST)).thenReturn(sessionAwareServiceBusMessagingService);
 
-        handler.sendMessage("1234");
+        handler.sendMessage("1234", LIST_ASSIST, CANCEL_HEARING);
 
         verify(sessionAwareServiceBusMessagingService).sendMessage(hearingRequestCaptor.capture());
         HearingRequest actualRequest = hearingRequestCaptor.getValue();
@@ -59,7 +59,7 @@ public class ResendToGapsMessageHandlerTest {
         boolean gapsSwitchoverEnabled = false;
         handler = new ResendToGapsMessageHandler(gapsSwitchoverEnabled, hearingMessagingServiceFactory);
 
-        handler.sendMessage("1234");
+        handler.sendMessage("1234", LIST_ASSIST, CANCEL_HEARING);
 
         verifyNoInteractions(hearingMessagingServiceFactory);
         verifyNoInteractions(sessionAwareServiceBusMessagingService);

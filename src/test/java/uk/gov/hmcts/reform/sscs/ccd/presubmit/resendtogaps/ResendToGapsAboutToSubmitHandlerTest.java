@@ -94,7 +94,8 @@ public class ResendToGapsAboutToSubmitHandlerTest {
         assertEquals(0, response.getErrors().size());
         assertEquals("sentToRobotics", response.getData().getHmctsDwpState());
         verify(jsonValidator, atLeastOnce()).validate(any(), any());
-        verify(messageHandler, atMostOnce()).sendMessage("1234");
+        verify(messageHandler, atMostOnce()).sendMessage(
+            "1234", HearingRoute.LIST_ASSIST, HearingState.CANCEL_HEARING);
     }
 
     @Test
