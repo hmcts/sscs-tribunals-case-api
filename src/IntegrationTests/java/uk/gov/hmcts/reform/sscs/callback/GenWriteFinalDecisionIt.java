@@ -339,6 +339,49 @@ public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
+    @Parameters(named = "allowed")
+    public void nonDescriptorFlowHmrc_shouldGeneratePdfWithExpectedText(boolean allowed) throws Exception {
+        setup();
+        String json = getJsonCallbackForTestAndReplace("callback/hmrcScenarioCallbackNonDescriptorFlow.json", Arrays.asList("ALLOWED_OR_REFUSED"),
+                Arrays.asList(allowed ? "allowed" : "refused"));
+
+        String documentUrl = "document.url";
+        when(generateFile.assemble(any())).thenReturn(documentUrl);
+
+        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+
+        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+
+        assertEquals(Collections.EMPTY_SET, result.getErrors());
+
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+
+        ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
+        verify(generateFile).assemble(capture.capture());
+        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
+        final WriteFinalDecisionTemplateContent content = parentPayload.getWriteFinalDecisionTemplateContent();
+        List<TemplateComponent<?>> components = content.getComponents();
+        if (allowed) {
+            assertIsParagraphWithText(components, 1, "The appeal is allowed.");
+            assertIsParagraphWithText(components, 2, "The decision made by the Respondent on 17/11/2020 is set aside.");
+        } else {
+            assertIsParagraphWithText(components, 1, "The appeal is refused.");
+            assertIsParagraphWithText(components, 2, "The decision made by the Respondent on 17/11/2020 is confirmed.");
+        }
+        assertIsParagraphWithText(components, 3, "My summary.");
+        assertIsParagraphWithText(components, 4, "Reasons for decision 1");
+        assertIsParagraphWithText(components, 5, "Reasons for decision 2");
+        assertIsParagraphWithText(components, 6, "Anything else.");
+        assertIsParagraphWithText(components, 7,
+                "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
+        Assert.assertEquals(7, components.size());
+    }
+
+    @Test
     @Parameters(named = "hearingTypeCombinations")
     public void notConsideredNoAward_shouldGeneratePdfWithExpectedTextForHearingType(String hearingType, boolean appellantAttended, boolean presentingOfficerAttended) throws Exception {
         setup();
