@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.sscs.service.MessageAuthenticationService;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_it.properties")
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 public class SubscriptionsControllerIt {
 
     @Autowired

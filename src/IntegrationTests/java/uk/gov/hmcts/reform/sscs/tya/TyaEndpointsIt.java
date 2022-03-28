@@ -36,7 +36,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_it.properties")
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 public class TyaEndpointsIt {
 
     private static final long CASE_ID = 123456789L;
