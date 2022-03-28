@@ -3,7 +3,10 @@ package uk.gov.hmcts.reform.sscs.service;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
@@ -16,9 +19,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Rule;
@@ -32,12 +40,21 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaAppointee;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaContactDetails;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaMrn;
 import uk.gov.hmcts.reform.sscs.exception.ApplicationErrorException;
 import uk.gov.hmcts.reform.sscs.exception.DuplicateCaseException;
@@ -45,6 +62,7 @@ import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
@@ -82,6 +100,9 @@ public class SubmitAppealServiceTest {
 
     @Mock
     private ResourceManager resourceManager;
+
+    @Mock
+    private RefDataService refDataService;
 
     private SubmitAppealService submitAppealService;
 
@@ -155,7 +176,7 @@ public class SubmitAppealServiceTest {
 
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, regionalProcessingCenterService,
-            idamService, convertAIntoBService, airLookupService, secureDocStoreService, false);
+            idamService, convertAIntoBService, airLookupService, secureDocStoreService, refDataService, true);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
@@ -605,6 +626,62 @@ public class SubmitAppealServiceTest {
         assertEquals(expectedRpcObject.getName(), caseData.getRegion());
     }
 
+    @Test
+    public void givenAppointeePostCode_shouldSetRegionAndRpcToAppointee()
+        throws JsonProcessingException {
+        SyaContactDetails appointeeContactDetails = new SyaContactDetails();
+        appointeeContactDetails.setPostCode("B1 1AA");
+
+        SyaCaseWrapper appealData = getSyaWrapperWithAppointee(appointeeContactDetails);
+
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
+
+        assertRpc(caseData, BIRMINGHAM_RPC);
+    }
+
+    @Test
+    @Parameters({"", "null"})
+    public void givenAppointeeWithNoPostCode_shouldSetRegionAndRpcToNull(@Nullable String postCode) {
+        SyaContactDetails appointeeContactDetails = new SyaContactDetails();
+        appointeeContactDetails.setPostCode(postCode);
+
+        SyaCaseWrapper appealData = getSyaWrapperWithAppointee(appointeeContactDetails);
+
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
+
+        assertNull(caseData.getRegionalProcessingCenter());
+    }
+
+    @Test
+    public void givenAppointeeWithNoContactData_shouldSetRegionAndRpcToAppellant()
+        throws JsonProcessingException {
+        SyaCaseWrapper appealData = getSyaWrapperWithAppointee(null);
+        appealData.setIsAppointee(false);
+
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
+
+        assertRpc(caseData, BRADFORD_RPC);
+    }
+
+    private void assertRpc(SscsCaseData caseData, String expectedRpc) throws JsonProcessingException {
+        RegionalProcessingCenter actualRpc = caseData.getRegionalProcessingCenter();
+        RegionalProcessingCenter expectedRpcObject = getRpcObjectForGivenJsonRpc(expectedRpc);
+        assertThat(actualRpc, is(expectedRpcObject));
+        assertEquals(expectedRpcObject.getName(), caseData.getRegion());
+    }
+
+    private SyaCaseWrapper getSyaWrapperWithAppointee(SyaContactDetails appointeeContact) {
+        SyaAppointee appointee = new SyaAppointee();
+        appointee.setContactDetails(appointeeContact);
+
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+        appealData.getAppellant().getContactDetails().setPostCode("TN32 6PL");
+        appealData.setAppointee(appointee);
+        appealData.setIsAppointee(true);
+
+        return appealData;
+    }
+
     private RegionalProcessingCenter getRpcObjectForGivenJsonRpc(String jsonRpc) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(jsonRpc, RegionalProcessingCenter.class);
@@ -793,20 +870,22 @@ public class SubmitAppealServiceTest {
 
     @Test
     @Parameters({
-            "PIP, n1w1 wal, Birmingham, appellant",
-            "ESA, n1w1 wal, Birmingham, appellant",
-            "UC, n1w1 wal, Birmingham, appellant",
-            "PIP, NN85 1ss, Northampton, appellant",
-            "ESA, NN85 1ss, Northampton, appellant",
-            "UC, NN85 1ss, Northampton, appellant",
-            "PIP, n1w1 wal, Birmingham, appointee",
-            "ESA, n1w1 wal, Birmingham, appointee",
-            "UC, n1w1 wal, Birmingham, appointee",
-            "PIP, NN85 1ss, Northampton, appointee",
-            "ESA, NN85 1ss, Northampton, appointee",
-            "UC, NN85 1ss, Northampton, appointee",
+            "PIP, n1w1 wal, Birmingham, appellant, 1, 21",
+            "ESA, n1w1 wal, Birmingham, appellant, 1, 21",
+            "UC, n1w1 wal, Birmingham, appellant, 1, 21",
+            "PIP, NN85 1ss, Northampton, appellant, 2, 30",
+            "ESA, NN85 1ss, Northampton, appellant, 2, 30",
+            "UC, NN85 1ss, Northampton, appellant, 2, 30",
+            "PIP, n1w1 wal, Birmingham, appointee, 1, 21",
+            "ESA, n1w1 wal, Birmingham, appointee, 1, 21",
+            "UC, n1w1 wal, Birmingham, appointee, 1, 21",
+            "PIP, NN85 1ss, Northampton, appointee, 2, 30",
+            "ESA, NN85 1ss, Northampton, appointee, 2, 30",
+            "UC, NN85 1ss, Northampton, appointee, 2, 30",
     })
-    public void shouldSetProcessingVenueBasedOnBenefitTypeAndPostCode(String benefitCode, String postcode, String expectedVenue, String appellantOrAppointee) {
+    public void shouldSetProcessingVenueBasedOnBenefitTypeAndPostCode(String benefitCode, String postcode, String expectedVenue, String appellantOrAppointee, String epimsId, String regionId) {
+        when(refDataService.getVenueRefData(expectedVenue)).thenReturn(CourtVenue.builder().epimsId(epimsId).regionId(regionId).build());
+
         boolean isAppellant = appellantOrAppointee.equals("appellant");
         SyaCaseWrapper appealData = getSyaCaseWrapper(isAppellant ? "json/sya.json" : "sya/allDetailsWithAppointeeWithDifferentAddress.json");
         SyaBenefitType syaBenefitType = new SyaBenefitType(benefitCode, benefitCode);
@@ -819,5 +898,8 @@ public class SubmitAppealServiceTest {
 
         SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
         assertEquals(expectedVenue, caseData.getProcessingVenue());
+        assertNotNull(caseData.getCaseManagementLocation());
+        assertEquals(epimsId, caseData.getCaseManagementLocation().getBaseLocation());
+        assertEquals(regionId, caseData.getCaseManagementLocation().getRegion());
     }
 }
