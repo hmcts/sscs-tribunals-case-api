@@ -35,7 +35,7 @@ import uk.gov.hmcts.reform.sscs.service.OnlineHearingService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 public class CitizenRequestControllerIt {
 
     private static final String CASE_ID = "1625080769409918";
