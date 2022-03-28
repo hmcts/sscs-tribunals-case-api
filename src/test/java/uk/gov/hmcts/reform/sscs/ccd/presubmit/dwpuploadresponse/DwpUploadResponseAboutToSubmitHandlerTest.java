@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -255,35 +255,61 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
+        assertNull(response.getData().getDwpEvidenceBundleDocument());
+        assertNull(response.getData().getDwpEditedEvidenceBundleDocument());
+        assertNull(response.getData().getDwpResponseDocument());
+        assertNull(response.getData().getDwpEditedResponseDocument());
+
+        assertEquals(3, response.getData().getDwpDocuments().size());
+
         String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        assertAll("DwpUploadResponseDocument fileName modified but URL remains same",
-                () -> assertNull(response.getData().getDwpAT38Document()),
-                () -> assertNull(response.getData().getDwpEvidenceBundleDocument()),
-                () -> assertNull(response.getData().getDwpEditedEvidenceBundleDocument()),
-                () -> assertNull(response.getData().getDwpResponseDocument()),
-                () -> assertNull(response.getData().getDwpEditedResponseDocument()),
-                () -> assertEquals(3, response.getData().getDwpDocuments().size()),
-                () -> assertEquals(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue(), response.getData().getDwpDocuments().get(0).getValue().getDocumentType()),
-                () -> assertEquals("http://dm-store:5005/documents/defg-5678-xyzabcmnop", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl()),
-                () -> assertEquals("http://dm-store:5005/documents/defg-5678-xyzabcmnop/binary", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentBinaryUrl()),
-                () -> assertEquals("http://dm-store:5005/documents/defg-6545-xyzabcmnop", response.getData().getDwpDocuments().get(0).getValue().getEditedDocumentLink().getDocumentUrl()),
-                () -> assertEquals("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary", response.getData().getDwpDocuments().get(0).getValue().getEditedDocumentLink().getDocumentBinaryUrl()),
-                () -> assertEquals(AppConstants.DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(0).getValue().getEditedDocumentLink().getDocumentFilename()),
-                () -> assertEquals(AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentFilename()),
-                () -> assertEquals("Edited reason", response.getData().getDwpDocuments().get(0).getValue().getDwpEditedEvidenceReason()),
-                () -> assertEquals(DwpDocumentType.DWP_RESPONSE.getValue(), response.getData().getDwpDocuments().get(1).getValue().getDocumentType()),
-                () -> assertEquals("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl()),
-                () -> assertEquals("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw/binary", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentBinaryUrl()),
-                () -> assertEquals("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw", response.getData().getDwpDocuments().get(1).getValue().getEditedDocumentLink().getDocumentUrl()),
-                () -> assertEquals("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw/binary", response.getData().getDwpDocuments().get(1).getValue().getEditedDocumentLink().getDocumentBinaryUrl()),
-                () -> assertEquals(AppConstants.DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(1).getValue().getEditedDocumentLink().getDocumentFilename()),
-                () -> assertEquals(AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentFilename()),
-                () -> assertEquals("Edited reason", response.getData().getDwpDocuments().get(1).getValue().getDwpEditedEvidenceReason()),
-                () -> assertEquals(DwpDocumentType.AT_38.getValue(), response.getData().getDwpDocuments().get(2).getValue().getDocumentType()),
-                () -> assertEquals("http://dm-store:5005/documents/abcd-0123-xyzabcdefgh", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentUrl()),
-                () -> assertEquals("http://dm-store:5005/documents/abcd-0123-xyzabcdefgh/binary", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentBinaryUrl()),
-                () -> assertEquals(AppConstants.DWP_DOCUMENT_AT38_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentFilename()),
-                () -> assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState()));
+
+        assertThat(response.getData().getDwpDocuments(), hasItem(
+                hasProperty("value", allOf(
+                        hasProperty("documentLink", allOf(
+                                hasProperty("documentUrl", is("http://dm-store:5005/documents/defg-5678-xyzabcmnop")),
+                                hasProperty("documentBinaryUrl", is("http://dm-store:5005/documents/defg-5678-xyzabcmnop/binary")),
+                                hasProperty("documentFilename", is(AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX + " on " + todayDate + ".pdf"))
+                        )),
+                        hasProperty("editedDocumentLink", allOf(
+                                hasProperty("documentUrl", is("http://dm-store:5005/documents/defg-6545-xyzabcmnop")),
+                                hasProperty("documentBinaryUrl", is("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary")),
+                                hasProperty("documentFilename", is(AppConstants.DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX + " on " + todayDate + ".pdf"))
+                        )),
+                        hasProperty("documentType", is(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue())),
+                        hasProperty("dwpEditedEvidenceReason", is("Edited reason"))
+                ))
+        ));
+
+        assertThat(response.getData().getDwpDocuments(), hasItem(
+                hasProperty("value", allOf(
+                        hasProperty("documentLink", allOf(
+                                hasProperty("documentUrl", is("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw")),
+                                hasProperty("documentBinaryUrl", is("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw/binary")),
+                                hasProperty("documentFilename", is(AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf"))
+                        )),
+                        hasProperty("editedDocumentLink", allOf(
+                                hasProperty("documentUrl", is("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw")),
+                                hasProperty("documentBinaryUrl", is("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw/binary")),
+                                hasProperty("documentFilename", is(AppConstants.DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf"))
+                        )),
+                        hasProperty("documentType", is(DwpDocumentType.DWP_RESPONSE.getValue())),
+                        hasProperty("dwpEditedEvidenceReason", is("Edited reason"))
+                ))
+        ));
+
+        assertThat(response.getData().getDwpDocuments(), hasItem(
+                hasProperty("value", allOf(
+                        hasProperty("documentLink", allOf(
+                                hasProperty("documentUrl", is("http://dm-store:5005/documents/abcd-0123-xyzabcdefgh")),
+                                hasProperty("documentBinaryUrl", is("http://dm-store:5005/documents/abcd-0123-xyzabcdefgh/binary")),
+                                hasProperty("documentFilename", is(AppConstants.DWP_DOCUMENT_AT38_FILENAME_PREFIX + " on " + todayDate + ".pdf"))
+                        )),
+                        hasProperty("documentType", is(DwpDocumentType.AT_38.getValue()))
+                ))
+        ));
+
+        assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
     }
 
     @Test
@@ -475,10 +501,21 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
 
-        assertEquals("Appendix 12 received on " + todayDate, response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
-        assertEquals("Appendix 12 received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentFilename());
-        assertEquals(DwpDocumentType.APPENDIX_12.getValue(), response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
-        assertEquals("existingDoc", response.getData().getDwpDocuments().get(3).getValue().getDocumentFileName());
+        assertThat(response.getData().getDwpDocuments(), hasItem(
+                hasProperty("value", allOf(
+                        hasProperty("documentLink", allOf(
+                                hasProperty("documentFilename", is("Appendix 12 received on " + todayDate + ".pdf"))
+                        )),
+                        hasProperty("documentFileName", is("Appendix 12 received on " + todayDate)),
+                        hasProperty("documentType", is(DwpDocumentType.APPENDIX_12.getValue()))
+                ))
+        ));
+
+        assertThat(response.getData().getDwpDocuments(), hasItem(
+                hasProperty("value", allOf(
+                        hasProperty("documentFileName", is("existingDoc"))
+                ))
+        ));
     }
 
     @Test
