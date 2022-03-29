@@ -11,7 +11,7 @@ public class CftlibConfig implements CFTLibConfigurer {
 
     @Override
     public void configure(CFTLib lib) throws Exception {
-        lib.createIdamUser("a@b.com",
+        lib.createIdamUser("system.update@hmcts.net",
                 "caseworker",
                 "caseworker-sscs",
                 "caseworker-sscs-superuser",

@@ -1,3 +1,0 @@
-[submodule "sscs-ccd-e2e-tests"]
-	path = sscs-ccd-e2e-tests
-	url = https://github.com/hmcts/sscs-ccd-e2e-tests.git
