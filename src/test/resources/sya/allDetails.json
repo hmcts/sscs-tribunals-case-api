@@ -22,7 +22,8 @@
       "county": "Kent",
       "postCode": "TN32 6PL",
       "phoneNumber": "07411222222",
-      "emailAddress": "sscstest+notify@greencroftconsulting.com"
+      "emailAddress": "sscstest+notify@greencroftconsulting.com",
+      "hearingRoute": null
     },
     "isAddressSameAsAppointee": false
   },
