@@ -102,7 +102,6 @@ public class RestoreCasesService2 {
         try {
             reader.readNext();
 
-            List<String[]> linesList = reader.readAll();
             linesList.forEach(line ->
                 allCasesToRestore.add(line[0])
             );
