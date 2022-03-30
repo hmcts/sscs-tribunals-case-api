@@ -183,7 +183,8 @@
     "address3": "Administrative Support Centre",
     "postcode": "B16 6FR",
     "city": "BIRMINGHAM",
-    "email": "Birmingham-SYA-Receipts@justice.gov.uk"
+    "email": "Birmingham-SYA-Receipts@justice.gov.uk",
+    "hearingRoute": null
   },
   "sscsDocument": [{
     "value": {
