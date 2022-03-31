@@ -51,7 +51,3 @@ dependencies:
     version: 1.0.9
     repository: '@hmctspublic'
     condition: em-ccdorc.enabled
-  - name: servicebus
-    version: 0.3.2
-    repository: '@hmctspublic'
-    condition: servicebus.enabled

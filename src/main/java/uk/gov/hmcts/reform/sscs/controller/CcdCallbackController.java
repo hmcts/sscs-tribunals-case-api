@@ -8,7 +8,6 @@ import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTH
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,7 +38,7 @@ public class CcdCallbackController {
         this.dispatcher = dispatcher;
     }
 
-    @PostMapping(path = "/ccdAboutToStart", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/ccdAboutToStart")
     public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdAboutToStart(
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestHeader(AUTHORIZATION) String userAuthorisation,
@@ -54,7 +53,7 @@ public class CcdCallbackController {
         return performRequest(ABOUT_TO_START, callback, userAuthorisation);
     }
 
-    @PostMapping(path = "/ccdAboutToSubmit", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/ccdAboutToSubmit")
     public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdAboutToSubmit(
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestHeader(AUTHORIZATION) String userAuthorisation,
@@ -67,7 +66,7 @@ public class CcdCallbackController {
         return performRequest(ABOUT_TO_SUBMIT, callback, userAuthorisation);
     }
 
-    @PostMapping(path = "/ccdMidEvent", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/ccdMidEvent")
     public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdMidEvent(
             @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
             @RequestHeader(AUTHORIZATION) String userAuthorisation,
@@ -83,7 +82,7 @@ public class CcdCallbackController {
         return performRequest(MID_EVENT, callback, userAuthorisation);
     }
 
-    @PostMapping(path = "/ccdSubmittedEvent", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/ccdSubmittedEvent")
     public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdSubmittedEvent(
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestHeader(AUTHORIZATION) String userAuthorisation,

@@ -22,7 +22,6 @@ public class HearingMessagingServiceFactoryTest {
         SessionAwareMessagingService messagingService = hearingMessagingServiceFactory
             .getMessagingService(HearingRoute.LIST_ASSIST);
 
-
         assertThat(messagingService.getClass()).isEqualTo(SessionAwareServiceBusMessagingService.class);
     }
 

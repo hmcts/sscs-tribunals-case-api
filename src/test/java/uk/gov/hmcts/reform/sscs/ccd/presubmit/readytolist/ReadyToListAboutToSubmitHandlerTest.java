@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -157,6 +158,26 @@ public class ReadyToListAboutToSubmitHandlerTest {
             .as("An unsuccessfully sent message should result in an errors.").hasSize(1);
         assertThat(response.getErrors())
             .contains("An error occurred during message publish. Please try again.");
+    }
+
+    @Test
+    public void givenAnRpcUsingListAssistButFeatureDisabled_shouldDoNothing() {
+        buildRegionalProcessingCentreMap(HearingRoute.LIST_ASSIST);
+        when(sessionAwareServiceBusMessagingService.sendMessage(any())).thenReturn(true);
+
+        handler = new ReadyToListAboutToSubmitHandler(false, regionalProcessingCenterService,
+            hearingMessagingServiceFactory);
+
+        sscsCaseData = sscsCaseData.toBuilder().region("TEST").build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT,
+            callback, USER_AUTHORISATION);
+
+        verifyNoInteractions(sessionAwareServiceBusMessagingService);
+
+        assertThat(response.getData().getHearingRoute()).isNull();
+        assertThat(response.getData().getHearingState()).isNull();
     }
 
     private void verifyMessagingServiceCalled() {
