@@ -43,6 +43,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.core.io.ByteArrayResource;
@@ -131,7 +132,7 @@ public class EvidenceUploadServiceTest {
         file = mock(MultipartFile.class);
 
         UploadResponse uploadResponse = createUploadResponse(fileName);
-        when(evidenceManagementService.upload(singletonList(file), "sscs")).thenReturn(uploadResponse);
+        when(evidenceManagementService.upload(singletonList(file),idamTokens)).thenReturn(uploadResponse);
         when(fileToPdfConversionService.convert(singletonList(file))).thenReturn(singletonList(file));
     }
 
@@ -339,7 +340,7 @@ public class EvidenceUploadServiceTest {
         when(evidenceDescriptionPdf.getContent()).thenReturn(new ByteArrayResource(dummyFileContentInBytes));
 
         UploadResponse uploadResponse = createUploadResponse(avFileName);
-        when(evidenceManagementService.upload(singletonList(file), "sscs")).thenReturn(uploadResponse);
+        when(evidenceManagementService.upload(singletonList(file),idamTokens)).thenReturn(uploadResponse);
 
         String otherEvidenceDocType = "Other evidence";
         String expectedEvidenceUploadFilename =  "Appellant upload 1 - 123.pdf";
@@ -529,11 +530,11 @@ public class EvidenceUploadServiceTest {
         when(file.getOriginalFilename()).thenReturn(avFileName);
         when(file.getBytes()).thenReturn(fileName.getBytes());
         byte[] dummyFileContentInBytes = getDummyFileContentInBytes();
-        when(evidenceManagementService.download(any(), eq("sscs"))).thenReturn(dummyFileContentInBytes);
+        when(evidenceManagementService.download(any(),eq(idamTokens))).thenReturn(dummyFileContentInBytes);
         when(evidenceDescriptionPdf.getContent()).thenReturn(new ByteArrayResource(dummyFileContentInBytes));
 
         UploadResponse uploadResponse = createUploadResponse(avFileName);
-        when(evidenceManagementService.upload(singletonList(file), "sscs")).thenReturn(uploadResponse);
+        when(evidenceManagementService.upload(singletonList(file),idamTokens)).thenReturn(uploadResponse);
 
         String otherEvidenceDocType = "Other evidence";
         String expectedEvidenceUploadFilename = "Appellant upload 1 - 123.pdf";
@@ -579,11 +580,11 @@ public class EvidenceUploadServiceTest {
         when(file.getOriginalFilename()).thenReturn(pdfFile);
         when(file.getBytes()).thenReturn(fileName.getBytes());
         byte[] dummyFileContentInBytes = getDummyFileContentInBytes();
-        when(evidenceManagementService.download(any(), eq("sscs"))).thenReturn(dummyFileContentInBytes);
+        when(evidenceManagementService.download(any(), eq(idamTokens))).thenReturn(dummyFileContentInBytes);
         when(evidenceDescriptionPdf.getContent()).thenReturn(new ByteArrayResource(dummyFileContentInBytes));
 
         UploadResponse uploadResponse = createUploadResponse(pdfFile);
-        when(evidenceManagementService.upload(singletonList(file), "sscs")).thenReturn(uploadResponse);
+        when(evidenceManagementService.upload(singletonList(file),idamTokens)).thenReturn(uploadResponse);
 
         String otherEvidenceDocType = "Other evidence";
         String expectedEvidenceUploadFilename = "Appellant upload 1 - 123.pdf";
