@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -34,7 +35,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
     private RoboticsJsonMapper jsonMapper;
 
     @Mock
-    private ResendToGapsMessageHandler messageHandler;
+    private ResendToGapsHearingMessageHandler hearingMessageHandler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -53,7 +54,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
     public void setUp() {
         openMocks(this);
 
-        handler = new ResendToGapsAboutToSubmitHandler(jsonMapper, jsonValidator, messageHandler);
+        handler = new ResendToGapsAboutToSubmitHandler(jsonMapper, jsonValidator, hearingMessageHandler);
         when(callback.getEvent()).thenReturn(EventType.RESEND_CASE_TO_GAPS2);
 
         sscsCaseData = SscsCaseData.builder()
@@ -94,8 +95,17 @@ public class ResendToGapsAboutToSubmitHandlerTest {
         assertEquals(0, response.getErrors().size());
         assertEquals("sentToRobotics", response.getData().getHmctsDwpState());
         verify(jsonValidator, atLeastOnce()).validate(any(), any());
-        verify(messageHandler, atMostOnce()).sendMessage(
-            "1234", HearingRoute.LIST_ASSIST, HearingState.CANCEL_HEARING);
+        verifyNoInteractions(hearingMessageHandler);
+    }
+
+    @Test
+    public void givenGapsSwitchover_andListAssistCase_shouldSendCancelHearingMessage() {
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        ReflectionTestUtils.setField(handler, "gapsSwitchOverFeatureEnabled", true);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(hearingMessageHandler, atMostOnce()).sendListAssistCancelHearingMessage("1234");
     }
 
     @Test
@@ -125,7 +135,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
 
         assertEquals("failedRobotics", response.getData().getHmctsDwpState());
         verify(jsonValidator, atLeastOnce()).validate(any(), any());
-        verifyNoInteractions(messageHandler);
+        verifyNoInteractions(hearingMessageHandler);
     }
 
     @Test
@@ -139,6 +149,6 @@ public class ResendToGapsAboutToSubmitHandlerTest {
         assertEquals("failedRobotics", response.getData().getHmctsDwpState());
         assertTrue(response.getErrors().iterator().next().contains("Json Mapper unable to build robotics json due to missing fields"));
         verify(jsonMapper, atLeastOnce()).map(any());
-        verifyNoInteractions(messageHandler);
+        verifyNoInteractions(hearingMessageHandler);
     }
 }

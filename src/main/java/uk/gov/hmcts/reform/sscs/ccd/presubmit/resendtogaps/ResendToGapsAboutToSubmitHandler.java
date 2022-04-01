@@ -2,12 +2,12 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.CANCEL_HEARING;
 
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -15,8 +15,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -30,9 +28,12 @@ import uk.gov.hmcts.reform.sscs.robotics.RoboticsWrapper;
 @RequiredArgsConstructor
 public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    @Value("${feature.gaps-switchover.enabled:false}")
+    private boolean gapsSwitchOverFeatureEnabled;
+
     private final RoboticsJsonMapper roboticsJsonMapper;
     private final RoboticsJsonValidator roboticsJsonValidator;
-    private final ResendToGapsMessageHandler messageHandler;
+    private final ResendToGapsHearingMessageHandler messageHandler;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -62,7 +63,10 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
                 preSubmitCallbackResponse.addErrors(errorSet);
             } else {
                 sscsCaseData.setHmctsDwpState("sentToRobotics");
-                messageHandler.sendMessage(sscsCaseData.getCcdCaseId(), LIST_ASSIST, CANCEL_HEARING);
+                if (gapsSwitchOverFeatureEnabled && sscsCaseData.getHearingRoute() == LIST_ASSIST) {
+                    messageHandler.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId());
+                }
+
             }
         } catch (RoboticsValidationException roboticsValidationException) {
             preSubmitCallbackResponse.addError(roboticsValidationException.getMessage());
