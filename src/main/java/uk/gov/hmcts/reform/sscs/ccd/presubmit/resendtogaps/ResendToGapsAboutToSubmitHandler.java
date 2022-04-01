@@ -66,7 +66,6 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
                 if (gapsSwitchOverFeatureEnabled && sscsCaseData.getHearingRoute() == LIST_ASSIST) {
                     messageHandler.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId());
                 }
-
             }
         } catch (RoboticsValidationException roboticsValidationException) {
             preSubmitCallbackResponse.addError(roboticsValidationException.getMessage());
