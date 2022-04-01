@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 
 import com.networknt.schema.ValidationMessage;
@@ -113,6 +114,16 @@ public class ResendToGapsAboutToSubmitHandlerTest {
     @Test
     public void givenGapsSwitchoverNotEnabled_andListAssistCase_shouldNotSendCancelHearingMessage() {
         sscsCaseData.setHearingRoute(LIST_ASSIST);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(messageHandler, never()).sendListAssistCancelHearingMessage("1234");
+    }
+
+    @Test
+    public void givenGapsSwitchoverEnabled_andGapsCase_shouldNotSendCancelHearingMessage() {
+        sscsCaseData.setHearingRoute(GAPS);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
