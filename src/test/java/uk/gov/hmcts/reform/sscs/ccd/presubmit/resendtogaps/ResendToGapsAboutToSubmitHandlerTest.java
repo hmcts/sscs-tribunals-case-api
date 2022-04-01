@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 
 import com.networknt.schema.ValidationMessage;
 import java.util.HashSet;
@@ -35,7 +36,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
     private RoboticsJsonMapper jsonMapper;
 
     @Mock
-    private ResendToGapsHearingMessageHandler hearingMessageHandler;
+    private ResendToGapsHearingMessageHandler messageHandler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -54,7 +55,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
     public void setUp() {
         openMocks(this);
 
-        handler = new ResendToGapsAboutToSubmitHandler(jsonMapper, jsonValidator, hearingMessageHandler);
+        handler = new ResendToGapsAboutToSubmitHandler(jsonMapper, jsonValidator, messageHandler);
         when(callback.getEvent()).thenReturn(EventType.RESEND_CASE_TO_GAPS2);
 
         sscsCaseData = SscsCaseData.builder()
@@ -95,17 +96,18 @@ public class ResendToGapsAboutToSubmitHandlerTest {
         assertEquals(0, response.getErrors().size());
         assertEquals("sentToRobotics", response.getData().getHmctsDwpState());
         verify(jsonValidator, atLeastOnce()).validate(any(), any());
-        verifyNoInteractions(hearingMessageHandler);
+        verifyNoInteractions(messageHandler);
     }
 
     @Test
     public void givenGapsSwitchover_andListAssistCase_shouldSendCancelHearingMessage() {
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeatureEnabled", true);
+        sscsCaseData.setHearingRoute(LIST_ASSIST);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(hearingMessageHandler, atMostOnce()).sendListAssistCancelHearingMessage("1234");
+        verify(messageHandler, atLeastOnce()).sendListAssistCancelHearingMessage("1234");
     }
 
     @Test
@@ -135,7 +137,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
 
         assertEquals("failedRobotics", response.getData().getHmctsDwpState());
         verify(jsonValidator, atLeastOnce()).validate(any(), any());
-        verifyNoInteractions(hearingMessageHandler);
+        verifyNoInteractions(messageHandler);
     }
 
     @Test
@@ -149,6 +151,6 @@ public class ResendToGapsAboutToSubmitHandlerTest {
         assertEquals("failedRobotics", response.getData().getHmctsDwpState());
         assertTrue(response.getErrors().iterator().next().contains("Json Mapper unable to build robotics json due to missing fields"));
         verify(jsonMapper, atLeastOnce()).map(any());
-        verifyNoInteractions(hearingMessageHandler);
+        verifyNoInteractions(messageHandler);
     }
 }
