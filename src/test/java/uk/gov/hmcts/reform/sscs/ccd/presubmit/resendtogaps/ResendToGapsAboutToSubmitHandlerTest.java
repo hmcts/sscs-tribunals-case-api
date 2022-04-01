@@ -100,7 +100,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenGapsSwitchover_andListAssistCase_shouldSendCancelHearingMessage() {
+    public void givenGapsSwitchoverEnabled_andListAssistCase_shouldSendCancelHearingMessage() {
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeatureEnabled", true);
         sscsCaseData.setHearingRoute(LIST_ASSIST);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -108,6 +108,16 @@ public class ResendToGapsAboutToSubmitHandlerTest {
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(messageHandler, atLeastOnce()).sendListAssistCancelHearingMessage("1234");
+    }
+
+    @Test
+    public void givenGapsSwitchoverNotEnabled_andListAssistCase_shouldNotSendCancelHearingMessage() {
+        sscsCaseData.setHearingRoute(LIST_ASSIST);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(messageHandler, never()).sendListAssistCancelHearingMessage("1234");
     }
 
     @Test
