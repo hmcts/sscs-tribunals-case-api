@@ -1,6 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwplapse;
 
 import static junit.framework.TestCase.assertTrue;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -80,10 +84,27 @@ public class DwpLapseCaseHandlerTest {
 
         assertNull(response.getData().getDwpLT203());
         assertNull(response.getData().getDwpLapseLetter());
-        assertEquals("lt203Link", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals(DwpDocumentType.DWP_LT_203.getValue(), response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
-        assertEquals("lapseLink", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals(DwpDocumentType.DWP_LAPSE_LETTER.getValue(), response.getData().getDwpDocuments().get(1).getValue().getDocumentType());
+
+        assertEquals(2, response.getData().getDwpDocuments().size());
+
+        assertThat(response.getData().getDwpDocuments(), hasItem(
+                hasProperty("value", allOf(
+                        hasProperty("documentLink", allOf(
+                                hasProperty("documentUrl", is("lt203Link"))
+                        )),
+                        hasProperty("documentType", is(DwpDocumentType.DWP_LT_203.getValue()))
+                ))
+        ));
+
+        assertThat(response.getData().getDwpDocuments(), hasItem(
+                hasProperty("value", allOf(
+                        hasProperty("documentLink", allOf(
+                                hasProperty("documentUrl", is("lapseLink"))
+                        )),
+                        hasProperty("documentType", is(DwpDocumentType.DWP_LAPSE_LETTER.getValue()))
+                ))
+        ));
+
         assertEquals("awaitingAdminAction", response.getData().getInterlocReviewState());
         assertEquals("lapsed", response.getData().getDwpState());
     }
@@ -103,12 +124,35 @@ public class DwpLapseCaseHandlerTest {
 
         assertNull(response.getData().getDwpLT203());
         assertNull(response.getData().getDwpLapseLetter());
+
         assertEquals(3, response.getData().getDwpDocuments().size());
-        assertEquals("lt203Link", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals(DwpDocumentType.DWP_LT_203.getValue(), response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
-        assertEquals("lapseLink", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals(DwpDocumentType.DWP_LAPSE_LETTER.getValue(), response.getData().getDwpDocuments().get(1).getValue().getDocumentType());
-        assertEquals("existing.com", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentUrl());
+
+        assertThat(response.getData().getDwpDocuments(), hasItem(
+                hasProperty("value", allOf(
+                        hasProperty("documentLink", allOf(
+                                hasProperty("documentUrl", is("lt203Link"))
+                        )),
+                        hasProperty("documentType", is(DwpDocumentType.DWP_LT_203.getValue()))
+                ))
+        ));
+
+        assertThat(response.getData().getDwpDocuments(), hasItem(
+                hasProperty("value", allOf(
+                        hasProperty("documentLink", allOf(
+                                hasProperty("documentUrl", is("lapseLink"))
+                        )),
+                        hasProperty("documentType", is(DwpDocumentType.DWP_LAPSE_LETTER.getValue()))
+                ))
+        ));
+
+        assertThat(response.getData().getDwpDocuments(), hasItem(
+                hasProperty("value", allOf(
+                        hasProperty("documentLink", allOf(
+                                hasProperty("documentUrl", is("existing.com"))
+                        ))
+                ))
+        ));
+
         assertEquals("awaitingAdminAction", response.getData().getInterlocReviewState());
         assertEquals("lapsed", response.getData().getDwpState());
     }

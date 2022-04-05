@@ -52,12 +52,14 @@ import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.callback.AbstractEventIt;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.client.RefDataApi;
 import uk.gov.hmcts.reform.sscs.idam.Authorize;
+import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_it.properties")
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @RunWith(JUnitParamsRunner.class)
 public class SyaEndpointsIt extends AbstractEventIt {
 
@@ -88,6 +90,9 @@ public class SyaEndpointsIt extends AbstractEventIt {
 
     @MockBean
     private DocumentUploadClientApi documentUploadClientApi;
+
+    @MockBean
+    private RefDataApi refDataApi;
 
     @Captor
     private ArgumentCaptor<Map<String, Object>> captor;
@@ -149,13 +154,19 @@ public class SyaEndpointsIt extends AbstractEventIt {
 
         given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
 
+        given(refDataApi.courtVenueByName("token", "authToken", "31")).willReturn(List.of(CourtVenue.builder().epimsId("1").regionId("2").venueName("Ashford").build()));
+
         mockMvc.perform(post("/appeals")
             .contentType(MediaType.APPLICATION_JSON)
             .content(getCase("json/sya.json")))
             .andExpect(status().isCreated());
 
         verify(ccdClient).startCaseForCaseworker(any(), eq(VALID_APPEAL_CREATED.getCcdType()));
-        verify(ccdClient).submitForCaseworker(any(), any());
+        verify(ccdClient).submitForCaseworker(any(), caseDataCaptor.capture());
+
+        assertEquals("Ashford", ((SscsCaseData) caseDataCaptor.getValue().getData()).getProcessingVenue());
+        assertEquals("1", ((SscsCaseData) caseDataCaptor.getValue().getData()).getCaseManagementLocation().getBaseLocation());
+        assertEquals("2", ((SscsCaseData) caseDataCaptor.getValue().getData()).getCaseManagementLocation().getRegion());
     }
 
     @Test

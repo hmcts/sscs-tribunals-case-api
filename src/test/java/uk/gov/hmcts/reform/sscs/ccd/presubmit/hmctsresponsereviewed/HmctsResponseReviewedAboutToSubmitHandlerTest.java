@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -259,18 +260,36 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         String todayDate = java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
 
-        assertEquals("/evidenceurl", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals("/evidencebinaryurl", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentBinaryUrl());
-        assertEquals("FTA evidence received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentFilename());
+        assertThat(response.getData().getDwpDocuments(), hasItem(
+                hasProperty("value", allOf(
+                    hasProperty("documentLink", allOf(
+                            hasProperty("documentUrl", is("/evidenceurl")),
+                            hasProperty("documentBinaryUrl", is("/evidencebinaryurl")),
+                            hasProperty("documentFilename", is("FTA evidence received on " + todayDate + ".pdf"))
+                    ))
+                ))
+        ));
 
-        assertEquals("/responseurl", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals("/responsebinaryurl", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentBinaryUrl());
-        assertEquals("FTA response received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentFilename());
+        assertThat(response.getData().getDwpDocuments(), hasItem(
+                hasProperty("value", allOf(
+                    hasProperty("documentLink", allOf(
+                        hasProperty("documentUrl", is("/responseurl")),
+                        hasProperty("documentBinaryUrl", is("/responsebinaryurl")),
+                        hasProperty("documentFilename", is("FTA response received on " + todayDate + ".pdf"))
+                    ))
+                ))
+        ));
 
-        assertEquals("/url", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals("/binaryurl", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentBinaryUrl());
-        assertEquals("AT38 received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentFilename());
-        assertEquals("AT38 received on " + todayDate, response.getData().getDwpDocuments().get(2).getValue().getDocumentFileName());
+        assertThat(response.getData().getDwpDocuments(), hasItem(
+                hasProperty("value", allOf(
+                    hasProperty("documentLink", allOf(
+                        hasProperty("documentUrl", is("/url")),
+                        hasProperty("documentBinaryUrl", is("/binaryurl")),
+                        hasProperty("documentFilename", is("AT38 received on " + todayDate + ".pdf"))
+                    )),
+                    hasProperty("documentFileName", is("AT38 received on " + todayDate))
+                ))
+        ));
 
         assertNull(response.getData().getDwpResponseDocument());
         assertNull(response.getData().getDwpAT38Document());

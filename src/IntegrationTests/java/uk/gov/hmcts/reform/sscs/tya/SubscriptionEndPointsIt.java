@@ -29,7 +29,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_it.properties")
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 public class SubscriptionEndPointsIt {
 
     public static final String BENEFIT_TYPE_RESPONSE = "{\"benefitType\":\"pip\"}";

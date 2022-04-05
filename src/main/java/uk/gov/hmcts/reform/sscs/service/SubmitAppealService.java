@@ -22,12 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLinkDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
@@ -39,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.exception.DuplicateCaseException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
@@ -56,6 +52,7 @@ public class SubmitAppealService {
     private final IdamService idamService;
     private final ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
     private final AirLookupService airLookupService;
+    private final RefDataService refDataService;
     private final EvidenceManagementSecureDocStoreService secureDocStoreService;
     private final boolean workAllocationFeature;
 
@@ -68,6 +65,7 @@ public class SubmitAppealService {
                         ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
                         AirLookupService airLookupService,
                         EvidenceManagementSecureDocStoreService secureDocStoreService,
+                        RefDataService refDataService,
                         @Value("${feature.work-allocation.enabled}")  boolean workAllocationFeature) {
 
         this.ccdService = ccdService;
@@ -77,6 +75,7 @@ public class SubmitAppealService {
         this.convertAIntoBService = convertAIntoBService;
         this.airLookupService = airLookupService;
         this.secureDocStoreService = secureDocStoreService;
+        this.refDataService = refDataService;
         this.workAllocationFeature = workAllocationFeature;
     }
 
@@ -262,7 +261,18 @@ public class SubmitAppealService {
         }
 
         sscsCaseData.setCreatedInGapsFrom(READY_TO_LIST.getId());
-        sscsCaseData.setProcessingVenue(airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType()));
+        String processingVenue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
+        sscsCaseData.setProcessingVenue(processingVenue);
+
+        if (workAllocationFeature && !StringUtils.isEmpty(processingVenue)) {
+            log.info("Getting venue details for " + processingVenue);
+            CourtVenue courtVenue = refDataService.getVenueRefData(processingVenue);
+            if (courtVenue != null) {
+                sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
+                        .baseLocation(courtVenue.getEpimsId())
+                        .region(courtVenue.getRegionId()).build());
+            }
+        }
 
         log.info("{} - setting venue name to {}", sscsCaseData.getAppeal().getAppellant().getIdentity().getNino(), sscsCaseData.getProcessingVenue());
 
