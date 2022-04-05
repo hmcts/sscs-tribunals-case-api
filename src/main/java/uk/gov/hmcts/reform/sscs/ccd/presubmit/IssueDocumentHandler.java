@@ -5,6 +5,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.WordUtils;
@@ -16,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
+import uk.gov.hmcts.reform.sscs.model.docassembly.Respondent;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
 
 @Slf4j
@@ -53,6 +56,7 @@ public class IssueDocumentHandler {
                 .caseId(caseData.getCcdCaseId())
                 .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
                 .shouldHideNino(isBenefitTypeValidToHideNino(caseData.getBenefitType()))
+                .respondents(getRespondents(caseData))
                 .noticeBody(Optional.ofNullable(caseData.getBodyContent())
                         .orElse(caseData.getDirectionNoticeContent()))
                 .userName(caseData.getSignedBy())
@@ -73,6 +77,32 @@ public class IssueDocumentHandler {
                     .build();
         }
         return formPayload;
+    }
+
+    protected List<Respondent> getRespondents(SscsCaseData caseData) {
+        List<Respondent> respondents = new ArrayList<>();
+        Optional<Benefit> benefitType = caseData.getBenefitType();
+        if (benefitType.isPresent()) {
+            if (benefitType.get().getSscsType().equals(SscsType.SSCS5)) {
+                respondents.add(Respondent.builder().name(Respondent.HMRC).build());
+            } else if (benefitType.get().getSscsType().equals(SscsType.SSCS1) || benefitType.get().getSscsType().equals(SscsType.SSCS2)) {
+                respondents.add(Respondent.builder().name(Respondent.DWP).build());
+            }
+        }
+        List<CcdValue<OtherParty>> otherParties = caseData.getOtherParties();
+        if (otherParties != null) {
+            String name;
+            for (int i = 0; i < otherParties.size(); i++) {
+                if (i < 10) {
+                    name = Respondent.labelPrefixes[i] + " Respondent: ";
+                } else {
+                    name = "Respondent: ";
+                }
+                name = name + otherParties.get(i).getValue().getName().getFullName();
+                respondents.add(Respondent.builder().name(name).build());
+            }
+        }
+        return respondents;
     }
 
     protected boolean isBenefitTypeValidToHideNino(Optional<Benefit> benefitType) {
