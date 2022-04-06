@@ -209,7 +209,7 @@ configurations {
 
 def versions = [
         assertj         : '3.21.0',
-        azureCore       : '1.26.0',
+        azureCore       : '1.27.0',
         azureMessagingServiceBus: '7.6.0',
         commonsIo       : '2.11.0',
         gradlePitest    : '1.3.0',
@@ -222,7 +222,7 @@ def versions = [
         reformLogging   : '5.1.7',
         sonarPitest     : '0.5',
         springfoxSwagger: '2.8.0',
-        sscsCommon      : '4.7.1-RC-SSCS-10220-3'
+        sscsCommon      : '4.7.1-RC-SSCS-10220-4'
 ]
 
 ext["rest-assured.version"] = '4.2.0'
@@ -286,7 +286,7 @@ dependencyManagement {
         }
 
         //CVE-2021-22118
-        dependencySet(group: 'org.springframework', version: '5.2.15.RELEASE') {
+        dependencySet(group: 'org.springframework', version: '5.2.20.RELEASE') {
             entry 'spring-aop'
             entry 'spring-aspects'
             entry 'spring-beans'
@@ -348,7 +348,6 @@ dependencyManagement {
 }
 
 configurations.all {
-    exclude group: 'com.fasterxml.jackson.dataformat', module:'jackson-dataformat-xml'
     resolutionStrategy {
         eachDependency { DependencyResolveDetails details ->
             if (details.requested.group in ['com.fasterxml.jackson.module', 'com.fasterxml.jackson.datatype']) {

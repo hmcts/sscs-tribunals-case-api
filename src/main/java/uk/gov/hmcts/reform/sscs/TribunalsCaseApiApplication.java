@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.validation.ValidatorFactory;
@@ -8,15 +10,24 @@ import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
+import org.springframework.http.converter.xml.SourceHttpMessageConverter;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
 
@@ -51,7 +62,26 @@ public class TribunalsCaseApiApplication {
 
     @Bean
     public RestTemplate restTemplate() {
-        return new RestTemplate();
+        List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
+        messageConverters.add(new ByteArrayHttpMessageConverter());
+        messageConverters.add(new StringHttpMessageConverter());
+        messageConverters.add(new ResourceHttpMessageConverter(false));
+        try {
+            messageConverters.add(new SourceHttpMessageConverter<>());
+        } catch (Error err) {
+            // Ignore when no TransformerFactory implementation is available
+        }
+
+        messageConverters.add(new AllEncompassingFormHttpMessageConverter());
+        messageConverters.add(new MappingJackson2HttpMessageConverter());
+
+        DefaultUriBuilderFactory uriFactory = new DefaultUriBuilderFactory();
+        uriFactory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.URI_COMPONENT);
+
+        return new RestTemplateBuilder()
+            .messageConverters(messageConverters)
+            .uriTemplateHandler(uriFactory)
+            .build();
     }
 
     @Bean
