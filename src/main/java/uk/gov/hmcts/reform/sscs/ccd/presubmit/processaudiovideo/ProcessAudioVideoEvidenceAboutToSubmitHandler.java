@@ -86,6 +86,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
             return response;
         }
         processIfIssueDirectionNotice(caseData);
+        processIfRemoveEvidence(caseData, userAuthorisation);
         processIfAdmitEvidence(caseData, response);
         processIfExcludeEvidence(caseData);
         processIfRemoveEvidence(caseData, userAuthorisation);
