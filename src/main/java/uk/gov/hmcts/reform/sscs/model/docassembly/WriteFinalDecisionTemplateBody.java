@@ -63,6 +63,8 @@ public class WriteFinalDecisionTemplateBody {
     private String pageNumber;
     @JsonProperty("attended_hearing")
     private boolean attendedHearing;
+    @JsonProperty("other_party_names_attended_hearing")
+    private String otherPartyNamesAttendedHearing;
     @JsonProperty("presenting_officer_attended")
     private boolean presentingOfficerAttended;
     @JsonProperty("is_descriptor_flow")
@@ -109,4 +111,6 @@ public class WriteFinalDecisionTemplateBody {
     private Boolean schedule8Paragraph4Applicable;
     @JsonProperty("is_schedule_9_paragraph_4_applicable")
     private Boolean schedule9Paragraph4Applicable;
+    @JsonProperty("is_hmrc")
+    private boolean isHmrc;
 }

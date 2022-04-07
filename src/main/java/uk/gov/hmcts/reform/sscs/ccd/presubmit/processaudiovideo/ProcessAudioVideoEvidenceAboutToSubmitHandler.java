@@ -21,7 +21,10 @@ import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnproce
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,7 +88,6 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         processIfIssueDirectionNotice(caseData);
         processIfAdmitEvidence(caseData, response);
         processIfExcludeEvidence(caseData);
-        processIfRemoveEvidence(caseData, userAuthorisation);
         processIfSendToJudge(caseData, userAuthorisation);
         processIfSendToAdmin(caseData, userAuthorisation);
         overrideInterlocReviewStateIfSelected(caseData);
@@ -243,7 +245,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     }
 
     private String findAudioVideoDocumentType(AudioVideoEvidenceDetails audioVideoEvidence, PreSubmitCallbackResponse<SscsCaseData> response) {
-        DocumentType documentType = getDocumentType(audioVideoEvidence);
+        DocumentType documentType = getDocumentType(audioVideoEvidence.getDocumentLink().getDocumentFilename());
 
         if (isNull(documentType)) {
             response.addError("Evidence cannot be included as it is not in .mp3 or .mp4 format");
@@ -253,14 +255,10 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         }
     }
 
-    private void addToNotesIfNoteExists(SscsCaseData caseData, String userAuthorisation)  {
-        String noteDetails  = caseData.getTempNoteDetail();
-        if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), REMOVE_EVIDENCE.getCode())) {
-            noteDetails =  caseData.getNoteDetailRemoveAudioVideo();
-        }
-        if (StringUtils.isNoneBlank(noteDetails)) {
+    private void addToNotesIfNoteExists(SscsCaseData caseData, String userAuthorisation) {
+        if (StringUtils.isNoneBlank(caseData.getTempNoteDetail())) {
             ArrayList<Note> notes = new ArrayList<>(Optional.ofNullable(caseData.getAppealNotePad()).flatMap(f -> Optional.ofNullable(f.getNotesCollection())).orElse(Collections.emptyList()));
-            final NoteDetails noteDetail = NoteDetails.builder().noteDetail(noteDetails).noteDate(LocalDate.now().toString()).author(userDetailsService.buildLoggedInUserName(userAuthorisation)).build();
+            final NoteDetails noteDetail = NoteDetails.builder().noteDetail(caseData.getTempNoteDetail()).noteDate(LocalDate.now().toString()).author(userDetailsService.buildLoggedInUserName(userAuthorisation)).build();
             notes.add(Note.builder().value(noteDetail).build());
             caseData.setAppealNotePad(NotePad.builder().notesCollection(notes).build());
         }

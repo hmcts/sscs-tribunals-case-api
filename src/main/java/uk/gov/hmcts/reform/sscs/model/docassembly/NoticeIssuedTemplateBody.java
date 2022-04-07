@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.Builder;
 import lombok.Value;
 import uk.gov.hmcts.reform.docassembly.domain.FormPayload;
@@ -32,6 +33,8 @@ public class NoticeIssuedTemplateBody implements FormPayload {
     private String noticeType;
     @JsonProperty("should_hide_nino")
     private boolean shouldHideNino;
+    @JsonProperty("respondents")
+    private List respondents;
     @JsonProperty("notice_body")
     private String noticeBody;
     @JsonProperty("user_name")

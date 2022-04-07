@@ -63,7 +63,8 @@
           "value": {
             "fileName": "file.mp3",
             "documentLink": {
-              "document_url": "url"
+              "document_url": "url",
+              "document_filename": "file.mp3"
             },
             "rip1Document": {
               "document_url": "url"
@@ -74,7 +75,8 @@
           "value": {
             "fileName": "file2.mp3",
             "documentLink": {
-              "document_url": "url2"
+              "document_url": "url2",
+              "document_filename": "file2.mp3"
             },
             "rip1Document": {
               "document_url": "url2"

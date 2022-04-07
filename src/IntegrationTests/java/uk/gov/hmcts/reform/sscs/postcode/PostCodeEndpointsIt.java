@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.MvcResult;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_it.properties")
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 public class PostCodeEndpointsIt {
     @Autowired
     private MockMvc mockMvc;
