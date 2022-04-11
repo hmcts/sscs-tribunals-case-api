@@ -23,10 +23,10 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
-import uk.gov.hmcts.reform.sscs.model.servicebus.SessionAwareServiceBusMessagingService;
+import uk.gov.hmcts.reform.sscs.model.servicebus.NoOpMessagingService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.servicebus.HearingMessagingServiceFactory;
-import uk.gov.hmcts.reform.sscs.service.servicebus.NoOpMessagingService;
+import uk.gov.hmcts.reform.sscs.service.servicebus.SessionAwareServiceBusMessagingService;
 
 @RunWith(JUnitParamsRunner.class)
 public class ReadyToListAboutToSubmitHandlerTest {

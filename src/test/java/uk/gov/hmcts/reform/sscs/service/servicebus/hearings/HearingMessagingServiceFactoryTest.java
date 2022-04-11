@@ -6,10 +6,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
-import uk.gov.hmcts.reform.sscs.model.servicebus.SessionAwareServiceBusMessagingService;
+import uk.gov.hmcts.reform.sscs.model.servicebus.NoOpMessagingService;
+import uk.gov.hmcts.reform.sscs.model.servicebus.SessionAwareMessagingService;
 import uk.gov.hmcts.reform.sscs.service.servicebus.HearingMessagingServiceFactory;
-import uk.gov.hmcts.reform.sscs.service.servicebus.NoOpMessagingService;
-import uk.gov.hmcts.reform.sscs.service.servicebus.SessionAwareMessagingService;
+import uk.gov.hmcts.reform.sscs.service.servicebus.SessionAwareServiceBusMessagingService;
 
 
 @RunWith(MockitoJUnitRunner.class)

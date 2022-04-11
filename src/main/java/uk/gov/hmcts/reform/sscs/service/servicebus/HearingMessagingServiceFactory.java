@@ -4,7 +4,8 @@ import com.azure.messaging.servicebus.ServiceBusSenderClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
-import uk.gov.hmcts.reform.sscs.model.servicebus.SessionAwareServiceBusMessagingService;
+import uk.gov.hmcts.reform.sscs.model.servicebus.NoOpMessagingService;
+import uk.gov.hmcts.reform.sscs.model.servicebus.SessionAwareMessagingService;
 
 @Component
 public class HearingMessagingServiceFactory {

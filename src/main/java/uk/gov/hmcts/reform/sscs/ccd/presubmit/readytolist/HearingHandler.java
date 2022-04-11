@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
-import uk.gov.hmcts.reform.sscs.service.servicebus.SessionAwareMessagingService;
+import uk.gov.hmcts.reform.sscs.model.servicebus.SessionAwareMessagingService;
 
 @Slf4j
 public enum HearingHandler {
