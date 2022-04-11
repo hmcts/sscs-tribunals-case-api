@@ -186,6 +186,7 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/EvidenceDescriptionPdfData.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/StoreAppellantStatementService.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/StorePdfService.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/service/servicebus/SessionAwareServiceBusMessagingService.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/coversheet/PdfCoverSheet.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/controllers/CreateCaseController.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/PdfData.java," +
@@ -222,7 +223,7 @@ def versions = [
         reformLogging   : '5.1.7',
         sonarPitest     : '0.5',
         springfoxSwagger: '2.8.0',
-        sscsCommon      : '4.7.1-RC-SSCS-10220-5'
+        sscsCommon      : '4.8.1'
 ]
 
 ext["rest-assured.version"] = '4.2.0'
