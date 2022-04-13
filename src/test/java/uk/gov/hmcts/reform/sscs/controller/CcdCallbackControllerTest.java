@@ -24,6 +24,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
+import org.springframework.http.converter.xml.SourceHttpMessageConverter;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
@@ -85,7 +91,12 @@ public class CcdCallbackControllerTest {
     @Before
     public void setUp() {
         controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
-        mockMvc = standaloneSetup(controller).build();
+        mockMvc = standaloneSetup(controller)
+            .setMessageConverters(new ByteArrayHttpMessageConverter(), new StringHttpMessageConverter(),
+                new ResourceHttpMessageConverter(false), new SourceHttpMessageConverter<>(),
+                new AllEncompassingFormHttpMessageConverter(),
+                new MappingJackson2HttpMessageConverter())
+            .build();
     }
 
     @Test
