@@ -4,9 +4,12 @@ import static org.apache.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.ResponseEntity.ok;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 
+import com.opencsv.CSVReader;
+import java.io.InputStreamReader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -129,7 +132,10 @@ public class CcdMideventCallbackController {
 
             String fileName = restoreCasesService2.getRestoreCaseFileName(message);
 
-            RestoreCasesStatus status = restoreCasesService2.restoreCases("csv/" + fileName);
+            ClassPathResource classPathResource = new ClassPathResource("csv/" + fileName);
+            CSVReader reader = new CSVReader(new InputStreamReader(classPathResource.getInputStream()));
+
+            RestoreCasesStatus status = restoreCasesService2.restoreCases(reader);
 
             if (!status.isCompleted()) {
                 preSubmitCallbackResponse.addError(status.toString());

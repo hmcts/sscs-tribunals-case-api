@@ -1,13 +1,19 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.UNREGISTERED;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 import feign.FeignException.UnprocessableEntity;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,6 +23,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.core.io.ClassPathResource;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -37,6 +44,9 @@ public class RestoreCasesService2Test {
 
     @Mock
     private IdamTokens idamTokens;
+
+    @Mock
+    CSVReader reader;
 
     private static final RegionalProcessingCenterService regionalProcessingCenterService;
 
@@ -89,12 +99,15 @@ public class RestoreCasesService2Test {
     }
 
     @Test
-    public void givenRestoreEventForWithDwpCases_thenSetCaseDataAndRestoreCaseWithAppealReceivedEvent() {
+    public void givenRestoreEventForWithDwpCases_thenSetCaseDataAndRestoreCaseWithAppealReceivedEvent() throws IOException {
 
         when(ccdService.getByCaseId(eq(1234112842952455L), Mockito.eq(idamTokens))).thenReturn(sscsCaseDetails);
         when(ccdService.getByCaseId(eq(1234118573817544L), Mockito.eq(idamTokens))).thenReturn(sscsCaseDetails2);
 
-        final RestoreCasesStatus status = restoreCasesService2.restoreCases("csv/restore-cases-test.csv");
+        ClassPathResource classPathResource = new ClassPathResource("csv/restore-cases-test.csv");
+        CSVReader reader = new CSVReader(new InputStreamReader(classPathResource.getInputStream()));
+
+        final RestoreCasesStatus status = restoreCasesService2.restoreCases(reader);
 
         Mockito.verify(ccdService, Mockito.times(2)).updateCase(sscsCaseDataCaptor.capture(), caseIdCaptor.capture(),
             eq("appealReceived"), eq("Restore case details"), eq("Automatically restore missing case details"), eq(idamTokens));
@@ -126,7 +139,7 @@ public class RestoreCasesService2Test {
     }
 
     @Test
-    public void givenRestoreEventForInvalidCases_thenSetCaseDataAndRestoreCaseWithUpdateCaseOnlyEvent() {
+    public void givenRestoreEventForInvalidCases_thenSetCaseDataAndRestoreCaseWithUpdateCaseOnlyEvent() throws IOException {
 
         sscsCaseDetails.setState(State.INCOMPLETE_APPLICATION.getId());
         sscsCaseDetails2.setState(State.INTERLOCUTORY_REVIEW_STATE.getId());
@@ -134,7 +147,10 @@ public class RestoreCasesService2Test {
         when(ccdService.getByCaseId(eq(1234112842952455L), Mockito.eq(idamTokens))).thenReturn(sscsCaseDetails);
         when(ccdService.getByCaseId(eq(1234118573817544L), Mockito.eq(idamTokens))).thenReturn(sscsCaseDetails2);
 
-        final RestoreCasesStatus status = restoreCasesService2.restoreCases("csv/restore-cases-test.csv");
+        ClassPathResource classPathResource = new ClassPathResource("csv/restore-cases-test.csv");
+        CSVReader reader = new CSVReader(new InputStreamReader(classPathResource.getInputStream()));
+
+        final RestoreCasesStatus status = restoreCasesService2.restoreCases(reader);
 
         Mockito.verify(ccdService, Mockito.times(2)).updateCase(sscsCaseDataCaptor.capture(), caseIdCaptor.capture(),
                 eq("updateCaseOnly"), eq("Restore case details"), eq("Automatically restore missing case details"), eq(idamTokens));
@@ -166,11 +182,14 @@ public class RestoreCasesService2Test {
     }
 
     @Test
-    public void testRestoreBatchOfCasesWhenNoReturnedCases() {
+    public void testRestoreBatchOfCasesWhenNoReturnedCases() throws IOException {
 
         when(ccdService.getByCaseId(eq(1234112842952455L), Mockito.eq(idamTokens))).thenReturn(null);
 
-        final RestoreCasesStatus status = restoreCasesService2.restoreCases("csv/restore-cases-test.csv");
+        ClassPathResource classPathResource = new ClassPathResource("csv/restore-cases-test.csv");
+        CSVReader reader = new CSVReader(new InputStreamReader(classPathResource.getInputStream()));
+
+        final RestoreCasesStatus status = restoreCasesService2.restoreCases(reader);
 
         Mockito.verify(ccdService, Mockito.times(0)).updateCase(sscsCaseDataCaptor.capture(), caseIdCaptor.capture(),
             any(), any(), any(), any());
@@ -182,7 +201,7 @@ public class RestoreCasesService2Test {
     }
 
     @Test
-    public void testRestoreCasesAndUpdateCaseThrowsUnprocessableEntityExceptionForOne() {
+    public void testRestoreCasesAndUpdateCaseThrowsUnprocessableEntityExceptionForOne() throws IOException {
 
         when(ccdService.getByCaseId(eq(1234112842952455L), Mockito.eq(idamTokens))).thenReturn(sscsCaseDetails);
         when(ccdService.getByCaseId(eq(1234118573817544L), Mockito.eq(idamTokens))).thenReturn(sscsCaseDetails2);
@@ -193,7 +212,10 @@ public class RestoreCasesService2Test {
         Mockito.when(ccdService.updateCase(any(), Mockito.eq(1234118573817544L), Mockito.anyString(),
             Mockito.anyString(), Mockito.anyString(), Mockito.eq(idamTokens))).thenThrow(unprocessableEntity);
 
-        final RestoreCasesStatus status = restoreCasesService2.restoreCases("csv/restore-cases-test.csv");
+        ClassPathResource classPathResource = new ClassPathResource("csv/restore-cases-test.csv");
+        CSVReader reader = new CSVReader(new InputStreamReader(classPathResource.getInputStream()));
+
+        final RestoreCasesStatus status = restoreCasesService2.restoreCases(reader);
 
         Mockito.verify(ccdService, Mockito.times(2)).updateCase(sscsCaseDataCaptor.capture(), caseIdCaptor.capture(),
                 eq("appealReceived"), eq("Restore case details"), eq("Automatically restore missing case details"), eq(idamTokens));
@@ -207,7 +229,7 @@ public class RestoreCasesService2Test {
     }
 
     @Test
-    public void testRestoreCasesAndUpdateCaseThrowsRuntimeExceptionForOne() {
+    public void testRestoreCasesAndUpdateCaseThrowsRuntimeExceptionForOne() throws IOException {
 
         when(ccdService.getByCaseId(eq(1234112842952455L), Mockito.eq(idamTokens))).thenReturn(sscsCaseDetails);
         when(ccdService.getByCaseId(eq(1234118573817544L), Mockito.eq(idamTokens))).thenReturn(sscsCaseDetails2);
@@ -215,7 +237,10 @@ public class RestoreCasesService2Test {
         Mockito.when(ccdService.updateCase(any(), Mockito.eq(1234118573817544L), Mockito.anyString(),
                 Mockito.anyString(), Mockito.anyString(), Mockito.eq(idamTokens))).thenThrow(new RuntimeException("some exception message"));
 
-        final RestoreCasesStatus status = restoreCasesService2.restoreCases("csv/restore-cases-test.csv");
+        ClassPathResource classPathResource = new ClassPathResource("csv/restore-cases-test.csv");
+        CSVReader reader = new CSVReader(new InputStreamReader(classPathResource.getInputStream()));
+
+        final RestoreCasesStatus status = restoreCasesService2.restoreCases(reader);
 
         Mockito.verify(ccdService, Mockito.times(2)).updateCase(sscsCaseDataCaptor.capture(), caseIdCaptor.capture(),
                 eq("appealReceived"), eq("Restore case details"), eq("Automatically restore missing case details"), eq(idamTokens));
@@ -233,6 +258,23 @@ public class RestoreCasesService2Test {
         String json = "{\"case_details\" : {\"case_data\" : {\"restoreCaseFileName\" : \"restore-case-.csv\"}}}";
         String fileName = restoreCasesService2.getRestoreCaseFileName(json);
         Assert.assertEquals("restore-case-.csv", fileName);
+    }
+
+    @Test
+    public void testRestoreCasesStatusThrowsCsvException() throws IOException, CsvValidationException {
+        doThrow(CsvValidationException.class).when(reader).readNext();
+
+        assertThatNoException().isThrownBy(
+                () -> restoreCasesService2.restoreCases(reader));
+    }
+
+    @Test
+    public void testRestoreCasesStatusThrowsIoException() throws IOException, CsvValidationException {
+        doThrow(IOException.class).when(reader).readNext();
+        doThrow(IOException.class).when(reader).close();
+
+        assertThatNoException().isThrownBy(
+                () -> restoreCasesService2.restoreCases(reader));
     }
 
 }
