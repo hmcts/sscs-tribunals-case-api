@@ -2,10 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -66,6 +63,7 @@ import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
@@ -104,6 +102,9 @@ public class SubmitAppealServiceTest {
     @Mock
     private ResourceManager resourceManager;
 
+    @Mock
+    private RefDataService refDataService;
+
     private SubmitAppealService submitAppealService;
 
     private final SyaCaseWrapper appealData = getSyaCaseWrapper();
@@ -139,7 +140,8 @@ public class SubmitAppealServiceTest {
         + "    \"postcode\" : \"B16 6FR\",\n"
         + "    \"phoneNumber\" : \"0300 123 1142\",\n"
         + "    \"faxNumber\" : \"0126 434 7983\",\n"
-        + "    \"email\" : \"Birmingham-SYA-Receipts@justice.gov.uk\"\n"
+        + "    \"email\" : \"Birmingham-SYA-Receipts@justice.gov.uk\",\n"
+        + "    \"hearingRoute\" : \"gaps\"\n"
         + "  }";
 
     public static final String BRADFORD_RPC = "{\n"
@@ -152,7 +154,8 @@ public class SubmitAppealServiceTest {
         + "    \"postcode\": \"BD3 7BH\",\n"
         + "    \"phoneNumber\" : \"0300 123 1142\",\n"
         + "    \"faxNumber\" : \"0126 434 7983\",\n"
-        + "    \"email\" : \"SSCS_Bradford@justice.gov.uk\"\n"
+        + "    \"email\" : \"SSCS_Bradford@justice.gov.uk\",\n"
+        + "    \"hearingRoute\" : \"gaps\"\n"
         + "  }";
 
     public static final String SUTTON_RPC = "{\n"
@@ -165,7 +168,8 @@ public class SubmitAppealServiceTest {
         + "    \"postcode\" : \"SM1 1DA\",\n"
         + "    \"phoneNumber\" : \"0300 123 1142\",\n"
         + "    \"faxNumber\" : \"0870 739 4229\",\n"
-        + "    \"email\" : \"Sutton_SYA_Respons@justice.gov.uk\"\n"
+        + "    \"email\" : \"Sutton_SYA_Respons@justice.gov.uk\",\n"
+        + "    \"hearingRoute\" : \"gaps\"\n"
         + "  }";
 
     @Before
@@ -176,7 +180,7 @@ public class SubmitAppealServiceTest {
 
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, regionalProcessingCenterService,
-            idamService, convertAIntoBService, airLookupService, secureDocStoreService, false);
+            idamService, convertAIntoBService, airLookupService, secureDocStoreService, refDataService, true);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
@@ -879,20 +883,22 @@ public class SubmitAppealServiceTest {
 
     @Test
     @Parameters({
-            "PIP, n1w1 wal, Birmingham, appellant",
-            "ESA, n1w1 wal, Birmingham, appellant",
-            "UC, n1w1 wal, Birmingham, appellant",
-            "PIP, NN85 1ss, Northampton, appellant",
-            "ESA, NN85 1ss, Northampton, appellant",
-            "UC, NN85 1ss, Northampton, appellant",
-            "PIP, n1w1 wal, Birmingham, appointee",
-            "ESA, n1w1 wal, Birmingham, appointee",
-            "UC, n1w1 wal, Birmingham, appointee",
-            "PIP, NN85 1ss, Northampton, appointee",
-            "ESA, NN85 1ss, Northampton, appointee",
-            "UC, NN85 1ss, Northampton, appointee",
+            "PIP, n1w1 wal, Birmingham, appellant, 1, 21",
+            "ESA, n1w1 wal, Birmingham, appellant, 1, 21",
+            "UC, n1w1 wal, Birmingham, appellant, 1, 21",
+            "PIP, NN85 1ss, Northampton, appellant, 2, 30",
+            "ESA, NN85 1ss, Northampton, appellant, 2, 30",
+            "UC, NN85 1ss, Northampton, appellant, 2, 30",
+            "PIP, n1w1 wal, Birmingham, appointee, 1, 21",
+            "ESA, n1w1 wal, Birmingham, appointee, 1, 21",
+            "UC, n1w1 wal, Birmingham, appointee, 1, 21",
+            "PIP, NN85 1ss, Northampton, appointee, 2, 30",
+            "ESA, NN85 1ss, Northampton, appointee, 2, 30",
+            "UC, NN85 1ss, Northampton, appointee, 2, 30",
     })
-    public void shouldSetProcessingVenueBasedOnBenefitTypeAndPostCode(String benefitCode, String postcode, String expectedVenue, String appellantOrAppointee) {
+    public void shouldSetProcessingVenueBasedOnBenefitTypeAndPostCode(String benefitCode, String postcode, String expectedVenue, String appellantOrAppointee, String epimsId, String regionId) {
+        when(refDataService.getVenueRefData(expectedVenue)).thenReturn(CourtVenue.builder().epimsId(epimsId).regionId(regionId).build());
+
         boolean isAppellant = appellantOrAppointee.equals("appellant");
         SyaCaseWrapper appealData = getSyaCaseWrapper(isAppellant ? "json/sya.json" : "sya/allDetailsWithAppointeeWithDifferentAddress.json");
         SyaBenefitType syaBenefitType = new SyaBenefitType(benefitCode, benefitCode);
@@ -905,5 +911,8 @@ public class SubmitAppealServiceTest {
 
         SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
         assertEquals(expectedVenue, caseData.getProcessingVenue());
+        assertNotNull(caseData.getCaseManagementLocation());
+        assertEquals(epimsId, caseData.getCaseManagementLocation().getBaseLocation());
+        assertEquals(regionId, caseData.getCaseManagementLocation().getRegion());
     }
 }

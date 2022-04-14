@@ -2,6 +2,7 @@
   "caseReference": "SC022/14/12423",
   "addedDocuments": null,
   "region": "BIRMINGHAM",
+  "addedDocuments": null,
   "appeal": {
     "mrnDetails": {
       "dwpIssuingOffice": "test-hmcts-address",
@@ -200,7 +201,8 @@
     "address3": "Administrative Support Centre",
     "postcode": "B16 6FR",
     "city": "BIRMINGHAM",
-    "email": "Birmingham-SYA-Receipts@justice.gov.uk"
+    "email": "Birmingham-SYA-Receipts@justice.gov.uk",
+    "hearingRoute": null
   },
   "sscsDocument": [
     {
