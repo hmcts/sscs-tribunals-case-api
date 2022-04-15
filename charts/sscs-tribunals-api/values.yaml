@@ -26,6 +26,8 @@ java:
         - docmosis-endpoint
         - docmosis-api-key
         - AppInsightsInstrumentationKey
+        - name: sscs-asb-connection-string
+          alias: HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING
   environment:
     SERVER_PORT: 8080
     REFORM_TEAM: sscs
@@ -56,6 +58,7 @@ java:
     RD_LOCATION_REF_API_URL: "http://rd-location-ref-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     SECURE_DOC_STORE_FEATURE: true
     WORK_ALLOCATION_FEATURE: true
+    HEARINGS_EVENT_QUEUE_NAME: tribunals-to-hearing-api-{{ .Values.global.environment }}
 
 idam-pr:
   enabled: false
