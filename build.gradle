@@ -217,13 +217,13 @@ def versions = [
         jackson         : '2.11.0',
         junitJupiter    : '5.7.2',
         lombok          : '1.18.22',
+        sscsCommon      : '4.8.2',
         pact            : '4.1.7',
         pitest          : '1.4.2',
         reactorCore     : '3.4.15',
         reformLogging   : '5.1.7',
         sonarPitest     : '0.5',
         springfoxSwagger: '2.8.0',
-        sscsCommon      : '4.8.2'
 ]
 
 ext["rest-assured.version"] = '4.2.0'
