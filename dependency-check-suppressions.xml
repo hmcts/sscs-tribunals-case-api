@@ -31,7 +31,7 @@
         <cve>CVE-2020-11022</cve>
         <cve>CVE-2020-11023</cve>
     </suppress>
-    <suppress until="2022-04-15">
+    <suppress until="2022-06-15">
         <notes><![CDATA[
    file name: jakarta.el-3.0.3.jar
    ]]></notes>
@@ -105,11 +105,5 @@
      ]]></notes>
         <packageUrl regex="true">^pkg:maven/io\.netty/netty\-tcnative\-classes@.*$</packageUrl>
         <cpe>cpe:/a:netty:netty</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-     file name: jakarta.el-3.0.3.jar
-     ]]></notes>
-        <cve>CVE-2021-28170</cve>
     </suppress>
 </suppressions>
