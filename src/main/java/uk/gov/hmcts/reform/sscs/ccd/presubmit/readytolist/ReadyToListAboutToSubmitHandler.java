@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
-
+import uk.gov.hmcts.reform.sscs.service.servicebus.HearingMessagingServiceFactory;
 
 @Service
 @Slf4j
@@ -22,10 +23,14 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
 
-    public ReadyToListAboutToSubmitHandler(@Value("${feature.gaps-switchover.enabled}")  boolean gapsSwitchOverFeature,
-                                           @Autowired RegionalProcessingCenterService regionalProcessingCenterService) {
+    private final HearingMessagingServiceFactory hearingMessagingServiceFactory;
+
+    public ReadyToListAboutToSubmitHandler(@Value("${feature.gaps-switchover.enabled}") boolean gapsSwitchOverFeature,
+                                           @Autowired RegionalProcessingCenterService regionalProcessingCenterService,
+                                           @Autowired HearingMessagingServiceFactory hearingMessagingServiceFactory) {
         this.gapsSwitchOverFeature = gapsSwitchOverFeature;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
+        this.hearingMessagingServiceFactory = hearingMessagingServiceFactory;
     }
 
     @Override
@@ -38,7 +43,8 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
+                                                          String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback.");
         }
@@ -46,10 +52,21 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         if (!gapsSwitchOverFeature) {
-            return HearingHandler.GAPS.handle(sscsCaseData, gapsSwitchOverFeature);
+            return HearingHandler.GAPS.handle(sscsCaseData, false,
+                hearingMessagingServiceFactory.getMessagingService(HearingRoute.GAPS));
         }
 
         String region = sscsCaseData.getRegion();
-        return HearingHandler.valueOf(regionalProcessingCenterService.getHearingRoute(region).name()).handle(sscsCaseData, gapsSwitchOverFeature);
+
+        Map<String, RegionalProcessingCenter> regionalProcessingCenterMap = regionalProcessingCenterService
+            .getRegionalProcessingCenterMap();
+
+        HearingRoute route = regionalProcessingCenterMap.values().stream()
+            .filter(rpc -> rpc.getName().equalsIgnoreCase(region))
+            .map(RegionalProcessingCenter::getHearingRoute)
+            .findFirst().orElse(HearingRoute.LIST_ASSIST);
+
+        return HearingHandler.valueOf(route.name()).handle(sscsCaseData, true,
+            hearingMessagingServiceFactory.getMessagingService(route));
     }
 }
