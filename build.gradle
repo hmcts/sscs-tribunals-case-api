@@ -186,6 +186,7 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/EvidenceDescriptionPdfData.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/StoreAppellantStatementService.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/StorePdfService.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/service/servicebus/SessionAwareServiceBusMessagingService.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/coversheet/PdfCoverSheet.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/controllers/CreateCaseController.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/PdfData.java," +
@@ -208,16 +209,21 @@ configurations {
 
 
 def versions = [
-        reformLogging   : '5.1.7',
-        springfoxSwagger: '2.8.0',
-        pitest          : '1.4.2',
+        assertj         : '3.21.0',
+        azureCore       : '1.27.0',
+        azureMessagingServiceBus: '7.6.0',
+        commonsIo       : '2.11.0',
         gradlePitest    : '1.3.0',
-        sonarPitest     : '0.5',
-        pact            : '4.1.7',
+        jackson         : '2.11.0',
         junitJupiter    : '5.7.2',
         lombok          : '1.18.22',
-        sscsCommon      : '4.8.2',
-        assertj         : '3.21.0',
+        pact            : '4.1.7',
+        pitest          : '1.4.2',
+        reactorCore     : '3.4.15',
+        reformLogging   : '5.1.7',
+        sonarPitest     : '0.5',
+        springfoxSwagger: '2.8.0',
+        sscsCommon      : '4.8.1'
 ]
 
 ext["rest-assured.version"] = '4.2.0'
@@ -269,12 +275,6 @@ dependencyManagement {
             entry 'spring-security-web'
         }
 
-        //CVE-2021-27807
-        dependencySet(group: 'org.apache.pdfbox', version: '2.0.24') {
-            entry 'pdfbox-tools'
-            entry 'preflight'
-        }
-
         dependencySet(group: 'org.apache.xmlgraphics', version: '1.14') {
             entry 'batik-all'
         }
@@ -301,6 +301,25 @@ dependencyManagement {
             entry 'spring-tx'
             entry 'spring-web'
             entry 'spring-webmvc'
+        }
+
+        dependencySet(group: 'io.netty', version: '4.1.72.Final') {
+            entry 'netty-handler'
+            entry 'netty-transport-native-epoll'
+            entry 'netty-transport-native-kqueue'
+            entry 'netty-codec-http'
+            entry 'netty-codec-http2'
+            entry 'netty-codec-socks'
+            entry 'netty-handler-proxy'
+            entry 'netty-codec'
+            entry 'netty-codec-dns'
+            entry 'netty-transport-native-unix-common'
+            entry 'netty-transport'
+            entry 'netty-buffer'
+            entry 'netty-resolver'
+            entry 'netty-resolver-dns'
+            entry 'netty-resolver-dns-native-macos'
+            entry 'netty-common'
         }
 
         //CVE-2021-27568
@@ -333,7 +352,7 @@ configurations.all {
     resolutionStrategy {
         eachDependency { DependencyResolveDetails details ->
             if (details.requested.group in ['com.fasterxml.jackson.module', 'com.fasterxml.jackson.datatype']) {
-                details.useVersion '2.11.0'
+                details.useVersion versions.jackson
             }
         }
     }
@@ -352,9 +371,6 @@ dependencies {
     compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.3'
 
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
-
-    // Safe to remove once Spring update their dependencies - see CVE-2019-14439 and add 'com.fasterxml.jackson.core' configurations.all above
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
 
     compile group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.4'
 
@@ -375,6 +391,10 @@ dependencies {
     compile group: 'com.github.hmcts', name: 'sscs-common', version: versions.sscsCommon
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.54'
 
+    compile group: 'com.azure', name: 'azure-core', version: versions.azureCore
+    compile group: 'com.azure', name: 'azure-messaging-servicebus', version: versions.azureMessagingServiceBus
+
+    compile group: 'io.projectreactor', name: 'reactor-core', version: versions.reactorCore
 
     compile group:'org.overviewproject', name: 'mime-types', version: '1.0.2'
 
@@ -383,13 +403,18 @@ dependencies {
     testCompile group: 'com.github.hmcts', name: 'fortify-client', version: '1.2.2', classifier: 'all', {
         exclude group: 'commons-io', module: 'commons-io'
     }
-    compile group: 'commons-io', name: 'commons-io', version: '2.11.0'
-    integrationTestCompile group: 'commons-io', name: 'commons-io', version: '2.11.0'
+    compile group: 'commons-io', name: 'commons-io', version: versions.commonsIo
+
+    integrationTestCompile group: 'commons-io', name: 'commons-io', version: versions.commonsIo
 
     compile "org.projectlombok:lombok:$versions.lombok"
     annotationProcessor "org.projectlombok:lombok:$versions.lombok"
 
-    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
+        exclude group: 'com.vaadin.external.google', module: 'android-json'
+    }
+    testCompile group: 'com.azure', name: 'azure-core', version: versions.azureCore
+    testCompile group: 'com.azure', name: 'azure-messaging-servicebus', version: versions.azureMessagingServiceBus
     testCompile group: 'org.mockito', name: 'mockito-core', version: '4.0.0'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.28.0'
     testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.0.0'
@@ -418,11 +443,11 @@ dependencies {
     //pact contract testing
     contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact
     contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact
-    contractTestCompile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.0'
+    contractTestCompile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
 
     contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact
     contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'java8',  version: versions.pact
-    contractTestRuntime group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.0'
+    contractTestRuntime group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
 
     contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     contractTestCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junitJupiter
