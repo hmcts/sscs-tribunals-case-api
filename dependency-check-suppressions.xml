@@ -106,4 +106,10 @@
         <packageUrl regex="true">^pkg:maven/io\.netty/netty\-tcnative\-classes@.*$</packageUrl>
         <cpe>cpe:/a:netty:netty</cpe>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+     file name: jakarta.el-3.0.3.jar
+     ]]></notes>
+        <cve>CVE-2021-28170</cve>
+    </suppress>
 </suppressions>
