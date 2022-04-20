@@ -405,7 +405,12 @@
   "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/evidence_PUT" : "ignore",
   "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/evidence_POST" : "ignore",
   "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/evidence_POST" : "ignore",
-  "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/evidence_GET" : "ignore"
+  "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/evidence_GET" : "ignore",
+  "10010_Cookie No HttpOnly Flag_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/ccdMidEvent?pageId=pageId_POST" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/ccdMidEvent?pageId=pageId_POST" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/evidence/evidenceId_DELETE" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/request/identifier/recordingrequest?hearingIds=hearingIds_POST" : "ignore",
+  "90033_Loosely Scoped Cookie_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/ccdMidEvent?pageId=pageId_POST" : "ignore"
 
 
 
