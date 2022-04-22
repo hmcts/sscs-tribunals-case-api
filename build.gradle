@@ -261,7 +261,7 @@ dependencyManagement {
         }
 
         // CVE-2020-17521
-        dependencySet(group: 'org.codehaus.groovy', version: '3.0.9') {
+        dependencySet(group: 'org.codehaus.groovy', version: '3.0.10') {
             entry 'groovy'
             entry 'groovy-json'
             entry 'groovy-xml'
