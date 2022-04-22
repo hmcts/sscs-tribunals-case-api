@@ -17,8 +17,8 @@ public enum HearingHandler {
         public PreSubmitCallbackResponse<SscsCaseData> handle(SscsCaseData sscsCaseData, boolean gapsSwitchOverFeature,
                                                               SessionAwareMessagingService messagingService) {
             if (gapsSwitchOverFeature) {
-                sscsCaseData.setHearingRoute(HearingRoute.GAPS);
-                sscsCaseData.setHearingState(HearingState.CREATE_HEARING);
+                sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
+                sscsCaseData.getSchedulingAndListingFields().setHearingState(HearingState.CREATE_HEARING);
             }
             PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
             log.info(String.format("createdInGapsFrom is %s for caseId %s", sscsCaseData.getCreatedInGapsFrom(), sscsCaseData.getCcdCaseId()));
@@ -54,8 +54,8 @@ public enum HearingHandler {
                 if (!messageSuccess) {
                     callbackResponse.addError("An error occurred during message publish. Please try again.");
                 } else {
-                    sscsCaseData.setHearingRoute(hearingRoute);
-                    sscsCaseData.setHearingState(hearingState);
+                    sscsCaseData.getSchedulingAndListingFields().setHearingRoute(hearingRoute);
+                    sscsCaseData.getSchedulingAndListingFields().setHearingState(hearingState);
                 }
             }
 

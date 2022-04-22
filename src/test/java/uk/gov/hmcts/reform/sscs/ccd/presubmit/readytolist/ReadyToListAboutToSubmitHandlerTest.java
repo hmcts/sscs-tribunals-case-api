@@ -128,8 +128,8 @@ public class ReadyToListAboutToSubmitHandlerTest {
 
         verifyMessagingServiceCalled();
 
-        assertThat(response.getData().getHearingRoute()).isEqualTo(HearingRoute.LIST_ASSIST);
-        assertThat(response.getData().getHearingState()).isEqualTo(HearingState.CREATE_HEARING);
+        assertThat(response.getData().getSchedulingAndListingFields().getHearingRoute()).isEqualTo(HearingRoute.LIST_ASSIST);
+        assertThat(response.getData().getSchedulingAndListingFields().getHearingState()).isEqualTo(HearingState.CREATE_HEARING);
 
         assertThat(response.getErrors())
             .as("A successfully sent message should not result in any errors.").isEmpty();
@@ -151,8 +151,8 @@ public class ReadyToListAboutToSubmitHandlerTest {
 
         verifyMessagingServiceCalled();
 
-        assertThat(response.getData().getHearingRoute()).isNull();
-        assertThat(response.getData().getHearingState()).isNull();
+        assertThat(response.getData().getSchedulingAndListingFields().getHearingRoute()).isNull();
+        assertThat(response.getData().getSchedulingAndListingFields().getHearingState()).isNull();
 
         assertThat(response.getErrors())
             .as("An unsuccessfully sent message should result in an errors.").hasSize(1);
@@ -176,8 +176,8 @@ public class ReadyToListAboutToSubmitHandlerTest {
 
         verifyNoInteractions(sessionAwareServiceBusMessagingService);
 
-        assertThat(response.getData().getHearingRoute()).isNull();
-        assertThat(response.getData().getHearingState()).isNull();
+        assertThat(response.getData().getSchedulingAndListingFields().getHearingRoute()).isNull();
+        assertThat(response.getData().getSchedulingAndListingFields().getHearingState()).isNull();
     }
 
     private void verifyMessagingServiceCalled() {
