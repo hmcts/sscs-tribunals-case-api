@@ -372,7 +372,7 @@ dependencies {
 
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
 
-    compile group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.4'
+    compile group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.8'
 
     compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
