@@ -147,7 +147,7 @@ dependencyCheck {
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'false' ? 11 : 0
     suppressionFile = 'dependency-check-suppressions.xml'
     analyzers {
-        ossIndexEnabked = false
+        ossIndexEnabled = false
     }
 
 }
