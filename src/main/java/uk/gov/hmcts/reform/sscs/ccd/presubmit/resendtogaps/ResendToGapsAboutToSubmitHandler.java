@@ -28,7 +28,7 @@ import uk.gov.hmcts.reform.sscs.robotics.RoboticsWrapper;
 @RequiredArgsConstructor
 public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    @Value("${feature.gaps-switchover.enabled:false}")
+    @Value("${feature.gaps-switchover.enabled}")
     private boolean gapsSwitchOverFeatureEnabled;
 
     private final RoboticsJsonMapper roboticsJsonMapper;
