@@ -15,11 +15,17 @@ public class ListAssistHearingMessageHelper {
     private final HearingMessagingServiceFactory hearingMessagingServiceFactory;
 
     public void sendListAssistCancelHearingMessage(final String ccdCaseId) {
-        hearingMessagingServiceFactory
-            .getMessagingService(LIST_ASSIST)
-            .sendMessage(HearingRequest.builder(ccdCaseId)
+        sendListAssistHearingMessage(
+            HearingRequest.builder(ccdCaseId)
                 .hearingRoute(LIST_ASSIST)
                 .hearingState(CANCEL_HEARING)
-                .build());
+                .build()
+        );
+    }
+
+    private void sendListAssistHearingMessage(final HearingRequest hearingRequest) {
+        hearingMessagingServiceFactory
+            .getMessagingService(LIST_ASSIST)
+            .sendMessage(hearingRequest);
     }
 }

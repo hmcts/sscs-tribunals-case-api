@@ -39,8 +39,8 @@ public class ListAssistHearingMessageHelperTest {
         messageHelper.sendListAssistCancelHearingMessage("1234");
 
         verify(sessionAwareServiceBusMessagingService).sendMessage(hearingRequestCaptor.capture());
-        HearingRequest actualRequest = hearingRequestCaptor.getValue();
 
+        HearingRequest actualRequest = hearingRequestCaptor.getValue();
         assertEquals("1234", actualRequest.getCcdCaseId());
         assertEquals(LIST_ASSIST, actualRequest.getHearingRoute());
         assertEquals(CANCEL_HEARING, actualRequest.getHearingState());
