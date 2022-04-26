@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service.evidence;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -412,10 +413,9 @@ public class EvidenceUploadServiceTest {
         String docType = "statement";
         String caseId = "1234";
 
-        Exception exception = assertThrows(EvidenceUploadException.class, () -> {
-            evidenceUploadService.getLoadSafe(badBytes, docType, caseId);
+        Exception exception = assertThrows(EvidenceUploadException.class, () ->
+            EvidenceUploadService.getLoadSafe(badBytes, docType, caseId));
 
-        });
         assertTrue(exception.getMessage().contains("Error when getting PDDocument " + docType
                 + " for caseId " + caseId + " with bytes length " + badBytes.length));
     }
@@ -675,7 +675,7 @@ public class EvidenceUploadServiceTest {
     @Test
     public void givenListDraftHearingEvidenceIsEmptyThenShouldReturnEmptyEvidence() {
         String identifier = "12345";
-        List<SscsDocument> draftSscsDocument = Lists.emptyList();
+        List<SscsDocument> draftSscsDocument = emptyList();
         SscsCaseDetails caseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().draftSscsDocument(draftSscsDocument).build()).build();
         when(onlineHearingService.getCcdCaseByIdentifier(identifier)).thenReturn(Optional.of(caseDetails));
         List<Evidence> result = evidenceUploadService.listDraftHearingEvidence(identifier);
