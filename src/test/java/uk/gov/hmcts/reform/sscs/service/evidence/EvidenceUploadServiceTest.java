@@ -38,7 +38,6 @@ import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.assertj.core.util.Lists;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Rule;
@@ -614,7 +613,7 @@ public class EvidenceUploadServiceTest {
     }
 
     private SscsCaseDetails createSscsCaseDetailsDraftDocsJustDescription(String fileName) {
-        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder()
+        return SscsCaseDetails.builder()
                 .id(someCcdCaseId)
                 .data(SscsCaseData.builder()
                         .draftSscsDocument(singletonList(SscsDocument.builder()
@@ -628,8 +627,6 @@ public class EvidenceUploadServiceTest {
                                 .build()))
                         .build())
                 .build();
-
-        return sscsCaseDetails;
     }
 
     @Test
