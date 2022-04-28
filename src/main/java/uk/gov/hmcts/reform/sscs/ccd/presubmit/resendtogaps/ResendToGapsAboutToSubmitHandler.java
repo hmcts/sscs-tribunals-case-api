@@ -13,10 +13,7 @@ import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonValidator;
@@ -63,6 +60,7 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
             } else {
                 sscsCaseData.setHmctsDwpState("sentToRobotics");
                 if (gapsSwitchOverFeatureEnabled && sscsCaseData.getSchedulingAndListingFields().getHearingRoute() == LIST_ASSIST) {
+                    sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
                     hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId());
                 }
             }
