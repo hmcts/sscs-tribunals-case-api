@@ -77,7 +77,7 @@ public class ActionHearingRecordingIt extends AbstractEventIt {
                                 .organisation("org")
                                 .build())
                         .build())
-                .jointParty(YES.getValue())
+                .jointParty(JointParty.builder().hasJointParty(YES).build())
                 .build();
 
 

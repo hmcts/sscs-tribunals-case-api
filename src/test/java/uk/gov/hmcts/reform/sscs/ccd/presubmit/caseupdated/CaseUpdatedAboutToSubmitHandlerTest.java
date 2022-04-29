@@ -401,7 +401,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             " Ho.use, ., \"101 House, House",
             " ., ãHouse, âHouse, &101 House"})
     public void givenACaseUpdateEventWithInvalidJointPartyAddressDetails_thenReturnError(String line1, String line2, String town, String county) {
-        callback.getCaseDetails().getCaseData().setJointPartyAddress(buildAddress(line1, line2, county, town));
+        callback.getCaseDetails().getCaseData().getJointParty().setAddress(buildAddress(line1, line2, county, town));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         long numberOfExpectedError = getNumberOfExpectedError(response);
@@ -432,7 +432,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         numberOfExpectedError = getNumberOfExpectedError(response);
         assertEquals(0, numberOfExpectedError);
 
-        callback.getCaseDetails().getCaseData().setJointPartyAddress(address);
+        callback.getCaseDetails().getCaseData().getJointParty().setAddress(address);
         response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         numberOfExpectedError = getNumberOfExpectedError(response);
         assertEquals(0, numberOfExpectedError);

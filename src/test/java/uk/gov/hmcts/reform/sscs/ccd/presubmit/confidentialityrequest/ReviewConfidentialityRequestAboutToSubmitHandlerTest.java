@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -368,8 +369,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.GRANTED), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
         assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.GRANTED), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), sscsCaseData.getInterlocReviewState());
-        assertEquals(YesNo.YES, sscsCaseData.getIsConfidentialCase());
-        assertEquals(YesNo.YES.getValue(), sscsCaseData.getIsProgressingViaGaps());
+        assertEquals(YES, sscsCaseData.getIsConfidentialCase());
+        assertEquals(YES.getValue(), sscsCaseData.getIsProgressingViaGaps());
     }
 
     @Test
@@ -388,8 +389,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.REFUSED), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
         assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.GRANTED), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), sscsCaseData.getInterlocReviewState());
-        assertEquals(YesNo.YES, sscsCaseData.getIsConfidentialCase());
-        assertEquals(YesNo.YES.getValue(), sscsCaseData.getIsProgressingViaGaps());
+        assertEquals(YES, sscsCaseData.getIsConfidentialCase());
+        assertEquals(YES.getValue(), sscsCaseData.getIsProgressingViaGaps());
     }
 
     @Test
@@ -408,8 +409,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.GRANTED), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
         assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.REFUSED), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), sscsCaseData.getInterlocReviewState());
-        assertEquals(YesNo.YES, sscsCaseData.getIsConfidentialCase());
-        assertEquals(YesNo.YES.getValue(), sscsCaseData.getIsProgressingViaGaps());
+        assertEquals(YES, sscsCaseData.getIsConfidentialCase());
+        assertEquals(YES.getValue(), sscsCaseData.getIsProgressingViaGaps());
     }
 
     @Test
@@ -596,7 +597,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
     @Test
     public void givenConfidentialityRequestsCombinationShouldResetNotSetValuesToNull(@Nullable RequestOutcome appellantOutcome, @Nullable RequestOutcome jointPartyOutcome, @Nullable String appellantReviewText, @Nullable String jointPartyReviewText) {
 
-        sscsCaseData.setJointParty("Yes");
+        sscsCaseData.getJointParty().setHasJointParty(YES);
         sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantOutcome));
         sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyOutcome));
         if (RequestOutcome.IN_PROGRESS.equals(appellantOutcome)) {
@@ -640,7 +641,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.GRANTED), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
         assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.GRANTED), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         assertThat(sscsCaseData.getInterlocReviewState(), is(nullValue()));
-        assertEquals(YesNo.YES, sscsCaseData.getIsConfidentialCase());
+        assertEquals(YES, sscsCaseData.getIsConfidentialCase());
         assertNull(sscsCaseData.getIsProgressingViaGaps());
     }
 }

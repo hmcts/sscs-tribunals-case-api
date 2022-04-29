@@ -43,7 +43,7 @@ public class PartiesOnCaseUtilTest {
 
     @Test
     public void givenCaseWithJointParty_thenGetPartiesOnCaseWithAppellantAndJointParty() {
-        sscsCaseData.setJointParty("Yes");
+        sscsCaseData.getJointParty().setHasJointParty(YES);
 
         List<DynamicListItem> response = PartiesOnCaseUtil.getPartiesOnCase(sscsCaseData);
 
