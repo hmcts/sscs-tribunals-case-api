@@ -61,7 +61,6 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
                 preSubmitCallbackResponse.addErrors(errorSet);
             } else {
                 sscsCaseData.setHmctsDwpState("sentToRobotics");
-                log.info("Hearing route for case {}: {}", caseDetails.getId(), sscsCaseData.getSchedulingAndListingFields().getHearingRoute());
                 if (gapsSwitchOverFeatureEnabled && sscsCaseData.getSchedulingAndListingFields().getHearingRoute() == LIST_ASSIST) {
                     log.info("HearingRoute is ListAssist for CaseID: {}. Sending ListAssist cancellation message.", caseDetails.getId());
                     sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);

@@ -44,8 +44,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final RefDataService refDataService;
     private final boolean workAllocationFeature;
 
-    private final boolean gapsSwitchOverEnabled;
-
     @Autowired
     CaseUpdatedAboutToSubmitHandler(RegionalProcessingCenterService regionalProcessingCenterService,
                                     AssociatedCaseLinkHelper associatedCaseLinkHelper,
@@ -53,8 +51,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                     DwpAddressLookupService dwpAddressLookupService,
                                     IdamService idamService,
                                     RefDataService refDataService,
-                                    @Value("${feature.work-allocation.enabled}")  boolean workAllocationFeature,
-                                    @Value("${feature.gaps-switchover.enabled}") boolean gapsSwitchOverEnabled) {
+                                    @Value("${feature.work-allocation.enabled}")  boolean workAllocationFeature) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
         this.airLookupService = airLookupService;
@@ -62,7 +59,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         this.idamService = idamService;
         this.refDataService = refDataService;
         this.workAllocationFeature = workAllocationFeature;
-        this.gapsSwitchOverEnabled = gapsSwitchOverEnabled;
     }
 
     @Override
@@ -117,7 +113,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         checkConfidentiality(sscsCaseData);
         updateCaseNameIfNameUpdated(callback, sscsCaseData);
-        updateHearingFieldsIfUpdated(callback, sscsCaseData);
         updateCaseCategoriesIfBenefitTypeUpdated(callback, sscsCaseData, preSubmitCallbackResponse);
 
         final boolean hasSystemUserRole = userDetails.hasRole(SYSTEM_USER);
@@ -256,27 +251,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                     || oldCaseDetails.getCaseData().getWorkAllocationFields().getCaseNameHmctsInternal() == null
                     || !oldCaseDetails.getCaseData().getWorkAllocationFields().getCaseNameHmctsInternal().equals(caseName)) {
                 caseData.getWorkAllocationFields().setCaseNames(caseName);
-            }
-        }
-    }
-
-    private void updateHearingFieldsIfUpdated(Callback<SscsCaseData> callback, SscsCaseData caseData) {
-        if (gapsSwitchOverEnabled) {
-            HearingRoute route = caseData.getSchedulingAndListingFields().getHearingRoute();
-            HearingState state = caseData.getSchedulingAndListingFields().getHearingState();
-
-
-            CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
-            if (oldCaseDetails == null
-                || oldCaseDetails.getCaseData().getSchedulingAndListingFields().getHearingRoute() == null
-                || oldCaseDetails.getCaseData().getSchedulingAndListingFields().getHearingRoute() != route) {
-                caseData.getSchedulingAndListingFields().setHearingRoute(route);
-            }
-
-            if (oldCaseDetails == null
-                || oldCaseDetails.getCaseData().getSchedulingAndListingFields().getHearingState() == null
-                || oldCaseDetails.getCaseData().getSchedulingAndListingFields().getHearingState() != state) {
-                caseData.getSchedulingAndListingFields().setHearingState(state);
             }
         }
     }
