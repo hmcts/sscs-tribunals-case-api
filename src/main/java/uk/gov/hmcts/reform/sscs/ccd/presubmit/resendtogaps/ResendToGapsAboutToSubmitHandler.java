@@ -48,6 +48,8 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
             throw new IllegalStateException("Cannot handle callback");
         }
 
+        log.info("Handling event {} for CaseID: {}", callback.getEvent(), callback.getCaseDetails().getId());
+
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
@@ -60,6 +62,7 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
             } else {
                 sscsCaseData.setHmctsDwpState("sentToRobotics");
                 if (gapsSwitchOverFeatureEnabled && sscsCaseData.getSchedulingAndListingFields().getHearingRoute() == LIST_ASSIST) {
+                    log.info("HearingRoute is ListAssist for CaseID: {}. Sending ListAssist cancellation message.", caseDetails.getId());
                     sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
                     hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId());
                 }
