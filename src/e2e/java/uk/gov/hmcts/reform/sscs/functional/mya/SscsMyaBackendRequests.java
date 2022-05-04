@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
 @Slf4j
 public class SscsMyaBackendRequests {
+    public static final String APPLICATION_JSON = "application/json";
     private final IdamTokens idamTokens;
     private final CitizenIdamService citizenIdamService;
     private String baseUrl;
@@ -66,7 +67,7 @@ public class SscsMyaBackendRequests {
     }
 
     public JSONObject assignCaseToUser(String tya, String email, String postcode) throws IOException {
-        StringEntity entity = new StringEntity("{\"email\":\"" + email + "\", \"postcode\":\"" + postcode + "\"}", APPLICATION_JSON);
+        StringEntity entity = new StringEntity("{\"email\":\"" + email + "\", \"postcode\":\"" + postcode + "\"}", ContentType.APPLICATION_JSON);
 
         HttpResponse response = postRequest("/api/citizen/" + tya, entity, email);
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
@@ -77,7 +78,7 @@ public class SscsMyaBackendRequests {
     }
 
     public void logUserWithCase(Long caseId) throws IOException {
-        StringEntity entity = new StringEntity(EMPTY, APPLICATION_JSON);
+        StringEntity entity = new StringEntity(EMPTY, ContentType.APPLICATION_JSON);
 
         HttpResponse response = putRequest("/api/citizen/cases/" + caseId + "/log", entity);
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
@@ -124,7 +125,7 @@ public class SscsMyaBackendRequests {
                 new StringEntity("{\n"
                         + "  \"body\": \"" + description + "\",\n"
                         + "  \"idamEmail\": \"mya-sscs-6920@mailinator.com\"\n"
-                        + "}", APPLICATION_JSON)
+                        + "}", ContentType.APPLICATION_JSON)
         );
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
     }
@@ -144,7 +145,7 @@ public class SscsMyaBackendRequests {
                 + "  \"body\": \"statement\",\n"
                 + "  \"tya\": \"Q9jE2FQuRR\"\n"
                 + "}";
-        HttpResponse getQuestionResponse = postRequest(uri, new StringEntity(stringEntity, APPLICATION_JSON));
+        HttpResponse getQuestionResponse = postRequest(uri, new StringEntity(stringEntity, ContentType.APPLICATION_JSON));
 
         assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
     }
@@ -160,7 +161,7 @@ public class SscsMyaBackendRequests {
 
     public String updateSubscription(String appellantTya, String userEmail) throws IOException {
         HttpResponse response = postRequest(format("/appeals/%s/subscriptions/%s", appellantTya, appellantTya),
-                new StringEntity(format("{ \"subscription\" : {\"email\" : \"%s\"}}", userEmail), APPLICATION_JSON));
+                new StringEntity(format("{ \"subscription\" : {\"email\" : \"%s\"}}", userEmail), ContentType.APPLICATION_JSON));
 
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
         return EntityUtils.toString(response.getEntity());
@@ -213,7 +214,9 @@ public class SscsMyaBackendRequests {
     }
 
     public HttpResponse midEvent(HttpEntity body, String postfixUrl) throws IOException {
-        return client.execute(addHeaders(post(format("%s/ccdMidEvent%s", baseUrl, postfixUrl))).setEntity(body).build());
+        return client.execute(addHeaders(post(format("%s/ccdMidEvent%s", baseUrl, postfixUrl))
+            .setHeader("Accept", APPLICATION_JSON)
+            .setHeader("Content-type", APPLICATION_JSON)).setEntity(body).build());
     }
 
     public byte[] toBytes(String documentUrl) {
