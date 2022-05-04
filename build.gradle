@@ -1,7 +1,4 @@
 buildscript {
-    repositories {
-        jcenter()
-    }
     dependencies {
         classpath("net.serenity-bdd:serenity-gradle-plugin:2.4.34")
     }
@@ -152,8 +149,6 @@ repositories {
 
     mavenLocal()
     mavenCentral()
-
-    jcenter()
 
     // jitpack should be last resort
     // see: https://github.com/jitpack/jitpack.io/issues/1939
