@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service.evidence;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -37,7 +38,6 @@ import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.assertj.core.util.Lists;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Rule;
@@ -412,10 +412,9 @@ public class EvidenceUploadServiceTest {
         String docType = "statement";
         String caseId = "1234";
 
-        Exception exception = assertThrows(EvidenceUploadException.class, () -> {
-            evidenceUploadService.getLoadSafe(badBytes, docType, caseId);
+        Exception exception = assertThrows(EvidenceUploadException.class, () ->
+            EvidenceUploadService.getLoadSafe(badBytes, docType, caseId));
 
-        });
         assertTrue(exception.getMessage().contains("Error when getting PDDocument " + docType
                 + " for caseId " + caseId + " with bytes length " + badBytes.length));
     }
@@ -614,7 +613,7 @@ public class EvidenceUploadServiceTest {
     }
 
     private SscsCaseDetails createSscsCaseDetailsDraftDocsJustDescription(String fileName) {
-        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder()
+        return SscsCaseDetails.builder()
                 .id(someCcdCaseId)
                 .data(SscsCaseData.builder()
                         .draftSscsDocument(singletonList(SscsDocument.builder()
@@ -628,8 +627,6 @@ public class EvidenceUploadServiceTest {
                                 .build()))
                         .build())
                 .build();
-
-        return sscsCaseDetails;
     }
 
     @Test
@@ -675,7 +672,7 @@ public class EvidenceUploadServiceTest {
     @Test
     public void givenListDraftHearingEvidenceIsEmptyThenShouldReturnEmptyEvidence() {
         String identifier = "12345";
-        List<SscsDocument> draftSscsDocument = Lists.emptyList();
+        List<SscsDocument> draftSscsDocument = emptyList();
         SscsCaseDetails caseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().draftSscsDocument(draftSscsDocument).build()).build();
         when(onlineHearingService.getCcdCaseByIdentifier(identifier)).thenReturn(Optional.of(caseDetails));
         List<Evidence> result = evidenceUploadService.listDraftHearingEvidence(identifier);

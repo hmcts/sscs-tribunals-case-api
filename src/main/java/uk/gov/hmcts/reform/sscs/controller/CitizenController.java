@@ -37,7 +37,7 @@ public class CitizenController {
         this.idamService = idamService;
     }
 
-    @GetMapping
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Loads cases associated with a citizen",
             notes = "Loads the cases that have been associated with a citizen in CCD. Gets the user from the token "
                     + "in the Authorization header."
@@ -51,7 +51,7 @@ public class CitizenController {
         return getOnlineHearingsForTyaNumber(authorisation, "");
     }
 
-    @GetMapping(value = "{tya}")
+    @GetMapping(value = "{tya}", produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Loads cases associated with a citizen",
             notes = "Loads the cases that have been associated with a citizen in CCD. If a tya parameter is provided "
                     + "then the list will be limited to the case with the tya number or be empty if the case has not "
@@ -69,7 +69,7 @@ public class CitizenController {
         return ResponseEntity.ok(casesForCitizen);
     }
 
-    @GetMapping(value = "/cases/active")
+    @GetMapping(value = "/cases/active", produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Loads active cases associated with a citizen",
             notes = "Loads the active cases that have been associated with a citizen in CCD. If a tya parameter is provided "
                     + "then the list will be limited to the case with the tya number or be empty if the case has not "
@@ -86,7 +86,7 @@ public class CitizenController {
         return ResponseEntity.ok(casesForCitizen);
     }
 
-    @GetMapping(value = "/cases/dormant")
+    @GetMapping(value = "/cases/dormant", produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Loads dormant cases associated with a citizen",
             notes = "Loads the dormant cases that have been associated with a citizen in CCD. If a tya parameter is provided "
                     + "then the list will be limited to the case with the tya number or be empty if the case has not "
@@ -114,7 +114,7 @@ public class CitizenController {
                 .build();
     }
 
-    @PostMapping(value = "{tya}")
+    @PostMapping(value = "{tya}", produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Associates a case with a citizen",
             notes = "Associates a case in CCD with a citizen idam user. Checks the TYA number, email and postcode are "
                     + "all match the case before associating the case with the idam user."
