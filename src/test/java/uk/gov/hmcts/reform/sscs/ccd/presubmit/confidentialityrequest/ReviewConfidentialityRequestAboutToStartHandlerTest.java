@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import junitparams.JUnitParamsRunner;
@@ -126,7 +127,7 @@ public class ReviewConfidentialityRequestAboutToStartHandlerTest {
     @Test
     public void givenNoConfidentialityRequestsAreInProgressShouldDisplayAnErrorWhenJointPartyWhenJointPartyExists(RequestOutcome appellantOutcome, RequestOutcome jointPartyOutcome) {
 
-        sscsCaseData.setJointParty("Yes");
+        sscsCaseData.getJointParty().setHasJointParty(YES);
         sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantOutcome));
         sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyOutcome));
 
@@ -143,7 +144,7 @@ public class ReviewConfidentialityRequestAboutToStartHandlerTest {
     @Test
     public void givenAppellantConfidentialityRequestOnlyIsInProgressShouldNotDisplayAnErrorWhenJointPartyExists(RequestOutcome jointPartyRequestOutcome) {
 
-        sscsCaseData.setJointParty("Yes");
+        sscsCaseData.getJointParty().setHasJointParty(YES);
         sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyRequestOutcome));
         sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS));
 
@@ -160,7 +161,7 @@ public class ReviewConfidentialityRequestAboutToStartHandlerTest {
     @Test
     public void givenJointPartyConfidentialityRequestOnlyIsInProgressShouldNotDisplayAnErrorWhenJointPartyExists(RequestOutcome appellantRequestOutcome) {
 
-        sscsCaseData.setJointParty("Yes");
+        sscsCaseData.getJointParty().setHasJointParty(YES);
         sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantRequestOutcome));
         sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS));
 
@@ -175,7 +176,7 @@ public class ReviewConfidentialityRequestAboutToStartHandlerTest {
     @Test
     public void givenBothRequestsInProgressShouldNotDisplayAnErrorWhenJointPartyExists() {
 
-        sscsCaseData.setJointParty("Yes");
+        sscsCaseData.getJointParty().setHasJointParty(YES);
         sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS));
         sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS));
 

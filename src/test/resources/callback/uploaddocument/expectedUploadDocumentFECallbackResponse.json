@@ -29,6 +29,8 @@
           "phone": "01424 752419",
           "mobile": null
         },
+        "organisation": null,
+        "id": null,
         "identity": {
           "dob": "1900-01-01",
           "nino": "JT 12 34 56 D"
@@ -41,7 +43,8 @@
           "name": null,
           "address": null,
           "contact": null,
-          "identity": null
+          "identity": null,
+          "organisation": null
         },
         "isAddressSameAsAppointee": null
       },
@@ -56,6 +59,7 @@
       "appealReasons": {},
       "rep": {
         "id": null,
+        "identity": null,
         "hasRepresentative": "Yes",
         "organisation": "HP Ltd",
         "name": {

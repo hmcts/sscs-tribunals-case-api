@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.smoke;
 
+import static java.util.Objects.nonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
@@ -22,7 +23,7 @@ public class GetSavedCase  extends BaseHandler {
 
     @Test
     public void retrieveCaseFromCcd() throws Exception {
-        RestAssured.baseURI = tcaInstance;
+        RestAssured.baseURI = nonNull(tcaInstance) ? tcaInstance : testUrl;
         RestAssured.useRelaxedHTTPSValidation();
 
         SscsCaseDetails sscsCaseDetails = createCaseInWithDwpState(2);

@@ -42,6 +42,8 @@
         "phone": null,
         "mobile": "07411222222"
       },
+      "organisation": null,
+      "id": null,
       "identity": {
         "dob": "1990-02-26",
         "nino": "AB877533C"
@@ -93,6 +95,7 @@
     },
     "rep": {
       "id": null,
+      "identity": null,
       "hasRepresentative": "Yes",
       "name": {
         "title": "Mr",

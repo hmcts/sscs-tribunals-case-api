@@ -66,7 +66,7 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
                                 .organisation("org")
                                 .build())
                         .build())
-                .jointParty(YES.getValue())
+                .jointParty(JointParty.builder().hasJointParty(YES).build())
                 .hearings(List.of(HEARING, getHearing("an_id2")))
                 .sscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder()
                         .selectHearingDetails(new DynamicList(selectedHearing, Arrays.asList(selectedHearing)))

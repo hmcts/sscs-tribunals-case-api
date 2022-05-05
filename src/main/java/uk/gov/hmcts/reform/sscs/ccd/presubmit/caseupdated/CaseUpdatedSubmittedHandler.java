@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -74,12 +76,12 @@ public class CaseUpdatedSubmittedHandler implements PreSubmitCallbackHandler<Ssc
         CaseDetails oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
         if (oldCaseDetails != null) {
             SscsCaseData oldCaseData = (SscsCaseData) oldCaseDetails.getCaseData();
-            if (oldCaseData.getJointParty() == null || StringUtils.equalsIgnoreCase(oldCaseData.getJointParty(),"No")) {
+            if (isNoOrNull(oldCaseData.getJointParty().getHasJointParty())) {
                 wasNotAlreadyJointParty = true;
             }
         } else {
             wasNotAlreadyJointParty = true;
         }
-        return wasNotAlreadyJointParty && caseData.getJointParty() != null && StringUtils.equalsIgnoreCase("Yes", caseData.getJointParty());
+        return wasNotAlreadyJointParty && isYes(caseData.getJointParty().getHasJointParty());
     }
 }
