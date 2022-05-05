@@ -141,7 +141,9 @@ dependencyUpdates.resolutionStrategy = {
 
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
 dependencyCheck {
-    failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'false' ? 11 : 0
+    // Specifies if the build should be failed if a CVSS score above a specified level is identified.
+    // range of 7-10 fails the build, anything lower and it doesn't fail the build
+    failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 7.0 : 11
     suppressionFile = 'dependency-check-suppressions.xml'
 }
 
