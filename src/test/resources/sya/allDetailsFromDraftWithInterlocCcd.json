@@ -158,7 +158,10 @@
     },
     "rep": {
       "id": null,
-      "identity": null,
+      "identity": {
+        "dob": null,
+        "nino": null
+      },
       "hasRepresentative": "Yes",
       "name": {
         "title": "Mr",

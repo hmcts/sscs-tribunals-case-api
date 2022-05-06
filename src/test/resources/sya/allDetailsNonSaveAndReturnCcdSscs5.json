@@ -157,6 +157,11 @@
       "otherReasons": "Another reason"
     },
     "rep": {
+      "id": null,
+      "identity": {
+        "dob": null,
+        "nino": null
+      },
       "hasRepresentative": "Yes",
       "name": {
         "title": "Mr",
@@ -175,9 +180,7 @@
         "phone": null,
         "mobile": "07411999999"
       },
-      "organisation": "HP Ltd",
-      "id": null,
-      "identity": null
+      "organisation": "HP Ltd"
     },
     "signer": "Joe Bloggs",
     "hearingSubtype": {},
