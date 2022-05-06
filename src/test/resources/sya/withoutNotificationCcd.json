@@ -42,6 +42,8 @@
         "phone": null,
         "mobile": null
       },
+      "organisation": null,
+      "id": null,
       "identity": {
         "dob": "1990-02-26",
         "nino": "AB877533C"
@@ -114,6 +116,7 @@
     },
     "rep": {
       "id": null,
+      "identity": null,
       "hasRepresentative": "Yes",
       "name": {
         "title": "Mr",

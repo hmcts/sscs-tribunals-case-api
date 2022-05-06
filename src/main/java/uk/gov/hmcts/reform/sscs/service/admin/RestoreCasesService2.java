@@ -13,15 +13,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
-import com.opencsv.exceptions.CsvValidationException;
 import feign.FeignException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -73,8 +70,8 @@ public class RestoreCasesService2 {
         return jsonNode;
     }
 
-    public RestoreCasesStatus restoreCases(String path) {
-        List<String> caseIdsToRestore = getCaseIdsToRestoreFromCsv(path);
+    public RestoreCasesStatus restoreCases(CSVReader reader) {
+        List<String> caseIdsToRestore = getCaseIdsToRestoreFromCsv(reader);
         IdamTokens idamTokens = idamService.getIdamTokens();
 
         List<Long> successIds = new ArrayList<>();
@@ -99,15 +96,10 @@ public class RestoreCasesService2 {
         return new RestoreCasesStatus(processedCount, successIds.size(), failureIds, false);
     }
 
-    private List<String> getCaseIdsToRestoreFromCsv(String path) {
-        List<String> allCasesToRestore = new ArrayList();
+    private List<String> getCaseIdsToRestoreFromCsv(CSVReader reader) {
+        List<String> allCasesToRestore = new ArrayList<>();
 
-        ClassPathResource classPathResource = new ClassPathResource(path);
-
-        CSVReader reader = null;
         try {
-            reader = new CSVReader(new InputStreamReader(classPathResource.getInputStream()));
-
             reader.readNext();
 
             List<String[]> linesList = reader.readAll();
@@ -117,15 +109,11 @@ public class RestoreCasesService2 {
 
         } catch (IOException e) {
             log.error("IOException from RestoreCasesService2: ", e);
-        } catch (CsvValidationException e) {
-            log.error("CsvValidationException from RestoreCasesService2: ", e);
         } catch (CsvException e) {
             log.error("CsvException from RestoreCasesService2: ", e);
         } finally {
             try {
-                if (reader != null) {
-                    reader.close();
-                }
+                reader.close();
             } catch (IOException e) {
                 log.error("IOException from RestoreCasesService2 in finally: ", e);
             }

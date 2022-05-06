@@ -260,7 +260,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
 
         String dateToTest = LocalDate.now().minusYears(1).toString();
 
-        sscsCaseData.setJointPartyIdentity(Identity.builder().dob(dateToTest).build());
+        sscsCaseData.getJointParty().setIdentity(Identity.builder().dob(dateToTest).build());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -274,7 +274,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
 
         String dateToTest = LocalDate.now().toString();
 
-        sscsCaseData.setJointPartyIdentity(Identity.builder().dob(dateToTest).build());
+        sscsCaseData.getJointParty().setIdentity(Identity.builder().dob(dateToTest).build());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -289,7 +289,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
 
         String dateToTest = LocalDate.now().plusYears(1).toString();
 
-        sscsCaseData.setJointPartyIdentity(Identity.builder().dob(dateToTest).build());
+        sscsCaseData.getJointParty().setIdentity(Identity.builder().dob(dateToTest).build());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -312,7 +312,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
     @Test
     public void givenValidJointPartyNinoNoSpaces_thenDoNotDisplayError() {
 
-        sscsCaseData.setJointPartyIdentity(Identity.builder().nino("BB000000B").build());
+        sscsCaseData.getJointParty().setIdentity(Identity.builder().nino("BB000000B").build());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -324,7 +324,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
     @Test
     public void givenValidJointPartyNinoWithSpaces_thenDoNotDisplayError() {
 
-        sscsCaseData.setJointPartyIdentity(Identity.builder().nino("BB 00 00 00 B").build());
+        sscsCaseData.getJointParty().setIdentity(Identity.builder().nino("BB 00 00 00 B").build());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -337,7 +337,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
     @Test
     public void givenInvalidJointPartyNino_thenDoDisplayError() {
 
-        sscsCaseData.setJointPartyIdentity(Identity.builder().nino("blah").build());
+        sscsCaseData.getJointParty().setIdentity(Identity.builder().nino("blah").build());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -357,7 +357,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
             .county("some text")
             .postcode("w1p 4df").build();
 
-        sscsCaseData.setJointPartyAddress(jointPartyAddress);
+        sscsCaseData.getJointParty().setAddress(jointPartyAddress);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -371,7 +371,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
 
         Address jointPartyAddress = Address.builder().line1("some $ text").build();
 
-        sscsCaseData.setJointPartyAddress(jointPartyAddress);
+        sscsCaseData.getJointParty().setAddress(jointPartyAddress);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -384,7 +384,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
 
         Address jointPartyAddress = Address.builder().line2("some $ text").build();
 
-        sscsCaseData.setJointPartyAddress(jointPartyAddress);
+        sscsCaseData.getJointParty().setAddress(jointPartyAddress);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -397,7 +397,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
 
         Address jointPartyAddress = Address.builder().town("some $ text").build();
 
-        sscsCaseData.setJointPartyAddress(jointPartyAddress);
+        sscsCaseData.getJointParty().setAddress(jointPartyAddress);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -410,7 +410,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
 
         Address jointPartyAddress = Address.builder().county("some $ text").build();
 
-        sscsCaseData.setJointPartyAddress(jointPartyAddress);
+        sscsCaseData.getJointParty().setAddress(jointPartyAddress);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -423,7 +423,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
 
         Address jointPartyAddress = Address.builder().postcode("invalid postcode").build();
 
-        sscsCaseData.setJointPartyAddress(jointPartyAddress);
+        sscsCaseData.getJointParty().setAddress(jointPartyAddress);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 

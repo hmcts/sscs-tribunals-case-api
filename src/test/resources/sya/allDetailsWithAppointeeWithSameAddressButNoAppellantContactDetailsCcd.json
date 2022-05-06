@@ -41,6 +41,8 @@
         "phone": null,
         "mobile": null
       },
+      "organisation": null,
+      "id": null,
       "identity": {
         "dob": "1990-02-26",
         "nino": "AB877533C"
@@ -62,6 +64,7 @@
           "county": "Newcastle",
           "postcode": "NE1 1AW"
         },
+        "organisation": null,
         "contact": {
           "email": "sscsappointee@greencroftconsulting.com",
           "phone": null,
@@ -135,6 +138,7 @@
     },
     "rep": {
       "id": null,
+      "identity": null,
       "hasRepresentative": "Yes",
       "name": {
         "title": "Mr",

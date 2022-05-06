@@ -893,7 +893,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(furtherEvidenceActionDynamicListItem.code, furtherEvidenceActionDynamicListItem.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
-        sscsCaseData.setJointParty(YES);
+        sscsCaseData.getJointParty().setHasJointParty(YesNo.YES);
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
@@ -924,7 +924,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     ) {
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(furtherEvidenceActionDynamicListItem.code, furtherEvidenceActionDynamicListItem.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
-        sscsCaseData.setJointParty(YES);
+        sscsCaseData.getJointParty().setHasJointParty(YesNo.YES);
         sscsCaseData.setIsProgressingViaGaps(isProgressingViaGaps);
         sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedRequestOutcome(RequestOutcome.GRANTED));
 
@@ -1086,7 +1086,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(JOINT_PARTY.getCode(), JOINT_PARTY.getLabel()));
-        sscsCaseData.setJointParty(YES);
+        sscsCaseData.getJointParty().setHasJointParty(YesNo.YES);
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
@@ -1126,7 +1126,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(REPRESENTATIVE.getCode(), REPRESENTATIVE.getLabel()));
-        sscsCaseData.setJointParty(YES);
+        sscsCaseData.getJointParty().setHasJointParty(YesNo.YES);
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
@@ -1145,7 +1145,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     public void givenChildSupportWithConfidentialRequestFromOtherPartyDoNotMatchWithDocumentOriginalSender_thenShowAnError() {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
-        sscsCaseData.setJointParty(YES);
+        sscsCaseData.getJointParty().setHasJointParty(YesNo.YES);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         OtherParty otherParty = OtherParty.builder().id("10").name(Name.builder().firstName("John").lastName("smith").build()).build();
         CcdValue ccdValue = CcdValue.builder().value(otherParty).build();
@@ -1171,7 +1171,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     public void givenChildSupportWithOtherRequestFromOtherPartyWithDocumentOriginalSenderIsNull_thenDonNotShowAnError() {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
-        sscsCaseData.setJointParty(YES);
+        sscsCaseData.getJointParty().setHasJointParty(YesNo.YES);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         OtherParty otherParty = OtherParty.builder().id("10").name(Name.builder().firstName("John").lastName("smith").build()).build();
         CcdValue ccdValue = CcdValue.builder().value(otherParty).build();
@@ -1196,7 +1196,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     public void givenChildSupportWithConfidentialRequestFromOtherPartyDoMatchWithDocumentOriginalSender_thenDontShowAnError() {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
-        sscsCaseData.setJointParty(YES);
+        sscsCaseData.getJointParty().setHasJointParty(YesNo.YES);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         OtherParty otherParty = OtherParty.builder().id("10").name(Name.builder().firstName("John").lastName("smith").build()).build();
         CcdValue ccdValue = CcdValue.builder().value(otherParty).build();
@@ -1221,7 +1221,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     public void givenChildSupportWithOtherRequestWhenOtherPartyIsEmpty_thenDontShowAnError() {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
-        sscsCaseData.setJointParty(YES);
+        sscsCaseData.getJointParty().setHasJointParty(YesNo.YES);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         sscsCaseData.setOtherParties(otherPartyList);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
@@ -1243,7 +1243,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(ISSUE_FURTHER_EVIDENCE.code, ISSUE_FURTHER_EVIDENCE.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
-        sscsCaseData.setJointParty(YES);
+        sscsCaseData.getJointParty().setHasJointParty(YesNo.YES);
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
