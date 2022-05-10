@@ -90,7 +90,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
         String error = response.getErrors().stream()
                 .findFirst()
                 .orElse("");
-        assertEquals("The bundle cannot be created as mandatory DWP documents are missing", error);
+        assertEquals("The bundle cannot be created as mandatory FTA documents are missing", error);
         verifyNoInteractions(serviceRequestExecutor);
 
     }
@@ -105,7 +105,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
         String error = response.getErrors().stream()
                 .findFirst()
                 .orElse("");
-        assertEquals("The bundle cannot be created as mandatory DWP documents are missing", error);
+        assertEquals("The bundle cannot be created as mandatory FTA documents are missing", error);
         verifyNoInteractions(serviceRequestExecutor);
     }
 
@@ -133,7 +133,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
         String error = response.getErrors().stream()
                 .findFirst()
                 .orElse("");
-        assertEquals("The bundle cannot be created as mandatory DWP documents are missing", error);
+        assertEquals("The bundle cannot be created as mandatory FTA documents are missing", error);
         verifyNoInteractions(serviceRequestExecutor);
     }
 
@@ -147,7 +147,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
         String error = response.getErrors().stream()
                 .findFirst()
                 .orElse("");
-        assertEquals("The bundle cannot be created as mandatory DWP documents are missing", error);
+        assertEquals("The bundle cannot be created as mandatory FTA documents are missing", error);
         verifyNoInteractions(serviceRequestExecutor);
     }
 
@@ -167,7 +167,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
                 .findFirst()
                 .orElse("");
 
-        assertEquals("The bundle cannot be created as mandatory DWP documents are missing, do you want to proceed?", warning);
+        assertEquals("The bundle cannot be created as mandatory FTA documents are missing, do you want to proceed?", warning);
         verifyNoInteractions(serviceRequestExecutor);
 
     }
@@ -185,7 +185,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
                 .findFirst()
                 .orElse("");
 
-        assertEquals("The bundle cannot be created as mandatory DWP documents are missing, do you want to proceed?", warning);
+        assertEquals("The bundle cannot be created as mandatory FTA documents are missing, do you want to proceed?", warning);
         verifyNoInteractions(serviceRequestExecutor);
     }
 
@@ -203,7 +203,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
                 .findFirst()
                 .orElse("");
 
-        assertEquals("The bundle cannot be created as mandatory DWP documents are missing, do you want to proceed?", warning);
+        assertEquals("The bundle cannot be created as mandatory FTA documents are missing, do you want to proceed?", warning);
         verifyNoInteractions(serviceRequestExecutor);
     }
 
@@ -219,7 +219,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
                 .findFirst()
                 .orElse("");
 
-        assertEquals("The bundle cannot be created as mandatory DWP documents are missing, do you want to proceed?", warning);
+        assertEquals("The bundle cannot be created as mandatory FTA documents are missing, do you want to proceed?", warning);
         verifyNoInteractions(serviceRequestExecutor);
     }
 }

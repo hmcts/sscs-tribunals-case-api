@@ -2,18 +2,36 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
+import uk.gov.hmcts.reform.sscs.service.servicebus.HearingMessagingServiceFactory;
 
 @Service
 @Slf4j
 public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private final boolean gapsSwitchOverFeature;
+
+    private final RegionalProcessingCenterService regionalProcessingCenterService;
+
+    private final HearingMessagingServiceFactory hearingMessagingServiceFactory;
+
+    public ReadyToListAboutToSubmitHandler(@Value("${feature.gaps-switchover.enabled}") boolean gapsSwitchOverFeature,
+                                           @Autowired RegionalProcessingCenterService regionalProcessingCenterService,
+                                           @Autowired HearingMessagingServiceFactory hearingMessagingServiceFactory) {
+        this.gapsSwitchOverFeature = gapsSwitchOverFeature;
+        this.regionalProcessingCenterService = regionalProcessingCenterService;
+        this.hearingMessagingServiceFactory = hearingMessagingServiceFactory;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -21,7 +39,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.READY_TO_LIST;
+            && callback.getEvent() == EventType.READY_TO_LIST;
     }
 
     @Override
@@ -30,19 +48,25 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback.");
         }
-        final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        log.info(String.format("createdInGapsFrom is %s for caseId %s",
-                sscsCaseData.getCreatedInGapsFrom(), sscsCaseData.getCcdCaseId()));
-
-        if (sscsCaseData.getCreatedInGapsFrom() == null
-                || StringUtils.equalsIgnoreCase(sscsCaseData.getCreatedInGapsFrom(), State.VALID_APPEAL.getId())) {
-            callbackResponse.addError("Case already created in GAPS at valid appeal.");
-            log.warn(String.format("Case already created in GAPS at valid appeal for caseId %s.", sscsCaseData.getCcdCaseId()));
+        if (!gapsSwitchOverFeature) {
+            return HearingHandler.GAPS.handle(sscsCaseData, false,
+                hearingMessagingServiceFactory.getMessagingService(HearingRoute.GAPS));
         }
-        return callbackResponse;
+
+        String region = sscsCaseData.getRegion();
+
+        Map<String, RegionalProcessingCenter> regionalProcessingCenterMap = regionalProcessingCenterService
+            .getRegionalProcessingCenterMap();
+
+        HearingRoute route = regionalProcessingCenterMap.values().stream()
+            .filter(rpc -> rpc.getName().equalsIgnoreCase(region))
+            .map(RegionalProcessingCenter::getHearingRoute)
+            .findFirst().orElse(HearingRoute.LIST_ASSIST);
+
+        return HearingHandler.valueOf(route.name()).handle(sscsCaseData, gapsSwitchOverFeature,
+            hearingMessagingServiceFactory.getMessagingService(route));
     }
 }

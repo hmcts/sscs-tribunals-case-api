@@ -1,6 +1,6 @@
 {
   "caseCreated" : "${json-unit.ignore}",
-  "caseAccessCategory": "Child Support",
+  "caseAccessCategory": "childSupport",
   "caseManagementCategory": {
     "value": {
       "code": "childSupport",
@@ -13,6 +13,8 @@
       }
     ]
   },
+  "caseManagementLocation":{"baseLocation":"239985","region":"6"},
+  "addedDocuments": null,
   "caseNameHmctsInternal": "Joe Bloggs",
   "caseNameHmctsRestricted": "Joe Bloggs",
   "caseNamePublic": "Joe Bloggs",
@@ -31,7 +33,8 @@
     "postcode" : "BD3 7BH",
     "phoneNumber" : "0300 123 1142",
     "faxNumber" : "0126 434 7983",
-    "email": "SSCS_Bradford@justice.gov.uk"
+    "email": "SSCS_Bradford@justice.gov.uk",
+    "hearingRoute":null
   },
   "appeal": {
     "mrnDetails": {
@@ -58,6 +61,8 @@
         "phone": null,
         "mobile": null
       },
+      "organisation": null,
+      "id": null,
       "identity": {
         "dob": "1990-02-26",
         "nino": "AB877533C"
@@ -83,6 +88,7 @@
           "phone": null,
           "mobile": "01234567810"
         },
+        "organisation": null,
         "identity": {
           "dob": "1991-03-31",
           "nino": null
@@ -151,6 +157,11 @@
       "otherReasons": "Another reason"
     },
     "rep": {
+      "id": null,
+      "identity": {
+        "dob": null,
+        "nino": null
+      },
       "hasRepresentative": "Yes",
       "name": {
         "title": "Mr",
@@ -169,8 +180,7 @@
         "phone": null,
         "mobile": "07411999999"
       },
-      "organisation": "HP Ltd",
-      "id": null
+      "organisation": "HP Ltd"
     },
     "signer": "Joe Bloggs",
     "hearingSubtype": {},

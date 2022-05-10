@@ -3,7 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.sscs.idam.UserRole.SYSTEM_USER;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.checkConfidentiality;
 
 import java.util.Arrays;
@@ -24,9 +25,11 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish.IsScottishHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
+import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 @Component
@@ -38,6 +41,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final AirLookupService airLookupService;
     private final DwpAddressLookupService dwpAddressLookupService;
     private IdamService idamService;
+    private final RefDataService refDataService;
     private final boolean workAllocationFeature;
 
     @Autowired
@@ -46,12 +50,14 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                     AirLookupService airLookupService,
                                     DwpAddressLookupService dwpAddressLookupService,
                                     IdamService idamService,
+                                    RefDataService refDataService,
                                     @Value("${feature.work-allocation.enabled}")  boolean workAllocationFeature) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
         this.airLookupService = airLookupService;
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.idamService = idamService;
+        this.refDataService = refDataService;
         this.workAllocationFeature = workAllocationFeature;
     }
 
@@ -76,14 +82,22 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        setCaseCode(preSubmitCallbackResponse, callback);
+        final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
+        final boolean hasSuperUserRole = userDetails.hasRole(SUPER_USER);
+
+        setCaseCode(preSubmitCallbackResponse, callback, hasSuperUserRole);
+        validateBenefitForCase(preSubmitCallbackResponse, callback, hasSuperUserRole);
+        if (!preSubmitCallbackResponse.getErrors().isEmpty()) {
+            return preSubmitCallbackResponse;
+        }
 
         if (sscsCaseData.getAppeal().getAppellant() != null
                 && sscsCaseData.getAppeal().getAppellant().getAddress() != null
                 && isNotBlank(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode())) {
 
-            RegionalProcessingCenter newRpc =
-                    regionalProcessingCenterService.getByPostcode(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
+
+            String postCode = resolvePostCode(sscsCaseData);
+            RegionalProcessingCenter newRpc = regionalProcessingCenterService.getByPostcode(postCode);
 
             maybeChangeIsScottish(sscsCaseData.getRegionalProcessingCenter(), newRpc, sscsCaseData);
 
@@ -101,7 +115,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         updateCaseNameIfNameUpdated(callback, sscsCaseData);
         updateCaseCategoriesIfBenefitTypeUpdated(callback, sscsCaseData, preSubmitCallbackResponse);
 
-        final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
         final boolean hasSystemUserRole = userDetails.hasRole(SYSTEM_USER);
 
         updateHearingTypeForNonSscs1Case(sscsCaseData, preSubmitCallbackResponse, hasSystemUserRole);
@@ -179,7 +192,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private boolean validateDwpIssuingOffice(MrnDetails mrnDetails, BenefitType benefitType, PreSubmitCallbackResponse<SscsCaseData> response) {
         if (mrnDetails != null) {
             if (StringUtils.isEmpty(mrnDetails.getDwpIssuingOffice())) {
-                response.addWarning("DWP issuing office is empty");
+                response.addWarning("FTA issuing office is empty");
                 return false;
             } else if (Benefit.findBenefitByShortName(benefitType.getCode()).isPresent()) {
                 if (!dwpAddressLookupService.validateIssuingOffice(benefitType.getCode(), mrnDetails.getDwpIssuingOffice())) {
@@ -204,24 +217,27 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private void updateProcessingVenueIfRequired(CaseDetails<SscsCaseData> caseDetails) {
 
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
-
-        String postCode = "yes".equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())
-            && null != sscsCaseData.getAppeal().getAppellant().getAppointee()
-            && null != sscsCaseData.getAppeal().getAppellant().getAppointee().getAddress()
-            && null != sscsCaseData.getAppeal().getAppellant().getAppointee().getAddress().getPostcode()
-                ? sscsCaseData.getAppeal().getAppellant().getAppointee().getAddress().getPostcode()
-                : sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
-
+        String postCode = resolvePostCode(sscsCaseData);
+        log.info("updateProcessingVenueIfRequired for post code " + postCode);
         String venue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
 
+        log.info("venue i s {}", venue);
         if (venue != null && !venue.equalsIgnoreCase(sscsCaseData.getProcessingVenue())) {
             log.info("Case id: {} - setting venue name to {} from {}", caseDetails.getId(), venue, sscsCaseData.getProcessingVenue());
 
             sscsCaseData.setProcessingVenue(venue);
+
+            if (workAllocationFeature && !StringUtils.isEmpty(venue)) {
+                CourtVenue courtVenue = refDataService.getVenueRefData(venue);
+                if (courtVenue != null) {
+                    sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
+                            .baseLocation(courtVenue.getEpimsId())
+                            .region(courtVenue.getRegionId()).build());
+                }
+            }
         }
 
     }
-
 
     private void updateCaseNameIfNameUpdated(Callback<SscsCaseData> callback, SscsCaseData caseData) {
         if (workAllocationFeature) {
@@ -272,6 +288,22 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         } else {
             return oldCaseDetails.getCaseData().getBenefitType();
         }
+    }
+
+    private String resolvePostCode(SscsCaseData sscsCaseData) {
+        String postCode;
+
+        if ("yes".equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())) {
+            postCode = Optional.ofNullable(sscsCaseData.getAppeal().getAppellant().getAppointee())
+                .map(Appointee::getAddress)
+                .map(Address::getPostcode)
+                .filter(appointeePostCode -> !"".equals(appointeePostCode))
+                .orElse(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
+        } else {
+            postCode = sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
+        }
+
+        return postCode;
     }
 
 }

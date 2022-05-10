@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.sscs.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
@@ -46,6 +49,16 @@ public class AudioVideoEvidenceUtilTest {
     })
     public void shouldBeValidAudioVideoDocumentType(String documentType) {
         assertTrue(AudioVideoEvidenceUtil.isValidAudioVideoDocumentType(documentType));
+    }
+
+    @Test
+    @Parameters({
+        "test.mp3, audioDocument",
+        "test2.mp4, videoDocument",
+        "test3.doc, null",
+    })
+    public void shouldReturnCorrectDocumentTypeValue(String documentFileName, @Nullable String documentTypeValue) {
+        assertEquals(AudioVideoEvidenceUtil.getDocumentTypeValue(documentFileName), documentTypeValue);
     }
 
     @Test

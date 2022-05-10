@@ -1,6 +1,8 @@
 {
   "caseReference": "SC022/14/12423",
+  "addedDocuments": null,
   "region": "BIRMINGHAM",
+  "addedDocuments": null,
   "appeal": {
     "mrnDetails": {
       "dwpIssuingOffice": "test-hmcts-address",
@@ -26,6 +28,8 @@
         "phone": "01424 752419",
         "mobile": null
       },
+      "organisation": null,
+      "id": null,
       "identity": {
         "dob": "1900-01-01",
         "nino": "JT 12 34 56 D"
@@ -38,7 +42,8 @@
         "name": null,
         "address": null,
         "contact": null,
-        "identity": null
+        "identity": null,
+        "organisation": null
       },
       "isAddressSameAsAppointee": null
     },
@@ -54,6 +59,7 @@
     "rep": {
       "hasRepresentative": "Yes",
       "id":null,
+      "identity": null,
       "organisation": "HP Ltd",
       "name": {
         "title": "Mr",
@@ -181,7 +187,8 @@
     "address3": "Administrative Support Centre",
     "postcode": "B16 6FR",
     "city": "BIRMINGHAM",
-    "email": "Birmingham-SYA-Receipts@justice.gov.uk"
+    "email": "Birmingham-SYA-Receipts@justice.gov.uk",
+    "hearingRoute": null
   },
   "sscsDocument": [{
     "value": {

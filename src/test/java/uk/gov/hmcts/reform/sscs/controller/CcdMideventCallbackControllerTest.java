@@ -28,6 +28,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
+import org.springframework.http.converter.xml.SourceHttpMessageConverter;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
@@ -104,7 +110,12 @@ public class CcdMideventCallbackControllerTest {
 
         controller = new CcdMideventCallbackController(authorisationService, deserializer, decisionNoticeService,
             adjournCasePreviewService, adjournCaseCcdService, restoreCasesService2);
-        mockMvc = standaloneSetup(controller).build();
+        mockMvc = standaloneSetup(controller)
+            .setMessageConverters(new ByteArrayHttpMessageConverter(), new StringHttpMessageConverter(),
+                new ResourceHttpMessageConverter(false), new SourceHttpMessageConverter<>(),
+                new AllEncompassingFormHttpMessageConverter(),
+                new MappingJackson2HttpMessageConverter())
+            .build();
     }
 
     @Test
@@ -136,9 +147,9 @@ public class CcdMideventCallbackControllerTest {
         RestoreCasesStatus status = new RestoreCasesStatus(10, 6,
             Arrays.asList(1L, 2L, 3L, 4L), false);
 
-        Mockito.when(restoreCasesService2.restoreCases("csv/somePath")).thenReturn(status);
+        Mockito.when(restoreCasesService2.restoreCases(any())).thenReturn(status);
 
-        Mockito.when(restoreCasesService2.getRestoreCaseFileName(anyString())).thenReturn("somePath");
+        Mockito.when(restoreCasesService2.getRestoreCaseFileName(anyString())).thenReturn("restore-cases1.csv");
 
         // We don't care what the content is for this test, as we are defining behaviour through the
         // restoreCasesService2 mock config above
@@ -169,9 +180,9 @@ public class CcdMideventCallbackControllerTest {
         RestoreCasesStatus status = new RestoreCasesStatus(10, 10,
             Arrays.asList(), false);
 
-        Mockito.when(restoreCasesService2.restoreCases("csv/somePath")).thenReturn(status);
+        Mockito.when(restoreCasesService2.restoreCases(any())).thenReturn(status);
 
-        Mockito.when(restoreCasesService2.getRestoreCaseFileName(anyString())).thenReturn("somePath");
+        Mockito.when(restoreCasesService2.getRestoreCaseFileName(anyString())).thenReturn("restore-cases1.csv");
 
         // We don't care what the content is for this test, as we are defining behaviour through the
         // restoreCasesService2 mock config above
@@ -202,9 +213,9 @@ public class CcdMideventCallbackControllerTest {
         RestoreCasesStatus status = new RestoreCasesStatus(10, 10,
             Arrays.asList(), true);
 
-        Mockito.when(restoreCasesService2.restoreCases("csv/somePath")).thenReturn(status);
+        Mockito.when(restoreCasesService2.restoreCases(any())).thenReturn(status);
 
-        Mockito.when(restoreCasesService2.getRestoreCaseFileName(anyString())).thenReturn("somePath");
+        Mockito.when(restoreCasesService2.getRestoreCaseFileName(anyString())).thenReturn("restore-cases1.csv");
 
         // We don't care what the content is for this test, as we are defining behaviour through the
         // restoreCasesService2 mock config above
@@ -232,9 +243,9 @@ public class CcdMideventCallbackControllerTest {
     @Test
     public void handleCcdMidEventAdminRestoreCasesWhenPathIsExtractedAndRestoreNextBatchThrowsException() throws Exception {
 
-        Mockito.when(restoreCasesService2.restoreCases("csv/somePath")).thenThrow(new RuntimeException("anything"));
+        Mockito.when(restoreCasesService2.restoreCases(any())).thenThrow(new RuntimeException("anything"));
 
-        Mockito.when(restoreCasesService2.getRestoreCaseFileName(anyString())).thenReturn("somePath");
+        Mockito.when(restoreCasesService2.getRestoreCaseFileName(anyString())).thenReturn("restore-cases1.csv");
 
         // We don't care what the content is for this test, as we are defining behaviour through the
         // restoreCasesService2 mock config above
@@ -297,9 +308,9 @@ public class CcdMideventCallbackControllerTest {
         RestoreCasesStatus status = new RestoreCasesStatus(10, 6,
             Arrays.asList(1L, 2L, 3L, 4L), true);
 
-        Mockito.when(restoreCasesService2.restoreCases("csv/somePath")).thenReturn(status);
+        Mockito.when(restoreCasesService2.restoreCases(any())).thenReturn(status);
 
-        Mockito.when(restoreCasesService2.getRestoreCaseFileName(anyString())).thenReturn("somePath");
+        Mockito.when(restoreCasesService2.getRestoreCaseFileName(anyString())).thenReturn("restore-cases1.csv");
 
 
         // We don't care what the content is for this test, as we are defining behaviour through the

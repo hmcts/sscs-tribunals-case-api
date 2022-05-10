@@ -52,7 +52,7 @@ public class BaseHandler {
     protected IdamTokens idamTokens;
 
     @Value("${test-url}")
-    private String testUrl;
+    protected String testUrl;
 
     @Before
     public void setUp() {

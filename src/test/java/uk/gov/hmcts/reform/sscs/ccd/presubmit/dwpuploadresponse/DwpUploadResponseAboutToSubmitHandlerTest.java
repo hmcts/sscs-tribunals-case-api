@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
 import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -13,9 +14,16 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVI
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse.DwpUploadResponseAboutToSubmitHandler.NEW_OTHER_PARTY_RESPONSE_DUE_DAYS;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -33,6 +41,7 @@ import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 
 @RunWith(JUnitParamsRunner.class)
@@ -57,12 +66,17 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     private DwpDocumentService dwpDocumentService;
 
+    private AddedDocumentsUtil addedDocumentsUtil;
+
     @Before
     public void setUp() {
+        addedDocumentsUtil = new AddedDocumentsUtil(false);
+
         openMocks(this);
         dwpDocumentService = new DwpDocumentService();
         AddNoteService addNoteService = new AddNoteService(userDetailsService);
-        dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService, addNoteService);
+        dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
+            addNoteService, addedDocumentsUtil);
 
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
                 .forename("Chris").surname("Davis").build().getFullName());
@@ -139,7 +153,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         assertEquals(1, response.getErrors().size());
 
-        assertEquals("DWP response document cannot be empty.", response.getErrors().iterator().next());
+        assertEquals("FTA response document cannot be empty.", response.getErrors().iterator().next());
     }
 
     @Test
@@ -149,7 +163,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         assertEquals(1, response.getErrors().size());
 
-        assertEquals("DWP evidence bundle cannot be empty.", response.getErrors().iterator().next());
+        assertEquals("FTA evidence bundle cannot be empty.", response.getErrors().iterator().next());
     }
 
     @Test
@@ -241,35 +255,61 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
+        assertNull(response.getData().getDwpEvidenceBundleDocument());
+        assertNull(response.getData().getDwpEditedEvidenceBundleDocument());
+        assertNull(response.getData().getDwpResponseDocument());
+        assertNull(response.getData().getDwpEditedResponseDocument());
+
+        assertEquals(3, response.getData().getDwpDocuments().size());
+
         String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        assertAll("DwpUploadResponseDocument fileName modified but URL remains same",
-                () -> assertNull(response.getData().getDwpAT38Document()),
-                () -> assertNull(response.getData().getDwpEvidenceBundleDocument()),
-                () -> assertNull(response.getData().getDwpEditedEvidenceBundleDocument()),
-                () -> assertNull(response.getData().getDwpResponseDocument()),
-                () -> assertNull(response.getData().getDwpEditedResponseDocument()),
-                () -> assertEquals(3, response.getData().getDwpDocuments().size()),
-                () -> assertEquals(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue(), response.getData().getDwpDocuments().get(0).getValue().getDocumentType()),
-                () -> assertEquals("http://dm-store:5005/documents/defg-5678-xyzabcmnop", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl()),
-                () -> assertEquals("http://dm-store:5005/documents/defg-5678-xyzabcmnop/binary", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentBinaryUrl()),
-                () -> assertEquals("http://dm-store:5005/documents/defg-6545-xyzabcmnop", response.getData().getDwpDocuments().get(0).getValue().getEditedDocumentLink().getDocumentUrl()),
-                () -> assertEquals("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary", response.getData().getDwpDocuments().get(0).getValue().getEditedDocumentLink().getDocumentBinaryUrl()),
-                () -> assertEquals(AppConstants.DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(0).getValue().getEditedDocumentLink().getDocumentFilename()),
-                () -> assertEquals(AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentFilename()),
-                () -> assertEquals("Edited reason", response.getData().getDwpDocuments().get(0).getValue().getDwpEditedEvidenceReason()),
-                () -> assertEquals(DwpDocumentType.DWP_RESPONSE.getValue(), response.getData().getDwpDocuments().get(1).getValue().getDocumentType()),
-                () -> assertEquals("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl()),
-                () -> assertEquals("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw/binary", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentBinaryUrl()),
-                () -> assertEquals("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw", response.getData().getDwpDocuments().get(1).getValue().getEditedDocumentLink().getDocumentUrl()),
-                () -> assertEquals("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw/binary", response.getData().getDwpDocuments().get(1).getValue().getEditedDocumentLink().getDocumentBinaryUrl()),
-                () -> assertEquals(AppConstants.DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(1).getValue().getEditedDocumentLink().getDocumentFilename()),
-                () -> assertEquals(AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentFilename()),
-                () -> assertEquals("Edited reason", response.getData().getDwpDocuments().get(1).getValue().getDwpEditedEvidenceReason()),
-                () -> assertEquals(DwpDocumentType.AT_38.getValue(), response.getData().getDwpDocuments().get(2).getValue().getDocumentType()),
-                () -> assertEquals("http://dm-store:5005/documents/abcd-0123-xyzabcdefgh", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentUrl()),
-                () -> assertEquals("http://dm-store:5005/documents/abcd-0123-xyzabcdefgh/binary", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentBinaryUrl()),
-                () -> assertEquals(AppConstants.DWP_DOCUMENT_AT38_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(2).getValue().getDocumentLink().getDocumentFilename()),
-                () -> assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState()));
+
+        assertThat(response.getData().getDwpDocuments(), hasItem(
+                hasProperty("value", allOf(
+                        hasProperty("documentLink", allOf(
+                                hasProperty("documentUrl", is("http://dm-store:5005/documents/defg-5678-xyzabcmnop")),
+                                hasProperty("documentBinaryUrl", is("http://dm-store:5005/documents/defg-5678-xyzabcmnop/binary")),
+                                hasProperty("documentFilename", is(AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX + " on " + todayDate + ".pdf"))
+                        )),
+                        hasProperty("editedDocumentLink", allOf(
+                                hasProperty("documentUrl", is("http://dm-store:5005/documents/defg-6545-xyzabcmnop")),
+                                hasProperty("documentBinaryUrl", is("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary")),
+                                hasProperty("documentFilename", is(AppConstants.DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX + " on " + todayDate + ".pdf"))
+                        )),
+                        hasProperty("documentType", is(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue())),
+                        hasProperty("dwpEditedEvidenceReason", is("Edited reason"))
+                ))
+        ));
+
+        assertThat(response.getData().getDwpDocuments(), hasItem(
+                hasProperty("value", allOf(
+                        hasProperty("documentLink", allOf(
+                                hasProperty("documentUrl", is("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw")),
+                                hasProperty("documentBinaryUrl", is("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw/binary")),
+                                hasProperty("documentFilename", is(AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf"))
+                        )),
+                        hasProperty("editedDocumentLink", allOf(
+                                hasProperty("documentUrl", is("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw")),
+                                hasProperty("documentBinaryUrl", is("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw/binary")),
+                                hasProperty("documentFilename", is(AppConstants.DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf"))
+                        )),
+                        hasProperty("documentType", is(DwpDocumentType.DWP_RESPONSE.getValue())),
+                        hasProperty("dwpEditedEvidenceReason", is("Edited reason"))
+                ))
+        ));
+
+        assertThat(response.getData().getDwpDocuments(), hasItem(
+                hasProperty("value", allOf(
+                        hasProperty("documentLink", allOf(
+                                hasProperty("documentUrl", is("http://dm-store:5005/documents/abcd-0123-xyzabcdefgh")),
+                                hasProperty("documentBinaryUrl", is("http://dm-store:5005/documents/abcd-0123-xyzabcdefgh/binary")),
+                                hasProperty("documentFilename", is(AppConstants.DWP_DOCUMENT_AT38_FILENAME_PREFIX + " on " + todayDate + ".pdf"))
+                        )),
+                        hasProperty("documentType", is(DwpDocumentType.AT_38.getValue()))
+                ))
+        ));
+
+        assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
     }
 
     @Test
@@ -422,7 +462,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(1, response.getErrors().size());
 
         for (String error : response.getErrors()) {
-            assertEquals("You must upload an edited DWP response document", error);
+            assertEquals("You must upload an edited FTA response document", error);
         }
     }
 
@@ -443,7 +483,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(1, response.getErrors().size());
 
         for (String error : response.getErrors()) {
-            assertEquals("You must upload an edited DWP evidence bundle", error);
+            assertEquals("You must upload an edited FTA evidence bundle", error);
         }
     }
 
@@ -461,10 +501,21 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
 
-        assertEquals("Appendix 12 received on " + todayDate, response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
-        assertEquals("Appendix 12 received on " + todayDate + ".pdf", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentFilename());
-        assertEquals(DwpDocumentType.APPENDIX_12.getValue(), response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
-        assertEquals("existingDoc", response.getData().getDwpDocuments().get(3).getValue().getDocumentFileName());
+        assertThat(response.getData().getDwpDocuments(), hasItem(
+                hasProperty("value", allOf(
+                        hasProperty("documentLink", allOf(
+                                hasProperty("documentFilename", is("Appendix 12 received on " + todayDate + ".pdf"))
+                        )),
+                        hasProperty("documentFileName", is("Appendix 12 received on " + todayDate)),
+                        hasProperty("documentType", is(DwpDocumentType.APPENDIX_12.getValue()))
+                ))
+        ));
+
+        assertThat(response.getData().getDwpDocuments(), hasItem(
+                hasProperty("value", allOf(
+                        hasProperty("documentFileName", is("existingDoc"))
+                ))
+        ));
     }
 
     @Test
@@ -523,7 +574,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenHandleAudioVideoDocuments_thenItMovesToAudioVideoListAndFillsInFieldsSendToTcw() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
-                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
+                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build())
                 .rip1Document(DocumentLink.builder()
                         .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("rip1").build()).build();
 
@@ -537,7 +588,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         AudioVideoEvidence audioVideoEvidence = callback.getCaseDetails().getCaseData().getAudioVideoEvidence().get(0);
         assertEquals("/url", audioVideoEvidence.getValue().getDocumentLink().getDocumentUrl());
         assertEquals("rip1", audioVideoEvidence.getValue().getRip1Document().getDocumentFilename());
-        assertEquals("filename", audioVideoEvidence.getValue().getFileName());
+        assertEquals("filename.mp4", audioVideoEvidence.getValue().getFileName());
         assertEquals(UploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
         assertNotNull(audioVideoEvidence.getValue().getDateAdded());
         assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
@@ -547,7 +598,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenHandleAudioVideoDocumentsNoRip1_thenItMovesToAudioVideoListAndFillsInFieldsSendToTcw() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
-                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build()).build();
+            .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build()).build();
 
         sscsCaseData.setDwpUploadAudioVideoEvidence(Collections
                 .singletonList(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build()));
@@ -559,7 +610,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         AudioVideoEvidence audioVideoEvidence = callback.getCaseDetails().getCaseData().getAudioVideoEvidence().get(0);
         assertEquals("/url", audioVideoEvidence.getValue().getDocumentLink().getDocumentUrl());
         assertNull("rip1", audioVideoEvidence.getValue().getRip1Document());
-        assertEquals("filename", audioVideoEvidence.getValue().getFileName());
+        assertEquals("filename.mp4", audioVideoEvidence.getValue().getFileName());
         assertEquals(UploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
         assertNotNull(audioVideoEvidence.getValue().getDateAdded());
         assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
@@ -582,7 +633,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenExistingAudioVideo_thenItGetsAddedToListSendToTcw() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
-                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
+                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build())
                 .rip1Document(DocumentLink.builder()
                         .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("surveillance").build()).build();
 
@@ -606,7 +657,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenHandleAudioVideoDocumentsAndPhme_thenItMovesToAudioVideoListAndFillsInFieldsSendToJudge() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
-                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
+                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build())
                 .rip1Document(DocumentLink.builder()
                         .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("rip1").build()).build();
 
@@ -622,7 +673,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         AudioVideoEvidence audioVideoEvidence = callback.getCaseDetails().getCaseData().getAudioVideoEvidence().get(0);
         assertEquals("/url", audioVideoEvidence.getValue().getDocumentLink().getDocumentUrl());
         assertEquals("rip1", audioVideoEvidence.getValue().getRip1Document().getDocumentFilename());
-        assertEquals("filename", audioVideoEvidence.getValue().getFileName());
+        assertEquals("filename.mp4", audioVideoEvidence.getValue().getFileName());
         assertEquals(UploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
         assertNotNull(audioVideoEvidence.getValue().getDateAdded());
         assertEquals(REVIEW_BY_JUDGE.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
@@ -632,7 +683,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenHandleAudioVideoDocumentsAndInterlocReviewStateAlreadyReviewByJudge_thenLeaveAsReviewByJudge() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
-                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
+                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build())
                 .rip1Document(DocumentLink.builder()
                         .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("surveillance").build()).build();
 
@@ -653,6 +704,126 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(2, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
         assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
         assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), callback.getCaseDetails().getCaseData().getInterlocReferralReason());
+    }
+
+    @Test
+    public void givenAudioVideoDocuments_shouldComputeCorrectAudioVideoTotals() throws JsonProcessingException {
+        dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
+            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true));
+
+        List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>();
+
+        audioVideoEvidence.add(AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
+                .documentLink(DocumentLink.builder()
+                    .documentUrl("/url")
+                    .documentBinaryUrl("/url/binary")
+                    .documentFilename("video.mp4")
+                    .build())
+                .rip1Document(DocumentLink.builder()
+                    .documentUrl("/url")
+                    .documentBinaryUrl("/url/binary")
+                    .documentFilename("surveillance")
+                    .build())
+                .build())
+            .build());
+
+        audioVideoEvidence.add(AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
+                .documentLink(DocumentLink.builder()
+                    .documentUrl("/url")
+                    .documentBinaryUrl("/url/binary")
+                    .documentFilename("audio.mp3")
+                    .build())
+                .rip1Document(DocumentLink.builder()
+                    .documentUrl("/url")
+                    .documentBinaryUrl("/url/binary")
+                    .documentFilename("surveillance")
+                    .build())
+                .build())
+            .build());
+
+
+        sscsCaseData.setDwpUploadAudioVideoEvidence(audioVideoEvidence);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT,
+            callback, USER_AUTHORISATION);
+
+        Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
+            .readValue(response.getData().getWorkAllocationFields().getAddedDocuments());
+
+        org.assertj.core.api.Assertions.assertThat(addedDocuments)
+            .as("One piece of audio and video evidence each have been added, should be reflected in the map.")
+            .containsOnly(org.assertj.core.api.Assertions.entry("audioDocument", 1),
+                org.assertj.core.api.Assertions.entry("videoDocument", 1));
+    }
+
+    @Test
+    public void givenPreExistingAudioVideoDocuments_shouldComputeCorrectAudioVideoTotalsForAvAddedThisEvent() throws JsonProcessingException {
+        dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
+            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true));
+
+        List<AudioVideoEvidence> newAudioVideoEvidence = new ArrayList<>();
+
+        newAudioVideoEvidence.add(AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
+                .documentLink(DocumentLink.builder()
+                    .documentUrl("/url")
+                    .documentBinaryUrl("/url/binary")
+                    .documentFilename("video.mp4")
+                    .build())
+                .rip1Document(DocumentLink.builder()
+                    .documentUrl("/url")
+                    .documentBinaryUrl("/url/binary")
+                    .documentFilename("surveillance")
+                    .build())
+                .build())
+            .build());
+
+        List<AudioVideoEvidence> existingAudioVideoEvidence = new ArrayList<>();
+
+        existingAudioVideoEvidence.add(AudioVideoEvidence.builder().value(AudioVideoEvidenceDetails.builder()
+                .documentLink(DocumentLink.builder()
+                    .documentUrl("/url")
+                    .documentBinaryUrl("/url/binary")
+                    .documentFilename("audio.mp3")
+                    .build())
+                .rip1Document(DocumentLink.builder()
+                    .documentUrl("/url")
+                    .documentBinaryUrl("/url/binary")
+                    .documentFilename("surveillance")
+                    .build())
+                .build())
+            .build());
+
+
+        sscsCaseData.setDwpUploadAudioVideoEvidence(newAudioVideoEvidence);
+        sscsCaseData.setAudioVideoEvidence(existingAudioVideoEvidence);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT,
+            callback, USER_AUTHORISATION);
+
+        Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
+            .readValue(response.getData().getWorkAllocationFields().getAddedDocuments());
+
+        org.assertj.core.api.Assertions.assertThat(addedDocuments)
+            .as("Only video evidence was added this event, audio should not be inserted into added documents.")
+            .containsOnly(org.assertj.core.api.Assertions.entry("videoDocument", 1));
+    }
+
+    @Test
+    public void givenNoNewAudioVideoDocuments_shouldStillClearAddedDocuments() {
+        dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
+            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true));
+
+        sscsCaseData.setDwpUploadAudioVideoEvidence(new ArrayList<>());
+        sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder()
+            .addedDocuments("{audioEvidence=1}")
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT,
+            callback, USER_AUTHORISATION);
+
+        org.assertj.core.api.Assertions.assertThat(response.getData().getWorkAllocationFields().getAddedDocuments())
+            .as("Added documents should be cleared every event.")
+            .isNull();
     }
 
     @Test
@@ -689,7 +860,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenADwpUploadResponseEventWithRip1DocumentAndAvFile_thenDoNotDisplayAnError() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
-                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
+                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build())
                 .rip1Document(DocumentLink.builder()
                         .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("surveillance").build()).build();
 
@@ -706,7 +877,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenADwpUploadResponseEventWithAvFileAndNoRip1Document_thenDoNotDisplayAnError() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
-                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename").build())
+                .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build())
                 .rip1Document(null).build();
 
         List<AudioVideoEvidence> audioVideoList = new ArrayList<>();
@@ -762,7 +933,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(getMovieDocument());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("DWP response document must be a PDF."));
+        assertThat(response.getErrors().iterator().next(), is("FTA response document must be a PDF."));
     }
 
     @Test
@@ -770,7 +941,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(getMovieDocument());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("DWP evidence bundle must be a PDF."));
+        assertThat(response.getErrors().iterator().next(), is("FTA evidence bundle must be a PDF."));
     }
 
     @Test
@@ -778,7 +949,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpAT38Document(getMovieDocument());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("DWP AT38 document must be a PDF."));
+        assertThat(response.getErrors().iterator().next(), is("FTA AT38 document must be a PDF."));
     }
 
     @Test
@@ -788,7 +959,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(getMovieDocument());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("DWP edited response document must be a PDF."));
+        assertThat(response.getErrors().iterator().next(), is("FTA edited response document must be a PDF."));
     }
 
     @Test
@@ -798,7 +969,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(getMovieDocument());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("DWP edited evidence bundle must be a PDF."));
+        assertThat(response.getErrors().iterator().next(), is("FTA edited evidence bundle must be a PDF."));
     }
 
     @Test
@@ -1146,5 +1317,46 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getWarnings().size(), is(0));
         assertThat(NO, is(response.getData().getAppeal().getAppellant().getConfidentialityRequired()));
         assertThat(null, is(response.getData().getIsConfidentialCase()));
+    }
+
+    @Test
+    @Parameters({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
+    public void givenSscs5CaseAndCaseCodeIsSetToSscs5Code_thenNoErrorIsShown(String sscs5BenefitCode) {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("taxCredit").build());
+        sscsCaseData.setBenefitCode(sscs5BenefitCode);
+        sscsCaseDataBefore.setBenefitCode("022");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(0));
+    }
+
+    @Test
+    @Parameters({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
+    public void givenSscs5CaseAndCaseCodeIsChangedToNonSscs5_thenShowError(String sscs5BenefitCode) {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("guardiansAllowance").build());
+        sscsCaseData.setBenefitCode("001");
+        sscsCaseDataBefore.setBenefitCode(sscs5BenefitCode);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getWarnings().size(), is(0));
+        assertEquals("Benefit code cannot be changed to the selected code", response.getErrors().stream().findFirst().get());
+    }
+
+    @Test
+    @Parameters({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
+    public void givenNonSscs5CaseAndCaseCodeIsSetToSscs5Code_thenErrorIsShown(String sscs5BenefitCode) {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setBenefitCode(sscs5BenefitCode);
+        sscsCaseDataBefore.setBenefitCode("022");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getWarnings().size(), is(0));
+        assertEquals("Benefit code cannot be changed to the selected code", response.getErrors().stream().findFirst().get());
     }
 }

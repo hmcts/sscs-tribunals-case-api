@@ -52,7 +52,7 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandler implements PreSubmit
             sscsCaseData.getReasonableAdjustments().setAppointee(null);
         }
 
-        if (isNoOrNull(sscsCaseData.getJointParty()) || nonNull(sscsCaseData.getReasonableAdjustments().getJointParty()) && isNoOrNull(sscsCaseData.getReasonableAdjustments().getJointParty().getWantsReasonableAdjustment())) {
+        if (isNoOrNull(sscsCaseData.getJointParty().getHasJointParty()) || nonNull(sscsCaseData.getReasonableAdjustments().getJointParty()) && isNoOrNull(sscsCaseData.getReasonableAdjustments().getJointParty().getWantsReasonableAdjustment())) {
             sscsCaseData.getReasonableAdjustments().setJointParty(null);
         }
 

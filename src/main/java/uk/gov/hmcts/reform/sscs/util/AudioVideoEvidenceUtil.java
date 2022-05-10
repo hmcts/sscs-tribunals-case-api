@@ -2,18 +2,13 @@ package uk.gov.hmcts.reform.sscs.util;
 
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DWP_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.HMCTS_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.JOINT_PARTY_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidenceDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @Slf4j
@@ -23,11 +18,21 @@ public class AudioVideoEvidenceUtil {
         //
     }
 
-    public static DocumentType getDocumentType(AudioVideoEvidenceDetails evidence) {
-        if (evidence.getDocumentLink().getDocumentFilename().toLowerCase().contains("mp3")) {
+    public static DocumentType getDocumentType(String filename) {
+        if (filename.toLowerCase().contains("mp3")) {
             return DocumentType.AUDIO_DOCUMENT;
-        } else if (evidence.getDocumentLink().getDocumentFilename().toLowerCase().contains("mp4")) {
+        } else if (filename.toLowerCase().contains("mp4")) {
             return DocumentType.VIDEO_DOCUMENT;
+        }
+        return null;
+    }
+
+    public static String getDocumentTypeValue(String filename) {
+        if (filename != null) {
+            DocumentType type = getDocumentType(filename);
+            if (type != null) {
+                return type.getValue();
+            }
         }
         return null;
     }

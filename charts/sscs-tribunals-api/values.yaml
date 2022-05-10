@@ -26,6 +26,8 @@ java:
         - docmosis-endpoint
         - docmosis-api-key
         - AppInsightsInstrumentationKey
+        - name: sscs-asb-connection-string
+          alias: HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING
   environment:
     SERVER_PORT: 8080
     REFORM_TEAM: sscs
@@ -53,8 +55,10 @@ java:
     BUNDLE_URL: http://em-ccd-orchestrator-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     DM_GATEWAY_URL: https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net
     CASE_DOCUMENT_AM_URL: "http://ccd-case-document-am-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    RD_LOCATION_REF_API_URL: "http://rd-location-ref-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     SECURE_DOC_STORE_FEATURE: true
     WORK_ALLOCATION_FEATURE: true
+    HEARINGS_EVENT_QUEUE_NAME: tribunals-to-hearing-api-{{ .Values.global.environment }}
 
 idam-pr:
   enabled: false

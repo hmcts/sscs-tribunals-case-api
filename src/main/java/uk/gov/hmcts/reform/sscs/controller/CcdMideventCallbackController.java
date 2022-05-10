@@ -4,8 +4,12 @@ import static org.apache.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.ResponseEntity.ok;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 
+import com.opencsv.CSVReader;
+import java.io.InputStreamReader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,7 +53,7 @@ public class CcdMideventCallbackController {
         this.restoreCasesService2 = restoreCasesService2;
     }
 
-    @PostMapping(path = "/ccdMidEventAdjournCasePopulateVenueDropdown")
+    @PostMapping(path = "/ccdMidEventAdjournCasePopulateVenueDropdown", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdMidEventAdjournCasePopulateVenueDropdown(
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestHeader(AUTHORIZATION) String userAuthorisation,
@@ -70,7 +74,7 @@ public class CcdMideventCallbackController {
         return ok(preSubmitCallbackResponse);
     }
 
-    @PostMapping(path = "/ccdMidEventPreviewFinalDecision")
+    @PostMapping(path = "/ccdMidEventPreviewFinalDecision", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdMidEventPreviewFinalDecision(
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestHeader(AUTHORIZATION) String userAuthorisation,
@@ -96,7 +100,7 @@ public class CcdMideventCallbackController {
         return ok(writeFinalDecisionPreviewDecisionService.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, userAuthorisation, false));
     }
 
-    @PostMapping(path = "/ccdMidEventPreviewAdjournCase")
+    @PostMapping(path = "/ccdMidEventPreviewAdjournCase", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdMidEventPreviewAdjournCase(
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestHeader(AUTHORIZATION) String userAuthorisation,
@@ -110,7 +114,7 @@ public class CcdMideventCallbackController {
         return ok(adjournCasePreviewService.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, userAuthorisation, false));
     }
 
-    @PostMapping(path = "/ccdMidEventAdminRestoreCases")
+    @PostMapping(path = "/ccdMidEventAdminRestoreCases", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdMidEventAdminRestoreCases(
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestHeader(AUTHORIZATION) String userAuthorisation,
@@ -128,7 +132,10 @@ public class CcdMideventCallbackController {
 
             String fileName = restoreCasesService2.getRestoreCaseFileName(message);
 
-            RestoreCasesStatus status = restoreCasesService2.restoreCases("csv/" + fileName);
+            ClassPathResource classPathResource = new ClassPathResource("csv/" + fileName);
+            CSVReader reader = new CSVReader(new InputStreamReader(classPathResource.getInputStream()));
+
+            RestoreCasesStatus status = restoreCasesService2.restoreCases(reader);
 
             if (!status.isCompleted()) {
                 preSubmitCallbackResponse.addError(status.toString());

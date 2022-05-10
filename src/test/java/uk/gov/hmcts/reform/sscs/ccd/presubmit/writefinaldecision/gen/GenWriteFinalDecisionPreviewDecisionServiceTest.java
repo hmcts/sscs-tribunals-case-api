@@ -9,15 +9,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import junitparams.NamedParameters;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceTestBase;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
@@ -221,6 +219,72 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDailyLivingDescriptors());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
+    }
+
+    @Test
+    public void willSetPreviewFileWithReasonsAndOtherPartiesAdded_whenAllowed() {
+
+        setCommonNonDescriptorRoutePreviewParams(sscsCaseData);
+
+        setDescriptorFlowIndicator("no", sscsCaseData);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childsupport").build());
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        CcdValue<OtherParty> otherPartyCcdValue1 = CcdValue.<OtherParty>builder().value(OtherParty.builder().name(Name.builder().firstName("otherPartyFirstName1").lastName("otherPartyLastName1").build()).build()).build();
+        CcdValue<OtherParty> otherPartyCcdValue2 = CcdValue.<OtherParty>builder().value(OtherParty.builder().name(Name.builder().firstName("otherPartyFirstName2").lastName("otherPartyLastName2").build()).build()).build();
+        otherPartyList.add(otherPartyCcdValue1);
+        otherPartyList.add(otherPartyCcdValue2);
+        sscsCaseData.setOtherParties(otherPartyList);
+        OtherPartyAttendedQuestion otherPartyAttendedQuestion1 = OtherPartyAttendedQuestion.builder().value(OtherPartyAttendedQuestionDetails.builder().otherPartyName("otherPartyFirstName1 otherPartyLastName1").attendedOtherParty(YesNo.YES).build()).build();
+        OtherPartyAttendedQuestion otherPartyAttendedQuestion2 = OtherPartyAttendedQuestion.builder().value(OtherPartyAttendedQuestionDetails.builder().otherPartyName("otherPartyFirstName2 otherPartyLastName2").attendedOtherParty(YesNo.NO).build()).build();
+        List<OtherPartyAttendedQuestion> otherPartyAttendedQuestionList = new ArrayList<>();
+        otherPartyAttendedQuestionList.add(otherPartyAttendedQuestion1);
+        otherPartyAttendedQuestionList.add(otherPartyAttendedQuestion2);
+        sscsCaseData.getSscsFinalDecisionCaseData().setOtherPartyAttendedQuestions(otherPartyAttendedQuestionList);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(null);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(DocumentLink.builder()
+                .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                .documentBinaryUrl(URL + "/binary")
+                .documentUrl(URL)
+                .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+
+        boolean appealAllowedExpectation = true;
+
+        boolean setAsideExpectation = true;
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
+                appealAllowedExpectation, setAsideExpectation, true, false, true,
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+
+        assertEquals("Judge Full Name", payload.getUserName());
+        assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
+
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+
+        assertNotNull(body);
+
+        // Common assertions
+        assertNull(body.getMobilityAwardRate());
+        assertEquals(false, body.isMobilityIsSeverelyLimited());
+        assertEquals(false, body.isMobilityIsEntited());
+        assertNull(body.getMobilityDescriptors());
+        assertNull(body.getMobilityNumberOfPoints());
+        assertNull(body.getDailyLivingDescriptors());
+        assertNull(body.getDailyLivingNumberOfPoints());
+        assertEquals(false, body.isDailyLivingIsEntited());
+        assertEquals(false, body.isDailyLivingIsSeverelyLimited());
+        assertNull(body.getDailyLivingAwardRate());
+        assertNull(body.getDailyLivingDescriptors());
+        assertNull(payload.getDateIssued());
+        assertEquals(LocalDate.now(), payload.getGeneratedDate());
+        assertEquals("otherPartyFirstName1 otherPartyLastName1", payload.getWriteFinalDecisionTemplateBody().getOtherPartyNamesAttendedHearing());
     }
 
     @Test

@@ -55,15 +55,13 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    private DwpDocumentService dwpDocumentService;
-
-    private ArgumentCaptor<BundleCallback<SscsCaseData>> capture = ArgumentCaptor.forClass(BundleCallback.class);
+    private final ArgumentCaptor<BundleCallback> capture = ArgumentCaptor.forClass(BundleCallback.class);
 
 
     @Before
     public void setUp() {
         openMocks(this);
-        dwpDocumentService = new DwpDocumentService();
+        DwpDocumentService dwpDocumentService = new DwpDocumentService();
         handler = new CreateBundleAboutToSubmitHandler(serviceRequestExecutor, dwpDocumentService, bundleAudioVideoPdfService, "bundleUrl.com", "bundleEnglishConfig", "bundleWelshConfig",
                 "bundleEnglishEditedConfig", "bundleWelshEditedConfig");
 

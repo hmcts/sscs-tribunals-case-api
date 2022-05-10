@@ -213,7 +213,9 @@ public class SscsMyaBackendRequests {
     }
 
     public HttpResponse midEvent(HttpEntity body, String postfixUrl) throws IOException {
-        return client.execute(addHeaders(post(format("%s/ccdMidEvent%s", baseUrl, postfixUrl))).setEntity(body).build());
+        return client.execute(addHeaders(post(format("%s/ccdMidEvent%s", baseUrl, postfixUrl))
+            .setHeader("Accept", APPLICATION_JSON.toString())
+            .setHeader("Content-type", APPLICATION_JSON.toString())).setEntity(body).build());
     }
 
     public byte[] toBytes(String documentUrl) {

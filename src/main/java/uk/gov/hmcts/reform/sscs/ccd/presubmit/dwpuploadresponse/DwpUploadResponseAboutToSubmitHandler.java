@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
 import static java.lang.String.format;
-import static java.util.Collections.*;
+import static java.util.Collections.sort;
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_UPLOAD_RESPONSE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
@@ -11,18 +11,24 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.*;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.assignNewOtherPartyData;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isValidBenefitTypeForConfidentiality;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateOtherPartyUcb;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.ccd.callback.*;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -30,6 +36,8 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
+import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
+import uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil;
 import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 
 @Component
@@ -40,11 +48,16 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     public static final int NEW_OTHER_PARTY_RESPONSE_DUE_DAYS = 14;
     private final DwpDocumentService dwpDocumentService;
     private final AddNoteService addNoteService;
+    private final AddedDocumentsUtil addedDocumentsUtil;
+    private static final Enum<EventType> EVENT_TYPE = EventType.DWP_UPLOAD_RESPONSE;
+
 
     @Autowired
-    public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService, AddNoteService addNoteService) {
+    public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService, AddNoteService addNoteService,
+                                                 AddedDocumentsUtil addedDocumentsUtil) {
         this.dwpDocumentService = dwpDocumentService;
         this.addNoteService = addNoteService;
+        this.addedDocumentsUtil = addedDocumentsUtil;
     }
 
     @Override
@@ -53,7 +66,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == DWP_UPLOAD_RESPONSE;
+            && callback.getEvent() == EVENT_TYPE;
     }
 
     @Override
@@ -70,6 +83,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             return preSubmitCallbackResponse;
         }
 
+        addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(sscsCaseData);
         setCaseCode(preSubmitCallbackResponse, callback);
 
         sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
@@ -143,12 +157,21 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         List<AudioVideoEvidence> dwpAudioVideoEvidence = sscsCaseData.getDwpUploadAudioVideoEvidence();
 
         for (AudioVideoEvidence audioVideo : dwpAudioVideoEvidence) {
-            audioVideo.getValue().setDateAdded(LocalDate.now());
-            audioVideo.getValue().setFileName(audioVideo.getValue().getDocumentLink().getDocumentFilename());
-            audioVideo.getValue().setPartyUploaded(UploadParty.DWP);
+            AudioVideoEvidenceDetails details = audioVideo.getValue();
+            details.setDateAdded(LocalDate.now());
+            details.setFileName(audioVideo.getValue().getDocumentLink().getDocumentFilename());
+            details.setPartyUploaded(UploadParty.DWP);
+            details.setDocumentType(AudioVideoEvidenceUtil.getDocumentTypeValue(details
+                .getDocumentLink().getDocumentFilename()));
             sscsCaseData.getAudioVideoEvidence().add(audioVideo);
         }
         log.info("DWP audio video documents moved into case audio video {}", sscsCaseData.getCcdCaseId());
+
+        addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, dwpAudioVideoEvidence.stream()
+            .map(evidence -> evidence.getValue().getDocumentType())
+                .filter(Objects::nonNull)
+            .collect(Collectors.toUnmodifiableList()), EVENT_TYPE);
+
         sort(sscsCaseData.getAudioVideoEvidence());
 
         sscsCaseData.setDwpUploadAudioVideoEvidence(null);
@@ -209,39 +232,39 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     private void validateEditedDwpEvidenceBundle(DwpResponseDocument dwpResponseDocument, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (dwpResponseDocument == null || dwpResponseDocument.getDocumentLink() == null) {
-            preSubmitCallbackResponse.addError("You must upload an edited DWP evidence bundle");
+            preSubmitCallbackResponse.addError("You must upload an edited FTA evidence bundle");
         } else {
-            validateDocumentIsAPdf("DWP edited evidence bundle", dwpResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
+            validateDocumentIsAPdf("FTA edited evidence bundle", dwpResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
         }
     }
 
     private void validateEditedDwpResponseDocument(DwpResponseDocument dwpEditedResponseDocument, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (dwpEditedResponseDocument == null || dwpEditedResponseDocument.getDocumentLink() == null) {
-            preSubmitCallbackResponse.addError("You must upload an edited DWP response document");
+            preSubmitCallbackResponse.addError("You must upload an edited FTA response document");
         } else {
-            validateDocumentIsAPdf("DWP edited response document", dwpEditedResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
+            validateDocumentIsAPdf("FTA edited response document", dwpEditedResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
         }
     }
 
     private void validateDwpEvidenceBundle(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (sscsCaseData.getDwpEvidenceBundleDocument() == null || sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink() == null) {
-            preSubmitCallbackResponse.addError("DWP evidence bundle cannot be empty.");
+            preSubmitCallbackResponse.addError("FTA evidence bundle cannot be empty.");
         } else {
-            validateDocumentIsAPdf("DWP evidence bundle", sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink(), preSubmitCallbackResponse);
+            validateDocumentIsAPdf("FTA evidence bundle", sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink(), preSubmitCallbackResponse);
         }
     }
 
     private void validateDwpAt38Document(DwpResponseDocument dwpResponseDocument, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (dwpResponseDocument != null && dwpResponseDocument.getDocumentLink() != null) {
-            validateDocumentIsAPdf("DWP AT38 document", dwpResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
+            validateDocumentIsAPdf("FTA AT38 document", dwpResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
         }
     }
 
     private void validateDwpResponseDocument(DwpResponseDocument dwpResponseDocument, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (dwpResponseDocument == null || dwpResponseDocument.getDocumentLink() == null) {
-            preSubmitCallbackResponse.addError("DWP response document cannot be empty.");
+            preSubmitCallbackResponse.addError("FTA response document cannot be empty.");
         } else {
-            validateDocumentIsAPdf("DWP response document", dwpResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
+            validateDocumentIsAPdf("FTA response document", dwpResponseDocument.getDocumentLink(), preSubmitCallbackResponse);
         }
     }
 

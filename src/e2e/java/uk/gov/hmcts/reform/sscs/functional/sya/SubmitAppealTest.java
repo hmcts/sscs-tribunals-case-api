@@ -119,8 +119,12 @@ public class SubmitAppealTest {
         SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, idamTokens);
 
         log.info(String.format("SYA created with CCD ID %s", id));
+        log.info("[assertCaseIsExpectedResult] expected Response : " + changeExpectedFields(expectedResponse, nino, mrnDate));
+        log.info("[assertCaseIsExpectedResult] sscsCaseDetails : " + sscsCaseDetails.getData());
+        log.info("[assertCaseIsExpectedResult] sscsCaseDetails.getWorkAllocationFields : " + sscsCaseDetails.getData().getWorkAllocationFields());
+        log.info("[assertCaseIsExpectedResult] sscsCaseDetails.getWorkAllocationFields.getCaseAccessCategory : " + sscsCaseDetails.getData().getWorkAllocationFields().getCaseAccessCategory());
 
-        assertJsonEquals(changeExpectedFields(expectedResponse, nino, mrnDate), sscsCaseDetails.getData(), whenIgnoringPaths("sscsDocument"));
+        assertJsonEquals(changeExpectedFields(expectedResponse, nino, mrnDate), sscsCaseDetails.getData(), whenIgnoringPaths("sscsDocument","regionalProcessingCenter.hearingRoute"));
 
         assertEquals(expectedState, sscsCaseDetails.getState());
 

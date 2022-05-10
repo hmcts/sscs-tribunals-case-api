@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.pdf;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayOutputStream;
@@ -12,6 +13,9 @@ import org.junit.Test;
 
 public class PdfWatermarkerTest {
 
+    final String page1 = "Appellant evidence Addition  A | Page 1\n";
+    final String page2 = "Appellant evidence Addition  A | Page 2\n";
+
     @Test
     public void shrinkAndWatermarkAPdfWithOnePage() throws Exception {
         PdfWatermarker pw = new PdfWatermarker();
@@ -22,7 +26,7 @@ public class PdfWatermarkerTest {
                 "Appellant evidence","Addition  A");
         try (PDDocument doc = PDDocument.load(outputBytes)) {
             String text = new PDFTextStripper().getText(doc);
-            assertEquals("Appellant evidence Addition  A | Page 1\n", text);
+            assertThat(page1).isEqualToNormalizingNewlines(text);
         }
     }
 
@@ -38,8 +42,7 @@ public class PdfWatermarkerTest {
         try (PDDocument doc = PDDocument.load(outputBytes)) {
             String text = new PDFTextStripper().getText(doc);
             assertEquals(2, doc.getNumberOfPages());
-            assertEquals("Appellant evidence Addition  A | Page 1\n"
-                    + "Appellant evidence Addition  A | Page 2\n", text);
+            assertThat(page1 + page2).isEqualToNormalizingNewlines(text);
         }
     }
 
@@ -55,8 +58,7 @@ public class PdfWatermarkerTest {
         try (PDDocument doc = PDDocument.load(outputBytes)) {
             String text = new PDFTextStripper().getText(doc);
             assertEquals(2, doc.getNumberOfPages());
-            assertEquals("Appellant evidence Addition  A | Page 1\n"
-                    + "Appellant evidence Addition  A | Page 2\n", text);
+            assertThat(page1 + page2).isEqualToNormalizingNewlines(text);
         }
     }
 
