@@ -65,10 +65,10 @@ public class CcdCallbackController {
             callback.getCaseDetails().getId());
         authorisationService.authorise(serviceAuthHeader);
         ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> resp = performRequest(ABOUT_TO_SUBMIT, callback, userAuthorisation);
-//        resp.getBody().getData().getSscsDocument().forEach(s->{
-//            System.out.println("documentDateAdded : " + s.getValue().getDocumentDateAdded());
-//            System.out.println("Document : " + s.getValue());
-//        });
+        //        resp.getBody().getData().getSscsDocument().forEach(s->{
+        //            System.out.println("documentDateAdded : " + s.getValue().getDocumentDateAdded());
+        //            System.out.println("Document : " + s.getValue());
+        //        });
         return resp;
     }
 

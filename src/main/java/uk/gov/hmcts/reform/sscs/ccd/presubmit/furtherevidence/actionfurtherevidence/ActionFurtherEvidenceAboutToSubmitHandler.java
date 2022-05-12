@@ -22,9 +22,9 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyName
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
+//import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+//import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -369,9 +369,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         sscsCaseData.setSscsDocument(documents);
     }
 
-            addTimeValueToDocuments(sscsCaseData.getSscsDocument());
-
-            documents.add(sscsDocument);
+    //            addTimeValueToDocuments(sscsCaseData.getSscsDocument());
+    //
+    //            documents.add(sscsDocument);
 
     private boolean warningAddedForBundleAddition(SscsCaseData sscsCaseData, Boolean ignoreWarnings,
                                                   PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
@@ -413,16 +413,16 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
     }
 
-    private void addTimeValueToDocuments( List<SscsDocument> sscsDocument ) {
-        sscsDocument.stream().forEach(s -> {
-            try {
-                LocalDateTime.parse(s.getValue().getDocumentDateAdded(), DateTimeFormatter.ISO_DATE_TIME);
-            } catch (DateTimeParseException dtpe) {
-                LocalDateTime dt = LocalDateTime.of(LocalDate.parse(s.getValue().getDocumentDateAdded()), LocalTime.MIN);
-                s.getValue().setDocumentDateAdded(dt.format(DateTimeFormatter.ISO_DATE_TIME));
-            }
-        });
-    }
+    //    private void addTimeValueToDocuments( List<SscsDocument> sscsDocument ) {
+    //        sscsDocument.stream().forEach(s -> {
+    //            try {
+    //                LocalDateTime.parse(s.getValue().getDocumentDateAdded(), DateTimeFormatter.ISO_DATE_TIME);
+    //            } catch (DateTimeParseException dtpe) {
+    //                LocalDateTime dt = LocalDateTime.of(LocalDate.parse(s.getValue().getDocumentDateAdded()), LocalTime.MIN);
+    //                s.getValue().setDocumentDateAdded(dt.format(DateTimeFormatter.ISO_DATE_TIME));
+    //            }
+    //        });
+    //    }
 
     private void setConfidentialCaseFields(SscsCaseData sscsCaseData) {
         if (APPELLANT.getCode().equals(sscsCaseData.getOriginalSender().getValue().getCode())) {
@@ -458,7 +458,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         String scannedDate = null;
         if (scannedDocument.getValue().getScannedDate() != null) {
             scannedDate = LocalDateTime.parse(scannedDocument.getValue().getScannedDate())
-                    .format(DateTimeFormatter.ISO_DATE_TIME);
+                    .format(DateTimeFormatter.ISO_DATE);
+            //                    .format(DateTimeFormatter.ISO_DATE_TIME);
         }
 
         DocumentLink url = scannedDocument.getValue().getUrl();
