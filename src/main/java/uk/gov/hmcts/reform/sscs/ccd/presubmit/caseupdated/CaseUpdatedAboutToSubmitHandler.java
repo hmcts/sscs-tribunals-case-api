@@ -142,7 +142,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (hearingOptions != null
             && sscsCaseData.getAppeal().getHearingType() != null
             && HearingType.ORAL.getValue().equals(sscsCaseData.getAppeal().getHearingType())
-            && Boolean.TRUE.equals(!hearingOptions.isWantsToAttendHearing())) {
+            && Boolean.FALSE.equals(hearingOptions.isWantsToAttendHearing())) {
             response.addWarning("There is a mismatch between the hearing type and the wants to attend field, "
                 + "all hearing options will be cleared please check if this is correct");
         }
