@@ -90,8 +90,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
 
         if (sscsCaseData.getAppeal().getAppellant() != null
-                && sscsCaseData.getAppeal().getAppellant().getAddress() != null
-                && isNotBlank(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode())) {
+            && sscsCaseData.getAppeal().getAppellant().getAddress() != null
+            && isNotBlank(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode())) {
 
             String postCode = resolvePostCode(sscsCaseData);
             RegionalProcessingCenter newRpc = regionalProcessingCenterService.getByPostcode(postCode);
@@ -105,7 +105,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             }
 
             updateProcessingVenueIfRequired(caseDetails);
-
         }
 
         checkConfidentiality(sscsCaseData);
@@ -208,7 +207,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private void updateProcessingVenueIfRequired(CaseDetails<SscsCaseData> caseDetails) {
-
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
         String postCode = resolvePostCode(sscsCaseData);
         log.info("updateProcessingVenueIfRequired for post code " + postCode);
@@ -229,7 +227,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                 }
             }
         }
-
     }
 
     private void updateCaseNameIfNameUpdated(Callback<SscsCaseData> callback, SscsCaseData caseData) {
