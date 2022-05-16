@@ -47,8 +47,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private CaseUpdatedAboutToSubmitHandler handler;
-
     @Mock
     private Callback<SscsCaseData> callback;
 
@@ -76,6 +74,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Mock
     private RefDataService refDataService;
+
+    private CaseUpdatedAboutToSubmitHandler handler;
 
     @Before
     public void setUp() {
