@@ -33,7 +33,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     private RegionalProcessingCenter regionalProcessingCenter;
 
     @Before
-    public void setUp() {
+    public void setup() {
         openMocks(this);
         regionalProcessingCenter = getRegionalProcessingCenter();
     }
@@ -426,21 +426,37 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     }
 
     @Test
-    public void syaWithAppellantNameSetsWorkAllocationFields() {
+    public void givenSyaWithAppellantName_shouldSetCaseAccessManagementFields() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         syaCaseWrapper.getAppellant().setFirstName("George");
         syaCaseWrapper.getAppellant().setLastName("Foreman");
+
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, regionalProcessingCenter.getName(), regionalProcessingCenter, true);
+
         assertEquals("George Foreman", caseData.getCaseAccessManagementFields().getCaseNameHmctsInternal());
         assertEquals("George Foreman", caseData.getCaseAccessManagementFields().getCaseNameHmctsRestricted());
         assertEquals("George Foreman", caseData.getCaseAccessManagementFields().getCaseNamePublic());
 
-        assertEquals("personalIndependencePayment", caseData.getCaseAccessManagementFields().getCaseAccessCategory());
-        assertEquals("DWP", caseData.getCaseAccessManagementFields().getOgdType());
         assertEquals("Personal Independence Payment", caseData.getCaseAccessManagementFields().getCaseManagementCategory().getValue().getLabel());
         assertEquals("PIP", caseData.getCaseAccessManagementFields().getCaseManagementCategory().getValue().getCode());
+        assertEquals("personalIndependencePayment", caseData.getCaseAccessManagementFields().getCaseAccessCategory());
+        assertEquals("DWP", caseData.getCaseAccessManagementFields().getOgdType());
+    }
 
+    @Test
+    public void givenSyaWithSSCS5BenefitType_shouldSetCaseAccessManagementFields() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_NON_SAVE_AND_RETURN_SSCS5.getDeserializeMessage();
 
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, regionalProcessingCenter.getName(), regionalProcessingCenter, true);
+
+        assertEquals("Joe Bloggs", caseData.getCaseAccessManagementFields().getCaseNameHmctsInternal());
+        assertEquals("Joe Bloggs", caseData.getCaseAccessManagementFields().getCaseNameHmctsRestricted());
+        assertEquals("Joe Bloggs", caseData.getCaseAccessManagementFields().getCaseNamePublic());
+
+        assertEquals("Tax Credit", caseData.getCaseAccessManagementFields().getCaseManagementCategory().getValue().getLabel());
+        assertEquals("taxCredit", caseData.getCaseAccessManagementFields().getCaseManagementCategory().getValue().getCode());
+        assertEquals("taxCredit", caseData.getCaseAccessManagementFields().getCaseAccessCategory());
+        assertEquals("HMRC", caseData.getCaseAccessManagementFields().getOgdType());
     }
 
 }
