@@ -89,9 +89,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             return preSubmitCallbackResponse;
         }
 
-        if (sscsCaseData.getAppeal().getAppellant() != null
-            && sscsCaseData.getAppeal().getAppellant().getAddress() != null
-            && isNotBlank(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode())) {
+        Appellant appellant = sscsCaseData.getAppeal().getAppellant();
+        if (appellant != null
+            && appellant.getAddress() != null
+            && isNotBlank(appellant.getAddress().getPostcode())) {
 
             String postCode = resolvePostCode(sscsCaseData);
             RegionalProcessingCenter newRpc = regionalProcessingCenterService.getByPostcode(postCode);
@@ -234,7 +235,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             return;
         }
 
-        final String caseName = getCaseName(caseData);
+        final String caseName = getCaseName(caseData.getAppeal().getAppellant());
         CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
 
         if (oldCaseDetails != null
@@ -248,10 +249,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         caseData.getCaseAccessManagementFields().setCaseNames(caseName);
     }
 
-    private String getCaseName(SscsCaseData caseData) {
-        if (caseData.getAppeal().getAppellant() != null
-            && caseData.getAppeal().getAppellant().getName() != null) {
-            return caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
+    private String getCaseName(Appellant appellant) {
+        if (appellant != null
+            && appellant.getName() != null) {
+            return appellant.getName().getFullNameNoTitle();
         }
         return null;
     }
@@ -271,7 +272,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (benefit.isPresent()) {
             sscsCaseData.getCaseAccessManagementFields().setCategories(benefit.get());
 
-        } else if (benefitCodeHasValue(sscsCaseData)) {
+        } else if (benefitCodeHasValue(sscsCaseData.getAppeal())) {
             String validBenefitTypes = Arrays.stream(Benefit.values())
                 .map(Benefit::getShortName)
                 .collect(Collectors.joining(", "));
@@ -282,11 +283,11 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private boolean benefitCodeHasValue(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getAppeal() != null
-                && sscsCaseData.getAppeal().getBenefitType() != null
-                && sscsCaseData.getAppeal().getBenefitType().getCode() != null
-                && !isEmpty(sscsCaseData.getAppeal().getBenefitType().getCode());
+    private boolean benefitCodeHasValue(Appeal appeal) {
+        return appeal != null
+                && appeal.getBenefitType() != null
+                && appeal.getBenefitType().getCode() != null
+                && !isEmpty(appeal.getBenefitType().getCode());
     }
 
     private Optional<Benefit> getOldBenefitCode(CaseDetails<SscsCaseData> oldCaseDetails) {
