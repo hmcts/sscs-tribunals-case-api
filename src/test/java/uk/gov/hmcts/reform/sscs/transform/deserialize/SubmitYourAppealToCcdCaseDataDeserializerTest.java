@@ -444,7 +444,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     }
 
     @Test
-    public void givenSyaWithSSCS5BenefitType_shouldSetCaseAccessManagementFields() {
+    public void givenSyaWithSscs5BenefitType_shouldSetCaseAccessManagementFields() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_NON_SAVE_AND_RETURN_SSCS5.getDeserializeMessage();
 
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, regionalProcessingCenter.getName(), regionalProcessingCenter, true);
