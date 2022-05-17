@@ -238,14 +238,15 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
             CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
             if (oldCaseDetails == null
-                    || oldCaseDetails.getCaseData().getCaseAccessManagementFields().getCaseNameHmctsInternal() == null
-                    || !oldCaseDetails.getCaseData().getCaseAccessManagementFields().getCaseNameHmctsInternal().equals(caseName)) {
+                || oldCaseDetails.getCaseData().getCaseAccessManagementFields().getCaseNameHmctsInternal() == null) {
                 caseData.getCaseAccessManagementFields().setCaseNames(caseName);
             }
         }
     }
 
-    private void updateCaseCategoriesIfBenefitTypeUpdated(Callback<SscsCaseData> callback, SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+    private void updateCaseCategoriesIfBenefitTypeUpdated(Callback<SscsCaseData> callback,
+                                                          SscsCaseData sscsCaseData,
+                                                          PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (caseAccessManagementFeature) {
             Optional<Benefit> benefit = sscsCaseData.getBenefitType();
 
@@ -254,8 +255,11 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
             if (benefit.isPresent()) {
                 sscsCaseData.getCaseAccessManagementFields().setCategories(benefit.get());
+
             } else if (benefitCodeHasValue(sscsCaseData)) {
-                String validBenefitTypes = Arrays.stream(Benefit.values()).sequential().map(Benefit::getShortName).collect(Collectors.joining(", "));
+                String validBenefitTypes = Arrays.stream(Benefit.values())
+                    .map(Benefit::getShortName)
+                    .collect(Collectors.joining(", "));
                 preSubmitCallbackResponse.addError("Benefit type code is invalid, should be one of: " + validBenefitTypes);
 
             } else if (oldBenefit.isPresent()) {
