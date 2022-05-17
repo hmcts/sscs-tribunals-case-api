@@ -108,7 +108,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
 
         checkConfidentiality(sscsCaseData);
-        updateCaseNameIfNameUpdated(callback, sscsCaseData);
+        updateCaseName(callback, sscsCaseData);
         updateCaseCategoriesIfBenefitTypeUpdated(callback, sscsCaseData, preSubmitCallbackResponse);
 
         final boolean hasSystemUserRole = userDetails.hasRole(SYSTEM_USER);
@@ -229,42 +229,56 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private void updateCaseNameIfNameUpdated(Callback<SscsCaseData> callback, SscsCaseData caseData) {
-        if (caseAccessManagementFeature) {
-            String caseName = caseData.getAppeal().getAppellant() != null
-                    && caseData.getAppeal().getAppellant().getName() != null
-                    ? caseData.getAppeal().getAppellant().getName().getFullNameNoTitle()
-                    : null;
-
-            CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
-            if (oldCaseDetails == null
-                || oldCaseDetails.getCaseData().getCaseAccessManagementFields().getCaseNameHmctsInternal() == null) {
-                caseData.getCaseAccessManagementFields().setCaseNames(caseName);
-            }
+    private void updateCaseName(Callback<SscsCaseData> callback, SscsCaseData caseData) {
+        if (!caseAccessManagementFeature) {
+            return;
         }
+
+        final String caseName = getCaseName(caseData);
+        CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
+
+        if (oldCaseDetails != null
+            && oldCaseDetails.getCaseData() != null
+            && oldCaseDetails.getCaseData().getCaseAccessManagementFields() != null
+            && oldCaseDetails.getCaseData().getCaseAccessManagementFields().getCaseNameHmctsInternal() != null
+            && oldCaseDetails.getCaseData().getCaseAccessManagementFields().getCaseNameHmctsInternal().equals(caseName)) {
+            return;
+        }
+
+        caseData.getCaseAccessManagementFields().setCaseNames(caseName);
+    }
+
+    private String getCaseName(SscsCaseData caseData) {
+        if (caseData.getAppeal().getAppellant() != null
+            && caseData.getAppeal().getAppellant().getName() != null) {
+            return caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
+        }
+        return null;
     }
 
     private void updateCaseCategoriesIfBenefitTypeUpdated(Callback<SscsCaseData> callback,
                                                           SscsCaseData sscsCaseData,
                                                           PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (caseAccessManagementFeature) {
-            Optional<Benefit> benefit = sscsCaseData.getBenefitType();
+        if (!caseAccessManagementFeature) {
+            return;
+        }
 
-            CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
-            Optional<Benefit> oldBenefit = getOldBenefitCode(oldCaseDetails);
+        Optional<Benefit> benefit = sscsCaseData.getBenefitType();
 
-            if (benefit.isPresent()) {
-                sscsCaseData.getCaseAccessManagementFields().setCategories(benefit.get());
+        CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
+        Optional<Benefit> oldBenefit = getOldBenefitCode(oldCaseDetails);
 
-            } else if (benefitCodeHasValue(sscsCaseData)) {
-                String validBenefitTypes = Arrays.stream(Benefit.values())
-                    .map(Benefit::getShortName)
-                    .collect(Collectors.joining(", "));
-                preSubmitCallbackResponse.addError("Benefit type code is invalid, should be one of: " + validBenefitTypes);
+        if (benefit.isPresent()) {
+            sscsCaseData.getCaseAccessManagementFields().setCategories(benefit.get());
 
-            } else if (oldBenefit.isPresent()) {
-                preSubmitCallbackResponse.addError("Benefit type code is empty");
-            }
+        } else if (benefitCodeHasValue(sscsCaseData)) {
+            String validBenefitTypes = Arrays.stream(Benefit.values())
+                .map(Benefit::getShortName)
+                .collect(Collectors.joining(", "));
+            preSubmitCallbackResponse.addError("Benefit type code is invalid, should be one of: " + validBenefitTypes);
+
+        } else if (oldBenefit.isPresent()) {
+            preSubmitCallbackResponse.addError("Benefit type code is empty");
         }
     }
 

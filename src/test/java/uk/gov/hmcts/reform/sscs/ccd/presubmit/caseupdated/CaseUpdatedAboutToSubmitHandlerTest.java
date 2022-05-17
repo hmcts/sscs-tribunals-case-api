@@ -121,8 +121,11 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             .build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
+
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
         when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
             .roles(List.of(SUPER_USER.getValue()))
             .build());
@@ -794,21 +797,30 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
         assertNull(response.getData().getCaseAccessManagementFields().getCaseNameHmctsInternal());
         assertNull(response.getData().getCaseAccessManagementFields().getCaseNameHmctsRestricted());
         assertNull(response.getData().getCaseAccessManagementFields().getCaseNamePublic());
     }
 
     @Test
-    public void givenCaseNameAlreadyExists_shouldNotSetNewCaseName() {
-        sscsCaseDataBefore.getCaseAccessManagementFields().setCaseNames("Old Case Name");
-        sscsCaseData.getCaseAccessManagementFields().setCaseNames("New Case Name");
+    public void givenOldCaseNameExists_shouldStillSetNewCaseName() {
+        sscsCaseDataBefore.getCaseAccessManagementFields().setCaseNameHmctsInternal("Harvey Specter");
+        sscsCaseData.setAppeal(Appeal.builder()
+            .benefitType(new BenefitType("UC", "Universal credit"))
+            .appellant(Appellant.builder()
+                .name(Name.builder()
+                    .firstName("Louis")
+                    .lastName("Litt")
+                    .build())
+                .build())
+            .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        response.getData().getCaseAccessManagementFields().getCaseNameHmctsInternal();
-        response.getData().getCaseAccessManagementFields().getCaseNameHmctsRestricted();
-        response.getData().getCaseAccessManagementFields().getCaseNamePublic();
+        assertThat(response.getData()
+            .getCaseAccessManagementFields()
+            .getCaseNameHmctsInternal(), is("Louis Litt"));
     }
 
     @Test
