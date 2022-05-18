@@ -27,22 +27,21 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     private static final String YES = "Yes";
     private static final String NO = "No";
 
-
     private SubmitYourAppealToCcdCaseDataDeserializer() {
-        // Empty
     }
 
-    public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, String region, RegionalProcessingCenter rpc,
-            boolean workAllocationEnabled) {
-        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, workAllocationEnabled);
-
-        return caseData.toBuilder()
-                .region(region)
-                .regionalProcessingCenter(rpc)
-                .build();
+    public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper,
+                                                       String region,
+                                                       RegionalProcessingCenter rpc,
+                                                       boolean caseAccessManagementEnabled) {
+        return convertSyaToCcdCaseData(syaCaseWrapper, caseAccessManagementEnabled)
+            .toBuilder()
+            .region(region)
+            .regionalProcessingCenter(rpc)
+            .build();
     }
 
-    public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, boolean workAllocationEnabled) {
+    public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, boolean caseAccessManagementEnabled) {
         Appeal appeal = getAppeal(syaCaseWrapper);
 
         boolean isDraft = isDraft(syaCaseWrapper);
@@ -63,26 +62,24 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
         List<SscsDocument> sscsDocuments = getEvidenceDocumentDetails(syaCaseWrapper);
 
-        log.info("workAllocationEnabled=" + workAllocationEnabled);
-        if (workAllocationEnabled) {
+        log.info("caseAccessManagementEnabled=" + caseAccessManagementEnabled);
+
+        if (caseAccessManagementEnabled) {
             String caseName = null;
-            if (appeal.getAppellant() != null && appeal.getAppellant().getName() != null) {
+            if (appeal.getAppellant() != null
+                && appeal.getAppellant().getName() != null) {
                 Name name = appeal.getAppellant().getName();
                 caseName = name.getFullNameNoTitle();
             }
 
             Benefit benefit = Benefit.getBenefitByCodeOrThrowException(appeal.getBenefitType().getCode());
-            WorkAllocationFields workAllocationFields = new WorkAllocationFields();
-            workAllocationFields.setCaseNames(caseName);
-            if (benefit.getSscsType().equals(SscsType.SSCS5)) {
-                workAllocationFields.setOgdType("HMRC");
-            } else {
-                workAllocationFields.setOgdType("DWP");
-            }
-            workAllocationFields.setCategories(benefit);
+            CaseAccessManagementFields caseAccessManagementFields = new CaseAccessManagementFields();
+            caseAccessManagementFields.setCaseNames(caseName);
+            caseAccessManagementFields.setCategories(benefit);
+            caseAccessManagementFields.setOgdType(benefit.getSscsType().equals(SscsType.SSCS5) ? "HMRC" : "DWP");
 
             return SscsCaseData.builder()
-                    .workAllocationFields(workAllocationFields)
+                    .caseAccessManagementFields(caseAccessManagementFields)
                     .caseCreated(LocalDate.now().toString())
                     .isSaveAndReturn(syaCaseWrapper.getIsSaveAndReturn())
                     .appeal(appeal)
@@ -127,14 +124,14 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     private static String getDwpRegionalCenterGivenDwpIssuingOffice(String benefitTypeCode, String dwpIssuingOffice) {
         DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
 
-        if (dwpIssuingOffice == null && ! (CARERS_ALLOWANCE == Benefit.getBenefitOptionalByCode(benefitTypeCode).orElse(null))) {
+        if (dwpIssuingOffice == null
+            && CARERS_ALLOWANCE != Benefit.getBenefitOptionalByCode(benefitTypeCode).orElse(null)) {
             Optional<OfficeMapping> defaultOfficeMapping = dwpAddressLookupService.getDefaultDwpMappingByBenefitType(benefitTypeCode);
             if (defaultOfficeMapping.isPresent()) {
                 String defaultDwpIssuingOffice = defaultOfficeMapping.get().getMapping().getCcd();
                 return dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(benefitTypeCode, defaultDwpIssuingOffice);
-            } else {
-                return null;
             }
+            return null;
         }
         return dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(benefitTypeCode, dwpIssuingOffice);
     }
@@ -163,7 +160,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     private static Subscriptions getSubscriptions(SyaCaseWrapper syaCaseWrapper) {
         return populateSubscriptions(syaCaseWrapper);
     }
-
 
     private static Appeal getAppeal(SyaCaseWrapper syaCaseWrapper) {
 
@@ -493,9 +489,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                         .build();
             }
 
-            String scheduleHearing = syaHearingOptions.getScheduleHearing() ? YES : NO;
+            String scheduleHearing = Boolean.TRUE.equals(syaHearingOptions.getScheduleHearing()) ? YES : NO;
             List<ExcludeDate> excludedDates = null;
-            if (syaHearingOptions.getScheduleHearing()) {
+            if (Boolean.TRUE.equals(syaHearingOptions.getScheduleHearing())) {
                 excludedDates = getExcludedDates(syaHearingOptions.getDatesCantAttend());
             }
 
@@ -526,7 +522,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
     private static List<ExcludeDate> getExcludedDates(String[] dates) {
         if (dates == null) {
-            return null;
+            return Collections.emptyList();
         }
         List<ExcludeDate> excludeDates = new ArrayList<>();
         for (String date : dates) {
