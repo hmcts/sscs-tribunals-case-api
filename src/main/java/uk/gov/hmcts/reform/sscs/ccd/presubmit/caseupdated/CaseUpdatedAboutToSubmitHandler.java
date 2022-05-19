@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -40,31 +39,30 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final AssociatedCaseLinkHelper associatedCaseLinkHelper;
     private final AirLookupService airLookupService;
     private final DwpAddressLookupService dwpAddressLookupService;
-    private IdamService idamService;
+    private final IdamService idamService;
     private final RefDataService refDataService;
-    private final boolean workAllocationFeature;
+    private final boolean caseAccessManagementFeature;
 
-    @Autowired
     CaseUpdatedAboutToSubmitHandler(RegionalProcessingCenterService regionalProcessingCenterService,
                                     AssociatedCaseLinkHelper associatedCaseLinkHelper,
                                     AirLookupService airLookupService,
                                     DwpAddressLookupService dwpAddressLookupService,
                                     IdamService idamService,
                                     RefDataService refDataService,
-                                    @Value("${feature.work-allocation.enabled}")  boolean workAllocationFeature) {
+                                    @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
         this.airLookupService = airLookupService;
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.idamService = idamService;
         this.refDataService = refDataService;
-        this.workAllocationFeature = workAllocationFeature;
+        this.caseAccessManagementFeature = caseAccessManagementFeature;
     }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
-        requireNonNull(callbackType, "callbacktype must not be null");
+        requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
                 && callback.getEvent() == EventType.CASE_UPDATED;
@@ -91,10 +89,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             return preSubmitCallbackResponse;
         }
 
-        if (sscsCaseData.getAppeal().getAppellant() != null
-                && sscsCaseData.getAppeal().getAppellant().getAddress() != null
-                && isNotBlank(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode())) {
-
+        Appellant appellant = sscsCaseData.getAppeal().getAppellant();
+        if (appellant != null
+            && appellant.getAddress() != null
+            && isNotBlank(appellant.getAddress().getPostcode())) {
 
             String postCode = resolvePostCode(sscsCaseData);
             RegionalProcessingCenter newRpc = regionalProcessingCenterService.getByPostcode(postCode);
@@ -108,11 +106,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             }
 
             updateProcessingVenueIfRequired(caseDetails);
-
         }
 
         checkConfidentiality(sscsCaseData);
-        updateCaseNameIfNameUpdated(callback, sscsCaseData);
+        updateCaseName(callback, sscsCaseData);
         updateCaseCategoriesIfBenefitTypeUpdated(callback, sscsCaseData, preSubmitCallbackResponse);
 
         final boolean hasSystemUserRole = userDetails.hasRole(SYSTEM_USER);
@@ -128,9 +125,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         return preSubmitCallbackResponse;
     }
 
-
-
-
     private void validateAndUpdateDwpHandlingOffice(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         MrnDetails mrnDetails = sscsCaseData.getAppeal().getMrnDetails();
         BenefitType benefitType = sscsCaseData.getAppeal().getBenefitType();
@@ -145,9 +139,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private void validateHearingOptions(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
-        if (hearingOptions != null && sscsCaseData.getAppeal().getHearingType() != null
+        if (hearingOptions != null
+            && sscsCaseData.getAppeal().getHearingType() != null
             && HearingType.ORAL.getValue().equals(sscsCaseData.getAppeal().getHearingType())
-            && !hearingOptions.isWantsToAttendHearing()) {
+            && Boolean.FALSE.equals(hearingOptions.isWantsToAttendHearing())) {
             response.addWarning("There is a mismatch between the hearing type and the wants to attend field, "
                 + "all hearing options will be cleared please check if this is correct");
         }
@@ -178,9 +173,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             response.addWarning("Benefit type code is empty");
             return false;
         } else if (Benefit.findBenefitByShortName(benefitType.getCode()).isEmpty()) {
-            if (!workAllocationFeature) {
-                //this can be removed once workallocation is in PROD as the validation and warnings are done
-                //in updateCaseCategoriesIfBenefitTypeUpdated below
+            if (!caseAccessManagementFeature) {
                 String validBenefitTypes = Arrays.stream(Benefit.values()).sequential().map(Benefit::getShortName).collect(Collectors.joining(", "));
                 response.addWarning("Benefit type code is invalid, should be one of: " + validBenefitTypes);
             }
@@ -215,7 +208,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private void updateProcessingVenueIfRequired(CaseDetails<SscsCaseData> caseDetails) {
-
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
         String postCode = resolvePostCode(sscsCaseData);
         log.info("updateProcessingVenueIfRequired for post code " + postCode);
@@ -227,7 +219,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
             sscsCaseData.setProcessingVenue(venue);
 
-            if (workAllocationFeature && !StringUtils.isEmpty(venue)) {
+            if (caseAccessManagementFeature && !StringUtils.isEmpty(venue)) {
                 CourtVenue courtVenue = refDataService.getVenueRefData(venue);
                 if (courtVenue != null) {
                     sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
@@ -236,49 +228,66 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                 }
             }
         }
-
     }
 
-    private void updateCaseNameIfNameUpdated(Callback<SscsCaseData> callback, SscsCaseData caseData) {
-        if (workAllocationFeature) {
-            String caseName = caseData.getAppeal().getAppellant() != null
-                    && caseData.getAppeal().getAppellant().getName() != null
-                    ? caseData.getAppeal().getAppellant().getName().getFullNameNoTitle()
-                    : null;
+    private void updateCaseName(Callback<SscsCaseData> callback, SscsCaseData caseData) {
+        if (!caseAccessManagementFeature) {
+            return;
+        }
 
-            CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
-            if (oldCaseDetails == null
-                    || oldCaseDetails.getCaseData().getWorkAllocationFields().getCaseNameHmctsInternal() == null
-                    || !oldCaseDetails.getCaseData().getWorkAllocationFields().getCaseNameHmctsInternal().equals(caseName)) {
-                caseData.getWorkAllocationFields().setCaseNames(caseName);
-            }
+        final String caseName = getCaseName(caseData.getAppeal().getAppellant());
+        CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
+
+        if (oldCaseDetails != null
+            && oldCaseDetails.getCaseData() != null
+            && oldCaseDetails.getCaseData().getCaseAccessManagementFields() != null
+            && oldCaseDetails.getCaseData().getCaseAccessManagementFields().getCaseNameHmctsInternal() != null
+            && oldCaseDetails.getCaseData().getCaseAccessManagementFields().getCaseNameHmctsInternal().equals(caseName)) {
+            return;
+        }
+
+        caseData.getCaseAccessManagementFields().setCaseNames(caseName);
+    }
+
+    private String getCaseName(Appellant appellant) {
+        if (appellant != null
+            && appellant.getName() != null) {
+            return appellant.getName().getFullNameNoTitle();
+        }
+        return null;
+    }
+
+    private void updateCaseCategoriesIfBenefitTypeUpdated(Callback<SscsCaseData> callback,
+                                                          SscsCaseData sscsCaseData,
+                                                          PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (!caseAccessManagementFeature) {
+            return;
+        }
+
+        Optional<Benefit> benefit = sscsCaseData.getBenefitType();
+
+        CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
+        Optional<Benefit> oldBenefit = getOldBenefitCode(oldCaseDetails);
+
+        if (benefit.isPresent()) {
+            sscsCaseData.getCaseAccessManagementFields().setCategories(benefit.get());
+
+        } else if (benefitCodeHasValue(sscsCaseData.getAppeal())) {
+            String validBenefitTypes = Arrays.stream(Benefit.values())
+                .map(Benefit::getShortName)
+                .collect(Collectors.joining(", "));
+            preSubmitCallbackResponse.addError("Benefit type code is invalid, should be one of: " + validBenefitTypes);
+
+        } else if (oldBenefit.isPresent()) {
+            preSubmitCallbackResponse.addError("Benefit type code is empty");
         }
     }
 
-    private void updateCaseCategoriesIfBenefitTypeUpdated(Callback<SscsCaseData> callback, SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (workAllocationFeature) {
-            Optional<Benefit> benefit = sscsCaseData.getBenefitType();
-
-            CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
-            Optional<Benefit> oldBenefit = getOldBenefitCode(oldCaseDetails);
-
-            if (benefit.isPresent()) {
-                sscsCaseData.getWorkAllocationFields().setCategories(benefit.get());
-            } else if (benefitCodeHasValue(sscsCaseData)) {
-                String validBenefitTypes = Arrays.stream(Benefit.values()).sequential().map(Benefit::getShortName).collect(Collectors.joining(", "));
-                preSubmitCallbackResponse.addError("Benefit type code is invalid, should be one of: " + validBenefitTypes);
-
-            } else if (oldBenefit.isPresent()) {
-                preSubmitCallbackResponse.addError("Benefit type code is empty");
-            }
-        }
-    }
-
-    private boolean benefitCodeHasValue(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getAppeal() != null
-                && sscsCaseData.getAppeal().getBenefitType() != null
-                && sscsCaseData.getAppeal().getBenefitType().getCode() != null
-                && !isEmpty(sscsCaseData.getAppeal().getBenefitType().getCode());
+    private boolean benefitCodeHasValue(Appeal appeal) {
+        return appeal != null
+                && appeal.getBenefitType() != null
+                && appeal.getBenefitType().getCode() != null
+                && !isEmpty(appeal.getBenefitType().getCode());
     }
 
     private Optional<Benefit> getOldBenefitCode(CaseDetails<SscsCaseData> oldCaseDetails) {

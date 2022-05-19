@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -43,6 +42,7 @@ import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
 @Service
 @Slf4j
 public class SubmitAppealService {
+
     public static final String DM_STORE_USER_ID = "sscs";
     private static final String CITIZEN_ROLE = "citizen";
 
@@ -53,28 +53,23 @@ public class SubmitAppealService {
     private final ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
     private final AirLookupService airLookupService;
     private final RefDataService refDataService;
-    private final EvidenceManagementSecureDocStoreService secureDocStoreService;
     private final boolean workAllocationFeature;
 
     @SuppressWarnings("squid:S107")
-    @Autowired
     SubmitAppealService(CcdService ccdService,
                         CitizenCcdService citizenCcdService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
                         ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
                         AirLookupService airLookupService,
-                        EvidenceManagementSecureDocStoreService secureDocStoreService,
                         RefDataService refDataService,
                         @Value("${feature.work-allocation.enabled}")  boolean workAllocationFeature) {
-
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.idamService = idamService;
         this.convertAIntoBService = convertAIntoBService;
         this.airLookupService = airLookupService;
-        this.secureDocStoreService = secureDocStoreService;
         this.refDataService = refDataService;
         this.workAllocationFeature = workAllocationFeature;
     }

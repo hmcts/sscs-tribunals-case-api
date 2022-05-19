@@ -1,5 +1,5 @@
 variable "product" {
-  type = string
+  type    = string
   default = "sscs"
 }
 
