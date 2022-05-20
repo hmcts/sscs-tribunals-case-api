@@ -3,3 +3,5 @@ java:
   ingressHost: ${SERVICE_FQDN}
   environment:
     CREATE_CCD_ENDPOINT: true
+    WORK_ALLOCATION_FEATURE: true
+    CASE_ACCESS_MANAGEMENT: true

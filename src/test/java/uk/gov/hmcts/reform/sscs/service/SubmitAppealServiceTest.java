@@ -67,12 +67,9 @@ import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
-import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.ResourceManager;
 
 @RunWith(JUnitParamsRunner.class)
 public class SubmitAppealServiceTest {
-    private static final String TEMPLATE_PATH = "/templates/appellant_appeal_template.html";
-    private static final String WELSH_TEMPLATE_PATH = "/templates/appellant_appeal_welsh_template.html";
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.LENIENT);
@@ -84,9 +81,6 @@ public class SubmitAppealServiceTest {
     private CitizenCcdService citizenCcdService;
 
     @Mock
-    private CcdPdfService ccdPdfService;
-
-    @Mock
     private PDFServiceClient pdfServiceClient;
 
     @Mock
@@ -94,12 +88,6 @@ public class SubmitAppealServiceTest {
 
     @Mock
     private IdamService idamService;
-
-    @Mock
-    private EvidenceManagementSecureDocStoreService secureDocStoreService;
-
-    @Mock
-    private ResourceManager resourceManager;
 
     @Mock
     private RefDataService refDataService;
@@ -118,9 +106,7 @@ public class SubmitAppealServiceTest {
 
     private static final RegionalProcessingCenterService regionalProcessingCenterService;
 
-    private static AirLookupService airLookupService;
-
-    private SscsPdfService sscsPdfService;
+    private static final AirLookupService airLookupService;
 
     static {
         airLookupService = new AirLookupService();
@@ -173,13 +159,17 @@ public class SubmitAppealServiceTest {
 
     @Before
     public void setUp() {
-
-
         appealData.getMrn().setDate(LocalDate.now().minusMonths(1));
 
         submitAppealService = new SubmitAppealService(
-            ccdService, citizenCcdService, regionalProcessingCenterService,
-            idamService, convertAIntoBService, airLookupService, secureDocStoreService, refDataService, true);
+            ccdService,
+            citizenCcdService,
+            regionalProcessingCenterService,
+            idamService,
+            convertAIntoBService,
+            airLookupService,
+            refDataService,
+            true);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
@@ -189,7 +179,7 @@ public class SubmitAppealServiceTest {
 
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
-        given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().roles(Arrays.asList("citizen")).build());
+        given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().roles(List.of("citizen")).build());
         given(emailHelper.generateUniqueEmailId(any(Appellant.class))).willReturn("Bloggs_33C");
     }
 
@@ -520,7 +510,7 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void shouldhandleScConfilctWithNullNinoForSubmitDraftAppeal() {
+    public void shouldHandleScConflictWithNullNinoForSubmitDraftAppeal() {
         FeignException feignException = mock(FeignException.class);
         given(feignException.status()).willReturn(HttpStatus.SC_CONFLICT);
         given(citizenCcdService.saveCase(any(SscsCaseData.class), any(IdamTokens.class)))
@@ -535,7 +525,7 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void shouldhandleScConfilctWithNullNinoForUpdateDraftAppeal() {
+    public void shouldHandleScConflictWithNullNinoForUpdateDraftAppeal() {
         FeignException feignException = mock(FeignException.class);
         given(feignException.status()).willReturn(409);
         given(citizenCcdService.updateCase(any(SscsCaseData.class), any(), any(), any(), any(), any()))
@@ -587,7 +577,7 @@ public class SubmitAppealServiceTest {
     @Test(expected = ApplicationErrorException.class)
     public void shouldThrowExceptionOnGetDraftWhenCitizenRoleNotPresent() {
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
-        Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
+        submitAppealService.getDraftAppeal("authorisation");
     }
 
     @Test
@@ -611,7 +601,7 @@ public class SubmitAppealServiceTest {
     @Test(expected = ApplicationErrorException.class)
     public void shouldThrowExceptionOnGetDraftsWhenCitizenRoleNotPresent() {
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
-        List<SessionDraft> sessionDrafts = submitAppealService.getDraftAppeals("authorisation");
+        submitAppealService.getDraftAppeals("authorisation");
     }
 
     @Test
@@ -730,7 +720,7 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void givenAUcCaseWithRecoveryFromEstatesOffice_thenSetOfficeCorrecty() {
+    public void givenAUcCaseWithRecoveryFromEstatesOffice_thenSetOfficeCorrectly() {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
         SyaBenefitType syaBenefitType = new SyaBenefitType("Universal Credit", "UC");
         appealData.setBenefitType(syaBenefitType);

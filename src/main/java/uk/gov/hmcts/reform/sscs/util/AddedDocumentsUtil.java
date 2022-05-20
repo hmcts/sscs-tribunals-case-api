@@ -25,7 +25,8 @@ public class AddedDocumentsUtil {
         sscsCaseData.getWorkAllocationFields().setAddedDocuments(null);
     }
 
-    public void computeDocumentsAddedThisEvent(SscsCaseData sscsCaseData, List<String> documentsAddedThisEvent,
+    public void computeDocumentsAddedThisEvent(SscsCaseData sscsCaseData,
+                                               List<String> documentsAddedThisEvent,
                                                Enum<EventType> eventType) {
         if (workAllocationFeature) {
             Map<String, Integer> documentsAddedThisEventCounts = new HashMap<>();
