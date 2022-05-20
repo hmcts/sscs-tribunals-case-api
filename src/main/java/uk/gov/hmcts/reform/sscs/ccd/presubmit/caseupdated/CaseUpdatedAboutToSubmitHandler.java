@@ -103,9 +103,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
             if (newRpc != null) {
                 sscsCaseData.setRegion(newRpc.getName());
+                updateProcessingVenueIfRequired(caseDetails, newRpc);
             }
-
-            updateProcessingVenueIfRequired(caseDetails);
         }
 
         checkConfidentiality(sscsCaseData);
@@ -207,7 +206,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private void updateProcessingVenueIfRequired(CaseDetails<SscsCaseData> caseDetails) {
+    private void updateProcessingVenueIfRequired(CaseDetails<SscsCaseData> caseDetails, RegionalProcessingCenter newRpc) {
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
         String postCode = resolvePostCode(sscsCaseData);
         log.info("updateProcessingVenueIfRequired for post code " + postCode);
@@ -223,7 +222,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                 CourtVenue courtVenue = refDataService.getVenueRefData(venue);
                 if (courtVenue != null) {
                     sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
-                            .baseLocation(courtVenue.getEpimsId())
+//                            .baseLocation(courtVenue.getEpimsId())
+                            .baseLocation(newRpc.getName()) // is this right - ask Del
                             .region(courtVenue.getRegionId()).build());
                 }
             }

@@ -258,7 +258,8 @@ public class SubmitAppealService {
             CourtVenue courtVenue = refDataService.getVenueRefData(processingVenue);
             if (courtVenue != null) {
                 sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
-                        .baseLocation(courtVenue.getEpimsId())
+//                        .baseLocation(courtVenue.getEpimsId())
+                        .baseLocation(rpc.getName())
                         .region(courtVenue.getRegionId()).build());
             }
         }
