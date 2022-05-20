@@ -93,9 +93,7 @@ public class CitizenCcdService {
 
     public CaseDetails archiveDraft(SscsCaseData caseData, IdamTokens userIdamTokens, Long caseId) {
         log.info("Archiving Draft for caseId {} with user roles {}", caseId, userIdamTokens.getRoles().toString());
-        CaseDetails caseDetails = updateCase(caseData, DRAFT_ARCHIVED.getCcdType(), "SSCS Archive Draft", "SSCS Archive Draft", userIdamTokens, caseId.toString());
-
-        return caseDetails;
+        return updateCase(caseData, DRAFT_ARCHIVED.getCcdType(), "SSCS Archive Draft", "SSCS Archive Draft", userIdamTokens, caseId.toString());
     }
 
     private CaseDetails newCase(SscsCaseData caseData, String eventType, String summary, String description, IdamTokens idamTokens) {
