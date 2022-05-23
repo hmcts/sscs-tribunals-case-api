@@ -76,6 +76,7 @@
         ]]></notes>
         <packageUrl regex="true">^pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@.*$</packageUrl>
         <cve>CVE-2022-23181</cve>
+        <cve>CVE-2022-29885</cve>
     </suppress>
     <suppress until="2022-06-01">
         <notes><![CDATA[
@@ -83,6 +84,7 @@
         ]]></notes>
         <packageUrl regex="true">^pkg:maven/org.apache.tomcat.embed/tomcat-embed-websocket@.*$</packageUrl>
         <cve>CVE-2022-23181</cve>
+        <cve>CVE-2022-29885</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
