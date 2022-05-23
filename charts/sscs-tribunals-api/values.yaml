@@ -59,7 +59,7 @@ java:
     SECURE_DOC_STORE_FEATURE: true
     WORK_ALLOCATION_FEATURE: false
     HEARINGS_EVENT_QUEUE_NAME: tribunals-to-hearing-api-{{ .Values.global.environment }}
-    CASE_ACCESS_MANAGEMENT: false
+    CASE_ACCESS_MANAGEMENT_FEATURE: false
 
 idam-pr:
   enabled: false
