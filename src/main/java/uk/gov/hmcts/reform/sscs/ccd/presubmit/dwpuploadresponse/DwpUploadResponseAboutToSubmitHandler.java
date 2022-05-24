@@ -108,6 +108,10 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             }
         }
 
+        if (YesNo.isNoOrNull(sscsCaseData.getDwpFurtherInfo())) {
+            sscsCaseData.setState(State.READY_TO_LIST);
+        }
+
         return preSubmitCallbackResponse;
     }
 

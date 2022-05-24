@@ -1359,4 +1359,21 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getWarnings().size(), is(0));
         assertEquals("Benefit code cannot be changed to the selected code", response.getErrors().stream().findFirst().get());
     }
+
+    @Test
+    public void givenADwpUploadResponseEventWithoutFurtherInformation_thenSetStateToReadyToList() {
+        sscsCaseData.setDwpFurtherInfo(NO.getValue());
+        sscsCaseData.setState(State.WITH_DWP);
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(State.READY_TO_LIST, response.getData().getState());
+    }
+
+    @Test
+    public void givenADwpUploadResponseEventWithFurtherInformation_thenStateShouldNotChange() {
+        sscsCaseData.setDwpFurtherInfo(YES.getValue());
+        sscsCaseData.setState(State.WITH_DWP);
+        State stateBeforeEvent = sscsCaseData.getState();
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(stateBeforeEvent, response.getData().getState());
+    }
 }
