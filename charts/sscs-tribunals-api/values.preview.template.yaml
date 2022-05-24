@@ -12,3 +12,5 @@ java:
     CREATE_CCD_ENDPOINT: true
     SECURE_DOC_STORE_FEATURE: true
     CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
+    WORK_ALLOCATION_FEATURE: true
+    CASE_ACCESS_MANAGEMENT_FEATURE: true
