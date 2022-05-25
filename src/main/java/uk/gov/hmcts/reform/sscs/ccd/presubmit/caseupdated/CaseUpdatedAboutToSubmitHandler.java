@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
+import uk.gov.hmcts.reform.sscs.service.VenueService;
 
 @Component
 @Slf4j
@@ -41,14 +42,17 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final DwpAddressLookupService dwpAddressLookupService;
     private final IdamService idamService;
     private final RefDataService refDataService;
+    private final VenueService venueService;
     private final boolean caseAccessManagementFeature;
 
+    @SuppressWarnings("squid:S107")
     CaseUpdatedAboutToSubmitHandler(RegionalProcessingCenterService regionalProcessingCenterService,
                                     AssociatedCaseLinkHelper associatedCaseLinkHelper,
                                     AirLookupService airLookupService,
                                     DwpAddressLookupService dwpAddressLookupService,
                                     IdamService idamService,
                                     RefDataService refDataService,
+                                    VenueService venueService,
                                     @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
@@ -56,6 +60,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.idamService = idamService;
         this.refDataService = refDataService;
+        this.venueService = venueService;
         this.caseAccessManagementFeature = caseAccessManagementFeature;
     }
 
@@ -65,7 +70,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.CASE_UPDATED;
+            && callback.getEvent() == EventType.CASE_UPDATED;
     }
 
     @Override
@@ -103,7 +108,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
             if (newRpc != null) {
                 sscsCaseData.setRegion(newRpc.getName());
-                updateProcessingVenueIfRequired(caseDetails, newRpc);
+                updateProcessingVenueIfRequired(caseDetails, newRpc.getPostcode());
             }
         }
 
@@ -206,7 +211,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private void updateProcessingVenueIfRequired(CaseDetails<SscsCaseData> caseDetails, RegionalProcessingCenter newRpc) {
+    private void updateProcessingVenueIfRequired(CaseDetails<SscsCaseData> caseDetails, String rpcPostcode) {
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
         String postCode = resolvePostCode(sscsCaseData);
         log.info("updateProcessingVenueIfRequired for post code " + postCode);
@@ -218,12 +223,12 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
             sscsCaseData.setProcessingVenue(venue);
 
-            if (caseAccessManagementFeature && !StringUtils.isEmpty(venue)) {
+            if (caseAccessManagementFeature && StringUtils.isNotEmpty(venue)) {
                 CourtVenue courtVenue = refDataService.getVenueRefData(venue);
+                String rpcEpimsId = venueService.getEpimsIdForActiveVenueByPostcode(rpcPostcode).orElse(null);
                 if (courtVenue != null) {
                     sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
-//                            .baseLocation(courtVenue.getEpimsId())
-                            .baseLocation(newRpc.getName()) // is this right - ask Del
+                            .baseLocation(rpcEpimsId)
                             .region(courtVenue.getRegionId()).build());
                 }
             }

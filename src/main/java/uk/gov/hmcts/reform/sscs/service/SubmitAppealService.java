@@ -258,7 +258,7 @@ public class SubmitAppealService {
             && rpc != null) {
             log.info("Getting venue details for " + processingVenue);
             CourtVenue courtVenue = refDataService.getVenueRefData(processingVenue);
-            String rpcEpimsId = venueService.getEpimsIdForVenueByPostcode(rpc.getPostcode()).orElse(null);
+            String rpcEpimsId = venueService.getEpimsIdForActiveVenueByPostcode(rpc.getPostcode()).orElse(null);
 
             if (courtVenue != null) {
                 sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()

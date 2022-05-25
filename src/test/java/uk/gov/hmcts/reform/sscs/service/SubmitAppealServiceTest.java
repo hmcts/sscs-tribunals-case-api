@@ -892,7 +892,7 @@ public class SubmitAppealServiceTest {
                 .build());
         when(airLookupService.lookupAirVenueNameByPostCode(eq(postcode), any())).thenReturn(expectedVenue);
         when(refDataService.getVenueRefData(expectedVenue)).thenReturn(CourtVenue.builder().regionId(regionId).build());
-        when(venueService.getEpimsIdForVenueByPostcode("rpcPostcode")).thenReturn(Optional.of(epimsId));
+        when(venueService.getEpimsIdForActiveVenueByPostcode("rpcPostcode")).thenReturn(Optional.of(epimsId));
 
         boolean isAppellant = appellantOrAppointee.equals("appellant");
         SyaCaseWrapper appealData = getSyaCaseWrapper(isAppellant ? "json/sya.json" : "sya/allDetailsWithAppointeeWithDifferentAddress.json");
