@@ -30,28 +30,28 @@ java:
 sscs-hearings-api:
   enabled: true
   java:
-    image: 'hmctspublic.azurecr.io/sscs/sscs-hearings-api:latest' #Change to pr if required
+    image: "hmctspublic.azurecr.io/sscs/sscs-hearings-api:latest" #Change to pr if required
     ingressHost: sscs-hearings-api-${SERVICE_FQDN}
     environment:
-    ROOT_LOGGING_LEVEL: INFO
-    LOG_OUTPUT: single
-    CREATE_CCD_ENDPOINT: false
-    IDAM_S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-    CASEWORKER_REF_API_URL: "http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal"
-    IDAM_API_URL: "https://idam-api.aat.platform.hmcts.net"
-    CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-${SERVICE_FQDN}"
-    COMMON_REF_API_URL: "http://rd-commondata-api-aat.service.core-compute-aat.internal"
-    JUDICIAL_REF_API_URL: "http://judicial-ref-api-aat.service.core-compute-aat.internal"
-    EXUI_API_URL: "https://xui-${SERVICE_FQDN}"
-    HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
-    #Messaging
-    ##Enable for inbound
-    HMC_HEARING_LISTENING_ENABLED: false
-    HEARINGS_TOPIC_NAME: "hmc-to-cft"
-    HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription"
-    ##Enable for outbound
-    TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
-    TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
+      ROOT_LOGGING_LEVEL: INFO
+      LOG_OUTPUT: single
+      CREATE_CCD_ENDPOINT: false
+      IDAM_S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+      CASEWORKER_REF_API_URL: "http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal"
+      IDAM_API_URL: "https://idam-api.aat.platform.hmcts.net"
+      CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-${SERVICE_FQDN}"
+      COMMON_REF_API_URL: "http://rd-commondata-api-aat.service.core-compute-aat.internal"
+      JUDICIAL_REF_API_URL: "http://judicial-ref-api-aat.service.core-compute-aat.internal"
+      EXUI_API_URL: "https://xui-${SERVICE_FQDN}"
+      HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+      #Messaging
+      ##Enable for inbound
+      HMC_HEARING_LISTENING_ENABLED: false
+      HEARINGS_TOPIC_NAME: "hmc-to-cft"
+      HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription"
+      ##Enable for outbound
+      TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
+      TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
 
 hmc-cft-hearing-service:
   enabled: true

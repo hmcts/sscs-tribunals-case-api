@@ -52,7 +52,7 @@ dependencies:
     repository: '@hmctspublic'
     condition: em-ccdorc.enabled
   - name: sscs-hearings-api
-    version: 0.0.18
+    version: 0.0.17
     repository: '@hmctspublic'
     condition: sscs-hearings-api.enabled
   - name: hmc-cft-hearing-service
