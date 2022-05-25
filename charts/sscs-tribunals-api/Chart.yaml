@@ -51,3 +51,15 @@ dependencies:
     version: 1.0.9
     repository: '@hmctspublic'
     condition: em-ccdorc.enabled
+  - name: sscs-hearings-api
+    version: 0.0.18
+    repository: '@hmctspublic'
+    condition: sscs-hearings-api.enabled
+  - name: hmc-cft-hearing-service
+    version: 1.6.5
+    repository: '@hmctspublic'
+    condition: hmc-cft-hearing-service.enabled
+  - name: servicebus
+    version: 0.3.0
+    repository: '@hmctspublic'
+    condition: servicebus.enabled
