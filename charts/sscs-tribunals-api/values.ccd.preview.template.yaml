@@ -32,6 +32,7 @@ sscs-hearings-api:
   java:
     image: "hmctspublic.azurecr.io/sscs/sscs-hearings-api:latest" #Change to pr if required
     ingressHost: sscs-hearings-api-${SERVICE_FQDN}
+    releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
     environment:
       ROOT_LOGGING_LEVEL: INFO
       LOG_OUTPUT: single
@@ -56,6 +57,7 @@ sscs-hearings-api:
 hmc-cft-hearing-service:
   enabled: true
   java:
+    releaseNameOverride: ${SERVICE_NAME}-hmc-cft-hearing-service
     image: "hmctspublic.azurecr.io/hmc/cft-hearing-service:latest"
     ingressHost: hmc-cft-hearing-service-${SERVICE_FQDN}
     environment:
@@ -83,7 +85,7 @@ hmc-cft-hearing-service:
         key: connectionString
 
 servicebus:
-  enabled: false
+  enabled: true
   teamName: sscs
   resourceGroup: sscs-aks
   serviceplan: standard
