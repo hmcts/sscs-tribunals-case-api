@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.postponementrequest;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -35,8 +39,16 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-
         final PreSubmitCallbackResponse<SscsCaseData> response = validatePostponementRequest(sscsCaseData);
+
+        final Optional<Hearing> optionalHearing = emptyIfNull(sscsCaseData.getHearings()).stream()
+                .filter(h -> h.getValue().getHearingDateTime().isAfter(LocalDateTime.now()))
+                .distinct()
+                .findFirst();
+
+        optionalHearing.ifPresentOrElse(hearing ->
+                        postponementRequestService.setHearingDateAsExcludeDate(hearing, sscsCaseData),
+                        () -> response.addError("There are no hearing to postpone"));
 
         if (response.getErrors().isEmpty()) {
             postponementRequestService.processPostponementRequest(sscsCaseData, UploadParty.DWP);

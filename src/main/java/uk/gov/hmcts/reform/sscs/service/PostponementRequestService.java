@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.DATE_FORMAT_YYYYMMDD;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -8,10 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 
@@ -52,5 +50,22 @@ public class PostponementRequestService {
     private void ensureSscsDocumentsIsNotNull(SscsCaseData sscsCaseData) {
         final List<SscsDocument> sscsDocuments = (sscsCaseData.getSscsDocument() == null) ? new ArrayList<>() : sscsCaseData.getSscsDocument();
         sscsCaseData.setSscsDocument(sscsDocuments);
+    }
+
+    public void setHearingDateAsExcludeDate(Hearing hearing, SscsCaseData sscsCaseData) {
+        List<ExcludeDate> excludeDates =
+                sscsCaseData.getAppeal().getHearingOptions().getExcludeDates() == null ? new ArrayList<>():
+        sscsCaseData.getAppeal().getHearingOptions().getExcludeDates();
+
+        DateRange dateRange = DateRange.builder()
+                .start(getLocalDate(hearing.getValue().getHearingDate()))
+                .end(getLocalDate(hearing.getValue().getHearingDate()))
+                .build();
+        excludeDates.add(ExcludeDate.builder().value(dateRange).build());
+    }
+
+    private static String getLocalDate(String dateStr) {
+        LocalDate localDate = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern(DATE_FORMAT_YYYYMMDD));
+        return localDate.toString();
     }
 }
