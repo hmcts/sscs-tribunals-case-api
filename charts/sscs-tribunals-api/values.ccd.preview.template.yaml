@@ -30,7 +30,7 @@ java:
 sscs-hearings-api:
   enabled: true
   java:
-    image: "hmctspublic.azurecr.io/sscs/sscs-hearings-api:latest" #Change to pr if required
+    image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
     ingressHost: sscs-hearings-api-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
     environment:
@@ -83,6 +83,11 @@ hmc-cft-hearing-service:
       HMC_OUTBOUND_QUEUE_CONNECTION_STRING:
         secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-hmc-to-hmi
         key: connectionString
+    keyVaults:
+      hmc:
+        resourceGroup: hmc-shared
+        secrets:
+          - name: AppInsightsInstrumentationKey
 
 servicebus:
   enabled: true
