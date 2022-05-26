@@ -93,7 +93,7 @@ public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHa
                 preSubmitCallbackResponse.addError(POSTPONEMENTS_REVIEWED_BY_TCW);
             }
 
-            if (HearingRoute.GAPS == sscsCaseData.getSchedulingAndListingFields().getHearingRoute()) {
+            if (HearingRoute.GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute())) {
                 //since S&L is null then it's a GAPS which should not allow postponement request
                 preSubmitCallbackResponse.addError(POSTPONEMENTS_NOT_POSSIBLE_GAPS);
             }
