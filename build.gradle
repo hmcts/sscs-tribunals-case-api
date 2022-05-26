@@ -279,7 +279,7 @@ dependencyManagement {
         }
 
         //CVE-2021-27807
-        dependencySet(group: 'org.apache.pdfbox', version: '2.0.24') {
+        dependencySet(group: 'org.apache.pdfbox', version: '2.0.26') {
             entry 'pdfbox'
             entry 'pdfbox-tools'
             entry 'preflight'
