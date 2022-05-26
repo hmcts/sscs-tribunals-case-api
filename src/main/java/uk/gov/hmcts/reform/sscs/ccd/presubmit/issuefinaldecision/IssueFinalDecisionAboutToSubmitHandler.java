@@ -2,18 +2,21 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -22,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionBenefitTypeHelper;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
@@ -31,16 +35,22 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 @Slf4j
 public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    @Value("${feature.snl.enabled}")
+    private boolean scheduleListingEnabled;
+
     private final FooterService footerService;
     private final DecisionNoticeService decisionNoticeService;
     private final Validator validator;
+    private final ListAssistHearingMessageHelper hearingMessageHelper;
 
     @Autowired
     public IssueFinalDecisionAboutToSubmitHandler(FooterService footerService,
-        DecisionNoticeService decisionNoticeService, Validator validator) {
+        DecisionNoticeService decisionNoticeService, Validator validator,
+            ListAssistHearingMessageHelper hearingMessageHelper) {
         this.footerService = footerService;
         this.decisionNoticeService = decisionNoticeService;
         this.validator = validator;
+        this.hearingMessageHelper = hearingMessageHelper;
     }
 
     @Override
@@ -79,6 +89,13 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument() != null) {
                 createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
                 clearTransientFields(preSubmitCallbackResponse);
+                if (scheduleListingEnabled && LIST_ASSIST.equals(Optional.ofNullable(sscsCaseData)
+                        .map(SscsCaseData::getSchedulingAndListingFields)
+                                .map(SchedulingAndListingFields::getHearingRoute).orElse(null))) {
+                    log.info("Issue Final Decision: HearingRoute ListAssist Case ({}). Sending cancellation message",
+                            sscsCaseData.getCcdCaseId());
+                    hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId());
+                }
             } else {
                 preSubmitCallbackResponse.addError("There is no Preview Draft Decision Notice on the case so decision cannot be issued");
             }
