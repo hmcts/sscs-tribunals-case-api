@@ -112,4 +112,25 @@
     <packageUrl regex="true">^pkg:maven/io\.netty/netty.*@2\.0\.46\.Final$</packageUrl>
     <cve>CVE-2022-24823</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+    file name: spring-cloud-openfeign-core-2.2.9.RELEASE.jar
+    ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org.springframework\.cloud/spring-cloud-openfeign-core@.*$</packageUrl>
+        <cve>CVE-2021-22044</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+    file name: jackson-dataformat-cbor-2.11.3.jar
+    ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.dataformat/jackson-dataformat-cbor@.*$</packageUrl>
+        <cve>CVE-2020-28491</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+    file name: tika-core-2.2.1.jar
+    ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.tika/tika-core@.*$</packageUrl>
+        <cve>CVE-2022-30126</cve>
+    </suppress>
 </suppressions>
