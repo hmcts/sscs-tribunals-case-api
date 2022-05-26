@@ -214,7 +214,7 @@ def versions = [
         gradlePitest    : '1.3.0',
         jackson         : '2.11.0',
         junitJupiter    : '5.7.2',
-        lombok          : '1.18.22',
+        lombok          : '1.18.24',
         pact            : '4.1.7',
         pdfEmailCommon  : '1.4.55',
         pitest          : '1.4.2',
