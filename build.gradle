@@ -222,7 +222,7 @@ def versions = [
         reformLogging   : '5.1.7',
         sonarPitest     : '0.5',
         springfoxSwagger: '2.8.0',
-        sscsCommon      : '4.9.4',
+        sscsCommon      : '4.9.6',
 ]
 
 ext["rest-assured.version"] = '4.2.0'
@@ -286,7 +286,7 @@ dependencyManagement {
         }
 
         //CVE-2021-22118
-        dependencySet(group: 'org.springframework', version: '5.2.21.RELEASE') {
+        dependencySet(group: 'org.springframework', version: '5.2.22.RELEASE') {
             entry 'spring-aop'
             entry 'spring-aspects'
             entry 'spring-beans'
