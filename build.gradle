@@ -207,7 +207,7 @@ configurations {
 
 
 def versions = [
-        assertj         : '3.21.0',
+        assertj         : '3.22.0',
         azureCore       : '1.27.0',
         azureMessagingServiceBus: '7.6.0',
         commonsIo       : '2.11.0',
