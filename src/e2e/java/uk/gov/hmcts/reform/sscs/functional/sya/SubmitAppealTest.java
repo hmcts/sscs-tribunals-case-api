@@ -5,7 +5,6 @@ import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static net.javacrumbs.jsonunit.JsonAssert.whenIgnoringPaths;
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
-import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
@@ -25,7 +24,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -67,27 +65,27 @@ public class SubmitAppealTest {
     }
 
     @Test
-    public void givenValidAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateValidAppeal() throws InterruptedException {
+    public void givenValidAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateValidAppeal() {
         assertSscsCaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN);
     }
 
     @Test
-    public void givenValidChildSupportAppealIsSubmitted_thenCreateValidAppeal() throws InterruptedException {
+    public void givenValidChildSupportAppealIsSubmitted_thenCreateValidAppeal() {
         assertSscsCaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_CHILD_SUPPORT.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN_CHILD_SUPPORT);
     }
 
     @Test
-    public void givenValidSscs5AppealIsSubmitted_thenCreateValidAppeal() throws InterruptedException {
+    public void givenValidSscs5AppealIsSubmitted_thenCreateValidAppeal() {
         assertSscsCaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_SSCS5.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN_SSCS5);
     }
 
     @Test
-    public void givenIncompleteAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateIncompleteAppeal() throws InterruptedException {
+    public void givenIncompleteAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateIncompleteAppeal() {
         assertSscsCaseIsExpectedResult("incompleteApplication", ALL_DETAILS_NON_SAVE_AND_RETURN_NO_MRN_DATE_CCD.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN);
     }
 
     @Test
-    public void givenNonCompliantAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateNonCompliantAppeal() throws InterruptedException {
+    public void givenNonCompliantAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateNonCompliantAppeal() {
         assertSscsCaseIsExpectedResult("interlocutoryReviewState", ALL_DETAILS_NON_SAVE_AND_RETURN_WITH_INTERLOC_CCD.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN);
     }
 
@@ -121,16 +119,16 @@ public class SubmitAppealTest {
         log.info(String.format("SYA created with CCD ID %s", id));
         log.info("[assertCaseIsExpectedResult] expected Response : " + changeExpectedFields(expectedResponse, nino, mrnDate));
         log.info("[assertCaseIsExpectedResult] sscsCaseDetails : " + sscsCaseDetails.getData());
-        log.info("[assertCaseIsExpectedResult] sscsCaseDetails.getWorkAllocationFields : " + sscsCaseDetails.getData().getWorkAllocationFields());
-        log.info("[assertCaseIsExpectedResult] sscsCaseDetails.getWorkAllocationFields.getCaseAccessCategory : " + sscsCaseDetails.getData().getWorkAllocationFields().getCaseAccessCategory());
+        log.info("[assertCaseIsExpectedResult] sscsCaseDetails.getCaseAccessManagementFields : " + sscsCaseDetails.getData().getCaseAccessManagementFields());
+        log.info("[assertCaseIsExpectedResult] sscsCaseDetails.getCaseAccessManagementFields.getCaseAccessCategory : " + sscsCaseDetails.getData().getCaseAccessManagementFields().getCaseAccessCategory());
 
-        assertJsonEquals(changeExpectedFields(expectedResponse, nino, mrnDate), sscsCaseDetails.getData(), whenIgnoringPaths("sscsDocument"));
+        assertJsonEquals(changeExpectedFields(expectedResponse, nino, mrnDate), sscsCaseDetails.getData(), whenIgnoringPaths("sscsDocument","regionalProcessingCenter.hearingRoute"));
 
         assertEquals(expectedState, sscsCaseDetails.getState());
 
-        assertEquals("Joe Bloggs", sscsCaseDetails.getData().getWorkAllocationFields().getCaseNameHmctsInternal());
-        assertEquals("Joe Bloggs", sscsCaseDetails.getData().getWorkAllocationFields().getCaseNameHmctsRestricted());
-        assertEquals("Joe Bloggs", sscsCaseDetails.getData().getWorkAllocationFields().getCaseNamePublic());
+        assertEquals("Joe Bloggs", sscsCaseDetails.getData().getCaseAccessManagementFields().getCaseNameHmctsInternal());
+        assertEquals("Joe Bloggs", sscsCaseDetails.getData().getCaseAccessManagementFields().getCaseNameHmctsRestricted());
+        assertEquals("Joe Bloggs", sscsCaseDetails.getData().getCaseAccessManagementFields().getCaseNamePublic());
     }
 
     private String changeExpectedFields(String serializedMessage, String nino, LocalDate mrnDate) {
@@ -158,8 +156,6 @@ public class SubmitAppealTest {
 
         SyaCaseWrapper wrapper = syaJsonMessageSerializer.getDeserializeMessage();
         wrapper.getAppellant().setNino(nino);
-
-        RegionalProcessingCenter rpc = getRegionalProcessingCenter();
 
         RequestSpecification httpRequest = RestAssured.given()
             .body(body)
@@ -220,6 +216,5 @@ public class SubmitAppealTest {
         response = httpRequest.post("/appeals");
 
         response.then().statusCode(HttpStatus.SC_CONFLICT);
-
     }
 }

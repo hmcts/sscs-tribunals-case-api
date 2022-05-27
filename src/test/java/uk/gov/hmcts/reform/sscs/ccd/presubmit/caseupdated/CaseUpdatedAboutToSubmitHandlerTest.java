@@ -27,6 +27,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -44,8 +45,8 @@ import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 @RunWith(JUnitParamsRunner.class)
 public class CaseUpdatedAboutToSubmitHandlerTest {
+
     private static final String USER_AUTHORISATION = "Bearer token";
-    private CaseUpdatedAboutToSubmitHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -58,6 +59,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Mock
     private CcdService ccdService;
+
     @Mock
     private IdamService idamService;
 
@@ -71,34 +73,62 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @Mock
     private AirLookupService airLookupService;
 
-    private AssociatedCaseLinkHelper associatedCaseLinkHelper;
-
     @Mock
     private RefDataService refDataService;
+
+    private CaseUpdatedAboutToSubmitHandler handler;
 
     @Before
     public void setUp() {
         openMocks(this);
-        associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService);
-        handler = new CaseUpdatedAboutToSubmitHandler(regionalProcessingCenterService, associatedCaseLinkHelper, airLookupService, new DwpAddressLookupService(), idamService, refDataService, true);
+        AssociatedCaseLinkHelper associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService);
+        handler = new CaseUpdatedAboutToSubmitHandler(regionalProcessingCenterService,
+            associatedCaseLinkHelper,
+            airLookupService,
+            new DwpAddressLookupService(),
+            idamService,
+            refDataService,
+            true);
 
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-        sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code("PIP").build())
-                .appellant(Appellant.builder().address(Address.builder().postcode("CM120NS").build()).build()).build())
-                .benefitCode("002")
-                .issueCode("DD")
-                .build();
 
-        sscsCaseDataBefore = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder()
-                .appellant(Appellant.builder().address(Address.builder().postcode("CM120NS").build()).build()).build())
-                .build();
+        sscsCaseData = SscsCaseData.builder()
+            .ccdCaseId("ccdId")
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder()
+                    .code("PIP")
+                    .build())
+                .appellant(Appellant.builder()
+                    .address(Address.builder()
+                        .postcode("CM120NS")
+                        .build())
+                    .build())
+                .build())
+            .benefitCode("002")
+            .issueCode("DD")
+            .build();
+
+        sscsCaseDataBefore = SscsCaseData.builder()
+            .ccdCaseId("ccdId")
+            .appeal(Appeal.builder()
+                .appellant(Appellant.builder()
+                    .address(Address.builder()
+                        .postcode("CM120NS")
+                        .build())
+                    .build())
+                .build())
+            .build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
-        when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(SUPER_USER.getValue())).build());
+
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+        when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            .roles(List.of(SUPER_USER.getValue()))
+            .build());
     }
 
     @Test
@@ -401,7 +431,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             " Ho.use, ., \"101 House, House",
             " ., ãHouse, âHouse, &101 House"})
     public void givenACaseUpdateEventWithInvalidJointPartyAddressDetails_thenReturnError(String line1, String line2, String town, String county) {
-        callback.getCaseDetails().getCaseData().setJointPartyAddress(buildAddress(line1, line2, county, town));
+        callback.getCaseDetails().getCaseData().getJointParty().setAddress(buildAddress(line1, line2, county, town));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         long numberOfExpectedError = getNumberOfExpectedError(response);
@@ -427,12 +457,12 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         numberOfExpectedError = getNumberOfExpectedError(response);
         assertEquals(0, numberOfExpectedError);
 
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().toBuilder().appointee(Appointee.builder().address(address).build()).build();
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().address(address).build());
         response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         numberOfExpectedError = getNumberOfExpectedError(response);
         assertEquals(0, numberOfExpectedError);
 
-        callback.getCaseDetails().getCaseData().setJointPartyAddress(address);
+        callback.getCaseDetails().getCaseData().getJointParty().setAddress(address);
         response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         numberOfExpectedError = getNumberOfExpectedError(response);
         assertEquals(0, numberOfExpectedError);
@@ -646,7 +676,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefitDescription);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(null, response.getData().getIsConfidentialCase());
+        assertNull(response.getData().getIsConfidentialCase());
     }
 
     @Test
@@ -698,7 +728,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(null, response.getData().getIsConfidentialCase());
+        assertNull(response.getData().getIsConfidentialCase());
     }
 
     @Test
@@ -722,8 +752,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     public void givenNewAppellantName_thenSetCaseName() {
-        sscsCaseDataBefore.getWorkAllocationFields().setCaseNameHmctsInternal("Old Name");
-        sscsCaseData.getWorkAllocationFields().setCaseNameHmctsInternal("Old Name");
+        sscsCaseDataBefore.getCaseAccessManagementFields().setCaseNameHmctsInternal("Old Name");
+        sscsCaseData.getCaseAccessManagementFields().setCaseNameHmctsInternal("Old Name");
         sscsCaseData.setAppeal(Appeal.builder()
                         .benefitType(new BenefitType("UC", "Universal credit"))
                         .appellant(Appellant.builder()
@@ -731,9 +761,9 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                                 .build())
                         .build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals("New Name", response.getData().getWorkAllocationFields().getCaseNameHmctsInternal());
-        assertEquals("New Name", response.getData().getWorkAllocationFields().getCaseNameHmctsRestricted());
-        assertEquals("New Name", response.getData().getWorkAllocationFields().getCaseNamePublic());
+        assertEquals("New Name", response.getData().getCaseAccessManagementFields().getCaseNameHmctsInternal());
+        assertEquals("New Name", response.getData().getCaseAccessManagementFields().getCaseNameHmctsRestricted());
+        assertEquals("New Name", response.getData().getCaseAccessManagementFields().getCaseNamePublic());
     }
 
     @Test
@@ -749,15 +779,15 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals("New Name", response.getData().getWorkAllocationFields().getCaseNameHmctsInternal());
-        assertEquals("New Name", response.getData().getWorkAllocationFields().getCaseNameHmctsRestricted());
-        assertEquals("New Name", response.getData().getWorkAllocationFields().getCaseNamePublic());
+        assertEquals("New Name", response.getData().getCaseAccessManagementFields().getCaseNameHmctsInternal());
+        assertEquals("New Name", response.getData().getCaseAccessManagementFields().getCaseNameHmctsRestricted());
+        assertEquals("New Name", response.getData().getCaseAccessManagementFields().getCaseNamePublic());
     }
 
     @Test
     public void givenAppellantNameDeleted_thenUnsetCaseName() {
-        sscsCaseDataBefore.getWorkAllocationFields().setCaseNameHmctsInternal("Old Name");
-        sscsCaseData.getWorkAllocationFields().setCaseNameHmctsInternal("Old Name");
+        sscsCaseDataBefore.getCaseAccessManagementFields().setCaseNameHmctsInternal("Old Name");
+        sscsCaseData.getCaseAccessManagementFields().setCaseNameHmctsInternal("Old Name");
         sscsCaseData.setAppeal(Appeal.builder()
                 .benefitType(new BenefitType("UC", "Universal credit"))
                 .appellant(Appellant.builder().build())
@@ -767,16 +797,48 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getWorkAllocationFields().getCaseNameHmctsInternal());
-        assertNull(response.getData().getWorkAllocationFields().getCaseNameHmctsRestricted());
-        assertNull(response.getData().getWorkAllocationFields().getCaseNamePublic());
+
+        assertNull(response.getData().getCaseAccessManagementFields().getCaseNameHmctsInternal());
+        assertNull(response.getData().getCaseAccessManagementFields().getCaseNameHmctsRestricted());
+        assertNull(response.getData().getCaseAccessManagementFields().getCaseNamePublic());
+    }
+
+    @Test
+    public void givenOldCaseNameExists_shouldStillSetNewCaseName() {
+        sscsCaseDataBefore.getCaseAccessManagementFields().setCaseNameHmctsInternal("Harvey Specter");
+        sscsCaseData.setAppeal(Appeal.builder()
+            .benefitType(new BenefitType("UC", "Universal credit"))
+            .appellant(Appellant.builder()
+                .name(Name.builder()
+                    .firstName("Louis")
+                    .lastName("Litt")
+                    .build())
+                .build())
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData()
+            .getCaseAccessManagementFields()
+            .getCaseNameHmctsInternal(), is("Louis Litt"));
+    }
+
+    @Test
+    public void givenCaseAccessManagementFeatureDisabled_shouldNotSetCaseNames() {
+        ReflectionTestUtils.setField(handler, "caseAccessManagementFeature", false);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getCaseAccessManagementFields().getCaseNameHmctsInternal());
+        assertNull(response.getData().getCaseAccessManagementFields().getCaseNameHmctsRestricted());
+        assertNull(response.getData().getCaseAccessManagementFields().getCaseNamePublic());
     }
 
     @Test
     public void givenBenefitTypeChanged_thenSetCaseCategories() {
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-        sscsCaseDataBefore.getWorkAllocationFields().setCategories(Benefit.ESA);
-        sscsCaseData.getWorkAllocationFields().setCategories(Benefit.ESA);
+        sscsCaseDataBefore.getCaseAccessManagementFields().setCategories(Benefit.ESA);
+        sscsCaseData.getCaseAccessManagementFields().setCategories(Benefit.ESA);
         sscsCaseDataBefore.getAppeal().setBenefitType(new BenefitType("ESA", "Employment and Support Allowance"));
         sscsCaseData.setAppeal(Appeal.builder()
                 .benefitType(new BenefitType("UC", "Universal Credit"))
@@ -785,14 +847,14 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                         .build())
                 .build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals("universalCredit", response.getData().getWorkAllocationFields().getCaseAccessCategory());
-        assertEquals("Universal Credit", response.getData().getWorkAllocationFields().getCaseManagementCategory().getValue().getLabel());
-        assertEquals("UC", response.getData().getWorkAllocationFields().getCaseManagementCategory().getValue().getCode());
+        assertEquals("universalCredit", response.getData().getCaseAccessManagementFields().getCaseAccessCategory());
+        assertEquals("Universal Credit", response.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getLabel());
+        assertEquals("UC", response.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getCode());
     }
 
     @Test
     public void givenDeleteBenefitType_thenAddError() {
-        sscsCaseDataBefore.getWorkAllocationFields().setCategories(Benefit.ESA);
+        sscsCaseDataBefore.getCaseAccessManagementFields().setCategories(Benefit.ESA);
         sscsCaseDataBefore = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code("PIP").build())
                 .appellant(Appellant.builder().address(Address.builder().postcode("CM120NS").build()).build()).build())
@@ -801,7 +863,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
 
-        sscsCaseData.getWorkAllocationFields().setCategories(Benefit.ESA);
+        sscsCaseData.getCaseAccessManagementFields().setCategories(Benefit.ESA);
         sscsCaseData.setAppeal(Appeal.builder()
                 .benefitType(new BenefitType("", ""))
                 .appellant(Appellant.builder()
@@ -850,9 +912,9 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                 .build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("personalIndependencePayment", response.getData().getWorkAllocationFields().getCaseAccessCategory());
-        assertEquals("Personal Independence Payment", response.getData().getWorkAllocationFields().getCaseManagementCategory().getValue().getLabel());
-        assertEquals("PIP", response.getData().getWorkAllocationFields().getCaseManagementCategory().getValue().getCode());
+        assertEquals("personalIndependencePayment", response.getData().getCaseAccessManagementFields().getCaseAccessCategory());
+        assertEquals("Personal Independence Payment", response.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getLabel());
+        assertEquals("PIP", response.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getCode());
     }
 
     @Test
@@ -875,12 +937,22 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         assertEquals(1, response.getErrors().size());
     }
 
+    @Test
+    public void givenCaseAccessManagementFeatureDisabled_shouldNotSetCaseCategories() {
+        ReflectionTestUtils.setField(handler, "caseAccessManagementFeature", false);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().isEmpty());
+        assertNull(response.getData().getCaseAccessManagementFields().getCaseAccessCategory());
+        assertNull(response.getData().getCaseAccessManagementFields().getCaseManagementCategory());
+    }
 
     @Test
     @Parameters({"childSupport,Child Support", "taxCredit,Tax Credit", "guardiansAllowance,Guardians Allowance",
-            "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
-            "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare","guaranteedMinimumPension,Guaranteed Minimum Pension",
-            "nationalInsuranceCredits,National Insurance Credits"})
+        "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
+        "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare","guaranteedMinimumPension,Guaranteed Minimum Pension",
+        "nationalInsuranceCredits,National Insurance Credits"})
     public void givenNonSscs1PaperCaseAppellantWantsToAttendYes_thenCaseIsOralAndWarningShown(String shortName, String description) {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(description);
@@ -892,6 +964,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(
             HearingOptions.builder().wantsToAttend("Yes").build()
         );
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getWarnings().size());
@@ -913,6 +986,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             HearingOptions.builder().wantsToAttend("Yes").build()
         );
         when(idamService.getUserDetails(any())).thenReturn(UserDetails.builder().roles(List.of("caseworker-sscs-systemupdate")).build());
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getWarnings().size());
@@ -921,9 +995,9 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"childSupport,Child Support", "taxCredit,Tax Credit", "guardiansAllowance,Guardians Allowance",
-            "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
+        "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
         "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare","guaranteedMinimumPension,Guaranteed Minimum Pension",
-            "nationalInsuranceCredits,National Insurance Credits"})
+        "nationalInsuranceCredits,National Insurance Credits"})
     public void givenNonSscs1PaperCaseAppelllantWantsToAttendNo_thenCaseIsNotChangedAndNoWarningShown(String shortName, String description) {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(description);
@@ -931,6 +1005,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             HearingOptions.builder().wantsToAttend("No").build()
         );
         callback.getCaseDetails().getCaseData().getAppeal().setHearingType(HearingType.PAPER.getValue());
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getWarnings().size());
@@ -946,6 +1021,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(
             HearingOptions.builder().wantsToAttend(appellantWantsToAttend).build()
         );
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getWarnings().size());
@@ -958,7 +1034,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             .hearingOptions(HearingOptions.builder().wantsToAttend(wantsToAttend).build())
             .build()).build();
     }
-
 
     @Test
     @Parameters({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})

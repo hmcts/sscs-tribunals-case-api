@@ -34,9 +34,7 @@ Run the application by executing:
 ### Running Smoke Test locally
 Once the application running locally, please make sure
 1. Your local CCD is up and running with subscription id "7S9MxdSBpt"
-2. Set Environment variable TEST_URL to where your api is running
-    For example:  export TEST_URL=http://localhost:8080
-3. Execute ./gradlew --info smoke
+2. Execute ./gradlew --info smoke
 
 ### Running in Docker(Work in progress...)
 Create the image of the application by executing the following command:

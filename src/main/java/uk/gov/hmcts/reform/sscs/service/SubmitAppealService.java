@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -44,6 +43,7 @@ import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
 @Service
 @Slf4j
 public class SubmitAppealService {
+
     public static final String DM_STORE_USER_ID = "sscs";
     private static final String CITIZEN_ROLE = "citizen";
     private static final String CASEWORKER_ROLE_CLERK = "caseworker-sscs-clerk";
@@ -56,30 +56,25 @@ public class SubmitAppealService {
     private final ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
     private final AirLookupService airLookupService;
     private final RefDataService refDataService;
-    private final EvidenceManagementSecureDocStoreService secureDocStoreService;
-    private final boolean workAllocationFeature;
+    private final boolean caseAccessManagementFeature;
 
     @SuppressWarnings("squid:S107")
-    @Autowired
     SubmitAppealService(CcdService ccdService,
                         CitizenCcdService citizenCcdService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
                         ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
                         AirLookupService airLookupService,
-                        EvidenceManagementSecureDocStoreService secureDocStoreService,
                         RefDataService refDataService,
-                        @Value("${feature.work-allocation.enabled}")  boolean workAllocationFeature) {
-
+                        @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature) {
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.idamService = idamService;
         this.convertAIntoBService = convertAIntoBService;
         this.airLookupService = airLookupService;
-        this.secureDocStoreService = secureDocStoreService;
         this.refDataService = refDataService;
-        this.workAllocationFeature = workAllocationFeature;
+        this.caseAccessManagementFeature = caseAccessManagementFeature;
     }
 
     public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
@@ -107,7 +102,7 @@ public class SubmitAppealService {
         checkHasValidRole(idamTokens);
 
         try {
-            return Optional.of(saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal, workAllocationFeature), idamTokens, forceCreate));
+            return Optional.of(saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal, caseAccessManagementFeature), idamTokens, forceCreate));
         } catch (FeignException e) {
             if (e.status() == HttpStatus.SC_CONFLICT) {
                 logError(appeal, idamTokens);
@@ -126,7 +121,9 @@ public class SubmitAppealService {
         checkHasValidRole(idamTokens);
 
         try {
-            SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal, workAllocationFeature);
+
+            SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal, caseAccessManagementFeature);
+
             CaseDetails caseDetails = citizenCcdService.updateCase(sscsCaseData, EventType.UPDATE_DRAFT.getCcdType(), "Update draft",
                     "Update draft in CCD", idamTokens, appeal.getCcdCaseId());
 
@@ -136,7 +133,6 @@ public class SubmitAppealService {
                     .build());
 
         } catch (FeignException e) {
-
             if (e.status() == HttpStatus.SC_CONFLICT) {
                 logError(appeal, idamTokens);
                 return Optional.empty();
@@ -163,13 +159,17 @@ public class SubmitAppealService {
         IdamTokens idamTokens = getUserTokens(oauth2Token);
         checkHasValidRole(idamTokens);
 
-        SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal, workAllocationFeature);
+        if (!hasValidCitizenRole(idamTokens)) {
+            throw new ApplicationErrorException(new Exception("User has a invalid role"));
+        }
+
+        SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal, caseAccessManagementFeature);
         citizenCcdService.archiveDraft(sscsCaseData, idamTokens, ccdCaseId);
 
         return Optional.of(SaveCaseResult.builder()
-                .caseDetailsId(ccdCaseId)
-                .saveCaseOperation(SaveCaseOperation.ARCHIVE)
-                .build());
+            .caseDetailsId(ccdCaseId)
+            .saveCaseOperation(SaveCaseOperation.ARCHIVE)
+            .build());
     }
 
     public Optional<SessionDraft> getDraftAppeal(String oauth2Token) {
@@ -257,16 +257,16 @@ public class SubmitAppealService {
 
         SscsCaseData sscsCaseData;
         if (rpc == null) {
-            sscsCaseData = convertSyaToCcdCaseData(appeal, workAllocationFeature);
+            sscsCaseData = convertSyaToCcdCaseData(appeal, caseAccessManagementFeature);
         } else {
-            sscsCaseData = convertSyaToCcdCaseData(appeal, rpc.getName(), rpc, workAllocationFeature);
+            sscsCaseData = convertSyaToCcdCaseData(appeal, rpc.getName(), rpc, caseAccessManagementFeature);
         }
 
         sscsCaseData.setCreatedInGapsFrom(READY_TO_LIST.getId());
         String processingVenue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
         sscsCaseData.setProcessingVenue(processingVenue);
 
-        if (workAllocationFeature && !StringUtils.isEmpty(processingVenue)) {
+        if (caseAccessManagementFeature && !StringUtils.isEmpty(processingVenue)) {
             log.info("Getting venue details for " + processingVenue);
             CourtVenue courtVenue = refDataService.getVenueRefData(processingVenue);
             if (courtVenue != null) {
@@ -282,7 +282,7 @@ public class SubmitAppealService {
     }
 
     private String resolvePostCode(SyaCaseWrapper appeal) {
-        if (appeal.getIsAppointee()) {
+        if (Boolean.TRUE.equals(appeal.getIsAppointee())) {
             return Optional.ofNullable(appeal.getAppointee())
                 .map(SyaAppointee::getContactDetails)
                 .map(SyaContactDetails::getPostCode)

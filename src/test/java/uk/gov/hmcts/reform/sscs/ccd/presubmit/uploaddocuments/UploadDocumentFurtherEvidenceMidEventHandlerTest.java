@@ -13,6 +13,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.DocumentType.REQUEST_FOR_HEARING_RECORDING;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.FileUploadScenario.FILE_UPLOAD_IS_EMPTY;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.FileUploadScenario.FILE_UPLOAD_IS_NULL;
@@ -117,7 +118,7 @@ public class UploadDocumentFurtherEvidenceMidEventHandlerTest extends BaseHandle
         sscsCaseData.setDraftSscsFurtherEvidenceDocument(Collections.singletonList(furtherEvidenceDoc));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertEquals(YesNo.YES, response.getData().getSscsHearingRecordingCaseData().getShowRequestingPartyPage());
+        assertEquals(YES, response.getData().getSscsHearingRecordingCaseData().getShowRequestingPartyPage());
         assertEquals(1, response.getData().getSscsHearingRecordingCaseData().getRequestingParty().getListItems().size());
         assertEquals("appellant", response.getData().getSscsHearingRecordingCaseData().getRequestingParty().getListItems().get(0).getCode());
     }
@@ -131,7 +132,7 @@ public class UploadDocumentFurtherEvidenceMidEventHandlerTest extends BaseHandle
         sscsCaseData.setDraftSscsFurtherEvidenceDocument(Collections.singletonList(furtherEvidenceDoc));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertEquals(YesNo.YES, response.getData().getSscsHearingRecordingCaseData().getShowRequestingPartyPage());
+        assertEquals(YES, response.getData().getSscsHearingRecordingCaseData().getShowRequestingPartyPage());
         assertEquals(2, response.getData().getSscsHearingRecordingCaseData().getRequestingParty().getListItems().size());
         assertEquals("appellant", response.getData().getSscsHearingRecordingCaseData().getRequestingParty().getListItems().get(0).getCode());
         assertEquals("representative", response.getData().getSscsHearingRecordingCaseData().getRequestingParty().getListItems().get(1).getCode());
@@ -139,14 +140,14 @@ public class UploadDocumentFurtherEvidenceMidEventHandlerTest extends BaseHandle
 
     @Test
     public void givenOneHearingRecordingRequestDocumentIsUploaded_thenShowHearingsPageAndSetPartiesListForAppellantAndJointParty() {
-        sscsCaseData.setJointParty("Yes");
+        sscsCaseData.getJointParty().setHasJointParty(YES);
         SscsFurtherEvidenceDoc furtherEvidenceDoc = SscsFurtherEvidenceDoc.builder().value(SscsFurtherEvidenceDocDetails.builder()
                 .documentType(REQUEST_FOR_HEARING_RECORDING.getId()).documentLink(DocumentLink.builder().documentUrl("url.com").documentFilename("file.pdf").build()).build()).build();
 
         sscsCaseData.setDraftSscsFurtherEvidenceDocument(Collections.singletonList(furtherEvidenceDoc));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertEquals(YesNo.YES, response.getData().getSscsHearingRecordingCaseData().getShowRequestingPartyPage());
+        assertEquals(YES, response.getData().getSscsHearingRecordingCaseData().getShowRequestingPartyPage());
         assertEquals(2, response.getData().getSscsHearingRecordingCaseData().getRequestingParty().getListItems().size());
         assertEquals("appellant", response.getData().getSscsHearingRecordingCaseData().getRequestingParty().getListItems().get(0).getCode());
         assertEquals("jointParty", response.getData().getSscsHearingRecordingCaseData().getRequestingParty().getListItems().get(1).getCode());

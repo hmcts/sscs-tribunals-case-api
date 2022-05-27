@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -47,11 +46,7 @@ import uk.gov.hmcts.reform.sscs.util.SyaServiceHelper;
 @SpringBootTest
 @Slf4j
 public class SubmitDraftTest {
-
-    private static final String CLIENT_ID = "sscs";
-    private static final String BASIC_AUTHORIZATION = "Basic ";
-    private static final String AUTHORIZATION_CODE = "authorization_code";
-    private static final String RESPONSE_TYPE = "code";
+    
     private static final String LOCATION_HEADER_NAME = "Location";
 
     @Value("${test-url}")
@@ -63,20 +58,11 @@ public class SubmitDraftTest {
     @Autowired
     private CitizenCcdService citizenCcdService;
 
-    @Value("${idam.client.secret}")
-    private String idamOauth2ClientSecret;
-
-    @Value("${idam.oauth2.redirectUrl}")
-    private String idamOauth2RedirectUrl;
-
     @Value("${idam.oauth2.citizen.email}")
     private String username;
 
     @Value("${idam.oauth2.citizen.password}")
     private String password;
-
-    @Autowired
-    private AuthTokenGenerator authTokenGenerator;
 
     @Autowired
     private IdamService idamService;
@@ -115,8 +101,8 @@ public class SubmitDraftTest {
     public void tearDown() throws InterruptedException {
         List<SscsCaseData> savedDrafts = findCase(citizenIdamTokens);
 
-        if (savedDrafts.size() > 0) {
-            savedDrafts.stream().forEach(d -> archiveDraft(d));
+        if (!savedDrafts.isEmpty()) {
+            savedDrafts.forEach(this::archiveDraft);
         }
     }
 
@@ -125,10 +111,10 @@ public class SubmitDraftTest {
     }
 
     private SyaCaseWrapper buildTestDraftAppeal() {
-        SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
-        draftAppeal.setCaseType("draft");
-        draftAppeal.setBenefitType(new SyaBenefitType("Personal Independence Payment", "PIP"));
-        return draftAppeal;
+        SyaCaseWrapper testDraftAppeal = new SyaCaseWrapper();
+        testDraftAppeal.setCaseType("draft");
+        testDraftAppeal.setBenefitType(new SyaBenefitType("Personal Independence Payment", "PIP"));
+        return testDraftAppeal;
     }
 
     @Test
@@ -177,7 +163,7 @@ public class SubmitDraftTest {
 
         SscsCaseData draft = findCase(citizenIdamTokens).get(0);
 
-        String body = updateDraftCaseJsonWithMrnDateAndNino(mrnDate, nino).replaceAll("CCD_CASE_ID", draft.getCcdCaseId());
+        String body = updateDraftCaseJsonWithMrnDateAndNino(mrnDate, nino).replace("CCD_CASE_ID", draft.getCcdCaseId());
 
         Response response = RestAssured.given()
                 .body(body)
@@ -194,10 +180,10 @@ public class SubmitDraftTest {
 
         log.info("[assertCaseIsExpectedResult] expected Response : " + changeExpectedFields(expectedResponse, nino, mrnDate));
         log.info("[assertCaseIsExpectedResult] sscsCaseDetails : " + sscsCaseDetails.getData());
-        log.info("[assertCaseIsExpectedResult] sscsCaseDetails.getWorkAllocationFields : " + sscsCaseDetails.getData().getWorkAllocationFields());
-        log.info("[assertCaseIsExpectedResult] sscsCaseDetails.getWorkAllocationFields.getCaseAccessCategory : " + sscsCaseDetails.getData().getWorkAllocationFields().getCaseAccessCategory());
+        log.info("[assertCaseIsExpectedResult] sscsCaseDetails.getCaseAccessManagementFields : " + sscsCaseDetails.getData().getCaseAccessManagementFields());
+        log.info("[assertCaseIsExpectedResult] sscsCaseDetails.getCaseAccessManagementFields.getCaseAccessCategory : " + sscsCaseDetails.getData().getCaseAccessManagementFields().getCaseAccessCategory());
 
-        assertJsonEquals(changeExpectedFields(expectedResponse, nino, mrnDate), sscsCaseDetails.getData(), whenIgnoringPaths("sscsDocument"));
+        assertJsonEquals(changeExpectedFields(expectedResponse, nino, mrnDate), sscsCaseDetails.getData(), whenIgnoringPaths("sscsDocument","regionalProcessingCenter.hearingRoute"));
 
         assertEquals(expectedState, sscsCaseDetails.getState());
     }
