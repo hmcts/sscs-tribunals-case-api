@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.postponementrequest;
 
-import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
+import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,9 +14,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -28,8 +27,8 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        requireNonNull(callback, "callback must not be null");
-        requireNonNull(callbackType, "callbacktype must not be null");
+        Objects.requireNonNull(callback, "callback must not be null");
+        Objects.requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
                 && callback.getEvent() == EventType.POSTPONEMENT_REQUEST
@@ -48,7 +47,7 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
 
         optionalHearing.ifPresentOrElse(hearing ->
                         postponementRequestService.setHearingDateAsExcludeDate(hearing, sscsCaseData),
-                        () -> response.addError("There are no hearing to postpone"));
+                () -> response.addError("There are no hearing to postpone"));
 
         if (response.getErrors().isEmpty()) {
             postponementRequestService.processPostponementRequest(sscsCaseData, UploadParty.DWP);

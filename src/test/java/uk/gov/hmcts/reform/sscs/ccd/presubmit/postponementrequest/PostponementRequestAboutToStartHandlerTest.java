@@ -8,9 +8,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -70,13 +72,26 @@ public class PostponementRequestAboutToStartHandlerTest {
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
     }
 
-    static Hearing getHearing(int hearingId) {
+    public static Hearing getHearing(int hearingId) {
         return Hearing.builder().value(HearingDetails.builder()
                 .hearingDate(LocalDate.now().plusDays(1).toString())
                 .hearingId(String.valueOf(hearingId))
                 .venue(Venue.builder().name("Venue " + hearingId).build())
                 .time("12:00")
                 .build()).build();
+    }
+
+    public static HearingOptions getHearingOptions() {
+        HearingOptions hearingOptions = HearingOptions.builder()
+                .wantsToAttend(YES)
+                .languageInterpreter(YES)
+                .languages("Spanish")
+                .signLanguageType("A sign language")
+                .arrangements(Arrays.asList("hearingLoop", "signLanguageInterpreter"))
+                .other("Yes, this...")
+                .build();
+
+        return  hearingOptions;
     }
 
     @Test

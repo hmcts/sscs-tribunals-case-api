@@ -53,15 +53,18 @@ public class PostponementRequestService {
     }
 
     public void setHearingDateAsExcludeDate(Hearing hearing, SscsCaseData sscsCaseData) {
-        List<ExcludeDate> excludeDates =
-                sscsCaseData.getAppeal().getHearingOptions().getExcludeDates() == null ? new ArrayList<>():
-        sscsCaseData.getAppeal().getHearingOptions().getExcludeDates();
+        List<ExcludeDate> newExcludeDates = new ArrayList<>();
+        if (sscsCaseData.getAppeal().getHearingOptions().getExcludeDates() != null) {
+            newExcludeDates.addAll(sscsCaseData.getAppeal().getHearingOptions().getExcludeDates());
+        }
 
         DateRange dateRange = DateRange.builder()
                 .start(getLocalDate(hearing.getValue().getHearingDate()))
                 .end(getLocalDate(hearing.getValue().getHearingDate()))
                 .build();
-        excludeDates.add(ExcludeDate.builder().value(dateRange).build());
+        newExcludeDates.add(ExcludeDate.builder().value(dateRange).build());
+
+        sscsCaseData.getAppeal().getHearingOptions().setExcludeDates(newExcludeDates);
     }
 
     private static String getLocalDate(String dateStr) {

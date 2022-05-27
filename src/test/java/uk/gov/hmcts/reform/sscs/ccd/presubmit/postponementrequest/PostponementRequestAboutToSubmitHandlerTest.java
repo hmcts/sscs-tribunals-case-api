@@ -9,8 +9,9 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.postponementrequest.PostponementRequestAboutToStartHandlerTest.getHearing;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.postponementrequest.PostponementRequestAboutToStartHandlerTest.getHearingOptions;
+import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -59,9 +60,12 @@ public class PostponementRequestAboutToSubmitHandlerTest {
         handler = new PostponementRequestAboutToSubmitHandler(new PostponementRequestService());
 
         Hearing hearing = getHearing(1);
+        HearingOptions hearingOptions = getHearingOptions();
         List<Hearing> hearings  = List.of(hearing);
+
         sscsCaseData = SscsCaseData.builder()
-                .appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build())
+                .appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3")
+                .build()).hearingOptions(hearingOptions).build())
                 .state(State.HEARING)
                 .hearings(hearings)
                 .postponementRequest(PostponementRequest.builder()
