@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.postponementrequest;
 
-import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
