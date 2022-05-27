@@ -1,18 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
 
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +9,13 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
@@ -30,6 +23,22 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecis
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
+
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 @Component
 @Slf4j
@@ -89,9 +98,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument() != null) {
                 createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
                 clearTransientFields(preSubmitCallbackResponse);
-                if (scheduleListingEnabled && LIST_ASSIST.equals(Optional.ofNullable(sscsCaseData)
-                        .map(SscsCaseData::getSchedulingAndListingFields)
-                                .map(SchedulingAndListingFields::getHearingRoute).orElse(null))) {
+                if (eligibleForHearingsCancel.test(sscsCaseData)) {
                     log.info("Issue Final Decision: HearingRoute ListAssist Case ({}). Sending cancellation message",
                             sscsCaseData.getCcdCaseId());
                     hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId());
@@ -103,6 +110,12 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         return preSubmitCallbackResponse;
     }
+
+    private final Predicate<SscsCaseData> eligibleForHearingsCancel = sscsCaseData -> scheduleListingEnabled
+            && List.of(State.HEARING, State.READY_TO_LIST).contains(Optional.of(sscsCaseData)
+                    .map(SscsCaseData::getState).orElse(State.UNKNOWN))
+            && LIST_ASSIST.equals(Optional.of(sscsCaseData).map(SscsCaseData::getSchedulingAndListingFields)
+                    .map(SchedulingAndListingFields::getHearingRoute).orElse(null));
 
     private void calculateOutcomeCode(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
 

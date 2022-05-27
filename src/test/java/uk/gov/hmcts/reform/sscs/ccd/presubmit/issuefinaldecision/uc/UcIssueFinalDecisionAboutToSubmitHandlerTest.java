@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsUcCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.IssueFinalDecisionAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
@@ -106,7 +107,9 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
 
         SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(DRAFT_DECISION_NOTICE.getValue()).build();
         documentList.add(new SscsDocument(details));
-        sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
+        sscsCaseData = SscsCaseData.builder()
+            .ccdCaseId("ccdId")
+            .state(State.HEARING)
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("UC").build()).build())
             .sscsDocument(documentList)
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
