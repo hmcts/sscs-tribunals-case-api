@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,7 +47,7 @@ public class ListAssistHearingMessageHelperTest {
         assertEquals("1234", actualRequest.getCcdCaseId());
         assertEquals(LIST_ASSIST, actualRequest.getHearingRoute());
         assertEquals(CANCEL_HEARING, actualRequest.getHearingState());
-        assertEquals(CancellationReason.OTHER, actualRequest.getCancellationReason());
+        assertThat(actualRequest.getCancellationReason(), is(CancellationReason.OTHER));
     }
 
 }

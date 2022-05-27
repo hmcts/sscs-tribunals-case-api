@@ -17,7 +17,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -43,22 +42,21 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 @Slf4j
 public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    @Value("${feature.snl.enabled}")
-    private boolean scheduleListingEnabled;
-
     private final FooterService footerService;
     private final DecisionNoticeService decisionNoticeService;
     private final Validator validator;
     private final ListAssistHearingMessageHelper hearingMessageHelper;
+    private boolean isScheduleListingEnabled;
 
-    @Autowired
     public IssueFinalDecisionAboutToSubmitHandler(FooterService footerService,
         DecisionNoticeService decisionNoticeService, Validator validator,
-            ListAssistHearingMessageHelper hearingMessageHelper) {
+            ListAssistHearingMessageHelper hearingMessageHelper,
+                @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled) {
         this.footerService = footerService;
         this.decisionNoticeService = decisionNoticeService;
         this.validator = validator;
         this.hearingMessageHelper = hearingMessageHelper;
+        this.isScheduleListingEnabled = isScheduleListingEnabled;
     }
 
     @Override
@@ -85,36 +83,46 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         }
 
         calculateOutcomeCode(sscsCaseData, preSubmitCallbackResponse);
+        verifyPreviewDocument(sscsCaseData, preSubmitCallbackResponse);
 
-        if (preSubmitCallbackResponse.getErrors().isEmpty()) {
+        if (!preSubmitCallbackResponse.getErrors().isEmpty()) {
+            return preSubmitCallbackResponse;
+        }
 
-            sscsCaseData.setDwpState(FINAL_DECISION_ISSUED.getId());
-
-            if (!preSubmitCallbackResponse.getErrors().isEmpty()) {
-                return preSubmitCallbackResponse;
-            }
-
-            if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument() != null) {
-                createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
-                clearTransientFields(preSubmitCallbackResponse);
-                if (eligibleForHearingsCancel.test(sscsCaseData)) {
-                    log.info("Issue Final Decision: HearingRoute ListAssist Case ({}). Sending cancellation message",
-                            sscsCaseData.getCcdCaseId());
-                    hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId());
-                }
-            } else {
-                preSubmitCallbackResponse.addError("There is no Preview Draft Decision Notice on the case so decision cannot be issued");
-            }
+        sscsCaseData.setDwpState(FINAL_DECISION_ISSUED.getId());
+        createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
+        clearTransientFields(preSubmitCallbackResponse);
+        if (eligibleForHearingsCancel.test(sscsCaseData)) {
+            log.info("Issue Final Decision: HearingRoute ListAssist Case ({}). Sending cancellation message",
+                    sscsCaseData.getCcdCaseId());
+            hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId());
         }
 
         return preSubmitCallbackResponse;
     }
 
-    private final Predicate<SscsCaseData> eligibleForHearingsCancel = sscsCaseData -> scheduleListingEnabled
-            && List.of(State.HEARING, State.READY_TO_LIST).contains(Optional.of(sscsCaseData)
-                    .map(SscsCaseData::getState).orElse(State.UNKNOWN))
-            && LIST_ASSIST.equals(Optional.of(sscsCaseData).map(SscsCaseData::getSchedulingAndListingFields)
-                    .map(SchedulingAndListingFields::getHearingRoute).orElse(null));
+    private void verifyPreviewDocument(SscsCaseData sscsCaseData,
+                                       PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument() == null) {
+            preSubmitCallbackResponse
+                    .addError("There is no Preview Draft Decision Notice on the case so decision cannot be issued");
+        }
+    }
+
+    private final Predicate<SscsCaseData> eligibleForHearingsCancel = sscsCaseData -> isScheduleListingEnabled
+            && isValidCaseState(sscsCaseData)
+            && isSAndLCase(sscsCaseData);
+
+    private boolean isValidCaseState(SscsCaseData sscsCaseData) {
+        return List.of(State.HEARING, State.READY_TO_LIST)
+                .contains(Optional.of(sscsCaseData).map(SscsCaseData::getState).orElse(State.UNKNOWN));
+    }
+
+    private boolean isSAndLCase(SscsCaseData sscsCaseData) {
+        return LIST_ASSIST
+                .equals(Optional.of(sscsCaseData).map(SscsCaseData::getSchedulingAndListingFields)
+                        .map(SchedulingAndListingFields::getHearingRoute).orElse(null));
+    }
 
     private void calculateOutcomeCode(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
 
