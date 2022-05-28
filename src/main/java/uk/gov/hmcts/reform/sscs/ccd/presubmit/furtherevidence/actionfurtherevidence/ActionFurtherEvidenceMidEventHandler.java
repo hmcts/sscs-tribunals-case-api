@@ -34,7 +34,6 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     public static final String POSTPONEMENTS_REVIEWED_BY_TCW = "Postponement requests need to be reviewed by TCW";
-    public static final String POSTPONEMENTS_NOT_POSSIBLE_GAPS = "Postponement requests cannot be made for hearings listed in GAPS";
     public static final String POSTPONEMENT_IN_HEARING_STATE = "You can only submit a postponement request on cases in 'hearing' state";
     public static final String ONLY_ONE_POSTPONEMENT_AT_A_TIME = "Only one request for postponement can be submitted at a time";
     public static final String OTHER_PARTY_ORIGINAL_PARTY_ERROR = "You cannot select 'Other party hearing preferences' as a Document Type as an Other party not selected from Original Sender list";
@@ -91,11 +90,6 @@ public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHa
             if (!sscsCaseData.getFurtherEvidenceAction().getValue().getCode()
                     .equals(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode())) {
                 preSubmitCallbackResponse.addError(POSTPONEMENTS_REVIEWED_BY_TCW);
-            }
-
-            if (HearingRoute.GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute())) {
-                //since S&L is null then it's a GAPS which should not allow postponement request
-                preSubmitCallbackResponse.addError(POSTPONEMENTS_NOT_POSSIBLE_GAPS);
             }
 
             if (!caseDetails.getState().equals(State.HEARING)) {
