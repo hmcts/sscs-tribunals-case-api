@@ -87,8 +87,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             preSubmitCallbackResponse.addError("No document URL so could not process");
         }
 
-        if (sscsCaseData.getRegionalProcessingCenter().getHearingRoute().equals(HearingRoute.GAPS)
-                && scannedDocument.getValue().getType().equals("postponementRequest")) {
+        if (HearingRoute.GAPS.equals(sscsCaseData.getRegionalProcessingCenter().getHearingRoute())
+                && "postponementRequest".equals(scannedDocument.getValue().getType())) {
             preSubmitCallbackResponse.addError("Postponement requests cannot be made for hearings listed in GAPS");
         }
 
