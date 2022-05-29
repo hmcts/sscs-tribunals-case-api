@@ -39,7 +39,6 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     private final ListAssistHearingMessageHelper hearingMessageHelper;
     private boolean isScheduleListingEnabled;
 
-    @Autowired
     public ActionPostponementRequestAboutToSubmitHandler(UserDetailsService userDetailsService,
         FooterService footerService, ListAssistHearingMessageHelper hearingMessageHelper,
             @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled) {
