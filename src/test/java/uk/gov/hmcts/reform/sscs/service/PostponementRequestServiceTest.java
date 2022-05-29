@@ -83,7 +83,7 @@ public class PostponementRequestServiceTest {
         sscsCaseData = setSscsCaseData(hearingOptions);
         service.setHearingDateAsExcludeDate(getHearing(1), sscsCaseData);
 
-        assertEquals(sscsCaseData.getAppeal().getHearingOptions().getExcludeDates().size(), 2);
+        assertEquals(2, sscsCaseData.getAppeal().getHearingOptions().getExcludeDates().size());
     }
 
     private SscsCaseData setSscsCaseData(HearingOptions hearingOptions) {

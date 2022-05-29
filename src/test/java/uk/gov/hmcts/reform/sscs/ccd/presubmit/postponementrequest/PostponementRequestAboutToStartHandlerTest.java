@@ -9,10 +9,10 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
+import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.ARRANGEMENTS_LIST;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -82,13 +82,12 @@ public class PostponementRequestAboutToStartHandlerTest {
     }
 
     public static HearingOptions getHearingOptions() {
-        String[] arrangementsArray =  new String[] {"hearingLoop", "signLanguageInterpreter"};
         return  HearingOptions.builder()
                 .wantsToAttend(YES)
                 .languageInterpreter(YES)
                 .languages("Spanish")
                 .signLanguageType("A sign language")
-                .arrangements(Arrays.asList(arrangementsArray))
+                .arrangements(ARRANGEMENTS_LIST)
                 .other("Yes, this...")
                 .build();
     }

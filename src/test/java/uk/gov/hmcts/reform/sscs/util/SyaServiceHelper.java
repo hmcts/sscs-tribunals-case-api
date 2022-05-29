@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
@@ -11,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 public final class SyaServiceHelper {
 
     private static final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    public static final List<String> ARRANGEMENTS_LIST = Arrays.asList("hearingLoop", "signLanguageInterpreter");
 
     private SyaServiceHelper() {
     }
