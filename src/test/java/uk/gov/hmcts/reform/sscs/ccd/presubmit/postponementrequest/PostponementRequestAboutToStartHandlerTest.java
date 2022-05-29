@@ -82,16 +82,15 @@ public class PostponementRequestAboutToStartHandlerTest {
     }
 
     public static HearingOptions getHearingOptions() {
-        HearingOptions hearingOptions = HearingOptions.builder()
+        String[] arrangementsArray =  new String[] {"hearingLoop", "signLanguageInterpreter"};
+        return  HearingOptions.builder()
                 .wantsToAttend(YES)
                 .languageInterpreter(YES)
                 .languages("Spanish")
                 .signLanguageType("A sign language")
-                .arrangements(Arrays.asList("hearingLoop", "signLanguageInterpreter"))
+                .arrangements(Arrays.asList(arrangementsArray))
                 .other("Yes, this...")
                 .build();
-
-        return  hearingOptions;
     }
 
     @Test
