@@ -130,7 +130,7 @@ public class PostponementRequestAboutToSubmitHandlerTest {
         assertThat(document.getValue().getOriginalPartySender(), is(UploadParty.DWP.getValue()));
         assertThat(sscsCaseData.getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_TCW.getId()));
         assertThat(sscsCaseData.getInterlocReferralReason(), is(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId()));
-        assertThat(sscsCaseData.getPostponementRequest().getUnprocessedPostponementRequest(), is(YES));
+        assertThat(sscsCaseData.getPostponementRequest().getUnprocessedPostponementRequest().getValue(), is(YES));
     }
 
 }
