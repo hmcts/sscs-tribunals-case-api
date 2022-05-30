@@ -10,8 +10,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -20,8 +21,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 
 @Service
@@ -32,11 +35,16 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
 
     private UserDetailsService userDetailsService;
     private final FooterService footerService;
+    private final ListAssistHearingMessageHelper hearingMessageHelper;
+    private boolean isScheduleListingEnabled;
 
-    @Autowired
-    public ActionPostponementRequestAboutToSubmitHandler(UserDetailsService userDetailsService, FooterService footerService) {
+    public ActionPostponementRequestAboutToSubmitHandler(UserDetailsService userDetailsService,
+        FooterService footerService, ListAssistHearingMessageHelper hearingMessageHelper,
+            @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled) {
         this.userDetailsService = userDetailsService;
         this.footerService = footerService;
+        this.hearingMessageHelper = hearingMessageHelper;
+        this.isScheduleListingEnabled = isScheduleListingEnabled;
     }
 
     @Override
@@ -62,6 +70,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
             sendToJudge(userAuthorisation, sscsCaseData);
         } else if (isGrantPostponement(postponementRequest)) {
             grantPostponement(sscsCaseData, postponementRequest);
+            cancelHearing(sscsCaseData);
         } else if (isRefusePostponement(postponementRequest)) {
             clearInterlocAndSetFlags(sscsCaseData);
         }
@@ -69,6 +78,15 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         clearTransientFields(sscsCaseData);
         return response;
     }
+
+    private void cancelHearing(SscsCaseData sscsCaseData) {
+        if (eligibleForHearingsCancel.test(sscsCaseData)) {
+            hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId());
+        }
+    }
+
+    private final Predicate<SscsCaseData> eligibleForHearingsCancel = sscsCaseData -> isScheduleListingEnabled
+            && SscsUtil.isSAndLCase(sscsCaseData);
 
     private void grantPostponement(SscsCaseData sscsCaseData, PostponementRequest postponementRequest) {
 
