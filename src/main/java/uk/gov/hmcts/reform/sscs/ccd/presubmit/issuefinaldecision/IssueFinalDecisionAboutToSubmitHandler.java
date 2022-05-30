@@ -92,6 +92,13 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.setDwpState(FINAL_DECISION_ISSUED.getId());
         createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
         clearTransientFields(preSubmitCallbackResponse);
+        log.info("Postponement request: Check eligible hearing request for case {}", sscsCaseData.getCcdCaseId());
+        log.info("Postponement request: Feature flag {} for case {}", isScheduleListingEnabled,
+                sscsCaseData.getCcdCaseId());
+        log.info("Postponement request: SnL case determinant {} for case {}", sscsCaseData
+                .getSchedulingAndListingFields().getHearingRoute(), sscsCaseData.getCcdCaseId());
+        log.info("Postponement request: SnL case determinant {} for case {}", sscsCaseData
+                .getSchedulingAndListingFields().getHearingRoute(), sscsCaseData.getCcdCaseId());
         if (eligibleForHearingsCancel.test(sscsCaseData)) {
             log.info("Issue Final Decision: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());
