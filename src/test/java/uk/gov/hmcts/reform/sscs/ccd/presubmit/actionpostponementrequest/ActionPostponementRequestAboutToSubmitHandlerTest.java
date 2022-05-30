@@ -17,6 +17,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest.A
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
+
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,6 +68,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
                 .directionNoticeContent("Body Content")
                 .sscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder().build()).build();
+
         sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -123,6 +126,12 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
                 .listingOption("readyToList").build());
 
+        sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
+                .hearingDate(LocalDate.now().plusDays(1).toString())
+                .time("10:00")
+                .build()).build()));
+        sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
+
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -143,6 +152,12 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
         sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
                 .listingOption("notListable").build());
+
+        sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
+                .hearingDate(LocalDate.now().plusDays(1).toString())
+                .time("10:00")
+                .build()).build()));
+        sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

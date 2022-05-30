@@ -7,8 +7,12 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +65,8 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         if (isSendToJudge(postponementRequest)) {
             sendToJudge(userAuthorisation, sscsCaseData);
         } else if (isGrantPostponement(postponementRequest)) {
-            grantPostponement(sscsCaseData, postponementRequest);
+            grantPostponement(sscsCaseData, postponementRequest, response);
+            setHearingDateToExcludedDate(sscsCaseData, response);
         } else if (isRefusePostponement(postponementRequest)) {
             clearInterlocAndSetFlags(sscsCaseData);
         }
@@ -70,8 +75,8 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         return response;
     }
 
-    private void grantPostponement(SscsCaseData sscsCaseData, PostponementRequest postponementRequest) {
-
+    private void grantPostponement(SscsCaseData sscsCaseData, PostponementRequest postponementRequest
+                                   , PreSubmitCallbackResponse<SscsCaseData> response ) {
         if (isReadyToList(postponementRequest)) {
             sscsCaseData.setState(State.READY_TO_LIST);
         } else if (isNotListable(postponementRequest)) {
@@ -79,6 +84,17 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         }
 
         clearInterlocAndSetFlags(sscsCaseData);
+    }
+
+    private void setHearingDateToExcludedDate(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        final Optional<Hearing> optionalHearing = emptyIfNull(sscsCaseData.getHearings()).stream()
+                .filter(h -> h.getValue().getHearingDateTime().isAfter(LocalDateTime.now()))
+                .distinct()
+                .findFirst();
+
+        optionalHearing.ifPresentOrElse(hearing ->
+                        footerService.setHearingDateAsExcludeDate(hearing, sscsCaseData),
+                () -> response.addError("There are no hearing to postpone"));
     }
 
     private void clearInterlocAndSetFlags(SscsCaseData sscsCaseData) {
