@@ -314,10 +314,8 @@ public class FooterServiceTest {
                 .time("10:00")
                 .build()).build()));
         sscsCaseData.setAppeal(
-                Appeal.builder().
-                        hearingOptions(
-                                HearingOptions.builder().
-                                        excludeDates(excludeDate).build())
+                Appeal.builder().hearingOptions(
+                       HearingOptions.builder().excludeDates(excludeDate).build())
                 .build()
         );
 

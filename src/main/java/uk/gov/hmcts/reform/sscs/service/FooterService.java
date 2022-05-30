@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.DATE_FORMAT_YYYYMMDD;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -11,9 +13,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
-
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.DATE_FORMAT_YYYYMMDD;
-
 
 @Component
 @Slf4j

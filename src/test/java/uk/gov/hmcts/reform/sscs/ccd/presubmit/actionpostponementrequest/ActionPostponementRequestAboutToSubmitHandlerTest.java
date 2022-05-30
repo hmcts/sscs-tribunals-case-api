@@ -18,7 +18,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest.A
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +30,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
-
 
 @RunWith(JUnitParamsRunner.class)
 public class ActionPostponementRequestAboutToSubmitHandlerTest {
