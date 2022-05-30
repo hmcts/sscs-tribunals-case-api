@@ -29,7 +29,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.ActionFurtherEvidenceMidEventHandler;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
@@ -171,7 +170,7 @@ public class ValidSendToInterlocMidEventHandlerTest {
 
         sscsCaseData.setSelectWhoReviewsCase(new DynamicList(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()), null));
 
-       sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder()
+        sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder()
                 .name("Bradford")
                 .hearingRoute(HearingRoute.LIST_ASSIST)
                 .build());
