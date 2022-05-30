@@ -44,11 +44,6 @@ public class ValidSendToInterlocMidEventHandler implements PreSubmitCallbackHand
                     generateFile, templateId);
         }
 
-        if (HearingRoute.GAPS.equals(sscsCaseData.getRegionalProcessingCenter().getHearingRoute())
-                && "reviewByTcw".equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode())) {
-            response.addError("Postponement requests cannot be made for hearings listed in GAPS.");
-        }
-
         return response;
     }
 }

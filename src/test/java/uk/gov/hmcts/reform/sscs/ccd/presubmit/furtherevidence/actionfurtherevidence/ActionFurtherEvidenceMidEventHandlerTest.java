@@ -154,6 +154,60 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
+    public void givenAPostponementRequestWithGaps_thenAddAnError() {
+        List<ScannedDocument> docs = new ArrayList<>();
+        when(caseDetails.getState()).thenReturn(State.HEARING);
+        sscsCaseData.getFurtherEvidenceAction().setValue(
+                new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
+                        FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getLabel()));
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+                .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
+                        .fileName("Testing.jpg").url(DocumentLink.builder().documentUrl("test.com").build()).build())
+                .build();
+
+        docs.add(scannedDocument);
+
+        sscsCaseData.setScannedDocuments(docs);
+
+        sscsCaseData.setSchedulingAndListingFields(
+                SchedulingAndListingFields.builder()
+                .hearingRoute(HearingRoute.GAPS)
+                .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors(), is(not(empty())));
+        assertThat(response.getErrors().iterator().next(),
+                is(ActionFurtherEvidenceMidEventHandler.POSTPONEMENTS_NOT_POSSIBLE_GAPS));
+    }
+
+    @Test
+    public void givenAPostponementRequestWithListAssist_thenNoError() {
+        List<ScannedDocument> docs = new ArrayList<>();
+        when(caseDetails.getState()).thenReturn(State.HEARING);
+        sscsCaseData.getFurtherEvidenceAction().setValue(
+                new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
+                        FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getLabel()));
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+                .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
+                        .fileName("Testing.jpg").url(DocumentLink.builder().documentUrl("test.com").build()).build())
+                .build();
+
+        docs.add(scannedDocument);
+
+        sscsCaseData.setScannedDocuments(docs);
+
+        sscsCaseData.setSchedulingAndListingFields(
+                SchedulingAndListingFields.builder()
+                        .hearingRoute(HearingRoute.LIST_ASSIST)
+                        .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors(), is(empty()));
+    }
+
+    @Test
     public void givenAPostponementRequestInOtherThanHearingState_thenAddAnError() {
         List<ScannedDocument> docs = new ArrayList<>();
         when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
