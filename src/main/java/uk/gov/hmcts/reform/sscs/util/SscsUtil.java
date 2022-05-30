@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.PostponeRequestTemplateBody;
@@ -62,6 +63,10 @@ public class SscsUtil {
         return LIST_ASSIST
                 .equals(Optional.of(sscsCaseData).map(SscsCaseData::getSchedulingAndListingFields)
                         .map(SchedulingAndListingFields::getHearingRoute).orElse(null));
+    }
+
+    public static boolean isValidCaseStateForHearingCancel(SscsCaseData sscsCaseData, List<State> states) {
+        return states.contains(Optional.of(sscsCaseData).map(SscsCaseData::getState).orElse(State.UNKNOWN));
     }
 
 }

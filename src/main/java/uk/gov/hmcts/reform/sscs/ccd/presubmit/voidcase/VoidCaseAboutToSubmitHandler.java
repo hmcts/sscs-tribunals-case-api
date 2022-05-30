@@ -2,7 +2,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.voidcase;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.List;
+import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -10,11 +13,23 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 @Slf4j
 public class VoidCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private final ListAssistHearingMessageHelper hearingMessageHelper;
+    private boolean isScheduleListingEnabled;
+
+    public VoidCaseAboutToSubmitHandler(ListAssistHearingMessageHelper hearingMessageHelper,
+        @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled) {
+        this.hearingMessageHelper = hearingMessageHelper;
+        this.isScheduleListingEnabled = isScheduleListingEnabled;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -39,9 +54,20 @@ public class VoidCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
 
         sscsCaseData.setDirectionDueDate(null);
         sscsCaseData.setInterlocReviewState(null);
+        cancelHearing(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         return callbackResponse;
     }
+
+    private void cancelHearing(SscsCaseData sscsCaseData) {
+        if (eligibleForHearingsCancel.test(sscsCaseData)) {
+            hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId());
+        }
+    }
+
+    private final Predicate<SscsCaseData> eligibleForHearingsCancel = sscsCaseData -> isScheduleListingEnabled
+            && SscsUtil.isValidCaseStateForHearingCancel(sscsCaseData, List.of(State.HEARING, State.READY_TO_LIST))
+            && SscsUtil.isSAndLCase(sscsCaseData);
 }

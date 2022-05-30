@@ -1,6 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.voidcase;
 
 import static org.junit.Assert.assertFalse;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -18,7 +22,11 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 
 @RunWith(JUnitParamsRunner.class)
 public class VoidCaseAboutToSubmitHandlerTest {
@@ -29,18 +37,25 @@ public class VoidCaseAboutToSubmitHandlerTest {
     private Callback<SscsCaseData> callback;
 
     @Mock
+    private ListAssistHearingMessageHelper hearingMessageHelper;
+
+    @Mock
     private CaseDetails<SscsCaseData> caseDetails;
     private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new VoidCaseAboutToSubmitHandler();
+        handler = new VoidCaseAboutToSubmitHandler(hearingMessageHelper, false);
 
         when(callback.getEvent()).thenReturn(EventType.ADMIN_SEND_TO_VOID_STATE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").interlocReviewState("interlocState").directionDueDate("tomorrow")
                 .appeal(Appeal.builder().build())
+                .state(State.HEARING)
+                .schedulingAndListingFields(SchedulingAndListingFields.builder()
+                        .hearingRoute(HearingRoute.LIST_ASSIST)
+                        .build())
                 .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
@@ -59,15 +74,33 @@ public class VoidCaseAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"VOID_CASE", "ADMIN_SEND_TO_VOID_STATE"})
-    public void givenAVoidCaseEvent_thenClearDirectionDueDateAndInterlocReviewState(EventType eventType) {
+    public void givenAVoidCaseEventAndSnLFeatureEnabled_thenActionsAndHearingCancel(EventType
+        eventType) {
+        handler = new VoidCaseAboutToSubmitHandler(hearingMessageHelper, true);
         when(callback.getEvent()).thenReturn(eventType);
-
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         Assert.assertNull(response.getData().getInterlocReviewState());
         Assert.assertNull(response.getData().getDirectionDueDate());
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()));
+        verifyNoMoreInteractions(hearingMessageHelper);
+    }
+
+    @Test
+    @Parameters({"VOID_CASE"})
+    public void givenAVoidCaseEventAndSnLFeatureNotEnabled_thenActionsButNoHearingCancel(EventType
+                                                                                                            eventType) {
+        handler = new VoidCaseAboutToSubmitHandler(hearingMessageHelper, false);
+        when(callback.getEvent()).thenReturn(eventType);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Assert.assertNull(response.getData().getInterlocReviewState());
+        Assert.assertNull(response.getData().getDirectionDueDate());
+        verifyNoInteractions(hearingMessageHelper);
     }
 
     @Test(expected = IllegalStateException.class)
