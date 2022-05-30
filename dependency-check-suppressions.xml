@@ -99,6 +99,9 @@
 	<cve>CVE-2022-25647</cve>
     </suppress>
     <suppress>
+        <cve>CVE-2022-25169</cve>
+    </suppress>
+    <suppress>
     <notes><![CDATA[
     file name: netty-*-4.1.72.Final.jar
     ]]></notes>

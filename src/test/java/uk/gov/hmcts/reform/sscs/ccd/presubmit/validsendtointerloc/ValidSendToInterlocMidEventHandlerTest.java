@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.ActionFurtherEvidenceMidEventHandler;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
@@ -153,7 +154,7 @@ public class ValidSendToInterlocMidEventHandlerTest {
     }
 
     @Test
-    public void givenPostponementRequestReviewedByTwc_thenThroughError() {
+    public void givenGapsPostponementRequestReviewedByTwc_thenThroughError() {
         when(caseDetails.getState()).thenReturn(State.HEARING);
 
         sscsCaseData.setSelectWhoReviewsCase(new DynamicList(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()), null));
@@ -161,6 +162,22 @@ public class ValidSendToInterlocMidEventHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors(), Matchers.is(not(empty())));
-        assertThat(response.getErrors().iterator().next(), is("Postponement requests cannot be made for hearings listed in GAPS"));
+        assertThat(response.getErrors().iterator().next(), is(ValidSendToInterlocMidEventHandler.POSTPONEMENTS_NOT_POSSIBLE_GAPS));
+    }
+
+    @Test
+    public void givenListAssitPostponementRequestReviewedByTwc_thenNoError() {
+        when(caseDetails.getState()).thenReturn(State.HEARING);
+
+        sscsCaseData.setSelectWhoReviewsCase(new DynamicList(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()), null));
+
+       sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder()
+                .name("Bradford")
+                .hearingRoute(HearingRoute.LIST_ASSIST)
+                .build());
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors(), Matchers.is(empty()));
     }
 }
