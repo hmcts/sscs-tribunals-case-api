@@ -77,7 +77,6 @@ public class FooterService extends AbstractFooterService<SscsDocument> {
     }
 
     private static String getLocalDate(String dateStr) {
-        LocalDate localDate = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern(DATE_FORMAT_YYYYMMDD));
-        return localDate.toString();
+        return LocalDate.parse(dateStr, DateTimeFormatter.ofPattern(DATE_FORMAT_YYYYMMDD)).toString();
     }
 }
