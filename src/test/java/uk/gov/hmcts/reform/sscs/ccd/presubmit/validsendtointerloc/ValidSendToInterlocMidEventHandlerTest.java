@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.*;
@@ -20,7 +21,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -160,7 +160,7 @@ public class ValidSendToInterlocMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors(), Matchers.is(not(empty())));
+        assertThat(response.getErrors(), is(not(empty())));
         assertThat(response.getErrors().iterator().next(), is(ValidSendToInterlocMidEventHandler.POSTPONEMENTS_NOT_POSSIBLE_GAPS));
     }
 
@@ -177,6 +177,6 @@ public class ValidSendToInterlocMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors(), Matchers.is(empty()));
+        assertThat(response.getErrors(), is(empty()));
     }
 }
