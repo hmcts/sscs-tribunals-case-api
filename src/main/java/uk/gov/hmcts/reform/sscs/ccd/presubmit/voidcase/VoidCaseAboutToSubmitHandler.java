@@ -68,6 +68,6 @@ public class VoidCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
     }
 
     private final Predicate<SscsCaseData> eligibleForHearingsCancel = sscsCaseData -> isScheduleListingEnabled
-            && SscsUtil.isValidCaseStateForHearingCancel(sscsCaseData, List.of(State.HEARING, State.READY_TO_LIST))
+            && SscsUtil.isValidCaseState(sscsCaseData, List.of(State.HEARING, State.READY_TO_LIST))
             && SscsUtil.isSAndLCase(sscsCaseData);
 }
