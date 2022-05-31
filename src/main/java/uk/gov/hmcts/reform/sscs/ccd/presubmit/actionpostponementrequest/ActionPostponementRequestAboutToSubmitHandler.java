@@ -12,9 +12,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.function.Predicate;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -23,8 +24,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 
 @Service
@@ -35,11 +38,16 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
 
     private UserDetailsService userDetailsService;
     private final FooterService footerService;
+    private final ListAssistHearingMessageHelper hearingMessageHelper;
+    private boolean isScheduleListingEnabled;
 
-    @Autowired
-    public ActionPostponementRequestAboutToSubmitHandler(UserDetailsService userDetailsService, FooterService footerService) {
+    public ActionPostponementRequestAboutToSubmitHandler(UserDetailsService userDetailsService,
+        FooterService footerService, ListAssistHearingMessageHelper hearingMessageHelper,
+            @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled) {
         this.userDetailsService = userDetailsService;
         this.footerService = footerService;
+        this.hearingMessageHelper = hearingMessageHelper;
+        this.isScheduleListingEnabled = isScheduleListingEnabled;
     }
 
     @Override
@@ -66,6 +74,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         } else if (isGrantPostponement(postponementRequest)) {
             grantPostponement(sscsCaseData, postponementRequest);
             setHearingDateToExcludedDate(sscsCaseData, response);
+            cancelHearing(sscsCaseData);
         } else if (isRefusePostponement(postponementRequest)) {
             clearInterlocAndSetFlags(sscsCaseData);
         }
@@ -73,6 +82,23 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         clearTransientFields(sscsCaseData);
         return response;
     }
+
+    private void cancelHearing(SscsCaseData sscsCaseData) {
+        log.info("Issue final decision request: Check eligible hearing request for case {}", sscsCaseData
+                .getCcdCaseId());
+        log.info("Issue final decision request: Feature flag {} for case {}", isScheduleListingEnabled,
+                sscsCaseData.getCcdCaseId());
+        log.info("Issue final decision request: case state {} for case {}", sscsCaseData.getState(), sscsCaseData
+                .getCcdCaseId());
+        if (eligibleForHearingsCancel.test(sscsCaseData)) {
+            log.info("Issue final decision request: Sending cancel hearing request for case {}", sscsCaseData
+                    .getCcdCaseId());
+            hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId());
+        }
+    }
+
+    private final Predicate<SscsCaseData> eligibleForHearingsCancel = sscsCaseData -> isScheduleListingEnabled
+            && SscsUtil.isSAndLCase(sscsCaseData);
 
     private void grantPostponement(SscsCaseData sscsCaseData, PostponementRequest postponementRequest) {
         if (isReadyToList(postponementRequest)) {
