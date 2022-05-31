@@ -7,9 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -90,16 +88,20 @@ public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler
         }
     }
 
+    // TODO remove duplication
     @Override
     protected void cancelHearing(SscsCaseData sscsCaseData) {
+        log.info("Interloc service: Cancel hearing conditions ({}) ({}) ({}) for case ({})", isScheduleListingEnabled,
+                sscsCaseData.getState(), sscsCaseData.getSchedulingAndListingFields().getHearingRoute(),
+                sscsCaseData.getCcdCaseId());
         if (eligibleForHearingsCancel.test(sscsCaseData)) {
-            log.info(String.format("Strike out - Sending cancel request for hearing for case id %s", sscsCaseData
-                    .getCcdCaseId()));
+            log.info("Interloc service: HearingRoute ListAssist Case ({}). Sending cancellation message",
+                    sscsCaseData.getCcdCaseId());
             hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId());
         }
     }
 
     private final Predicate<SscsCaseData> eligibleForHearingsCancel = sscsCaseData -> isScheduleListingEnabled
-            && SscsUtil.isValidCaseStateForHearingCancel(sscsCaseData, List.of(State.HEARING, State.READY_TO_LIST))
+            && SscsUtil.isValidCaseState(sscsCaseData, List.of(State.HEARING, State.READY_TO_LIST))
             && SscsUtil.isSAndLCase(sscsCaseData);
 }

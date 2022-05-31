@@ -89,7 +89,7 @@ public class VoidCaseAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"VOID_CASE"})
+    @Parameters({"VOID_CASE", "ADMIN_SEND_TO_VOID_STATE"})
     public void givenAVoidCaseEventAndSnLFeatureNotEnabled_thenActionsButNoHearingCancel(EventType
                                                                                                             eventType) {
         handler = new VoidCaseAboutToSubmitHandler(hearingMessageHelper, false);

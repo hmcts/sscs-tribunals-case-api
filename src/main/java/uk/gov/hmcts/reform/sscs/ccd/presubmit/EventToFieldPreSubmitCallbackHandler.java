@@ -5,7 +5,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 
 import java.util.Map;
 import java.util.Optional;
-
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -50,7 +49,7 @@ public abstract class EventToFieldPreSubmitCallbackHandler implements PreSubmitC
     }
 
     protected void cancelHearing(SscsCaseData sscsCaseData) {
-        log.info("Specific implementation to override");
+        log.info("Default implementation");
     }
 
     private Optional<PreSubmitCallbackResponse<SscsCaseData>> responseWithErrorCheck(Callback<SscsCaseData> callback) {
