@@ -66,6 +66,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         } else if (isGrantPostponement(postponementRequest)) {
             grantPostponement(sscsCaseData, postponementRequest);
             setHearingDateToExcludedDate(sscsCaseData, response);
+
         } else if (isRefusePostponement(postponementRequest)) {
             clearInterlocAndSetFlags(sscsCaseData);
         }
