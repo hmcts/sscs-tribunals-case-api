@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.DATE_FORMAT_YYYYMMDD;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -11,7 +13,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
-
 
 @Component
 @Slf4j
@@ -60,5 +61,22 @@ public class FooterService extends AbstractFooterService<SscsDocument> {
         caseData.setSscsDocument(documents);
     }
 
+    public void setHearingDateAsExcludeDate(Hearing hearing, SscsCaseData sscsCaseData) {
+        List<ExcludeDate> newExcludeDates = new ArrayList<>();
+        if (sscsCaseData.getAppeal().getHearingOptions().getExcludeDates() != null) {
+            newExcludeDates.addAll(sscsCaseData.getAppeal().getHearingOptions().getExcludeDates());
+        }
 
+        DateRange dateRange = DateRange.builder()
+                .start(getLocalDate(hearing.getValue().getHearingDate()))
+                .end(getLocalDate(hearing.getValue().getHearingDate()))
+                .build();
+        newExcludeDates.add(ExcludeDate.builder().value(dateRange).build());
+
+        sscsCaseData.getAppeal().getHearingOptions().setExcludeDates(newExcludeDates);
+    }
+
+    private static String getLocalDate(String dateStr) {
+        return LocalDate.parse(dateStr, DateTimeFormatter.ofPattern(DATE_FORMAT_YYYYMMDD)).toString();
+    }
 }
