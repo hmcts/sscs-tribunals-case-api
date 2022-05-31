@@ -95,8 +95,14 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                 sscsCaseData.getCcdCaseId());
         log.info("Issue final decision request: SnL case determinant {} for case {}", sscsCaseData
                 .getSchedulingAndListingFields().getHearingRoute(), sscsCaseData.getCcdCaseId());
-        log.info("Issue final decision request: SnL case determinant {} for case {}", sscsCaseData
-                .getSchedulingAndListingFields().getHearingRoute(), sscsCaseData.getCcdCaseId());
+        log.info("Issue final decision request: SnL case state {} for case {}", sscsCaseData.getState(),
+                sscsCaseData.getCcdCaseId());
+        log.info("Issue final decision request: condition outcome 1 ({})", isScheduleListingEnabled);
+        log.info("Issue final decision request: condition outcome 2 ({})", SscsUtil
+                .isValidCaseState(sscsCaseData, List.of(State.HEARING, State.READY_TO_LIST)));
+        log.info("Issue final decision request: condition outcome 3 ({})", SscsUtil.isSAndLCase(sscsCaseData));
+        log.info("Issue final decision request: consolidated condition ({})", eligibleForHearingsCancel
+                .test(sscsCaseData));
         if (eligibleForHearingsCancel.test(sscsCaseData)) {
             log.info("Issue Final Decision: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());
