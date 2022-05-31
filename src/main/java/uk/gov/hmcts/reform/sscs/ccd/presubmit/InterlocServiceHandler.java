@@ -4,20 +4,32 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.*;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 @Slf4j
 public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler {
 
-    @Autowired
-    public InterlocServiceHandler() {
+    private final ListAssistHearingMessageHelper hearingMessageHelper;
+    private boolean isScheduleListingEnabled;
+
+    public InterlocServiceHandler(ListAssistHearingMessageHelper hearingMessageHelper,
+        @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled) {
         super(createMappings());
+        this.hearingMessageHelper = hearingMessageHelper;
+        this.isScheduleListingEnabled = isScheduleListingEnabled;
     }
 
     private static Map<EventType, String> createMappings() {
@@ -77,4 +89,17 @@ public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler
             newSscsCaseData.setDirectionDueDate(null);
         }
     }
+
+    @Override
+    protected void cancelHearing(SscsCaseData sscsCaseData) {
+        if (eligibleForHearingsCancel.test(sscsCaseData)) {
+            log.info(String.format("Strike out - Sending cancel request for hearing for case id %s", sscsCaseData
+                    .getCcdCaseId()));
+            hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId());
+        }
+    }
+
+    private final Predicate<SscsCaseData> eligibleForHearingsCancel = sscsCaseData -> isScheduleListingEnabled
+            && SscsUtil.isValidCaseStateForHearingCancel(sscsCaseData, List.of(State.HEARING, State.READY_TO_LIST))
+            && SscsUtil.isSAndLCase(sscsCaseData);
 }

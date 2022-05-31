@@ -5,6 +5,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 
 import java.util.Map;
 import java.util.Optional;
+
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DecisionType;
@@ -13,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
+@Slf4j
 public abstract class EventToFieldPreSubmitCallbackHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final Map<EventType, String> eventFieldMappings;
 
@@ -41,8 +44,13 @@ public abstract class EventToFieldPreSubmitCallbackHandler implements PreSubmitC
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
+        cancelHearing(sscsCaseData);
         return new PreSubmitCallbackResponse<>(setField(sscsCaseData, eventFieldMappings.get(callback.getEvent()),
             callback.getEvent()));
+    }
+
+    protected void cancelHearing(SscsCaseData sscsCaseData) {
+        log.info("Specific implementation to override");
     }
 
     private Optional<PreSubmitCallbackResponse<SscsCaseData>> responseWithErrorCheck(Callback<SscsCaseData> callback) {

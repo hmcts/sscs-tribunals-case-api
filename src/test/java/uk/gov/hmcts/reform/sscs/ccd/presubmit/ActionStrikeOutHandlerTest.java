@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 
 @RunWith(JUnitParamsRunner.class)
 public class ActionStrikeOutHandlerTest {
@@ -41,9 +42,12 @@ public class ActionStrikeOutHandlerTest {
     @Mock
     private Callback<SscsCaseData> callback;
 
+    @Mock
+    private ListAssistHearingMessageHelper hearingMessageHelper;
+
     @Before
     public void setUp() {
-        actionStrikeOutHandler = new ActionStrikeOutHandler();
+        actionStrikeOutHandler = new ActionStrikeOutHandler(hearingMessageHelper, false);
 
         sscsCaseData = SscsCaseData.builder().build();
 
