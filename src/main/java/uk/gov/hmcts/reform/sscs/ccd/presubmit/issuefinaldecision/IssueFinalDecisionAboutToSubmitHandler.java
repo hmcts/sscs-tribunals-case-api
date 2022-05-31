@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -10,7 +9,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import javax.validation.ConstraintViolation;
@@ -26,7 +24,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -37,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecis
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
@@ -92,12 +90,12 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.setDwpState(FINAL_DECISION_ISSUED.getId());
         createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
         clearTransientFields(preSubmitCallbackResponse);
-        log.info("Postponement request: Check eligible hearing request for case {}", sscsCaseData.getCcdCaseId());
-        log.info("Postponement request: Feature flag {} for case {}", isScheduleListingEnabled,
+        log.info("Issue final decision request: Check eligible hearing request for case {}", sscsCaseData.getCcdCaseId());
+        log.info("Issue final decision request: Feature flag {} for case {}", isScheduleListingEnabled,
                 sscsCaseData.getCcdCaseId());
-        log.info("Postponement request: SnL case determinant {} for case {}", sscsCaseData
+        log.info("Issue final decision request: SnL case determinant {} for case {}", sscsCaseData
                 .getSchedulingAndListingFields().getHearingRoute(), sscsCaseData.getCcdCaseId());
-        log.info("Postponement request: SnL case determinant {} for case {}", sscsCaseData
+        log.info("Issue final decision request: SnL case determinant {} for case {}", sscsCaseData
                 .getSchedulingAndListingFields().getHearingRoute(), sscsCaseData.getCcdCaseId());
         if (eligibleForHearingsCancel.test(sscsCaseData)) {
             log.info("Issue Final Decision: HearingRoute ListAssist Case ({}). Sending cancellation message",
@@ -117,19 +115,8 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     }
 
     private final Predicate<SscsCaseData> eligibleForHearingsCancel = sscsCaseData -> isScheduleListingEnabled
-            && isValidCaseState(sscsCaseData)
-            && isSAndLCase(sscsCaseData);
-
-    private boolean isValidCaseState(SscsCaseData sscsCaseData) {
-        return List.of(State.HEARING, State.READY_TO_LIST)
-                .contains(Optional.of(sscsCaseData).map(SscsCaseData::getState).orElse(State.UNKNOWN));
-    }
-
-    private boolean isSAndLCase(SscsCaseData sscsCaseData) {
-        return LIST_ASSIST
-                .equals(Optional.of(sscsCaseData).map(SscsCaseData::getSchedulingAndListingFields)
-                        .map(SchedulingAndListingFields::getHearingRoute).orElse(null));
-    }
+            && SscsUtil.isValidCaseState(sscsCaseData, List.of(State.HEARING, State.READY_TO_LIST))
+            && SscsUtil.isSAndLCase(sscsCaseData);
 
     private void calculateOutcomeCode(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
 
