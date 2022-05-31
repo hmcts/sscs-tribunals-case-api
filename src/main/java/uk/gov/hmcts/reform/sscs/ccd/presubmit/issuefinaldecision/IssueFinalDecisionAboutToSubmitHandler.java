@@ -95,8 +95,10 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                 sscsCaseData.getCcdCaseId());
         log.info("Issue final decision request: SnL case determinant {} for case {}", sscsCaseData
                 .getSchedulingAndListingFields().getHearingRoute(), sscsCaseData.getCcdCaseId());
-        log.info("Issue final decision request: SnL case state {} for case {}", sscsCaseData.getState(),
+        log.info("Issue final decision request: Sscscasedata case state {} for case {}", sscsCaseData.getState(),
                 sscsCaseData.getCcdCaseId());
+        log.info("Issue final decision request: Overall case state {} for case {}", callback.getCaseDetails()
+                        .getState(), sscsCaseData.getCcdCaseId());
         log.info("Issue final decision request: condition outcome 1 ({})", isScheduleListingEnabled);
         log.info("Issue final decision request: condition outcome 2 ({})", SscsUtil
                 .isValidCaseState(sscsCaseData, List.of(State.HEARING, State.READY_TO_LIST)));
