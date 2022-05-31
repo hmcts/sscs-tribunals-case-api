@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.deathofappellant;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -23,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 
 @RunWith(JUnitParamsRunner.class)
 public class DeathOfAppellantAboutToSubmitHandlerTest {
@@ -38,6 +42,9 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetailsBefore;
 
+    @Mock
+    private ListAssistHearingMessageHelper hearingMessageHelper;
+
     protected static Validator validator = Validation.byDefaultProvider()
             .configure()
             .messageInterpolator(new ParameterMessageInterpolator())
@@ -50,10 +57,18 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new DeathOfAppellantAboutToSubmitHandler(validator);
+        handler = new DeathOfAppellantAboutToSubmitHandler(validator, hearingMessageHelper, false);
 
         when(callback.getEvent()).thenReturn(EventType.DEATH_OF_APPELLANT);
-        sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().appellant(Appellant.builder().build()).build()).dwpUcb("yes").build();
+        sscsCaseData = SscsCaseData.builder()
+                .ccdCaseId("ccdId")
+                .appeal(Appeal.builder().appellant(Appellant.builder().build()).build())
+                .dwpUcb("yes")
+                .state(State.HEARING)
+                .schedulingAndListingFields(SchedulingAndListingFields.builder()
+                        .hearingRoute(HearingRoute.LIST_ASSIST)
+                        .build())
+                .build();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -81,11 +96,14 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
     @Test
     public void givenADeathOfAppellantEvent_thenSetInterlocReviewStateAndRemoveUcb() {
+        handler = new DeathOfAppellantAboutToSubmitHandler(validator, hearingMessageHelper, true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertNull(response.getData().getDwpUcb());
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()));
+        verifyNoMoreInteractions(hearingMessageHelper);
     }
 
     @Test
@@ -98,6 +116,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
         assertEquals("No", response.getData().getSubscriptions().getAppellantSubscription().getSubscribeEmail());
         assertEquals("No", response.getData().getSubscriptions().getAppellantSubscription().getSubscribeSms());
         assertEquals("No", response.getData().getSubscriptions().getAppellantSubscription().getWantSmsNotifications());
+        verifyNoMoreInteractions(hearingMessageHelper);
     }
 
     @Test
@@ -108,6 +127,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertNull(response.getData().getSubscriptions().getAppellantSubscription());
+        verifyNoMoreInteractions(hearingMessageHelper);
     }
 
     @Test
@@ -118,6 +138,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertNull(response.getData().getSubscriptions().getAppellantSubscription());
+        verifyNoMoreInteractions(hearingMessageHelper);
     }
 
     @Test
@@ -131,6 +152,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertNull(response.getData().getDwpState());
+        verifyNoMoreInteractions(hearingMessageHelper);
     }
 
     @Test
@@ -145,6 +167,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertNull(response.getData().getDwpState());
+        verifyNoMoreInteractions(hearingMessageHelper);
     }
 
     @Test
@@ -157,6 +180,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertEquals(DwpState.APPOINTEE_DETAILS_NEEDED.getId(), response.getData().getDwpState());
+        verifyNoMoreInteractions(hearingMessageHelper);
     }
 
     @Test
@@ -171,6 +195,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(DwpState.APPOINTEE_DETAILS_NEEDED.getId(), response.getData().getDwpState());
+        verifyNoMoreInteractions(hearingMessageHelper);
     }
 
     @Test
@@ -185,6 +210,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
         assertNull(response.getData().getInterlocReviewState());
         assertNull(response.getData().getDwpState());
+        verifyNoMoreInteractions(hearingMessageHelper);
     }
 
     @Test

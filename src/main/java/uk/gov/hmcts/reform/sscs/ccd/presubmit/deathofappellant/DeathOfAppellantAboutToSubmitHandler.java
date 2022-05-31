@@ -5,26 +5,36 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.APPOINTEE_DETAILS_NEE
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome.GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 @Slf4j
 public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final Validator validator;
+    private final ListAssistHearingMessageHelper hearingMessageHelper;
+    private boolean isScheduleListingEnabled;
 
-    protected DeathOfAppellantAboutToSubmitHandler(Validator validator) {
+    protected DeathOfAppellantAboutToSubmitHandler(Validator validator, ListAssistHearingMessageHelper
+            hearingMessageHelper, @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled) {
         this.validator = validator;
+        this.hearingMessageHelper = hearingMessageHelper;
+        this.isScheduleListingEnabled = isScheduleListingEnabled;
     }
 
     @Override
@@ -94,9 +104,25 @@ public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHa
         if (!shouldKeepConfidentialCaseFlag(caseDataAfter)) {
             preSubmitCallbackResponse.getData().setIsConfidentialCase(null);
         }
+        cancelHearing(sscsCaseData);
 
         return preSubmitCallbackResponse;
     }
+
+    private void cancelHearing(SscsCaseData sscsCaseData) {
+        log.info("Death of appellant case: Cancel hearing conditions ({}) ({}) ({}) for case ({})",
+                isScheduleListingEnabled, sscsCaseData.getState(), sscsCaseData.getSchedulingAndListingFields()
+                        .getHearingRoute(), sscsCaseData.getCcdCaseId());
+        if (eligibleForHearingsCancel.test(sscsCaseData)) {
+            log.info("Void case: HearingRoute ListAssist Case ({}). Sending cancellation message",
+                    sscsCaseData.getCcdCaseId());
+            hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId());
+        }
+    }
+
+    private final Predicate<SscsCaseData> eligibleForHearingsCancel = sscsCaseData -> isScheduleListingEnabled
+            && SscsUtil.isValidCaseState(sscsCaseData, List.of(State.HEARING, State.READY_TO_LIST))
+            && SscsUtil.isSAndLCase(sscsCaseData);
 
     private boolean shouldSetInterlocReviewState(Appointee appointeeBefore, Appointee appointeeAfter) {
 
