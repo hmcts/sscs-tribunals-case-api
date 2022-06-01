@@ -65,8 +65,8 @@ public class SscsUtil {
                         .map(SchedulingAndListingFields::getHearingRoute).orElse(null));
     }
 
-    public static boolean isValidCaseState(SscsCaseData sscsCaseData, List<State> allowedStates) {
-        return allowedStates.contains(Optional.of(sscsCaseData).map(SscsCaseData::getState).orElse(State.UNKNOWN));
+    public static boolean isValidCaseState(State state, List<State> allowedStates) {
+        return allowedStates.contains(state);
     }
 
 }
