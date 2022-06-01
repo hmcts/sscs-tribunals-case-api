@@ -135,7 +135,7 @@ public class PostponementRequestAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenAPostponementRequestfromListAssist_returnAnError() {
+    public void givenAPostponementRequestfromListAssist_shouldNotReturnAnError() {
         sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().hearingRoute(HearingRoute.LIST_ASSIST).build());
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(0));
