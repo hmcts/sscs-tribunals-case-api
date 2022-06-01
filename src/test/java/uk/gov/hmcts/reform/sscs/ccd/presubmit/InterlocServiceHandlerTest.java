@@ -3,10 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -23,11 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 
 
 @RunWith(JUnitParamsRunner.class)
@@ -44,21 +36,12 @@ public class InterlocServiceHandlerTest {
     @Mock
     private Callback<SscsCaseData> callback;
 
-    @Mock
-    private ListAssistHearingMessageHelper hearingMessageHelper;
-
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new InterlocServiceHandler(hearingMessageHelper, false);
+        handler = new InterlocServiceHandler();
 
-        sscsCaseData = SscsCaseData.builder()
-                .schedulingAndListingFields(SchedulingAndListingFields.builder()
-                        .hearingRoute(HearingRoute.LIST_ASSIST)
-                        .build())
-                .state(State.HEARING)
-                .directionDueDate("01/02/2020")
-                .build();
+        sscsCaseData = SscsCaseData.builder().directionDueDate("01/02/2020").build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -105,7 +88,6 @@ public class InterlocServiceHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getInterlocReviewState(), is(expectedInterlocReviewState));
-        verifyNoInteractions(hearingMessageHelper);
     }
 
     @Test
@@ -125,7 +107,6 @@ public class InterlocServiceHandlerTest {
         assertThat(response.getData().getInterlocReviewState(), is(expectedInterlocReviewState));
         assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now().toString()));
         assertThat(response.getData().getDirectionDueDate(), is("01/02/2020"));
-        verifyNoInteractions(hearingMessageHelper);
     }
 
     @Test
@@ -145,7 +126,6 @@ public class InterlocServiceHandlerTest {
         assertThat(response.getData().getInterlocReviewState(), is(expectedInterlocReviewState));
         assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now().toString()));
         assertNull(response.getData().getDirectionDueDate());
-        verifyNoInteractions(hearingMessageHelper);
     }
 
     @Test
@@ -158,7 +138,6 @@ public class InterlocServiceHandlerTest {
             EventType eventType,
             String expectedInterlocReviewState) {
 
-        handler = new InterlocServiceHandler(hearingMessageHelper, true);
         sscsCaseData.setLanguagePreferenceWelsh("Yes");
         when(callback.getEvent()).thenReturn(eventType);
 
@@ -168,8 +147,6 @@ public class InterlocServiceHandlerTest {
         assertThat(response.getData().getWelshInterlocNextReviewState(), is(expectedInterlocReviewState));
         assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now().toString()));
         assertNull(response.getData().getDirectionDueDate());
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()));
-        verifyNoMoreInteractions(hearingMessageHelper);
     }
 
     @Test(expected = IllegalStateException.class)

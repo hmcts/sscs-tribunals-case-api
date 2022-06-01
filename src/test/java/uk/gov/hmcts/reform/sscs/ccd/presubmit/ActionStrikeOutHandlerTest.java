@@ -3,10 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
@@ -26,11 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 
 @RunWith(JUnitParamsRunner.class)
 public class ActionStrikeOutHandlerTest {
@@ -49,19 +41,11 @@ public class ActionStrikeOutHandlerTest {
     @Mock
     private Callback<SscsCaseData> callback;
 
-    @Mock
-    private ListAssistHearingMessageHelper hearingMessageHelper;
-
     @Before
     public void setUp() {
-        actionStrikeOutHandler = new ActionStrikeOutHandler(hearingMessageHelper, false);
+        actionStrikeOutHandler = new ActionStrikeOutHandler();
 
-        sscsCaseData = SscsCaseData.builder()
-                .schedulingAndListingFields(SchedulingAndListingFields.builder()
-                        .hearingRoute(HearingRoute.LIST_ASSIST)
-                        .build())
-                .state(State.HEARING)
-                .build();
+        sscsCaseData = SscsCaseData.builder().build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -88,7 +72,7 @@ public class ActionStrikeOutHandlerTest {
         "ACTION_STRIKE_OUT, ,null",
         "ACTION_STRIKE_OUT, null,null",
     })
-    public void givenEvent_thenSetDwpStateToExpected_NoHearingsCancel(EventType eventType, @Nullable String decisionType,
+    public void givenEvent_thenSetDwpStateToExpected(EventType eventType, @Nullable String decisionType,
                                                      @Nullable String expectedDwpState) {
         when(callback.getEvent()).thenReturn(eventType);
         sscsCaseData.setDecisionType(decisionType);
@@ -103,31 +87,6 @@ public class ActionStrikeOutHandlerTest {
                 .orElse("");
             assertEquals("The decision type is not \"strike out\". We cannot proceed.", error);
         }
-        verifyNoInteractions(hearingMessageHelper);
-    }
-
-    @Test
-    @Parameters({
-            "ACTION_STRIKE_OUT, strikeOut, strikeOutActioned"
-    })
-    public void givenEvent_thenSetDwpStateToExpected_HearingsCancel(EventType eventType, @Nullable String decisionType,
-                                                     @Nullable String expectedDwpState) {
-        actionStrikeOutHandler = new ActionStrikeOutHandler(hearingMessageHelper, true);
-        when(callback.getEvent()).thenReturn(eventType);
-        sscsCaseData.setDecisionType(decisionType);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = actionStrikeOutHandler.handle(ABOUT_TO_SUBMIT, callback,
-                USER_AUTHORISATION);
-
-        assertThat(response.getData().getDwpState(), is(expectedDwpState));
-        if (StringUtils.isBlank(decisionType)) {
-            String error = response.getErrors().stream()
-                    .findFirst()
-                    .orElse("");
-            assertEquals("The decision type is not \"strike out\". We cannot proceed.", error);
-        }
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()));
-        verifyNoMoreInteractions(hearingMessageHelper);
     }
 
     @Test(expected = IllegalStateException.class)
