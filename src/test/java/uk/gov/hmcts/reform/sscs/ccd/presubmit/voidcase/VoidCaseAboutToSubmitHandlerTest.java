@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -57,6 +58,7 @@ public class VoidCaseAboutToSubmitHandlerTest {
                         .hearingRoute(HearingRoute.LIST_ASSIST)
                         .build())
                 .build();
+        when(caseDetails.getState()).thenReturn(HEARING);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
@@ -73,7 +75,7 @@ public class VoidCaseAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"VOID_CASE", "ADMIN_SEND_TO_VOID_STATE"})
+    @Parameters({"VOID_CASE"})
     public void givenAVoidCaseEventAndSnLFeatureEnabled_thenActionsAndHearingCancel(EventType
         eventType) {
         handler = new VoidCaseAboutToSubmitHandler(hearingMessageHelper, true);
@@ -89,10 +91,25 @@ public class VoidCaseAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"VOID_CASE", "ADMIN_SEND_TO_VOID_STATE"})
+    @Parameters({"VOID_CASE"})
     public void givenAVoidCaseEventAndSnLFeatureNotEnabled_thenActionsButNoHearingCancel(EventType
-                                                                                                            eventType) {
+                                                                                            eventType) {
         handler = new VoidCaseAboutToSubmitHandler(hearingMessageHelper, false);
+        when(callback.getEvent()).thenReturn(eventType);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Assert.assertNull(response.getData().getInterlocReviewState());
+        Assert.assertNull(response.getData().getDirectionDueDate());
+        verifyNoInteractions(hearingMessageHelper);
+    }
+
+    @Test
+    @Parameters({"ADMIN_SEND_TO_VOID_STATE"})
+    public void givenAdminVoidCaseEventAndSnLFeatureEnabled_thenActionsButNoHearingCancel(EventType
+                                                                                                            eventType) {
+        handler = new VoidCaseAboutToSubmitHandler(hearingMessageHelper, true);
         when(callback.getEvent()).thenReturn(eventType);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 

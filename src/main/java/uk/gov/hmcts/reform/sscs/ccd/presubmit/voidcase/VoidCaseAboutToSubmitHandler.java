@@ -54,25 +54,27 @@ public class VoidCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
 
         sscsCaseData.setDirectionDueDate(null);
         sscsCaseData.setInterlocReviewState(null);
-        cancelHearing(sscsCaseData);
+        cancelHearing(callback);
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         return callbackResponse;
     }
 
-    private void cancelHearing(SscsCaseData sscsCaseData) {
+    private void cancelHearing(Callback<SscsCaseData> callback) {
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         log.info("Void case: Cancel hearing conditions ({}) ({}) ({}) for case ({})", isScheduleListingEnabled,
-                sscsCaseData.getState(), sscsCaseData.getSchedulingAndListingFields().getHearingRoute(),
+                callback.getCaseDetails().getState(), sscsCaseData.getSchedulingAndListingFields().getHearingRoute(),
                 sscsCaseData.getCcdCaseId());
-        if (eligibleForHearingsCancel.test(sscsCaseData)) {
+        if (eligibleForHearingsCancel.test(callback)) {
             log.info("Void case: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());
             hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId());
         }
     }
 
-    private final Predicate<SscsCaseData> eligibleForHearingsCancel = sscsCaseData -> isScheduleListingEnabled
-            && SscsUtil.isValidCaseState(sscsCaseData, List.of(State.HEARING, State.READY_TO_LIST))
-            && SscsUtil.isSAndLCase(sscsCaseData);
+    private final Predicate<Callback<SscsCaseData>> eligibleForHearingsCancel = callback -> isScheduleListingEnabled
+            && EventType.VOID_CASE.equals(callback.getEvent())
+            && SscsUtil.isValidCaseState(callback.getCaseDetails().getState(), List.of(State.HEARING, State.READY_TO_LIST))
+            && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData());
 }

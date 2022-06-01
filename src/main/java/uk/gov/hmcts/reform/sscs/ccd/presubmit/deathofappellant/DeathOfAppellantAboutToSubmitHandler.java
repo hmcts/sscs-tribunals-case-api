@@ -104,25 +104,26 @@ public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHa
         if (!shouldKeepConfidentialCaseFlag(caseDataAfter)) {
             preSubmitCallbackResponse.getData().setIsConfidentialCase(null);
         }
-        cancelHearing(sscsCaseData);
+        cancelHearing(callback);
 
         return preSubmitCallbackResponse;
     }
 
-    private void cancelHearing(SscsCaseData sscsCaseData) {
-        log.info("Death of appellant case: Cancel hearing conditions ({}) ({}) ({}) for case ({})",
-                isScheduleListingEnabled, sscsCaseData.getState(), sscsCaseData.getSchedulingAndListingFields()
+    private void cancelHearing(Callback<SscsCaseData> callback) {
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        log.info("Death of appellant: Cancel hearing conditions ({}) ({}) ({}) for case ({})",
+                isScheduleListingEnabled, callback.getCaseDetails().getState(), sscsCaseData.getSchedulingAndListingFields()
                         .getHearingRoute(), sscsCaseData.getCcdCaseId());
-        if (eligibleForHearingsCancel.test(sscsCaseData)) {
-            log.info("Void case: HearingRoute ListAssist Case ({}). Sending cancellation message",
+        if (eligibleForHearingsCancel.test(callback)) {
+            log.info("Death of appellant: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());
             hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId());
         }
     }
 
-    private final Predicate<SscsCaseData> eligibleForHearingsCancel = sscsCaseData -> isScheduleListingEnabled
-            && SscsUtil.isValidCaseState(sscsCaseData, List.of(State.HEARING, State.READY_TO_LIST))
-            && SscsUtil.isSAndLCase(sscsCaseData);
+    private final Predicate<Callback<SscsCaseData>> eligibleForHearingsCancel = callback -> isScheduleListingEnabled
+            && SscsUtil.isValidCaseState(callback.getCaseDetails().getState(), List.of(State.HEARING, State.READY_TO_LIST))
+            && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData());
 
     private boolean shouldSetInterlocReviewState(Appointee appointeeBefore, Appointee appointeeAfter) {
 

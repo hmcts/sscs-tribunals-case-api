@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.deathofappellant;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -75,6 +76,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         sscsCaseDataBefore = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().appellant(Appellant.builder().build()).build()).dwpUcb("yes").build();
         when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
+        when(caseDetails.getState()).thenReturn(State.HEARING);
     }
 
     @Test
@@ -116,7 +118,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
         assertEquals("No", response.getData().getSubscriptions().getAppellantSubscription().getSubscribeEmail());
         assertEquals("No", response.getData().getSubscriptions().getAppellantSubscription().getSubscribeSms());
         assertEquals("No", response.getData().getSubscriptions().getAppellantSubscription().getWantSmsNotifications());
-        verifyNoMoreInteractions(hearingMessageHelper);
+        verifyNoInteractions(hearingMessageHelper);
     }
 
     @Test
@@ -127,7 +129,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertNull(response.getData().getSubscriptions().getAppellantSubscription());
-        verifyNoMoreInteractions(hearingMessageHelper);
+        verifyNoInteractions(hearingMessageHelper);
     }
 
     @Test
@@ -138,7 +140,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertNull(response.getData().getSubscriptions().getAppellantSubscription());
-        verifyNoMoreInteractions(hearingMessageHelper);
+        verifyNoInteractions(hearingMessageHelper);
     }
 
     @Test
@@ -152,7 +154,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertNull(response.getData().getDwpState());
-        verifyNoMoreInteractions(hearingMessageHelper);
+        verifyNoInteractions(hearingMessageHelper);
     }
 
     @Test
@@ -167,7 +169,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertNull(response.getData().getDwpState());
-        verifyNoMoreInteractions(hearingMessageHelper);
+        verifyNoInteractions(hearingMessageHelper);
     }
 
     @Test
@@ -180,7 +182,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertEquals(DwpState.APPOINTEE_DETAILS_NEEDED.getId(), response.getData().getDwpState());
-        verifyNoMoreInteractions(hearingMessageHelper);
+        verifyNoInteractions(hearingMessageHelper);
     }
 
     @Test
@@ -195,7 +197,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(DwpState.APPOINTEE_DETAILS_NEEDED.getId(), response.getData().getDwpState());
-        verifyNoMoreInteractions(hearingMessageHelper);
+        verifyNoInteractions(hearingMessageHelper);
     }
 
     @Test
@@ -210,7 +212,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
         assertNull(response.getData().getInterlocReviewState());
         assertNull(response.getData().getDwpState());
-        verifyNoMoreInteractions(hearingMessageHelper);
+        verifyNoInteractions(hearingMessageHelper);
     }
 
     @Test
