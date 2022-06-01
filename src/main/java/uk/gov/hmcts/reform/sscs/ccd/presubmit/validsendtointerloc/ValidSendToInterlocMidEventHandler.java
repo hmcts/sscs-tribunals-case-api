@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 public class ValidSendToInterlocMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
+    public static final String POSTPONEMENTS_NOT_POSSIBLE_GAPS = "Postponement requests cannot be made for hearings listed in GAPS";
     private final GenerateFile generateFile;
     private final String templateId;
 
@@ -44,6 +44,15 @@ public class ValidSendToInterlocMidEventHandler implements PreSubmitCallbackHand
                     generateFile, templateId);
         }
 
+        validatePostponementRequests(sscsCaseData, response);
         return response;
+    }
+
+    private void validatePostponementRequests(SscsCaseData sscsCaseData,
+                                              PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (HearingRoute.GAPS.equals(sscsCaseData.getRegionalProcessingCenter().getHearingRoute())
+                && "reviewByTcw".equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode())) {
+            preSubmitCallbackResponse.addError(POSTPONEMENTS_NOT_POSSIBLE_GAPS);
+        }
     }
 }
