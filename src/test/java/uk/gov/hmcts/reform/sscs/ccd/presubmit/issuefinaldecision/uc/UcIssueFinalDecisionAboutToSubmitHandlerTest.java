@@ -160,6 +160,7 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
             .build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(caseDetails.getState()).thenReturn(State.HEARING);
     }
 
     @Test
