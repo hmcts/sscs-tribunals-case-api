@@ -16,7 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
-import uk.gov.hmcts.reform.sscs.reference.data.mappings.CancellationReason;
+import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.servicebus.HearingMessagingServiceFactory;
 import uk.gov.hmcts.reform.sscs.service.servicebus.SessionAwareServiceBusMessagingService;
 
