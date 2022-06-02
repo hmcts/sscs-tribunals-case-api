@@ -51,7 +51,8 @@ public class ValidSendToInterlocMidEventHandler implements PreSubmitCallbackHand
     private void validatePostponementRequests(SscsCaseData sscsCaseData,
                                               PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (HearingRoute.GAPS.equals(sscsCaseData.getRegionalProcessingCenter().getHearingRoute())
-                && SelectWhoReviewsCase.REVIEW_BY_TCW.getId().equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode())) {
+                && SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId().equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode())
+                && sscsCaseData.getPostponementRequest().getPostponementRequestDetails() != null) {
             preSubmitCallbackResponse.addError(POSTPONEMENTS_NOT_POSSIBLE_GAPS);
         }
     }
