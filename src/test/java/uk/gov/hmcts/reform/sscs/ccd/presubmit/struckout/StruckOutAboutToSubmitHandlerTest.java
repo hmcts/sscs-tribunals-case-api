@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 
 @RunWith(JUnitParamsRunner.class)
 public class StruckOutAboutToSubmitHandlerTest {
@@ -36,7 +37,8 @@ public class StruckOutAboutToSubmitHandlerTest {
 
     @Mock
     private Callback<SscsCaseData> callback;
-
+    @Mock
+    private ListAssistHearingMessageHelper listAssistHearingMessageHelper;
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
@@ -45,7 +47,7 @@ public class StruckOutAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new StruckOutAboutToSubmitHandler();
+        handler = new StruckOutAboutToSubmitHandler(listAssistHearingMessageHelper, false);
 
         when(callback.getEvent()).thenReturn(EventType.STRUCK_OUT);
 

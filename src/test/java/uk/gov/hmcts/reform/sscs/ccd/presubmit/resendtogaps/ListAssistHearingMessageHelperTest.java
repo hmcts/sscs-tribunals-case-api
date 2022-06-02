@@ -39,7 +39,7 @@ public class ListAssistHearingMessageHelperTest {
     public void shouldSendExpectedCancellationMessage() {
         when(hearingMessagingServiceFactory.getMessagingService(LIST_ASSIST)).thenReturn(sessionAwareServiceBusMessagingService);
 
-        messageHelper.sendListAssistCancelHearingMessage("1234");
+        messageHelper.sendListAssistCancelHearingMessage("1234", CancellationReason.OTHER);
 
         verify(sessionAwareServiceBusMessagingService).sendMessage(hearingRequestCaptor.capture());
 
