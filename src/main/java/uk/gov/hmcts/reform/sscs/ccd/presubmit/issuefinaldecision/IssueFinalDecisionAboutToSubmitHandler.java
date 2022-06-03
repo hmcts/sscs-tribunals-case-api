@@ -98,14 +98,15 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                 .getSchedulingAndListingFields().getHearingRoute(), sscsCaseData.getCcdCaseId());
         log.info("Issue final decision request: Sscscasedata case state {} for case {}", sscsCaseData.getState(),
                 sscsCaseData.getCcdCaseId());
-        log.info("Issue final decision request: Overall case state {} for case {}", callback.getCaseDetails()
+        log.info("Issue final decision request: Callback case state {} for case {}", callback.getCaseDetails()
                         .getState(), sscsCaseData.getCcdCaseId());
-        log.info("Issue final decision request: Overall case state before {} for case {}",
+        log.info("Issue final decision request: Callback case state before {} for case {}",
                 callback.getCaseDetailsBefore().map(CaseDetails::getState).orElse(null),
                 sscsCaseData.getCcdCaseId());
         log.info("Issue final decision request: condition outcome 1 ({})", isScheduleListingEnabled);
         log.info("Issue final decision request: condition outcome 2 ({})", SscsUtil
-                .isValidCaseState(callback.getCaseDetails().getState(), List.of(State.HEARING, State.READY_TO_LIST)));
+                .isValidCaseState(callback.getCaseDetailsBefore().map(CaseDetails::getState).orElse(State.UNKNOWN),
+                        List.of(State.HEARING, State.READY_TO_LIST)));
         log.info("Issue final decision request: condition outcome 3 ({})", SscsUtil.isSAndLCase(sscsCaseData));
         log.info("Issue final decision request: consolidated condition ({})", eligibleForHearingsCancel
                 .test(callback));
@@ -127,8 +128,8 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     }
 
     private final Predicate<Callback<SscsCaseData>> eligibleForHearingsCancel = callback -> isScheduleListingEnabled
-            && SscsUtil.isValidCaseState(callback.getCaseDetails().getState(),
-                List.of(State.HEARING, State.READY_TO_LIST))
+            && SscsUtil.isValidCaseState(callback.getCaseDetailsBefore().map(CaseDetails::getState)
+                    .orElse(State.UNKNOWN), List.of(State.HEARING, State.READY_TO_LIST))
             && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData());
 
     private void calculateOutcomeCode(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {

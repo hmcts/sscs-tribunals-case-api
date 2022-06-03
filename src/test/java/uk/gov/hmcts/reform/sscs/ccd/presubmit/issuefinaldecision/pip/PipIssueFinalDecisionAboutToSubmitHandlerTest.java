@@ -24,6 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import junitparams.JUnitParamsRunner;
@@ -105,6 +106,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetails));
 
         List<SscsDocument> documentList = new ArrayList<>();
 
