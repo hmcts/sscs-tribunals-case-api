@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
@@ -100,6 +101,9 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                 sscsCaseData.getCcdCaseId());
         log.info("Issue final decision request: Overall case state {} for case {}", callback.getCaseDetails()
                         .getState(), sscsCaseData.getCcdCaseId());
+        log.info("Issue final decision request: Overall case state before {} for case {}",
+                callback.getCaseDetailsBefore().map(CaseDetails::getState).orElse(null),
+                sscsCaseData.getCcdCaseId());
         log.info("Issue final decision request: condition outcome 1 ({})", isScheduleListingEnabled);
         log.info("Issue final decision request: condition outcome 2 ({})", SscsUtil
                 .isValidCaseState(callback.getCaseDetails().getState(), List.of(State.HEARING, State.READY_TO_LIST)));
