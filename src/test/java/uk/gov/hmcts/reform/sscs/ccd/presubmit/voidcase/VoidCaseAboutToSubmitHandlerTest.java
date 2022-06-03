@@ -10,6 +10,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
 
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Assert;
@@ -51,6 +52,7 @@ public class VoidCaseAboutToSubmitHandlerTest {
 
         when(callback.getEvent()).thenReturn(EventType.ADMIN_SEND_TO_VOID_STATE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetails));
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").interlocReviewState("interlocState").directionDueDate("tomorrow")
                 .appeal(Appeal.builder().build())
                 .state(State.HEARING)

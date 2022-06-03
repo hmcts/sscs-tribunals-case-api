@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -65,8 +66,9 @@ public class AdminAppealWithdrawnHandler implements PreSubmitCallbackHandler<Ssc
     private void cancelHearing(Callback<SscsCaseData> callback) {
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         log.info("Admin Appeal Withdrawn: Cancel hearing conditions ({}) ({}) ({}) for case ({})",
-                isScheduleListingEnabled, callback.getCaseDetails().getState(),
-                sscsCaseData.getSchedulingAndListingFields().getHearingRoute(), sscsCaseData.getCcdCaseId());
+                isScheduleListingEnabled, callback.getCaseDetailsBefore().map(CaseDetails::getState)
+                        .orElse(null), sscsCaseData.getSchedulingAndListingFields().getHearingRoute(),
+                                sscsCaseData.getCcdCaseId());
         if (eligibleForHearingsCancel.test(callback)) {
             log.info("Admin Appeal Withdrawn: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());
@@ -75,7 +77,8 @@ public class AdminAppealWithdrawnHandler implements PreSubmitCallbackHandler<Ssc
     }
 
     private final Predicate<Callback<SscsCaseData>> eligibleForHearingsCancel = callback -> isScheduleListingEnabled
-        && SscsUtil.isValidCaseState(callback.getCaseDetails().getState(), List.of(State.HEARING, State.READY_TO_LIST))
+        && SscsUtil.isValidCaseState(callback.getCaseDetailsBefore().map(CaseDetails::getState)
+            .orElse(State.UNKNOWN), List.of(State.HEARING, State.READY_TO_LIST))
         && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData());
 
     private void addToSscsDocuments(SscsCaseData caseData, DocumentLink documentDetails) {

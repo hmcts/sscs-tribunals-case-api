@@ -60,12 +60,12 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
         openMocks(this);
         handler = new DeathOfAppellantAboutToSubmitHandler(validator, hearingMessageHelper, false);
 
+
         when(callback.getEvent()).thenReturn(EventType.DEATH_OF_APPELLANT);
         sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("ccdId")
                 .appeal(Appeal.builder().appellant(Appellant.builder().build()).build())
                 .dwpUcb("yes")
-                .state(State.HEARING)
                 .schedulingAndListingFields(SchedulingAndListingFields.builder()
                         .hearingRoute(HearingRoute.LIST_ASSIST)
                         .build())
@@ -74,9 +74,13 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-        sscsCaseDataBefore = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().appellant(Appellant.builder().build()).build()).dwpUcb("yes").build();
+        sscsCaseDataBefore = SscsCaseData.builder()
+                .ccdCaseId("ccdId")
+                .appeal(Appeal.builder().appellant(Appellant.builder().build()).build())
+                .dwpUcb("yes")
+                .build();
         when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
-        when(caseDetails.getState()).thenReturn(State.HEARING);
+        when(caseDetailsBefore.getState()).thenReturn(State.HEARING);
     }
 
     @Test

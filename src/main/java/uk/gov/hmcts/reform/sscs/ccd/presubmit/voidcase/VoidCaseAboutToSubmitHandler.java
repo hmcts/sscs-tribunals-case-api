@@ -64,8 +64,8 @@ public class VoidCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
     private void cancelHearing(Callback<SscsCaseData> callback) {
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         log.info("Void case: Cancel hearing conditions ({}) ({}) ({}) for case ({})", isScheduleListingEnabled,
-                callback.getCaseDetails().getState(), sscsCaseData.getSchedulingAndListingFields().getHearingRoute(),
-                sscsCaseData.getCcdCaseId());
+                callback.getCaseDetailsBefore().map(CaseDetails::getState).orElse(null),
+                sscsCaseData.getSchedulingAndListingFields().getHearingRoute(), sscsCaseData.getCcdCaseId());
         if (eligibleForHearingsCancel.test(callback)) {
             log.info("Void case: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());
@@ -75,6 +75,7 @@ public class VoidCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
 
     private final Predicate<Callback<SscsCaseData>> eligibleForHearingsCancel = callback -> isScheduleListingEnabled
             && EventType.VOID_CASE.equals(callback.getEvent())
-            && SscsUtil.isValidCaseState(callback.getCaseDetails().getState(), List.of(State.HEARING, State.READY_TO_LIST))
+            && SscsUtil.isValidCaseState(callback.getCaseDetailsBefore().map(CaseDetails::getState)
+                .orElse(State.UNKNOWN), List.of(State.HEARING, State.READY_TO_LIST))
             && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData());
 }

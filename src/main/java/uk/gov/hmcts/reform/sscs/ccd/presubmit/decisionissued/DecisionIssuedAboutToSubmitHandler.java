@@ -113,7 +113,7 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
     private void cancelHearing(Callback<SscsCaseData> callback) {
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         log.info("Issue interlocutory decision: Cancel hearing conditions ({}) ({}) ({}) for case ({})",
-                isScheduleListingEnabled, callback.getCaseDetails().getState(),
+                isScheduleListingEnabled, callback.getCaseDetailsBefore().map(CaseDetails::getState).orElse(null),
                 sscsCaseData.getSchedulingAndListingFields().getHearingRoute(), sscsCaseData.getCcdCaseId());
         if (eligibleForHearingsCancel.test(callback)) {
             log.info("Issue interlocutory decision: HearingRoute ListAssist Case ({}). Sending cancellation message",
@@ -124,6 +124,7 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
 
     private final Predicate<Callback<SscsCaseData>> eligibleForHearingsCancel = callback -> isScheduleListingEnabled
             && EventType.DECISION_ISSUED.equals(callback.getEvent())
-            && SscsUtil.isValidCaseState(callback.getCaseDetails().getState(), List.of(State.HEARING, State.READY_TO_LIST))
+            && SscsUtil.isValidCaseState(callback.getCaseDetailsBefore().map(CaseDetails::getState)
+            .       orElse(State.UNKNOWN), List.of(State.HEARING, State.READY_TO_LIST))
             && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData());
 }
