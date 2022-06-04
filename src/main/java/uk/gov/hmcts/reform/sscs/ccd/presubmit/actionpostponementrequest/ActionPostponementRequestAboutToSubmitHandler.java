@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
@@ -93,7 +94,8 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         if (eligibleForHearingsCancel.test(sscsCaseData)) {
             log.info("Action postponement request: Sending cancel hearing request for case {}", sscsCaseData
                     .getCcdCaseId());
-            hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId());
+            hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(),
+                    CancellationReason.OTHER);
         }
     }
 

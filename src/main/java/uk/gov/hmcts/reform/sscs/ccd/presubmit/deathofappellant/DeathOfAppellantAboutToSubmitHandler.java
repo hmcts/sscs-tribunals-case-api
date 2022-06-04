@@ -5,26 +5,37 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.APPOINTEE_DETAILS_NEE
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome.GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 @Slf4j
 public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final Validator validator;
+    private final ListAssistHearingMessageHelper hearingMessageHelper;
+    private boolean isScheduleListingEnabled;
 
-    protected DeathOfAppellantAboutToSubmitHandler(Validator validator) {
+    protected DeathOfAppellantAboutToSubmitHandler(Validator validator, ListAssistHearingMessageHelper
+            hearingMessageHelper, @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled) {
         this.validator = validator;
+        this.hearingMessageHelper = hearingMessageHelper;
+        this.isScheduleListingEnabled = isScheduleListingEnabled;
     }
 
     @Override
@@ -94,9 +105,29 @@ public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHa
         if (!shouldKeepConfidentialCaseFlag(caseDataAfter)) {
             preSubmitCallbackResponse.getData().setIsConfidentialCase(null);
         }
+        cancelHearing(callback);
 
         return preSubmitCallbackResponse;
     }
+
+    private void cancelHearing(Callback<SscsCaseData> callback) {
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        log.info("Death of appellant: Cancel hearing conditions ({}) ({}) ({}) for case ({})",
+                isScheduleListingEnabled, callback.getCaseDetailsBefore().map(CaseDetails::getState)
+                        .orElse(null), sscsCaseData.getSchedulingAndListingFields()
+                        .getHearingRoute(), sscsCaseData.getCcdCaseId());
+        if (eligibleForHearingsCancel.test(callback)) {
+            log.info("Death of appellant: HearingRoute ListAssist Case ({}). Sending cancellation message",
+                    sscsCaseData.getCcdCaseId());
+            hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(),
+                    CancellationReason.PARTY_UNABLE_TO_ATTEND);
+        }
+    }
+
+    private final Predicate<Callback<SscsCaseData>> eligibleForHearingsCancel = callback -> isScheduleListingEnabled
+            && SscsUtil.isValidCaseState(callback.getCaseDetailsBefore().map(CaseDetails::getState)
+                .orElse(State.UNKNOWN), List.of(State.HEARING, State.READY_TO_LIST))
+            && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData());
 
     private boolean shouldSetInterlocReviewState(Appointee appointeeBefore, Appointee appointeeAfter) {
 
