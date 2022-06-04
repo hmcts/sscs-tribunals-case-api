@@ -43,19 +43,17 @@ public class StruckOutAboutToSubmitHandlerTest {
 
     @Mock
     private Callback<SscsCaseData> callback;
-
+    @Mock
+    private ListAssistHearingMessageHelper listAssistHearingMessageHelper;
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
-
-    @Mock
-    private ListAssistHearingMessageHelper hearingMessageHelper;
 
     private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new StruckOutAboutToSubmitHandler(hearingMessageHelper, false);
+        handler = new StruckOutAboutToSubmitHandler(listAssistHearingMessageHelper, false);
 
         when(callback.getEvent()).thenReturn(EventType.STRUCK_OUT);
 
@@ -98,7 +96,7 @@ public class StruckOutAboutToSubmitHandlerTest {
     @Test
     public void givenStruckOutEvent_thenDwpStateToStrikeOutActioned() {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        handler = new StruckOutAboutToSubmitHandler(hearingMessageHelper, true);
+        handler = new StruckOutAboutToSubmitHandler(listAssistHearingMessageHelper, true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -106,7 +104,7 @@ public class StruckOutAboutToSubmitHandlerTest {
         assertThat(response.getData().getDirectionDueDate(), is(nullValue()));
         assertThat(response.getData().getPreviousState(), is(HEARING));
         assertThat(response.getData().getDwpState(), is(DwpState.STRIKE_OUT_ACTIONED.getId()));
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()));
-        verifyNoMoreInteractions(hearingMessageHelper);
+        verify(listAssistHearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()));
+        verifyNoMoreInteractions(listAssistHearingMessageHelper);
     }
 }

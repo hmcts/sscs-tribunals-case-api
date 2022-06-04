@@ -23,13 +23,10 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Slf4j
 public class StruckOutAboutToSubmitHandler extends DormantEventsAboutToSubmitHandler {
 
-    private final ListAssistHearingMessageHelper hearingMessageHelper;
-    private boolean isScheduleListingEnabled;
-
-    public StruckOutAboutToSubmitHandler(ListAssistHearingMessageHelper hearingMessageHelper,
-        @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled) {
-        this.hearingMessageHelper = hearingMessageHelper;
-        this.isScheduleListingEnabled = isScheduleListingEnabled;
+    public StruckOutAboutToSubmitHandler(
+            ListAssistHearingMessageHelper hearingMessageHelper,
+            @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled) {
+        super(hearingMessageHelper, isScheduleListingEnabled);
     }
 
     @Override
