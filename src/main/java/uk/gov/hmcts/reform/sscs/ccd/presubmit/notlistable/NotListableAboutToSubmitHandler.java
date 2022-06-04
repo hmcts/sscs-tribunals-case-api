@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -66,7 +67,8 @@ public class NotListableAboutToSubmitHandler implements PreSubmitCallbackHandler
     }
 
     private final Predicate<Callback<SscsCaseData>> eligibleForHearingsCancel = callback ->
-            SscsUtil.isValidCaseState(callback.getCaseDetails().getState(), List.of(State.HEARING, State.READY_TO_LIST))
+            SscsUtil.isValidCaseState(callback.getCaseDetailsBefore().map(CaseDetails::getState)
+                    .orElse(State.UNKNOWN), List.of(State.HEARING, State.READY_TO_LIST))
                     && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData())
                     && isScheduleListingEnabled;
 }

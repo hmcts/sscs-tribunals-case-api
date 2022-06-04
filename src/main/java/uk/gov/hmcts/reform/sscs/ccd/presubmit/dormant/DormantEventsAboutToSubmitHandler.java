@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -93,10 +94,11 @@ public class DormantEventsAboutToSubmitHandler implements PreSubmitCallbackHandl
     }
 
     private final Predicate<Callback<SscsCaseData>> eligibleForHearingsCancel = callback ->
-            SscsUtil.isValidCaseState(callback.getCaseDetails().getState(), List.of(State.HEARING, State.READY_TO_LIST))
-                    && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData())
-                    && isValidCaseEventForCancellation(callback.getEvent())
-                    && isScheduleListingEnabled;
+            SscsUtil.isValidCaseState(callback.getCaseDetailsBefore().map(CaseDetails::getState)
+                    .orElse(State.UNKNOWN), List.of(State.HEARING, State.READY_TO_LIST))
+            && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData())
+            && isValidCaseEventForCancellation(callback.getEvent())
+            && isScheduleListingEnabled;
 
     private boolean isValidCaseEventForCancellation(EventType event) {
         return List.of(

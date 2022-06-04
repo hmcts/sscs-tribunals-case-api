@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NOT_LISTABLE;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -82,9 +83,10 @@ public class NotListableAboutToSubmitHandlerTest {
                         .build())
                 .build();
 
-        when(callback.getEvent()).thenReturn(NOT_LISTABLE);
         when(caseDetails.getState()).thenReturn(state);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetails));
+        when(callback.getEvent()).thenReturn(NOT_LISTABLE);
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
