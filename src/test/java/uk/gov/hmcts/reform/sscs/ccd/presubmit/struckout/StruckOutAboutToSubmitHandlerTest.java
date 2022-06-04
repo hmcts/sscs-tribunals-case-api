@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 
 @RunWith(JUnitParamsRunner.class)
 public class StruckOutAboutToSubmitHandlerTest {
@@ -104,7 +105,8 @@ public class StruckOutAboutToSubmitHandlerTest {
         assertThat(response.getData().getDirectionDueDate(), is(nullValue()));
         assertThat(response.getData().getPreviousState(), is(HEARING));
         assertThat(response.getData().getDwpState(), is(DwpState.STRIKE_OUT_ACTIONED.getId()));
-        verify(listAssistHearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()));
+        verify(listAssistHearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()),
+                eq(CancellationReason.STRUCK_OUT));
         verifyNoMoreInteractions(listAssistHearingMessageHelper);
     }
 }

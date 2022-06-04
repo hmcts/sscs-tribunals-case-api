@@ -25,8 +25,8 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Slf4j
 public class DormantEventsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final ListAssistHearingMessageHelper hearingMessageHelper;
-    private boolean isScheduleListingEnabled;
+    protected final ListAssistHearingMessageHelper hearingMessageHelper;
+    protected boolean isScheduleListingEnabled;
 
     public DormantEventsAboutToSubmitHandler(
             ListAssistHearingMessageHelper hearingMessageHelper,

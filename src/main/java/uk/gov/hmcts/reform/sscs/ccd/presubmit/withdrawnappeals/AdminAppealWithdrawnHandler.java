@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
@@ -72,7 +73,8 @@ public class AdminAppealWithdrawnHandler implements PreSubmitCallbackHandler<Ssc
         if (eligibleForHearingsCancel.test(callback)) {
             log.info("Admin Appeal Withdrawn: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());
-            hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId());
+            hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(),
+                    CancellationReason.WITHDRAWN);
         }
     }
 

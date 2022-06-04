@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 
 @RunWith(JUnitParamsRunner.class)
 public class VoidCaseAboutToSubmitHandlerTest {
@@ -88,7 +89,8 @@ public class VoidCaseAboutToSubmitHandlerTest {
 
         Assert.assertNull(response.getData().getInterlocReviewState());
         Assert.assertNull(response.getData().getDirectionDueDate());
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()));
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()),
+                eq(CancellationReason.OTHER));
         verifyNoMoreInteractions(hearingMessageHelper);
     }
 

@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
@@ -190,7 +191,8 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()),
                 any(), eq(DocumentType.DECISION_NOTICE), any(), any(), eq(null), eq(null));
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()));
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()),
+                eq(CancellationReason.STRUCK_OUT));
         verifyNoMoreInteractions(hearingMessageHelper);
     }
 

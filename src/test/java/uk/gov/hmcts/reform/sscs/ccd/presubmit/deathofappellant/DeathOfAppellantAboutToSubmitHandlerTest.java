@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 
 @RunWith(JUnitParamsRunner.class)
 public class DeathOfAppellantAboutToSubmitHandlerTest {
@@ -108,7 +109,8 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertNull(response.getData().getDwpUcb());
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()));
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()),
+                eq(CancellationReason.PARTY_UNABLE_TO_ATTEND));
         verifyNoMoreInteractions(hearingMessageHelper);
     }
 
