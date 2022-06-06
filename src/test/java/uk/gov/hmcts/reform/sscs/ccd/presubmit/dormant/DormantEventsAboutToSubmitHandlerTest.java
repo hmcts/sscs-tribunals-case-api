@@ -94,8 +94,7 @@ public class DormantEventsAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(listAssistHearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()),
-                eq(CancellationReason.LAPSED));
+        verify(listAssistHearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.LAPSED));
     }
 
     @Test

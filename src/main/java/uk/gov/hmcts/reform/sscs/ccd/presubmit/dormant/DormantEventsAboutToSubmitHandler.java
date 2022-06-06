@@ -1,6 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dormant;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADMIN_SEND_TO_DORMANT_APPEAL_STATE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIRM_LAPSED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.LAPSED_REVISED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.WITHDRAWN;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIRM_LAPSED;
 
@@ -17,6 +21,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+
+import java.util.List;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
@@ -25,10 +31,10 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Slf4j
 public class DormantEventsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final ListAssistHearingMessageHelper hearingMessageHelper;
-    private boolean isScheduleListingEnabled;
     private final List<EventType> hearingsCancelEvents = List.of(CONFIRM_LAPSED, ADMIN_SEND_TO_DORMANT_APPEAL_STATE,
             LAPSED_REVISED, WITHDRAWN);
+    protected final ListAssistHearingMessageHelper hearingMessageHelper;
+    protected boolean isScheduleListingEnabled;
 
     public DormantEventsAboutToSubmitHandler(
             ListAssistHearingMessageHelper hearingMessageHelper,
@@ -103,10 +109,6 @@ public class DormantEventsAboutToSubmitHandler implements PreSubmitCallbackHandl
             && isScheduleListingEnabled;
 
     private boolean isValidCaseEventForCancellation(EventType event) {
-        return List.of(
-                CONFIRM_LAPSED,
-                ADMIN_SEND_TO_DORMANT_APPEAL_STATE,
-                LAPSED_REVISED,
-                WITHDRAWN).contains(event);
+        return hearingsCancelEvents.contains(event);
     }
 }
