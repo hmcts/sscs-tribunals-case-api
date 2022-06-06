@@ -1,8 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dormant;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADMIN_APPEAL_WITHDRAWN;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADMIN_SEND_TO_DORMANT_APPEAL_STATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIRM_LAPSED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DORMANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.HMCTS_LAPSE_CASE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FINAL_DECISION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.LAPSED_REVISED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.WITHDRAWN;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -25,6 +31,8 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Slf4j
 public class DormantEventsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    private final List<EventType> hearingsCancelEvents = List.of(CONFIRM_LAPSED, ADMIN_SEND_TO_DORMANT_APPEAL_STATE,
+            LAPSED_REVISED, WITHDRAWN);
     protected final ListAssistHearingMessageHelper hearingMessageHelper;
     protected boolean isScheduleListingEnabled;
 
@@ -101,11 +109,6 @@ public class DormantEventsAboutToSubmitHandler implements PreSubmitCallbackHandl
             && isScheduleListingEnabled;
 
     private boolean isValidCaseEventForCancellation(EventType event) {
-        return List.of(
-                CONFIRM_LAPSED,
-                HMCTS_LAPSE_CASE,
-                ADMIN_SEND_TO_DORMANT_APPEAL_STATE,
-                LAPSED_REVISED,
-                WITHDRAWN).contains(event);
+        return hearingsCancelEvents.contains(event);
     }
 }
