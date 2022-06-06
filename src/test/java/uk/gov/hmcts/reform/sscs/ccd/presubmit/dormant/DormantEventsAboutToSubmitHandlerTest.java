@@ -77,7 +77,7 @@ public class DormantEventsAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"CONFIRM_LAPSED", "HMCTS_LAPSE_CASE", "ADMIN_SEND_TO_DORMANT_APPEAL_STATE", "LAPSED_REVISED"})
+    @Parameters({"CONFIRM_LAPSED", "ADMIN_SEND_TO_DORMANT_APPEAL_STATE", "LAPSED_REVISED"})
     public void sendCancellationReasonAsOther_withEligibleCases_whenSchedulingListingEnabled(EventType eventType) {
         handler = new DormantEventsAboutToSubmitHandler(listAssistHearingMessageHelper, true);
 
@@ -94,7 +94,8 @@ public class DormantEventsAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(listAssistHearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.LAPSED));
+        verify(listAssistHearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()),
+                eq(CancellationReason.LAPSED));
     }
 
     @Test

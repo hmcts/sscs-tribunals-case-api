@@ -27,6 +27,8 @@ public class DormantEventsAboutToSubmitHandler implements PreSubmitCallbackHandl
 
     private final ListAssistHearingMessageHelper hearingMessageHelper;
     private boolean isScheduleListingEnabled;
+    private final List<EventType> hearingsCancelEvents = List.of(CONFIRM_LAPSED, ADMIN_SEND_TO_DORMANT_APPEAL_STATE,
+            LAPSED_REVISED, WITHDRAWN);
 
     public DormantEventsAboutToSubmitHandler(
             ListAssistHearingMessageHelper hearingMessageHelper,
@@ -103,7 +105,6 @@ public class DormantEventsAboutToSubmitHandler implements PreSubmitCallbackHandl
     private boolean isValidCaseEventForCancellation(EventType event) {
         return List.of(
                 CONFIRM_LAPSED,
-                HMCTS_LAPSE_CASE,
                 ADMIN_SEND_TO_DORMANT_APPEAL_STATE,
                 LAPSED_REVISED,
                 WITHDRAWN).contains(event);
