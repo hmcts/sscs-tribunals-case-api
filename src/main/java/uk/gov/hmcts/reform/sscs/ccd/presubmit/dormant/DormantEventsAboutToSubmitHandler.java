@@ -1,12 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dormant;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADMIN_APPEAL_WITHDRAWN;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADMIN_SEND_TO_DORMANT_APPEAL_STATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIRM_LAPSED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DORMANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.HMCTS_LAPSE_CASE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FINAL_DECISION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.LAPSED_REVISED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.WITHDRAWN;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIRM_LAPSED;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -21,8 +23,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-
-import java.util.List;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
