@@ -77,7 +77,7 @@ public class DormantEventsAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"CONFIRM_LAPSED", "HMCTS_LAPSE_CASE", "ADMIN_SEND_TO_DORMANT_APPEAL_STATE", "LAPSED_REVISED"})
+    @Parameters({"CONFIRM_LAPSED", "ADMIN_SEND_TO_DORMANT_APPEAL_STATE", "LAPSED_REVISED"})
     public void sendCancellationReasonAsOther_withEligibleCases_whenSchedulingListingEnabled(EventType eventType) {
         handler = new DormantEventsAboutToSubmitHandler(listAssistHearingMessageHelper, true);
 
