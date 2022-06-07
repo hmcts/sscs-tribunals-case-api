@@ -63,6 +63,8 @@ public class PostponementRequestAboutToStartHandlerTest {
                 .hearings(hearings)
                 .build();
 
+        sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().hearingRoute(HearingRoute.LIST_ASSIST).build());
+
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getEvent()).thenReturn(EventType.POSTPONEMENT_REQUEST);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -125,5 +127,17 @@ public class PostponementRequestAboutToStartHandlerTest {
         assertThat(response.getData().getPostponementRequest().getPostponementRequestHearingDateAndTime(), is(hearing.getValue().getHearingDateTime().toString()));
     }
 
+    @Test
+    public void givenAPostponementRequestfromGaps_returnAnError() {
+        sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().hearingRoute(HearingRoute.GAPS).build());
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().size(), is(1));
+    }
 
+    @Test
+    public void givenAPostponementRequestfromListAssist_shouldNotReturnAnError() {
+        sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().hearingRoute(HearingRoute.LIST_ASSIST).build());
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().size(), is(0));
+    }
 }

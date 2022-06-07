@@ -5,11 +5,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DecisionType.STRIKE_OUT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.STRUCK_OUT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -34,8 +36,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
@@ -44,6 +48,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDecisionDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
@@ -73,6 +79,9 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetailsBefore;
 
+    @Mock
+    private ListAssistHearingMessageHelper hearingMessageHelper;
+
     private SscsCaseData sscsCaseData;
 
     private SscsDocument expectedDocument;
@@ -81,7 +90,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        handler = new DecisionIssuedAboutToSubmitHandler(footerService);
+        handler = new DecisionIssuedAboutToSubmitHandler(footerService, hearingMessageHelper, false);
         when(callback.getEvent()).thenReturn(EventType.DECISION_ISSUED);
 
         SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("myTest.doc").build()).build();
@@ -107,7 +116,11 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
                                 .name(Name.builder().build())
                                 .identity(Identity.builder().build())
                                 .build())
-                        .build()).build();
+                        .build())
+                .schedulingAndListingFields(SchedulingAndListingFields.builder()
+                        .hearingRoute(HearingRoute.LIST_ASSIST)
+                        .build())
+                .build();
 
         expectedDocument = SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
@@ -120,7 +133,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(caseDetailsBefore.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
+        when(caseDetailsBefore.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE).thenReturn(HEARING);
     }
 
     @Test
@@ -161,11 +174,15 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         assertEquals(String.format(assertionMsg, currentDwpState, expectedDwpState), expectedDwpState, currentDwpState);
         assertEquals(expectedInterlocReviewState, response.getData().getInterlocReviewState());
         assertNull(response.getData().getDirectionDueDate());
+        verifyNoInteractions(hearingMessageHelper);
     }
 
     @Test
     public void willCopyThePreviewFileToTheInterlocDecisionDocumentAndAddFooter() {
+        handler = new DecisionIssuedAboutToSubmitHandler(footerService, hearingMessageHelper, true);
+
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
         assertNull(response.getData().getPreviewDocument());
         assertNull(response.getData().getSignedBy());
         assertNull(response.getData().getSignedRole());
@@ -174,6 +191,9 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()),
                 any(), eq(DocumentType.DECISION_NOTICE), any(), any(), eq(null), eq(null));
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()),
+                eq(CancellationReason.STRUCK_OUT));
+        verifyNoMoreInteractions(hearingMessageHelper);
     }
 
     @Test
@@ -237,11 +257,12 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()),
                 any(), eq(DocumentType.DECISION_NOTICE), any(), any(), eq(null), eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));
+        verifyNoInteractions(hearingMessageHelper);
     }
 
     @Test
     public void givenDecisionIssuedWelshAndCaseIsWelsh_SetDwpStateAndOutcomeToStruckOut() {
-
+        handler = new DecisionIssuedAboutToSubmitHandler(footerService, hearingMessageHelper, true);
         expectedWelshDocument = SscsWelshDocument.builder()
                 .value(SscsWelshDocumentDetails.builder()
                         .documentFileName("welshDecisionDocFilename")
@@ -265,6 +286,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         assertEquals(response.getData().getState(), (State.DORMANT_APPEAL_STATE));
 
         verifyNoInteractions(footerService);
+        verifyNoInteractions(hearingMessageHelper);
     }
 
     @Test

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.withdrawnappeals;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.WITHDRAWAL_REQUEST;
 
 import java.io.IOException;
@@ -9,18 +10,30 @@ import java.time.LocalDate;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 
 @RunWith(JUnitParamsRunner.class)
 public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
+
+    @Rule
+    public MockitoRule rule = MockitoJUnit.rule();
+
+    @Mock
+    private ListAssistHearingMessageHelper hearingMessageHelper;
+
     private static final String USER_AUTHORISATION = "Bearer token";
     public static final String ADMIN_APPEAL_WITHDRAWN_CALLBACK_JSON = "adminAppealWithdrawnCallback.json";
-    private final AdminAppealWithdrawnHandler handler = new AdminAppealWithdrawnHandler();
+    private final AdminAppealWithdrawnHandler handler = new AdminAppealWithdrawnHandler(hearingMessageHelper, false);
 
     @Test
     @Parameters({
@@ -49,6 +62,7 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
         assertEquals("withdrawalReceived", actualResult.getData().getDwpState());
         assertEquals(1, actualResult.getData().getSscsDocument().size());
         assertThatJson(actualResult.getData()).isEqualTo(expectedCaseData);
+        verifyNoInteractions(hearingMessageHelper);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -62,6 +76,7 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
         handler.handle(callbackType, buildTestCallbackGivenEvent(eventType, ADMIN_APPEAL_WITHDRAWN_CALLBACK_JSON), USER_AUTHORISATION);
     }
 
+    // TODO verify interaction of hearingmessagehelper - satisfy condition
     @Test
     public void movesWithdrawalDocumentToSscsDocumentsCollection() throws IOException {
         PreSubmitCallbackResponse<SscsCaseData> actualResult = handler.handle(
