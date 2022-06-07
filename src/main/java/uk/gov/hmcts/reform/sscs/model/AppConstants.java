@@ -35,6 +35,7 @@ public class AppConstants {
     public static final String DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX = "FTA evidence received";
     public static final String DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX = "FTA edited response received";
     public static final String DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX = "FTA edited evidence received";
+    public static final String DATE_FORMAT_YYYYMMDD = "yyyy-MM-dd";
 
     private AppConstants(){
         //
