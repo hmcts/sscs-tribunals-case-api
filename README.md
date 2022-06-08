@@ -4,13 +4,6 @@
 Tribunals case api is a spring boot based application to create new appeals for the SSCS Appellants
 
 
-
-
-
-
-
-
-
 ### Prerequisites
 
 For versions and complete list of dependencies see build.gradle
