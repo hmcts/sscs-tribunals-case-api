@@ -44,7 +44,7 @@ dependencies:
     repository: '@hmctspublic'
     condition: sscs-tribunals-frontend.enabled
   - name: redis
-    version: 15.7.6
+    version: 16.11.3
     repository: "https://charts.bitnami.com/bitnami"
     condition: redis.enabled
   - name: em-ccdorc
