@@ -3,6 +3,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -71,6 +74,10 @@ public class ValidSendToInterlocMidEventHandlerTest {
                         .postponementPreviewDocument(null)
                         .postponementRequestHearingDateAndTime(LocalDateTime.now().plusDays(1).toString())
                         .build())
+                .regionalProcessingCenter(RegionalProcessingCenter.builder()
+                        .name("Bradford")
+                        .hearingRoute(HearingRoute.GAPS)
+                        .build())
                 .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -118,6 +125,10 @@ public class ValidSendToInterlocMidEventHandlerTest {
         String dmUrl = "http://dm-store/documents/123";
         when(callback.getEvent()).thenReturn(eventType);
         when(generateFile.assemble(any())).thenReturn(dmUrl);
+        sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder()
+                .name("Bradford")
+                .hearingRoute(HearingRoute.LIST_ASSIST)
+                .build());
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -142,5 +153,33 @@ public class ValidSendToInterlocMidEventHandlerTest {
 
         assertEquals(0, response.getErrors().size());
         verifyNoInteractions(generateFile);
+    }
+
+    @Test
+    public void givenGapsPostponementRequestReviewedByTwc_thenThroughError() {
+        when(caseDetails.getState()).thenReturn(State.HEARING);
+
+        sscsCaseData.setSelectWhoReviewsCase(new DynamicList(new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()), null));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors(), is(not(empty())));
+        assertThat(response.getErrors().iterator().next(), is(ValidSendToInterlocMidEventHandler.POSTPONEMENTS_NOT_POSSIBLE_GAPS));
+    }
+
+    @Test
+    public void givenListAssitPostponementRequestReviewedByTwc_thenNoError() {
+        when(caseDetails.getState()).thenReturn(State.HEARING);
+
+        sscsCaseData.setSelectWhoReviewsCase(new DynamicList(new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()), null));
+
+        sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder()
+                .name("Bradford")
+                .hearingRoute(HearingRoute.LIST_ASSIST)
+                .build());
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors(), is(empty()));
     }
 }
