@@ -140,4 +140,5 @@ public class PostponementRequestAboutToStartHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(0));
     }
+
 }
