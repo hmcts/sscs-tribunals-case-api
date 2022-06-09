@@ -79,8 +79,10 @@ public class DormantEventsAboutToSubmitHandler implements PreSubmitCallbackHandl
 
             CancellationReason cancellationReason = null;
             switch (callback.getEvent()) {
-                case CONFIRM_LAPSED:
                 case ADMIN_SEND_TO_DORMANT_APPEAL_STATE:
+                    cancellationReason = CancellationReason.OTHER;
+                    break;
+                case CONFIRM_LAPSED:
                 case LAPSED_REVISED:
                     cancellationReason = CancellationReason.LAPSED;
                     break;
