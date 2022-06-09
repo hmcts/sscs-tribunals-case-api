@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.WITHDRAWN;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
 
@@ -77,8 +76,10 @@ public class DormantEventsAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"CONFIRM_LAPSED", "ADMIN_SEND_TO_DORMANT_APPEAL_STATE", "LAPSED_REVISED"})
-    public void sendCancellationReasonAsOther_withEligibleCases_whenSchedulingListingEnabled(EventType eventType) {
+    @Parameters({"CONFIRM_LAPSED, LAPSED", "ADMIN_SEND_TO_DORMANT_APPEAL_STATE, OTHER", "LAPSED_REVISED, LAPSED",
+    "WITHDRAWN, WITHDRAWN"})
+    public void sendCancellationReasonAsOther_withEligibleCases_whenSchedulingListingEnabled(EventType eventType,
+        CancellationReason cancellationReason) {
         handler = new DormantEventsAboutToSubmitHandler(listAssistHearingMessageHelper, true);
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
@@ -94,26 +95,8 @@ public class DormantEventsAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(listAssistHearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.LAPSED));
-    }
-
-    @Test
-    public void sendCancellationReasonAsWithdrawn_withEligibleCases_whenSchedulingListingEnabled() {
-        handler = new DormantEventsAboutToSubmitHandler(listAssistHearingMessageHelper, true);
-
-        sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
-                .state(HEARING)
-                .schedulingAndListingFields(SchedulingAndListingFields.builder()
-                        .hearingRoute(HearingRoute.LIST_ASSIST)
-                        .build())
-                .build();
-        when(callback.getEvent()).thenReturn(WITHDRAWN);
-        when(caseDetails.getState()).thenReturn(HEARING);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        verify(listAssistHearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.WITHDRAWN));
+        verify(listAssistHearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()),
+            eq(cancellationReason));
     }
 
     @Test(expected = IllegalStateException.class)
