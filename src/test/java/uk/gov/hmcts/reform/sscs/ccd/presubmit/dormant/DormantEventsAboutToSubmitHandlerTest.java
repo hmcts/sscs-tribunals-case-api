@@ -77,7 +77,7 @@ public class DormantEventsAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"CONFIRM_LAPSED, LAPSED", "ADMIN_SEND_TO_DORMANT_APPEAL_STATE, OTHER", "LAPSED_REVISED, LAPSED",
-    "WITHDRAWN, WITHDRAWN"})
+        "WITHDRAWN, WITHDRAWN"})
     public void sendCancellationReasonAsOther_withEligibleCases_whenSchedulingListingEnabled(EventType eventType,
         CancellationReason cancellationReason) {
         handler = new DormantEventsAboutToSubmitHandler(listAssistHearingMessageHelper, true);
