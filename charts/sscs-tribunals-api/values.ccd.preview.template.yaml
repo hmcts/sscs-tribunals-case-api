@@ -71,8 +71,8 @@ hmc-cft-hearing-service:
       CFT_HEARING_SERVICE_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
       CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified"
       CFT_HEARING_SERVICE_DB_PORT: 5432
-    # postgresql:
-    #   enabled: true
+    postgresql:
+      enabled: true
     secrets:
       HMC_SERVICE_BUS_CONNECTION_STRING:
         secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
@@ -183,8 +183,8 @@ ccd:
       enabled: true
     apiGatewayWeb:
       enabled: true
-    postgresql:
-      enabled: true
+    # postgresql:
+    #   enabled: true
     s2s:
       enabled: false
     elastic:
