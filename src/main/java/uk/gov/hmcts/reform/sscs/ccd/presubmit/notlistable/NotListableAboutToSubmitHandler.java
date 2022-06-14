@@ -66,9 +66,10 @@ public class NotListableAboutToSubmitHandler implements PreSubmitCallbackHandler
         sscsCaseData.setNotListableDueDate(null);
     }
 
-    private final Predicate<Callback<SscsCaseData>> eligibleForHearingsCancel = callback ->
-            SscsUtil.isValidCaseState(callback.getCaseDetailsBefore().map(CaseDetails::getState)
-                    .orElse(State.UNKNOWN), List.of(State.HEARING, State.READY_TO_LIST))
-                    && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData())
-                    && isScheduleListingEnabled;
+    private final Predicate<Callback<SscsCaseData>> eligibleForHearingsCancel = callback -> isScheduleListingEnabled
+            && SscsUtil.isValidCaseState(
+                    callback.getCaseDetailsBefore()
+                            .map(CaseDetails::getState)
+                            .orElse(State.UNKNOWN), List.of(State.HEARING, State.READY_TO_LIST))
+            && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData());
 }

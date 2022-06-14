@@ -112,10 +112,7 @@ public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHa
 
     private void cancelHearing(Callback<SscsCaseData> callback) {
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        log.info("Death of appellant: Cancel hearing conditions ({}) ({}) ({}) for case ({})",
-                isScheduleListingEnabled, callback.getCaseDetailsBefore().map(CaseDetails::getState)
-                        .orElse(null), sscsCaseData.getSchedulingAndListingFields()
-                        .getHearingRoute(), sscsCaseData.getCcdCaseId());
+
         if (eligibleForHearingsCancel.test(callback)) {
             log.info("Death of appellant: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());

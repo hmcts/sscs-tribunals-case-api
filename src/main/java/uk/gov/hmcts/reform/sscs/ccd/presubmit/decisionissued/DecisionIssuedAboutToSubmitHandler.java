@@ -113,9 +113,7 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
 
     private void cancelHearing(Callback<SscsCaseData> callback) {
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        log.info("Issue interlocutory decision: Cancel hearing conditions ({}) ({}) ({}) for case ({})",
-                isScheduleListingEnabled, callback.getCaseDetailsBefore().map(CaseDetails::getState).orElse(null),
-                sscsCaseData.getSchedulingAndListingFields().getHearingRoute(), sscsCaseData.getCcdCaseId());
+
         if (eligibleForHearingsCancel.test(callback)) {
             log.info("Issue interlocutory decision: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());

@@ -45,19 +45,17 @@ public class StruckOutAboutToSubmitHandler extends DormantEventsAboutToSubmitHan
         super.handle(callbackType, callback, userAuthorisation);
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-
         log.info(String.format("Handling struckOut event for caseId %s", sscsCaseData.getCcdCaseId()));
 
         sscsCaseData.setDwpState(DwpState.STRIKE_OUT_ACTIONED.getId());
         cancelHearing(callback);
+
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
     private void cancelHearing(Callback<SscsCaseData> callback) {
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        log.info("Strike out case: Cancel hearing conditions ({}) ({}) ({}) for case ({})", isScheduleListingEnabled,
-                callback.getCaseDetailsBefore().map(CaseDetails::getState).orElse(null),
-                sscsCaseData.getSchedulingAndListingFields().getHearingRoute(), sscsCaseData.getCcdCaseId());
+
         if (eligibleForHearingsCancel.test(callback)) {
             log.info("Strike out case: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());
