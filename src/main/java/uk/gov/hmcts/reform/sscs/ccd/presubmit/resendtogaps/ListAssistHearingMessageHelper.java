@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.CANCEL_HEARING;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
+import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.servicebus.HearingMessagingServiceFactory;
 
 @Service
@@ -14,11 +15,12 @@ public class ListAssistHearingMessageHelper {
 
     private final HearingMessagingServiceFactory hearingMessagingServiceFactory;
 
-    public void sendListAssistCancelHearingMessage(final String ccdCaseId) {
+    public void sendListAssistCancelHearingMessage(final String ccdCaseId, CancellationReason cancellationReason) {
         sendListAssistHearingMessage(
             HearingRequest.builder(ccdCaseId)
                 .hearingRoute(LIST_ASSIST)
                 .hearingState(CANCEL_HEARING)
+                .cancellationReason(cancellationReason)
                 .build()
         );
     }
