@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
+import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.servicebus.HearingMessagingServiceFactory;
 import uk.gov.hmcts.reform.sscs.service.servicebus.SessionAwareServiceBusMessagingService;
 
@@ -36,7 +39,7 @@ public class ListAssistHearingMessageHelperTest {
     public void shouldSendExpectedCancellationMessage() {
         when(hearingMessagingServiceFactory.getMessagingService(LIST_ASSIST)).thenReturn(sessionAwareServiceBusMessagingService);
 
-        messageHelper.sendListAssistCancelHearingMessage("1234");
+        messageHelper.sendListAssistCancelHearingMessage("1234", CancellationReason.OTHER);
 
         verify(sessionAwareServiceBusMessagingService).sendMessage(hearingRequestCaptor.capture());
 
@@ -44,6 +47,7 @@ public class ListAssistHearingMessageHelperTest {
         assertEquals("1234", actualRequest.getCcdCaseId());
         assertEquals(LIST_ASSIST, actualRequest.getHearingRoute());
         assertEquals(CANCEL_HEARING, actualRequest.getHearingState());
+        assertThat(actualRequest.getCancellationReason(), is(CancellationReason.OTHER));
     }
 
 }
