@@ -129,11 +129,34 @@
         <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.dataformat/jackson-dataformat-cbor@.*$</packageUrl>
         <cve>CVE-2020-28491</cve>
     </suppress>
-    <suppress>
+    <suppress until ="2022-08-01">
         <notes><![CDATA[
     file name: tika-core-2.2.1.jar
     ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.apache\.tika/tika-core@.*$</packageUrl>
         <cve>CVE-2022-30126</cve>
+        <cve>CVE-2022-25169</cve>
+    </suppress>
+    <suppress until ="2022-08-01">
+        <notes><![CDATA[
+    file name: spring-security-crypto-5.4.7.jar
+    ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org.springframework\.security/spring-security-crypto@.*$</packageUrl>
+        <cve>CVE-2020-5408</cve>
+        <cve>CVE-2022-22976</cve>
+    </suppress>
+    <suppress until ="2022-08-01">
+        <notes><![CDATA[
+    file name: spring-security-web-5.4.7.jar
+    ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org.springframework\.security/spring-security-web@.*$</packageUrl>
+        <cve>CVE-2022-22978</cve>
+    </suppress>
+    <suppress until ="2022-08-01">
+        <notes><![CDATA[
+    file name: spring-web-5.2.22.RELEASE.jar
+    ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org.springframework/spring-web@.*$</packageUrl>
+        <cve>CVE-2016-1000027</cve>
     </suppress>
 </suppressions>
