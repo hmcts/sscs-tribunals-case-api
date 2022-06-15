@@ -223,6 +223,7 @@ def versions = [
         sonarPitest     : '0.5',
         springfoxSwagger: '2.8.0',
         sscsCommon      : '4.9.6-RC-SSCS-9874',
+]
 
 ext["rest-assured.version"] = '4.2.0'
 ext['spring-security.version']='5.3.8.RELEASE'
