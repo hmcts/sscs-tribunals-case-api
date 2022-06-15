@@ -14,3 +14,432 @@ java:
     CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
     WORK_ALLOCATION_FEATURE: true
     CASE_ACCESS_MANAGEMENT_FEATURE: true
+
+
+sscs-hearings-api:
+  enabled: true
+  java:
+    image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
+    ingressHost: sscs-hearings-api-${SERVICE_FQDN}
+    releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
+    environment:
+      ROOT_LOGGING_LEVEL: INFO
+      LOG_OUTPUT: single
+      CREATE_CCD_ENDPOINT: false
+      IDAM_S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+      CASEWORKER_REF_API_URL: "http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal"
+      IDAM_API_URL: "https://idam-api.aat.platform.hmcts.net"
+      CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-${SERVICE_FQDN}"
+      COMMON_REF_API_URL: "http://rd-commondata-api-aat.service.core-compute-aat.internal"
+      JUDICIAL_REF_API_URL: "http://judicial-ref-api-aat.service.core-compute-aat.internal"
+      EXUI_API_URL: "https://xui-${SERVICE_FQDN}"
+      HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+      #Messaging
+      ##Enable for inbound
+      HMC_HEARING_LISTENING_ENABLED: false
+      HEARINGS_TOPIC_NAME: "hmc-to-cft"
+      HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription"
+      ##Enable for outbound
+      TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
+      TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
+
+hmc-cft-hearing-service:
+  enabled: true
+  java:
+    releaseNameOverride: ${SERVICE_NAME}-hmc-cft-hearing-service
+    image: "hmctspublic.azurecr.io/hmc/cft-hearing-service:latest"
+    ingressHost: hmc-cft-hearing-service-${SERVICE_FQDN}
+    environment:
+      HMC_SERVICE_BUS_TOPIC: "hmc-to-cft"
+      HMC_SERVICE_BUS_SUBSCRIPTION: "hmc-to-sscs-subscription"
+      HMC_SERVICE_BUS_QUEUE: hmc-from-hmi
+      HMC_OUTBOUND_SERVICE_BUS_QUEUE: hmc-to-hmi
+      CFT_HEARING_SERVICE_DB_HOST: "{{ .Release.Name }}-postgresql"
+      CFT_HEARING_SERVICE_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
+      CFT_HEARING_SERVICE_DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
+      CFT_HEARING_SERVICE_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
+      CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified"
+      CFT_HEARING_SERVICE_DB_PORT: 5432
+    postgresql:
+      enabled: true
+    secrets:
+      HMC_SERVICE_BUS_CONNECTION_STRING:
+        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
+        key: connectionString
+      HMC_QUEUE_CONNECTION_STRING:
+        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-hmc-from-hmi
+        key: connectionString
+      HMC_OUTBOUND_QUEUE_CONNECTION_STRING:
+        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-hmc-to-hmi
+        key: connectionString
+    keyVaults:
+      hmc:
+        resourceGroup: hmc-shared
+        secrets:
+          - name: AppInsightsInstrumentationKey
+
+servicebus:
+  enabled: true
+  teamName: sscs
+  resourceGroup: sscs-aks
+  serviceplan: standard
+  setup:
+    topics:
+      - name: hmc-to-cft
+    subscriptions:
+      - name: hmc-to-sscs-subscription
+    queues:
+      - name: hmc-from-hmi
+      - name: hmc-to-hmi
+      - name: tribunals-to-hearing-api
+
+idam-pr:
+  releaseNameOverride: ${SERVICE_NAME}-idam-pr
+  enabled: true
+  redirect_uris:
+    XUI:
+      - http://xui-${SERVICE_FQDN}/oauth2/callback
+    CCD-ADMIN:
+      - http://ccd-admin-web-${SERVICE_FQDN}/oauth2redirect
+    CCD-DATASTORE-API:
+      - http://ccd-data-store-api-${SERVICE_FQDN}/oauth2redirect
+
+em-ccdorc:
+  enabled: true
+  java:
+    image: hmctspublic.azurecr.io/em/ccdorc:latest
+    ingressHost: em-ccdorc-${SERVICE_FQDN}
+    releaseNameOverride: ${SERVICE_NAME}-em-ccdorc
+    environment:
+      IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
+      OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
+      S2S_BASE_URI: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      EM_STITCHING_API_URL: http://em-stitching-aat.service.core-compute-aat.internal
+      DM_STORE_APP_URL: http://dm-store-aat.service.core-compute-aat.internal
+      CCD_DATA_API_URL: http://ccd-data-store-api-${SERVICE_FQDN}
+      CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
+
+xui-webapp:
+  enabled: true
+  nodejs:
+    imagePullPolicy: Always
+    releaseNameOverride: ${SERVICE_NAME}-xui-webapp
+    image: hmctspublic.azurecr.io/xui/webapp:latest
+    ingressHost: xui-${SERVICE_FQDN}
+    memoryLimits: 1836Mi
+    cpuLimits: 1900m
+    environment:
+      HEALTH_CCD_COMPONENT_API: http://gateway-${SERVICE_FQDN}/health
+      HEALTH_CCD_DATA_API: http://ccd-data-store-api-${SERVICE_FQDN}/health
+      HEALTH_TERMS_AND_CONDITIONS_API: http://xui-terms-and-conditions-${SERVICE_FQDN}/health
+      SERVICES_EM_ANNO_API: http://gateway-${SERVICE_FQDN}
+      SERVICES_CCD_COMPONENT_API: http://gateway-${SERVICE_FQDN}
+      SERVICES_CCD_DATA_STORE_API: http://ccd-data-store-api-${SERVICE_FQDN}
+      SERVICES_CCD_CASE_ASSIGNMENT_API: http://aac-${SERVICE_FQDN}
+      SERVICES_TERMS_AND_CONDITIONS: http://xui-terms-and-conditions-${SERVICE_FQDN}
+      SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+      SERVICES_S2S: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      JURISDICTIONS: SSCS
+      LAUNCH_DARKLY_CLIENT_ID: 5de6610b23ce5408280f2268
+      FEATURE_REDIS_ENABLED: false
+      FEATURE_APP_INSIGHTS_ENABLED: false
+      FEATURE_SECURE_COOKIE_ENABLED: false
+      FEATURE_PROXY_ENABLED: false
+      FEATURE_TERMS_AND_CONDITIONS_ENABLED: false
+      FEATURE_HELMET_ENABLED: false
+      FEATURE_OIDC_ENABLED: false
+      NOW: false
+      REDISCLOUD_URL: http://dummyrediscloudurl
+      UV_THREADPOOL_SIZE: 128
+      PROTOCOL: http
+    keyVaults:
+      rpx:
+        resourceGroup: rpx
+        secrets:
+          - mc-s2s-client-secret
+          - mc-idam-client-secret
+          - system-user-name
+          - system-user-password
+
+ccd:
+  enabled: true
+  ccd:
+    adminWeb:
+      enabled: true
+    definitionImporter:
+      enabled: true
+    userProfileImporter:
+      enabled: true
+    apiGatewayWeb:
+      enabled: true
+    postgresql:
+      enabled: true
+    s2s:
+      enabled: false
+    elastic:
+      enabled: false
+
+  ingressHost: ${SERVICE_FQDN}
+
+  global:
+    ccdApiGatewayIngress: gateway-${SERVICE_FQDN}
+    ccdAdminWebIngress: ccd-admin-web-${SERVICE_FQDN}
+    ccdDataStoreUrl: http://ccd-data-store-api-${SERVICE_FQDN}
+    ccdDefinitionStoreUrl: http://ccd-definition-store-${SERVICE_FQDN}
+    ccdUserProfileUrl: http://ccd-user-profile-api-${SERVICE_FQDN}
+    dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
+    idamApiUrl: https://idam-api.aat.platform.hmcts.net
+    idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
+    s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+    enableKeyVaults: true
+    devMode: true
+
+  ccd-admin-web:
+    nodejs:
+      image: hmctspublic.azurecr.io/ccd/admin-web:latest
+      ingressHost: ccd-admin-web-${SERVICE_FQDN}
+      keyVaults: []
+      environment:
+        IDAM_OAUTH2_AW_CLIENT_SECRET: ${ADMIN_WEB_IDAM_SECRET}
+        IDAM_BASE_URL: https://idam-api.aat.platform.hmcts.net
+        IDAM_OAUTH2_TOKEN_ENDPOINT: https://idam-web-public.aat.platform.hmcts.net/oauth2/token'
+        IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+    idam-pr:
+      releaseNameOverride: ${SERVICE_NAME}-ccd-admin-idam-pr
+      enabled: true
+
+  ccd-user-profile-api:
+    java:
+      image: hmctspublic.azurecr.io/ccd/user-profile-api:latest
+      imagePullPolicy: Always
+      enviroment:
+        USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
+        USER_PROFILE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_definition,ccd_admin,sscs
+      keyVaults: [ ]
+      ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
+
+  ccd-definition-store-api:
+    java:
+      image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
+      imagePullPolicy: Always
+      environment:
+        DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
+        DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
+        IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
+        DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,sscs,sscs_bulkscan,em_ccd_orchestrator,ccd_case_document_am_api
+        OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/hmcts
+        ELASTIC_SEARCH_ENABLED: true
+        ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
+        ELASTIC_SEARCH_FAIL_ON_IMPORT: false
+      keyVaults: [ ]
+      ingressHost: ccd-definition-store-${SERVICE_FQDN}
+
+  ccd-data-store-api:
+    java:
+      image: hmctspublic.azurecr.io/ccd/data-store-api:latest
+      imagePullPolicy: Always
+      memoryRequests: '1524Mi'
+      cpuRequests: '900m'
+      environment:
+        DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
+        DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
+        DEFINITION_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,sscs,sscs_bulkscan,em_ccd_orchestrator
+        IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
+        IDAM_API_BASE_URL: https://idam-api.aat.platform.hmcts.net
+        IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
+        IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+        CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,sscs,sscs_bulkscan,em_ccd_orchestrator
+        ELASTIC_SEARCH_ENABLED: true
+        ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
+        ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
+        HTTP_CLIENT_READ_TIMEOUT: '120000'
+        HTTP_CLIENT_MAX_TOTAL: '300'
+        HTTP_CLIENT_MAX_CLIENT_PER_ROUTE: '30'
+        DATA_STORE_DB_MAX_POOL_SIZE: 80
+        CCD_DOCUMENT_URL_PATTERN: 'http://dm-store.*'
+        CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
+        DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
+        IDAM_DATA_STORE_SYSTEM_USER_USERNAME: ${IDAM_DATA_STORE_SYSTEM_USER_USERNAME}
+        IDAM_DATA_STORE_SYSTEM_USER_PASSWORD: ${IDAM_DATA_STORE_SYSTEM_USER_PASSWORD}
+        IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET: ${IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET}
+      keyVaults: [ ]
+      ingressHost: ccd-data-store-api-${SERVICE_FQDN}
+      autoscaling:
+        enabled: false
+
+  ccd-api-gateway-web:
+    nodejs:
+      imagePullPolicy: Always
+      environment:
+        ADDRESS_LOOKUP_TOKEN: ${ADDRESS_LOOKUP_TOKEN}
+        IDAM_SERVICE_KEY: ${CCD_API_GATEWAY_S2S_SECRET}
+        IDAM_OAUTH2_CLIENT_SECRET: ${CCD_API_GATEWAY_IDAM_CLIENT_SECRET}
+        PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
+      ingressHost: gateway-${SERVICE_FQDN}
+      ingressIP: ${INGRESS_IP}
+      keyVaults: []
+
+  ccd-user-profile-importer:
+    image: hmctspublic.azurecr.io/ccd/user-profile-importer:db2r9a
+    environment:
+      AUTH_PROVIDER_BASE_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      CCD_USER_PROFILE_URL: http://${SERVICE_NAME}-ccd-user-profile-api
+    users:
+      - system.update@hmcts.net|SSCS|Benefit|appealCreated
+      - sscs.superuser@mailinator.com|SSCS|Benefit|appealCreated
+      - sscs-citizen2@hmcts.net|SSCS|Benefit|appealCreated
+
+  ccd-definition-importer:
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.14.8-9872nonProd
+    definitionFilename: sscs-ccd.xlsx
+    redirectUri: https://ccd-admin-web-${SERVICE_FQDN}/oauth2redirect
+    environment:
+      CCD_ENVIRONMENT: 'PROD'
+      CCD_DEF_EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-em-ccd-orchestrator
+      CCD_DEF_SSCS_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-sscs-ccd-orchestrator
+      CCD_DEF_TRIBUNALS_API_URL: http://${SERVICE_NAME}-java
+      CCD_DEF_TYA_NOTIFICATIONS_API_URL: http://${SERVICE_NAME}-tya-notification
+      CCD_DEF_BULK_SCAN_API_URL: http://${SERVICE_NAME}-bulk-scan-api
+      CCD_DEF_BULK_SCAN_ORCHESTRATOR_URL: http://${SERVICE_NAME}-bulk-scan-orchestrator
+      CCD_DEF_COR_BACKEND_URL: http://${SERVICE_NAME}-ccd-definition-store
+      CCD_DEF_PIP_DECISION_NOTICE_QUESTIONS: ${PIP_DECISION_NOTICE_QUESTIONS}
+      CCD_DEF_ESA_DECISION_NOTICE_QUESTIONS: ${ESA_DECISION_NOTICE_QUESTIONS}
+      CCD_DEF_UC_DECISION_NOTICE_QUESTIONS: ${UC_DECISION_NOTICE_QUESTIONS}
+      CCD_DEF_LANGUAGES: ${CCD_DEF_LANGUAGES}
+      CCD_DEF_TYA_LINK: http://${SERVICE_NAME}-ccd-definition-store
+      CCD_DEF_TYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
+      CCD_DEF_MYA_LINK: http://${SERVICE_NAME}/sign-in?tya=
+      CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
+      CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
+      CCD_DEF_E: 'PREVIEW'
+    secrets: []
+    userRoles:
+      - citizen
+      - caseworker
+      - caseworker-sscs
+      - caseworker-sscs-systemupdate
+      - caseworker-sscs-anonymouscitizen
+      - caseworker-sscs-callagent
+      - caseworker-sscs-judge
+      - caseworker-sscs-clerk
+      - caseworker-sscs-dwpresponsewriter
+      - caseworker-sscs-registrar
+      - caseworker-sscs-superuser
+      - caseworker-sscs-teamleader
+      - caseworker-sscs-panelmember
+      - caseworker-sscs-bulkscan
+      - caseworker-sscs-pcqextractor
+
+elastic:
+  enabled: true
+
+elasticsearch:
+  clusterName: "es"
+  imageTag: "6.4.2"
+  replicas: 1
+  minimumMasterNodes: 1
+  antiAffinity: "soft"
+  esJavaOpts: "-Xmx512m -Xms512m"
+  persistence:
+    enabled: false
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: traefik
+    path: /
+    hosts:
+      - es-${SERVICE_FQDN}
+
+logstash:
+  image:
+    repository: hmctspublic.azurecr.io/ccd/logstash
+    tag: ccd-sscs-logstash-latest
+    pullPolicy: Always
+  logstashJavaOpts: -Xmx1g -Xms512M
+  persistence:
+    enabled: false
+  volumeMounts:
+    - name: pipeline
+      mountPath: /usr/share/logstash/files
+  elasticsearch:
+    host: ${SERVICE_NAME}-es-master
+    port: 9200
+  configTpl:
+    xpack.monitoring.enabled: "false"
+    db.url: jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?stringtype=unspecified&ssl=false
+    db.user: hmcts
+    db.pwd: hmcts
+    es.data.nodes.url: http://${SERVICE_NAME}-es-master:9200
+  livenessProbe:
+    initialDelaySeconds: 90
+
+sscs-evidence-share:
+  enabled: false
+  java:
+    image: hmctspublic.azurecr.io/sscs/evidence-share:latest
+    releaseNameOverride: ${SERVICE_NAME}-sscs-evidence-share
+    ingressHost: sscs-evidence-share-${SERVICE_FQDN}
+    environment:
+      SEND_LETTER_SERVICE_ENABLED: "true"
+      SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
+      IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+      DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
+      CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-${SERVICE_FQDN}"
+      SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
+      TOPIC_NAME: "sscs-evidenceshare-topic-aat"
+      AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
+      AMQP_USERNAME: "SendAndListenSharedAccessKey"
+      ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
+      ROBOTICS_EMAIL_TO: "fake"
+      ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
+      ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
+
+sscs-ccd-callback-orchestrator:
+  enabled: false
+  java:
+    image: hmctspublic.azurecr.io/sscs/ccd-callback-orchestrator:latest
+    releaseNameOverride: ${SERVICE_NAME}-sscs-ccd-callback-orchestrator
+    ingressHost: sscs-ccd-callback-orchestrator-${SERVICE_FQDN}
+    readinessDelay: 90
+    environment:
+      SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
+      TOPIC_NAME: "sscs-evidenceshare-topic-aat"
+      AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
+
+sscs-tribunals-frontend:
+  enabled: false
+  nodejs:
+    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
+    ingressHost: sya-${SERVICE_FQDN}
+    environment:
+      REDIS_URL: redis://${SERVICE_NAME}-redis-master
+      APPINSIGHTS_ROLE_NAME: ${SERVICE_NAME}
+      PCQ_URL: "https://pcq.aat.platform.hmcts.net"
+      FT_ANTENNA_WEBCHAT: false
+      FT_WELSH: true
+      PCQ_ENABLED: true
+      MULTIPLE_DRAFTS_ENABLED: true
+      TRIBUNALS_CASE_API_URL: http://${SERVICE_FQDN}
+      UPLOAD_EVIDENCE_URL: http://${SERVICE_FQDN}/evidence/upload
+      SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
+      SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+      UV_THREADPOOL_SIZE: 64
+    keyVaults:
+      sscs:
+        secrets:
+          - idam-sscs-oauth2-client-secret
+          - postcode-lookup-token
+          - AppInsightsInstrumentationKey
+          - pcq-token-key
+          - sscs-redis-access-key
+          - sscs-redis-connection-string
+
+redis:
+  enabled: false
+  cluster:
+    enabled: false
+    slaveCount: 0
+  usePassword: false
+  master:
+    persistence:
+      enabled: false
