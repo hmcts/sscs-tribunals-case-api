@@ -45,7 +45,7 @@ public class CaseUpdatedIt extends AbstractEventIt {
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().idamOauth2Token("Bearer Token:").serviceAuthorization("sscs").build());
         when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(SUPER_USER.getValue())).build());
-        when(refDataApi.courtVenueByName(eq("Bearer Token:"), eq("sscs"), anyString())).thenReturn(List.of(CourtVenue.builder().epimsId("1").regionId("2").venueName("Basildon CC").build()));
+        when(refDataApi.courtVenueByName(eq("Bearer Token:"), eq("sscs"), anyString())).thenReturn(List.of(CourtVenue.builder().regionId("2").venueName("Basildon CC").build()));
     }
 
     @Test
@@ -55,7 +55,7 @@ public class CaseUpdatedIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         assertEquals("Basildon CC", result.getData().getProcessingVenue());
-        assertEquals("1", result.getData().getCaseManagementLocation().getBaseLocation());
+        assertEquals("698118", result.getData().getCaseManagementLocation().getBaseLocation());
         assertEquals("2", result.getData().getCaseManagementLocation().getRegion());
     }
 
