@@ -7,9 +7,11 @@ import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -19,17 +21,24 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 @Slf4j
 public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final FooterService footerService;
+    private final ListAssistHearingMessageHelper hearingMessageHelper;
+    private boolean isScheduleListingEnabled;
 
-    @Autowired
-    public DecisionIssuedAboutToSubmitHandler(FooterService footerService) {
+    public DecisionIssuedAboutToSubmitHandler(FooterService footerService, ListAssistHearingMessageHelper
+            hearingMessageHelper, @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled) {
         this.footerService = footerService;
+        this.hearingMessageHelper = hearingMessageHelper;
+        this.isScheduleListingEnabled = isScheduleListingEnabled;
     }
 
     @Override
@@ -98,7 +107,24 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
         }
 
         log.info("Saved the new interloc decision document for case id: " + caseData.getCcdCaseId());
-
+        cancelHearing(callback);
         return sscsCaseDataPreSubmitCallbackResponse;
     }
+
+    private void cancelHearing(Callback<SscsCaseData> callback) {
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+
+        if (eligibleForHearingsCancel.test(callback)) {
+            log.info("Issue interlocutory decision: HearingRoute ListAssist Case ({}). Sending cancellation message",
+                    sscsCaseData.getCcdCaseId());
+            hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(),
+                    CancellationReason.STRUCK_OUT);
+        }
+    }
+
+    private final Predicate<Callback<SscsCaseData>> eligibleForHearingsCancel = callback -> isScheduleListingEnabled
+            && EventType.DECISION_ISSUED.equals(callback.getEvent())
+            && SscsUtil.isValidCaseState(callback.getCaseDetailsBefore().map(CaseDetails::getState)
+            .       orElse(State.UNKNOWN), List.of(State.HEARING, State.READY_TO_LIST))
+            && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData());
 }
