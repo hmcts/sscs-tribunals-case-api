@@ -232,5 +232,7 @@
         }
       }
     ]
-  }
+  },
+  "workBasketHearingDate": null,
+  "workBasketHearingEpimsId": null
 }

@@ -242,7 +242,9 @@
     "dateSentToDwp": "2019-09-06",
     "hmctsDwpState": "sentToDwp",
     "evidenceHandled": "No",
-    "hasUnprocessedAudioVideoEvidence": "No"
+    "hasUnprocessedAudioVideoEvidence": "No",
+    "workBasketHearingDate": null,
+    "workBasketHearingEpimsId": null
   },
   "errors": [],
   "warnings": []
