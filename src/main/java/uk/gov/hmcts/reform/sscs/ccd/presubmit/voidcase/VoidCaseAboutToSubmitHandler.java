@@ -64,9 +64,7 @@ public class VoidCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
 
     private void cancelHearing(Callback<SscsCaseData> callback) {
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        log.info("Void case: Cancel hearing conditions ({}) ({}) ({}) for case ({})", isScheduleListingEnabled,
-                callback.getCaseDetailsBefore().map(CaseDetails::getState).orElse(null),
-                sscsCaseData.getSchedulingAndListingFields().getHearingRoute(), sscsCaseData.getCcdCaseId());
+
         if (eligibleForHearingsCancel.test(callback)) {
             log.info("Void case: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());

@@ -102,12 +102,13 @@ public class DormantEventsAboutToSubmitHandler implements PreSubmitCallbackHandl
         return new PreSubmitCallbackResponse<>(caseData);
     }
 
-    private final Predicate<Callback<SscsCaseData>> eligibleForHearingsCancel = callback ->
-            SscsUtil.isValidCaseState(callback.getCaseDetailsBefore().map(CaseDetails::getState)
-                    .orElse(State.UNKNOWN), List.of(State.HEARING, State.READY_TO_LIST))
-            && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData())
+    private final Predicate<Callback<SscsCaseData>> eligibleForHearingsCancel = callback -> isScheduleListingEnabled
             && isValidCaseEventForCancellation(callback.getEvent())
-            && isScheduleListingEnabled;
+            && SscsUtil.isValidCaseState(
+            callback.getCaseDetailsBefore()
+                    .map(CaseDetails::getState)
+                    .orElse(State.UNKNOWN), List.of(State.HEARING, State.READY_TO_LIST))
+            && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData());
 
     private boolean isValidCaseEventForCancellation(EventType event) {
         return hearingsCancelEvents.contains(event);

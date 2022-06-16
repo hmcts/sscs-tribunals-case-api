@@ -85,12 +85,6 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     }
 
     private void cancelHearing(SscsCaseData sscsCaseData) {
-        log.info("Action postponement request: Check eligible hearing request for case {}", sscsCaseData
-                .getCcdCaseId());
-        log.info("Action postponement request: Feature flag {} for case {}", isScheduleListingEnabled,
-                sscsCaseData.getCcdCaseId());
-        log.info("Action postponement request: case state {} for case {}", sscsCaseData.getState(), sscsCaseData
-                .getCcdCaseId());
         if (eligibleForHearingsCancel.test(sscsCaseData)) {
             log.info("Action postponement request: Sending cancel hearing request for case {}", sscsCaseData
                     .getCcdCaseId());
