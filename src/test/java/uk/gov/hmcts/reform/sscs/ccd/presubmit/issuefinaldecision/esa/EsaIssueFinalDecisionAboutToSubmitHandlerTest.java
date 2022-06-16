@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -22,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import junitparams.JUnitParamsRunner;
@@ -40,12 +42,17 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsEsaCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.IssueFinalDecisionAboutToSubmitHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
@@ -70,6 +77,9 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     @Mock
     private FooterService footerService;
 
+    @Mock
+    private ListAssistHearingMessageHelper hearingMessageHelper;
+
     private SscsCaseData sscsCaseData;
 
     private SscsDocument document;
@@ -87,16 +97,20 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
 
         decisionNoticeService = new DecisionNoticeService(new ArrayList<>(), Arrays.asList(esaecisionNoticeOutcomeService), new ArrayList<>());
 
-        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator);
+        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
+                hearingMessageHelper, false);
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetails));
 
         List<SscsDocument> documentList = new ArrayList<>();
 
         SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(DRAFT_DECISION_NOTICE.getValue()).build();
         documentList.add(new SscsDocument(details));
-        sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
+        sscsCaseData = SscsCaseData.builder()
+            .ccdCaseId("ccdId")
+            .state(State.HEARING)
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("ESA").build()).build())
             .sscsDocument(documentList)
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
@@ -143,9 +157,13 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
                 .doesRegulation29Apply(YES)
                 .build())
             .showFinalDecisionNoticeSummaryOfOutcomePage(YES)
+            .schedulingAndListingFields(SchedulingAndListingFields.builder()
+                    .hearingRoute(HearingRoute.LIST_ASSIST)
+                    .build())
             .build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(caseDetails.getState()).thenReturn(State.HEARING);
     }
 
     @Test
@@ -222,6 +240,8 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnIssueFinalDecisionEventForGenerateNoticeFlowWhenAllowedOrRefusedIsNotNull_ThenDoNotDisplayAnError() {
+        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
+                hearingMessageHelper, true);
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().setWcaAppeal(YES);
@@ -234,6 +254,8 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         assertEquals(0, response.getErrors().size());
 
         verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(FINAL_DECISION_NOTICE), any(), eq(null), eq(null), eq(null));
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+        verifyNoMoreInteractions(hearingMessageHelper);
         assertEquals(FINAL_DECISION_ISSUED.getId(), response.getData().getDwpState());
 
         assertEquals("decisionInFavourOfAppellant", response.getData().getOutcome());

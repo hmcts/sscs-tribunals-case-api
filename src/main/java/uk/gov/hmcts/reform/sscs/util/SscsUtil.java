@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +9,9 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.PostponeRequestTemplateBody;
@@ -55,4 +58,15 @@ public class SscsUtil {
 
         return response;
     }
+
+    public static boolean isSAndLCase(SscsCaseData sscsCaseData) {
+        return LIST_ASSIST
+                .equals(Optional.of(sscsCaseData).map(SscsCaseData::getSchedulingAndListingFields)
+                        .map(SchedulingAndListingFields::getHearingRoute).orElse(null));
+    }
+
+    public static boolean isValidCaseState(State state, List<State> allowedStates) {
+        return allowedStates.contains(state);
+    }
+
 }

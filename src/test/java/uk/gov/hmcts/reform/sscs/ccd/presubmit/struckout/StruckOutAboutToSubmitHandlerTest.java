@@ -4,10 +4,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
 
@@ -26,7 +30,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 
 @RunWith(JUnitParamsRunner.class)
 public class StruckOutAboutToSubmitHandlerTest {
@@ -36,7 +44,8 @@ public class StruckOutAboutToSubmitHandlerTest {
 
     @Mock
     private Callback<SscsCaseData> callback;
-
+    @Mock
+    private ListAssistHearingMessageHelper listAssistHearingMessageHelper;
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
@@ -45,7 +54,7 @@ public class StruckOutAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new StruckOutAboutToSubmitHandler();
+        handler = new StruckOutAboutToSubmitHandler(listAssistHearingMessageHelper, false);
 
         when(callback.getEvent()).thenReturn(EventType.STRUCK_OUT);
 
@@ -56,11 +65,14 @@ public class StruckOutAboutToSubmitHandlerTest {
                 .dwpState(DwpState.IN_PROGRESS.getId())
                 .state(INTERLOCUTORY_REVIEW_STATE)
                 .appeal(Appeal.builder().build())
+                .schedulingAndListingFields(SchedulingAndListingFields.builder()
+                        .hearingRoute(HearingRoute.LIST_ASSIST)
+                        .build())
                 .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetails));
-        when(caseDetails.getState()).thenReturn(INTERLOCUTORY_REVIEW_STATE);
+        when(caseDetails.getState()).thenReturn(HEARING);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
@@ -85,11 +97,16 @@ public class StruckOutAboutToSubmitHandlerTest {
     @Test
     public void givenStruckOutEvent_thenDwpStateToStrikeOutActioned() {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        handler = new StruckOutAboutToSubmitHandler(listAssistHearingMessageHelper, true);
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getInterlocReviewState(), is(nullValue()));
         assertThat(response.getData().getDirectionDueDate(), is(nullValue()));
-        assertThat(response.getData().getPreviousState(), is(INTERLOCUTORY_REVIEW_STATE));
+        assertThat(response.getData().getPreviousState(), is(HEARING));
         assertThat(response.getData().getDwpState(), is(DwpState.STRIKE_OUT_ACTIONED.getId()));
+        verify(listAssistHearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()),
+                eq(CancellationReason.STRUCK_OUT));
+        verifyNoMoreInteractions(listAssistHearingMessageHelper);
     }
 }
