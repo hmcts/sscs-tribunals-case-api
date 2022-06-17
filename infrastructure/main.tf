@@ -108,7 +108,7 @@ data "azurerm_key_vault_secret" "pdf_service_access_key" {
 
 data "azurerm_key_vault_secret" "appinsights_instrumentation_key" {
   name      = "AppInsightsInstrumentationKey"
-  key_vault_id = "${data.azurerm_key_vault.sscs_key_vault.id}"
+  key_vault_id = "${data.azurerm_key_vault.sscs_key_vault.key_vault_id}"
 }
 
 locals {
