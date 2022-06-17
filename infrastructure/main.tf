@@ -108,7 +108,18 @@ data "azurerm_key_vault_secret" "pdf_service_access_key" {
 
 data "azurerm_key_vault_secret" "appinsights_instrumentation_key" {
   name      = "AppInsightsInstrumentationKey"
-  key_vault_id = "${data.azurerm_key_vault.sscs_key_vault.key_vault_id}"
+  key_vault_id = "${data.azurerm_key_vault.sscs_key_vault.id}"
+}
+
+data "terraform_remote_state" "core_apps_compute" {
+  backend = "azurerm"
+
+  config {
+    resource_group_name  = "mgmt-state-store-${var.subscription}"
+    storage_account_name = "mgmtstatestore${var.subscription}"
+    container_name       = "mgmtstatestorecontainer${var.env}"
+    key                  = "core-compute/${var.env}/terraform.tfstate"
+  }
 }
 
 locals {
