@@ -111,6 +111,17 @@ data "azurerm_key_vault_secret" "appinsights_instrumentation_key" {
   key_vault_id = "${data.azurerm_key_vault.sscs_key_vault.id}"
 }
 
+data "terraform_remote_state" "core_apps_compute" {
+  backend = "azurerm"
+
+  config {
+    resource_group_name  = "mgmt-state-store-${var.subscription}"
+    storage_account_name = "mgmtstatestore${var.subscription}"
+    container_name       = "mgmtstatestorecontainer${var.env}"
+    key                  = "core-compute/${var.env}/terraform.tfstate"
+  }
+}
+
 locals {
   local_ase = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
 
