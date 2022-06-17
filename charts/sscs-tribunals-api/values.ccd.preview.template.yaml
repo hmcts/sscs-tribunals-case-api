@@ -26,6 +26,7 @@ java:
     CORE_CASE_DATA_CASE_TYPE_ID: Benefit
     TEST_URL: http://${SERVICE_FQDN}
     CREATE_CCD_ENDPOINT: true
+    CASE_ACCESS_MANAGEMENT_FEATURE: true
 
 sscs-hearings-api:
   enabled: true
@@ -65,14 +66,12 @@ hmc-cft-hearing-service:
       HMC_SERVICE_BUS_SUBSCRIPTION: "hmc-to-sscs-subscription"
       HMC_SERVICE_BUS_QUEUE: hmc-from-hmi
       HMC_OUTBOUND_SERVICE_BUS_QUEUE: hmc-to-hmi
-      CFT_HEARING_SERVICE_DB_HOST: "{{ .Release.Name }}-postgresql"
-      CFT_HEARING_SERVICE_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
-      CFT_HEARING_SERVICE_DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
-      CFT_HEARING_SERVICE_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
-      CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified"
+      CFT_HEARING_SERVICE_DB_HOST: "${SERVICE_NAME}-postgresql"
+      CFT_HEARING_SERVICE_DB_NAME: "hmc-cft-hearing-service"
+      CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
       CFT_HEARING_SERVICE_DB_PORT: 5432
-    # postgresql:
-    #   enabled: true
+      HMC_ACCESS_CONTROL_ENABLED: false
+      SPRING_CONFIG_IMPORT : "optional:configtree:/mnt/secrets/hmc/,optional:configtree:/mnt/secrets/sscs/"
     secrets:
       HMC_SERVICE_BUS_CONNECTION_STRING:
         secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
@@ -88,6 +87,12 @@ hmc-cft-hearing-service:
         resourceGroup: hmc-shared
         secrets:
           - name: AppInsightsInstrumentationKey
+      sscs:
+        secrets:
+          - name: preview-ccd-db-username
+            alias: CFT_HEARING_SERVICE_DB_USERNAME
+          - name: preview-ccd-db-password
+            alias: CFT_HEARING_SERVICE_DB_PASSWORD
 
 servicebus:
   enabled: true
@@ -150,6 +155,11 @@ xui-webapp:
       SERVICES_TERMS_AND_CONDITIONS: http://xui-terms-and-conditions-${SERVICE_FQDN}
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       SERVICES_S2S: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      SERVICES_HEARINGS_COMPONENT_API: http://jurisdiction-hearings-api-aat.service.core-compute-aat.internal
+      SERVICES_HMC_HEARINGS_COMPONENT_API: http://hmc-cft-hearing-service-${SERVICE_FQDN}
+      SERVICES_PRD_LOCATION_API: http://rd-location-ref-api-aat.service.core-compute-aat.internal
+      SERVICES_PRD_JUDICIAL_API: http://rd-judicial-api-aat.service.core-compute-aat.internal
+      SERVICES_PRD_COMMONDATA_API: http://rd-commondata-api-aat.service.core-compute-aat.internal
       JURISDICTIONS: SSCS
       LAUNCH_DARKLY_CLIENT_ID: 5de6610b23ce5408280f2268
       FEATURE_REDIS_ENABLED: false
