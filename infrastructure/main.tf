@@ -111,25 +111,25 @@ data "azurerm_key_vault_secret" "appinsights_instrumentation_key" {
   key_vault_id = "${data.azurerm_key_vault.sscs_key_vault.id}"
 }
 
-data "terraform_remote_state" "core_apps_compute" {
-  backend = "azurerm"
+# data "terraform_remote_state" "core_apps_compute" {
+#   backend = "azurerm"
 
-  config = {
-    resource_group_name  = "mgmt-state-store-${var.subscription}"
-    storage_account_name = "mgmtstatestore${var.subscription}"
-    container_name       = "mgmtstatestorecontainer${var.env}"
-    key                  = "core-compute/${var.env}/terraform.tfstate"
-  }
-}
+#   config = {
+#     resource_group_name  = "mgmt-state-store-${var.subscription}"
+#     storage_account_name = "mgmtstatestore${var.subscription}"
+#     container_name       = "mgmtstatestorecontainer${var.env}"
+#     key                  = "core-compute/${var.env}/terraform.tfstate"
+#   }
+# }
 
 locals {
-  local_ase = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
+  # local_ase = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
 
-  ccdApi        = "http://ccd-data-store-api-${var.env}.service.${local.local_ase}.internal"
-  s2sCnpUrl     = "http://rpe-service-auth-provider-${var.env}.service.${local.local_ase}.internal"
-  pdfService    = "http://cmc-pdf-service-${var.env}.service.${local.local_ase}.internal"
-  documentStore = "http://dm-store-${var.env}.service.${local.local_ase}.internal"
-  docAssembly   = "http://dg-docassembly-${var.env}.service.${local.local_ase}.internal"
+  ccdApi        = "http://ccd-data-store-api-${var.env}.service.core-compute-aat.internal"
+  s2sCnpUrl     = "http://rpe-service-auth-provider-${var.env}.service.core-compute-aat.internal"
+  pdfService    = "http://cmc-pdf-service-${var.env}.service.core-compute-aat.internal"
+  documentStore = "http://dm-store-${var.env}.service.core-compute-aat.internal"
+  docAssembly   = "http://dg-docassembly-${var.env}.service.core-compute-aat.internal"
 
   azureVaultName = "sscs-${var.env}"
 
