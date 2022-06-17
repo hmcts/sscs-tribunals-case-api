@@ -114,7 +114,7 @@ data "azurerm_key_vault_secret" "appinsights_instrumentation_key" {
 data "terraform_remote_state" "core_apps_compute" {
   backend = "azurerm"
 
-  config {
+  config = {
     resource_group_name  = "mgmt-state-store-${var.subscription}"
     storage_account_name = "mgmtstatestore${var.subscription}"
     container_name       = "mgmtstatestorecontainer${var.env}"
