@@ -46,7 +46,7 @@ import uk.gov.hmcts.reform.sscs.util.SyaServiceHelper;
 @SpringBootTest
 @Slf4j
 public class SubmitDraftTest {
-    
+
     private static final String LOCATION_HEADER_NAME = "Location";
 
     @Value("${test-url}")
@@ -183,7 +183,9 @@ public class SubmitDraftTest {
         log.info("[assertCaseIsExpectedResult] sscsCaseDetails.getCaseAccessManagementFields : " + sscsCaseDetails.getData().getCaseAccessManagementFields());
         log.info("[assertCaseIsExpectedResult] sscsCaseDetails.getCaseAccessManagementFields.getCaseAccessCategory : " + sscsCaseDetails.getData().getCaseAccessManagementFields().getCaseAccessCategory());
 
-        assertJsonEquals(changeExpectedFields(expectedResponse, nino, mrnDate), sscsCaseDetails.getData(), whenIgnoringPaths("sscsDocument","regionalProcessingCenter.hearingRoute"));
+        assertJsonEquals(changeExpectedFields(expectedResponse, nino, mrnDate), sscsCaseDetails.getData(),
+            whenIgnoringPaths("sscsDocument","regionalProcessingCenter.hearingRoute","workBasketHearingDate",
+                "workBasketHearingEpimsId"));
 
         assertEquals(expectedState, sscsCaseDetails.getState());
     }

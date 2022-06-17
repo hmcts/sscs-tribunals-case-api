@@ -122,7 +122,9 @@ public class SubmitAppealTest {
         log.info("[assertCaseIsExpectedResult] sscsCaseDetails.getCaseAccessManagementFields : " + sscsCaseDetails.getData().getCaseAccessManagementFields());
         log.info("[assertCaseIsExpectedResult] sscsCaseDetails.getCaseAccessManagementFields.getCaseAccessCategory : " + sscsCaseDetails.getData().getCaseAccessManagementFields().getCaseAccessCategory());
 
-        assertJsonEquals(changeExpectedFields(expectedResponse, nino, mrnDate), sscsCaseDetails.getData(), whenIgnoringPaths("sscsDocument","regionalProcessingCenter.hearingRoute"));
+        assertJsonEquals(changeExpectedFields(expectedResponse, nino, mrnDate), sscsCaseDetails.getData(),
+            whenIgnoringPaths("sscsDocument","regionalProcessingCenter.hearingRoute","workBasketHearingDate",
+                "workBasketHearingEpimsId"));
 
         assertEquals(expectedState, sscsCaseDetails.getState());
 
