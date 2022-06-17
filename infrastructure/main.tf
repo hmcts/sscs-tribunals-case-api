@@ -7,6 +7,6 @@ data "azurerm_key_vault" "sscs_key_vault" {
   resource_group_name = local.azureVaultName
 }
 
-locals {
-  azureVaultName = "sscs-${var.env}"
-}
+# locals {     
+#   azureVaultName = "sscs-${var.env}"
+# }
