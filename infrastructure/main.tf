@@ -12,7 +12,6 @@ data "azurerm_key_vault" "sscs_key_vault" {
 # }
 
 
-
 ### FOLLOWING FILES ARE TEMPORARY AND SHOULD BE REMOVED ONCE PERFEST TFSTATE CAN PERFORM A TERRAFORM INIT 
 resource "azurerm_resource_group" "rg" {
   name     = "${var.product}-${var.component}-${var.env}"
