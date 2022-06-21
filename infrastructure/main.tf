@@ -10,3 +10,10 @@ data "azurerm_key_vault" "sscs_key_vault" {
 locals {
   azureVaultName = "sscs-${var.env}"
 }
+
+
+// Shared Resource Group
+resource "azurerm_resource_group" "rg" {
+  name     = "${var.product}-shared-${var.env}"
+  location = var.location
+}
