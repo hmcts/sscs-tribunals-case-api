@@ -982,7 +982,8 @@
           "type": "appealReceived",
           "description": "Appeal received"
         }
-      }]
+      }],
+      "workBasketHearingDate": null
     },
     "data_classification": {
       "evidencePresent": "PUBLIC",
