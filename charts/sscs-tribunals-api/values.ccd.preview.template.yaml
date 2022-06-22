@@ -71,6 +71,7 @@ hmc-cft-hearing-service:
       CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
       CFT_HEARING_SERVICE_DB_PORT: 5432
       HMC_ACCESS_CONTROL_ENABLED: false
+      ROLE_ASSIGNMENT_URL: "http://{{ .Release.Name }}-am-role-assignment-service"
       SPRING_CONFIG_IMPORT : "optional:configtree:/mnt/secrets/hmc/,optional:configtree:/mnt/secrets/sscs/"
     secrets:
       HMC_SERVICE_BUS_CONNECTION_STRING:
@@ -108,6 +109,48 @@ servicebus:
       - name: hmc-from-hmi
       - name: hmc-to-hmi
       - name: tribunals-to-hearing-api
+
+am-role-assignment-service:
+  java:
+    image: 'hmctspublic.azurecr.io/am/role-assignment-service:latest'
+    imagePullPolicy: Always
+    ingressHost: ""
+    releaseNameOverride: ${SERVICE_NAME}-am-role-assignment-service
+    readinessDelay: 240
+    livenessDelay: 240
+    environment:
+      ROLE_ASSIGNMENT_DB_HOST: ${SERVICE_NAME}-postgresql
+      ROLE_ASSIGNMENT_DB_NAME: "role_assignment"
+      ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
+      AM_ROLE_ASSIGNMENT_SERVICE_SECRET: AAAAAAAAAAAAAAAA
+      IDAM_USER_URL: "https://idam-web-public.aat.platform.hmcts.net"
+      IDAM_S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+      OPEN_ID_API_BASE_URI: "https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o"
+      ROLE_ASSIGNMENT_IDAM_ADMIN_USERID: ras-validation-system@hmcts.net
+      APPLICATION_LOGGING_LEVEL: INFO
+      BYPASS_ORG_DROOL_RULE: true
+      LAUNCH_DARKLY_ENV: pr
+      ENABLE_DB_MIGRATE: true
+    keyVaults:
+      sscs:
+        secrets:
+          - name: preview-ccd-db-username
+            alias: ROLE_ASSIGNMENT_DB_USERNAME
+          - name: preview-ccd-db-password
+            alias: ROLE_ASSIGNMENT_DB_PASSWORD
+    secrets:
+      LD_SDK_KEY:
+        secretRef: role-assignment-service-LD-SDK-KEY
+        key: key
+        disabled: true
+      ROLE_ASSIGNMENT_IDAM_CLIENT_SECRET:
+        secretRef: role-assignment-service-IDAM-CLIENT-SECRET
+        key: key
+        disabled: true
+      ROLE_ASSIGNMENT_IDAM_ADMIN_PASSWORD:
+        secretRef: role-assignment-service-IDAM-ADMIN-SECRET
+        key: key
+        disabled: true
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
@@ -195,6 +238,49 @@ ccd:
         CREATE DATABASE "annotation" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
         CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
         CREATE DATABASE "hmc-cft-hearing-service" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+  am-role-assignment-service:
+    java:
+      image: 'hmctspublic.azurecr.io/am/role-assignment-service:latest'
+      imagePullPolicy: Always
+      ingressHost: ""
+      releaseNameOverride: ${SERVICE_NAME}-am-role-assignment-service
+      readinessDelay: 240
+      livenessDelay: 240
+      environment:
+        ROLE_ASSIGNMENT_DB_HOST: ${SERVICE_NAME}-postgresql
+        ROLE_ASSIGNMENT_DB_NAME: "role_assignment"
+        ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
+        AM_ROLE_ASSIGNMENT_SERVICE_SECRET: AAAAAAAAAAAAAAAA
+        IDAM_USER_URL: "https://idam-web-public.aat.platform.hmcts.net"
+        IDAM_S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+        OPEN_ID_API_BASE_URI: "https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o"
+        ROLE_ASSIGNMENT_IDAM_ADMIN_USERID: ras-validation-system@hmcts.net
+        SPRING_CLOUD_PROPERTIESVOLUME_PATHS: "/mnt/secrets/am,/mnt/secrets/sscs"
+        APPLICATION_LOGGING_LEVEL: INFO
+        BYPASS_ORG_DROOL_RULE: true
+        LAUNCH_DARKLY_ENV: pr
+        ENABLE_DB_MIGRATE: true
+      keyVaults:
+        sscs:
+          secrets:
+            - name: preview-ccd-db-username
+              alias: ROLE_ASSIGNMENT_DB_USERNAME
+            - name: preview-ccd-db-password
+              alias: ROLE_ASSIGNMENT_DB_PASSWORD
+      secrets:
+        LD_SDK_KEY:
+          secretRef: role-assignment-service-LD-SDK-KEY
+          key: key
+          disabled: true
+        ROLE_ASSIGNMENT_IDAM_CLIENT_SECRET:
+          secretRef: role-assignment-service-IDAM-CLIENT-SECRET
+          key: key
+          disabled: true
+        ROLE_ASSIGNMENT_IDAM_ADMIN_PASSWORD:
+          secretRef: role-assignment-service-IDAM-ADMIN-SECRET
+          key: key
+          disabled: true
+
   ccd:
     adminWeb:
       enabled: true
@@ -294,6 +380,7 @@ ccd:
         IDAM_DATA_STORE_SYSTEM_USER_USERNAME: ${IDAM_DATA_STORE_SYSTEM_USER_USERNAME}
         IDAM_DATA_STORE_SYSTEM_USER_PASSWORD: ${IDAM_DATA_STORE_SYSTEM_USER_PASSWORD}
         IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET: ${IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET}
+        ROLE_ASSIGNMENT_URL: "http://{{ .Release.Name }}-am-role-assignment-service"
       keyVaults: [ ]
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
       autoscaling:
