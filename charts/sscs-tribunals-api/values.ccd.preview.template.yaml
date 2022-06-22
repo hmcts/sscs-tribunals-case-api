@@ -52,11 +52,11 @@ sscs-hearings-api:
       HEARINGS_TOPIC_NAME: "hmc-to-cft"
       HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription"
       ##Enable for outbound
-      TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
+      TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
       TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
 
 hmc-cft-hearing-service:
-  enabled: true
+  enabled: false
   java:
     releaseNameOverride: ${SERVICE_NAME}-hmc-cft-hearing-service
     image: "hmctspublic.azurecr.io/hmc/cft-hearing-service:latest"
@@ -66,17 +66,12 @@ hmc-cft-hearing-service:
       HMC_SERVICE_BUS_SUBSCRIPTION: "hmc-to-sscs-subscription"
       HMC_SERVICE_BUS_QUEUE: hmc-from-hmi
       HMC_OUTBOUND_SERVICE_BUS_QUEUE: hmc-to-hmi
-      CFT_HEARING_SERVICE_DB_HOST: "{{ .Release.Name }}-postgresql"
-      CFT_HEARING_SERVICE_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
-      CFT_HEARING_SERVICE_DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
-      CFT_HEARING_SERVICE_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
-      CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified"
-#      CFT_HEARING_SERVICE_DB_HOST: "${SERVICE_NAME}-postgresql"
-#      CFT_HEARING_SERVICE_DB_NAME: "hmc-cft-hearing-service"
-#      CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
+      CFT_HEARING_SERVICE_DB_HOST: "${SERVICE_NAME}-postgresql"
+      CFT_HEARING_SERVICE_DB_NAME: "hmc-cft-hearing-service"
+      CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
       CFT_HEARING_SERVICE_DB_PORT: 5432
       HMC_ACCESS_CONTROL_ENABLED: false
-      #SPRING_CONFIG_IMPORT : "optional:configtree:/mnt/secrets/hmc/,optional:configtree:/mnt/secrets/sscs/"
+      SPRING_CONFIG_IMPORT : "optional:configtree:/mnt/secrets/hmc/,optional:configtree:/mnt/secrets/sscs/"
     postgresql:
       enabled: true
     secrets:
@@ -94,12 +89,12 @@ hmc-cft-hearing-service:
         resourceGroup: hmc-shared
         secrets:
           - name: AppInsightsInstrumentationKey
-#      sscs:
-#        secrets:
-#          - name: preview-ccd-db-username
-#            alias: CFT_HEARING_SERVICE_DB_USERNAME
-#          - name: preview-ccd-db-password
-#            alias: CFT_HEARING_SERVICE_DB_PASSWORD
+      sscs:
+        secrets:
+          - name: preview-ccd-db-username
+            alias: CFT_HEARING_SERVICE_DB_USERNAME
+          - name: preview-ccd-db-password
+            alias: CFT_HEARING_SERVICE_DB_PASSWORD
 
 servicebus:
   enabled: true
@@ -107,13 +102,13 @@ servicebus:
   resourceGroup: sscs-aks
   serviceplan: standard
   setup:
-    topics:
-      - name: hmc-to-cft
-    subscriptions:
-      - name: hmc-to-sscs-subscription
+    #topics:
+    #  - name: hmc-to-cft
+    #subscriptions:
+    #  - name: hmc-to-sscs-subscription
     queues:
-      - name: hmc-from-hmi
-      - name: hmc-to-hmi
+    #  - name: hmc-from-hmi
+    #  - name: hmc-to-hmi
       - name: tribunals-to-hearing-api
 
 idam-pr:
