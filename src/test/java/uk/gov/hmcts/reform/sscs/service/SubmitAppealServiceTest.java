@@ -96,9 +96,6 @@ public class SubmitAppealServiceTest {
     private RefDataService refDataService;
 
     @Mock
-    private VenueService venueService;
-
-    @Mock
     private PDFServiceClient pdfServiceClient;
 
     @Mock
@@ -167,7 +164,6 @@ public class SubmitAppealServiceTest {
             convertAIntoBService,
             airLookupService,
             refDataService,
-            venueService,
             true);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
@@ -889,10 +885,10 @@ public class SubmitAppealServiceTest {
             RegionalProcessingCenter.builder()
                 .name("rpcName")
                 .postcode("rpcPostcode")
+                .epimsId(epimsId)
                 .build());
         when(airLookupService.lookupAirVenueNameByPostCode(eq(postcode), any())).thenReturn(expectedVenue);
         when(refDataService.getVenueRefData(expectedVenue)).thenReturn(CourtVenue.builder().regionId(regionId).build());
-        when(venueService.getEpimsIdForActiveVenueByPostcode("rpcPostcode")).thenReturn(Optional.of(epimsId));
 
         boolean isAppellant = appellantOrAppointee.equals("appellant");
         SyaCaseWrapper appealData = getSyaCaseWrapper(isAppellant ? "json/sya.json" : "sya/allDetailsWithAppointeeWithDifferentAddress.json");

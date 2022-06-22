@@ -42,7 +42,6 @@ import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
-import uk.gov.hmcts.reform.sscs.service.VenueService;
 
 @RunWith(JUnitParamsRunner.class)
 public class CaseUpdatedAboutToSubmitHandlerTest {
@@ -73,9 +72,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @Mock
     private RefDataService refDataService;
 
-    @Mock
-    private VenueService venueService;
-
     private CaseUpdatedAboutToSubmitHandler handler;
 
     private SscsCaseData sscsCaseData;
@@ -93,7 +89,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             new DwpAddressLookupService(),
             idamService,
             refDataService,
-            venueService,
             true);
 
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
@@ -274,10 +269,14 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnAppealWithNewAppellantPostcodeAndNoAppointee_thenUpdateProcessingVenue() {
-        when(regionalProcessingCenterService.getByPostcode("AB12 00B")).thenReturn(RegionalProcessingCenter.builder().name("rpcName").postcode("rpcPostcode").build());
+        when(regionalProcessingCenterService.getByPostcode("AB12 00B")).thenReturn(
+            RegionalProcessingCenter.builder()
+                .name("rpcName")
+            .postcode("rpcPostcode")
+            .epimsId("rpcEpimsId")
+                .build());
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn("VenueB");
         when(refDataService.getVenueRefData("VenueB")).thenReturn(CourtVenue.builder().regionId("regionId").build());
-        when(venueService.getEpimsIdForActiveVenueByPostcode("rpcPostcode")).thenReturn(Optional.of("rpcEpimsId"));
 
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB12 00B");
 
@@ -291,10 +290,14 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnAppealWithNewAppointeePostcode_thenUpdateProcessingVenueWithAppointeeVenue() {
-        when(regionalProcessingCenterService.getByPostcode("AB12 00B")).thenReturn(RegionalProcessingCenter.builder().name("rpcName").postcode("rpcPostcode").build());
+        when(regionalProcessingCenterService.getByPostcode("AB12 00B")).thenReturn(
+            RegionalProcessingCenter.builder()
+                .name("rpcName")
+                .postcode("rpcPostcode")
+                .epimsId("rpcEpimsId")
+                .build());
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn("VenueB");
         when(refDataService.getVenueRefData("VenueB")).thenReturn(CourtVenue.builder().regionId("regionId").build());
-        when(venueService.getEpimsIdForActiveVenueByPostcode("rpcPostcode")).thenReturn(Optional.of("rpcEpimsId"));
 
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().address(Address.builder().postcode("AB12 00B").build()).build());
@@ -330,10 +333,14 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @Test
     @Parameters({"", "null"})
     public void givenAnAppealWithNewAppointeeButEmptyPostcode_thenUpdateProcessingVenueWithAppellantVenue(@Nullable String postCode) {
-        when(regionalProcessingCenterService.getByPostcode("AB12 00B")).thenReturn(RegionalProcessingCenter.builder().name("rpcName").postcode("rpcPostcode").build());
+        when(regionalProcessingCenterService.getByPostcode("AB12 00B")).thenReturn(
+            RegionalProcessingCenter.builder()
+                .name("rpcName")
+                .postcode("rpcPostcode")
+                .epimsId("rpcEpimsId")
+                .build());
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn("VenueB");
         when(refDataService.getVenueRefData("VenueB")).thenReturn(CourtVenue.builder().regionId("regionId").build());
-        when(venueService.getEpimsIdForActiveVenueByPostcode("rpcPostcode")).thenReturn(Optional.of("rpcEpimsId"));
 
         Appellant appellant = callback.getCaseDetails().getCaseData().getAppeal().getAppellant();
         appellant.getAddress().setPostcode("AB12 00B");

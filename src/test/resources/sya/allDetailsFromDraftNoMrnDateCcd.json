@@ -37,7 +37,8 @@
     "phoneNumber" : "0300 123 1142",
     "faxNumber" : "0126 434 7983",
     "email": "SSCS_Bradford@justice.gov.uk",
-    "hearingRoute": null
+    "hearingRoute": null,
+    "epimsId": null
   },
   "appeal": {
     "mrnDetails": {

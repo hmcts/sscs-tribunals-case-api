@@ -30,7 +30,6 @@ import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
-import uk.gov.hmcts.reform.sscs.service.VenueService;
 
 @Component
 @Slf4j
@@ -42,7 +41,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final DwpAddressLookupService dwpAddressLookupService;
     private final IdamService idamService;
     private final RefDataService refDataService;
-    private final VenueService venueService;
     private final boolean caseAccessManagementFeature;
 
     @SuppressWarnings("squid:S107")
@@ -52,7 +50,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                     DwpAddressLookupService dwpAddressLookupService,
                                     IdamService idamService,
                                     RefDataService refDataService,
-                                    VenueService venueService,
                                     @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
@@ -60,7 +57,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.idamService = idamService;
         this.refDataService = refDataService;
-        this.venueService = venueService;
         this.caseAccessManagementFeature = caseAccessManagementFeature;
     }
 
@@ -108,7 +104,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
             if (newRpc != null) {
                 sscsCaseData.setRegion(newRpc.getName());
-                updateProcessingVenueIfRequired(caseDetails, newRpc.getPostcode());
+                updateProcessingVenueIfRequired(caseDetails, newRpc.getEpimsId());
             }
         }
 
@@ -211,7 +207,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private void updateProcessingVenueIfRequired(CaseDetails<SscsCaseData> caseDetails, String rpcPostcode) {
+    private void updateProcessingVenueIfRequired(CaseDetails<SscsCaseData> caseDetails, String rpcEpimsId) {
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
         String postCode = resolvePostCode(sscsCaseData);
         log.info("updateProcessingVenueIfRequired for post code " + postCode);
@@ -225,7 +221,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
             if (caseAccessManagementFeature && StringUtils.isNotEmpty(venue)) {
                 CourtVenue courtVenue = refDataService.getVenueRefData(venue);
-                String rpcEpimsId = venueService.getEpimsIdForActiveVenueByPostcode(rpcPostcode).orElse(null);
                 if (courtVenue != null) {
                     sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
                             .baseLocation(rpcEpimsId)

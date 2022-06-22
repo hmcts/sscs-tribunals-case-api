@@ -53,7 +53,6 @@ public class SubmitAppealService {
     private final ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
     private final AirLookupService airLookupService;
     private final RefDataService refDataService;
-    private final VenueService venueService;
     private final boolean caseAccessManagementFeature;
 
     @SuppressWarnings("squid:S107")
@@ -64,7 +63,6 @@ public class SubmitAppealService {
                         ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
                         AirLookupService airLookupService,
                         RefDataService refDataService,
-                        VenueService venueService,
                         @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature) {
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
@@ -73,7 +71,6 @@ public class SubmitAppealService {
         this.convertAIntoBService = convertAIntoBService;
         this.airLookupService = airLookupService;
         this.refDataService = refDataService;
-        this.venueService = venueService;
         this.caseAccessManagementFeature = caseAccessManagementFeature;
     }
 
@@ -258,11 +255,10 @@ public class SubmitAppealService {
             && rpc != null) {
             log.info("Getting venue details for " + processingVenue);
             CourtVenue courtVenue = refDataService.getVenueRefData(processingVenue);
-            String rpcEpimsId = venueService.getEpimsIdForActiveVenueByPostcode(rpc.getPostcode()).orElse(null);
 
             if (courtVenue != null) {
                 sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
-                        .baseLocation(rpcEpimsId)
+                        .baseLocation(rpc.getEpimsId())
                         .region(courtVenue.getRegionId()).build());
             }
         }
