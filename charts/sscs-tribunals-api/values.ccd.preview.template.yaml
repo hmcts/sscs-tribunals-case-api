@@ -52,11 +52,11 @@ sscs-hearings-api:
       HEARINGS_TOPIC_NAME: "hmc-to-cft"
       HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription"
       ##Enable for outbound
-      TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
+      TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
       TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
 
 hmc-cft-hearing-service:
-  enabled: false
+  enabled: true
   java:
     releaseNameOverride: ${SERVICE_NAME}-hmc-cft-hearing-service
     image: "hmctspublic.azurecr.io/hmc/cft-hearing-service:latest"
@@ -72,8 +72,6 @@ hmc-cft-hearing-service:
       CFT_HEARING_SERVICE_DB_PORT: 5432
       HMC_ACCESS_CONTROL_ENABLED: false
       SPRING_CONFIG_IMPORT : "optional:configtree:/mnt/secrets/hmc/,optional:configtree:/mnt/secrets/sscs/"
-    postgresql:
-      enabled: true
     secrets:
       HMC_SERVICE_BUS_CONNECTION_STRING:
         secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
@@ -102,10 +100,10 @@ servicebus:
   resourceGroup: sscs-aks
   serviceplan: standard
   setup:
-    #topics:
-    #  - name: hmc-to-cft
-    #subscriptions:
-    #  - name: hmc-to-sscs-subscription
+    topics:
+      - name: hmc-to-cft
+    subscriptions:
+      - name: hmc-to-sscs-subscription
     queues:
     #  - name: hmc-from-hmi
     #  - name: hmc-to-hmi
@@ -186,6 +184,17 @@ xui-webapp:
 
 ccd:
   enabled: true
+  postgresql:
+    initdbScripts:
+      init.sql: |-
+        CREATE DATABASE "data-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "draftstore" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "evidence" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "annotation" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "hmc-cft-hearing-service" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
   ccd:
     adminWeb:
       enabled: true
