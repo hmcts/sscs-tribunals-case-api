@@ -216,5 +216,6 @@
         "noteDetail": "this is a withdrawn note"
       }
     }]
-  }
+  },
+  "workBasketHearingDate": null
 }
