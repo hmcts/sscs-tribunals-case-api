@@ -104,7 +104,13 @@
           "adjourned": "No",
           "eventDate": null,
           "hearingId": "3698764",
-          "venueId": null
+          "venueId": null,
+          "hearingRequested": null,
+          "hearingStatus": null,
+          "start": null,
+          "end": null,
+          "versionNumber": null,
+          "epimsId": null
         }
       }
     ],
@@ -242,7 +248,8 @@
     "dateSentToDwp": "2019-09-06",
     "hmctsDwpState": "sentToDwp",
     "evidenceHandled": "No",
-    "hasUnprocessedAudioVideoEvidence": "No"
+    "hasUnprocessedAudioVideoEvidence": "No",
+    "workBasketHearingDate": null
   },
   "errors": [],
   "warnings": []
