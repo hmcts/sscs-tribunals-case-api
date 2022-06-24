@@ -178,6 +178,19 @@ em-ccdorc:
       CCD_DATA_API_URL: http://ccd-data-store-api-${SERVICE_FQDN}
       CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
 
+ccd-case-document-am-api:
+  enabled: true
+  java:
+    image: hmctspublic.azurecr.io/ccd/case-document-am-api:latest
+    ingressHost: ccd-case-document-am-api-${SERVICE_FQDN}
+    environment:
+      CCD_DATA_STORE_API_BASE_URL: http://ccd-data-store-api-${SERVICE_FQDN}
+      IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
+      IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
+      OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts
+      S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      DM_STORE_BASE_URL: http://dm-store-aat.service.core-compute-aat.internal
+
 xui-webapp:
   enabled: true
   nodejs:
@@ -375,7 +388,7 @@ ccd:
         HTTP_CLIENT_MAX_CLIENT_PER_ROUTE: '30'
         DATA_STORE_DB_MAX_POOL_SIZE: 80
         CCD_DOCUMENT_URL_PATTERN: 'http://dm-store.*'
-        CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
+        CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-${SERVICE_FQDN}
         DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
         IDAM_DATA_STORE_SYSTEM_USER_USERNAME: ${IDAM_DATA_STORE_SYSTEM_USER_USERNAME}
         IDAM_DATA_STORE_SYSTEM_USER_PASSWORD: ${IDAM_DATA_STORE_SYSTEM_USER_PASSWORD}
