@@ -252,5 +252,6 @@
   "interlocReferralDate" : "2021-04-13",
   "interlocReviewState" : "reviewByTcw",
   "isScottishCase" : "No",
-  "workBasketHearingDate": null
+  "workBasketHearingDate": null,
+  "workBasketHearingEpimsId": null
 }
