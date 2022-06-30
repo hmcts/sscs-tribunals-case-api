@@ -244,7 +244,7 @@ dependencyManagement {
         dependency group: 'org.apache.santuario', name: 'xmlsec', version: '2.3.0'
 
         // resolves: CVE-2019-10101, CVE-2019-10102, CVE-2019-10103, CVE-2020-15824
-        dependencySet(group: 'org.jetbrains.kotlin', version: '1.6.10') {
+        dependencySet(group: 'org.jetbrains.kotlin', version: '1.7.0') {
             entry 'kotlin-stdlib'
             entry 'kotlin-stdlib-common'
             entry 'kotlin-stdlib-jdk8'
