@@ -117,6 +117,18 @@ ccd:
 
   ingressHost: ${SERVICE_FQDN}
 
+  postgresql:
+    initdbScripts:
+      init.sql: |-
+        CREATE DATABASE "data-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "draftstore" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "evidence" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "annotation" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "hmc-cft-hearing-service" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+
   global:
     ccdApiGatewayIngress: gateway-${SERVICE_FQDN}
     ccdAdminWebIngress: ccd-admin-web-${SERVICE_FQDN}
@@ -315,7 +327,7 @@ elastic:
 
 elasticsearch:
   clusterName: "es"
-  imageTag: "6.4.2"
+  imageTag: "7.8.1"
   replicas: 1
   minimumMasterNodes: 1
   antiAffinity: "soft"
