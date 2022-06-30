@@ -26,6 +26,8 @@ java:
     CORE_CASE_DATA_CASE_TYPE_ID: Benefit
     TEST_URL: http://${SERVICE_FQDN}
     CREATE_CCD_ENDPOINT: true
+    CASE_ACCESS_MANAGEMENT_FEATURE: true
+    WORK_ALLOCATION_FEATURE: true
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
@@ -116,6 +118,18 @@ ccd:
       enabled: false
 
   ingressHost: ${SERVICE_FQDN}
+
+  postgresql:
+    initdbScripts:
+      init.sql: |-
+        CREATE DATABASE "data-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "draftstore" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "evidence" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "annotation" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "hmc-cft-hearing-service" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
 
   global:
     ccdApiGatewayIngress: gateway-${SERVICE_FQDN}
@@ -270,7 +284,7 @@ ccd:
       - sscs-citizen2@hmcts.net|SSCS|Benefit|appealCreated
 
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.14.25-517nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.14.26-517nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: https://ccd-admin-web-${SERVICE_FQDN}/oauth2redirect
     environment:
@@ -315,7 +329,7 @@ elastic:
 
 elasticsearch:
   clusterName: "es"
-  imageTag: "6.4.2"
+  imageTag: "7.8.1"
   replicas: 1
   minimumMasterNodes: 1
   antiAffinity: "soft"
@@ -373,6 +387,7 @@ sscs-evidence-share:
       ROBOTICS_EMAIL_TO: "fake"
       ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
       ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
+      CASE_ACCESS_MANAGEMENT_FEATURE: true
 
 sscs-ccd-callback-orchestrator:
   enabled: false
@@ -387,7 +402,7 @@ sscs-ccd-callback-orchestrator:
       AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
 
 sscs-tribunals-frontend:
-  enabled: false
+  enabled: true
   nodejs:
     image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
@@ -415,7 +430,9 @@ sscs-tribunals-frontend:
           - sscs-redis-connection-string
 
 redis:
-  enabled: false
+  enabled: true
+  replica:
+    replicaCount: 0
   cluster:
     enabled: false
     slaveCount: 0
