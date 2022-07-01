@@ -51,7 +51,3 @@ dependencies:
     version: 1.0.9
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: em-ccdorc.enabled
-  - name: ccd-case-document-am-api
-    version: 1.7.3
-    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
-    condition: ccd-case-document-am-api.enabled
