@@ -464,7 +464,7 @@ redis:
 sscs-hearings-api:
   enabled: true
   java:
-    image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
+    image: "hmctspublic.azurecr.io/sscs/hearings-api:pr-269" #Change to pr if required
     ingressHost: sscs-hearings-api-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
     environment:
@@ -484,22 +484,24 @@ sscs-hearings-api:
       HMC_HEARING_LISTENING_ENABLED: true
       HEARINGS_TOPIC_NAME: "hmc-to-cft"
       HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription"
+      HMC_HEARINGS_TOPIC_POLICY_NAME: RootManageSharedAccessKey
       ##Enable for inbound
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
+      TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
+      TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
     secrets:
-      TRIBUNALS_EVENT_QUEUE_CONNECTION_STRING:
+      TRIBUNALS_EVENT_QUEUE_NAMESPACE:
         secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
         key: namespaceName
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
         secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
         key: primaryKey
+      HMC_HEARINGS_TOPIC_NAMESPACE:
+        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
+        key: namespaceName
       HMC_HEARINGS_TOPIC_ACCESS_KEY:
         secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
         key: primaryKey
-      HMC_HEARINGS_TOPIC_CONNECTION_STRING:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
-        key: namespaceName
-
 
 hmc-cft-hearing-service:
   enabled: true
