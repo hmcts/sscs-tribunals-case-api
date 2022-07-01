@@ -26,6 +26,8 @@ java:
     CORE_CASE_DATA_CASE_TYPE_ID: Benefit
     TEST_URL: http://${SERVICE_FQDN}
     CREATE_CCD_ENDPOINT: true
+    CASE_ACCESS_MANAGEMENT_FEATURE: true
+    WORK_ALLOCATION_FEATURE: true
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
@@ -33,9 +35,11 @@ idam-pr:
   redirect_uris:
     XUI:
       - http://xui-${SERVICE_FQDN}/oauth2/callback
-    CCD-ADMIN:
+    CCD Admin:
       - http://ccd-admin-web-${SERVICE_FQDN}/oauth2redirect
-    CCD-DATASTORE-API:
+    CCD:
+      - https://case-management-web-${SERVICE_FQDN}/oauth2redirect
+    ccd_data_store_api:
       - http://ccd-data-store-api-${SERVICE_FQDN}/oauth2redirect
 
 em-ccdorc:
@@ -52,6 +56,19 @@ em-ccdorc:
       DM_STORE_APP_URL: http://dm-store-aat.service.core-compute-aat.internal
       CCD_DATA_API_URL: http://ccd-data-store-api-${SERVICE_FQDN}
       CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
+
+ccd-case-document-am-api:
+  enabled: true
+  java:
+    image: hmctspublic.azurecr.io/ccd/case-document-am-api:latest
+    ingressHost: ccd-case-document-am-api-${SERVICE_FQDN}
+    environment:
+      CCD_DATA_STORE_API_BASE_URL: http://ccd-data-store-api-${SERVICE_FQDN}
+      IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
+      IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
+      OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts
+      S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      DM_STORE_BASE_URL: http://dm-store-aat.service.core-compute-aat.internal
 
 xui-webapp:
   enabled: true
@@ -115,6 +132,18 @@ ccd:
 
   ingressHost: ${SERVICE_FQDN}
 
+  postgresql:
+    initdbScripts:
+      init.sql: |-
+        CREATE DATABASE "data-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "draftstore" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "evidence" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "annotation" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "hmc-cft-hearing-service" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+
   global:
     ccdApiGatewayIngress: gateway-${SERVICE_FQDN}
     ccdAdminWebIngress: ccd-admin-web-${SERVICE_FQDN}
@@ -127,6 +156,49 @@ ccd:
     s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     enableKeyVaults: true
     devMode: true
+
+  am-role-assignment-service:
+    java:
+      image: 'hmctspublic.azurecr.io/am/role-assignment-service:latest'
+      imagePullPolicy: Always
+      ingressHost: ""
+      releaseNameOverride: ${SERVICE_NAME}-am-role-assignment-service
+      readinessDelay: 240
+      livenessDelay: 240
+      environment:
+        ROLE_ASSIGNMENT_DB_HOST: ${SERVICE_NAME}-postgresql
+        ROLE_ASSIGNMENT_DB_NAME: "role_assignment"
+        ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
+        AM_ROLE_ASSIGNMENT_SERVICE_SECRET: AAAAAAAAAAAAAAAA
+        IDAM_USER_URL: "https://idam-web-public.aat.platform.hmcts.net"
+        IDAM_S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+        OPEN_ID_API_BASE_URI: "https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o"
+        ROLE_ASSIGNMENT_IDAM_ADMIN_USERID: ras-validation-system@hmcts.net
+        SPRING_CLOUD_PROPERTIESVOLUME_PATHS: "/mnt/secrets/am,/mnt/secrets/sscs"
+        APPLICATION_LOGGING_LEVEL: INFO
+        BYPASS_ORG_DROOL_RULE: true
+        LAUNCH_DARKLY_ENV: pr
+        ENABLE_DB_MIGRATE: true
+      keyVaults:
+        sscs:
+          secrets:
+            - name: preview-ccd-db-username
+              alias: ROLE_ASSIGNMENT_DB_USERNAME
+            - name: preview-ccd-db-password
+              alias: ROLE_ASSIGNMENT_DB_PASSWORD
+      secrets:
+        LD_SDK_KEY:
+          secretRef: role-assignment-service-LD-SDK-KEY
+          key: key
+          disabled: true
+        ROLE_ASSIGNMENT_IDAM_CLIENT_SECRET:
+          secretRef: role-assignment-service-IDAM-CLIENT-SECRET
+          key: key
+          disabled: true
+        ROLE_ASSIGNMENT_IDAM_ADMIN_PASSWORD:
+          secretRef: role-assignment-service-IDAM-ADMIN-SECRET
+          key: key
+          disabled: true
 
   ccd-admin-web:
     nodejs:
@@ -191,11 +263,12 @@ ccd:
         HTTP_CLIENT_MAX_CLIENT_PER_ROUTE: '30'
         DATA_STORE_DB_MAX_POOL_SIZE: 80
         CCD_DOCUMENT_URL_PATTERN: 'http://dm-store.*'
-        CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
+        CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-${SERVICE_FQDN}
         DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
         IDAM_DATA_STORE_SYSTEM_USER_USERNAME: ${IDAM_DATA_STORE_SYSTEM_USER_USERNAME}
         IDAM_DATA_STORE_SYSTEM_USER_PASSWORD: ${IDAM_DATA_STORE_SYSTEM_USER_PASSWORD}
         IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET: ${IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET}
+        ROLE_ASSIGNMENT_URL: "http://{{ .Release.Name }}-am-role-assignment-service"
       keyVaults: [ ]
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
       autoscaling:
@@ -224,7 +297,7 @@ ccd:
       - sscs-citizen2@hmcts.net|SSCS|Benefit|appealCreated
 
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.14.8-9872nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.14.26nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: https://ccd-admin-web-${SERVICE_FQDN}/oauth2redirect
     environment:
@@ -269,7 +342,7 @@ elastic:
 
 elasticsearch:
   clusterName: "es"
-  imageTag: "6.4.2"
+  imageTag: "7.8.1"
   replicas: 1
   minimumMasterNodes: 1
   antiAffinity: "soft"
@@ -327,6 +400,7 @@ sscs-evidence-share:
       ROBOTICS_EMAIL_TO: "fake"
       ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
       ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
+      CASE_ACCESS_MANAGEMENT_FEATURE: true
 
 sscs-ccd-callback-orchestrator:
   enabled: false
@@ -370,6 +444,8 @@ sscs-tribunals-frontend:
 
 redis:
   enabled: false
+  replica:
+    replicaCount: 0
   cluster:
     enabled: false
     slaveCount: 0
