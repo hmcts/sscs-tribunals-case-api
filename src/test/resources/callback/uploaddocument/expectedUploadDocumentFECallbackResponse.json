@@ -249,7 +249,8 @@
     "hmctsDwpState": "sentToDwp",
     "evidenceHandled": "No",
     "hasUnprocessedAudioVideoEvidence": "No",
-    "workBasketHearingDate": null
+    "workBasketHearingDate": null,
+  "workBasketHearingEpimsId": null
   },
   "errors": [],
   "warnings": []
