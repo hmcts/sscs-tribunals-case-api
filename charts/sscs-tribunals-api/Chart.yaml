@@ -55,3 +55,15 @@ dependencies:
     version: 1.7.3
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd-case-document-am-api.enabled
+  - name: sscs-hearings-api
+    version: 0.0.17
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: sscs-hearings-api.enabled
+  - name: hmc-cft-hearing-service
+    version: 1.6.5
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: hmc-cft-hearing-service.enabled
+  - name: servicebus
+    version: 0.3.0
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: servicebus.enabled

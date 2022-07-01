@@ -58,7 +58,7 @@ em-ccdorc:
       CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
 
 ccd-case-document-am-api:
-  enabled: true
+  enabled: false
   java:
     image: hmctspublic.azurecr.io/ccd/case-document-am-api:latest
     ingressHost: ccd-case-document-am-api-${SERVICE_FQDN}
@@ -91,6 +91,12 @@ xui-webapp:
       SERVICES_TERMS_AND_CONDITIONS: http://xui-terms-and-conditions-${SERVICE_FQDN}
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       SERVICES_S2S: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      SERVICES_HEARINGS_COMPONENT_API: http://jurisdiction-hearings-api-aat.service.core-compute-aat.internal
+      SERVICES_HMC_HEARINGS_COMPONENT_API: http://hmc-cft-hearing-service-${SERVICE_FQDN}
+      SERVICES_PRD_LOCATION_API: http://rd-location-ref-api-aat.service.core-compute-aat.internal
+      SERVICES_PRD_JUDICIAL_API: http://rd-judicial-api-aat.service.core-compute-aat.internal
+      SERVICES_PRD_COMMONDATA_API: http://rd-commondata-api-aat.service.core-compute-aat.internal
+      SERVICES_DOCUMENTS_API_V2: http://ccd-case-document-am-api-${SERVICE_FQDN}
       JURISDICTIONS: SSCS
       LAUNCH_DARKLY_CLIENT_ID: 5de6610b23ce5408280f2268
       FEATURE_REDIS_ENABLED: false
@@ -454,3 +460,85 @@ redis:
   master:
     persistence:
       enabled: false
+
+sscs-hearings-api:
+  enabled: true
+  java:
+    image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
+    ingressHost: sscs-hearings-api-${SERVICE_FQDN}
+    releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
+    environment:
+      ROOT_LOGGING_LEVEL: INFO
+      LOG_OUTPUT: single
+      CREATE_CCD_ENDPOINT: false
+      IDAM_S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+      CASEWORKER_REF_API_URL: "http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal"
+      IDAM_API_URL: "https://idam-api.aat.platform.hmcts.net"
+      CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-${SERVICE_FQDN}"
+      COMMON_REF_API_URL: "http://rd-commondata-api-aat.service.core-compute-aat.internal"
+      JUDICIAL_REF_API_URL: "http://judicial-ref-api-aat.service.core-compute-aat.internal"
+      EXUI_API_URL: "https://xui-${SERVICE_FQDN}"
+      HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+      #Messaging
+      ##Enable for inbound
+      HMC_HEARING_LISTENING_ENABLED: true
+      HEARINGS_TOPIC_NAME: "hmc-to-cft"
+      HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription"
+      ##Enable for outbound
+      TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
+      TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
+
+hmc-cft-hearing-service:
+  enabled: true
+  java:
+    releaseNameOverride: ${SERVICE_NAME}-hmc-cft-hearing-service
+    image: "hmctspublic.azurecr.io/hmc/cft-hearing-service:latest"
+    ingressHost: hmc-cft-hearing-service-${SERVICE_FQDN}
+    environment:
+      HMC_SERVICE_BUS_TOPIC: "hmc-to-cft"
+      HMC_SERVICE_BUS_SUBSCRIPTION: "hmc-to-sscs-subscription"
+      HMC_SERVICE_BUS_QUEUE: hmc-from-hmi
+      HMC_OUTBOUND_SERVICE_BUS_QUEUE: hmc-to-hmi
+      CFT_HEARING_SERVICE_DB_HOST: "${SERVICE_NAME}-postgresql"
+      CFT_HEARING_SERVICE_DB_NAME: "hmc-cft-hearing-service"
+      CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
+      CFT_HEARING_SERVICE_DB_PORT: 5432
+      HMC_ACCESS_CONTROL_ENABLED: false
+      ROLE_ASSIGNMENT_URL: "http://{{ .Release.Name }}-am-role-assignment-service"
+      SPRING_CONFIG_IMPORT : "optional:configtree:/mnt/secrets/hmc/,optional:configtree:/mnt/secrets/sscs/"
+    secrets:
+      HMC_SERVICE_BUS_CONNECTION_STRING:
+        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
+        key: connectionString
+      HMC_QUEUE_CONNECTION_STRING:
+        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-hmc-from-hmi
+        key: connectionString
+      HMC_OUTBOUND_QUEUE_CONNECTION_STRING:
+        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-hmc-to-hmi
+        key: connectionString
+    keyVaults:
+      hmc:
+        resourceGroup: hmc-shared
+        secrets:
+          - name: AppInsightsInstrumentationKey
+      sscs:
+        secrets:
+          - name: preview-ccd-db-username
+            alias: CFT_HEARING_SERVICE_DB_USERNAME
+          - name: preview-ccd-db-password
+            alias: CFT_HEARING_SERVICE_DB_PASSWORD
+
+servicebus:
+  enabled: true
+  teamName: sscs
+  resourceGroup: sscs-aks
+  serviceplan: standard
+  setup:
+    topics:
+      - name: hmc-to-cft
+    subscriptions:
+      - name: hmc-to-sscs-subscription
+    queues:
+      - name: hmc-from-hmi
+      - name: hmc-to-hmi
+      - name: tribunals-to-hearing-api
