@@ -261,5 +261,6 @@
   "createdInGapsFrom": "readyToList",
   "processingVenue": "Ashford",
   "isScottishCase" : "No",
-  "workBasketHearingDate": null
+  "workBasketHearingDate": null,
+  "workBasketHearingEpimsId": null
 }
