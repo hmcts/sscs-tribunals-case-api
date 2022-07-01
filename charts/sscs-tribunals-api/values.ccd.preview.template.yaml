@@ -480,13 +480,26 @@ sscs-hearings-api:
       EXUI_API_URL: "https://xui-${SERVICE_FQDN}"
       HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
       #Messaging
-      ##Enable for inbound
+      ##Enable for outbound
       HMC_HEARING_LISTENING_ENABLED: true
       HEARINGS_TOPIC_NAME: "hmc-to-cft"
       HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription"
-      ##Enable for outbound
+      ##Enable for inbound
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
-      TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
+    secrets:
+      TRIBUNALS_EVENT_QUEUE_CONNECTION_STRING:
+        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
+        key: namespaceName
+      TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
+        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
+        key: primaryKey
+      HMC_HEARINGS_TOPIC_ACCESS_KEY:
+        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
+        key: primaryKey
+      HMC_HEARINGS_TOPIC_CONNECTION_STRING:
+        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
+        key: namespaceName
+
 
 hmc-cft-hearing-service:
   enabled: true
