@@ -462,9 +462,9 @@ redis:
       enabled: false
 
 sscs-hearings-api:
-  enabled: true
+  enabled: false
   java:
-    image: "hmctspublic.azurecr.io/sscs/hearings-api:pr-269" #Change to pr if required
+    image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
     ingressHost: sscs-hearings-api-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
     environment:
@@ -480,31 +480,15 @@ sscs-hearings-api:
       EXUI_API_URL: "https://xui-${SERVICE_FQDN}"
       HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
       #Messaging
-      ##Enable for outbound
-      HMC_HEARING_LISTENING_ENABLED: true
+      HMC_HEARING_LISTENING_ENABLED: false
       HEARINGS_TOPIC_NAME: "hmc-to-cft"
       HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription"
       HMC_HEARINGS_TOPIC_POLICY_NAME: RootManageSharedAccessKey
-      ##Enable for inbound
-      TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
+      TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
       TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
-      TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
-    secrets:
-      TRIBUNALS_EVENT_QUEUE_NAMESPACE:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
-        key: namespaceName
-      TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
-        key: primaryKey
-      HMC_HEARINGS_TOPIC_NAMESPACE:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
-        key: namespaceName
-      HMC_HEARINGS_TOPIC_ACCESS_KEY:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
-        key: primaryKey
 
 hmc-cft-hearing-service:
-  enabled: true
+  enabled: false
   java:
     releaseNameOverride: ${SERVICE_NAME}-hmc-cft-hearing-service
     image: "hmctspublic.azurecr.io/hmc/cft-hearing-service:latest"
@@ -544,7 +528,7 @@ hmc-cft-hearing-service:
             alias: CFT_HEARING_SERVICE_DB_PASSWORD
 
 servicebus:
-  enabled: true
+  enabled: false
   teamName: sscs
   resourceGroup: sscs-aks
   serviceplan: standard
