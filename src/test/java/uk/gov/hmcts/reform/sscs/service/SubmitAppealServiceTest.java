@@ -1,16 +1,30 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ASSOCIATE_CASE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_INCOMPLETE_APPLICATION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_NON_COMPLIANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_VALID_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATION_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SEND_TO_DWP;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
@@ -615,7 +629,10 @@ public class SubmitAppealServiceTest {
 
         RegionalProcessingCenter actualRpc = caseData.getRegionalProcessingCenter();
         RegionalProcessingCenter expectedRpcObject = getRpcObjectForGivenJsonRpc(expectedRpc);
-        assertThat(actualRpc, is(expectedRpcObject));
+        assertThat(actualRpc)
+            .usingRecursiveComparison()
+            .ignoringFields("hearingRoute")
+            .isEqualTo(expectedRpcObject);
         assertEquals(expectedRpcObject.getName(), caseData.getRegion());
     }
 
@@ -659,7 +676,10 @@ public class SubmitAppealServiceTest {
     private void assertRpc(SscsCaseData caseData, String expectedRpc) throws JsonProcessingException {
         RegionalProcessingCenter actualRpc = caseData.getRegionalProcessingCenter();
         RegionalProcessingCenter expectedRpcObject = getRpcObjectForGivenJsonRpc(expectedRpc);
-        assertThat(actualRpc, is(expectedRpcObject));
+        assertThat(actualRpc)
+            .usingRecursiveComparison()
+            .ignoringFields("hearingRoute")
+            .isEqualTo(expectedRpcObject);
         assertEquals(expectedRpcObject.getName(), caseData.getRegion());
     }
 
