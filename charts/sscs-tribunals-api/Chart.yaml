@@ -52,7 +52,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: em-ccdorc.enabled
   - name: ccd-case-document-am-api
-    version: 1.7.3
+    version: 1.7.4
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd-case-document-am-api.enabled
   - name: sscs-hearings-api
