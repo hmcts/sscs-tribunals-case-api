@@ -26,6 +26,7 @@ public class SessionAwareServiceBusMessagingService implements SessionAwareMessa
             serviceBusMessage.setSessionId(message.getSessionId());
             serviceBusMessage.setPartitionKey(message.getSessionId());
             serviceBusMessage.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            serviceBusMessage.getApplicationProperties().put("_type", "uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest");
 
             log.info("About to send request with body: {}", serviceBusMessage.getBody().toString());
 
