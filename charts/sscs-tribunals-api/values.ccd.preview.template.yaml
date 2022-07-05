@@ -1,3 +1,4 @@
+#Pull request needs to have the pr-values:ccd label to deploy this stack.
 tags:
   sscs-ccd-idam-pr: true
 
@@ -303,6 +304,8 @@ ccd:
       - sscs.superuser@mailinator.com|SSCS|Benefit|appealCreated
       - sscs-citizen2@hmcts.net|SSCS|Benefit|appealCreated
 
+  #Use this image to import your CCD definition. To have an image available, create a tag and push it. Must be the
+  #non-prod sheets.
   ccd-definition-importer:
     image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.14.26nonProd
     definitionFilename: sscs-ccd.xlsx
@@ -421,6 +424,7 @@ sscs-ccd-callback-orchestrator:
       TOPIC_NAME: "sscs-evidenceshare-topic-aat"
       AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
 
+#Enable for SYA
 sscs-tribunals-frontend:
   enabled: false
   nodejs:
@@ -461,14 +465,18 @@ redis:
     persistence:
       enabled: false
 
+#Turning either hearings api (with either listener on) or cft hearing service on requires
+#service bus to be turned on.
 sscs-hearings-api:
-  enabled: true
+  enabled: false
   java:
     image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
     ingressHost: sscs-hearings-api-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
     environment:
       ROOT_LOGGING_LEVEL: INFO
+      SSCS_LOG_LEVEL: INFO #Switch to debug to see requests being sent.
+      SERVICE_BUS_LOG_LEVEL: ERROR
       LOG_OUTPUT: single
       CREATE_CCD_ENDPOINT: false
       IDAM_S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
@@ -480,11 +488,11 @@ sscs-hearings-api:
       EXUI_API_URL: "https://xui-${SERVICE_FQDN}"
       HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
       #Messaging
-      HMC_HEARING_LISTENING_ENABLED: true
+      HMC_HEARING_LISTENING_ENABLED: false
       HEARINGS_TOPIC_NAME: "hmc-to-cft"
       HEARINGS_TOPIC_SUBSCRIPTION_NAME: "tribunals-to-hearing-api"
       HMC_HEARINGS_TOPIC_POLICY_NAME: RootManageSharedAccessKey
-      TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
+      TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
       TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
     secrets:
@@ -502,7 +510,7 @@ sscs-hearings-api:
         key: primaryKey
 
 hmc-cft-hearing-service:
-  enabled: true
+  enabled: false
   java:
     releaseNameOverride: ${SERVICE_NAME}-hmc-cft-hearing-service
     image: "hmctspublic.azurecr.io/hmc/cft-hearing-service:latest"
@@ -541,11 +549,13 @@ hmc-cft-hearing-service:
           - name: preview-ccd-db-password
             alias: CFT_HEARING_SERVICE_DB_PASSWORD
 
+#Enable for queues/topics
 servicebus:
-  enabled: true
+  enabled: false
   teamName: sscs
   resourceGroup: sscs-aks
   serviceplan: standard
+  #Each topic/queue matches up to one used in the config above
   setup:
     topics:
       - name: hmc-to-cft
