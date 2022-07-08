@@ -138,6 +138,7 @@
         <packageUrl regex="true">^pkg:maven/org\.apache\.tika/tika-core@.*$</packageUrl>
         <cve>CVE-2022-30126</cve>
         <cve>CVE-2022-25169</cve>
+        <cve>CVE-2022-33879</cve>
     </suppress>
     <suppress until ="2022-08-01">
         <notes><![CDATA[
