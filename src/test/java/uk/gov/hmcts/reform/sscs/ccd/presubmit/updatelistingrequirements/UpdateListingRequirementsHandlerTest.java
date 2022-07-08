@@ -5,6 +5,9 @@ import static org.assertj.core.groups.Tuple.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.JudicialMemberType.REGIONAL_TRIBUNAL_JUDGE;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.JudicialMemberType.TRIBUNAL_JUDGE;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.JudicialMemberType.TRIBUNAL_PRESIDENT;
 
 import java.util.List;
 import org.junit.Test;
@@ -24,6 +27,7 @@ import uk.gov.hmcts.reform.sscs.model.client.JudicialMemberAppointments;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialRefDataUsersRequest;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialRefDataUsersResponse;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUser;
+import uk.gov.hmcts.reform.sscs.reference.data.model.JudicialMemberType;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
@@ -367,4 +371,61 @@ public class UpdateListingRequirementsHandlerTest {
         assertThat(result.getLabel()).isEqualTo("Test Person");
     }
 
+    @Test
+    public void isValidJudicialMemberTypePresident() {
+        boolean result = updateListingRequirementsHandler.isValidJudicialMemberType("President of Tribunal");
+
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void isValidJudicialMemberTypeRegional() {
+        boolean result = updateListingRequirementsHandler.isValidJudicialMemberType("Regional Tribunal Judge");
+
+        assertThat(result).isTrue();
+    }
+
+
+    @Test
+    public void isValidJudicialMemberTypeJudge() {
+        boolean result = updateListingRequirementsHandler.isValidJudicialMemberType("Tribunal Judge");
+
+        assertThat(result).isTrue();
+    }
+
+
+    @Test
+    public void isValidJudicialMemberType() {
+        boolean result = updateListingRequirementsHandler.isValidJudicialMemberType("Wrong Type");
+
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void getJudicialMemberTypePresident() {
+        JudicialMemberType result = updateListingRequirementsHandler.getJudicialMemberType("President of Tribunal");
+
+        assertThat(result).isEqualTo(TRIBUNAL_PRESIDENT);
+    }
+
+    @Test
+    public void getJudicialMemberTypeRegional() {
+        JudicialMemberType result = updateListingRequirementsHandler.getJudicialMemberType("Regional Tribunal Judge");
+
+        assertThat(result).isEqualTo(REGIONAL_TRIBUNAL_JUDGE);
+    }
+
+    @Test
+    public void getJudicialMemberTypeJudge() {
+        JudicialMemberType result = updateListingRequirementsHandler.getJudicialMemberType("Tribunal Judge");
+
+        assertThat(result).isEqualTo(TRIBUNAL_JUDGE);
+    }
+
+    @Test
+    public void getJudicialMemberType() {
+        JudicialMemberType result = updateListingRequirementsHandler.getJudicialMemberType("Test");
+
+        assertThat(result).isNull();
+    }
 }

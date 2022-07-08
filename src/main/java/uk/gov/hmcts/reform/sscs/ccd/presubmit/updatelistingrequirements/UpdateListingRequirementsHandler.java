@@ -3,11 +3,13 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -23,7 +25,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.JudgeType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReservedToMember;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -34,6 +35,7 @@ import uk.gov.hmcts.reform.sscs.model.client.JudicialMemberAppointments;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialRefDataUsersRequest;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialRefDataUsersResponse;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUser;
+import uk.gov.hmcts.reform.sscs.reference.data.model.JudicialMemberType;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
@@ -78,7 +80,7 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
 
     }
 
-    private void generateInterpreterLanguageFields(OverrideFields overrideFields) {
+    public void generateInterpreterLanguageFields(OverrideFields overrideFields) {
         if (isNull(overrideFields.getAppellantInterpreter())
             || isNull(overrideFields.getAppellantInterpreter().getInterpreterLanguage())) {
             overrideFields.setAppellantInterpreter(HearingInterpreter.builder()
@@ -92,7 +94,7 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
             .setListItems(interpreterLanguage);
     }
 
-    private void generateReservedToJudgeFields(OverrideFields overrideFields) {
+    public void generateReservedToJudgeFields(OverrideFields overrideFields) {
         if (isNull(overrideFields.getReservedToJudge())
             || isNull(overrideFields.getReservedToJudge().getReservedMember())) {
             overrideFields.setReservedToJudge(ReservedToMember.builder()
@@ -119,7 +121,7 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
     }
 
     @NotNull
-    private List<DynamicListItem> generateInterpreterLanguage() {
+    public List<DynamicListItem> generateInterpreterLanguage() {
 
         return getLanguages().stream()
             .map(this::getLanguageDynamicListItem)
@@ -127,7 +129,7 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
     }
 
     @NotNull
-    private DynamicListItem getLanguageDynamicListItem(Language language) {
+    public DynamicListItem getLanguageDynamicListItem(Language language) {
         String reference = language.getReference();
         String name = language.getNameEn();
 
@@ -138,7 +140,7 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
         return new DynamicListItem(reference, name);
     }
 
-    private List<Language> getLanguages() {
+    public List<Language> getLanguages() {
         List<Language> signLanguages = signLanguagesService.getSignLanguages();
         List<Language> verbalLanguages = verbalLanguagesService.getVerbalLanguages();
 
@@ -146,7 +148,7 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
             .collect(Collectors.toList());
     }
 
-    private List<DynamicListItem> generateReservedMembers() {
+    public List<DynamicListItem> generateReservedMembers() {
         JudicialRefDataUsersRequest request = JudicialRefDataUsersRequest.builder()
             .ccdServiceName(SERVICE_NAME)
             .build();
@@ -159,29 +161,31 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
         return Optional.ofNullable(refDataResponse.getJudicialUsers())
             .orElse(Collections.emptyList())
             .stream()
-            .filter(judicialUser -> judicialUser.getAppointments().stream().map(JudicialMemberAppointments::getAppointment).anyMatch(this::isValidJudgeType))
+            .filter(Objects::nonNull)
+            .filter(judicialUser -> isNotEmpty(judicialUser.getAppointments()))
+            .filter(judicialUser -> judicialUser.getAppointments().stream().map(JudicialMemberAppointments::getAppointment).anyMatch(this::isValidJudicialMemberType))
             .map(this::getJudicialMemberListItem)
             .collect(Collectors.toList());
     }
 
     @NotNull
-    private DynamicListItem getJudicialMemberListItem(JudicialUser judicialUser) {
+    public DynamicListItem getJudicialMemberListItem(JudicialUser judicialUser) {
         String name = isNotBlank(judicialUser.getPostNominals())
             ? String.format("%s %s", judicialUser.getFullName(), judicialUser.getPostNominals())
             : judicialUser.getFullName();
         return new DynamicListItem(judicialUser.getPersonalCode(), name);
     }
 
-    private boolean isValidJudgeType(String appointment) {
-        JudgeType type = getJudgeType(appointment);
-        return JudgeType.PRESIDENT_OF_TRIBUNAL == type
-            || JudgeType.TRIBUNAL_JUDGE == type
-            || JudgeType.REGIONAL_TRIBUNAL_JUDGE == type;
+    public boolean isValidJudicialMemberType(String appointment) {
+        JudicialMemberType type = getJudicialMemberType(appointment);
+        return JudicialMemberType.TRIBUNAL_PRESIDENT == type
+            || JudicialMemberType.TRIBUNAL_JUDGE == type
+            || JudicialMemberType.REGIONAL_TRIBUNAL_JUDGE == type;
     }
 
-    private JudgeType getJudgeType(String appointment) {
-        return Arrays.stream(JudgeType.values())
-            .filter(x -> x.getEn().equals(appointment))
+    public JudicialMemberType getJudicialMemberType(String appointment) {
+        return Arrays.stream(JudicialMemberType.values())
+            .filter(x -> x.getDescriptionEn().equals(appointment))
             .findFirst()
             .orElse(null);
     }
