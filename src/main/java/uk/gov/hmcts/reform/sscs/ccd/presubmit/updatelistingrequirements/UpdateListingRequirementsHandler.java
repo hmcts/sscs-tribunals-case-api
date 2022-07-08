@@ -1,8 +1,20 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.updateListingRequirements;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -26,20 +38,13 @@ import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.Objects.*;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    @Value("${feature.snl.enabled}")
+    private boolean isScheduleListingEnabled;
 
     private final IdamService idamService;
     private final SignLanguagesService signLanguagesService;
@@ -55,16 +60,18 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        OverrideFields overrideFields = sscsCaseData.getSchedulingAndListingFields().getOverrideFields();
+        if (isScheduleListingEnabled) {
+            OverrideFields overrideFields = sscsCaseData.getSchedulingAndListingFields().getOverrideFields();
 
-        if(isNull(overrideFields)) {
-            overrideFields = new OverrideFields();
-            sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
+            if (isNull(overrideFields)) {
+                overrideFields = new OverrideFields();
+                sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
+            }
+
+            generateInterpreterLanguageFields(overrideFields);
+
+            generateReservedToJudgeFields(overrideFields);
         }
-
-        generateInterpreterLanguageFields(overrideFields);
-
-        generateReservedToJudgeFields(overrideFields);
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
             && (callback.getEvent() == EventType.UPDATE_LISTING_REQUIREMENTS);
@@ -72,8 +79,8 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
     }
 
     private void generateInterpreterLanguageFields(OverrideFields overrideFields) {
-        if(isNull(overrideFields.getAppellantInterpreter())
-            ||  isNull(overrideFields.getAppellantInterpreter().getInterpreterLanguage())) {
+        if (isNull(overrideFields.getAppellantInterpreter())
+            || isNull(overrideFields.getAppellantInterpreter().getInterpreterLanguage())) {
             overrideFields.setAppellantInterpreter(HearingInterpreter.builder()
                 .interpreterLanguage(new DynamicList(null, null))
                 .build());
@@ -86,7 +93,7 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
     }
 
     private void generateReservedToJudgeFields(OverrideFields overrideFields) {
-        if(isNull(overrideFields.getReservedToJudge())
+        if (isNull(overrideFields.getReservedToJudge())
             || isNull(overrideFields.getReservedToJudge().getReservedMember())) {
             overrideFields.setReservedToJudge(ReservedToMember.builder()
                 .reservedMember(new DynamicList(null, null))
@@ -124,7 +131,7 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
         String reference = language.getReference();
         String name = language.getNameEn();
 
-        if(nonNull(language.getDialectReference())) {
+        if (nonNull(language.getDialectReference())) {
             reference = String.format("%s-%s", language.getReference(), language.getDialectReference());
             name = language.getDialectEn();
         }
@@ -167,12 +174,9 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
 
     private boolean isValidJudgeType(String appointment) {
         JudgeType type = getJudgeType(appointment);
-        if (JudgeType.PRESIDENT_OF_TRIBUNAL == type
+        return JudgeType.PRESIDENT_OF_TRIBUNAL == type
             || JudgeType.TRIBUNAL_JUDGE == type
-            || JudgeType.REGIONAL_TRIBUNAL_JUDGE == type) {
-            return true;
-        }
-        return false;
+            || JudgeType.REGIONAL_TRIBUNAL_JUDGE == type;
     }
 
     private JudgeType getJudgeType(String appointment) {
@@ -180,10 +184,6 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
             .filter(x -> x.getEn().equals(appointment))
             .findFirst()
             .orElse(null);
-    }
-
-    private void extractJudges(JudicialRefDataUsersResponse refDataResponse) {
-
     }
 
 }
