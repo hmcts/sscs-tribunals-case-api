@@ -630,8 +630,11 @@ public class SubmitAppealServiceTest {
         RegionalProcessingCenter expectedRpcObject = getRpcObjectForGivenJsonRpc(expectedRpc);
         assertThat(actualRpc)
             .usingRecursiveComparison()
-            .ignoringFields("hearingRoute")
+            .ignoringFields("hearingRoute","epimsId")
             .isEqualTo(expectedRpcObject);
+        assertThat(actualRpc)
+            .extracting("hearingRoute","epimsId")
+            .doesNotContainNull();
         assertEquals(expectedRpcObject.getName(), caseData.getRegion());
     }
 
@@ -681,8 +684,12 @@ public class SubmitAppealServiceTest {
         RegionalProcessingCenter expectedRpcObject = getRpcObjectForGivenJsonRpc(expectedRpc);
         assertThat(actualRpc)
             .usingRecursiveComparison()
-            .ignoringFields("hearingRoute")
+            .ignoringFields("hearingRoute","epimsId")
             .isEqualTo(expectedRpcObject);
+        assertThat(actualRpc)
+            .extracting("hearingRoute","epimsId")
+            .doesNotContainNull();
+
         assertEquals(expectedRpcObject.getName(), caseData.getRegion());
     }
 
