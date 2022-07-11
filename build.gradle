@@ -189,7 +189,9 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/controllers/CreateCaseController.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/PdfData.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/esa/EsaWriteFinalDecisionMidEventValidationHandler.java," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/uc/UcWriteFinalDecisionMidEventValidationHandler.java"
+                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/uc/UcWriteFinalDecisionMidEventValidationHandler.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/caseupdated/CaseUpdatedAboutToSubmitHandler.java," + //Temporarily added for revert.
+                "src/main/java/uk/gov/hmcts/reform/sscs/service/SubmitAppealService.java"
         property "sonar.host.url", "https://sonar.reform.hmcts.net/"
         property "sonar.pitest.mode", "reuseReport"
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
