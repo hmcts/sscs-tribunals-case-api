@@ -180,17 +180,16 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
     }
 
     private String extractHmcReferenceCode(JudicialUser judicialUser) {
-        if(judicialUser.getAppointments() != null) {
-           JudicialMemberType judicialMemberType = judicialUser.getAppointments().stream()
+        if (judicialUser.getAppointments() != null) {
+            JudicialMemberType judicialMemberType = judicialUser.getAppointments().stream()
                 .map(JudicialMemberAppointments::getAppointment)
                 .map(this::getJudicialMemberType)
                 .findFirst()
                 .orElse(null);
+            if (judicialMemberType != null) {
+                return judicialMemberType.getHmcReference();
+            }
 
-           if (judicialMemberType != null) {
-               return judicialMemberType.getHmcReference();
-           }
-           
         }
         return StringUtils.EMPTY;
     }
