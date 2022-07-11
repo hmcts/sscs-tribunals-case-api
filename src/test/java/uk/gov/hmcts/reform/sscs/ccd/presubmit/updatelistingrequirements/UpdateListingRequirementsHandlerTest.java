@@ -156,7 +156,7 @@ public class UpdateListingRequirementsHandlerTest {
         assertThat(result)
             .hasSize(1)
             .extracting("code","label")
-            .containsExactlyInAnyOrder(tuple("1234","Test Person Judge"));
+            .containsExactlyInAnyOrder(tuple("1234|84","Test Person Judge"));
     }
 
     @Test
@@ -196,7 +196,7 @@ public class UpdateListingRequirementsHandlerTest {
         assertThat(result)
             .hasSize(1)
             .extracting("code","label")
-            .containsExactlyInAnyOrder(tuple("1234","Test Person Judge"));
+            .containsExactlyInAnyOrder(tuple("1234|84","Test Person Judge"));
     }
 
     @Test
@@ -234,7 +234,7 @@ public class UpdateListingRequirementsHandlerTest {
         assertThat(result)
             .hasSize(1)
             .extracting("code","label")
-            .containsExactlyInAnyOrder(tuple("1234","Test Person Judge"));
+            .containsExactlyInAnyOrder(tuple("1234|84","Test Person Judge"));
     }
 
     @Test
@@ -303,7 +303,7 @@ public class UpdateListingRequirementsHandlerTest {
         assertThat(result)
             .hasSize(1)
             .extracting("code","label")
-            .containsExactlyInAnyOrder(tuple("1234","Test Person Judge"));
+            .containsExactlyInAnyOrder(tuple("1234|84","Test Person Judge"));
     }
 
     @Test
@@ -328,13 +328,16 @@ public class UpdateListingRequirementsHandlerTest {
     public void getJudicialMemberListItem() {
         JudicialUser judicialUser = JudicialUser.builder()
             .personalCode("1234")
+            .appointments(List.of(JudicialMemberAppointments.builder()
+                .appointment("Tribunal Judge")
+                .build()))
             .fullName("Test Person")
             .postNominals("Judge")
             .build();
         DynamicListItem result = updateListingRequirementsHandler.getJudicialMemberListItem(judicialUser);
 
         assertThat(result).isNotNull();
-        assertThat(result.getCode()).isEqualTo("1234");
+        assertThat(result.getCode()).isEqualTo("1234|84");
         assertThat(result.getLabel()).isEqualTo("Test Person Judge");
     }
 
@@ -343,11 +346,14 @@ public class UpdateListingRequirementsHandlerTest {
         JudicialUser judicialUser = JudicialUser.builder()
             .personalCode("1234")
             .fullName("Test Person")
+            .appointments(List.of(JudicialMemberAppointments.builder()
+                .appointment("Tribunal Judge")
+                .build()))
             .build();
         DynamicListItem result = updateListingRequirementsHandler.getJudicialMemberListItem(judicialUser);
 
         assertThat(result).isNotNull();
-        assertThat(result.getCode()).isEqualTo("1234");
+        assertThat(result.getCode()).isEqualTo("1234|84");
         assertThat(result.getLabel()).isEqualTo("Test Person");
     }
 
