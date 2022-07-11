@@ -222,7 +222,7 @@ def versions = [
         reformLogging   : '5.1.7',
         sonarPitest     : '0.5',
         springfoxSwagger: '2.8.0',
-        sscsCommon      : '4.12.6',
+        sscsCommon      : '4.13.0'
 ]
 
 ext["rest-assured.version"] = '4.2.0'
@@ -252,7 +252,7 @@ dependencyManagement {
             entry 'kotlin-reflect'
         }
         // CVE-2020-13934, CVE-2020-13935, CVE-2020-17527, CVE-2020-17527,
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.63') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.64') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-annotations-api'
