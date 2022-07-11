@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.tika.utils.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -181,13 +181,17 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
 
     private String extractHmcReferenceCode(JudicialUser judicialUser) {
         if(judicialUser.getAppointments() != null) {
-            return judicialUser.getAppointments().stream()
+           JudicialMemberType judicialMemberType = judicialUser.getAppointments().stream()
                 .map(JudicialMemberAppointments::getAppointment)
                 .map(this::getJudicialMemberType)
                 .findFirst()
-                .orElse(null)
-                .getHmcReference();
-        } 
+                .orElse(null);
+
+           if (judicialMemberType != null) {
+               return judicialMemberType.getHmcReference();
+           }
+           
+        }
         return StringUtils.EMPTY;
     }
 
