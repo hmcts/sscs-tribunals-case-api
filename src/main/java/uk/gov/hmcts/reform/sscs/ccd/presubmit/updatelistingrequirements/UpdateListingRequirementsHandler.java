@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -170,7 +171,7 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
 
     @NotNull
     public DynamicListItem getJudicialMemberListItem(JudicialUser judicialUser) {
-        String referenceCodes = String.format("%s|%s", judicialUser.getPersonalCode(), getHmcReferenceCode(judicialUser));
+        String referenceCodes = String.format("%s|%s", judicialUser.getPersonalCode(), extractHmcReferenceCode(judicialUser));
 
         String name = isNotBlank(judicialUser.getPostNominals())
             ? String.format("%s %s", judicialUser.getFullName(), judicialUser.getPostNominals())
@@ -178,15 +179,16 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
         return new DynamicListItem(referenceCodes, name);
     }
 
-    private String getHmcReferenceCode(JudicialUser judicialUser) {
-        return judicialUser.getAppointments().stream()
-            .filter(Objects::nonNull)
-           .map(JudicialMemberAppointments::getAppointment)
-            .filter(Objects::nonNull)
-           .map(this::getJudicialMemberType)
-            .filter(Objects::nonNull)
-           .findFirst().orElse(null).getHmcReference();
-
+    private String extractHmcReferenceCode(JudicialUser judicialUser) {
+        if(judicialUser.getAppointments() != null) {
+            return judicialUser.getAppointments().stream()
+                .map(JudicialMemberAppointments::getAppointment)
+                .map(this::getJudicialMemberType)
+                .findFirst()
+                .orElse(null)
+                .getHmcReference();
+        } 
+        return StringUtils.EMPTY;
     }
 
     public boolean isValidJudicialMemberType(String appointment) {
