@@ -248,5 +248,7 @@
   "processingVenue": "Ashford",
   "interlocReferralDate" : "2021-04-13",
   "interlocReviewState" : "reviewByTcw",
-  "isScottishCase" : "No"
+  "isScottishCase" : "No",
+  "workBasketHearingDate": null,
+  "workBasketHearingEpimsId": null
 }
