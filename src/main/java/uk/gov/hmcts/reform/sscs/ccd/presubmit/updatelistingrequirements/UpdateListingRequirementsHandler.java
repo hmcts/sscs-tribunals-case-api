@@ -180,6 +180,7 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
 
     private String getHmcReferenceCode(JudicialUser judicialUser) {
         return judicialUser.getAppointments().stream()
+            .filter(Objects::nonNull)
            .map(JudicialMemberAppointments::getAppointment)
             .filter(Objects::nonNull)
            .map(this::getJudicialMemberType)
