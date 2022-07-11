@@ -194,7 +194,8 @@
     "postcode": "B16 6FR",
     "city": "BIRMINGHAM",
     "email": "Birmingham-SYA-Receipts@justice.gov.uk",
-    "hearingRoute": null
+    "hearingRoute": null,
+    "epimsId": null
   },
   "sscsDocument": [{
     "value": {
