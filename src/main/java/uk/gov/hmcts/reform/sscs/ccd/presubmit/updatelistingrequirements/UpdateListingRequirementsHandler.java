@@ -35,7 +35,7 @@ import uk.gov.hmcts.reform.sscs.model.client.JudicialMemberAppointments;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialRefDataUsersRequest;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialRefDataUsersResponse;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUser;
-import uk.gov.hmcts.reform.sscs.reference.data.model.JudgeType;
+import uk.gov.hmcts.reform.sscs.reference.data.model.JudicialMemberType;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
@@ -170,7 +170,7 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
 
     @NotNull
     public DynamicListItem getJudicialMemberListItem(JudicialUser judicialUser) {
-        String referenceCodes = String.format("%s %s", judicialUser.getPersonalCode(), getHmcReferenceCode(judicialUser));
+        String referenceCodes = String.format("%s|%s", judicialUser.getPersonalCode(), getHmcReferenceCode(judicialUser));
 
         String name = isNotBlank(judicialUser.getPostNominals())
             ? String.format("%s %s", judicialUser.getFullName(), judicialUser.getPostNominals())
@@ -179,7 +179,7 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
     }
 
     private String getHmcReferenceCode(JudicialUser judicialUser) {
-       return judicialUser.getAppointments().stream()
+        return judicialUser.getAppointments().stream()
            .map(JudicialMemberAppointments::getAppointment)
            .map(this::getJudicialMemberType)
            .findFirst()
@@ -189,14 +189,14 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
     }
 
     public boolean isValidJudicialMemberType(String appointment) {
-        JudgeType type = getJudicialMemberType(appointment);
-        return JudgeType.TRIBUNAL_PRESIDENT == type
-            || JudgeType.TRIBUNAL_JUDGE == type
-            || JudgeType.REGIONAL_TRIBUNAL_JUDGE == type;
+        JudicialMemberType type = getJudicialMemberType(appointment);
+        return JudicialMemberType.TRIBUNAL_PRESIDENT == type
+            || JudicialMemberType.TRIBUNAL_JUDGE == type
+            || JudicialMemberType.REGIONAL_TRIBUNAL_JUDGE == type;
     }
 
-    public JudgeType getJudicialMemberType(String appointment) {
-        return Arrays.stream(JudgeType.values())
+    public JudicialMemberType getJudicialMemberType(String appointment) {
+        return Arrays.stream(JudicialMemberType.values())
             .filter(x -> x.getDescriptionEn().equals(appointment))
             .findFirst()
             .orElse(null);
