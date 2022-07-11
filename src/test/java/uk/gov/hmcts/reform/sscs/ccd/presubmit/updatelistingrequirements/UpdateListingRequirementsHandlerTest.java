@@ -342,6 +342,20 @@ public class UpdateListingRequirementsHandlerTest {
     }
 
     @Test
+    public void getJudicialMemberListItemNoAppointments() {
+        JudicialUser judicialUser = JudicialUser.builder()
+            .personalCode("1234")
+            .fullName("Test Person")
+            .postNominals("Judge")
+            .build();
+        DynamicListItem result = updateListingRequirementsHandler.getJudicialMemberListItem(judicialUser);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getCode()).isEqualTo("1234|");
+        assertThat(result.getLabel()).isEqualTo("Test Person Judge");
+    }
+
+    @Test
     public void getJudicialMemberListItemNoPostNominals() {
         JudicialUser judicialUser = JudicialUser.builder()
             .personalCode("1234")
