@@ -43,7 +43,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final RefDataService refDataService;
     private final boolean caseAccessManagementFeature;
 
-    @SuppressWarnings("squid:S107")
     CaseUpdatedAboutToSubmitHandler(RegionalProcessingCenterService regionalProcessingCenterService,
                                     AssociatedCaseLinkHelper associatedCaseLinkHelper,
                                     AirLookupService airLookupService,
@@ -66,7 +65,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() == EventType.CASE_UPDATED;
+                && callback.getEvent() == EventType.CASE_UPDATED;
     }
 
     @Override
@@ -104,8 +103,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
             if (newRpc != null) {
                 sscsCaseData.setRegion(newRpc.getName());
-                updateProcessingVenueIfRequired(caseDetails, newRpc.getEpimsId());
             }
+
+            updateProcessingVenueIfRequired(caseDetails);
         }
 
         checkConfidentiality(sscsCaseData);
@@ -207,7 +207,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private void updateProcessingVenueIfRequired(CaseDetails<SscsCaseData> caseDetails, String rpcEpimsId) {
+    private void updateProcessingVenueIfRequired(CaseDetails<SscsCaseData> caseDetails) {
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
         String postCode = resolvePostCode(sscsCaseData);
         log.info("updateProcessingVenueIfRequired for post code " + postCode);
@@ -219,11 +219,11 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
             sscsCaseData.setProcessingVenue(venue);
 
-            if (caseAccessManagementFeature && StringUtils.isNotEmpty(venue)) {
+            if (caseAccessManagementFeature && !StringUtils.isEmpty(venue)) {
                 CourtVenue courtVenue = refDataService.getVenueRefData(venue);
                 if (courtVenue != null) {
                     sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
-                            .baseLocation(rpcEpimsId)
+                            .baseLocation(courtVenue.getEpimsId())
                             .region(courtVenue.getRegionId()).build());
                 }
             }
