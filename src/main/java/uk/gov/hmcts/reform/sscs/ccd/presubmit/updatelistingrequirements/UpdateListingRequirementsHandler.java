@@ -6,7 +6,6 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -40,6 +39,7 @@ import uk.gov.hmcts.reform.sscs.reference.data.model.JudicialMemberType;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
+import uk.gov.hmcts.reform.sscs.util.UpdateListingRequirementsUtil;
 
 @Service
 @Slf4j
@@ -53,6 +53,7 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
     private final SignLanguagesService signLanguagesService;
     private final VerbalLanguagesService verbalLanguagesService;
     private final JudicialRefDataApi judicialRefData;
+    private final UpdateListingRequirementsUtil utils;
 
     public static final String SERVICE_NAME = "sscs";
 
@@ -65,11 +66,6 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
 
         if (isScheduleListingEnabled) {
             OverrideFields overrideFields = sscsCaseData.getSchedulingAndListingFields().getOverrideFields();
-
-            if (isNull(overrideFields)) {
-                overrideFields = new OverrideFields();
-                sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
-            }
 
             generateInterpreterLanguageFields(overrideFields);
 
@@ -164,7 +160,9 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
             .stream()
             .filter(Objects::nonNull)
             .filter(judicialUser -> isNotEmpty(judicialUser.getAppointments()))
-            .filter(judicialUser -> judicialUser.getAppointments().stream().map(JudicialMemberAppointments::getAppointment).anyMatch(this::isValidJudicialMemberType))
+            .filter(judicialUser -> judicialUser.getAppointments().stream()
+                .map(JudicialMemberAppointments::getAppointment)
+                .anyMatch(UpdateListingRequirementsUtil::isValidJudicialMemberType))
             .map(this::getJudicialMemberListItem)
             .collect(Collectors.toList());
     }
@@ -183,7 +181,7 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
         if (judicialUser.getAppointments() != null) {
             JudicialMemberType judicialMemberType = judicialUser.getAppointments().stream()
                 .map(JudicialMemberAppointments::getAppointment)
-                .map(this::getJudicialMemberType)
+                .map(appointment -> utils.getJudicialMemberType(appointment))
                 .findFirst()
                 .orElse(null);
             if (judicialMemberType != null) {
@@ -194,17 +192,4 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
         return StringUtils.EMPTY;
     }
 
-    public boolean isValidJudicialMemberType(String appointment) {
-        JudicialMemberType type = getJudicialMemberType(appointment);
-        return JudicialMemberType.TRIBUNAL_PRESIDENT == type
-            || JudicialMemberType.TRIBUNAL_JUDGE == type
-            || JudicialMemberType.REGIONAL_TRIBUNAL_JUDGE == type;
-    }
-
-    public JudicialMemberType getJudicialMemberType(String appointment) {
-        return Arrays.stream(JudicialMemberType.values())
-            .filter(x -> x.getDescriptionEn().equals(appointment))
-            .findFirst()
-            .orElse(null);
-    }
 }
