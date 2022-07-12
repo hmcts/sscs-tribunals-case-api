@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 import java.util.Arrays;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.reference.data.model.JudicialMemberType;
 
+@Component
 public class UpdateListingRequirementsUtil {
 
     private UpdateListingRequirementsUtil(){

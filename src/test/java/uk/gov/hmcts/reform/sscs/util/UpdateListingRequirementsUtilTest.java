@@ -4,15 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.JudicialMemberType.*;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.sscs.reference.data.model.JudicialMemberType;
 
-@RunWith(MockitoJUnitRunner.class)
 public class UpdateListingRequirementsUtilTest {
 
-    @InjectMocks
     private UpdateListingRequirementsUtil utils;
 
     @Test
