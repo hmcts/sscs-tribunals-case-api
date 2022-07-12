@@ -13,10 +13,7 @@
       }
     ]
   },
-  "caseManagementLocation": {
-    "baseLocation":"698118",
-    "region":"6"
-  },
+  "caseManagementLocation":{"baseLocation":"239985","region":"6"},
   "addedDocuments": null,
   "caseNameHmctsInternal": "Joe Bloggs",
   "caseNameHmctsRestricted": "Joe Bloggs",
@@ -37,8 +34,7 @@
     "phoneNumber" : "0300 123 1142",
     "faxNumber" : "0126 434 7983",
     "email": "SSCS_Bradford@justice.gov.uk",
-    "hearingRoute": null,
-    "epimsId": null
+    "hearingRoute": null
   },
   "appeal": {
     "mrnDetails": {
