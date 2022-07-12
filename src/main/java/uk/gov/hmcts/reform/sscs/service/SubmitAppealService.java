@@ -242,30 +242,28 @@ public class SubmitAppealService {
         String firstHalfOfPostcode = getFirstHalfOfPostcode(postCode);
         RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);
 
-        SscsCaseData sscsCaseData = rpc == null
-            ? convertSyaToCcdCaseData(appeal, caseAccessManagementFeature)
-            : convertSyaToCcdCaseData(appeal, rpc.getName(), rpc, caseAccessManagementFeature);
+        SscsCaseData sscsCaseData;
+        if (rpc == null) {
+            sscsCaseData = convertSyaToCcdCaseData(appeal, caseAccessManagementFeature);
+        } else {
+            sscsCaseData = convertSyaToCcdCaseData(appeal, rpc.getName(), rpc, caseAccessManagementFeature);
+        }
 
         sscsCaseData.setCreatedInGapsFrom(READY_TO_LIST.getId());
         String processingVenue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
         sscsCaseData.setProcessingVenue(processingVenue);
 
-        if (caseAccessManagementFeature
-            && StringUtils.isNotEmpty(processingVenue)
-            && rpc != null) {
+        if (caseAccessManagementFeature && !StringUtils.isEmpty(processingVenue)) {
             log.info("Getting venue details for " + processingVenue);
             CourtVenue courtVenue = refDataService.getVenueRefData(processingVenue);
-
             if (courtVenue != null) {
                 sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
-                        .baseLocation(rpc.getEpimsId())
+                        .baseLocation(courtVenue.getEpimsId())
                         .region(courtVenue.getRegionId()).build());
             }
         }
 
-        log.info("{} - setting venue name to {}",
-            sscsCaseData.getAppeal().getAppellant().getIdentity().getNino(),
-            sscsCaseData.getProcessingVenue());
+        log.info("{} - setting venue name to {}", sscsCaseData.getAppeal().getAppellant().getIdentity().getNino(), sscsCaseData.getProcessingVenue());
 
         return sscsCaseData;
     }

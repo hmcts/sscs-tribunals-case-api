@@ -95,25 +95,16 @@ public class SubmitAppealServiceTest {
     private CitizenCcdService citizenCcdService;
 
     @Mock
-    private RegionalProcessingCenterService regionalProcessingCenterService;
+    private PDFServiceClient pdfServiceClient;
+
+    @Mock
+    private EmailHelper emailHelper;
 
     @Mock
     private IdamService idamService;
 
     @Mock
-    private ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
-
-    @Mock
-    private AirLookupService airLookupService;
-
-    @Mock
     private RefDataService refDataService;
-
-    @Mock
-    private PDFServiceClient pdfServiceClient;
-
-    @Mock
-    private EmailHelper emailHelper;
 
     private SubmitAppealService submitAppealService;
 
@@ -123,6 +114,20 @@ public class SubmitAppealServiceTest {
 
     @Captor
     private ArgumentCaptor<SscsCaseData> capture;
+
+    @Mock
+    private ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
+
+    private static final RegionalProcessingCenterService regionalProcessingCenterService;
+
+    private static final AirLookupService airLookupService;
+
+    static {
+        airLookupService = new AirLookupService();
+        airLookupService.init();
+        regionalProcessingCenterService = new RegionalProcessingCenterService(airLookupService);
+        regionalProcessingCenterService.init();
+    }
 
     public static final String BIRMINGHAM_RPC = "{\n"
         + "    \"name\" : \"BIRMINGHAM\",\n"
@@ -167,7 +172,7 @@ public class SubmitAppealServiceTest {
         + "  }";
 
     @Before
-    public void setup() {
+    public void setUp() {
         appealData.getMrn().setDate(LocalDate.now().minusMonths(1));
 
         submitAppealService = new SubmitAppealService(
@@ -615,12 +620,8 @@ public class SubmitAppealServiceTest {
 
     @Test
     @Parameters(method = "generateDifferentRpcScenarios")
-    public void givenAppellantPostCode_shouldSetRegionAndRpcCorrectly(String expectedRpc, String appellantPostCode) throws JsonProcessingException {
-        RegionalProcessingCenter rpc = getRpcObjectForGivenJsonRpc(expectedRpc);
-        when(regionalProcessingCenterService.getByPostcode(RegionalProcessingCenterService.getFirstHalfOfPostcode(appellantPostCode)))
-            .thenReturn(getRpcObjectForGivenJsonRpc(expectedRpc));
-        when(airLookupService.lookupAirVenueNameByPostCode(eq(appellantPostCode), any())).thenReturn(rpc.getCity());
-
+    public void givenAppellantPostCode_shouldSetRegionAndRpcCorrectly(String expectedRpc, String appellantPostCode)
+        throws JsonProcessingException {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
         appealData.getAppellant().getContactDetails().setPostCode(appellantPostCode);
 
@@ -636,10 +637,8 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void givenAppointeePostCode_shouldSetRegionAndRpcToAppointee() throws JsonProcessingException {
-        when(regionalProcessingCenterService.getByPostcode("B1")).thenReturn(getRpcObjectForGivenJsonRpc(BIRMINGHAM_RPC));
-        when(airLookupService.lookupAirVenueNameByPostCode(eq("B1 1AA"), any())).thenReturn("Birmingham");
-
+    public void givenAppointeePostCode_shouldSetRegionAndRpcToAppointee()
+        throws JsonProcessingException {
         SyaContactDetails appointeeContactDetails = new SyaContactDetails();
         appointeeContactDetails.setPostCode("B1 1AA");
 
@@ -664,10 +663,8 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void givenAppointeeWithNoContactData_shouldSetRegionAndRpcToAppellant() throws JsonProcessingException {
-        when(regionalProcessingCenterService.getByPostcode("TN32")).thenReturn(getRpcObjectForGivenJsonRpc(BRADFORD_RPC));
-        when(airLookupService.lookupAirVenueNameByPostCode(eq("TN32 6PL"), any())).thenReturn("Bradford");
-
+    public void givenAppointeeWithNoContactData_shouldSetRegionAndRpcToAppellant()
+        throws JsonProcessingException {
         SyaCaseWrapper appealData = getSyaWrapperWithAppointee(null);
         appealData.setIsAppointee(false);
 
@@ -900,15 +897,7 @@ public class SubmitAppealServiceTest {
             "UC, NN85 1ss, Northampton, appointee, 2, 30",
     })
     public void shouldSetProcessingVenueBasedOnBenefitTypeAndPostCode(String benefitCode, String postcode, String expectedVenue, String appellantOrAppointee, String epimsId, String regionId) {
-        String firstHalfOfPostcode = RegionalProcessingCenterService.getFirstHalfOfPostcode(postcode);
-        when(regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode)).thenReturn(
-            RegionalProcessingCenter.builder()
-                .name("rpcName")
-                .postcode("rpcPostcode")
-                .epimsId(epimsId)
-                .build());
-        when(airLookupService.lookupAirVenueNameByPostCode(eq(postcode), any())).thenReturn(expectedVenue);
-        when(refDataService.getVenueRefData(expectedVenue)).thenReturn(CourtVenue.builder().regionId(regionId).build());
+        when(refDataService.getVenueRefData(expectedVenue)).thenReturn(CourtVenue.builder().epimsId(epimsId).regionId(regionId).build());
 
         boolean isAppellant = appellantOrAppointee.equals("appellant");
         SyaCaseWrapper appealData = getSyaCaseWrapper(isAppellant ? "json/sya.json" : "sya/allDetailsWithAppointeeWithDifferentAddress.json");
@@ -921,7 +910,6 @@ public class SubmitAppealServiceTest {
         }
 
         SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
-
         assertEquals(expectedVenue, caseData.getProcessingVenue());
         assertNotNull(caseData.getCaseManagementLocation());
         assertEquals(epimsId, caseData.getCaseManagementLocation().getBaseLocation());
