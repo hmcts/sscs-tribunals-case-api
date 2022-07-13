@@ -44,7 +44,7 @@ import uk.gov.hmcts.reform.sscs.util.UpdateListingRequirementsUtil;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Value("${feature.snl.enabled}")
     private boolean isScheduleListingEnabled;
@@ -62,6 +62,17 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
+        return callbackType.equals(CallbackType.ABOUT_TO_START)
+            && (callback.getEvent() == EventType.UPDATE_LISTING_REQUIREMENTS);
+
+    }
+
+    @Override
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+        if (!canHandle(callbackType, callback)) {
+            throw new IllegalStateException("Cannot handle callback");
+        }
+
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         if (isScheduleListingEnabled) {
@@ -72,12 +83,12 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
             generateReservedToJudgeFields(overrideFields);
         }
 
-        return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && (callback.getEvent() == EventType.UPDATE_LISTING_REQUIREMENTS);
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        return response;
     }
 
-    public void generateInterpreterLanguageFields(OverrideFields overrideFields) {
+    void generateInterpreterLanguageFields(OverrideFields overrideFields) {
         if (isNull(overrideFields.getAppellantInterpreter())
             || isNull(overrideFields.getAppellantInterpreter().getInterpreterLanguage())) {
             overrideFields.setAppellantInterpreter(HearingInterpreter.builder()
@@ -91,7 +102,30 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
             .setListItems(interpreterLanguage);
     }
 
-    public void generateReservedToJudgeFields(OverrideFields overrideFields) {
+    @NotNull
+    List<DynamicListItem> generateInterpreterLanguage() {
+        List<Language> signLanguages = signLanguagesService.getSignLanguages();
+        List<Language> verbalLanguages = verbalLanguagesService.getVerbalLanguages();
+
+        return Stream.concat(signLanguages.stream(), verbalLanguages.stream())
+            .collect(Collectors.toList()).stream()
+            .map(this::getLanguageDynamicListItem)
+            .collect(Collectors.toList());
+    }
+
+    @NotNull
+    DynamicListItem getLanguageDynamicListItem(Language language) {
+        String reference = language.getReference();
+        String name = language.getNameEn();
+
+        if (nonNull(language.getDialectReference())) {
+            reference = String.format("%s-%s", language.getReference(), language.getDialectReference());
+            name = language.getDialectEn();
+        }
+        return new DynamicListItem(reference, name);
+    }
+
+    void generateReservedToJudgeFields(OverrideFields overrideFields) {
         if (isNull(overrideFields.getReservedToJudge())
             || isNull(overrideFields.getReservedToJudge().getReservedMember())) {
             overrideFields.setReservedToJudge(ReservedToMember.builder()
@@ -104,48 +138,8 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
         overrideFields.getReservedToJudge().getReservedMember().setListItems(reservedMembers);
     }
 
-    @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
-        if (!canHandle(callbackType, callback)) {
-            throw new IllegalStateException("Cannot handle callback");
-        }
 
-        final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
-
-        return response;
-    }
-
-    @NotNull
-    public List<DynamicListItem> generateInterpreterLanguage() {
-
-        return getLanguages().stream()
-            .map(this::getLanguageDynamicListItem)
-            .collect(Collectors.toList());
-    }
-
-    @NotNull
-    public DynamicListItem getLanguageDynamicListItem(Language language) {
-        String reference = language.getReference();
-        String name = language.getNameEn();
-
-        if (nonNull(language.getDialectReference())) {
-            reference = String.format("%s-%s", language.getReference(), language.getDialectReference());
-            name = language.getDialectEn();
-        }
-        return new DynamicListItem(reference, name);
-    }
-
-    public List<Language> getLanguages() {
-        List<Language> signLanguages = signLanguagesService.getSignLanguages();
-        List<Language> verbalLanguages = verbalLanguagesService.getVerbalLanguages();
-
-        return Stream.concat(signLanguages.stream(), verbalLanguages.stream())
-            .collect(Collectors.toList());
-    }
-
-    public List<DynamicListItem> generateReservedMembers() {
+    List<DynamicListItem> generateReservedMembers() {
         JudicialRefDataUsersRequest request = JudicialRefDataUsersRequest.builder()
             .ccdServiceName(SERVICE_NAME)
             .build();
@@ -168,7 +162,7 @@ public class UpdateListingRequirementsHandler implements PreSubmitCallbackHandle
     }
 
     @NotNull
-    public DynamicListItem getJudicialMemberListItem(JudicialUser judicialUser) {
+    DynamicListItem getJudicialMemberListItem(JudicialUser judicialUser) {
         String referenceCodes = String.format("%s|%s", judicialUser.getPersonalCode(), extractHmcReferenceCode(judicialUser));
 
         String name = isNotBlank(judicialUser.getPostNominals())

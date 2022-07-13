@@ -29,7 +29,7 @@ import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 
 @RunWith(MockitoJUnitRunner.class)
-public class UpdateListingRequirementsHandlerTest {
+public class UpdateListingRequirementsAboutToStartHandlerTest {
 
     private static final String IDAM_OAUTH2_TOKEN = "TestOauth2Token";
     private static final String SERVICE_AUTHORIZATION = "TestServiceAuthorization";
@@ -43,7 +43,7 @@ public class UpdateListingRequirementsHandlerTest {
     @Mock
     private JudicialRefDataApi judicialRefData;
     @InjectMocks
-    private UpdateListingRequirementsHandler updateListingRequirementsHandler;
+    private UpdateListingRequirementsAboutToStartHandler updateListingRequirementsAboutToStartHandler;
 
     @Test
     public void generateInterpreterLanguageFields() {
@@ -59,7 +59,7 @@ public class UpdateListingRequirementsHandlerTest {
                 .build())
             .build();
 
-        updateListingRequirementsHandler.generateInterpreterLanguageFields(overrideFields);
+        updateListingRequirementsAboutToStartHandler.generateInterpreterLanguageFields(overrideFields);
 
         List<DynamicListItem> result = overrideFields.getAppellantInterpreter().getInterpreterLanguage().getListItems();
 
@@ -83,7 +83,7 @@ public class UpdateListingRequirementsHandlerTest {
                 .build())
             .build();
 
-        updateListingRequirementsHandler.generateInterpreterLanguageFields(overrideFields);
+        updateListingRequirementsAboutToStartHandler.generateInterpreterLanguageFields(overrideFields);
 
         List<DynamicListItem> result = overrideFields.getAppellantInterpreter().getInterpreterLanguage().getListItems();
 
@@ -105,7 +105,7 @@ public class UpdateListingRequirementsHandlerTest {
             .appellantInterpreter(null)
             .build();
 
-        updateListingRequirementsHandler.generateInterpreterLanguageFields(overrideFields);
+        updateListingRequirementsAboutToStartHandler.generateInterpreterLanguageFields(overrideFields);
 
         List<DynamicListItem> result = overrideFields.getAppellantInterpreter().getInterpreterLanguage().getListItems();
 
@@ -145,7 +145,7 @@ public class UpdateListingRequirementsHandlerTest {
                 .build())
             .build();
 
-        updateListingRequirementsHandler.generateReservedToJudgeFields(overrideFields);
+        updateListingRequirementsAboutToStartHandler.generateReservedToJudgeFields(overrideFields);
 
         List<DynamicListItem> result = overrideFields.getReservedToJudge().getReservedMember().getListItems();
 
@@ -185,7 +185,7 @@ public class UpdateListingRequirementsHandlerTest {
                 .build())
             .build();
 
-        updateListingRequirementsHandler.generateReservedToJudgeFields(overrideFields);
+        updateListingRequirementsAboutToStartHandler.generateReservedToJudgeFields(overrideFields);
 
         List<DynamicListItem> result = overrideFields.getReservedToJudge().getReservedMember().getListItems();
 
@@ -223,7 +223,7 @@ public class UpdateListingRequirementsHandlerTest {
             .reservedToJudge(null)
             .build();
 
-        updateListingRequirementsHandler.generateReservedToJudgeFields(overrideFields);
+        updateListingRequirementsAboutToStartHandler.generateReservedToJudgeFields(overrideFields);
 
         List<DynamicListItem> result = overrideFields.getReservedToJudge().getReservedMember().getListItems();
 
@@ -237,7 +237,7 @@ public class UpdateListingRequirementsHandlerTest {
     public void getLanguageDynamicListItem() {
         Language language = new Language("fre", "French", null, null, null);
 
-        DynamicListItem result = updateListingRequirementsHandler.getLanguageDynamicListItem(language);
+        DynamicListItem result = updateListingRequirementsAboutToStartHandler.getLanguageDynamicListItem(language);
 
         assertThat(result).isNotNull();
         assertThat(result.getCode()).isEqualTo("fre");
@@ -248,26 +248,11 @@ public class UpdateListingRequirementsHandlerTest {
     public void getLanguageDynamicListItemDialect() {
         Language language = new Language("luo", "Luo", "lah", "Acholi", null);
 
-        DynamicListItem result = updateListingRequirementsHandler.getLanguageDynamicListItem(language);
+        DynamicListItem result = updateListingRequirementsAboutToStartHandler.getLanguageDynamicListItem(language);
 
         assertThat(result).isNotNull();
         assertThat(result.getCode()).isEqualTo("luo-lah");
         assertThat(result.getLabel()).isEqualTo("Acholi");
-    }
-
-    @Test
-    public void getLanguages() {
-        Language signLanguage = new Language("sign-mkn", "Makaton", null, null, null);
-        given(signLanguagesService.getSignLanguages()).willReturn(List.of(signLanguage));
-
-        Language verbalLanguage = new Language("fre", "French", null, null, null);
-        given(verbalLanguagesService.getVerbalLanguages()).willReturn(List.of(verbalLanguage));
-
-        List<Language> result = updateListingRequirementsHandler.getLanguages();
-
-        assertThat(result)
-            .hasSize(2)
-            .containsExactlyInAnyOrder(signLanguage, verbalLanguage);
     }
 
     @Test
@@ -294,7 +279,7 @@ public class UpdateListingRequirementsHandlerTest {
             any(JudicialRefDataUsersRequest.class)))
             .willReturn(response);
 
-        List<DynamicListItem> result = updateListingRequirementsHandler.generateReservedMembers();
+        List<DynamicListItem> result = updateListingRequirementsAboutToStartHandler.generateReservedMembers();
 
         assertThat(result)
             .hasSize(1)
@@ -315,7 +300,7 @@ public class UpdateListingRequirementsHandlerTest {
             any(JudicialRefDataUsersRequest.class)))
             .willReturn(JudicialRefDataUsersResponse.builder().build());
 
-        List<DynamicListItem> result = updateListingRequirementsHandler.generateReservedMembers();
+        List<DynamicListItem> result = updateListingRequirementsAboutToStartHandler.generateReservedMembers();
 
         assertThat(result).isEmpty();
     }
@@ -330,7 +315,7 @@ public class UpdateListingRequirementsHandlerTest {
             .fullName("Test Person")
             .postNominals("Judge")
             .build();
-        DynamicListItem result = updateListingRequirementsHandler.getJudicialMemberListItem(judicialUser);
+        DynamicListItem result = updateListingRequirementsAboutToStartHandler.getJudicialMemberListItem(judicialUser);
 
         assertThat(result).isNotNull();
         assertThat(result.getCode()).isEqualTo("1234|84");
@@ -344,7 +329,7 @@ public class UpdateListingRequirementsHandlerTest {
             .fullName("Test Person")
             .postNominals("Judge")
             .build();
-        DynamicListItem result = updateListingRequirementsHandler.getJudicialMemberListItem(judicialUser);
+        DynamicListItem result = updateListingRequirementsAboutToStartHandler.getJudicialMemberListItem(judicialUser);
 
         assertThat(result).isNotNull();
         assertThat(result.getCode()).isEqualTo("1234|");
@@ -360,7 +345,7 @@ public class UpdateListingRequirementsHandlerTest {
                 .appointment("Tribunal Judge")
                 .build()))
             .build();
-        DynamicListItem result = updateListingRequirementsHandler.getJudicialMemberListItem(judicialUser);
+        DynamicListItem result = updateListingRequirementsAboutToStartHandler.getJudicialMemberListItem(judicialUser);
 
         assertThat(result).isNotNull();
         assertThat(result.getCode()).isEqualTo("1234|84");
