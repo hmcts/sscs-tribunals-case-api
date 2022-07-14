@@ -180,7 +180,8 @@ public class SubmitDraftTest {
 
         assertJsonEquals(changeExpectedFields(expectedResponse, nino, mrnDate), sscsCaseDetails.getData(),
             whenIgnoringPaths("sscsDocument","regionalProcessingCenter.hearingRoute",
-            "caseManagementLocation.region", "regionalProcessingCenter.epimsId"));
+            "caseManagementLocation.region", "regionalProcessingCenter.epimsId",
+                "CaseAccessCategory"));
 
         assertEquals(expectedState, sscsCaseDetails.getState());
     }
