@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialMemberAppointments;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialRefDataUsersRequest;
-import uk.gov.hmcts.reform.sscs.model.client.JudicialRefDataUsersResponse;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUser;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
@@ -46,21 +45,19 @@ public class UpdateListingRequirementsUtilTest {
     JudicialRefDataApi judicialRefData;
     @InjectMocks
     private UpdateListingRequirementsUtil updateListingRequirementsUtil;
-    private JudicialRefDataUsersResponse response;
+    private List<JudicialUser> response;
 
 
     @Before
     public void setup() {
-        response = JudicialRefDataUsersResponse.builder()
-            .judicialUsers(newArrayList(JudicialUser.builder()
-                .personalCode("1234")
-                .fullName("Test Person1")
-                .postNominals("Judge")
-                .appointments(List.of(JudicialMemberAppointments.builder()
-                    .appointment("Tribunal Judge")
-                    .build()))
+        response = newArrayList(JudicialUser.builder()
+            .personalCode("1234")
+            .fullName("Test Person1")
+            .postNominals("Judge")
+            .appointments(List.of(JudicialMemberAppointments.builder()
+                .appointment("Tribunal Judge")
                 .build()))
-            .build();
+            .build());
     }
 
     @Test
@@ -198,7 +195,7 @@ public class UpdateListingRequirementsUtilTest {
             .serviceAuthorization(SERVICE_AUTHORIZATION)
             .build());
 
-        response.getJudicialUsers().addAll(List.of(JudicialUser.builder()
+        response.addAll(List.of(JudicialUser.builder()
             .personalCode("abcd")
             .fullName("Test Person2")
             .postNominals("Judge")

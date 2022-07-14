@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.sscs.client.JudicialRefDataApi;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialMemberAppointments;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialRefDataUsersRequest;
-import uk.gov.hmcts.reform.sscs.model.client.JudicialRefDataUsersResponse;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUser;
 import uk.gov.hmcts.reform.sscs.reference.data.model.JudicialMemberType;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
@@ -98,12 +97,12 @@ public class UpdateListingRequirementsUtil {
             .ccdServiceName(SERVICE_NAME)
             .build();
 
-        JudicialRefDataUsersResponse refDataResponse = judicialRefData.getJudicialUsers(
+        List<JudicialUser> judicialUsers = judicialRefData.getJudicialUsers(
             idamService.getIdamTokens().getIdamOauth2Token(),
             idamService.getIdamTokens().getServiceAuthorization(),
             request);
 
-        return Optional.ofNullable(refDataResponse.getJudicialUsers())
+        return Optional.ofNullable(judicialUsers)
             .orElse(Collections.emptyList())
             .stream()
             .filter(Objects::nonNull)
