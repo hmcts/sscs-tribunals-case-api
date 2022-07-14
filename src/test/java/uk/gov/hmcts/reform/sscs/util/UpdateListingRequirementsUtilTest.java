@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.mockito.ArgumentMatchers.any;
@@ -7,6 +8,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
 import java.util.List;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -43,7 +45,23 @@ public class UpdateListingRequirementsUtilTest {
     @Mock
     JudicialRefDataApi judicialRefData;
     @InjectMocks
-    private UpdateListingRequirementsUtil utils;
+    private UpdateListingRequirementsUtil updateListingRequirementsUtil;
+    private JudicialRefDataUsersResponse response;
+
+
+    @Before
+    public void setup() {
+        response = JudicialRefDataUsersResponse.builder()
+            .judicialUsers(newArrayList(JudicialUser.builder()
+                .personalCode("1234")
+                .fullName("Test Person1")
+                .postNominals("Judge")
+                .appointments(List.of(JudicialMemberAppointments.builder()
+                    .appointment("Tribunal Judge")
+                    .build()))
+                .build()))
+            .build();
+    }
 
     @Test
     public void generateInterpreterLanguageFields() {
@@ -59,7 +77,7 @@ public class UpdateListingRequirementsUtilTest {
                 .build())
             .build();
 
-        utils.generateInterpreterLanguageFields(overrideFields);
+        updateListingRequirementsUtil.generateInterpreterLanguageFields(overrideFields);
 
         List<DynamicListItem> result = overrideFields.getAppellantInterpreter().getInterpreterLanguage().getListItems();
 
@@ -83,7 +101,7 @@ public class UpdateListingRequirementsUtilTest {
                 .build())
             .build();
 
-        utils.generateInterpreterLanguageFields(overrideFields);
+        updateListingRequirementsUtil.generateInterpreterLanguageFields(overrideFields);
 
         List<DynamicListItem> result = overrideFields.getAppellantInterpreter().getInterpreterLanguage().getListItems();
 
@@ -105,7 +123,7 @@ public class UpdateListingRequirementsUtilTest {
             .appellantInterpreter(null)
             .build();
 
-        utils.generateInterpreterLanguageFields(overrideFields);
+        updateListingRequirementsUtil.generateInterpreterLanguageFields(overrideFields);
 
         List<DynamicListItem> result = overrideFields.getAppellantInterpreter().getInterpreterLanguage().getListItems();
 
@@ -122,17 +140,6 @@ public class UpdateListingRequirementsUtilTest {
             .serviceAuthorization(SERVICE_AUTHORIZATION)
             .build());
 
-        JudicialRefDataUsersResponse response = JudicialRefDataUsersResponse.builder()
-            .judicialUsers(List.of(JudicialUser.builder()
-                .personalCode("1234")
-                .fullName("Test Person")
-                .postNominals("Judge")
-                .appointments(List.of(JudicialMemberAppointments.builder()
-                    .appointment("Tribunal Judge")
-                    .build()))
-                .build()))
-            .build();
-
         given(judicialRefData.getJudicialUsers(
             eq(IDAM_OAUTH2_TOKEN),
             eq(SERVICE_AUTHORIZATION),
@@ -145,14 +152,14 @@ public class UpdateListingRequirementsUtilTest {
                 .build())
             .build();
 
-        utils.generateReservedToJudgeFields(overrideFields);
+        updateListingRequirementsUtil.generateReservedToJudgeFields(overrideFields);
 
         List<DynamicListItem> result = overrideFields.getReservedToJudge().getReservedMember().getListItems();
 
         assertThat(result)
             .hasSize(1)
             .extracting("code","label")
-            .containsExactlyInAnyOrder(tuple("1234|84","Test Person Judge"));
+            .containsExactlyInAnyOrder(tuple("1234|84","Test Person1 Judge"));
     }
 
     @Test
@@ -162,17 +169,6 @@ public class UpdateListingRequirementsUtilTest {
             .serviceAuthorization(SERVICE_AUTHORIZATION)
             .build());
 
-        JudicialRefDataUsersResponse response = JudicialRefDataUsersResponse.builder()
-            .judicialUsers(List.of(JudicialUser.builder()
-                .personalCode("1234")
-                .fullName("Test Person")
-                .postNominals("Judge")
-                .appointments(List.of(JudicialMemberAppointments.builder()
-                    .appointment("Tribunal Judge")
-                    .build()))
-                .build()))
-            .build();
-
         given(judicialRefData.getJudicialUsers(
             eq(IDAM_OAUTH2_TOKEN),
             eq(SERVICE_AUTHORIZATION),
@@ -185,14 +181,14 @@ public class UpdateListingRequirementsUtilTest {
                 .build())
             .build();
 
-        utils.generateReservedToJudgeFields(overrideFields);
+        updateListingRequirementsUtil.generateReservedToJudgeFields(overrideFields);
 
         List<DynamicListItem> result = overrideFields.getReservedToJudge().getReservedMember().getListItems();
 
         assertThat(result)
             .hasSize(1)
             .extracting("code","label")
-            .containsExactlyInAnyOrder(tuple("1234|84","Test Person Judge"));
+            .containsExactlyInAnyOrder(tuple("1234|84","Test Person1 Judge"));
     }
 
     @Test
@@ -202,32 +198,22 @@ public class UpdateListingRequirementsUtilTest {
             .serviceAuthorization(SERVICE_AUTHORIZATION)
             .build());
 
-        JudicialRefDataUsersResponse response = JudicialRefDataUsersResponse.builder()
-            .judicialUsers(List.of(JudicialUser.builder()
-                .personalCode("1234")
-                .fullName("Test Person1")
-                .postNominals("Judge")
-                .appointments(List.of(JudicialMemberAppointments.builder()
-                    .appointment("Tribunal Judge")
-                    .build()))
-                .build()))
-            .judicialUsers(List.of(JudicialUser.builder()
-            .personalCode("1234")
+        response.getJudicialUsers().addAll(List.of(JudicialUser.builder()
+            .personalCode("abcd")
             .fullName("Test Person2")
             .postNominals("Judge")
             .appointments(List.of(JudicialMemberAppointments.builder()
                 .appointment("President of Tribunal")
                 .build()))
-            .build()))
-            .judicialUsers(List.of(JudicialUser.builder()
-                .personalCode("1234")
+            .build(),
+            JudicialUser.builder()
+                .personalCode("efgh")
                 .fullName("Test Person3")
                 .postNominals("Judge")
                 .appointments(List.of(JudicialMemberAppointments.builder()
                     .appointment("Regional Tribunal Judge")
                     .build()))
-                .build()))
-            .build();
+                .build()));
 
         given(judicialRefData.getJudicialUsers(
             eq(IDAM_OAUTH2_TOKEN),
@@ -241,16 +227,16 @@ public class UpdateListingRequirementsUtilTest {
                 .build())
             .build();
 
-        utils.generateReservedToJudgeFields(overrideFields);
+        updateListingRequirementsUtil.generateReservedToJudgeFields(overrideFields);
 
         List<DynamicListItem> result = overrideFields.getReservedToJudge().getReservedMember().getListItems();
 
         assertThat(result)
             .hasSize(3)
             .extracting("code","label")
-            .contains(
-                tuple("1234|65", "Test Person1 Judge"),
-                tuple("1234|84", "Test Person2 Judge"),
-                tuple("1234|74", "Test Person3 Judge"));
+            .containsExactlyInAnyOrder(
+                tuple("1234|84", "Test Person1 Judge"),
+                tuple("abcd|65", "Test Person2 Judge"),
+                tuple("efgh|74", "Test Person3 Judge"));
     }
 }
