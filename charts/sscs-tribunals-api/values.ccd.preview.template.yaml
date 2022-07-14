@@ -59,7 +59,7 @@ em-ccdorc:
       CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
 
 ccd-case-document-am-api:
-  enabled: false
+  enabled: true
   java:
     image: hmctspublic.azurecr.io/ccd/case-document-am-api:latest
     ingressHost: ccd-case-document-am-api-${SERVICE_FQDN}
@@ -307,7 +307,7 @@ ccd:
   #Use this image to import your CCD definition. To have an image available, create a tag and push it. Must be the
   #non-prod sheets.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.14.26nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S_10334nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: https://ccd-admin-web-${SERVICE_FQDN}/oauth2redirect
     environment:
@@ -426,7 +426,7 @@ sscs-ccd-callback-orchestrator:
 
 #Enable for SYA
 sscs-tribunals-frontend:
-  enabled: false
+  enabled: true
   nodejs:
     image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
@@ -454,7 +454,7 @@ sscs-tribunals-frontend:
           - sscs-redis-connection-string
 
 redis:
-  enabled: false
+  enabled: true
   replica:
     replicaCount: 0
   cluster:
@@ -564,4 +564,4 @@ servicebus:
     queues:
       - name: hmc-from-hmi
       - name: hmc-to-hmi
-      - name:  tribunals-to-hearing-api
+      - name: tribunals-to-hearing-api
