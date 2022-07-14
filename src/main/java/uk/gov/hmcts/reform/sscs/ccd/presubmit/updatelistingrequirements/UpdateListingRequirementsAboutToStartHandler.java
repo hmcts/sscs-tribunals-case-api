@@ -44,16 +44,23 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         if (isScheduleListingEnabled) {
+
+            log.info("Handling override fields update listing requirements event for caseId {}", sscsCaseData.getCcdCaseId());
+
             OverrideFields overrideFields = sscsCaseData.getSchedulingAndListingFields().getOverrideFields();
 
             utils.generateInterpreterLanguageFields(overrideFields);
+            log.info("{} Languages in DynamicList for caseId {}",
+                overrideFields.getAppellantInterpreter().getInterpreterLanguage().getListItems().size(),
+                sscsCaseData.getCcdCaseId());
 
             utils.generateReservedToJudgeFields(overrideFields);
+            log.info("{} Judges in DynamicList for caseId {}",
+                overrideFields.getReservedToJudge().getReservedMember().getListItems().size(),
+                sscsCaseData.getCcdCaseId());
         }
 
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
-
-        return response;
+        return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
 

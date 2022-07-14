@@ -42,7 +42,7 @@ public class UpdateListingRequirementsUtilTest {
     @Mock
     private VerbalLanguagesService verbalLanguagesService;
     @Mock
-    JudicialRefDataApi judicialRefData;
+    private JudicialRefDataApi judicialRefData;
     @InjectMocks
     private UpdateListingRequirementsUtil updateListingRequirementsUtil;
     private List<JudicialUser> response;

@@ -2,22 +2,31 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ReservedToMember;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
+import uk.gov.hmcts.reform.sscs.util.UpdateListingRequirementsUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UpdateListingRequirementsAboutToStartHandlerTest {
@@ -29,16 +38,17 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
     @Mock
     private SscsCaseData sscsCaseData;
+    @Mock
+    UpdateListingRequirementsUtil updateListingRequirementsUtil;
     @InjectMocks
     private UpdateListingRequirementsAboutToStartHandler handler;
 
     @Before
     public void setUp() {
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(callback.getEvent()).thenReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
     }
 
     @Test
@@ -47,11 +57,41 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
     }
 
     @Test
-    public void handleUpdateListingRequirements() {
+    public void handleUpdateListingRequirementsNonSandL() {
+        ReflectionTestUtils.setField(handler, "isScheduleListingEnabled", false);
         sscsCaseData = CaseDataUtils.buildCaseData();
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
     }
+
+    @Test
+    public void handleUpdateListingRequirementsSandL() {
+        ReflectionTestUtils.setField(handler, "isScheduleListingEnabled", true);
+
+        sscsCaseData = CaseDataUtils.buildCaseData();
+        OverrideFields overrideFields = OverrideFields.builder()
+            .appellantInterpreter(HearingInterpreter.builder()
+                .interpreterLanguage(new DynamicList(null, List.of()))
+                .build())
+            .reservedToJudge(ReservedToMember.builder()
+                .reservedMember(new DynamicList(null, List.of()))
+                .build())
+            .build();
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
+
+        willDoNothing().given(updateListingRequirementsUtil)
+            .generateInterpreterLanguageFields(any(OverrideFields.class));
+
+        willDoNothing().given(updateListingRequirementsUtil)
+            .generateReservedToJudgeFields(any(OverrideFields.class));
+
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+    }
+
+
 
 }
