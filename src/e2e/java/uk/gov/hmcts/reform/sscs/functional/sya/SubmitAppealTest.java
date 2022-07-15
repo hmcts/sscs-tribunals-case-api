@@ -119,8 +119,7 @@ public class SubmitAppealTest {
         log.info(String.format("SYA created with CCD ID %s", id));
 
         assertJsonEquals(changeExpectedFields(expectedResponse, nino, mrnDate), sscsCaseDetails.getData(), whenIgnoringPaths("sscsDocument",
-            "regionalProcessingCenter.hearingRoute", "caseManagementLocation.region", "regionalProcessingCenter.epimsId",
-            "CaseAccessCategory"));
+            "regionalProcessingCenter.hearingRoute", "caseManagementLocation.region", "regionalProcessingCenter.epimsId"));
 
         assertEquals(expectedState, sscsCaseDetails.getState());
 
