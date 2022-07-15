@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonValidator;
 import uk.gov.hmcts.reform.sscs.robotics.RoboticsValidationException;
@@ -64,7 +65,7 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
                 if (gapsSwitchOverFeatureEnabled && sscsCaseData.getSchedulingAndListingFields().getHearingRoute() == LIST_ASSIST) {
                     log.info("HearingRoute is ListAssist for CaseID: {}. Sending ListAssist cancellation message.", caseDetails.getId());
                     sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
-                    hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), null);
+                    hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), CancellationReason.OTHER);
                 }
             }
         } catch (RoboticsValidationException roboticsValidationException) {
