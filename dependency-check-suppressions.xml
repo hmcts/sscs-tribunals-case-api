@@ -155,7 +155,7 @@
         <packageUrl regex="true">^pkg:maven/org.springframework\.security/spring-security-web@.*$</packageUrl>
         <cve>CVE-2022-22978</cve>
     </suppress>
-    <suppress until ="2022-08-01">
+    <suppress until="2022-08-01">
         <notes><![CDATA[
     file name: spring-web-5.2.22.RELEASE.jar
     ]]></notes>
