@@ -7,6 +7,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -62,8 +63,8 @@ public class UpdateListingRequirementsUtil {
         List<Language> verbalLanguages = verbalLanguagesService.getVerbalLanguages();
 
         return Stream.concat(signLanguages.stream(), verbalLanguages.stream())
-            .collect(Collectors.toList()).stream()
             .map(this::getLanguageDynamicListItem)
+            .sorted(Comparator.comparing(DynamicListItem::getLabel))
             .collect(Collectors.toList());
     }
 
@@ -111,6 +112,7 @@ public class UpdateListingRequirementsUtil {
                 .map(JudicialMemberAppointments::getAppointment)
                 .anyMatch(this::isValidJudicialMemberType))
             .map(this::getJudicialMemberListItem)
+            .sorted(Comparator.comparing(DynamicListItem::getLabel))
             .collect(Collectors.toList());
     }
 

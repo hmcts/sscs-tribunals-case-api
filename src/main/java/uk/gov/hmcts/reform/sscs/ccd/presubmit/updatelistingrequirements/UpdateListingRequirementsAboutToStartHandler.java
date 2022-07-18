@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,11 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
             log.info("Handling override fields update listing requirements event for caseId {}", sscsCaseData.getCcdCaseId());
 
             OverrideFields overrideFields = sscsCaseData.getSchedulingAndListingFields().getOverrideFields();
+
+            if (isNull(overrideFields)) {
+                overrideFields = new OverrideFields();
+                sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
+            }
 
             utils.generateInterpreterLanguageFields(overrideFields);
             log.info("{} Languages in DynamicList for caseId {}",
