@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 
@@ -36,7 +37,6 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
             && (callback.getEvent() == EventType.UPDATE_LISTING_REQUIREMENTS);
-
     }
 
     @Override
@@ -49,7 +49,9 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (gapsSwitchOverFeature && nonNull(sscsCaseData.getSchedulingAndListingFields().getOverrideFields())) {
+        if (gapsSwitchOverFeature
+            && sscsCaseData.getState() == State.READY_TO_LIST
+            && nonNull(sscsCaseData.getSchedulingAndListingFields().getOverrideFields())) {
             String caseId = sscsCaseData.getCcdCaseId();
             log.info("UpdateListingRequirements List Assist request Update Hearing for case ID: {}", caseId);
 
