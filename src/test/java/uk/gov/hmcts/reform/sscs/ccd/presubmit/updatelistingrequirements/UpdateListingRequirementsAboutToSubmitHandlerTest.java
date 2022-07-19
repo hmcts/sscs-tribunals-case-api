@@ -42,20 +42,19 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
     @Mock
-    private SscsCaseData sscsCaseData;
-
-    @Mock
     private ListAssistHearingMessageHelper listAssistHearingMessageHelper;
-
     @InjectMocks
     private UpdateListingRequirementsAboutToSubmitHandler handler;
+
+    private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() {
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
+        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
     }
 
     @Test
@@ -88,7 +87,6 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
     public void handleUpdateListingRequirementsGapsSwitchOverFeatureSendSuccessful() {
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
-        sscsCaseData.setState(State.READY_TO_LIST);
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
         sscsCaseData.setCcdCaseId("1234");
 
@@ -111,7 +109,6 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
     public void handleUpdateListingRequirementsGapsSwitchOverFeatureSendUnsuccessful() {
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
-        sscsCaseData.setState(State.READY_TO_LIST);
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
         sscsCaseData.setCcdCaseId("1234");
 
@@ -131,6 +128,17 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
     public void handleUpdateListingRequirementsGapsSwitchOverFeatureNoOverrides() {
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void handleUpdateListingRequirementsGapsSwitchOverFeatureWrongState() {
+        ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
+        sscsCaseData = CaseDataUtils.buildCaseData();
+
+        given(caseDetails.getState()).willReturn(State.UNKNOWN);
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
     }

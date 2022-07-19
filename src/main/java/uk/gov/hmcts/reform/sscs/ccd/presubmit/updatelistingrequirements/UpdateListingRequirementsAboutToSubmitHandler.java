@@ -49,11 +49,14 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        State state = callback.getCaseDetails().getState();
+
         if (gapsSwitchOverFeature
-            && sscsCaseData.getState() == State.READY_TO_LIST
+            && state == State.READY_TO_LIST
             && nonNull(sscsCaseData.getSchedulingAndListingFields().getOverrideFields())) {
             String caseId = sscsCaseData.getCcdCaseId();
-            log.info("UpdateListingRequirements List Assist request, Update Hearing, amend reasons: {}, for case ID: {}", sscsCaseData.getSchedulingAndListingFields().getAmendReasons(), caseId);
+            log.info("UpdateListingRequirements List Assist request, Update Hearing, amend reasons: {}, for case ID: {}",
+                sscsCaseData.getSchedulingAndListingFields().getAmendReasons(), caseId);
 
             HearingRoute hearingRoute = LIST_ASSIST;
             HearingState hearingState = UPDATE_HEARING;
