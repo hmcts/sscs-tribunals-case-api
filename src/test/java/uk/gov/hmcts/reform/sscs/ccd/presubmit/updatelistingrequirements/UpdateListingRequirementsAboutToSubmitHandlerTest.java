@@ -87,6 +87,7 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
     public void handleUpdateListingRequirementsGapsSwitchOverFeatureSendSuccessful() {
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
         sscsCaseData.setCcdCaseId("1234");
 
@@ -101,7 +102,6 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
         assertThat(response.getData()).isNotNull();
         SscsCaseData caseData = response.getData();
-        assertThat(caseData.getSchedulingAndListingFields().getHearingRoute()).isEqualTo(LIST_ASSIST);
         assertThat(caseData.getSchedulingAndListingFields().getHearingState()).isEqualTo(UPDATE_HEARING);
     }
 
@@ -109,6 +109,7 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
     public void handleUpdateListingRequirementsGapsSwitchOverFeatureSendUnsuccessful() {
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
         sscsCaseData.setCcdCaseId("1234");
 

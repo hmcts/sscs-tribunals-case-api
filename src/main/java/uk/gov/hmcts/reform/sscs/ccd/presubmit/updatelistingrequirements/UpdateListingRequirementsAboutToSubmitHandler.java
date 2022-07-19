@@ -51,14 +51,15 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
         State state = callback.getCaseDetails().getState();
 
+        HearingRoute hearingRoute = sscsCaseData.getSchedulingAndListingFields().getHearingRoute();
         if (gapsSwitchOverFeature
             && state == State.READY_TO_LIST
+            && hearingRoute == LIST_ASSIST
             && nonNull(sscsCaseData.getSchedulingAndListingFields().getOverrideFields())) {
             String caseId = sscsCaseData.getCcdCaseId();
             log.info("UpdateListingRequirements List Assist request, Update Hearing, amend reasons: {}, for case ID: {}",
                 sscsCaseData.getSchedulingAndListingFields().getAmendReasons(), caseId);
 
-            HearingRoute hearingRoute = LIST_ASSIST;
             HearingState hearingState = UPDATE_HEARING;
 
             boolean messageSuccess = listAssistHearingMessageHelper.sendHearingMessage(
@@ -68,7 +69,6 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 null);
 
             if (messageSuccess) {
-                sscsCaseData.getSchedulingAndListingFields().setHearingRoute(hearingRoute);
                 sscsCaseData.getSchedulingAndListingFields().setHearingState(hearingState);
             } else {
                 callbackResponse.addError("An error occurred during message publish. Please try again.");
