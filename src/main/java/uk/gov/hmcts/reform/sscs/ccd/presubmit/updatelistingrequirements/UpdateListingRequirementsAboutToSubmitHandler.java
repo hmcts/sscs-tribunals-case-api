@@ -53,7 +53,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             && sscsCaseData.getState() == State.READY_TO_LIST
             && nonNull(sscsCaseData.getSchedulingAndListingFields().getOverrideFields())) {
             String caseId = sscsCaseData.getCcdCaseId();
-            log.info("UpdateListingRequirements List Assist request Update Hearing for case ID: {}", caseId);
+            log.info("UpdateListingRequirements List Assist request, Update Hearing, amend reasons: {}, for case ID: {}", sscsCaseData.getSchedulingAndListingFields().getAmendReasons(), caseId);
 
             HearingRoute hearingRoute = LIST_ASSIST;
             HearingState hearingState = UPDATE_HEARING;
