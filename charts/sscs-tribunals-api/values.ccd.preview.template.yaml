@@ -426,7 +426,7 @@ sscs-ccd-callback-orchestrator:
 
 #Enable for SYA
 sscs-tribunals-frontend:
-  enabled: false
+  enabled: true
   nodejs:
     image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
