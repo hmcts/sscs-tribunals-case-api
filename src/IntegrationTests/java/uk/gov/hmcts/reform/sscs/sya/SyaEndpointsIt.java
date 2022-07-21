@@ -154,7 +154,7 @@ public class SyaEndpointsIt extends AbstractEventIt {
 
         given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
 
-        given(refDataApi.courtVenueByName("token", "authToken", "31")).willReturn(List.of(CourtVenue.builder().epimsId("1").regionId("2").venueName("Ashford").build()));
+        given(refDataApi.courtVenueByName("token", "authToken", "31")).willReturn(List.of(CourtVenue.builder().regionId("2").venueName("Ashford").build()));
 
         mockMvc.perform(post("/appeals")
             .contentType(MediaType.APPLICATION_JSON)
@@ -165,7 +165,7 @@ public class SyaEndpointsIt extends AbstractEventIt {
         verify(ccdClient).submitForCaseworker(any(), caseDataCaptor.capture());
 
         assertEquals("Ashford", ((SscsCaseData) caseDataCaptor.getValue().getData()).getProcessingVenue());
-        assertEquals("1", ((SscsCaseData) caseDataCaptor.getValue().getData()).getCaseManagementLocation().getBaseLocation());
+        assertEquals("698118", ((SscsCaseData) caseDataCaptor.getValue().getData()).getCaseManagementLocation().getBaseLocation());
         assertEquals("2", ((SscsCaseData) caseDataCaptor.getValue().getData()).getCaseManagementLocation().getRegion());
     }
 

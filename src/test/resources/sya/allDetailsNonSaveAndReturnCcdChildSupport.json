@@ -1,6 +1,6 @@
 {
   "caseCreated" : "${json-unit.ignore}",
-  "caseAccessCategory": "childSupport",
+  "CaseAccessCategory": "childSupport",
   "caseManagementCategory": {
     "value": {
       "code": "childSupport",
@@ -13,7 +13,10 @@
       }
     ]
   },
-  "caseManagementLocation":{"baseLocation":"239985","region":"6"},
+  "caseManagementLocation": {
+    "baseLocation":"698118",
+    "region":"6"
+  },
   "addedDocuments": null,
   "caseNameHmctsInternal": "Joe Bloggs",
   "caseNameHmctsRestricted": "Joe Bloggs",
@@ -32,9 +35,11 @@
     "city" : "BRADFORD",
     "postcode" : "BD3 7BH",
     "phoneNumber" : "0300 123 1142",
+    "epimsId" : null,
     "faxNumber" : "0126 434 7983",
     "email": "SSCS_Bradford@justice.gov.uk",
-    "hearingRoute":null
+    "hearingRoute":null,
+    "epimsId": null
   },
   "appeal": {
     "mrnDetails": {
