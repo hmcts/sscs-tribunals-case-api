@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -45,6 +46,8 @@ public class SubmitAppealService {
 
     public static final String DM_STORE_USER_ID = "sscs";
     private static final String CITIZEN_ROLE = "citizen";
+    public static final String DRAFT = "draft";
+    public static final String USER_HAS_A_INVALID_ROLE_MESSAGE = "User has a invalid role";
 
     private final CcdService ccdService;
     private final CitizenCcdService citizenCcdService;
@@ -93,11 +96,11 @@ public class SubmitAppealService {
     }
 
     public Optional<SaveCaseResult> submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal, Boolean forceCreate) {
-        appeal.setCaseType("draft");
+        appeal.setCaseType(DRAFT);
 
         IdamTokens idamTokens = getUserTokens(oauth2Token);
         if (!hasValidCitizenRole(idamTokens)) {
-            throw new ApplicationErrorException(new Exception("User has a invalid role"));
+            throw new ApplicationErrorException(new Exception(USER_HAS_A_INVALID_ROLE_MESSAGE));
         }
 
         try {
@@ -114,11 +117,11 @@ public class SubmitAppealService {
     }
 
     public Optional<SaveCaseResult> updateDraftAppeal(String oauth2Token, SyaCaseWrapper appeal) {
-        appeal.setCaseType("draft");
+        appeal.setCaseType(DRAFT);
 
         IdamTokens idamTokens = getUserTokens(oauth2Token);
         if (!hasValidCitizenRole(idamTokens)) {
-            throw new ApplicationErrorException(new Exception("User has a invalid role"));
+            throw new ApplicationErrorException(new Exception(USER_HAS_A_INVALID_ROLE_MESSAGE));
         }
 
         try {
@@ -154,12 +157,12 @@ public class SubmitAppealService {
     }
 
     public Optional<SaveCaseResult> archiveDraftAppeal(String oauth2Token, SyaCaseWrapper appeal, Long ccdCaseId) throws FeignException {
-        appeal.setCaseType("draft");
+        appeal.setCaseType(DRAFT);
 
         IdamTokens idamTokens = getUserTokens(oauth2Token);
 
         if (!hasValidCitizenRole(idamTokens)) {
-            throw new ApplicationErrorException(new Exception("User has a invalid role"));
+            throw new ApplicationErrorException(new Exception(USER_HAS_A_INVALID_ROLE_MESSAGE));
         }
 
         SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal, caseAccessManagementFeature);
@@ -177,7 +180,7 @@ public class SubmitAppealService {
         IdamTokens idamTokens = getUserTokens(oauth2Token);
 
         if (!hasValidCitizenRole(idamTokens)) {
-            throw new ApplicationErrorException(new Exception("User has a invalid role"));
+            throw new ApplicationErrorException(new Exception(USER_HAS_A_INVALID_ROLE_MESSAGE));
         }
 
         List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(idamTokens);
@@ -198,7 +201,7 @@ public class SubmitAppealService {
         IdamTokens idamTokens = getUserTokens(oauth2Token);
 
         if (!hasValidCitizenRole(idamTokens)) {
-            throw new ApplicationErrorException(new Exception("User has a invalid role"));
+            throw new ApplicationErrorException(new Exception(USER_HAS_A_INVALID_ROLE_MESSAGE));
         }
         List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(idamTokens);
 
@@ -242,28 +245,30 @@ public class SubmitAppealService {
         String firstHalfOfPostcode = getFirstHalfOfPostcode(postCode);
         RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);
 
-        SscsCaseData sscsCaseData;
-        if (rpc == null) {
-            sscsCaseData = convertSyaToCcdCaseData(appeal, caseAccessManagementFeature);
-        } else {
-            sscsCaseData = convertSyaToCcdCaseData(appeal, rpc.getName(), rpc, caseAccessManagementFeature);
-        }
+        SscsCaseData sscsCaseData = rpc == null
+            ? convertSyaToCcdCaseData(appeal, caseAccessManagementFeature)
+            : convertSyaToCcdCaseData(appeal, rpc.getName(), rpc, caseAccessManagementFeature);
 
         sscsCaseData.setCreatedInGapsFrom(READY_TO_LIST.getId());
         String processingVenue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
         sscsCaseData.setProcessingVenue(processingVenue);
 
-        if (caseAccessManagementFeature && !StringUtils.isEmpty(processingVenue)) {
+        if (caseAccessManagementFeature
+            && StringUtils.isNotEmpty(processingVenue)
+            && rpc != null) {
             log.info("Getting venue details for " + processingVenue);
             CourtVenue courtVenue = refDataService.getVenueRefData(processingVenue);
+
             if (courtVenue != null) {
                 sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
-                        .baseLocation(courtVenue.getEpimsId())
+                        .baseLocation(rpc.getEpimsId())
                         .region(courtVenue.getRegionId()).build());
             }
         }
 
-        log.info("{} - setting venue name to {}", sscsCaseData.getAppeal().getAppellant().getIdentity().getNino(), sscsCaseData.getProcessingVenue());
+        log.info("{} - setting venue name to {}",
+            sscsCaseData.getAppeal().getAppellant().getIdentity().getNino(),
+            sscsCaseData.getProcessingVenue());
 
         return sscsCaseData;
     }
@@ -410,19 +415,24 @@ public class SubmitAppealService {
             LocalDate mrnDate = LocalDate.parse(caseData.getAppeal().getMrnDetails().getMrnDate());
             boolean moveToNoneCompliant = mrnDate.plusMonths(13L).isBefore(LocalDate.now());
 
-            if (moveToNoneCompliant) {
-                log.info("Moving case for NINO {} to non-compliant as MRN Date is older than 13 months", caseData.getAppeal().getAppellant().getIdentity().getNino());
-                return saveAndReturnCase ? DRAFT_TO_NON_COMPLIANT : NON_COMPLIANT;
-            } else {
-                log.info("Valid appeal to be created for case with NINO {}", caseData.getAppeal().getAppellant().getIdentity().getNino());
-                return saveAndReturnCase ? DRAFT_TO_VALID_APPEAL_CREATED : VALID_APPEAL_CREATED;
-            }
+            return handleMoveToNonCompliant(caseData, saveAndReturnCase, moveToNoneCompliant);
         } else {
             log.info("Moving case for NINO {} to incomplete due to MRN Details {} present and MRN Date {} present",
                 caseData.getAppeal().getAppellant().getIdentity().getNino(),
                 (caseData.getAppeal().getMrnDetails() != null ? "" : "not"),
                 (caseData.getAppeal().getMrnDetails().getMrnDate() != null ? "" : "not"));
             return saveAndReturnCase ? DRAFT_TO_INCOMPLETE_APPLICATION : INCOMPLETE_APPLICATION_RECEIVED;
+        }
+    }
+
+    @NotNull
+    private EventType handleMoveToNonCompliant(SscsCaseData caseData, boolean saveAndReturnCase, boolean moveToNoneCompliant) {
+        if (moveToNoneCompliant) {
+            log.info("Moving case for NINO {} to non-compliant as MRN Date is older than 13 months", caseData.getAppeal().getAppellant().getIdentity().getNino());
+            return saveAndReturnCase ? DRAFT_TO_NON_COMPLIANT : NON_COMPLIANT;
+        } else {
+            log.info("Valid appeal to be created for case with NINO {}", caseData.getAppeal().getAppellant().getIdentity().getNino());
+            return saveAndReturnCase ? DRAFT_TO_VALID_APPEAL_CREATED : VALID_APPEAL_CREATED;
         }
     }
 }

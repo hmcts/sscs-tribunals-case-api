@@ -1,16 +1,30 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ASSOCIATE_CASE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_INCOMPLETE_APPLICATION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_NON_COMPLIANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_VALID_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATION_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SEND_TO_DWP;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
@@ -81,16 +95,25 @@ public class SubmitAppealServiceTest {
     private CitizenCcdService citizenCcdService;
 
     @Mock
-    private PDFServiceClient pdfServiceClient;
-
-    @Mock
-    private EmailHelper emailHelper;
+    private RegionalProcessingCenterService regionalProcessingCenterService;
 
     @Mock
     private IdamService idamService;
 
     @Mock
+    private ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
+
+    @Mock
+    private AirLookupService airLookupService;
+
+    @Mock
     private RefDataService refDataService;
+
+    @Mock
+    private PDFServiceClient pdfServiceClient;
+
+    @Mock
+    private EmailHelper emailHelper;
 
     private SubmitAppealService submitAppealService;
 
@@ -100,20 +123,6 @@ public class SubmitAppealServiceTest {
 
     @Captor
     private ArgumentCaptor<SscsCaseData> capture;
-
-    @Mock
-    private ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
-
-    private static final RegionalProcessingCenterService regionalProcessingCenterService;
-
-    private static final AirLookupService airLookupService;
-
-    static {
-        airLookupService = new AirLookupService();
-        airLookupService.init();
-        regionalProcessingCenterService = new RegionalProcessingCenterService(airLookupService);
-        regionalProcessingCenterService.init();
-    }
 
     public static final String BIRMINGHAM_RPC = "{\n"
         + "    \"name\" : \"BIRMINGHAM\",\n"
@@ -126,7 +135,8 @@ public class SubmitAppealServiceTest {
         + "    \"phoneNumber\" : \"0300 123 1142\",\n"
         + "    \"faxNumber\" : \"0126 434 7983\",\n"
         + "    \"email\" : \"Birmingham-SYA-Receipts@justice.gov.uk\",\n"
-        + "    \"hearingRoute\" : \"gaps\"\n"
+        + "    \"hearingRoute\" : \"gaps\",\n"
+        + "    \"epimsId\" : \"815833\"\n"
         + "  }";
 
     public static final String BRADFORD_RPC = "{\n"
@@ -140,7 +150,8 @@ public class SubmitAppealServiceTest {
         + "    \"phoneNumber\" : \"0300 123 1142\",\n"
         + "    \"faxNumber\" : \"0126 434 7983\",\n"
         + "    \"email\" : \"SSCS_Bradford@justice.gov.uk\",\n"
-        + "    \"hearingRoute\" : \"gaps\"\n"
+        + "    \"hearingRoute\" : \"gaps\",\n"
+        + "    \"epimsId\" : \"698118\"\n"
         + "  }";
 
     public static final String SUTTON_RPC = "{\n"
@@ -154,11 +165,12 @@ public class SubmitAppealServiceTest {
         + "    \"phoneNumber\" : \"0300 123 1142\",\n"
         + "    \"faxNumber\" : \"0870 739 4229\",\n"
         + "    \"email\" : \"Sutton_SYA_Respons@justice.gov.uk\",\n"
-        + "    \"hearingRoute\" : \"gaps\"\n"
+        + "    \"hearingRoute\" : \"gaps\",\n"
+        + "    \"epimsId\" : \"37792\"\n"
         + "  }";
 
     @Before
-    public void setUp() {
+    public void setup() {
         appealData.getMrn().setDate(LocalDate.now().minusMonths(1));
 
         submitAppealService = new SubmitAppealService(
@@ -606,8 +618,12 @@ public class SubmitAppealServiceTest {
 
     @Test
     @Parameters(method = "generateDifferentRpcScenarios")
-    public void givenAppellantPostCode_shouldSetRegionAndRpcCorrectly(String expectedRpc, String appellantPostCode)
-        throws JsonProcessingException {
+    public void givenAppellantPostCode_shouldSetRegionAndRpcCorrectly(String expectedRpc, String appellantPostCode) throws JsonProcessingException {
+        RegionalProcessingCenter rpc = getRpcObjectForGivenJsonRpc(expectedRpc);
+        when(regionalProcessingCenterService.getByPostcode(RegionalProcessingCenterService.getFirstHalfOfPostcode(appellantPostCode)))
+            .thenReturn(getRpcObjectForGivenJsonRpc(expectedRpc));
+        when(airLookupService.lookupAirVenueNameByPostCode(eq(appellantPostCode), any())).thenReturn(rpc.getCity());
+
         SyaCaseWrapper appealData = getSyaCaseWrapper();
         appealData.getAppellant().getContactDetails().setPostCode(appellantPostCode);
 
@@ -615,13 +631,21 @@ public class SubmitAppealServiceTest {
 
         RegionalProcessingCenter actualRpc = caseData.getRegionalProcessingCenter();
         RegionalProcessingCenter expectedRpcObject = getRpcObjectForGivenJsonRpc(expectedRpc);
-        assertThat(actualRpc, is(expectedRpcObject));
+        assertThat(actualRpc)
+            .usingRecursiveComparison()
+            .ignoringFields("hearingRoute","epimsId")
+            .isEqualTo(expectedRpcObject);
+        assertThat(actualRpc)
+            .extracting("hearingRoute","epimsId")
+            .doesNotContainNull();
         assertEquals(expectedRpcObject.getName(), caseData.getRegion());
     }
 
     @Test
-    public void givenAppointeePostCode_shouldSetRegionAndRpcToAppointee()
-        throws JsonProcessingException {
+    public void givenAppointeePostCode_shouldSetRegionAndRpcToAppointee() throws JsonProcessingException {
+        when(regionalProcessingCenterService.getByPostcode("B1")).thenReturn(getRpcObjectForGivenJsonRpc(BIRMINGHAM_RPC));
+        when(airLookupService.lookupAirVenueNameByPostCode(eq("B1 1AA"), any())).thenReturn("Birmingham");
+
         SyaContactDetails appointeeContactDetails = new SyaContactDetails();
         appointeeContactDetails.setPostCode("B1 1AA");
 
@@ -646,8 +670,10 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void givenAppointeeWithNoContactData_shouldSetRegionAndRpcToAppellant()
-        throws JsonProcessingException {
+    public void givenAppointeeWithNoContactData_shouldSetRegionAndRpcToAppellant() throws JsonProcessingException {
+        when(regionalProcessingCenterService.getByPostcode("TN32")).thenReturn(getRpcObjectForGivenJsonRpc(BRADFORD_RPC));
+        when(airLookupService.lookupAirVenueNameByPostCode(eq("TN32 6PL"), any())).thenReturn("Bradford");
+
         SyaCaseWrapper appealData = getSyaWrapperWithAppointee(null);
         appealData.setIsAppointee(false);
 
@@ -659,7 +685,14 @@ public class SubmitAppealServiceTest {
     private void assertRpc(SscsCaseData caseData, String expectedRpc) throws JsonProcessingException {
         RegionalProcessingCenter actualRpc = caseData.getRegionalProcessingCenter();
         RegionalProcessingCenter expectedRpcObject = getRpcObjectForGivenJsonRpc(expectedRpc);
-        assertThat(actualRpc, is(expectedRpcObject));
+        assertThat(actualRpc)
+            .usingRecursiveComparison()
+            .ignoringFields("hearingRoute","epimsId")
+            .isEqualTo(expectedRpcObject);
+        assertThat(actualRpc)
+            .extracting("hearingRoute","epimsId")
+            .doesNotContainNull();
+
         assertEquals(expectedRpcObject.getName(), caseData.getRegion());
     }
 
@@ -877,7 +910,15 @@ public class SubmitAppealServiceTest {
             "UC, NN85 1ss, Northampton, appointee, 2, 30",
     })
     public void shouldSetProcessingVenueBasedOnBenefitTypeAndPostCode(String benefitCode, String postcode, String expectedVenue, String appellantOrAppointee, String epimsId, String regionId) {
-        when(refDataService.getVenueRefData(expectedVenue)).thenReturn(CourtVenue.builder().epimsId(epimsId).regionId(regionId).build());
+        String firstHalfOfPostcode = RegionalProcessingCenterService.getFirstHalfOfPostcode(postcode);
+        when(regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode)).thenReturn(
+            RegionalProcessingCenter.builder()
+                .name("rpcName")
+                .postcode("rpcPostcode")
+                .epimsId(epimsId)
+                .build());
+        when(airLookupService.lookupAirVenueNameByPostCode(eq(postcode), any())).thenReturn(expectedVenue);
+        when(refDataService.getVenueRefData(expectedVenue)).thenReturn(CourtVenue.builder().regionId(regionId).build());
 
         boolean isAppellant = appellantOrAppointee.equals("appellant");
         SyaCaseWrapper appealData = getSyaCaseWrapper(isAppellant ? "json/sya.json" : "sya/allDetailsWithAppointeeWithDifferentAddress.json");
@@ -890,6 +931,7 @@ public class SubmitAppealServiceTest {
         }
 
         SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
+
         assertEquals(expectedVenue, caseData.getProcessingVenue());
         assertNotNull(caseData.getCaseManagementLocation());
         assertEquals(epimsId, caseData.getCaseManagementLocation().getBaseLocation());
