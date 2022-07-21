@@ -23,8 +23,6 @@ public class SessionAwareServiceBusMessagingService implements SessionAwareMessa
         try {
 
             ServiceBusMessage serviceBusMessage = new ServiceBusMessage(objectMapper.writeValueAsString(message));
-            serviceBusMessage.setSessionId(message.getSessionId());
-            serviceBusMessage.setPartitionKey(message.getSessionId());
             serviceBusMessage.setContentType(MediaType.APPLICATION_JSON_VALUE);
             serviceBusMessage.getApplicationProperties().put("_type", "uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest");
 
