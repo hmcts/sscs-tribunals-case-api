@@ -302,7 +302,7 @@ dependencyManagement {
             entry 'spring-webmvc'
         }
 
-        dependencySet(group: 'io.netty', version: '4.1.72.Final') {
+        dependencySet(group: 'io.netty', version: '4.1.79.Final') {
             entry 'netty-handler'
             entry 'netty-transport-native-epoll'
             entry 'netty-transport-native-kqueue'
