@@ -23,6 +23,10 @@ public class ListAssistHearingMessageHelper {
         sendHearingMessage(ccdCaseId, LIST_ASSIST, CANCEL_HEARING, cancellationReason);
     }
 
+    public boolean sendHearingMessage(final String ccdCaseId, HearingRoute hearingRoute, HearingState hearingState) {
+        return sendHearingMessage(ccdCaseId, hearingRoute, hearingState, null);
+    }
+
     public boolean sendHearingMessage(final String ccdCaseId, HearingRoute hearingRoute, HearingState hearingState, CancellationReason cancellationReason) {
         HearingRequest hearingRequest = HearingRequest.builder(ccdCaseId)
             .hearingRoute(hearingRoute)

@@ -65,8 +65,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             boolean messageSuccess = listAssistHearingMessageHelper.sendHearingMessage(
                 caseId,
                 hearingRoute,
-                hearingState,
-                null);
+                hearingState);
 
             if (messageSuccess) {
                 sscsCaseData.getSchedulingAndListingFields().setHearingState(hearingState);
