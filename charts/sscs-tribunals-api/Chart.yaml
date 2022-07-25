@@ -64,6 +64,6 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: hmc-cft-hearing-service.enabled
   - name: servicebus
-    version: 0.3.0
+    version: 0.4.0
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: servicebus.enabled
