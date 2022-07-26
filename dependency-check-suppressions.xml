@@ -155,7 +155,7 @@
         <packageUrl regex="true">^pkg:maven/org.springframework\.security/spring-security-web@.*$</packageUrl>
         <cve>CVE-2022-22978</cve>
     </suppress>
-    <suppress until ="2022-08-01">
+    <suppress until="2022-08-01">
         <notes><![CDATA[
     file name: spring-web-5.2.22.RELEASE.jar
     ]]></notes>
@@ -189,5 +189,13 @@
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.apache\.logging\.log4j/log4j\-to\-slf4j@.*$</packageUrl>
         <cve>CVE-2022-33915</cve>
+    </suppress>
+    <suppress until="2022-07-21">
+        <notes><![CDATA[
+   file name: jakarta.annotation-api-1.3.5.jar, spring-security-rsa-1.0.9.RELEASE.jar, spring-cloud-starter-openfeign-2.2.9.RELEASE.jar, spring-cloud-commons-2.2.9.RELEASE.jar, spring-cloud-context-2.2.9.RELEASE.jar, spring-cloud-starter-2.2.9.RELEASE.jar
+   Rejected CVE: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-31569
+   ]]></notes>
+        <packageUrl regex="true">^.*$</packageUrl>
+        <cve>CVE-2022-31569</cve>
     </suppress>
 </suppressions>
