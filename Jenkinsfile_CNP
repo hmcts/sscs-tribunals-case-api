@@ -83,7 +83,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
   ]
 }
 
-def branchesToSync = ['demo', 'ithc', 'perftest']
+def branchesToSync = ['demo']
 
 withPipeline(type, product, component) {
     if (env.BRANCH_NAME.startsWith("PR")) {
