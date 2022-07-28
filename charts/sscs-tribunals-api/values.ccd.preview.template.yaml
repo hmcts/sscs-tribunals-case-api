@@ -243,7 +243,7 @@ ccd:
         DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,sscs,sscs_bulkscan,em_ccd_orchestrator,ccd_case_document_am_api
         OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/hmcts
         ELASTIC_SEARCH_ENABLED: true
-        ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
+        ELASTIC_SEARCH_HOST: es-master
         ELASTIC_SEARCH_FAIL_ON_IMPORT: false
       keyVaults: [ ]
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
@@ -264,8 +264,8 @@ ccd:
         IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
         CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,sscs,sscs_bulkscan,em_ccd_orchestrator
         ELASTIC_SEARCH_ENABLED: true
-        ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
-        ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
+        ELASTIC_SEARCH_HOSTS: -es-master:9200
+        ELASTIC_SEARCH_DATA_NODES_HOSTS: http://es-master:9200
         HTTP_CLIENT_READ_TIMEOUT: '120000'
         HTTP_CLIENT_MAX_TOTAL: '300'
         HTTP_CLIENT_MAX_CLIENT_PER_ROUTE: '30'
@@ -365,7 +365,7 @@ elasticsearch:
       kubernetes.io/ingress.class: traefik
     path: /
     hosts:
-      - es-${SERVICE_FQDN}
+      - es-master
 
 logstash:
   image:
@@ -379,14 +379,14 @@ logstash:
     - name: pipeline
       mountPath: /usr/share/logstash/files
   elasticsearch:
-    host: ${SERVICE_NAME}-es-master
+    host: es-master
     port: 9200
   configTpl:
     xpack.monitoring.enabled: "false"
     db.url: jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?stringtype=unspecified&ssl=false
     db.user: hmcts
     db.pwd: hmcts
-    es.data.nodes.url: http://${SERVICE_NAME}-es-master:9200
+    es.data.nodes.url: http://-es-master:9200
   livenessProbe:
     initialDelaySeconds: 90
 
