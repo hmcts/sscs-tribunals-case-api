@@ -135,7 +135,8 @@ public class SubmitAppealServiceTest {
         + "    \"phoneNumber\" : \"0300 123 1142\",\n"
         + "    \"faxNumber\" : \"0126 434 7983\",\n"
         + "    \"email\" : \"Birmingham-SYA-Receipts@justice.gov.uk\",\n"
-        + "    \"hearingRoute\" : \"gaps\"\n"
+        + "    \"hearingRoute\" : \"gaps\",\n"
+        + "    \"epimsId\" : \"815833\"\n"
         + "  }";
 
     public static final String BRADFORD_RPC = "{\n"
@@ -149,7 +150,8 @@ public class SubmitAppealServiceTest {
         + "    \"phoneNumber\" : \"0300 123 1142\",\n"
         + "    \"faxNumber\" : \"0126 434 7983\",\n"
         + "    \"email\" : \"SSCS_Bradford@justice.gov.uk\",\n"
-        + "    \"hearingRoute\" : \"gaps\"\n"
+        + "    \"hearingRoute\" : \"gaps\",\n"
+        + "    \"epimsId\" : \"698118\"\n"
         + "  }";
 
     public static final String SUTTON_RPC = "{\n"
@@ -163,7 +165,8 @@ public class SubmitAppealServiceTest {
         + "    \"phoneNumber\" : \"0300 123 1142\",\n"
         + "    \"faxNumber\" : \"0870 739 4229\",\n"
         + "    \"email\" : \"Sutton_SYA_Respons@justice.gov.uk\",\n"
-        + "    \"hearingRoute\" : \"gaps\"\n"
+        + "    \"hearingRoute\" : \"gaps\",\n"
+        + "    \"epimsId\" : \"37792\"\n"
         + "  }";
 
     @Before
@@ -630,8 +633,11 @@ public class SubmitAppealServiceTest {
         RegionalProcessingCenter expectedRpcObject = getRpcObjectForGivenJsonRpc(expectedRpc);
         assertThat(actualRpc)
             .usingRecursiveComparison()
-            .ignoringFields("hearingRoute")
+            .ignoringFields("hearingRoute","epimsId")
             .isEqualTo(expectedRpcObject);
+        assertThat(actualRpc)
+            .extracting("hearingRoute","epimsId")
+            .doesNotContainNull();
         assertEquals(expectedRpcObject.getName(), caseData.getRegion());
     }
 
@@ -681,8 +687,12 @@ public class SubmitAppealServiceTest {
         RegionalProcessingCenter expectedRpcObject = getRpcObjectForGivenJsonRpc(expectedRpc);
         assertThat(actualRpc)
             .usingRecursiveComparison()
-            .ignoringFields("hearingRoute")
+            .ignoringFields("hearingRoute","epimsId")
             .isEqualTo(expectedRpcObject);
+        assertThat(actualRpc)
+            .extracting("hearingRoute","epimsId")
+            .doesNotContainNull();
+
         assertEquals(expectedRpcObject.getName(), caseData.getRegion());
     }
 
