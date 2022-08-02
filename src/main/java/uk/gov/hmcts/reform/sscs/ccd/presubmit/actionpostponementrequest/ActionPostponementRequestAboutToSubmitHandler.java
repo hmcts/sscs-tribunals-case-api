@@ -37,7 +37,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
 
     public static final String POSTPONEMENT_DETAILS_SENT_TO_JUDGE_PREFIX = "Postponement sent to judge - ";
 
-    private UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
     private final FooterService footerService;
     private final ListAssistHearingMessageHelper hearingMessageHelper;
     private boolean isScheduleListingEnabled;
