@@ -92,7 +92,7 @@ xui-webapp:
       SERVICES_TERMS_AND_CONDITIONS: http://xui-terms-and-conditions-${SERVICE_FQDN}
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       SERVICES_S2S: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-      SERVICES_HEARINGS_COMPONENT_API: http://jurisdiction-hearings-api-aat.service.core-compute-aat.internal
+      SERVICES_HEARINGS_COMPONENT_API: http://jurisdiction-hearings-api-${SERVICE_FQDN}
       SERVICES_HMC_HEARINGS_COMPONENT_API: http://hmc-cft-hearing-service-${SERVICE_FQDN}
       SERVICES_PRD_LOCATION_API: http://rd-location-ref-api-aat.service.core-compute-aat.internal
       SERVICES_PRD_JUDICIAL_API: http://rd-judicial-api-aat.service.core-compute-aat.internal
@@ -307,7 +307,7 @@ ccd:
   #Use this image to import your CCD definition. To have an image available, create a tag and push it. Must be the
   #non-prod sheets.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.14.29-RC-SSCS-10087
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.14.33nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: https://ccd-admin-web-${SERVICE_FQDN}/oauth2redirect
     environment:
@@ -468,9 +468,9 @@ redis:
 #Turning either hearings api (with either listener on) or cft hearing service on requires
 #service bus to be turned on.
 sscs-hearings-api:
-  enabled: false
+  enabled: true
   java:
-    image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
+    image: "hmctspublic.azurecr.io/sscs/hearings-api:pr-300" #Change to pr if required
     ingressHost: sscs-hearings-api-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
     environment:
@@ -495,22 +495,23 @@ sscs-hearings-api:
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
       TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
-    secrets:
-      TRIBUNALS_EVENT_QUEUE_NAMESPACE:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
-        key: namespaceName
-      TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
-        key: primaryKey
-      HMC_HEARINGS_TOPIC_NAMESPACE:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
-        key: namespaceName
-      HMC_HEARINGS_TOPIC_ACCESS_KEY:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
-        key: primaryKey
+#Uncomment for service bus functionality.
+#    secrets:
+#      TRIBUNALS_EVENT_QUEUE_NAMESPACE:
+#        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
+#        key: namespaceName
+#      TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
+#        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
+#        key: primaryKey
+#      HMC_HEARINGS_TOPIC_NAMESPACE:
+#        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
+#        key: namespaceName
+#      HMC_HEARINGS_TOPIC_ACCESS_KEY:
+#        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
+#        key: primaryKey
 
 hmc-cft-hearing-service:
-  enabled: false
+  enabled: true
   java:
     releaseNameOverride: ${SERVICE_NAME}-hmc-cft-hearing-service
     image: "hmctspublic.azurecr.io/hmc/cft-hearing-service:latest"
@@ -551,7 +552,7 @@ hmc-cft-hearing-service:
 
 #Enable for queues/topics
 servicebus:
-  enabled: false
+  enabled: true
   teamName: sscs
   resourceGroup: sscs-aks
   serviceplan: standard
