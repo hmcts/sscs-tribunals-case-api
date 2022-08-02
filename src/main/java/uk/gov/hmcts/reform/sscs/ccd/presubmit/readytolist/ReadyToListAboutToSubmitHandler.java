@@ -51,11 +51,11 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        if (!gapsSwitchOverFeature) {
-            return HearingHandler.GAPS.handle(sscsCaseData, false,
+        if (HearingRoute.GAPS == sscsCaseData.getSchedulingAndListingFields().getHearingRoute()) {
+            return HearingHandler.GAPS.handle(sscsCaseData, gapsSwitchOverFeature,
                 hearingMessagingServiceFactory.getMessagingService(HearingRoute.GAPS));
         }
-
+        
         String region = sscsCaseData.getRegion();
 
         Map<String, RegionalProcessingCenter> regionalProcessingCenterMap = regionalProcessingCenterService
