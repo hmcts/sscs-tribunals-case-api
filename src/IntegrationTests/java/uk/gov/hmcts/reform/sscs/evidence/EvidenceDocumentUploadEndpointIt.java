@@ -66,7 +66,7 @@ public class EvidenceDocumentUploadEndpointIt {
 
         MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         mockMvc.perform(MockMvcRequestBuilders.multipart("/evidence/upload"))
-            .andExpect(status().is(400));
+            .andExpect(status().is(404));
 
     }
 
