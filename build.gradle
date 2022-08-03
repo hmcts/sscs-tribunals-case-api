@@ -285,7 +285,7 @@ dependencyManagement {
             entry 'preflight'
         }
 
-        //CVE-2021-22118, CVE-2016-1000027
+        //CVE-2021-22118
         dependencySet(group: 'org.springframework', version: '5.3.22') {
             entry 'spring-aop'
             entry 'spring-aspects'
