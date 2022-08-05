@@ -37,10 +37,13 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
 
     public static final String POSTPONEMENT_DETAILS_SENT_TO_JUDGE_PREFIX = "Postponement sent to judge - ";
 
-    private UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
     private final FooterService footerService;
     private final ListAssistHearingMessageHelper hearingMessageHelper;
     private boolean isScheduleListingEnabled;
+
+    private final Predicate<SscsCaseData> isSchedulingAndListingCase = sscsCaseData -> isScheduleListingEnabled
+        && SscsUtil.isSAndLCase(sscsCaseData);
 
     public ActionPostponementRequestAboutToSubmitHandler(UserDetailsService userDetailsService,
         FooterService footerService, ListAssistHearingMessageHelper hearingMessageHelper,
@@ -73,28 +76,28 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         if (isSendToJudge(postponementRequest)) {
             sendToJudge(userAuthorisation, sscsCaseData);
         } else if (isGrantPostponement(postponementRequest)) {
-            grantPostponement(sscsCaseData, postponementRequest);
-            setHearingDateToExcludedDate(sscsCaseData, response);
             cancelHearing(sscsCaseData);
+            setHearingDateToExcludedDate(sscsCaseData, response);
+            grantPostponement(sscsCaseData, postponementRequest);
         } else if (isRefusePostponement(postponementRequest)) {
             clearInterlocAndSetFlags(sscsCaseData);
         }
 
         clearTransientFields(sscsCaseData);
+
+        sendNewSchedulingAndListingHearingRequest(sscsCaseData);
+
         return response;
     }
 
     private void cancelHearing(SscsCaseData sscsCaseData) {
-        if (eligibleForHearingsCancel.test(sscsCaseData)) {
+        if (isSchedulingAndListingCase.test(sscsCaseData)) {
             log.info("Action postponement request: Sending cancel hearing request for case {}", sscsCaseData
                     .getCcdCaseId());
             hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(),
                     CancellationReason.OTHER);
         }
     }
-
-    private final Predicate<SscsCaseData> eligibleForHearingsCancel = sscsCaseData -> isScheduleListingEnabled
-            && SscsUtil.isSAndLCase(sscsCaseData);
 
     private void grantPostponement(SscsCaseData sscsCaseData, PostponementRequest postponementRequest) {
         if (isReadyToList(postponementRequest)) {
@@ -104,6 +107,15 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         }
 
         clearInterlocAndSetFlags(sscsCaseData);
+    }
+
+    private void sendNewSchedulingAndListingHearingRequest(SscsCaseData sscsCaseData) {
+        if (isSchedulingAndListingCase.test(sscsCaseData) && READY_TO_LIST == sscsCaseData.getState()) {
+            log.info("Postponement granted for S&L case: {}, state: ready to list. Sending new hearing request.",
+                sscsCaseData.getCcdCaseId());
+            hearingMessageHelper.sendHearingMessage(sscsCaseData.getCcdCaseId(),
+                HearingRoute.LIST_ASSIST, HearingState.CREATE_HEARING, null);
+        }
     }
 
     private void setHearingDateToExcludedDate(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {

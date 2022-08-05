@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -149,11 +150,9 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     public void givenAGrantedPostponementAndReadyToList_thenClearReviewStateAndReferralReasonAndFlagAndAddNoteAndDwpStateAndDecisionDocAdded() {
         populatePostponementSscsCaseData();
         handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService,
-                hearingMessageHelper, true);
-        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
-                .hearingRoute(HearingRoute.LIST_ASSIST).build());
+                hearingMessageHelper, false);
         sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
-                .listingOption("readyToList").build());
+                .listingOption(State.READY_TO_LIST.getId()).build());
 
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
                 .hearingDate(LocalDate.now().plusDays(1).toString())
@@ -173,8 +172,6 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getDirectionNoticeContent(), is(nullValue()));
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
                 eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
-        verifyNoMoreInteractions(hearingMessageHelper);
     }
 
     @Test
@@ -182,7 +179,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         populatePostponementSscsCaseData();
 
         sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
-                .listingOption("notListable").build());
+                .listingOption(State.NOT_LISTABLE.getId()).build());
 
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
                 .hearingDate(LocalDate.now().plusDays(1).toString())
@@ -242,5 +239,78 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
                         .documentDateAdded(LocalDate.now().minusDays(1).toString())
                         .documentType(POSTPONEMENT_REQUEST_DIRECTION_NOTICE.getValue())
                         .build()).build();
+    }
+
+    @Test
+    public void snlEnabled_givenAGrantedPostponementAndReadyToList_shouldSendCancellationAndNewHearingMessages() {
+        populatePostponementSscsCaseData();
+        handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService,
+            hearingMessageHelper, true);
+
+        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
+            .hearingRoute(HearingRoute.LIST_ASSIST).build());
+        sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
+            .listingOption(State.READY_TO_LIST.getId()).build());
+
+        sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate(LocalDate.now().plusDays(1).toString())
+            .time("10:00")
+            .build()).build()));
+        sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), CancellationReason.OTHER);
+        verify(hearingMessageHelper).sendHearingMessage(sscsCaseData.getCcdCaseId(),
+            HearingRoute.LIST_ASSIST, HearingState.CREATE_HEARING, null);
+        verifyNoMoreInteractions(hearingMessageHelper);
+    }
+
+    @Test
+    public void snlEnabled_givenAGrantedPostponementAndNotListable_shouldSendCancellationMessage() {
+        populatePostponementSscsCaseData();
+        handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService,
+            hearingMessageHelper, true);
+
+        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
+            .hearingRoute(HearingRoute.LIST_ASSIST).build());
+        sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
+            .listingOption(State.NOT_LISTABLE.getId()).build());
+
+        sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate(LocalDate.now().plusDays(1).toString())
+            .time("10:00")
+            .build()).build()));
+        sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), CancellationReason.OTHER);
+        verifyNoMoreInteractions(hearingMessageHelper);
+    }
+
+    @Test
+    public void snlDisablednabled_givenAGrantedPostponementAndNotListable_shouldNoMessages() {
+        populatePostponementSscsCaseData();
+        handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService,
+            hearingMessageHelper, false);
+
+        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
+            .hearingRoute(HearingRoute.LIST_ASSIST).build());
+        sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
+            .listingOption(State.READY_TO_LIST.getId()).build());
+
+        sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate(LocalDate.now().plusDays(1).toString())
+            .time("10:00")
+            .build()).build()));
+        sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verifyNoInteractions(hearingMessageHelper);
     }
 }
