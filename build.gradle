@@ -462,6 +462,8 @@ dependencies {
 
     contractTestCompile sourceSets.main.runtimeClasspath
     contractTestCompile sourceSets.test.runtimeClasspath
+
+    cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
 }
 // this is required to force Java running on the Azure Windows Server OS into using
 // UTF-8 as the default character set instead of windows-1252 which causes issues
@@ -581,6 +583,8 @@ task generateXls(type: Exec) {
 bootWithCCD {
     dependsOn generateXls
     authMode = uk.gov.hmcts.rse.AuthMode.Local
+    environment 'JVM_HOST', 'localhost'
+    environment 'XUI_PORT', '3455'
     environment 'XUI_LD_ID', 'TODO'
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,payment-api,xui_webapp,sscs,ccd_case_document_am_api,am_role_assignment_service'
 }

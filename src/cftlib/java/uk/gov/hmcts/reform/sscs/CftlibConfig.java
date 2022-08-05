@@ -21,12 +21,46 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "caseworker-sscs-dwpresponsewriter",
                 "caseworker-sscs-registrar"
         );
+        lib.createIdamUser("local.test@example.com",
+            "caseworker",
+            "caseworker-sscs",
+            "caseworker-sscs-superuser",
+            "caseworker-sscs-clerk",
+            "caseworker-sscs-systemupdate",
+            "caseworker-sscs-judge",
+            "caseworker-sscs-dwpresponsewriter",
+            "caseworker-sscs-registrar"
+        );
+        lib.createIdamUser("sscs-citizen@hmcts.net",
+            "citizen"
+        );
+        lib.createIdamUser("judge@example.com",
+            "caseworker",
+            "caseworker-sscs",
+            "caseworker-sscs-judge"
+        );
+        lib.createIdamUser("clerk@example.com",
+            "caseworker",
+            "caseworker-sscs",
+            "caseworker-sscs-clerk"
+        );
+        lib.createIdamUser("dwpuser@example.com",
+            "caseworker",
+            "caseworker-sscs",
+            "caseworker-sscs-dwpresponsewriter"
+        );
+        lib.createIdamUser("hmrcuser@example.com",
+            "caseworker",
+            "caseworker-sscs",
+            "caseworker-sscs-hmrcresponsewriter"
+        );
         lib.createRoles(
                 "caseworker-sscs-superuser",
                 "caseworker-sscs-clerk",
                 "caseworker-sscs-systemupdate",
                 "caseworker-sscs-judge",
                 "caseworker-sscs-dwpresponsewriter",
+                "caseworker-sscs-hmrcresponsewriter",
                 "caseworker-sscs-registrar",
                 "caseworker-sscs-callagent",
                 "caseworker-sscs-teamleader",
