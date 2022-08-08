@@ -24,12 +24,7 @@ public class CftlibConfig implements CFTLibConfigurer {
         lib.createIdamUser("local.test@example.com",
             "caseworker",
             "caseworker-sscs",
-            "caseworker-sscs-superuser",
-            "caseworker-sscs-clerk",
-            "caseworker-sscs-systemupdate",
-            "caseworker-sscs-judge",
-            "caseworker-sscs-dwpresponsewriter",
-            "caseworker-sscs-registrar"
+            "caseworker-sscs-superuser"
         );
         lib.createIdamUser("sscs-citizen@hmcts.net",
             "citizen"
