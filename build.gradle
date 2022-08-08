@@ -17,6 +17,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.7.0'
     id 'org.owasp.dependencycheck' version '6.2.2'
     id 'au.com.dius.pact' version '4.2.14'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.295'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -222,7 +223,7 @@ def versions = [
         reformLogging   : '5.1.7',
         sonarPitest     : '0.5',
         springfoxSwagger: '2.8.0',
-        sscsCommon      : '4.14.1',
+        sscsCommon      : '4.14.1'
 ]
 
 ext["rest-assured.version"] = '4.2.0'
@@ -461,6 +462,8 @@ dependencies {
 
     contractTestCompile sourceSets.main.runtimeClasspath
     contractTestCompile sourceSets.test.runtimeClasspath
+
+    cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
 }
 // this is required to force Java running on the Azure Windows Server OS into using
 // UTF-8 as the default character set instead of windows-1252 which causes issues
@@ -560,10 +563,27 @@ static def getCheckedOutGitCommitHash() {
     'git rev-parse --verify --short HEAD'.execute().text.trim()
 }
 
-
+apply plugin: 'org.springframework.boot'
 run {
     def debug = System.getProperty("debug")
     if (debug == 'true') {
         jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
     }
+}
+
+
+task generateXls(type: Exec) {
+    commandLine project.file('../sscs-ccd-definitions/bin/create-xlsx.sh').path, 'benefit', 'dev', 'local'
+    inputs.dir project.file('../sscs-ccd-definitions/benefit')
+    outputs.dir project.file('../sscs-ccd-definitions/releases')
+    environment "TRIBUNALS_API_URL", "http://localhost:8080"
+    workingDir project.file('../sscs-ccd-definitions').path
+}
+
+bootWithCCD {
+    dependsOn generateXls
+    authMode = uk.gov.hmcts.rse.AuthMode.Local
+    environment 'XUI_PORT', '3455'
+    environment 'RSE_LIB_S2S_PORT', '4502'
+    environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,payment-api,xui_webapp,sscs,ccd_case_document_am_api,am_role_assignment_service'
 }
