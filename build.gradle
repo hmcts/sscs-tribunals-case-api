@@ -17,7 +17,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.7.0'
     id 'org.owasp.dependencycheck' version '6.2.2'
     id 'au.com.dius.pact' version '4.2.14'
-    id 'com.github.hmcts.rse-cft-lib' version '0.15.34'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.295'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -573,18 +573,17 @@ run {
 
 
 task generateXls(type: Exec) {
-    commandLine project.file('sscs-ccd-definitions/bin/create-xlsx.sh').path, 'benefit', 'dev', 'local'
-    inputs.dir project.file('sscs-ccd-definitions/benefit')
-    outputs.dir project.file('sscs-ccd-definitions/releases')
+    commandLine project.file('../sscs-ccd-definitions/bin/create-xlsx.sh').path, 'benefit', 'dev', 'local'
+    inputs.dir project.file('../sscs-ccd-definitions/benefit')
+    outputs.dir project.file('../sscs-ccd-definitions/releases')
     environment "TRIBUNALS_API_URL", "http://localhost:8080"
-    workingDir project.file('sscs-ccd-definitions').path
+    workingDir project.file('../sscs-ccd-definitions').path
 }
 
 bootWithCCD {
     dependsOn generateXls
     authMode = uk.gov.hmcts.rse.AuthMode.Local
-    environment 'JVM_HOST', 'localhost'
     environment 'XUI_PORT', '3455'
-    environment 'XUI_LD_ID', 'TODO'
+    environment 'RSE_LIB_S2S_PORT', '4502'
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,payment-api,xui_webapp,sscs,ccd_case_document_am_api,am_role_assignment_service'
 }
