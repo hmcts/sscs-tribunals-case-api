@@ -73,6 +73,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         if (isSendToJudge(postponementRequest)) {
             sendToJudge(userAuthorisation, sscsCaseData);
         } else if (isGrantPostponement(postponementRequest)) {
+            sscsCaseData.setDwpState(DwpState.HEARING_POSTPONED.getId());
             grantPostponement(sscsCaseData, postponementRequest);
             setHearingDateToExcludedDate(sscsCaseData, response);
             cancelHearing(sscsCaseData);
