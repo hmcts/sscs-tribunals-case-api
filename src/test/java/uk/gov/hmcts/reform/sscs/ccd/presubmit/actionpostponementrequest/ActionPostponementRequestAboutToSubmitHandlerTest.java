@@ -39,7 +39,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -165,7 +164,6 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
         assertThat(response.getData().getInterlocReviewState(), is(nullValue()));
         assertThat(response.getData().getInterlocReferralReason(), is(nullValue()));
-        assertThat(response.getData().getState(), is(State.READY_TO_LIST));
         assertThat(response.getData().getSscsDocument(), is(not(empty())));
         assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.NO));
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
@@ -194,7 +192,6 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
                 eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         assertThat(response.getData().getInterlocReviewState(), is(nullValue()));
         assertThat(response.getData().getInterlocReferralReason(), is(nullValue()));
-        assertThat(response.getData().getState(), is(State.NOT_LISTABLE));
         assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.NO));
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
         assertThat(response.getData().getDirectionNoticeContent(), is(nullValue()));
@@ -242,7 +239,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void snlEnabled_givenAGrantedPostponementAndReadyToList_shouldSendCancellationAndNewHearingMessages() {
+    public void snlEnabled_givenAGrantedPostponementAndReadyToList_shouldSendCancellation() {
         populatePostponementSscsCaseData();
         handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService,
             hearingMessageHelper, true);
@@ -262,8 +259,6 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(hearingMessageHelper).sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), CancellationReason.OTHER);
-        verify(hearingMessageHelper).sendHearingMessage(sscsCaseData.getCcdCaseId(),
-            HearingRoute.LIST_ASSIST, HearingState.CREATE_HEARING, null);
         verifyNoMoreInteractions(hearingMessageHelper);
     }
 

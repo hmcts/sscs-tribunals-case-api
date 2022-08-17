@@ -4,8 +4,8 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
@@ -78,9 +78,16 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         } else if (isGrantPostponement(postponementRequest)) {
             cancelHearing(sscsCaseData);
             setHearingDateToExcludedDate(sscsCaseData, response);
-            grantPostponement(sscsCaseData, postponementRequest);
+            clearInterlocAndSetDwpState(sscsCaseData);
+            addDirectionNotice(sscsCaseData);
+            postponementRequest.setUnprocessedPostponementRequest(NO);
         } else if (isRefusePostponement(postponementRequest)) {
-            clearInterlocAndSetFlags(sscsCaseData);
+            clearInterlocAndSetDwpState(sscsCaseData);
+            addDirectionNotice(sscsCaseData);
+            sscsCaseData.setPostponementRequest(PostponementRequest.builder()
+                .unprocessedPostponementRequest(NO)
+                .build());
+
         }
 
         clearTransientFields(sscsCaseData);
@@ -97,16 +104,6 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
             hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(),
                     CancellationReason.OTHER);
         }
-    }
-
-    private void grantPostponement(SscsCaseData sscsCaseData, PostponementRequest postponementRequest) {
-        if (isReadyToList(postponementRequest)) {
-            sscsCaseData.setState(State.READY_TO_LIST);
-        } else if (isNotListable(postponementRequest)) {
-            sscsCaseData.setState(State.NOT_LISTABLE);
-        }
-
-        clearInterlocAndSetFlags(sscsCaseData);
     }
 
     private void sendNewSchedulingAndListingHearingRequest(SscsCaseData sscsCaseData) {
@@ -129,14 +126,10 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
                 () -> response.addError("There are no hearing to postpone"));
     }
 
-    private void clearInterlocAndSetFlags(SscsCaseData sscsCaseData) {
-
+    private void clearInterlocAndSetDwpState(SscsCaseData sscsCaseData) {
         sscsCaseData.setInterlocReferralReason(null);
         sscsCaseData.setInterlocReviewState(null);
         sscsCaseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
-        addDirectionNotice(sscsCaseData);
-        sscsCaseData.setPostponementRequest(PostponementRequest.builder().unprocessedPostponementRequest(YesNo.NO)
-                .build());
     }
 
     private void sendToJudge(String userAuthorisation, SscsCaseData sscsCaseData) {
@@ -172,24 +165,16 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
                 .noteDate(LocalDate.now().toString()).build()).build();
     }
 
-    private boolean isNotListable(PostponementRequest postponementRequest) {
-        return postponementRequest.getListingOption().equals(NOT_LISTABLE.getId());
-    }
-
-    private boolean isReadyToList(PostponementRequest postponementRequest) {
-        return postponementRequest.getListingOption().equals(READY_TO_LIST.getId());
-    }
-
     private boolean isGrantPostponement(PostponementRequest postponementRequest) {
-        return postponementRequest.getActionPostponementRequestSelected().equals(GRANT.getValue());
+        return GRANT.getValue().equals(postponementRequest.getActionPostponementRequestSelected());
     }
 
     private boolean isSendToJudge(PostponementRequest postponementRequest) {
-        return postponementRequest.getActionPostponementRequestSelected().equals(SEND_TO_JUDGE.getValue());
+        return SEND_TO_JUDGE.getValue().equals(postponementRequest.getActionPostponementRequestSelected());
     }
 
     private boolean isRefusePostponement(PostponementRequest postponementRequest) {
-        return postponementRequest.getActionPostponementRequestSelected().equals(REFUSE.getValue());
+        return REFUSE.getValue().equals(postponementRequest.getActionPostponementRequestSelected());
     }
 
     private void clearTransientFields(SscsCaseData caseData) {
