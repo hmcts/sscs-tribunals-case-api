@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
+import uk.gov.hmcts.reform.sscs.service.VenueService;
 
 
 @SpringBootTest
@@ -38,6 +39,9 @@ public class RefDataClientIt {
     @Autowired
     private RefDataService refDataService;
 
+    @Autowired
+    private VenueService venueService;
+
     private static final AirLookupService airLookupService;
 
     static {
@@ -48,17 +52,18 @@ public class RefDataClientIt {
     @Test
     @Parameters(method = "getVenueName")
     @Ignore
-    public void testVenueRefDataForVenueName(String venueName) {
-        CourtVenue venue = refDataService.getVenueRefData(venueName);
+    public void testVenueRefDataForVenueName(String epimsId) {
+        CourtVenue venue = refDataService.getCourtVenueRefDataByEpimsId(epimsId);
         assertNotNull(venue);
         assertNotNull(venue.getEpimsId());
         assertNotNull(venue.getRegionId());
     }
 
-    private Object[] getVenueName() {
+    private Object[] getEpimsId() {
         return Stream.of(Benefit.values())
                 .map(airLookupService::lookupAirVenueNamesByBenefitCode)
                 .flatMap(List::stream)
+                .map(venueService::getEpimsIdForVenue)
                 .distinct()
                 .toArray(Object[]::new);
     }
