@@ -417,6 +417,9 @@
   "10023_Information Disclosure - Debug Error Messages_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/request/identifier/recordingrequest?hearingIds=hearingIds_POST" : "ignore",
   "10023_Information Disclosure - Debug Error Messages_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/evidence_PUT" : "ignore",
   "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/appeals?caseId=10&mya=false_GET" : "ignore",
-  "90022_Application Error Disclosure_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/evidence_PUT" : "ignore"
+  "90022_Application Error Disclosure_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/evidence_PUT" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/appeals_POST" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/ccdAboutToSubmit_POST" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/appeals_POST" : "ignore"
 
 }
