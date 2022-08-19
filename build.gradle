@@ -223,7 +223,7 @@ def versions = [
         reformLogging   : '5.1.7',
         sonarPitest     : '0.5',
         springfoxSwagger: '2.8.0',
-        sscsCommon      : '4.14.2-RC-SSCS-9874-3'
+        sscsCommon      : '4.14.3-RC-SSCS-9874'
 ]
 
 ext["rest-assured.version"] = '4.2.0'
