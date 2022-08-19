@@ -17,7 +17,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.7.0'
     id 'org.owasp.dependencycheck' version '6.2.2'
     id 'au.com.dius.pact' version '4.2.14'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.295'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.299'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -582,8 +582,24 @@ task generateXls(type: Exec) {
 
 bootWithCCD {
     dependsOn generateXls
+
+    //Uncomment to launch with debug
+    //jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
     authMode = uk.gov.hmcts.rse.AuthMode.Local
+
+    //Uncomment for ccd callback logging
+    //environment 'LOG_CALLBACK_DETAILS', '*'
     environment 'XUI_PORT', '3455'
     environment 'RSE_LIB_S2S_PORT', '4502'
+    //URLs for services running in Docker require host.docker.internal to resolve properly
+    environment 'XUI_DOCUMENTS_API', 'http://host.docker.internal:5005'
+    environment 'XUI_DOCUMENTS_API_V2', 'http://host.docker.internal:4455'
+    //URLs for other services can resolve localhost
+    environment 'DM_STORE_BASE_URL', 'http://localhost:5005'
+    environment 'S2S_URL', 'http://localhost:4502'
+    environment 'DOC_ASSEMBLY_URL', 'http://localhost:8079'
+    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'evidence'
+    environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
+    environment 'CASE_DOCUMENT_S2S_AUTHORISED_SERVICES', 'ccd_case_document_am_api,ccd_gw,xui_webapp,ccd_data,bulk_scan_processor,sscs'
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,payment-api,xui_webapp,sscs,ccd_case_document_am_api,am_role_assignment_service'
 }
