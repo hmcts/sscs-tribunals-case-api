@@ -34,15 +34,15 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-ccd-callback-orchestrator.enabled
   - name: ccd
-    version: 8.0.17
+    version: 8.0.19
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd.enabled
     tags:
       - sscs-ccd-idam-pr
-  - name: sscs-tribunals-frontend
-    version: 0.2.26
-    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
-    condition: sscs-tribunals-frontend.enabled
+#  - name: sscs-tribunals-frontend
+#    version: 0.2.26
+#    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+#    condition: sscs-tribunals-frontend.enabled
   - name: redis
     version: 17.0.11
     repository: "https://charts.bitnami.com/bitnami"
