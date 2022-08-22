@@ -10,7 +10,7 @@ dependencies:
     version: 4.0.1
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
   - name: idam-pr
-    version: 2.2.7
+    version: 2.2.6
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: idam-pr.enabled
   - name: xui-webapp
@@ -34,7 +34,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-ccd-callback-orchestrator.enabled
   - name: ccd
-    version: 8.0.19
+    version: 8.0.17
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd.enabled
     tags:
