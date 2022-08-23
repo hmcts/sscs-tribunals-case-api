@@ -102,7 +102,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
             writeFinalDecisionBuilder.dateOfDecision(null);
         }
 
-        writeFinalDecisionBuilder.appellantName(buildName(caseData, true));
+        writeFinalDecisionBuilder.appellantName(buildName(caseData, false));
         if ("na".equals(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType())) {
             caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(null);
         }
