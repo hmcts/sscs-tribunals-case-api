@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -85,7 +86,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     public void setUp() {
         openMocks(this);
         handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService,
-                hearingMessageHelper, false);
+                hearingMessageHelper, true);
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_POSTPONEMENT_REQUEST);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -105,7 +106,17 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenAValidAboutToSubmitEvent_thenReturnFalse() {
+        handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService,
+            hearingMessageHelper, false);
+        assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+    }
+
+    @Test
     public void givenASendToJudge_thenSetReviewStateAndReferralReasonAndAddNote() {
+        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
+            .hearingRoute(HearingRoute.LIST_ASSIST).build());
+
         sscsCaseData.setPostponementRequest(PostponementRequest.builder()
                 .actionPostponementRequestSelected("sendToJudge")
                 .postponementRequestDetails("Request Detail Test").build());
@@ -126,6 +137,9 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     @Test
     public void givenARefusedPostponement_thenClearReviewStateAndReferralReasonAndFlagAndAndStateIsUnchangedAddNoteAndDwpStateAndDecisionDocAdded() {
         populatePostponementSscsCaseData();
+
+        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
+            .hearingRoute(HearingRoute.LIST_ASSIST).build());
 
         sscsCaseData.setState(State.HEARING);
         sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("refuse")
@@ -148,6 +162,10 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     @Test
     public void givenAGrantedPostponementAndReadyToList_thenClearReviewStateAndReferralReasonAndFlagAndAddNoteAndDwpStateAndDecisionDocAdded() {
         populatePostponementSscsCaseData();
+
+        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
+            .hearingRoute(HearingRoute.LIST_ASSIST).build());
+
         handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService,
                 hearingMessageHelper, false);
         sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
@@ -176,6 +194,9 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     public void givenAGrantedPostponementAndNotListable_thenClearReviewStateAndReferralReasonAndFlagAndAddNoteAndDwpStateAndDecisionDocAdded() {
         populatePostponementSscsCaseData();
 
+        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
+            .hearingRoute(HearingRoute.LIST_ASSIST).build());
+
         sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
                 .listingOption(State.NOT_LISTABLE.getId()).build());
 
@@ -200,6 +221,9 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     @Test
     public void givenDirectionNoticeAddedToWelshCase_thenSetInterlocReviewStateAndTranslationRequiredFlag() {
         populatePostponementSscsCaseData();
+
+        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
+            .hearingRoute(HearingRoute.LIST_ASSIST).build());
 
         sscsCaseData.setState(State.HEARING);
         sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("refuse")
@@ -241,8 +265,6 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     @Test
     public void snlEnabled_givenAGrantedPostponementAndReadyToList_shouldSendCancellation() {
         populatePostponementSscsCaseData();
-        handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService,
-            hearingMessageHelper, true);
 
         sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
             .hearingRoute(HearingRoute.LIST_ASSIST).build());
@@ -263,10 +285,8 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void snlEnabled_givenAGrantedPostponementAndNotListable_shouldSendCancellationMessage() {
+    public void givenAGrantedPostponementAndNotListable_shouldSendCancellationMessage() {
         populatePostponementSscsCaseData();
-        handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService,
-            hearingMessageHelper, true);
 
         sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
             .hearingRoute(HearingRoute.LIST_ASSIST).build());
@@ -287,13 +307,11 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void snlDisablednabled_givenAGrantedPostponementAndNotListable_shouldNoMessages() {
+    public void snlEnabled_givenNonSAndLCase_shouldNoMessages() {
         populatePostponementSscsCaseData();
-        handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService,
-            hearingMessageHelper, false);
 
         sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
-            .hearingRoute(HearingRoute.LIST_ASSIST).build());
+            .hearingRoute(HearingRoute.GAPS).build());
         sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
             .listingOption(State.READY_TO_LIST.getId()).build());
 

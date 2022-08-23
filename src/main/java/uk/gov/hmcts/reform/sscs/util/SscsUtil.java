@@ -60,9 +60,10 @@ public class SscsUtil {
     }
 
     public static boolean isSAndLCase(SscsCaseData sscsCaseData) {
-        return LIST_ASSIST
-                .equals(Optional.of(sscsCaseData).map(SscsCaseData::getSchedulingAndListingFields)
-                        .map(SchedulingAndListingFields::getHearingRoute).orElse(null));
+        return LIST_ASSIST == Optional.of(sscsCaseData)
+            .map(SscsCaseData::getSchedulingAndListingFields)
+            .map(SchedulingAndListingFields::getHearingRoute)
+            .orElse(null);
     }
 
     public static boolean isValidCaseState(State state, List<State> allowedStates) {
