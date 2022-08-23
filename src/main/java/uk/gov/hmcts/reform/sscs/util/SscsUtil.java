@@ -3,12 +3,16 @@ package uk.gov.hmcts.reform.sscs.util;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -19,8 +23,9 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.PostponeRequestTemplateBody;
 @Slf4j
 public class SscsUtil {
 
-    private static final String TITLE = "Postponement Request";
+    private static final String TITLE = "Postponement Request from FTA";
     public static final String FILENAME = "Postponement Request.pdf";
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private SscsUtil() {
         //
@@ -36,6 +41,7 @@ public class SscsUtil {
                                                                                                              GenerateFile generateFile,
                                                                                                              String templateId) {
 
+        log.debug("Executing processPostponementRequestPdfAndSetPreviewDocument for caseId: {}", sscsCaseData.getCcdCaseId());
         final String requestDetails = sscsCaseData.getPostponementRequest().getPostponementRequestDetails();
 
         if (isBlank(requestDetails)) {
@@ -43,10 +49,19 @@ public class SscsUtil {
             return response;
         }
 
+        String ppHearingVenue = sscsCaseData.getPostponementRequest().getPostponementRequestHearingVenue();
+        LocalDate prHearingDate = LocalDateTime.parse(sscsCaseData.getPostponementRequest().getPostponementRequestHearingDateAndTime()).toLocalDate();
+
+        StringBuilder additionalRequestDetails = new StringBuilder();
+        additionalRequestDetails.append("Date request received: ").append(LocalDate.now().format(DATE_TIME_FORMATTER)).append("\n");
+        additionalRequestDetails.append("Date of Hearing: ").append(prHearingDate.format(DATE_TIME_FORMATTER)).append("\n");
+        additionalRequestDetails.append("Hearing Venue: ").append(ppHearingVenue).append("\n");
+        additionalRequestDetails.append("Reason for Postponement Request: ").append(requestDetails).append("\n");
+
         GenerateFileParams params = GenerateFileParams.builder()
                 .renditionOutputLocation(null)
                 .templateId(templateId)
-                .formPayload(PostponeRequestTemplateBody.builder().title(TITLE).text(requestDetails).build())
+                .formPayload(PostponeRequestTemplateBody.builder().title(TITLE).text(additionalRequestDetails.toString()).build())
                 .userAuthentication(userAuthorisation)
                 .build();
         final String generatedFileUrl = generateFile.assemble(params);

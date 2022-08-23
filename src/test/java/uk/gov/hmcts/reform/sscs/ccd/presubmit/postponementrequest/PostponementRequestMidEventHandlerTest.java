@@ -61,7 +61,8 @@ public class PostponementRequestMidEventHandlerTest {
         handler = new PostponementRequestMidEventHandler(generateFile, templateId);
 
         Hearing hearing = getHearing(1);
-        List<Hearing> hearings  = List.of(hearing);
+        List<Hearing> hearings = new ArrayList<>();
+        hearings.add(hearing);
         sscsCaseData = SscsCaseData.builder()
                 .appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build())
                 .state(State.HEARING)
