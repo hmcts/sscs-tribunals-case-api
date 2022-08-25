@@ -66,7 +66,11 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "caseworker-sscs-dwpresponsewriter",
                 "caseworker-sscs-hmrcresponsewriter",
                 "caseworker-sscs-registrar",
+                "caseworker-sscs-callagent",
+                "caseworker-sscs-teamleader",
+                "caseworker-sscs-panelmember",
                 "caseworker-sscs-bulkscan",
+                "caseworker-sscs-anonymouscitizen",
                 "caseworker-sscs-pcqextractor",
                 "citizen",
                 "caseworker-sscs"
