@@ -42,10 +42,6 @@ idam-pr:
     ccd_data_store_api:
       - http://ccd-data-store-api-${SERVICE_NAME}/oauth2redirect
 
-
-
-
-
 em-ccdorc:
   enabled: true
   java:
