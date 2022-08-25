@@ -39,10 +39,10 @@ dependencies:
     condition: ccd.enabled
     tags:
       - sscs-ccd-idam-pr
-#  - name: sscs-tribunals-frontend
-#    version: 0.2.26
-#    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
-#    condition: sscs-tribunals-frontend.enabled
+  - name: sscs-tribunals-frontend
+    version: 0.2.35
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: sscs-tribunals-frontend.enabled
   - name: redis
     version: 17.0.11
     repository: "https://charts.bitnami.com/bitnami"
