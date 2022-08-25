@@ -57,6 +57,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
                 .selectWhoReviewsCase(new DynamicList(new DynamicListItem("reviewByTcw", "Review by TCW"), null))
                 .benefitCode("002")
                 .issueCode("CC")
+                .dwpIsOfficerAttending("Yes")
                 .build();
 
         sscsCaseDataBefore = SscsCaseData.builder().build();
@@ -403,5 +404,13 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
         assertThat(response.getErrors().size(), is(1));
         assertThat(response.getWarnings().size(), is(0));
         assertEquals("Benefit code cannot be changed to the selected code", response.getErrors().stream().findFirst().get());
+    }
+
+    @Test
+    public void givenAHmctsResponseReviewedEventWithDwpIsOfficerAttending_thenSetPoToAttendValue() {
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response.getData().getSchedulingAndListingFields().getOverrideFields().getPoToAttend());
+        assertEquals(YES, response.getData().getSchedulingAndListingFields().getOverrideFields().getPoToAttend());
     }
 }
