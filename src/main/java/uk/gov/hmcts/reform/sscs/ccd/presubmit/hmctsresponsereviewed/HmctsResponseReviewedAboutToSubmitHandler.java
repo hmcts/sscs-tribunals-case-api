@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 
@@ -49,6 +50,16 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
         setCaseCode(preSubmitCallbackResponse, callback);
         checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
         setDwpDocuments(sscsCaseData);
+
+        OverrideFields overrideFields = sscsCaseData.getSchedulingAndListingFields().getOverrideFields();
+
+        if (isNull(overrideFields)) {
+            overrideFields = OverrideFields.builder()
+                .poToAttend(YesNo.isYes(sscsCaseData.getDwpIsOfficerAttending()) ? YesNo.YES : YesNo.NO)
+                .build();
+
+            sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
+        }
 
         if (sscsCaseData.getDwpResponseDate() == null) {
             sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
