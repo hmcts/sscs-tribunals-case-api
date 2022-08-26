@@ -45,8 +45,8 @@ public class DwpDocumentServiceTest {
 
         dwpDocumentService.addToDwpDocuments(sscsCaseData, DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("test.url").build()).build(), DwpDocumentType.UCB);
 
-        assertEquals("test.url", sscsCaseData.getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals("existing.com", sscsCaseData.getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("existing.com", sscsCaseData.getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("test.url", sscsCaseData.getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
     }
 
     @Test
@@ -58,10 +58,10 @@ public class DwpDocumentServiceTest {
 
         dwpDocumentService.addToDwpDocumentsWithEditedDoc(sscsCaseData, DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("test.url").build()).build(), DwpDocumentType.UCB, DocumentLink.builder().documentUrl("edited.url").build(), "Edited reason");
 
-        assertEquals("test.url", sscsCaseData.getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals("edited.url", sscsCaseData.getDwpDocuments().get(0).getValue().getEditedDocumentLink().getDocumentUrl());
-        assertEquals("Edited reason", sscsCaseData.getDwpDocuments().get(0).getValue().getDwpEditedEvidenceReason());
-        assertEquals("existing.com", sscsCaseData.getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("existing.com", sscsCaseData.getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("test.url", sscsCaseData.getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("edited.url", sscsCaseData.getDwpDocuments().get(1).getValue().getEditedDocumentLink().getDocumentUrl());
+        assertEquals("Edited reason", sscsCaseData.getDwpDocuments().get(1).getValue().getDwpEditedEvidenceReason());
     }
 
     @Test
