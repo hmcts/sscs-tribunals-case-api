@@ -50,16 +50,7 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
         setCaseCode(preSubmitCallbackResponse, callback);
         checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
         setDwpDocuments(sscsCaseData);
-
-        OverrideFields overrideFields = sscsCaseData.getSchedulingAndListingFields().getOverrideFields();
-
-        if (isNull(overrideFields)) {
-            overrideFields = OverrideFields.builder()
-                .poToAttend(YesNo.isYes(sscsCaseData.getDwpIsOfficerAttending()) ? YesNo.YES : YesNo.NO)
-                .build();
-
-            sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
-        }
+        setOverrideFields(sscsCaseData);
 
         if (sscsCaseData.getDwpResponseDate() == null) {
             sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
@@ -114,6 +105,17 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
                 dwpDocument.getValue().setDocumentDateAdded(java.time.LocalDate.now().toString());
                 dwpDocument.getValue().setDocumentFileName(documentTypePrefix + " on " + todayDate);
             }
+        }
+    }
+
+    private voud setOverrideFields(SscsCaseData sscsCaseData) {
+        OverrideFields overrideFields = sscsCaseData.getSchedulingAndListingFields().getOverrideFields();
+        if (isNull(overrideFields)) {
+            overrideFields = OverrideFields.builder()
+                .poToAttend(YesNo.isYes(sscsCaseData.getDwpIsOfficerAttending()) ? YesNo.YES : YesNo.NO)
+                .build();
+
+            sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
         }
     }
 
