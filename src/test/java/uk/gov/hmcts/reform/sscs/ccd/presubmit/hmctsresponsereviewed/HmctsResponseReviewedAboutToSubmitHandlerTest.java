@@ -410,7 +410,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     public void givenAHmctsResponseReviewedEventWithDwpIsOfficerAttending_thenSetPoToAttendValue() {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertNotNull(response.getData().getSchedulingAndListingFields().getOverrideFields().getPoToAttend());
-        assertEquals(YES, response.getData().getSchedulingAndListingFields().getOverrideFields().getPoToAttend());
+        assertNotNull(response.getData().getSchedulingAndListingFields().getDefaultOverrideFields().getPoToAttend());
+        assertEquals(YES, response.getData().getSchedulingAndListingFields().getDefaultOverrideFields().getPoToAttend());
     }
 }

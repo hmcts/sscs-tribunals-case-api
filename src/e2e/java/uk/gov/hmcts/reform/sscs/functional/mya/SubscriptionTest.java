@@ -14,7 +14,7 @@ public class SubscriptionTest extends BaseFunctionTest {
     @Test
     public void shouldUpdateSubscription() throws IOException, InterruptedException {
         String newUserEmail = createRandomEmail();
-        CreatedCcdCase ccdCase = createCcdCase(newUserEmail);
+        CreatedCcdCase ccdCase = createCcdCase(createRandomEmail());
         String appellantTya = ccdCase.getAppellantTya();
 
         // Give ES time to index
