@@ -108,7 +108,7 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
         }
     }
 
-    private voud setOverrideFields(SscsCaseData sscsCaseData) {
+    private void setOverrideFields(SscsCaseData sscsCaseData) {
         OverrideFields overrideFields = sscsCaseData.getSchedulingAndListingFields().getOverrideFields();
         if (isNull(overrideFields)) {
             overrideFields = OverrideFields.builder()
