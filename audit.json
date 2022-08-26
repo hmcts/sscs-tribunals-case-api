@@ -420,6 +420,18 @@
   "90022_Application Error Disclosure_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/evidence_PUT" : "ignore",
   "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/appeals_POST" : "ignore",
   "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/ccdAboutToSubmit_POST" : "ignore",
-  "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/appeals_POST" : "ignore"
+  "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/appeals_POST" : "ignore",
+  "10010_Cookie No HttpOnly Flag_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/drafts?forceCreate=forceCreate_PUT" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/appeals/id/subscriptions/subscriptionId_DELETE" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/ccdMidEventPreviewAdjournCase_POST" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/evidence/upload_POST" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/drafts?forceCreate=forceCreate_PUT" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/appeals/id/subscriptions/subscriptionId_DELETE" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/ccdMidEvent?pageId=pageId_POST" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/ccdMidEventPreviewAdjournCase_POST" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/evidence/upload_POST" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/drafts?forceCreate=forceCreate_PUT" : "ignore",
+  "90033_Loosely Scoped Cookie_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/drafts?forceCreate=forceCreate_PUT" : "ignore"
+
 
 }
