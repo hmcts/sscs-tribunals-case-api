@@ -289,7 +289,7 @@ ccd:
       keyVaults: []
 
   ccd-user-profile-importer:
-    image: hmctspublic.azurecr.io/ccd/user-profile-importer:db2r9a
+    image: hmctspublic.azurecr.io/ccd/user-profile-importer:latest
     environment:
       AUTH_PROVIDER_BASE_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       CCD_USER_PROFILE_URL: http://${SERVICE_NAME}-ccd-user-profile-api
@@ -303,7 +303,7 @@ ccd:
   ccd-definition-importer:
     image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.14.33nonProd
     definitionFilename: sscs-ccd.xlsx
-    redirectUri: https://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
+    redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
       CCD_ENVIRONMENT: 'PROD'
       CCD_DEF_EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-em-ccd-orchestrator
