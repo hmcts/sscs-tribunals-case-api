@@ -90,9 +90,10 @@ public class DwpChallengeValidityAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getDwpChallengeValidityDocument());
+        assertEquals("existing.com", sscsCaseData.getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
         assertEquals(2, response.getData().getDwpDocuments().size());
-        assertEquals("challengeValidityLink", response.getData().getDwpDocuments().get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals(DwpDocumentType.DWP_CHALLENGE_VALIDITY.getValue(), response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
+        assertEquals("challengeValidityLink", response.getData().getDwpDocuments().get(1).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals(DwpDocumentType.DWP_CHALLENGE_VALIDITY.getValue(), response.getData().getDwpDocuments().get(1).getValue().getDocumentType());
     }
 
     @Test(expected = IllegalStateException.class)

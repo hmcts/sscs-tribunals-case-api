@@ -57,8 +57,8 @@ public class DwpUploadResponseIt extends AbstractEventIt {
         assertEquals("001", result.getData().getBenefitCode());
         assertEquals("001US", result.getData().getCaseCode());
         assertEquals(2, result.getData().getSscsDocument().size());
-        assertEquals("sscs1", result.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        assertEquals("appellantEvidence", result.getData().getSscsDocument().get(1).getValue().getDocumentType());
+        assertEquals("sscs1", result.getData().getSscsDocument().get(1).getValue().getDocumentType());
+        assertEquals("appellantEvidence", result.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertNull(result.getData().getSscsDocument().get(1).getValue().getPartyUploaded());
         assertEquals(DwpState.RESPONSE_SUBMITTED_DWP.getId(), result.getData().getDwpState());
         assertEquals(1, result.getData().getAudioVideoEvidence().size());
@@ -81,8 +81,8 @@ public class DwpUploadResponseIt extends AbstractEventIt {
         assertEquals("003", result.getData().getBenefitCode());
         assertEquals("003CC", result.getData().getCaseCode());
         assertEquals(2, result.getData().getSscsDocument().size());
-        assertEquals("sscs1", result.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        assertEquals("appellantEvidence", result.getData().getSscsDocument().get(1).getValue().getDocumentType());
+        assertEquals("sscs1", result.getData().getSscsDocument().get(1).getValue().getDocumentType());
+        assertEquals("appellantEvidence", result.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals(1, result.getData().getAudioVideoEvidence().size());
         assertNull(result.getData().getAudioVideoEvidence().get(0).getValue().getRip1Document());
         assertEquals(REVIEW_BY_TCW.getId(), result.getData().getInterlocReviewState());

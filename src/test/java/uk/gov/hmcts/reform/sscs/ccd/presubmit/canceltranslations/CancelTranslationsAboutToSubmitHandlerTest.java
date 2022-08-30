@@ -122,12 +122,12 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
 
         SscsDocument sscs1Doc =
                 buildSscsDocument("english.pdf", SscsDocumentTranslationStatus.TRANSLATION_REQUIRED,
-                        DocumentType.SSCS1.getValue(), LocalDate.now().minusDays(3));
+                        DocumentType.SSCS1.getValue(), LocalDate.now().minusDays(1));
 
         SscsDocument sscs2Doc =
                 buildSscsDocument("anything.pdf", SscsDocumentTranslationStatus.TRANSLATION_REQUIRED,
                         DocumentType.DECISION_NOTICE
-                                .getValue(), LocalDate.now().minusDays(1));
+                                .getValue(), LocalDate.now().minusDays(3));
 
         SscsDocument sscs3Doc =
                 buildSscsDocument("anything.pdf", SscsDocumentTranslationStatus.TRANSLATION_COMPLETE,
