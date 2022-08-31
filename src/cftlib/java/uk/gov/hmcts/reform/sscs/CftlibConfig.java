@@ -25,7 +25,7 @@ public class CftlibConfig implements CFTLibConfigurer {
 	     "caseworker",
 	     "caseworker-sscs"
 	);
-	lib.createIdamUser("super-user@example.com"
+	lib.createIdamUser("super-user@example.com",
             "caseworker",
             "caseworker-sscs",
             "caseworker-sscs-superuser"
