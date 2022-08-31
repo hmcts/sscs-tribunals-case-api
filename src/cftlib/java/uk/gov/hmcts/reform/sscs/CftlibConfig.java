@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.rse.ccd.lib.api.CFTLib;
 import uk.gov.hmcts.rse.ccd.lib.api.CFTLibConfigurer;
@@ -12,20 +13,20 @@ public class CftlibConfig implements CFTLibConfigurer {
     @Override
     public void configure(CFTLib lib) throws Exception {
         lib.createIdamUser("system.update@hmcts.net",
-                "caseworker",
-                "caseworker-sscs",
-                "caseworker-sscs-superuser",
-                "caseworker-sscs-clerk",
-                "caseworker-sscs-systemupdate",
-                "caseworker-sscs-judge",
-                "caseworker-sscs-dwpresponsewriter",
-                "caseworker-sscs-registrar"
+            "caseworker",
+            "caseworker-sscs",
+            "caseworker-sscs-superuser",
+            "caseworker-sscs-clerk",
+            "caseworker-sscs-systemupdate",
+            "caseworker-sscs-judge",
+            "caseworker-sscs-dwpresponsewriter",
+            "caseworker-sscs-registrar"
         );
         lib.createIdamUser("local.test@example.com",
-	     "caseworker",
-	     "caseworker-sscs"
-	);
-	lib.createIdamUser("super-user@example.com",
+            "caseworker",
+            "caseworker-sscs"
+        );
+        lib.createIdamUser("super-user@example.com",
             "caseworker",
             "caseworker-sscs",
             "caseworker-sscs-superuser"
@@ -59,21 +60,21 @@ public class CftlibConfig implements CFTLibConfigurer {
             "caseworker-sscs-hmrcresponsewriter"
         );
         lib.createRoles(
-                "caseworker-sscs-superuser",
-                "caseworker-sscs-clerk",
-                "caseworker-sscs-systemupdate",
-                "caseworker-sscs-judge",
-                "caseworker-sscs-dwpresponsewriter",
-                "caseworker-sscs-hmrcresponsewriter",
-                "caseworker-sscs-registrar",
-                "caseworker-sscs-callagent",
-                "caseworker-sscs-teamleader",
-                "caseworker-sscs-panelmember",
-                "caseworker-sscs-bulkscan",
-                "caseworker-sscs-anonymouscitizen",
-                "caseworker-sscs-pcqextractor",
-                "citizen",
-                "caseworker-sscs"
+            "caseworker-sscs-superuser",
+            "caseworker-sscs-clerk",
+            "caseworker-sscs-systemupdate",
+            "caseworker-sscs-judge",
+            "caseworker-sscs-dwpresponsewriter",
+            "caseworker-sscs-hmrcresponsewriter",
+            "caseworker-sscs-registrar",
+            "caseworker-sscs-callagent",
+            "caseworker-sscs-teamleader",
+            "caseworker-sscs-panelmember",
+            "caseworker-sscs-bulkscan",
+            "caseworker-sscs-anonymouscitizen",
+            "caseworker-sscs-pcqextractor",
+            "citizen",
+            "caseworker-sscs"
         );
         var def = Files.readAllBytes(Path.of("../sscs-ccd-definitions/releases/CCD_SSCSDefinition_vdev_LOCAL.xlsx"));
         lib.importDefinition(def);
