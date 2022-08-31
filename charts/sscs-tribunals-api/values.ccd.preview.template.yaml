@@ -206,6 +206,7 @@ ccd:
   ccd-admin-web:
     nodejs:
       image: hmctspublic.azurecr.io/ccd/admin-web:latest
+      ingressHost: ccd-admin-web-${SERVICE_FQDN}
       keyVaults: []
       environment:
         IDAM_OAUTH2_AW_CLIENT_SECRET: ${ADMIN_WEB_IDAM_SECRET}
@@ -301,7 +302,7 @@ ccd:
   ccd-definition-importer:
     image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.14.33nonProd
     definitionFilename: sscs-ccd.xlsx
-    redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
+    redirectUri: https://ccd-admin-web-${SERVICE_FQDN}/oauth2redirect
     environment:
       CCD_ENVIRONMENT: 'PROD'
       CCD_DEF_EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-em-ccd-orchestrator
