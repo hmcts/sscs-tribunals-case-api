@@ -23,10 +23,10 @@ public class CftlibConfig implements CFTLibConfigurer {
             "caseworker-sscs-registrar"
         );
         lib.createIdamUser("local.test@example.com",
-	     "caseworker",
-	     "caseworker-sscs"
-	);
-	lib.createIdamUser("super-user@example.com",
+            "caseworker",
+            "caseworker-sscs"
+        );
+        lib.createIdamUser("super-user@example.com",
             "caseworker",
             "caseworker-sscs",
             "caseworker-sscs-superuser"
