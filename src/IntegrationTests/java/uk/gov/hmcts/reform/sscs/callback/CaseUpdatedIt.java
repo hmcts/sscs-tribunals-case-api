@@ -47,9 +47,8 @@ public class CaseUpdatedIt extends AbstractEventIt {
             .serviceAuthorization("sscs").build());
         when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
             .roles(List.of(SUPER_USER.getValue())).build());
-        when(refDataApi.courtVenueByEpimsId(eq("Bearer Token:"), eq("sscs"),
-            anyString())).thenReturn(List.of(CourtVenue.builder().courtTypeId("31")
-            .regionId("2").venueName("Basildon CC").build()));
+        when(refDataApi.courtVenueByName(eq("Bearer Token:"), eq("sscs"),
+            anyString())).thenReturn(List.of(CourtVenue.builder().regionId("2").venueName("Basildon CC").build()));
     }
 
     @Test
