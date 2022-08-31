@@ -223,7 +223,7 @@ def versions = [
         reformLogging   : '5.1.7',
         sonarPitest     : '0.5',
         springfoxSwagger: '2.8.0',
-        sscsCommon      : '4.15.2'
+        sscsCommon      : '4.14.4'
 ]
 
 ext["rest-assured.version"] = '4.2.0'
@@ -601,7 +601,6 @@ bootWithCCD {
     environment 'DOC_ASSEMBLY_URL', 'http://localhost:4631'
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'evidence'
     environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
-    environment 'CASE_ACCESS_MANAGEMENT_FEATURE', 'true'
     environment 'CASE_DOCUMENT_S2S_AUTHORISED_SERVICES', 'ccd_case_document_am_api,ccd_gw,xui_webapp,ccd_data,bulk_scan_processor,sscs'
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,payment-api,xui_webapp,sscs,ccd_case_document_am_api,am_role_assignment_service'
 }
