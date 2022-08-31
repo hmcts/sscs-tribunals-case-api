@@ -17,11 +17,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.7.0'
     id 'org.owasp.dependencycheck' version '6.2.2'
     id 'au.com.dius.pact' version '4.2.14'
-<<<<<<< HEAD
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.320'
-=======
     id 'com.github.hmcts.rse-cft-lib' version '0.19.299'
->>>>>>> parent 8946d1a4424a404f4aac39ebe878aca4d824a062
 }
 
 apply plugin: 'org.springframework.boot'
