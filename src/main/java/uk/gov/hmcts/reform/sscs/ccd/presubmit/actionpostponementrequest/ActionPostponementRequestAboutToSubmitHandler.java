@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest;
 
-
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
@@ -112,7 +111,6 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
                 .filter(hearing -> LocalDateTime.now().isBefore(hearing.getValue().getStart()))
                 .distinct()
                 .findFirst();
-
 
         optionalHearing.ifPresentOrElse(hearing ->
                         footerService.setHearingDateAsExcludeDate(hearing, sscsCaseData),
