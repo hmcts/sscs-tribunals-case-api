@@ -586,6 +586,10 @@ task generateXls(type: Exec) {
     workingDir project.file('../sscs-ccd-definitions').path
 }
 
+task startDocStack(type: Exec) {
+    commandLine 'docker', 'compose', '-f', project.file('src/cftlib/resources/docker/cft-lib-doc-stack.yml').path, 'up', '-d'
+}
+
 bootWithCCD {
     dependsOn generateXls
 
