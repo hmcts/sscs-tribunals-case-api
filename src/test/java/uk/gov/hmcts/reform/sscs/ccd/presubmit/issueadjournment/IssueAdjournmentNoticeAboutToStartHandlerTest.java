@@ -79,6 +79,7 @@ public class IssueAdjournmentNoticeAboutToStartHandlerTest {
     @Test
     public void givenAboutToStartRequest_willGeneratePreviewFile() {
         PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(sscsCaseData);
+        sscsCaseData.setAdjournCaseGenerateNotice("Yes");
 
         when(previewService.preview(callback, DocumentType.ADJOURNMENT_NOTICE, USER_AUTHORISATION, true)).thenReturn(response);
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -89,10 +90,11 @@ public class IssueAdjournmentNoticeAboutToStartHandlerTest {
     @Test
     public void givenNoPreviewDecisionFoundOnCase_thenShowError() {
         sscsCaseData.setAdjournCasePreviewDocument(null);
+        sscsCaseData.setAdjournCaseGenerateNotice("No");
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         String error = result.getErrors().stream().findFirst().orElse("");
-        assertEquals("No draft adjournment notice found on case. Please use 'Adjourn case' event before trying to issue.", error);
+        assertEquals("No draft adjournment notice found on case. Please use 'Adjourn case' event or upload your adjourn case document.", error);
     }
 
     @Test(expected = IllegalStateException.class)
