@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
@@ -29,6 +30,15 @@ import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
+
+
+
+
+
+
+
+
+
 
 
 @Service
@@ -108,7 +118,12 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
 
     private void setHearingDateToExcludedDate(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         final Optional<Hearing> optionalHearing = emptyIfNull(sscsCaseData.getHearings()).stream()
-                .filter(h -> h.getValue().getHearingDateTime().isAfter(LocalDateTime.now()))
+                .filter(h -> {
+                    if (!isNull(h.getValue().getStart())) {
+                        return LocalDateTime.now().isBefore(h.getValue().getStart());
+                    }
+                    return false;
+                })
                 .distinct()
                 .findFirst();
 

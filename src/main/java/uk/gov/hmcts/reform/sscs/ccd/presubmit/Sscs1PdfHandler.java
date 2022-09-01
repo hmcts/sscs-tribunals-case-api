@@ -54,7 +54,7 @@ public class Sscs1PdfHandler implements PreSubmitCallbackHandler<SscsCaseData> {
         if (caseData.getCaseCreated() == null) {
             sscsCaseDataPreSubmitCallbackResponse.addError("The Case Created Date must be set to generate the SSCS1");
         } else {
-            createAppealPdf(caseData);
+           createAppealPdf(caseData);
         }
 
         return sscsCaseDataPreSubmitCallbackResponse;
