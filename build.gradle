@@ -213,7 +213,7 @@ def versions = [
         azureMessagingServiceBus: '7.6.0',
         commonsIo       : '2.11.0',
         gradlePitest    : '1.3.0',
-        jackson         : '2.13.3',
+        jackson         : '2.11.4',
         junitJupiter    : '5.7.2',
         lombok          : '1.18.22',
         pact            : '4.1.7',
