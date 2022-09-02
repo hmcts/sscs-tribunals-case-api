@@ -134,4 +134,11 @@
         <packageUrl regex="true">^pkg:maven/org.springframework.security/spring-security.*$</packageUrl>
         <cve>CVE-2022-22978</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+                snakeyaml-1.26.jar
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org.yaml/snakeyaml.*$</packageUrl>
+        <cve>CVE-2022-25857</cve>
+    </suppress>
 </suppressions>
