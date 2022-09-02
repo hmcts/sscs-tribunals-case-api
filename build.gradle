@@ -328,6 +328,10 @@ dependencyManagement {
             entry 'accessors-smart'
         }
 
+        dependencySet(group: 'org.yaml', version: '1.31') {
+            entry 'snakeyaml'
+        }
+
         //CVE-2021-30468
         dependencySet(group: 'org.apache.cxf', version: '3.4.5') {
             entry 'cxf-core'
@@ -368,7 +372,7 @@ dependencies {
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
     compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.1'
     compile group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
-    compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.3'
+    compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.3'
 
     compile group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.3'
 
