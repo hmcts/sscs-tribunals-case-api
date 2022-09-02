@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static org.reflections.util.ConfigurationBuilder.build;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
@@ -411,6 +412,17 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNotNull(response.getData().getSchedulingAndListingFields().getDefaultOverrideFields().getPoToAttend());
+        assertEquals(YES, response.getData().getSchedulingAndListingFields().getDefaultOverrideFields().getPoToAttend());
+    }
+
+    @Test
+    public void givenDefaultOverrideValuesWithNoAttendWillBeUpdatedByDwpIsOfficerAttendingValue() {
+        OverrideFields defaultOverrideFields = OverrideFields.builder()
+            .poToAttend(NO)
+            .build();
+
+        callback.getCaseDetails().getCaseData().getSchedulingAndListingFields().setDefaultOverrideFields(defaultOverrideFields);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(YES, response.getData().getSchedulingAndListingFields().getDefaultOverrideFields().getPoToAttend());
     }
 }
