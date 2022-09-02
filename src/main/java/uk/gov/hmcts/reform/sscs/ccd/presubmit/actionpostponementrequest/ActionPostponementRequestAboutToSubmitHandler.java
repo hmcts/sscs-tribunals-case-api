@@ -32,15 +32,6 @@ import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 
-
-
-
-
-
-
-
-
-
 @Service
 @Slf4j
 public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -126,6 +117,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
                 })
                 .distinct()
                 .findFirst();
+        //Hearing hearing = sscsCaseData.getLatestHearing(); footerService.setHearingDateAsExcludeDate(hearing, sscsCaseData)
 
         optionalHearing.ifPresentOrElse(hearing ->
                         footerService.setHearingDateAsExcludeDate(hearing, sscsCaseData),

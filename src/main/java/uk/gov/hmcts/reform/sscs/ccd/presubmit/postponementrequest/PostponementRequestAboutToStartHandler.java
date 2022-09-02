@@ -38,11 +38,11 @@ public class PostponementRequestAboutToStartHandler implements PreSubmitCallback
             response.addError(POSTPONEMENTS_NOT_POSSIBLE_FOR_GAPS);
             return response;
         }
+
         final Optional<Hearing> optionalHearing = emptyIfNull(sscsCaseData.getHearings()).stream()
                 .filter(h -> h.getValue().getStart().isAfter(LocalDateTime.now()))
                 .distinct()
                 .findFirst();
-
 
         optionalHearing.ifPresentOrElse(hearing -> setPostponementRequest(hearing, sscsCaseData),
                 () -> response.addError("There are no hearing to postpone"));
@@ -51,7 +51,7 @@ public class PostponementRequestAboutToStartHandler implements PreSubmitCallback
     }
 
     private void setPostponementRequest(Hearing hearing, SscsCaseData sscsCaseData) {
-        if (HearingRoute.GAPS.equals(sscsCaseData.getRegionalProcessingCenter().getHearingRoute())) {
+        if (HearingRoute.GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute())) {
             sscsCaseData.getPostponementRequest().setPostponementRequestHearingDateAndTime(hearing.getValue().getHearingDateTime().toString());
 
         } else if (HearingRoute.LIST_ASSIST.equals(sscsCaseData.getRegionalProcessingCenter().getHearingRoute())) {
