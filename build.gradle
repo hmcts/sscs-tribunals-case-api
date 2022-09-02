@@ -327,6 +327,10 @@ dependencyManagement {
             entry 'json-smart'
             entry 'accessors-smart'
         }
+        
+        dependencySet(group: 'org.yaml', version: '1.31') {
+            entry 'snakeyaml'
+        }
 
         //CVE-2021-30468
         dependencySet(group: 'org.apache.cxf', version: '3.4.5') {
