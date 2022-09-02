@@ -49,13 +49,13 @@ public class SscsUtil {
             return response;
         }
 
-        String ppHearingVenue = sscsCaseData.getPostponementRequest().getPostponementRequestHearingVenue();
-        LocalDate prHearingDate = LocalDateTime.parse(sscsCaseData.getPostponementRequest().getPostponementRequestHearingDateAndTime()).toLocalDate();
+        String hearingVenue = sscsCaseData.getPostponementRequest().getPostponementRequestHearingVenue();
+        LocalDate hearingDate = LocalDateTime.parse(sscsCaseData.getPostponementRequest().getPostponementRequestHearingDateAndTime()).toLocalDate();
 
         StringBuilder additionalRequestDetails = new StringBuilder();
         additionalRequestDetails.append("Date request received: ").append(LocalDate.now().format(DATE_TIME_FORMATTER)).append("\n");
-        additionalRequestDetails.append("Date of Hearing: ").append(prHearingDate.format(DATE_TIME_FORMATTER)).append("\n");
-        additionalRequestDetails.append("Hearing Venue: ").append(ppHearingVenue).append("\n");
+        additionalRequestDetails.append("Date of Hearing: ").append(hearingDate.format(DATE_TIME_FORMATTER)).append("\n");
+        additionalRequestDetails.append("Hearing Venue: ").append(hearingVenue).append("\n");
         additionalRequestDetails.append("Reason for Postponement Request: ").append(requestDetails).append("\n");
 
         GenerateFileParams params = GenerateFileParams.builder()
