@@ -114,9 +114,10 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
             defaultOverrideFields = OverrideFields.builder()
                 .poToAttend(YesNo.isYes(sscsCaseData.getDwpIsOfficerAttending()) ? YesNo.YES : YesNo.NO)
                 .build();
-
-            sscsCaseData.getSchedulingAndListingFields().setDefaultOverrideFields(defaultOverrideFields);
+        } else {
+            defaultOverrideFields.setPoToAttend(YesNo.isYes(sscsCaseData.getDwpIsOfficerAttending()) ? YesNo.YES : YesNo.NO);
         }
+        sscsCaseData.getSchedulingAndListingFields().setDefaultOverrideFields(defaultOverrideFields);
     }
 
 }
