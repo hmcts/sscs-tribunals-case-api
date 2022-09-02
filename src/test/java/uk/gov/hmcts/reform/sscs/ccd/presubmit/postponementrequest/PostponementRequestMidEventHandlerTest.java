@@ -3,7 +3,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.postponementrequest;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -61,8 +63,7 @@ public class PostponementRequestMidEventHandlerTest {
         handler = new PostponementRequestMidEventHandler(generateFile, templateId);
 
         Hearing hearing = getHearing(1);
-        List<Hearing> hearings = new ArrayList<>();
-        hearings.add(hearing);
+        List<Hearing> hearings  = List.of(hearing);
         sscsCaseData = SscsCaseData.builder()
                 .appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build())
                 .state(State.HEARING)
@@ -123,6 +124,18 @@ public class PostponementRequestMidEventHandlerTest {
                 .documentFilename(FILENAME)
                 .build();
         assertThat(sscsCaseData.getPostponementRequest().getPostponementPreviewDocument(), is(documentLink));
+    }
+
+    @Test
+    public void givenAPostponementRequest_thenEnsureAdditionalRequestDetailsAreAttached() {
+        String dmUrl = "http://dm-store/documents/123";
+        when(generateFile.assemble(any())).thenReturn(dmUrl);
+        handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        assertNotNull(sscsCaseData.getPostponementRequest().getPostponementRequestHearingDateAndTime());
+        assertEquals(sscsCaseData.getPostponementRequest().getPostponementRequestHearingVenue(), "Venue 1");
+        assertEquals(sscsCaseData.getPostponementRequest().getPostponementRequestDetails(), "Here are some details");
     }
 
 }

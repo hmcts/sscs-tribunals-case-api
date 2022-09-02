@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.*;
@@ -15,10 +16,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.POSTPO
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.FILENAME;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -65,13 +64,9 @@ public class ValidSendToInterlocMidEventHandlerTest {
         openMocks(this);
         handler = new ValidSendToInterlocMidEventHandler(generateFile, templateId);
 
-        Hearing hearing = getHearing(1);
-        List<Hearing> hearings = new ArrayList<>();
-        hearings.add(hearing);
         sscsCaseData = SscsCaseData.builder()
                 .appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build())
                 .state(State.HEARING)
-                .hearings(hearings)
                 .selectWhoReviewsCase(new DynamicList(new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()), null))
                 .postponementRequest(PostponementRequest.builder()
                         .postponementRequestDetails("Here are some details")
@@ -90,16 +85,6 @@ public class ValidSendToInterlocMidEventHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(caseDetails.getState()).thenReturn(sscsCaseData.getState());
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
-    }
-
-    static Hearing getHearing(int hearingId) {
-        return Hearing.builder().value(HearingDetails.builder()
-                .hearingDate(LocalDate.now().plusDays(1).toString())
-                .hearingId(String.valueOf(hearingId))
-                .venue(Venue.builder()
-                        .name("Venue " + hearingId).build())
-                .time("12:00")
-                .build()).build();
     }
 
     @Test
