@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.client;
+package uk.gov.hmcts.reform.sscs.functional.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.hmcts.reform.sscs.client.RefDataApi;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
@@ -24,11 +25,11 @@ import uk.gov.hmcts.reform.sscs.service.VenueService;
  * returns valid court venue information. The main incidence for this test is in sscs-common's RefDataService
  * but the test is here to cache auth information for performance purposes.
  */
+@RunWith(SpringRunner.class)
 @SpringBootTest
 @Slf4j
-@RunWith(SpringRunner.class)
-@TestPropertySource(locations = "classpath:config/application_refdata_it.properties")
-public class RefDataClientIt {
+@TestPropertySource(locations = "classpath:config/application_refdata_test.properties")
+public class RefDataClientTest {
     public static final String SSCS_COURT_TYPE_ID = "31";
 
     @Autowired
