@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest;
 
-import static java.util.Objects.isNull;
+
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
@@ -109,15 +109,10 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
 
     private void setHearingDateToExcludedDate(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         final Optional<Hearing> optionalHearing = emptyIfNull(sscsCaseData.getHearings()).stream()
-                .filter(h -> {
-                    if (!isNull(h.getValue().getStart())) {
-                        return LocalDateTime.now().isBefore(h.getValue().getStart());
-                    }
-                    return false;
-                })
+                .filter(hearing -> LocalDateTime.now().isBefore(hearing.getValue().getStart()))
                 .distinct()
                 .findFirst();
-        //Hearing hearing = sscsCaseData.getLatestHearing(); footerService.setHearingDateAsExcludeDate(hearing, sscsCaseData)
+
 
         optionalHearing.ifPresentOrElse(hearing ->
                         footerService.setHearingDateAsExcludeDate(hearing, sscsCaseData),
