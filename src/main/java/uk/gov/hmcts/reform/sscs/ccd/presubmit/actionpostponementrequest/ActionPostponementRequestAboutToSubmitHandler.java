@@ -111,6 +111,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
                 .filter(hearing -> LocalDateTime.now().isBefore(hearing.getValue().getStart()))
                 .distinct()
                 .findFirst();
+        //Hearing hearing = sscsCaseData.getLatestHearing(); footerService.setHearingDateAsExcludeDate(hearing, sscsCaseData)
 
         optionalHearing.ifPresentOrElse(hearing ->
                         footerService.setHearingDateAsExcludeDate(hearing, sscsCaseData),
