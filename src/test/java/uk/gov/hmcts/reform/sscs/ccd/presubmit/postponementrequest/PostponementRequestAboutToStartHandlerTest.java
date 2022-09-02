@@ -10,6 +10,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
@@ -75,6 +76,7 @@ public class PostponementRequestAboutToStartHandlerTest {
     static Hearing getHearing(int hearingId) {
         return Hearing.builder().value(HearingDetails.builder()
                 .hearingDate(LocalDate.now().plusDays(1).toString())
+                .start(LocalDateTime.now().plusDays(1))
                 .hearingId(String.valueOf(hearingId))
                 .venue(Venue.builder().name("Venue " + hearingId).build())
                 .time("12:00")

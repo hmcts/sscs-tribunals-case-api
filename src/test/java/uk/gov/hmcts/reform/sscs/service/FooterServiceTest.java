@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -304,6 +305,8 @@ public class FooterServiceTest {
     public void shouldAddHearingDateToExcludeDateWhichIsNull() {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
                 .hearingDate(LocalDate.now().plusDays(1).toString())
+                .start(LocalDateTime.now().plusDays(1))
+                .end(LocalDateTime.now().plusDays(1))
                 .time("10:00")
                 .build()).build()));
         sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
@@ -326,6 +329,8 @@ public class FooterServiceTest {
 
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
                 .hearingDate(LocalDate.now().plusDays(1).toString())
+                .start(LocalDateTime.now().plusDays(1))
+                .end(LocalDateTime.now().plusDays(1))
                 .time("10:00")
                 .build()).build()));
         sscsCaseData.setAppeal(
