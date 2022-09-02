@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -24,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.service.VenueService;
  * but the test is here to cache auth information for performance purposes.
  */
 @SpringBootTest
+@Slf4j
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_refdata_it.properties")
 public class RefDataClientIt {
@@ -69,6 +71,7 @@ public class RefDataClientIt {
 
                 checkForMissingRegionId(missingInformationIds, epimsId, sscsCourtVenues.get(0));
             } catch (Exception ex) {
+                log.error(ex.getMessage());
                 failedIds.add(epimsId);
             }
         }
