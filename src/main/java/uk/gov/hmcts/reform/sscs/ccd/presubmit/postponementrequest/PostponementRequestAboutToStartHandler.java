@@ -51,12 +51,7 @@ public class PostponementRequestAboutToStartHandler implements PreSubmitCallback
     }
 
     private void setPostponementRequest(Hearing hearing, SscsCaseData sscsCaseData) {
-        if (HearingRoute.GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute())) {
-            sscsCaseData.getPostponementRequest().setPostponementRequestHearingDateAndTime(hearing.getValue().getHearingDateTime().toString());
-
-        } else if (HearingRoute.LIST_ASSIST.equals(sscsCaseData.getRegionalProcessingCenter().getHearingRoute())) {
-            sscsCaseData.getPostponementRequest().setPostponementRequestHearingDateAndTime(hearing.getValue().getStart().toString());
-        }
+        sscsCaseData.getPostponementRequest().setPostponementRequestHearingDateAndTime(hearing.getValue().getStart().toString());
         sscsCaseData.getPostponementRequest().setPostponementRequestHearingVenue(hearing.getValue().getVenue().getName());
     }
 }
