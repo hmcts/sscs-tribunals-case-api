@@ -65,7 +65,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest extends BaseHandler {
     }
 
     @Test
-    public void givenAboutToSubmitCallbackForEvent_shouldUpdatePreviousStateWhenStateIsNotReadyToListOrWithFTA() {
+    public void givenAboutToSubmitCallbackForEvent_shouldUpdatePreviousStateWhenStateIsNotReadyToListOrWithFta() {
         sscsCaseData.setPreviousState(State.VOID_STATE);
         sscsCaseData.setState(State.APPEAL_CREATED);
         PreSubmitCallbackResponse<SscsCaseData> response =
@@ -83,7 +83,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest extends BaseHandler {
     }
 
     @Test
-    public void givenAboutToSubmitCallbackForEvent_shouldNotUpdatePreviousStateWhenStateIsWithFTA() {
+    public void givenAboutToSubmitCallbackForEvent_shouldNotUpdatePreviousStateWhenStateIsWithFta() {
         sscsCaseData.setPreviousState(State.VOID_STATE);
         sscsCaseData.setState(State.WITH_DWP);
         PreSubmitCallbackResponse<SscsCaseData> response =
