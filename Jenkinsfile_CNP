@@ -128,8 +128,8 @@ withPipeline(type, product, component) {
     }
     onPR() {
         enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
-                        //Disabling due to IDAM OIDC issue. To be investigated under SSCS-10377
-                      //AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK])
+        //Disabling due to IDAM OIDC issue. To be investigated under SSCS-10377
+        //AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK])
     }
 
 }
