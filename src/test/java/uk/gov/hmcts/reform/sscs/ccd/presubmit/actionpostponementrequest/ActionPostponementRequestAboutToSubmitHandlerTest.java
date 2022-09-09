@@ -53,6 +53,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -78,6 +79,9 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     @Mock
     private ListAssistHearingMessageHelper hearingMessageHelper;
 
+    @Mock
+    private PostponementRequestService postponementRequestService;
+
     private SscsCaseData sscsCaseData;
 
     private SscsDocument expectedDocument;
@@ -86,7 +90,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     public void setUp() {
         openMocks(this);
         handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService,
-                hearingMessageHelper, false);
+                hearingMessageHelper, false, postponementRequestService);
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_POSTPONEMENT_REQUEST);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -150,7 +154,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     public void givenAGrantedPostponementAndReadyToList_thenClearReviewStateAndReferralReasonAndFlagAndAddNoteAndDwpStateAndDecisionDocAdded() {
         populatePostponementSscsCaseData();
         handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService,
-                hearingMessageHelper, true);
+                hearingMessageHelper, true, postponementRequestService);
         sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
                 .hearingRoute(HearingRoute.LIST_ASSIST).build());
         sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")

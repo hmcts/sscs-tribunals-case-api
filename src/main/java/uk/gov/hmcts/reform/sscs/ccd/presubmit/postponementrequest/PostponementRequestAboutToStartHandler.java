@@ -1,30 +1,38 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.postponementrequest;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.POSTPONEMENTS_NOT_POSSIBLE_FOR_GAPS;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 
 @Service
 public class PostponementRequestAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    public static final String NOT_LIST_ASSIST_CASE_ERROR = "Postponement requests can only be made for list"
+        + " assist cases";
+
+    @Value("${feature.snl.enabled}")
+    private boolean isScheduleListingEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        return callbackType.equals(CallbackType.ABOUT_TO_START)
-                && callback.getEvent() == EventType.POSTPONEMENT_REQUEST
-                && callback.getCaseDetails() != null;
+        return callbackType == CallbackType.ABOUT_TO_START
+            && callback.getEvent() == EventType.POSTPONEMENT_REQUEST
+            && isScheduleListingEnabled;
     }
 
     @Override
@@ -34,18 +42,18 @@ public class PostponementRequestAboutToStartHandler implements PreSubmitCallback
 
         final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (HearingRoute.GAPS.equals(sscsCaseData.getRegionalProcessingCenter().getHearingRoute())) {
-            response.addError(POSTPONEMENTS_NOT_POSSIBLE_FOR_GAPS);
+        if (!SscsUtil.isSAndLCase(sscsCaseData)) {
+            response.addError(NOT_LIST_ASSIST_CASE_ERROR);
             return response;
         }
 
-        final Optional<Hearing> optionalHearing = emptyIfNull(sscsCaseData.getHearings()).stream()
-                .filter(h -> h.getValue().getStart().isAfter(LocalDateTime.now()))
-                .distinct()
-                .findFirst();
+        Hearing hearing = sscsCaseData.getLatestHearing();
+        if (isNull(hearing)) {
+            response.addError("There are no hearing to postpone");
+            return response;
+        }
 
-        optionalHearing.ifPresentOrElse(hearing -> setPostponementRequest(hearing, sscsCaseData),
-                () -> response.addError("There are no hearing to postpone"));
+        setPostponementRequest(hearing, sscsCaseData);
 
         return response;
     }
