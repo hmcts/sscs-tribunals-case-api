@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.WELSH_T
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest.ActionPostponementRequestAboutToSubmitHandler.POSTPONEMENT_DETAILS_SENT_TO_JUDGE_PREFIX;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
@@ -157,6 +158,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
                 .hearingDate(LocalDate.now().plusDays(1).toString())
+                .start(LocalDateTime.now().plusDays(1))
                 .time("10:00")
                 .build()).build()));
         sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
@@ -186,6 +188,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
                 .hearingDate(LocalDate.now().plusDays(1).toString())
+                        .start(LocalDateTime.now().plusDays(1))
                 .time("10:00")
                 .build()).build()));
         sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());

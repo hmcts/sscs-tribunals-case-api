@@ -108,7 +108,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
 
     private void setHearingDateToExcludedDate(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         final Optional<Hearing> optionalHearing = emptyIfNull(sscsCaseData.getHearings()).stream()
-                .filter(h -> h.getValue().getHearingDateTime().isAfter(LocalDateTime.now()))
+                .filter(hearing -> LocalDateTime.now().isBefore(hearing.getValue().getStart()))
                 .distinct()
                 .findFirst();
 

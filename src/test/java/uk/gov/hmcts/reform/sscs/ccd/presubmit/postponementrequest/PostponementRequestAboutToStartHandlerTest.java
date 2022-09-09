@@ -10,6 +10,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
@@ -75,6 +76,7 @@ public class PostponementRequestAboutToStartHandlerTest {
     static Hearing getHearing(int hearingId) {
         return Hearing.builder().value(HearingDetails.builder()
                 .hearingDate(LocalDate.now().plusDays(1).toString())
+                .start(LocalDateTime.now().plusDays(1))
                 .hearingId(String.valueOf(hearingId))
                 .venue(Venue.builder().name("Venue " + hearingId).build())
                 .time("12:00")
@@ -109,7 +111,10 @@ public class PostponementRequestAboutToStartHandlerTest {
 
     @Test
     public void givenHearingsInThePast_returnAnError() {
-        HearingDetails hearingDetails = hearing.getValue().toBuilder().hearingDate(LocalDate.now().minusDays(1).toString()).build();
+        HearingDetails hearingDetails = hearing.getValue().toBuilder()
+                .hearingDate(LocalDate.now().minusDays(1).toString())
+                .start(LocalDateTime.now().minusDays(1))
+                .build();
         hearing = Hearing.builder().value(hearingDetails).build();
         sscsCaseData.setHearings(List.of(hearing));
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -119,12 +124,13 @@ public class PostponementRequestAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenAPostponementRequest_setupPostponementRequestData() {
+    public void givenAPostponementRequestFromListAssist_setupPostponementRequestData() {
+        sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().hearingRoute(HearingRoute.LIST_ASSIST).build());
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getWarnings().size(), is(0));
         assertThat(response.getData().getPostponementRequest().getPostponementRequestHearingVenue(), is(hearing.getValue().getVenue().getName()));
-        assertThat(response.getData().getPostponementRequest().getPostponementRequestHearingDateAndTime(), is(hearing.getValue().getHearingDateTime().toString()));
+        assertThat(response.getData().getPostponementRequest().getPostponementRequestHearingDateAndTime(), is(hearing.getValue().getStart().toString()));
     }
 
     @Test

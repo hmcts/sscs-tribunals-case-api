@@ -32,16 +32,17 @@ public class PostponementRequestAboutToStartHandler implements PreSubmitCallback
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        final Optional<Hearing> optionalHearing = emptyIfNull(sscsCaseData.getHearings()).stream()
-                .filter(h -> h.getValue().getHearingDateTime().isAfter(LocalDateTime.now()))
-                .distinct()
-                .findFirst();
-
         final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if (HearingRoute.GAPS.equals(sscsCaseData.getRegionalProcessingCenter().getHearingRoute())) {
             response.addError(POSTPONEMENTS_NOT_POSSIBLE_FOR_GAPS);
+            return response;
         }
+
+        final Optional<Hearing> optionalHearing = emptyIfNull(sscsCaseData.getHearings()).stream()
+                .filter(h -> h.getValue().getStart().isAfter(LocalDateTime.now()))
+                .distinct()
+                .findFirst();
 
         optionalHearing.ifPresentOrElse(hearing -> setPostponementRequest(hearing, sscsCaseData),
                 () -> response.addError("There are no hearing to postpone"));
@@ -50,7 +51,7 @@ public class PostponementRequestAboutToStartHandler implements PreSubmitCallback
     }
 
     private void setPostponementRequest(Hearing hearing, SscsCaseData sscsCaseData) {
-        sscsCaseData.getPostponementRequest().setPostponementRequestHearingDateAndTime(hearing.getValue().getHearingDateTime().toString());
+        sscsCaseData.getPostponementRequest().setPostponementRequestHearingDateAndTime(hearing.getValue().getStart().toString());
         sscsCaseData.getPostponementRequest().setPostponementRequestHearingVenue(hearing.getValue().getVenue().getName());
     }
 }

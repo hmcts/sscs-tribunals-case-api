@@ -67,11 +67,11 @@ public class FooterService extends AbstractFooterService<SscsDocument> {
             newExcludeDates.addAll(sscsCaseData.getAppeal().getHearingOptions().getExcludeDates());
         }
 
-        DateRange dateRange = DateRange.builder()
-                .start(getLocalDate(hearing.getValue().getHearingDate()))
-                .end(getLocalDate(hearing.getValue().getHearingDate()))
+        DateRange dateRangelistAssist = DateRange.builder()
+                .start(hearing.getValue().getStart().toLocalDate().toString())
+                .end(hearing.getValue().getEnd().toLocalDate().toString())
                 .build();
-        newExcludeDates.add(ExcludeDate.builder().value(dateRange).build());
+        newExcludeDates.add(ExcludeDate.builder().value(dateRangelistAssist).build());
 
         sscsCaseData.getAppeal().getHearingOptions().setExcludeDates(newExcludeDates);
     }
