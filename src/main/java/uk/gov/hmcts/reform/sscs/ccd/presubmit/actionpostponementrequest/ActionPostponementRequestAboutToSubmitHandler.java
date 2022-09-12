@@ -76,6 +76,9 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
             grantPostponement(sscsCaseData, postponementRequest);
             setHearingDateToExcludedDate(sscsCaseData, response);
             cancelHearing(sscsCaseData);
+            if (isScheduleListingEnabled) {
+                sscsCaseData.setDwpState(DwpState.HEARING_POSTPONED.getId());
+            }
         } else if (isRefusePostponement(postponementRequest)) {
             clearInterlocAndSetFlags(sscsCaseData);
         }

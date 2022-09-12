@@ -85,7 +85,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     public void setUp() {
         openMocks(this);
         handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService,
-                hearingMessageHelper, false);
+                hearingMessageHelper, true);
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_POSTPONEMENT_REQUEST);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -148,8 +148,6 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     @Test
     public void givenAGrantedPostponementAndReadyToList_thenClearReviewStateAndReferralReasonAndFlagAndAddNoteAndDwpStateAndDecisionDocAdded() {
         populatePostponementSscsCaseData();
-        handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService,
-                hearingMessageHelper, true);
         sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
                 .hearingRoute(HearingRoute.LIST_ASSIST).build());
         sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
@@ -169,13 +167,36 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getState(), is(State.READY_TO_LIST));
         assertThat(response.getData().getSscsDocument(), is(not(empty())));
         assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.NO));
-        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
+        assertThat(response.getData().getDwpState(), is(DwpState.HEARING_POSTPONED.getId()));
         assertThat(response.getData().getDirectionNoticeContent(), is(nullValue()));
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
                 eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
         verifyNoMoreInteractions(hearingMessageHelper);
     }
+
+    @Test
+    public void givenAGrantedPostponementAndReadyToList_verifyDwpStateBeforeSchedulingAndListing() {
+        populatePostponementSscsCaseData();
+        handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService,
+                hearingMessageHelper, false);
+        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
+                .hearingRoute(HearingRoute.LIST_ASSIST).build());
+        sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
+                .listingOption("readyToList").build());
+
+        sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
+                .hearingDate(LocalDate.now().plusDays(1).toString())
+                .time("10:00")
+                .build()).build()));
+        sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
+    }
+
 
     @Test
     public void givenAGrantedPostponementAndNotListable_thenClearReviewStateAndReferralReasonAndFlagAndAddNoteAndDwpStateAndDecisionDocAdded() {
@@ -199,7 +220,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getInterlocReferralReason(), is(nullValue()));
         assertThat(response.getData().getState(), is(State.NOT_LISTABLE));
         assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.NO));
-        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
+        assertThat(response.getData().getDwpState(), is(DwpState.HEARING_POSTPONED.getId()));
         assertThat(response.getData().getDirectionNoticeContent(), is(nullValue()));
     }
 
