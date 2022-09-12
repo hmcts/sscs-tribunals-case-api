@@ -62,8 +62,8 @@ public class RefDataClientTest {
 
         for (String epimsId : epimsIds) {
             try {
-                List<CourtVenue> sscsCourtVenues = refDataApi.courtVenueByEpimsId(serviceToken,
-                    oauth2Token, epimsId).stream().filter(venue -> SSCS_COURT_TYPE_ID.equals(venue.getCourtTypeId()))
+                List<CourtVenue> sscsCourtVenues = refDataApi.courtVenueByEpimsId(oauth2Token,
+                        serviceToken, epimsId).stream().filter(venue -> SSCS_COURT_TYPE_ID.equals(venue.getCourtTypeId()))
                     .collect(Collectors.toList());
 
                 if (sscsCourtVenues.size() != 1) {
