@@ -333,7 +333,7 @@ dependencyManagement {
         }
 
         //CVE-2021-30468
-        dependencySet(group: 'org.apache.cxf', version: '3.4.5') {
+        dependencySet(group: 'org.apache.cxf', version: '3.5.3') {
             entry 'cxf-core'
             entry 'cxf-rt-frontend-jaxrs'
             entry 'cxf-rt-rs-client'
