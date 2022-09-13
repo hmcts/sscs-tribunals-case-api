@@ -1,11 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -21,7 +16,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.WELSH_T
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest.ActionPostponementRequestAboutToSubmitHandler.POSTPONEMENT_DETAILS_SENT_TO_JUDGE_PREFIX;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
@@ -39,6 +33,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Note;
+import uk.gov.hmcts.reform.sscs.ccd.domain.NoteDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Postponement;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -60,6 +57,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     private static final String DOCUMENT_URL = "dm-store/documents/123";
 
     private static final String USER_AUTHORISATION = "Bearer token";
+
     ActionPostponementRequestAboutToSubmitHandler handler;
 
     @Mock
@@ -90,18 +88,51 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.ACTION_POSTPONEMENT_REQUEST);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
-        sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
-                .directionNoticeContent("Body Content")
-                .sscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder().build()).build();
+        sscsCaseData = SscsCaseData.builder()
+            .ccdCaseId("ccdId")
+            .appeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build())
+            .directionNoticeContent("Body Content")
+            .sscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder().build())
+            .schedulingAndListingFields(SchedulingAndListingFields.builder()
+                .hearingRoute(HearingRoute.LIST_ASSIST).build())
+            .hearings(List.of(Hearing.builder()
+                .value(HearingDetails.builder()
+                    .hearingDate(LocalDate.now().plusDays(1).toString())
+                    .time("10:00")
+                    .build())
+                .build()))
+            .previewDocument(DocumentLink.builder()
+                .documentUrl(DOCUMENT_URL)
+                .documentBinaryUrl(DOCUMENT_URL + "/binary")
+                .documentFilename("directionIssued.pdf")
+                .build())
+            .interlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId())
+            .postponementRequest(PostponementRequest.builder()
+                .actionPostponementRequestSelected("grant")
+                .build())
+            .build();
 
-        sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
+        expectedDocument = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentFileName(sscsCaseData.getPreviewDocument().getDocumentFilename())
+                .documentLink(sscsCaseData.getPreviewDocument())
+                .documentDateAdded(LocalDate.now().minusDays(1).toString())
+                .documentType(POSTPONEMENT_REQUEST_DIRECTION_NOTICE.getValue())
+                .build()).build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
     @Test
     public void givenAValidAboutToSubmitEvent_thenReturnTrue() {
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
+    }
+
+    @Test
+    public void givenSchedulingAndListingEnabledFalse_thenReturnFalse() {
+        handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService,
+            hearingMessageHelper, false);
+        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
     @Test
@@ -113,124 +144,109 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getInterlocReviewState(),
-                is(InterlocReviewState.REVIEW_BY_JUDGE.getId()));
-        assertThat(response.getData().getInterlocReferralReason(),
-                is(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId()));
-        assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.YES));
-        assertThat(response.getData().getAppealNotePad().getNotesCollection().stream()
-                .anyMatch(note -> note.getValue().getNoteDetail()
-                        .equals(POSTPONEMENT_DETAILS_SENT_TO_JUDGE_PREFIX + "Request Detail Test")), is(true));
+        assertThat(response.getData().getInterlocReviewState())
+            .isEqualTo(InterlocReviewState.REVIEW_BY_JUDGE.getId());
+        assertThat(response.getData().getInterlocReferralReason())
+            .isEqualTo(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId());
+        assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest()).isEqualTo(YesNo.YES);
+        assertThat(response.getData().getAppealNotePad().getNotesCollection())
+            .isNotEmpty()
+            .extracting(Note::getValue)
+            .extracting(NoteDetails::getNoteDetail)
+            .contains(POSTPONEMENT_DETAILS_SENT_TO_JUDGE_PREFIX + "Request Detail Test");
     }
 
     @Test
-    public void givenARefusedPostponement_thenClearReviewStateAndReferralReasonAndFlagAndAndStateIsUnchangedAddNoteAndDwpStateAndDecisionDocAdded() {
-        populatePostponementSscsCaseData();
-
-        sscsCaseData.setState(State.HEARING);
-        sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("refuse")
-                .build());
+    public void givenARefusedPostponement_thenClearReviewStateAndReferralReasonAndFlagAndAddNoteAndDwpStateAndDecisionDocAdded() {
+        sscsCaseData.setPostponementRequest(PostponementRequest.builder()
+            .actionPostponementRequestSelected("refuse")
+            .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
                 eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
+
         verifyNoInteractions(hearingMessageHelper);
-        assertThat(response.getData().getInterlocReviewState(), is(nullValue()));
-        assertThat(response.getData().getInterlocReferralReason(), is(nullValue()));
-        assertThat(response.getData().getState(), is(State.HEARING));
-        assertThat(response.getData().getSscsDocument(), is(not(empty())));
-        assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.NO));
-        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
+        assertThat(response.getData().getInterlocReviewState()).isNull();
+        assertThat(response.getData().getInterlocReferralReason()).isNull();
+        assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest()).isEqualTo(YesNo.NO);
+        assertThat(response.getData().getDwpState()).isEqualTo(DwpState.DIRECTION_ACTION_REQUIRED.getId());
     }
 
     @Test
-    public void givenAGrantedPostponementAndReadyToList_thenClearReviewStateAndReferralReasonAndFlagAndAddNoteAndDwpStateAndDecisionDocAdded() {
-        populatePostponementSscsCaseData();
-        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
-                .hearingRoute(HearingRoute.LIST_ASSIST).build());
-        sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
-                .listingOption("readyToList").build());
+    public void givenAGrantedPostponement_thenClearReviewStateAndReferralReasonAndFlagAndAddNoteAndDwpStateAndDecisionDocAdded() {
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
-                .hearingDate(LocalDate.now().plusDays(1).toString())
-                .time("10:00")
-                .build()).build()));
+        assertThat(response.getData().getInterlocReviewState()).isNull();
+        assertThat(response.getData().getInterlocReferralReason()).isNull();
+        assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest()).isEqualTo(YesNo.NO);
+        assertThat(response.getData().getDwpState()).isEqualTo(DwpState.HEARING_POSTPONED.getId());
+        assertThat(response.getData().getDirectionNoticeContent()).isNull();
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
+                eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
+    }
+
+    @Test
+    public void givenAGrantedPostponement_shouldSendCancellation() {
+
         sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
-                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getInterlocReviewState(), is(nullValue()));
-        assertThat(response.getData().getInterlocReferralReason(), is(nullValue()));
-        assertThat(response.getData().getState(), is(State.READY_TO_LIST));
-        assertThat(response.getData().getSscsDocument(), is(not(empty())));
-        assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.NO));
-        assertThat(response.getData().getDwpState(), is(DwpState.HEARING_POSTPONED.getId()));
-        assertThat(response.getData().getDirectionNoticeContent(), is(nullValue()));
-        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
-                eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(),
+            CancellationReason.OTHER);
         verifyNoMoreInteractions(hearingMessageHelper);
     }
 
     @Test
-    public void givenAGrantedPostponementAndReadyToList_verifyDwpStateBeforeSchedulingAndListing() {
-        populatePostponementSscsCaseData();
-        handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService,
-                hearingMessageHelper, false);
-        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
-                .hearingRoute(HearingRoute.LIST_ASSIST).build());
-        sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
-                .listingOption("readyToList").build());
+    public void givenAGrantedPostponementAndReadyToList_shouldSetPostponementCorrectly() {
 
-        sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
-                .hearingDate(LocalDate.now().plusDays(1).toString())
-                .time("10:00")
-                .build()).build()));
         sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
+        sscsCaseData.getPostponementRequest().setListingOption("readyToList");
 
         PreSubmitCallbackResponse<SscsCaseData> response =
-                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
+
+        Postponement expected = Postponement.builder()
+            .unprocessedPostponement(YES)
+            .postponementEvent(EventType.READY_TO_LIST)
+            .build();
+
+        assertThat(response.getData().getPostponement())
+            .isEqualTo(expected);
     }
 
-
     @Test
-    public void givenAGrantedPostponementAndNotListable_thenClearReviewStateAndReferralReasonAndFlagAndAddNoteAndDwpStateAndDecisionDocAdded() {
-        populatePostponementSscsCaseData();
+    public void givenAGrantedPostponementAndNotListable_shouldSetPostponementCorrectly() {
 
-        sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("grant")
-                .listingOption("notListable").build());
-
-        sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
-                .hearingDate(LocalDate.now().plusDays(1).toString())
-                .time("10:00")
-                .build()).build()));
         sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
+        sscsCaseData.getPostponementRequest().setListingOption("notListable");
 
         PreSubmitCallbackResponse<SscsCaseData> response =
-                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
-                eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
-        assertThat(response.getData().getInterlocReviewState(), is(nullValue()));
-        assertThat(response.getData().getInterlocReferralReason(), is(nullValue()));
-        assertThat(response.getData().getState(), is(State.NOT_LISTABLE));
-        assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.NO));
-        assertThat(response.getData().getDwpState(), is(DwpState.HEARING_POSTPONED.getId()));
-        assertThat(response.getData().getDirectionNoticeContent(), is(nullValue()));
+
+        Postponement expected = Postponement.builder()
+            .unprocessedPostponement(YES)
+            .postponementEvent(EventType.NOT_LISTABLE)
+            .build();
+
+        assertThat(response.getData().getPostponement())
+            .isEqualTo(expected);
     }
 
     @Test
     public void givenDirectionNoticeAddedToWelshCase_thenSetInterlocReviewStateAndTranslationRequiredFlag() {
-        populatePostponementSscsCaseData();
-
         sscsCaseData.setState(State.HEARING);
-        sscsCaseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected("refuse")
-                .build());
+        sscsCaseData.setPostponementRequest(PostponementRequest.builder()
+            .actionPostponementRequestSelected("refuse")
+            .build());
+
         sscsCaseData.setLanguagePreferenceWelsh(YES.getValue());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
@@ -238,30 +254,21 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
                 eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(TRANSLATION_REQUIRED));
-        assertThat(response.getData().getInterlocReviewState(), is(WELSH_TRANSLATION.getId()));
-        assertThat(response.getData().getTranslationWorkOutstanding(), is(YES.getValue()));
-        assertThat(response.getData().getSscsDocument(), is(not(empty())));
-        assertThat(response.getData().getDirectionNoticeContent(), is(nullValue()));
+
+        assertThat(response.getData().getInterlocReviewState()).isEqualTo(WELSH_TRANSLATION.getId());
+        assertThat(response.getData().getTranslationWorkOutstanding()).isEqualTo(YES.getValue());
+        System.out.println(response.getData().getSscsDocument());
+        assertThat(response.getData().getDirectionNoticeContent()).isNull();
     }
 
-    private void populatePostponementSscsCaseData() {
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-                .hearingDate(LocalDate.now().plusDays(1).toString())
-                .build()).build()));
-        sscsCaseData.setPreviewDocument(DocumentLink.builder()
-                .documentUrl(DOCUMENT_URL)
-                .documentBinaryUrl(DOCUMENT_URL + "/binary")
-                .documentFilename("directionIssued.pdf")
-                .build());
-        sscsCaseData.setInterlocReferralReason(InterlocReviewState.REVIEW_BY_JUDGE.getId());
-        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId());
+    @Test
+    public void givenNonSAndLCase_shouldNoMessages() {
+        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
+            .hearingRoute(HearingRoute.GAPS).build());
 
-        expectedDocument = SscsDocument.builder()
-                .value(SscsDocumentDetails.builder()
-                        .documentFileName(sscsCaseData.getPreviewDocument().getDocumentFilename())
-                        .documentLink(sscsCaseData.getPreviewDocument())
-                        .documentDateAdded(LocalDate.now().minusDays(1).toString())
-                        .documentType(POSTPONEMENT_REQUEST_DIRECTION_NOTICE.getValue())
-                        .build()).build();
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verifyNoInteractions(hearingMessageHelper);
     }
 }
