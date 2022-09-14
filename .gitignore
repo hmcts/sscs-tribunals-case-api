@@ -4,6 +4,7 @@
 *.iws
 *.ipr
 *.class
+*.hprof
 
 # Mac
 .DS_Store
