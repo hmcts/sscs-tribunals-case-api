@@ -1,14 +1,23 @@
 {
   "extends": [
-    "config:base"
+    "config:base",
+    ":dependencyDashboard",
+    ":semanticPrefixChore",
+    ":rebaseStalePrs",
+    ":prConcurrentLimit10"
   ],
-  "labels": ["dependencies"],
-  "enabledManagers": ["helm-requirements","gradle-wrapper"],
-  "helm-requirements":
-  {
+  "packageRules": [
+    {
+      "matchPackageNames": ["com.github.hmcts:sscs-common"],
+      "prPriority": 100
+    }
+  ],
+  "helm-requirements": {
     "fileMatch": ["\\Chart.yaml$"],
     "aliases": {
       "hmctspublic": "https://hmctspublic.azurecr.io/helm/v1/repo/"
     }
   }
+  "labels": ["dependencies"],
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
 }
