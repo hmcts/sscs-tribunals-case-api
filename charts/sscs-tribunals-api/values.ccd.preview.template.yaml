@@ -36,7 +36,7 @@ idam-pr:
     XUI:
       - http://xui-${SERVICE_NAME}/oauth2/callback
     CCD Admin:
-      - http://ccd-admin-web-${SERVICE_NAME}/oauth2redirect
+      - http://{{ .Values.global.ccdAdminWebIngress }}/oauth2redirect
     CCD:
       - https://case-management-web-${SERVICE_NAME}/oauth2redirect
     ccd_data_store_api:
@@ -206,7 +206,7 @@ ccd:
   ccd-admin-web:
     nodejs:
       image: hmctspublic.azurecr.io/ccd/admin-web:latest
-      ingressHost: ccd-admin-web-${SERVICE_FQDN}
+      ingressHost: {{ .Values.global.ccdAdminWebIngress }}
       keyVaults: []
       environment:
         IDAM_OAUTH2_AW_CLIENT_SECRET: ${ADMIN_WEB_IDAM_SECRET}
@@ -302,7 +302,7 @@ ccd:
   ccd-definition-importer:
     image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.14.33nonProd
     definitionFilename: sscs-ccd.xlsx
-    redirectUri: https://ccd-admin-web-${SERVICE_FQDN}/oauth2redirect
+    redirectUri: https://{{ .Values.global.ccdAdminWebIngress }}/oauth2redirect
     environment:
       CCD_ENVIRONMENT: 'PROD'
       CCD_DEF_EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-em-ccd-orchestrator
