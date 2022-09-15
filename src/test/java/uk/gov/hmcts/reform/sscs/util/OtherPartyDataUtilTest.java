@@ -99,37 +99,6 @@ public class OtherPartyDataUtilTest {
     }
 
     @Test
-    public void givenExistingOtherPartiesInDwpResponse_thenNewOtherPartyAssignedNewIdAndSetNotificationFlagForAllPartiesNotSentTheNotificationYet() {
-        List<CcdValue<OtherParty>> otherParties = Arrays.asList(
-            buildOtherPartyWithNotificationFlag(ID_2, true),
-            buildOtherParty(ID_1),
-            buildOtherPartyWithAppointeeAndRep(null, null, null));
-
-        OtherPartyDataUtil.assignNewOtherPartyData(otherParties);
-
-        Assertions.assertThat(otherParties)
-            .hasSize(3)
-            .extracting(CcdValue::getValue)
-            .anySatisfy((OtherParty otherParty) -> {
-                Assertions.assertThat(otherParty.getId()).isEqualTo(ID_1);
-                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);;
-            })
-            .anySatisfy((OtherParty otherParty) -> {
-                Assertions.assertThat(otherParty.getId()).isEqualTo(ID_2);
-                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(NO);
-            })
-            .anySatisfy((OtherParty otherParty) -> {
-                Assertions.assertThat(otherParty.getId())
-                    .isNotEqualTo(ID_1)
-                    .isNotEqualTo(ID_2)
-                    .hasSize(UUID_SIZE);
-                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
-                Assertions.assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
-                Assertions.assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
-            });
-    }
-
-    @Test
     public void givenExistingOtherPartiesWithAppointeeAndRep_thenNewOtherPartyAssignedNewId() {
         List<CcdValue<OtherParty>> otherParties = Arrays.asList(
             buildOtherParty(ID_2),
