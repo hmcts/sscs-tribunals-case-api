@@ -108,7 +108,8 @@
       "start": null,
       "end": null,
       "versionNumber": null,
-      "epimsId": null
+      "epimsId": null,
+      "hearingChannel": null
     }
   }],
   "evidence": {
