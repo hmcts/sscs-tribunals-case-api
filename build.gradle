@@ -208,6 +208,7 @@ configurations {
 
 
 def versions = [
+        logback         : '1.2.11',
         assertj         : '3.21.0',
         azureCore       : '1.27.0',
         azureMessagingServiceBus: '7.6.0',
@@ -386,6 +387,9 @@ dependencies {
 
     compile group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.7'
     compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.2'
+
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: versions.logback
+    compile group: 'ch.qos.logback', name: 'logback-core', version: versions.logback
 
     compile group: 'com.github.hmcts', name: 'auth-checker-lib', version: '2.1.5'
     compile group: 'com.github.hmcts', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
