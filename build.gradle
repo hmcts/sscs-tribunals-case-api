@@ -15,7 +15,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.39.0'
     id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.7.0'
-    id 'org.owasp.dependencycheck' version '6.2.2'
+    id 'org.owasp.dependencycheck' version '7.1.2'
     id 'au.com.dius.pact' version '4.2.14'
     id 'com.github.hmcts.rse-cft-lib' version '0.19.320'
 }
@@ -344,11 +344,6 @@ dependencyManagement {
         //CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
         dependencySet(group: 'org.apache.commons', version: '1.21') {
             entry 'commons-compress'
-        }
-
-        //CVE-2022-25857
-        dependencySet(group: 'org.yaml', version: '1.31') {
-            entry 'snakeyaml'
         }
 
         imports {
