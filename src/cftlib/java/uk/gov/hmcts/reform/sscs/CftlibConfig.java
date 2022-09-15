@@ -76,6 +76,6 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "caseworker-sscs"
         );
         var def = Files.readAllBytes(Path.of("../sscs-ccd-definitions/releases/CCD_SSCSDefinition_vdev_LOCAL.xlsx"));
-        lib.importDefinition(def);
+        //lib.importDefinition(def);
     }
 }

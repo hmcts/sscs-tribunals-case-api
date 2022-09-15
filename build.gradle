@@ -470,6 +470,8 @@ dependencies {
     contractTestCompile sourceSets.test.runtimeClasspath
 
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
+    cftlibAnnotationProcessor "org.projectlombok:lombok:$versions.lombok"
+
 }
 // this is required to force Java running on the Azure Windows Server OS into using
 // UTF-8 as the default character set instead of windows-1252 which causes issues
@@ -586,19 +588,23 @@ task generateXls(type: Exec) {
     workingDir project.file('../sscs-ccd-definitions').path
 }
 
-task startDocStack(type: Exec) {
-    commandLine 'docker', 'compose', '-f', project.file('src/cftlib/resources/docker/cft-lib-doc-stack.yml').path, 'up', '-d'
-}
-
 bootWithCCD {
     dependsOn generateXls
-
-    //Uncomment to launch with debug
-    //jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
     authMode = uk.gov.hmcts.rse.AuthMode.Local
 
+    //---Debug-----
+    //Uncomment to launch with debug
+    //jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
+
+    //---Extra ccd loging----
     //Uncomment for ccd callback logging
     //environment 'LOG_CALLBACK_DETAILS', '*'
+
+    //---Additional compose services---
+    //Place any extra compose files you'd like to be started automatically here. These should be
+    //in the folder /src/cftlib/resources/docker/ and comma delimited.
+    environment 'ADDITIONAL_COMPOSE_FILES', 'cft-lib-doc-stack.yml,cft-lib-doc-assembly.yml'
+
     environment 'XUI_PORT', '3455'
     environment 'RSE_LIB_S2S_PORT', '4502'
     //URLs for services running in Docker require host.docker.internal to resolve properly
