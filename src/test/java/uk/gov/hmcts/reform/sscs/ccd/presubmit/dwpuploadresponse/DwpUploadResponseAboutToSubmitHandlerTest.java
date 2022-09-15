@@ -38,7 +38,6 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.assertj.core.api.Assertions;
-import org.assertj.core.groups.Tuple;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,7 +62,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DwpResponseDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
@@ -82,6 +80,7 @@ import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 @RunWith(JUnitParamsRunner.class)
 public class DwpUploadResponseAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
+    public static final int UUID_SIZE = 36;
 
     private DwpUploadResponseAboutToSubmitHandler dwpUploadResponseAboutToSubmitHandler;
     private SscsCaseData sscsCaseData;
@@ -1174,29 +1173,16 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         Assertions.assertThat(response.getData().getOtherParties())
             .hasSize(1)
             .extracting(CcdValue::getValue)
-            .extracting(OtherParty::getSendNewOtherPartyNotification)
-            .containsOnly(YES);
-
-        Assertions.assertThat(response.getData().getOtherParties())
-            .extracting(CcdValue::getValue)
-            .extracting(Entity::getId)
-            .hasSize(1)
-            .doesNotContainNull()
-            .extracting(String::length)
-            .containsOnly(36);
-
-        Assertions.assertThat(response.getData().getOtherParties())
-            .extracting(CcdValue::getValue)
-            .flatExtracting(otherParty -> List.of(otherParty.getAppointee(), otherParty.getRep()))
-            .extracting(Entity::getId)
-            .hasSize(2)
-            .doesNotContainNull()
-            .extracting(String::length)
-            .containsOnly(36);
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId()).hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+                Assertions.assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+            });
     }
 
     @Test
-    public void givenExistingOtherParties_thenNewOtherPartyAssignedNextId() {
+    public void givenExistingOtherParties_thenNewOtherPartyAssignedNewId() {
         sscsCaseData.setOtherParties(Arrays.asList(
             buildOtherParty(ID_2),
             buildOtherParty(ID_1),
@@ -1208,34 +1194,30 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         Assertions.assertThat(response.getData().getOtherParties())
             .hasSize(3)
             .extracting(CcdValue::getValue)
-            .extracting(OtherParty::getSendNewOtherPartyNotification)
-            .containsOnly(YES);
-
-        Assertions.assertThat(response.getData().getOtherParties())
-            .extracting(CcdValue::getValue)
-            .extracting(Entity::getId)
-            .hasSize(3)
-            .contains(ID_2, ID_1)
-            .doesNotContainNull()
-            .extracting(String::length)
-            .containsOnly(36);
-
-        Assertions.assertThat(response.getData().getOtherParties())
-            .extracting(CcdValue::getValue)
-            .filteredOn(x -> !ID_1.equals(x.getId()) && !ID_2.equals(x.getId()))
-            .flatExtracting(otherParty -> List.of(otherParty.getAppointee(), otherParty.getRep()))
-            .extracting(Entity::getId)
-            .hasSize(2)
-            .doesNotContainNull()
-            .extracting(String::length)
-            .containsOnly(36);
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId()).isEqualTo(ID_1);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);;
+            })
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId()).isEqualTo(ID_2);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            })
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId())
+                    .isNotEqualTo(ID_1)
+                    .isNotEqualTo(ID_2)
+                    .hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+                Assertions.assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+            });
 
         Assertions.assertThat(sscsCaseData.getDirectionDueDate())
             .isEqualTo(DateTimeUtils.generateDwpResponseDueDate(NEW_OTHER_PARTY_RESPONSE_DUE_DAYS));
     }
 
     @Test
-    public void givenExistingOtherPartiesWithAppointeeAndRep_thenNewOtherPartyAssignedNextId() {
+    public void givenExistingOtherPartiesWithAppointeeAndRep_thenNewOtherPartyAssignedNewId() {
         sscsCaseData.setOtherParties(Arrays.asList(
             buildOtherParty(ID_2),
             buildOtherPartyWithAppointeeAndRep(ID_1, ID_3, ID_4),
@@ -1247,72 +1229,59 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         Assertions.assertThat(response.getData().getOtherParties())
             .hasSize(3)
             .extracting(CcdValue::getValue)
-            .extracting(OtherParty::getSendNewOtherPartyNotification)
-            .containsOnly(YES);
-
-        Assertions.assertThat(response.getData().getOtherParties())
-            .extracting(CcdValue::getValue)
-            .extracting(Entity::getId)
-            .hasSize(3)
-            .contains(ID_2, ID_1)
-            .doesNotContainNull()
-            .extracting(String::length)
-            .containsOnly(36);
-
-        Assertions.assertThat(response.getData().getOtherParties())
-            .extracting(CcdValue::getValue)
-            .filteredOn(otherParty -> ID_1.equals(otherParty.getId()))
-            .extracting(
-                otherParty -> otherParty.getAppointee().getId(),
-                otherParty -> otherParty.getRep().getId())
-            .containsOnly(Tuple.tuple(ID_3, ID_4));
-
-        Assertions.assertThat(response.getData().getOtherParties())
-            .extracting(CcdValue::getValue)
-            .filteredOn(x -> !ID_1.equals(x.getId()) && !ID_2.equals(x.getId()))
-            .flatExtracting(otherParty -> List.of(otherParty.getAppointee(), otherParty.getRep()))
-            .extracting(Entity::getId)
-            .hasSize(2)
-            .doesNotContainNull()
-            .extracting(String::length)
-            .containsOnly(36);
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId()).isEqualTo(ID_1);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);;
+                Assertions.assertThat(otherParty.getAppointee().getId()).isEqualTo(ID_3);
+                Assertions.assertThat(otherParty.getRep().getId()).isEqualTo(ID_4);
+            })
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId()).isEqualTo(ID_2);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            })
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId())
+                    .isNotEqualTo(ID_1)
+                    .isNotEqualTo(ID_2)
+                    .hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+                Assertions.assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+            });
     }
 
     @Test
-    public void givenExistingOtherParties_thenNewOtherPartyAppointeeAndRepAssignedNextId() {
+    public void givenExistingOtherParties_thenNewOtherPartyAppointeeAndRepAssignedNewId() {
         sscsCaseData.setOtherParties(Arrays.asList(
-            buildOtherPartyWithAppointeeAndRep(ID_1, ID_3, ID_4), buildOtherParty(null),
-            buildOtherPartyWithAppointeeAndRep(ID_2, null, null)));
+            buildOtherPartyWithAppointeeAndRep(ID_2, null, null),
+            buildOtherPartyWithAppointeeAndRep(ID_1, ID_3, ID_4),
+            buildOtherParty(null)));
         sscsCaseData.getAppeal().getBenefitType().setCode("childSupport");
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         Assertions.assertThat(response.getData().getOtherParties())
-            .extracting(CcdValue::getValue)
-            .extracting(Entity::getId)
             .hasSize(3)
-            .contains(ID_2, ID_1)
-            .doesNotContainNull()
-            .extracting(String::length)
-            .containsOnly(36);
-
-        Assertions.assertThat(response.getData().getOtherParties())
             .extracting(CcdValue::getValue)
-            .filteredOn(otherParty -> ID_1.equals(otherParty.getId()))
-            .extracting(
-                otherParty -> otherParty.getAppointee().getId(),
-                otherParty -> otherParty.getRep().getId())
-            .containsOnly(Tuple.tuple(ID_3, ID_4));
-
-        Assertions.assertThat(response.getData().getOtherParties())
-            .extracting(CcdValue::getValue)
-            .filteredOn(otherParty ->  ID_2.equals(otherParty.getId()))
-            .flatExtracting(otherParty -> List.of(otherParty.getAppointee(), otherParty.getRep()))
-            .extracting(Entity::getId)
-            .hasSize(2)
-            .doesNotContainNull()
-            .extracting(String::length)
-            .containsOnly(36);
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId()).isEqualTo(ID_1);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);;
+                Assertions.assertThat(otherParty.getAppointee().getId()).isEqualTo(ID_3);
+                Assertions.assertThat(otherParty.getRep().getId()).isEqualTo(ID_4);
+            })
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId()).isEqualTo(ID_2);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+                Assertions.assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+            })
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId())
+                    .isNotEqualTo(ID_1)
+                    .isNotEqualTo(ID_2)
+                    .hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            });
     }
 
     private CcdValue<OtherParty> buildOtherParty(String id) {

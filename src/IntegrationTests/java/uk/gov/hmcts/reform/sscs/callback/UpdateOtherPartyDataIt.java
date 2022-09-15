@@ -20,7 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -33,6 +32,7 @@ import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 public class UpdateOtherPartyDataIt extends AbstractEventIt {
 
     public static final String OTHER_PARTY_ID = "34c1ef28-b6c7-4b45-bb40-4bfe1e7133c5";
+    public static final int UUID_SIZE = 36;
     @MockBean
     private IdamService idamService;
 
@@ -55,37 +55,20 @@ public class UpdateOtherPartyDataIt extends AbstractEventIt {
         assertThat(otherParties)
             .hasSize(2)
             .extracting(CcdValue::getValue)
-            .extracting(OtherParty::getSendNewOtherPartyNotification)
-            .containsOnly(YES, NO);
-
-        assertThat(otherParties)
-            .extracting(CcdValue::getValue)
-            .extracting(Entity::getId)
-            .hasSize(2)
-            .contains(OTHER_PARTY_ID)
-            .doesNotContainNull()
-            .extracting(String::length)
-            .containsOnly(36);
-
-        assertThat(otherParties)
-            .extracting(CcdValue::getValue)
-            .filteredOn(otherParty -> OTHER_PARTY_ID.equals(otherParty.getId()))
-            .flatExtracting(otherParty -> List.of(otherParty.getAppointee(), otherParty.getRep()))
-            .extracting(Entity::getId)
-            .hasSize(2)
-            .doesNotContainNull()
-            .extracting(String::length)
-            .containsOnly(36);
-
-        assertThat(otherParties)
-            .extracting(CcdValue::getValue)
-            .filteredOn(otherParty -> !OTHER_PARTY_ID.equals(otherParty.getId()))
-            .flatExtracting(otherParty -> List.of(otherParty.getAppointee(), otherParty.getRep()))
-            .extracting(Entity::getId)
-            .hasSize(2)
-            .doesNotContainNull()
-            .extracting(String::length)
-            .containsOnly(36);
+            .anySatisfy((OtherParty otherParty) -> {
+                assertThat(otherParty.getId()).isEqualTo(OTHER_PARTY_ID);
+                assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(NO);
+            })
+            .anySatisfy((OtherParty otherParty) -> {
+                assertThat(otherParty.getId())
+                    .isNotEqualTo(OTHER_PARTY_ID)
+                    .hasSize(UUID_SIZE);
+                assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            })
+            .allSatisfy((OtherParty otherParty) -> {
+                assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+                assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+            });
     }
 
 }
