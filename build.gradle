@@ -9,7 +9,7 @@ plugins {
     id 'pmd'
     id 'org.sonarqube' version '3.3'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.3.5.RELEASE'
+    id 'org.springframework.boot' version '2.5.14'
     id 'uk.gov.hmcts.java' version '0.12.12'
     id 'com.gorylenko.gradle-git-properties' version '2.3.1'
     id 'com.github.ben-manes.versions' version '0.39.0'
@@ -268,7 +268,6 @@ dependencyManagement {
             entry 'groovy-xml'
         }
 
-        //CVE-2021-22112 CVE-2022-22978, CVE-2022-22976
         dependencySet(group: 'org.springframework.security', version: '5.7.1') {
             entry 'spring-security-crypto'
             entry 'spring-security-config'
