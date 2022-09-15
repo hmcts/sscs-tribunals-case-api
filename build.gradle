@@ -347,6 +347,7 @@ dependencyManagement {
 
         dependencySet(group: 'com.fasterxml.jackson.core', version: '2.13.4') {
             entry 'jackson-databind'
+            entry 'jackson-core'
         }
 
         imports {
