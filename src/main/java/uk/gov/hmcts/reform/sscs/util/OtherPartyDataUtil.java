@@ -1,18 +1,33 @@
 package uk.gov.hmcts.reform.sscs.util;
 
-import static java.util.Collections.sort;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.springframework.util.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 
 public class OtherPartyDataUtil {
 
@@ -35,76 +50,49 @@ public class OtherPartyDataUtil {
         }
     }
 
-    public static void assignNewOtherPartyData(List<CcdValue<OtherParty>> otherParties, EventType eventType) {
-        int maxId = getMaxId(otherParties);
+    public static void assignNewOtherPartyData(List<CcdValue<OtherParty>> otherParties) {
         for (CcdValue<OtherParty> ccdOtherParty : otherParties) {
             OtherParty otherParty = ccdOtherParty.getValue();
-            if (otherParty.getId() == null) {
-                otherParty.setId(Integer.toString(++maxId));
+            if (isNull(otherParty.getSendNewOtherPartyNotification())) {
                 //All the newly added other parties will be sent a notification
                 otherParty.setSendNewOtherPartyNotification(YES);
-            } else if (EventType.DWP_UPLOAD_RESPONSE.equals(eventType) && otherParty.getSendNewOtherPartyNotification() == null) {
-                //The other party added at case creation time, by bulk-scan, will be notified in dwpUploadResponse event
-                otherParty.setSendNewOtherPartyNotification(YES);
-            } else if (YesNo.isYes(otherParty.getSendNewOtherPartyNotification())) {
+            } else if (isYes(otherParty.getSendNewOtherPartyNotification())) {
                 //Notification flag is set to no for the other parties that already been notified
                 otherParty.setSendNewOtherPartyNotification(NO);
             }
-
-            if (otherParty.getAppointee() != null && isYes(otherParty.getIsAppointee()) && otherParty.getAppointee().getId() == null) {
-                otherParty.getAppointee().setId(Integer.toString(++maxId));
-            }
-            if (otherParty.getRep() != null && isYes(otherParty.getRep().getHasRepresentative()) && otherParty.getRep().getId() == null) {
-                otherParty.getRep().setId(Integer.toString(++maxId));
-            }
         }
-    }
-
-    @NotNull
-    private static int getMaxId(List<CcdValue<OtherParty>> otherParties) {
-        List<Integer> currentIds = new ArrayList<>();
-        otherParties.stream().forEach(o -> {
-            OtherParty otherParty = o.getValue();
-            if (otherParty.getId() != null) {
-                currentIds.add(Integer.parseInt(otherParty.getId()));
-            }
-            if (otherParty.getAppointee() != null && otherParty.getAppointee().getId() != null) {
-                currentIds.add(Integer.parseInt(otherParty.getAppointee().getId()));
-            }
-            if (otherParty.getRep() != null && otherParty.getRep().getId() != null) {
-                currentIds.add(Integer.parseInt(otherParty.getRep().getId()));
-            }
-        });
-        return currentIds.stream().max(Comparator.naturalOrder()).orElse(0);
     }
 
     public static boolean haveOtherPartiesChanged(List<CcdValue<OtherParty>> before, List<CcdValue<OtherParty>> after) {
-        if ((before == null || before.size() == 0) && (after == null || after.size() == 0)) {
+        if (isNull(before) && isNull(after)) {
             return false;
         }
-        if (before == null ^ after == null) {
-            return true;
-        }
-        if (before.size() != after.size()) {
-            return true;
-        }
-        List<String> beforeIds = before.stream().map(ccdValue -> ccdValue.getValue().getId()).collect(Collectors.toList());
-        List<String> afterIds = after.stream().map(ccdValue -> ccdValue.getValue().getId()).collect(Collectors.toList());
-        sort(beforeIds);
-        sort(afterIds);
-        for (int i = 0; i < beforeIds.size(); i++) {
-            if (!beforeIds.get(i).equals(afterIds.get(i))) {
-                return true;
-            }
-        }
-        return false;
+        return hasCollectionChanged(before, after)
+            || hasOtherPartiesIdsChanged(before, after);
+    }
+
+    private static <T> boolean hasCollectionChanged(Collection<T> before, Collection<T> after) {
+        return isNull(before) ^ isNull(after)
+            || (nonNull(before) && before.size() != after.size());
+    }
+
+    private static boolean hasOtherPartiesIdsChanged(List<CcdValue<OtherParty>> before, List<CcdValue<OtherParty>> after) {
+        return !getAllOtherPartyIds(before).containsAll(getAllOtherPartyIds(after));
+    }
+
+    @NotNull
+    private static Set<String> getAllOtherPartyIds(List<CcdValue<OtherParty>> before) {
+        return before.stream()
+            .map(CcdValue::getValue)
+            .map(Entity::getId)
+            .collect(Collectors.toSet());
     }
 
     public static void checkConfidentiality(SscsCaseData sscsCaseData) {
         if (isValidBenefitTypeForConfidentiality(sscsCaseData)) {
             if ((sscsCaseData.getAppeal().getAppellant() != null
                     && sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired() != null
-                    && YesNo.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired()))
+                    && isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired()))
                     || otherPartyHasConfidentiality(sscsCaseData)) {
                 sscsCaseData.setIsConfidentialCase(YES);
             } else {
@@ -125,7 +113,7 @@ public class OtherPartyDataUtil {
 
     private static boolean otherPartyHasConfidentiality(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getOtherParties() != null) {
-            Optional otherParty = sscsCaseData.getOtherParties().stream().filter(op -> YesNo.isYes(op.getValue().getConfidentialityRequired())).findAny();
+            Optional otherParty = sscsCaseData.getOtherParties().stream().filter(op -> isYes(op.getValue().getConfidentialityRequired())).findAny();
             if (otherParty.isPresent()) {
                 return true;
             }

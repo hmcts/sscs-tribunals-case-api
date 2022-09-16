@@ -1,10 +1,17 @@
 package uk.gov.hmcts.reform.sscs.functional.sya;
 
 import static io.restassured.RestAssured.baseURI;
-import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
-import static net.javacrumbs.jsonunit.JsonAssert.whenIgnoringPaths;
+import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.junit.Assert.assertEquals;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_SSCS5;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_NO_MRN_DATE_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_SSCS5;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_WITH_INTERLOC_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
@@ -118,8 +125,17 @@ public class SubmitAppealTest {
 
         log.info(String.format("SYA created with CCD ID %s", id));
 
-        assertJsonEquals(changeExpectedFields(expectedResponse, nino, mrnDate), sscsCaseDetails.getData(), whenIgnoringPaths("sscsDocument",
-            "regionalProcessingCenter.hearingRoute", "caseManagementLocation.region", "regionalProcessingCenter.epimsId"));
+        assertThatJson(sscsCaseDetails.getData())
+            .whenIgnoringPaths(
+                "sscsDocument",
+                "regionalProcessingCenter.hearingRoute",
+                "caseManagementLocation.region",
+                "regionalProcessingCenter.epimsId",
+                "appeal.appellant.id",
+                "appeal.appellant.appointee.id",
+                "appeal.rep.id",
+                "jointPartyId")
+            .isEqualTo(changeExpectedFields(expectedResponse, nino, mrnDate));
 
         assertEquals(expectedState, sscsCaseDetails.getState());
 
