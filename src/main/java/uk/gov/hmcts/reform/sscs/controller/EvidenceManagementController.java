@@ -63,7 +63,7 @@ public class EvidenceManagementController {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<String> upload(
-        @RequestParam("file") List<MultipartFile> files
+        @RequestParam(value = "file", required = false) List<MultipartFile> files
     ) throws JsonProcessingException {
         if (null == files || files.isEmpty()) {
             throw new EvidenceDocumentsMissingException();
