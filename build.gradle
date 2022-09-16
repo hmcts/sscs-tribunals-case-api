@@ -326,10 +326,6 @@ dependencyManagement {
             entry 'accessors-smart'
         }
 
-        dependencySet(group: 'org.yaml', version: '1.31') {
-            entry 'snakeyaml'
-        }
-
         //CVE-2021-30468
         dependencySet(group: 'org.apache.cxf', version: '3.4.5') {
             entry 'cxf-core'
@@ -395,7 +391,7 @@ dependencies {
     //remove when secure doc store is live
     compile group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.17.0'
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.17.1'
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.56'
 
     compile group: 'com.azure', name: 'azure-core', version: versions.azureCore

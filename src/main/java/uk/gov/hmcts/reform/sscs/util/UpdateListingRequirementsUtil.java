@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ReservedToMember;
 import uk.gov.hmcts.reform.sscs.client.JudicialRefDataApi;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialMemberAppointments;
@@ -78,19 +77,6 @@ public class UpdateListingRequirementsUtil {
             name = language.getDialectEn();
         }
         return new DynamicListItem(reference, name);
-    }
-
-    public void generateReservedToJudgeFields(OverrideFields overrideFields) {
-        if (isNull(overrideFields.getReservedToJudge())
-            || isNull(overrideFields.getReservedToJudge().getReservedMember())) {
-            overrideFields.setReservedToJudge(ReservedToMember.builder()
-                .reservedMember(new DynamicList(null, null))
-                .build());
-        }
-
-        List<DynamicListItem> reservedMembers = generateReservedMembers();
-
-        overrideFields.getReservedToJudge().getReservedMember().setListItems(reservedMembers);
     }
 
     private List<DynamicListItem> generateReservedMembers() {
