@@ -217,13 +217,11 @@ def versions = [
         junitJupiter    : '5.7.2',
         lombok          : '1.18.22',
         pact            : '4.1.7',
-        pdfEmailCommon  : '1.4.56',
         pitest          : '1.4.2',
         reactorCore     : '3.4.15',
         reformLogging   : '5.1.7',
         sonarPitest     : '0.5',
-        springfoxSwagger: '2.8.0',
-        sscsCommon      : '4.15.5',
+        springfoxSwagger: '2.8.0'
 ]
 
 ext["rest-assured.version"] = '4.2.0'
@@ -397,8 +395,8 @@ dependencies {
     //remove when secure doc store is live
     compile group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: versions.sscsCommon
-    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: versions.pdfEmailCommon
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.15.5'
+    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.56'
 
     compile group: 'com.azure', name: 'azure-core', version: versions.azureCore
     compile group: 'com.azure', name: 'azure-messaging-servicebus', version: versions.azureMessagingServiceBus
