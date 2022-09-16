@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE;
@@ -10,10 +9,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,7 +22,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Note;
 import uk.gov.hmcts.reform.sscs.ccd.domain.NoteDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.NotePad;
@@ -39,28 +36,23 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     public static final String POSTPONEMENT_DETAILS_SENT_TO_JUDGE_PREFIX = "Postponement sent to judge - ";
 
     private final UserDetailsService userDetailsService;
+    private final PostponementRequestService postponementRequestService;
     private final FooterService footerService;
     private final ListAssistHearingMessageHelper hearingMessageHelper;
-    private final boolean isScheduleListingEnabled;
-
-    public ActionPostponementRequestAboutToSubmitHandler(UserDetailsService userDetailsService,
-        FooterService footerService, ListAssistHearingMessageHelper hearingMessageHelper,
-            @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled) {
-        this.userDetailsService = userDetailsService;
-        this.footerService = footerService;
-        this.hearingMessageHelper = hearingMessageHelper;
-        this.isScheduleListingEnabled = isScheduleListingEnabled;
-    }
+    @Value("${feature.snl.enabled}")
+    private boolean isScheduleListingEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -118,7 +110,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
 
     private void grantPostponement(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         cancelHearing(sscsCaseData);
-        setHearingDateToExcludedDate(sscsCaseData, response);
+        postponementRequestService.addCurrentHearingToExcludeDates(response);
         sscsCaseData.setInterlocReferralReason(null);
         sscsCaseData.setInterlocReviewState(null);
         sscsCaseData.setDwpState(DwpState.HEARING_POSTPONED.getId());
@@ -142,17 +134,6 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
             .getCcdCaseId());
         hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(),
             CancellationReason.OTHER);
-    }
-
-    private void setHearingDateToExcludedDate(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-        final Optional<Hearing> optionalHearing = emptyIfNull(sscsCaseData.getHearings()).stream()
-                .filter(h -> LocalDateTime.now().isBefore(h.getValue().getHearingDateTime()))
-                .distinct()
-                .findFirst();
-
-        optionalHearing.ifPresentOrElse(hearing ->
-                        footerService.setHearingDateAsExcludeDate(hearing, sscsCaseData),
-                () -> response.addError("There are no hearing to postpone"));
     }
 
     private void sendToJudge(String userAuthorisation, SscsCaseData sscsCaseData) {
