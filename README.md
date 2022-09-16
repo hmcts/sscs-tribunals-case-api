@@ -30,6 +30,10 @@ Run the application by executing:
 ./gradlew bootRun
 ```
 
+### Cftlib
+
+This repo is now integrated with the rse-cft-library. For more information see the bootWithCCD task in build.gradle.
+Extra compose files can be provided in src/cftlib/resources/docker.
 
 ### Running Smoke Test locally
 Once the application running locally, please make sure
