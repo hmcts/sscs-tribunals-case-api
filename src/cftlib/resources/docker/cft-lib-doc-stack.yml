@@ -1,0 +1,84 @@
+---
+version: '3.5'
+
+name: cft-lib-doc-stack
+
+services:
+  dm-store:
+    image: "${DM_STORE_USE_LOCAL-hmctspublic.azurecr.io/}dm/store:${DM_STORE_TAG:-latest}"
+    healthcheck:
+      disable: true
+    environment:
+      SERVER_PORT: 5005
+      IDAM_SUPERUSER_EMAIL:
+      GOV_NOTIFY_API_KEY:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://shared-database-pg12:5432/evidence
+      SPRING_DATASOURCE_USERNAME: "postgres"
+      SPRING_DATASOURCE_PASSWORD: "postgres"
+      ENABLE_AZURE_STORAGE_CONTAINER: "false"
+      ENABLE_POSTGRES_BLOB_STORAGE: "false"
+      SPRING_PROFILES_ACTIVE: dev
+      IDAM_TESTING_SUPPORT_ENABLED: "true"
+      LOGGING_LEVEL_UK_GOV_HMCTS_IDAM: WARN
+      IDAM_USER_BASE_URI: "${IDAM_STUB_SERVICE_NAME:-http://rse-idam-simulator:5000}"
+      IDAM_S2S_BASE_URI: http://host.docker.internal:4502
+      #These are purely placeholder values. The key is simply 'some-key' Base64 encoded.
+      STORAGEACCOUNT_PRIMARY_CONNECTION_STRING: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=c29tZS1rZXk=;BlobEndpoint=http://azure-storage-emulator-azurite:10000/devstoreaccount1
+      S2S_NAMES_WHITELIST: sscs,divorce,em_gw,em_ccd_orchestrator,ccd,document-management-store,ccd_gw,idam-api,fpl_case_service,em_stitching_api,sscs_bulkscan,ccd_data,dg_docassembly_api,xui_webapp,ccd_case_document_am_api
+      http_proxy:
+      https_proxy:
+      no_proxy:
+      REFORM_SERVICE_TYPE: java
+      REFORM_SERVICE_NAME: document-management-store
+      REFORM_TEAM: ccd
+      REFORM_ENVIRONMENT: docker
+      PACKAGES_ENVIRONMENT: docker
+      PACKAGES_PROJECT: evidence
+      PACKAGES_NAME: document-management-store
+      PACKAGES_VERSION: unknown
+      ENABLE_DB_MIGRATE: "true"
+    ports:
+      - 5005:5005
+    networks:
+      - cftlib_default
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  pdf-service-api:
+    image: hmctspublic.azurecr.io/cmc/pdf-service:latest
+    environment:
+      - JAVA_OPTS=-Xms8m -Xmx256m -Djava.security.egd=file:/dev/./urandom -XX:MaxMetaspaceSize=128m
+      - S2S_URL=http://host.docker.internal:4502
+      - ROOT_APPENDER
+      - JSON_CONSOLE_PRETTY_PRINT
+      - ROOT_LOGGING_LEVEL
+      - REFORM_SERVICE_NAME=pdf-service
+      - REFORM_TEAM
+      - REFORM_ENVIRONMENT
+      - AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY=SomeRandomValue
+    ports:
+      - 5500:5500
+    healthcheck:
+      retries: 40
+    networks:
+      - cftlib_default
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  azure-storage-emulator-azurite:
+    image: arafato/azurite
+    ports:
+      - 10000:10000
+    environment:
+      executable: "blob"
+    volumes:
+      - ccd-docker-azure-blob-data:/opt/azurite/folder
+    networks:
+      - cftlib_default
+
+volumes:
+  ccd-docker-azure-blob-data:
+
+networks:
+  cftlib_default:
+    external: true

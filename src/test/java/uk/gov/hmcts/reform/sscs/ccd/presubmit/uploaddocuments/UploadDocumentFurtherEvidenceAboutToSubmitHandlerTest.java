@@ -32,7 +32,21 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRecordingRequest;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFurtherEvidenceDoc;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFurtherEvidenceDocDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecording;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecordingDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.WorkAllocationFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 
@@ -92,7 +106,13 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
         PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(ABOUT_TO_SUBMIT, callback,
             USER_AUTHORISATION);
 
-        assertThatJson(actualCaseData).isEqualTo(getExpectedResponse());
+        assertThatJson(actualCaseData)
+            .whenIgnoringPaths(
+                "data.jointPartyId",
+                "data.appeal.appellant.appointee.id",
+                "data.appeal.appellant.id",
+                "data.appeal.rep.id")
+            .isEqualTo(getExpectedResponse());
         assertNull(actualCaseData.getData().getDwpState());
         assertNull(actualCaseData.getData().getDraftSscsFurtherEvidenceDocument());
     }
