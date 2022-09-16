@@ -378,7 +378,8 @@
       "interlocReferralDate": "2021-09-03",
       "caseCreated": "2021-09-03",
       "interlocReviewState": "reviewByTcw",
-      "region": "BRADFORD"
+      "region": "BRADFORD",
+      "hearingRoute": "listAssist"
     },
     "data_classification": {
       "caseCode": "PUBLIC",
@@ -1562,7 +1563,8 @@
       "interlocReferralDate": "2021-09-03",
       "caseCreated": "2021-09-03",
       "interlocReviewState": "reviewByTcw",
-      "region": "BRADFORD"
+      "region": "BRADFORD",
+      "hearingRoute": "listAssist"
     },
     "data_classification": {
       "caseCode": "PUBLIC",

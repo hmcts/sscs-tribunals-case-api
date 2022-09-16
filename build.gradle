@@ -223,7 +223,7 @@ def versions = [
         reformLogging   : '5.1.7',
         sonarPitest     : '0.5',
         springfoxSwagger: '2.8.0',
-        sscsCommon      : '4.14.4'
+        sscsCommon      : '4.15.5',
 ]
 
 ext["rest-assured.version"] = '4.2.0'
@@ -346,8 +346,9 @@ dependencyManagement {
             entry 'commons-compress'
         }
 
+        //CVE-2022-25857
         dependencySet(group: 'org.yaml', version: '1.31') {
-           entry 'snakeyaml'
+            entry 'snakeyaml'
         }
 
         imports {
@@ -464,10 +465,7 @@ dependencies {
     contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junitJupiter
     contractTestRuntime "org.junit.platform:junit-platform-commons:1.8.1"
 
-    contractTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.31') {
-        force = true
-    }
-
+    contractTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.31')
     contractTestCompile sourceSets.main.runtimeClasspath
     contractTestCompile sourceSets.test.runtimeClasspath
 
