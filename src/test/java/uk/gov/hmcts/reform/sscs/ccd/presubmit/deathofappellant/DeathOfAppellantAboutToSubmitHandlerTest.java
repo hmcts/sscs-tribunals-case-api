@@ -209,10 +209,11 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
     @Test
     public void givenADeathOfAppellantEventThatHasAppointeeBeforeAndAppointeeAfterWithNoChange_thenDoNotSetInterlocReviewStateOrDwpState() {
 
+        Appointee appointee = Appointee.builder().name(Name.builder().firstName("Fred").build()).build();
+        caseDetailsBefore.getCaseData().getAppeal().getAppellant().setAppointee(appointee);
         caseDetailsBefore.getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
-        caseDetailsBefore.getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().name(Name.builder().firstName("Fred").build()).build());
+        caseDetails.getCaseData().getAppeal().getAppellant().setAppointee(appointee);
         caseDetails.getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
-        caseDetails.getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().name(Name.builder().firstName("Fred").build()).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
