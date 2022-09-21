@@ -217,13 +217,11 @@ def versions = [
         junitJupiter    : '5.7.2',
         lombok          : '1.18.22',
         pact            : '4.1.7',
-        pdfEmailCommon  : '1.4.56',
         pitest          : '1.4.2',
         reactorCore     : '3.4.15',
         reformLogging   : '5.1.7',
         sonarPitest     : '0.5',
-        springfoxSwagger: '2.8.0',
-        sscsCommon      : '4.15.3'
+        springfoxSwagger: '2.8.0'
 ]
 
 ext["rest-assured.version"] = '4.2.0'
@@ -328,10 +326,6 @@ dependencyManagement {
             entry 'accessors-smart'
         }
 
-        dependencySet(group: 'org.yaml', version: '1.31') {
-            entry 'snakeyaml'
-        }
-
         //CVE-2021-30468
         dependencySet(group: 'org.apache.cxf', version: '3.4.5') {
             entry 'cxf-core'
@@ -344,6 +338,11 @@ dependencyManagement {
         //CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
         dependencySet(group: 'org.apache.commons', version: '1.21') {
             entry 'commons-compress'
+        }
+
+        //CVE-2022-25857
+        dependencySet(group: 'org.yaml', version: '1.31') {
+            entry 'snakeyaml'
         }
 
         imports {
@@ -392,8 +391,8 @@ dependencies {
     //remove when secure doc store is live
     compile group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: versions.sscsCommon
-    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: versions.pdfEmailCommon
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.18.0-SSCS-10917-RC-1'
+    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.56'
 
     compile group: 'com.azure', name: 'azure-core', version: versions.azureCore
     compile group: 'com.azure', name: 'azure-messaging-servicebus', version: versions.azureMessagingServiceBus
@@ -461,14 +460,13 @@ dependencies {
     contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junitJupiter
     contractTestRuntime "org.junit.platform:junit-platform-commons:1.8.1"
 
-    contractTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.30') {
-        force = true
-    }
-
+    contractTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.31')
     contractTestCompile sourceSets.main.runtimeClasspath
     contractTestCompile sourceSets.test.runtimeClasspath
 
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
+    cftlibAnnotationProcessor "org.projectlombok:lombok:$versions.lombok"
+
 }
 // this is required to force Java running on the Azure Windows Server OS into using
 // UTF-8 as the default character set instead of windows-1252 which causes issues
@@ -587,13 +585,21 @@ task generateXls(type: Exec) {
 
 bootWithCCD {
     dependsOn generateXls
-
-    //Uncomment to launch with debug
-    //jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
     authMode = uk.gov.hmcts.rse.AuthMode.Local
 
+    //---Debug-----
+    //Uncomment to launch with debug
+    //jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
+
+    //---Extra ccd loging----
     //Uncomment for ccd callback logging
     //environment 'LOG_CALLBACK_DETAILS', '*'
+
+    //---Additional compose services---
+    //Place any extra compose files you'd like to be started automatically here. These should be
+    //in the folder /src/cftlib/resources/docker/ and comma delimited.
+    environment 'ADDITIONAL_COMPOSE_FILES', 'cft-lib-doc-stack.yml,cft-lib-doc-assembly.yml'
+
     environment 'XUI_PORT', '3455'
     environment 'RSE_LIB_S2S_PORT', '4502'
     //URLs for services running in Docker require host.docker.internal to resolve properly

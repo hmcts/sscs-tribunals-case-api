@@ -4,6 +4,7 @@
 *.iws
 *.ipr
 *.class
+*.hprof
 
 # Mac
 .DS_Store
@@ -28,3 +29,5 @@ bin/
 
 # Auto-generated file at compile time, used to display git version on health endpoint
 /src/main/resources/uk/gov/hmcts/reform/sscs/git.properties
+
+*.hprof

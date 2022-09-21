@@ -81,7 +81,13 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
         String expectedCaseData = fetchData("callback/withdrawnappeals/adminAppealWithdrawnExpectedCaseData.json");
         assertEquals("withdrawalReceived", actualResult.getData().getDwpState());
         assertEquals(1, actualResult.getData().getSscsDocument().size());
-        assertThatJson(actualResult.getData()).isEqualTo(expectedCaseData);
+        assertThatJson(actualResult.getData())
+            .whenIgnoringPaths(
+                "jointPartyId",
+                "appeal.appellant.appointee.id",
+                "appeal.appellant.id",
+                "appeal.rep.id")
+            .isEqualTo(expectedCaseData);
         verifyNoInteractions(hearingMessageHelper);
     }
 
