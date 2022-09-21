@@ -28,6 +28,7 @@ java:
     CREATE_CCD_ENDPOINT: true
     CASE_ACCESS_MANAGEMENT_FEATURE: true
     WORK_ALLOCATION_FEATURE: true
+    SCHEDULE_LISTING_FEATURE: true
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr

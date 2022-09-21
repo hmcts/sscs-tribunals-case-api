@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -28,14 +28,9 @@ import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -299,44 +294,4 @@ public class FooterServiceTest {
         PdfState result = footerService.isReadablePdf("url.pdf");
         assertEquals(PdfState.PASSWORD_ENCRYPTED, result);
     }
-
-    @Test
-    public void shouldAddHearingDateToExcludeDateWhichIsNull() {
-        sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
-                .hearingDate(LocalDate.now().plusDays(1).toString())
-                .time("10:00")
-                .build()).build()));
-        sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
-
-        footerService.setHearingDateAsExcludeDate(sscsCaseData.getHearings().get(0), sscsCaseData);
-
-        assertEquals(sscsCaseData.getAppeal().getHearingOptions().getExcludeDates().get(0).getValue().getStart(),
-                LocalDate.now().plusDays(1).toString());
-        assertEquals(sscsCaseData.getAppeal().getHearingOptions().getExcludeDates().get(0).getValue().getEnd(),
-                LocalDate.now().plusDays(1).toString());
-    }
-
-    @Test
-    public void shouldAddHearingDateToExistingExcludeDate() {
-        List<ExcludeDate> excludeDate = Arrays.asList(
-                ExcludeDate.builder().value(DateRange.builder()
-                        .start(LocalDate.now().toString())
-                        .end(LocalDate.now().toString())
-                        .build()).build());
-
-        sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
-                .hearingDate(LocalDate.now().plusDays(1).toString())
-                .time("10:00")
-                .build()).build()));
-        sscsCaseData.setAppeal(
-                Appeal.builder().hearingOptions(
-                       HearingOptions.builder().excludeDates(excludeDate).build())
-                .build()
-        );
-
-        footerService.setHearingDateAsExcludeDate(sscsCaseData.getHearings().get(0), sscsCaseData);
-
-        assertEquals(2, sscsCaseData.getAppeal().getHearingOptions().getExcludeDates().size());
-    }
-
 }

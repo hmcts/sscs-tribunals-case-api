@@ -57,7 +57,13 @@ public class DwpActionWithdrawalHandlerTest extends AdminAppealWithdrawnBase {
 
         String expectedCaseData = fetchData("callback/withdrawnappeals/dwpActionWithdrawalExpectedCaseData.json");
         assertEquals("Withdrawn", actualResult.getData().getDwpState());
-        assertThatJson(actualResult.getData()).isEqualTo(expectedCaseData);
+        assertThatJson(actualResult.getData())
+            .whenIgnoringPaths(
+                "jointPartyId",
+                "appeal.appellant.appointee.id",
+                "appeal.appellant.id",
+                "appeal.rep.id")
+            .isEqualTo(expectedCaseData);
     }
 
     @Test(expected = IllegalStateException.class)

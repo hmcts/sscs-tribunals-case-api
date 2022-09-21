@@ -49,6 +49,11 @@ public class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
 
         String expectedCaseData = fetchData("fenoaction/expectedFeNoActionAboutToStartCallbackResponse.json");
         assertThatJson(actualCaseData)
+            .whenIgnoringPaths(
+                "data.jointPartyId",
+                "data.appeal.appellant.appointee.id",
+                "data.appeal.appellant.id",
+                "data.appeal.rep.id")
             .when(Option.TREATING_NULL_AS_ABSENT)
             .isEqualTo(expectedCaseData);
         assertEquals("feReceived", actualCaseData.getData().getDwpState());

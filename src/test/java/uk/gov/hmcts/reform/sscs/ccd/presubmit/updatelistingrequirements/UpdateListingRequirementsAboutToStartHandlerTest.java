@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ReservedToMember;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.util.UpdateListingRequirementsUtil;
@@ -74,17 +73,11 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
             .appellantInterpreter(HearingInterpreter.builder()
                 .interpreterLanguage(new DynamicList(null, List.of()))
                 .build())
-            .reservedToJudge(ReservedToMember.builder()
-                .reservedMember(new DynamicList(null, List.of()))
-                .build())
             .build();
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
 
         willDoNothing().given(updateListingRequirementsUtil)
             .generateInterpreterLanguageFields(any(OverrideFields.class));
-
-        willDoNothing().given(updateListingRequirementsUtil)
-            .generateReservedToJudgeFields(any(OverrideFields.class));
 
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
 

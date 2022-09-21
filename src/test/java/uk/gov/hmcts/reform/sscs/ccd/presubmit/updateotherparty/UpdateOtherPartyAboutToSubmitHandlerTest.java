@@ -12,11 +12,16 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_1;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_2;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_3;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_4;
 
 import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,6 +41,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
     private static final String SSCS5_ROLE_WARNING = "You have entered a role for the Other Party which is not valid "
         + "for an SSCS5 case. This role will be ignored when the event completes.";
     private static final String SSCS2_ROLE_ERROR = "Role is required for the selected case";
+    public static final int UUID_SIZE = 36;
     private UpdateOtherPartyAboutToSubmitHandler handler;
 
     @Mock
@@ -73,14 +79,14 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
 
     @Test
     public void givenANonUpdateOtherPartyEvent_thenReturnFalse() {
-        sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty("2"), buildOtherParty("1")));
+        sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty(ID_2), buildOtherParty(ID_1)));
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
     public void givenAnUpdateOtherPartyEvent_thenReturnTrue() {
-        sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty("2"), buildOtherParty("1")));
+        sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty(ID_2), buildOtherParty(ID_1)));
         assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
@@ -98,7 +104,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
 
     @Test
     public void givenOtherPartiesUcbIsYes_thenUpdateCaseDataOtherPartyUcb() {
-        sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty("2"), buildOtherParty("1")));
+        sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty(ID_2), buildOtherParty(ID_1)));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getData().getOtherPartyUcb(), is(YesNo.YES.getValue()));
@@ -107,52 +113,126 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
 
     @Test
     public void givenNewOtherPartyAdded_thenAssignAnId() {
-        sscsCaseData.setOtherParties(Arrays.asList(buildOtherPartyWithAppointeeAndRep(null, null, null)));
+        sscsCaseData.setOtherParties(Arrays.asList(
+            buildOtherPartyWithAppointeeAndRep(null, null, null)));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(1, response.getData().getOtherParties().size());
-        assertEquals("1", response.getData().getOtherParties().get(0).getValue().getId());
-        assertEquals("2", response.getData().getOtherParties().get(0).getValue().getAppointee().getId());
-        assertEquals("3", response.getData().getOtherParties().get(0).getValue().getRep().getId());
-        assertTrue(YesNo.isYes(response.getData().getOtherParties().get(0).getValue().getSendNewOtherPartyNotification()));
+
+        Assertions.assertThat(response.getData().getOtherParties())
+            .hasSize(1)
+            .extracting(CcdValue::getValue)
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId()).hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+                Assertions.assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+            });
+
         assertEquals(0, response.getErrors().size());
     }
 
     @Test
-    public void givenExistingOtherParties_thenNewOtherPartyAssignedNextId() {
-        sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty("2"), buildOtherParty("1"), buildOtherPartyWithAppointeeAndRep(null, null, null)));
+    public void givenExistingOtherParties_thenNewOtherPartyAssignedNewId() {
+        sscsCaseData.setOtherParties(Arrays.asList(
+            buildOtherParty(ID_2),
+            buildOtherParty(ID_1),
+            buildOtherPartyWithAppointeeAndRep(null, null, null)));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(3, response.getData().getOtherParties().size());
-        assertEquals("3", response.getData().getOtherParties().get(2).getValue().getId());
-        assertEquals("4", response.getData().getOtherParties().get(2).getValue().getAppointee().getId());
-        assertEquals("5", response.getData().getOtherParties().get(2).getValue().getRep().getId());
-        assertFalse(YesNo.isYes(response.getData().getOtherParties().get(0).getValue().getSendNewOtherPartyNotification()));
-        assertFalse(YesNo.isYes(response.getData().getOtherParties().get(1).getValue().getSendNewOtherPartyNotification()));
-        assertTrue(YesNo.isYes(response.getData().getOtherParties().get(2).getValue().getSendNewOtherPartyNotification()));
-    }
 
-    @Test
-    public void givenExistingOtherPartiesWithAppointeeAndRep_thenNewOtherPartyAssignedNextId() {
-        sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty("2"), buildOtherPartyWithAppointeeAndRep("1", "3", "4"), buildOtherPartyWithAppointeeAndRep(null, null, null)));
+        Assertions.assertThat(response.getData().getOtherParties())
+            .hasSize(3)
+            .extracting(CcdValue::getValue)
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId()).isEqualTo(ID_1);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);;
+            })
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId()).isEqualTo(ID_2);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            })
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId())
+                    .isNotEqualTo(ID_1)
+                    .isNotEqualTo(ID_2)
+                    .hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+                Assertions.assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+            });
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(3, response.getData().getOtherParties().size());
-        assertEquals("5", response.getData().getOtherParties().get(2).getValue().getId());
-        assertEquals("6", response.getData().getOtherParties().get(2).getValue().getAppointee().getId());
-        assertEquals("7", response.getData().getOtherParties().get(2).getValue().getRep().getId());
         assertEquals(0, response.getErrors().size());
     }
 
     @Test
-    public void givenExistingOtherParties_thenNewOtherPartyAppointeeAndRepAssignedNextId() {
-        sscsCaseData.setOtherParties(Arrays.asList(buildOtherPartyWithAppointeeAndRep("2", null, null), buildOtherPartyWithAppointeeAndRep("1", "3", "4"), buildOtherParty(null)));
+    public void givenExistingOtherPartiesWithAppointeeAndRep_thenNewOtherPartyAssignedNewId() {
+        sscsCaseData.setOtherParties(Arrays.asList(
+            buildOtherParty(ID_2),
+            buildOtherPartyWithAppointeeAndRep(ID_1, ID_3, ID_4),
+            buildOtherPartyWithAppointeeAndRep(null, null, null)));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(3, response.getData().getOtherParties().size());
-        assertEquals("5", response.getData().getOtherParties().get(0).getValue().getAppointee().getId());
-        assertEquals("6", response.getData().getOtherParties().get(0).getValue().getRep().getId());
-        assertEquals("7", response.getData().getOtherParties().get(2).getValue().getId());
+
+        List<CcdValue<OtherParty>> otherParties = response.getData().getOtherParties();
+
+        Assertions.assertThat(response.getData().getOtherParties())
+            .hasSize(3)
+            .extracting(CcdValue::getValue)
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId()).isEqualTo(ID_1);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);;
+                Assertions.assertThat(otherParty.getAppointee().getId()).isEqualTo(ID_3);
+                Assertions.assertThat(otherParty.getRep().getId()).isEqualTo(ID_4);
+            })
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId()).isEqualTo(ID_2);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            })
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId())
+                    .isNotEqualTo(ID_1)
+                    .isNotEqualTo(ID_2)
+                    .hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+                Assertions.assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+            });
+
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void givenExistingOtherParties_thenNewOtherPartyAppointeeAndRepAssignedNewId() {
+        sscsCaseData.setOtherParties(Arrays.asList(
+            buildOtherPartyWithAppointeeAndRep(ID_2, null, null),
+            buildOtherPartyWithAppointeeAndRep(ID_1, ID_3, ID_4),
+            buildOtherParty(null)));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Assertions.assertThat(response.getData().getOtherParties())
+            .hasSize(3)
+            .extracting(CcdValue::getValue)
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId()).isEqualTo(ID_1);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);;
+                Assertions.assertThat(otherParty.getAppointee().getId()).isEqualTo(ID_3);
+                Assertions.assertThat(otherParty.getRep().getId()).isEqualTo(ID_4);
+            })
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId()).isEqualTo(ID_2);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+                Assertions.assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+            })
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId())
+                    .isNotEqualTo(ID_1)
+                    .isNotEqualTo(ID_2)
+                    .hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            });
+
         assertEquals(0, response.getErrors().size());
     }
 
@@ -179,7 +259,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
     public void givenOtherPartyWantsConfidentiality_thenCaseIsConfidential() {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build())
-                .otherParties(Arrays.asList(buildConfidentialOtherParty("2", YES), buildConfidentialOtherParty("1", NO))).build();
+                .otherParties(Arrays.asList(buildConfidentialOtherParty(ID_2, YES), buildConfidentialOtherParty(ID_1, NO))).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -192,7 +272,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
     public void givenNoOtherPartyWantsConfidentiality_thenCaseIsNotConfidential() {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build())
-                .otherParties(Arrays.asList(buildConfidentialOtherParty("2", NO), buildConfidentialOtherParty("1", NO))).build();
+                .otherParties(Arrays.asList(buildConfidentialOtherParty(ID_2, NO), buildConfidentialOtherParty(ID_1, NO))).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -206,7 +286,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
     public void givenSscs5CaseOtherPartyWithRole_thenWarningIsReturned(String benefit) {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefit).build()).build())
-            .otherParties(Arrays.asList(buildSscs5OtherParty("2", "PayingParent"), buildSscs5OtherParty("1", null)))
+            .otherParties(Arrays.asList(buildSscs5OtherParty(ID_2, "PayingParent"), buildSscs5OtherParty(ID_1, null)))
             .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -223,7 +303,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
     public void givenSscs5CaseOtherPartyWithNoRole_thenNoErrorsOrWarningIsReturned(String benefit) {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefit).build()).build())
-            .otherParties(Arrays.asList(buildSscs5OtherParty("2", null), buildSscs5OtherParty("1", null))).build();
+            .otherParties(Arrays.asList(buildSscs5OtherParty(ID_2, null), buildSscs5OtherParty(ID_1, null))).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
@@ -240,7 +320,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
     public void givenSscs5CaseOtherPartyWithRoleWarningIgnored_thenCaseIsUpdated(String benefit) {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefit).build()).build())
-            .otherParties(Arrays.asList(buildSscs5OtherParty("2", "PayingParent"), buildSscs5OtherParty("1", null)))
+            .otherParties(Arrays.asList(buildSscs5OtherParty(ID_2, "PayingParent"), buildSscs5OtherParty(ID_1, null)))
             .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.isIgnoreWarnings()).thenReturn(true);
@@ -259,7 +339,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
             .appeal(
                 Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
                     .build())
-            .otherParties(Arrays.asList(buildSscs5OtherParty("2", "PayingParent"), buildSscs5OtherParty("1", null)))
+            .otherParties(Arrays.asList(buildSscs5OtherParty(ID_2, "PayingParent"), buildSscs5OtherParty(ID_1, null)))
             .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -276,7 +356,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
             .appeal(
                 Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
                     .build())
-            .otherParties(Arrays.asList(buildSscs5OtherParty("2", "PayingParent"), buildSscs5OtherParty("1", "")))
+            .otherParties(Arrays.asList(buildSscs5OtherParty(ID_2, "PayingParent"), buildSscs5OtherParty(ID_1, "")))
             .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
