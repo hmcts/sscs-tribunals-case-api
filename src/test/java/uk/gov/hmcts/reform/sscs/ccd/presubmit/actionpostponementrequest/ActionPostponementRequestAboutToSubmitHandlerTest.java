@@ -11,6 +11,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.WELSH_TRANSLATION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest.ActionPostponementRequestAboutToSubmitHandler.POSTPONEMENT_DETAILS_SENT_TO_JUDGE_PREFIX;
@@ -21,7 +22,9 @@ import junitparams.JUnitParamsRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -43,12 +46,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecordingCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -58,6 +61,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
+    @InjectMocks
     ActionPostponementRequestAboutToSubmitHandler handler;
 
     @Mock
@@ -75,6 +79,9 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     @Mock
     private ListAssistHearingMessageHelper hearingMessageHelper;
 
+    @Mock
+    private PostponementRequestService postponementRequestService;
+
     private SscsCaseData sscsCaseData;
 
     private SscsDocument expectedDocument;
@@ -82,8 +89,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService,
-                hearingMessageHelper, true);
+        ReflectionTestUtils.setField(handler, "isScheduleListingEnabled", true);
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_POSTPONEMENT_REQUEST);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -130,8 +136,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
     @Test
     public void givenSchedulingAndListingEnabledFalse_thenReturnFalse() {
-        handler = new ActionPostponementRequestAboutToSubmitHandler(userDetailsService, footerService,
-            hearingMessageHelper, false);
+        ReflectionTestUtils.setField(handler, "isScheduleListingEnabled", false);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
@@ -148,7 +153,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
             .isEqualTo(InterlocReviewState.REVIEW_BY_JUDGE.getId());
         assertThat(response.getData().getInterlocReferralReason())
             .isEqualTo(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId());
-        assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest()).isEqualTo(YesNo.YES);
+        assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest()).isEqualTo(YES);
         assertThat(response.getData().getAppealNotePad().getNotesCollection())
             .isNotEmpty()
             .extracting(Note::getValue)
@@ -171,7 +176,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         verifyNoInteractions(hearingMessageHelper);
         assertThat(response.getData().getInterlocReviewState()).isNull();
         assertThat(response.getData().getInterlocReferralReason()).isNull();
-        assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest()).isEqualTo(YesNo.NO);
+        assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest()).isEqualTo(NO);
         assertThat(response.getData().getDwpState()).isEqualTo(DwpState.DIRECTION_ACTION_REQUIRED.getId());
     }
 
@@ -182,7 +187,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
         assertThat(response.getData().getInterlocReviewState()).isNull();
         assertThat(response.getData().getInterlocReferralReason()).isNull();
-        assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest()).isEqualTo(YesNo.NO);
+        assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest()).isEqualTo(NO);
         assertThat(response.getData().getDwpState()).isEqualTo(DwpState.HEARING_POSTPONED.getId());
         assertThat(response.getData().getDirectionNoticeContent()).isNull();
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
@@ -191,7 +196,6 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
     @Test
     public void givenAGrantedPostponement_shouldSendCancellation() {
-
         sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
@@ -204,7 +208,6 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
     @Test
     public void givenAGrantedPostponementAndReadyToList_shouldSetPostponementCorrectly() {
-
         sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
         sscsCaseData.getPostponementRequest().setListingOption("readyToList");
 

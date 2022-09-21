@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
@@ -17,8 +19,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
@@ -28,6 +31,8 @@ import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 @AutoConfigureMockMvc
 public class UpdateOtherPartyDataIt extends AbstractEventIt {
 
+    public static final String OTHER_PARTY_ID = "34c1ef28-b6c7-4b45-bb40-4bfe1e7133c5";
+    public static final int UUID_SIZE = 36;
     @MockBean
     private IdamService idamService;
 
@@ -45,17 +50,25 @@ public class UpdateOtherPartyDataIt extends AbstractEventIt {
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
-        assertEquals(2, result.getData().getOtherParties().size());
-        assertEquals("1", result.getData().getOtherParties().get(0).getValue().getId());
-        assertEquals("2", result.getData().getOtherParties().get(0).getValue().getAppointee().getId());
-        assertEquals("3", result.getData().getOtherParties().get(0).getValue().getRep().getId());
-        assertFalse(
-            YesNo.isYes(result.getData().getOtherParties().get(0).getValue().getSendNewOtherPartyNotification()));
-        assertEquals("4", result.getData().getOtherParties().get(1).getValue().getId());
-        assertTrue(
-            YesNo.isYes(result.getData().getOtherParties().get(1).getValue().getSendNewOtherPartyNotification()));
-        assertNull(result.getData().getOtherParties().get(1).getValue().getAppointee().getId());
-        assertNull(result.getData().getOtherParties().get(1).getValue().getRep().getId());
+        List<CcdValue<OtherParty>> otherParties = result.getData().getOtherParties();
+
+        assertThat(otherParties)
+            .hasSize(2)
+            .extracting(CcdValue::getValue)
+            .anySatisfy((OtherParty otherParty) -> {
+                assertThat(otherParty.getId()).isEqualTo(OTHER_PARTY_ID);
+                assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(NO);
+            })
+            .anySatisfy((OtherParty otherParty) -> {
+                assertThat(otherParty.getId())
+                    .isNotEqualTo(OTHER_PARTY_ID)
+                    .hasSize(UUID_SIZE);
+                assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            })
+            .allSatisfy((OtherParty otherParty) -> {
+                assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+                assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+            });
     }
 
 }
