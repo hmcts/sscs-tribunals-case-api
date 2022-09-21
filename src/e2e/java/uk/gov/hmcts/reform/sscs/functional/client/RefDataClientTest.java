@@ -48,6 +48,7 @@ public class RefDataClientTest {
     public void testVenueRefDataForVenueName() {
         List<String> failedIds = new ArrayList<>();
         List<String> missingInformationIds = new ArrayList<>();
+        List<String> duplicateIds = new ArrayList<>();
 
         List<String> epimsIds = venueDataLoader.getActiveVenueDetailsMapByEpimsId()
             .keySet().stream()
@@ -67,7 +68,7 @@ public class RefDataClientTest {
                     .collect(Collectors.toList());
 
                 if (sscsCourtVenues.size() != 1) {
-                    failedIds.add(epimsId);
+                    duplicateIds.add(epimsId);
                 }
 
                 checkForMissingRegionId(missingInformationIds, epimsId, sscsCourtVenues.get(0));
@@ -77,8 +78,15 @@ public class RefDataClientTest {
             }
         }
 
-        assertThat(failedIds).isEmpty();
-        assertThat(missingInformationIds).isEmpty();
+        assertThat(failedIds)
+            .as("No court venues were found for some epims ids.")
+            .isEmpty();
+        assertThat(duplicateIds)
+            .as("Multiple court venues were found for some epims ids.")
+            .isEmpty();
+        assertThat(missingInformationIds)
+            .as("Not all required court venue information was found for some epims ids.")
+            .isEmpty();
     }
 
     private static void checkForMissingRegionId(List<String> missingInformationIds, String epimsId,
