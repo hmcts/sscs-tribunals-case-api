@@ -301,7 +301,7 @@ ccd:
   #Use this image to import your CCD definition. To have an image available, create a tag and push it. Must be the
   #non-prod sheets.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.15.13nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.15.14nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://ccd-admin-web-${SERVICE_NAME}/oauth2redirect
     environment:
