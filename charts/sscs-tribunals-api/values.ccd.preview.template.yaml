@@ -301,7 +301,7 @@ ccd:
   #Use this image to import your CCD definition. To have an image available, create a tag and push it. Must be the
   #non-prod sheets.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.15.14nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.15.5-10914nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://ccd-admin-web-${SERVICE_NAME}/oauth2redirect
     environment:
@@ -313,10 +313,6 @@ ccd:
       CCD_DEF_BULK_SCAN_API_URL: http://${SERVICE_NAME}-bulk-scan-api
       CCD_DEF_BULK_SCAN_ORCHESTRATOR_URL: http://${SERVICE_NAME}-bulk-scan-orchestrator
       CCD_DEF_COR_BACKEND_URL: http://${SERVICE_NAME}-ccd-definition-store
-      CCD_DEF_PIP_DECISION_NOTICE_QUESTIONS: ${PIP_DECISION_NOTICE_QUESTIONS}
-      CCD_DEF_ESA_DECISION_NOTICE_QUESTIONS: ${ESA_DECISION_NOTICE_QUESTIONS}
-      CCD_DEF_UC_DECISION_NOTICE_QUESTIONS: ${UC_DECISION_NOTICE_QUESTIONS}
-      CCD_DEF_LANGUAGES: ${CCD_DEF_LANGUAGES}
       CCD_STORE_BASE_URL: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_LINK: http://${SERVICE_NAME}/sign-in?tya=
       CCD_DEF_E: 'PREVIEW'
