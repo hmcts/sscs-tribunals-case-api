@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.sscs.functional.client;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.api.JUnitSoftAssertions;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +29,9 @@ import uk.gov.hmcts.reform.sscs.service.VenueService;
 @Slf4j
 @TestPropertySource(locations = "classpath:config/application_refdata_test.properties")
 public class RefDataClientTest {
+
+    @Rule
+    public JUnitSoftAssertions softly = new JUnitSoftAssertions();
     public static final String SSCS_COURT_TYPE_ID = "31";
     public static final String OPEN = "Open";
 
@@ -66,10 +68,10 @@ public class RefDataClientTest {
             try {
                 List<CourtVenue> sscsCourtVenues = refDataApi.courtVenueByEpimsId(oauth2Token,
                         serviceToken, epimsId).stream().filter(venue -> SSCS_COURT_TYPE_ID.equals(venue.getCourtTypeId())
-                        && OPEN.equals(venue.getCourtStatus()))
+                        && OPEN.equalsIgnoreCase(venue.getCourtStatus()))
                     .collect(Collectors.toList());
 
-                if (sscsCourtVenues.size() != 1) {
+                if (sscsCourtVenues.size() > 1) {
                     duplicateIds.add(epimsId);
                 }
 
@@ -80,13 +82,13 @@ public class RefDataClientTest {
             }
         }
 
-        assertThat(failedIds)
+        softly.assertThat(failedIds)
             .as("No court venues were found for some epims ids.")
             .isEmpty();
-        assertThat(duplicateIds)
+        softly.assertThat(duplicateIds)
             .as("Multiple court venues were found for some epims ids.")
             .isEmpty();
-        assertThat(missingInformationIds)
+        softly.assertThat(missingInformationIds)
             .as("Not all required court venue information was found for some epims ids.")
             .isEmpty();
     }
