@@ -35,7 +35,7 @@ idam-pr:
   enabled: true
   redirect_uris:
     XUI:
-      - https://${SERVICE_NAME}-xui/oauth2/callback
+      - https://xui-${SERVICE_FQDN}/oauth2/callback
     CCD Admin:
       - http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     CCD:
