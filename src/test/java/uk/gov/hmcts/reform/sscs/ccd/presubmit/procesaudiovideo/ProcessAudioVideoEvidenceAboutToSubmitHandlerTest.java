@@ -566,7 +566,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         ArrayList<Note> notes = new ArrayList<>(Optional.ofNullable(sscsCaseData.getAppealNotePad()).flatMap(f -> Optional.ofNullable(f.getNotesCollection())).orElse(Collections.emptyList()));
 
         assertEquals(2, notes.size());
-        assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
+        assertEquals(2, response.getData().getAppealNotePad().getNotesCollection().size());
         assertEquals("Temp reason", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
         assertNull(response.getData().getAudioVideoEvidence());
     }
