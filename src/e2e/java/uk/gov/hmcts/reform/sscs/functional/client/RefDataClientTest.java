@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.service.VenueService;
 @TestPropertySource(locations = "classpath:config/application_refdata_test.properties")
 public class RefDataClientTest {
     public static final String SSCS_COURT_TYPE_ID = "31";
+    public static final String OPEN = "Open";
 
     @Autowired
     private VenueService venueService;
@@ -64,7 +65,8 @@ public class RefDataClientTest {
         for (String epimsId : epimsIds) {
             try {
                 List<CourtVenue> sscsCourtVenues = refDataApi.courtVenueByEpimsId(oauth2Token,
-                        serviceToken, epimsId).stream().filter(venue -> SSCS_COURT_TYPE_ID.equals(venue.getCourtTypeId()))
+                        serviceToken, epimsId).stream().filter(venue -> SSCS_COURT_TYPE_ID.equals(venue.getCourtTypeId())
+                        && OPEN.equals(venue.getCourtStatus()))
                     .collect(Collectors.toList());
 
                 if (sscsCourtVenues.size() != 1) {
