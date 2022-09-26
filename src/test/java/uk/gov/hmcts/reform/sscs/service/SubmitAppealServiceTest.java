@@ -628,7 +628,7 @@ public class SubmitAppealServiceTest {
             .thenReturn(getRpcObjectForGivenJsonRpc(expectedRpc));
         when(airLookupService.lookupAirVenueNameByPostCode(eq(appellantPostCode), any())).thenReturn(rpc.getCity());
         when(venueService.getEpimsIdForVenue(rpc.getCity())).thenReturn("1234");
-        when(refDataService.getCourtVenueRefDataByEpimsId("1234")).thenReturn(CourtVenue.builder().regionId("1").build());
+        when(refDataService.getCourtVenueRefDataByEpimsId("1234")).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("1").build());
 
         SyaCaseWrapper appealData = getSyaCaseWrapper();
         appealData.getAppellant().getContactDetails().setPostCode(appellantPostCode);
@@ -653,7 +653,7 @@ public class SubmitAppealServiceTest {
         when(airLookupService.lookupAirVenueNameByPostCode(eq("B1 1AA"), any())).thenReturn("Birmingham");
 
         when(venueService.getEpimsIdForVenue("Birmingham")).thenReturn("1234");
-        when(refDataService.getCourtVenueRefDataByEpimsId("1234")).thenReturn(CourtVenue.builder().regionId("1").build());
+        when(refDataService.getCourtVenueRefDataByEpimsId("1234")).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("1").build());
 
         SyaContactDetails appointeeContactDetails = new SyaContactDetails();
         appointeeContactDetails.setPostCode("B1 1AA");
@@ -683,7 +683,7 @@ public class SubmitAppealServiceTest {
         when(regionalProcessingCenterService.getByPostcode("TN32")).thenReturn(getRpcObjectForGivenJsonRpc(BRADFORD_RPC));
         when(airLookupService.lookupAirVenueNameByPostCode(eq("TN32 6PL"), any())).thenReturn("Bradford");
         when(venueService.getEpimsIdForVenue("Bradford")).thenReturn("1234");
-        when(refDataService.getCourtVenueRefDataByEpimsId("1234")).thenReturn(CourtVenue.builder().regionId("1").build());
+        when(refDataService.getCourtVenueRefDataByEpimsId("1234")).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("1").build());
 
         SyaCaseWrapper appealData = getSyaWrapperWithAppointee(null);
         appealData.setIsAppointee(false);
@@ -931,7 +931,7 @@ public class SubmitAppealServiceTest {
 
         when(venueService.getEpimsIdForVenue(expectedVenue)).thenReturn(epimsId);
         when(airLookupService.lookupAirVenueNameByPostCode(eq(postcode), any())).thenReturn(expectedVenue);
-        when(refDataService.getCourtVenueRefDataByEpimsId(epimsId)).thenReturn(CourtVenue.builder().regionId(regionId).build());
+        when(refDataService.getCourtVenueRefDataByEpimsId(epimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId(regionId).build());
 
         boolean isAppellant = appellantOrAppointee.equals("appellant");
         SyaCaseWrapper appealData = getSyaCaseWrapper(isAppellant ? "json/sya.json" : "sya/allDetailsWithAppointeeWithDifferentAddress.json");

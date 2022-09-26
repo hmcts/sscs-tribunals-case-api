@@ -287,7 +287,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(
             venueB);
 
-        when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().regionId("regionId").build());
+        when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
 
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB12 00B");
 
@@ -313,7 +313,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueEpimsId);
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(venueB);
-        when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().regionId("regionId").build());
+        when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
 
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().address(Address.builder().postcode("AB12 00B").build()).build());
@@ -362,7 +362,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueEpimsId);
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType()))
             .thenReturn(venueB);
-        when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().regionId("regionId").build());
+        when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
 
         Appellant appellant = callback.getCaseDetails().getCaseData().getAppeal().getAppellant();
         appellant.getAddress().setPostcode("AB12 00B");

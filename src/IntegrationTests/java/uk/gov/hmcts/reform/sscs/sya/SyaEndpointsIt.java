@@ -146,6 +146,7 @@ public class SyaEndpointsIt extends AbstractEventIt {
             .willReturn(List.of(CourtVenue.builder()
                 .regionId("2")
                 .courtTypeId("31")
+                .courtStatus("Open")
                 .venueName("Ashford")
                 .build()));
 
