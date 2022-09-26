@@ -288,7 +288,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         userDetails.getRoles().add(TCW.getValue());
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         SscsCaseData responseData = response.getData();
-        assertEquals(5, responseData.getProcessAudioVideoAction().getListItems().size());
+        assertEquals(6, responseData.getProcessAudioVideoAction().getListItems().size());
         assertEquals(ISSUE_DIRECTIONS_NOTICE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), ISSUE_DIRECTIONS_NOTICE.getCode()));
         assertEquals(ADMIT_EVIDENCE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), ADMIT_EVIDENCE.getCode()));
         assertEquals(EXCLUDE_EVIDENCE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), EXCLUDE_EVIDENCE.getCode()));
