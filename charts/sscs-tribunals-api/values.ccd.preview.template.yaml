@@ -61,7 +61,6 @@ ccd-case-document-am-api:
   enabled: true
   java:
     image: hmctspublic.azurecr.io/ccd/case-document-am-api:latest
-    releaseNameOverride: ${SERVICE_NAME}-cdam
     environment:
       CCD_DATA_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-data-store-api
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
@@ -80,11 +79,11 @@ xui-webapp:
     memoryLimits: 1836Mi
     cpuLimits: 1900m
     environment:
-      HEALTH_CCD_COMPONENT_API: http://${SERVICE_NAME}-gateway/health
+      HEALTH_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw/health
       HEALTH_CCD_DATA_API: http://${SERVICE_NAME}-ccd-data-store-api/health
       HEALTH_TERMS_AND_CONDITIONS_API: http://${SERVICE_NAME}-xui-terms-and-conditions/health
-      SERVICES_EM_ANNO_API: http://${SERVICE_NAME}-gateway
-      SERVICES_CCD_COMPONENT_API: http://${SERVICE_NAME}-gateway
+      SERVICES_EM_ANNO_API: http://${SERVICE_NAME}-ccd-api-gw
+      SERVICES_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw
       SERVICES_CCD_DATA_STORE_API: http://${SERVICE_NAME}-ccd-data-store-api
       SERVICES_CCD_CASE_ASSIGNMENT_API: http://${SERVICE_NAME}-aac
       SERVICES_TERMS_AND_CONDITIONS: http://${SERVICE_NAME}-xui-terms-and-conditions
@@ -149,7 +148,7 @@ ccd:
         CREATE DATABASE "hmc-cft-hearing-service" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
 
   global:
-    ccdApiGatewayIngress: ${SERVICE_NAME}-gateway
+    ccdApiGatewayIngress: ${SERVICE_NAME}-ccd-api-gw
     ccdAdminWebIngress: ${SERVICE_NAME}-ccd-admin-web
     ccdDataStoreUrl: http://${SERVICE_NAME}-ccd-data-store-api
     ccdDefinitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
