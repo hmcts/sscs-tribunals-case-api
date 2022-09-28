@@ -204,7 +204,6 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
                     pair.getRight())).collect(Collectors.toList());
 
         descriptors.sort(new DescriptorLexicographicalComparator());
-l
         return descriptors;
     }
 
