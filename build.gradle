@@ -312,6 +312,9 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
 
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
+    // For the below: https://stackoverflow.com/questions/64994034/bootstrap-yml-configuration-not-processed-anymore-with-spring-cloud-2020-0
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap'
+
     compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.1'
     compile group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
     compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.3'
