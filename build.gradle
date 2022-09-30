@@ -391,7 +391,7 @@ dependencies {
     //remove when secure doc store is live
     compile group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.17.2-RC-10895-3'
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.17.2-RC-10895-4'
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.56'
 
     compile group: 'com.azure', name: 'azure-core', version: versions.azureCore

@@ -79,29 +79,6 @@ public class UpdateListingRequirementsUtil {
         return new DynamicListItem(reference, name);
     }
 
-    private List<DynamicListItem> generateReservedMembers() {
-        JudicialRefDataUsersRequest request = JudicialRefDataUsersRequest.builder()
-            .ccdServiceName(SERVICE_NAME)
-            .build();
-
-        List<JudicialUser> judicialUsers = judicialRefData.getJudicialUsers(
-            idamService.getIdamTokens().getIdamOauth2Token(),
-            idamService.getIdamTokens().getServiceAuthorization(),
-            request);
-
-        return Optional.ofNullable(judicialUsers)
-            .orElse(Collections.emptyList())
-            .stream()
-            .filter(Objects::nonNull)
-            .filter(judicialUser -> isNotEmpty(judicialUser.getAppointments()))
-            .filter(judicialUser -> judicialUser.getAppointments().stream()
-                .map(JudicialMemberAppointments::getAppointment)
-                .anyMatch(this::isValidJudicialMemberType))
-            .map(this::getJudicialMemberListItem)
-            .sorted(Comparator.comparing(DynamicListItem::getLabel))
-            .collect(Collectors.toList());
-    }
-
     private boolean isValidJudicialMemberType(String appointment) {
         if (isNull(appointment)) {
             return false;
