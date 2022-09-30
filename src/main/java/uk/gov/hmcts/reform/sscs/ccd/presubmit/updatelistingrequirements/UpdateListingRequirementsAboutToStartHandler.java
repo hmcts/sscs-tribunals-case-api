@@ -11,7 +11,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ListingValues;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.UpdateListingRequirementsUtil;
@@ -33,7 +35,6 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
 
         return callbackType.equals(CallbackType.ABOUT_TO_START)
             && (callback.getEvent() == EventType.UPDATE_LISTING_REQUIREMENTS);
-
     }
 
     @Override
@@ -45,14 +46,22 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         if (isScheduleListingEnabled) {
-
             log.info("Handling override fields update listing requirements event for caseId {}", sscsCaseData.getCcdCaseId());
 
-            OverrideFields overrideFields = sscsCaseData.getSchedulingAndListingFields().getOverrideFields();
+            SchedulingAndListingFields schedulingAndListingFields = sscsCaseData.getSchedulingAndListingFields();
+
+            OverrideFields overrideFields = schedulingAndListingFields.getOverrideFields();
 
             if (isNull(overrideFields)) {
                 overrideFields = new OverrideFields();
-                sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
+                schedulingAndListingFields.setOverrideFields(overrideFields);
+            }
+
+            ListingValues listingValues = schedulingAndListingFields.getDefaultOverrideFields();
+
+            if (isNull(listingValues)) {
+                listingValues = new ListingValues();
+                schedulingAndListingFields.setDefaultOverrideFields(listingValues);
             }
 
             utils.generateInterpreterLanguageFields(overrideFields);

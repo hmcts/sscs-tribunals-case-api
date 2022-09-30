@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 
@@ -50,7 +49,6 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
         setCaseCode(preSubmitCallbackResponse, callback);
         checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
         setDwpDocuments(sscsCaseData);
-        setDefaultOverrideFields(sscsCaseData);
 
         if (sscsCaseData.getDwpResponseDate() == null) {
             sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
@@ -107,17 +105,4 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
             }
         }
     }
-
-    private void setDefaultOverrideFields(SscsCaseData sscsCaseData) {
-        OverrideFields defaultOverrideFields = sscsCaseData.getSchedulingAndListingFields().getDefaultOverrideFields();
-        if (isNull(defaultOverrideFields)) {
-            defaultOverrideFields = OverrideFields.builder()
-                .poToAttend(YesNo.isYes(sscsCaseData.getDwpIsOfficerAttending()) ? YesNo.YES : YesNo.NO)
-                .build();
-        } else {
-            defaultOverrideFields.setPoToAttend(YesNo.isYes(sscsCaseData.getDwpIsOfficerAttending()) ? YesNo.YES : YesNo.NO);
-        }
-        sscsCaseData.getSchedulingAndListingFields().setDefaultOverrideFields(defaultOverrideFields);
-    }
-
 }
