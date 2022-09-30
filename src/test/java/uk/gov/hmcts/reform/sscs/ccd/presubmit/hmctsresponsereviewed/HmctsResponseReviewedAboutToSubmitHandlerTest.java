@@ -56,7 +56,6 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
                     new DynamicListItem("reviewByTcw", "Review by TCW"), null))
                 .benefitCode("002")
                 .issueCode("CC")
-                .dwpIsOfficerAttending("Yes")
                 .build();
 
         sscsCaseDataBefore = SscsCaseData.builder().build();

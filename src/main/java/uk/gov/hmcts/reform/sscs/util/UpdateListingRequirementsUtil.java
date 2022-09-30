@@ -103,7 +103,7 @@ public class UpdateListingRequirementsUtil {
     }
 
     private boolean isValidJudicialMemberType(String appointment) {
-        if (appointment == null) {
+        if (isNull(appointment)) {
             return false;
         }
 
@@ -122,7 +122,8 @@ public class UpdateListingRequirementsUtil {
 
     @NotNull
     private DynamicListItem getJudicialMemberListItem(JudicialUser judicialUser) {
-        String referenceCodes = String.format("%s|%s", judicialUser.getPersonalCode(), extractHmcReferenceCode(judicialUser));
+        String referenceCodes = String.format("%s|%s",judicialUser.getPersonalCode(),
+            extractHmcReferenceCode(judicialUser));
 
         String name = isNotBlank(judicialUser.getPostNominals())
             ? String.format("%s %s", judicialUser.getFullName(), judicialUser.getPostNominals())
@@ -131,13 +132,13 @@ public class UpdateListingRequirementsUtil {
     }
 
     private String extractHmcReferenceCode(JudicialUser judicialUser) {
-        if (judicialUser.getAppointments() != null) {
+        if (nonNull(judicialUser.getAppointments())) {
             JudicialMemberType judicialMemberType = judicialUser.getAppointments().stream()
                 .map(JudicialMemberAppointments::getAppointment)
                 .map(UpdateListingRequirementsUtil::getJudicialMemberType)
                 .findFirst()
                 .orElse(null);
-            if (judicialMemberType != null) {
+            if (nonNull(judicialMemberType)) {
                 return judicialMemberType.getHmcReference();
             }
 
