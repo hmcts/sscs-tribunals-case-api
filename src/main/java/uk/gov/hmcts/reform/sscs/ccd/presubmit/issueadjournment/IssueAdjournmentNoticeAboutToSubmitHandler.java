@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.ADJOURNMENT_NOTICE_ISSUED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -64,12 +65,12 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
             calculateDueDate(sscsCaseData);
 
-            if (sscsCaseData.getAdjournCasePreviewDocument() != null) {
+            if (sscsCaseData.getAdjournment().getPreviewDocument() != null) {
                 createAdjournmentNoticeFromPreviewDraft(preSubmitCallbackResponse, documentTranslationStatus);
 
                 if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
                     sscsCaseData.setDwpState(ADJOURNMENT_NOTICE_ISSUED.getId());
-                    if ("yes".equalsIgnoreCase(sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties())) {
+                    if (isYes(sscsCaseData.getAdjournment().getAreDirectionsBeingMadeToParties())) {
                         sscsCaseData.setState(State.NOT_LISTABLE);
                     } else {
                         sscsCaseData.setState(State.READY_TO_LIST);
@@ -95,18 +96,22 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     }
 
     private void calculateDueDate(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getAdjournCaseDirectionsDueDate() != null && !"".equalsIgnoreCase(sscsCaseData.getAdjournCaseDirectionsDueDate())) {
-            sscsCaseData.setDirectionDueDate(sscsCaseData.getAdjournCaseDirectionsDueDate());
-        } else if (sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset() != null && !"".equalsIgnoreCase(sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset())) {
-            sscsCaseData.setDirectionDueDate(LocalDate.now().plusDays(Integer.parseInt(sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset())).toString());
+        if (sscsCaseData.getAdjournment().getDirectionsDueDate() != null) {
+            sscsCaseData.setDirectionDueDate(sscsCaseData.getAdjournment().getDirectionsDueDate().toString());
+        } else if (sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset() != null) {
+            sscsCaseData.setDirectionDueDate(LocalDate.now()
+                .plusDays(sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset().getCcdDefinition())
+                .toString());
         }
     }
 
-    private void createAdjournmentNoticeFromPreviewDraft(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, SscsDocumentTranslationStatus documentTranslationStatus) {
+    private void createAdjournmentNoticeFromPreviewDraft(
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
+        SscsDocumentTranslationStatus documentTranslationStatus) {
 
         SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
 
-        DocumentLink docLink = sscsCaseData.getAdjournCasePreviewDocument();
+        DocumentLink docLink = sscsCaseData.getAdjournment().getPreviewDocument();
 
         DocumentLink documentLink = DocumentLink.builder()
             .documentUrl(docLink.getDocumentUrl())

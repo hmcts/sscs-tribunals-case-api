@@ -37,7 +37,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 @AutoConfigureMockMvc
 public class AdjournCaseIt extends AbstractEventIt {
 
-    public static final String DIRECTIONS_DUE_DATE_PLACEHOLDER = "DIRECTIONS_DUE_DATE_PLACEHOLDER";
+    public static final String DIRECTIONS_DUE_DATE_PLACEHOLDER = "2020-01-01";
     public static final String GENERATED_VIDEO_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITH_DIRECTIONS_MADE_JSON =
         "callback/adjournCaseGeneratedVideoWhenCaseNotListedStraightAwayWithDirectionsMade.json";
     public static final String GENERATED_PAPER_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITHOUT_DIRECTIONS_MADE_JSON =
@@ -126,7 +126,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         setJsonAndReplace(VALID_SUBMISSION_WITH_SET_GENERATED_DATE_JSON, DIRECTIONS_DUE_DATE_PLACEHOLDER, DATE_2019);
 
         PreSubmitCallbackResponse<SscsCaseData> result = noticeGeneratedWithExpectedDetails();
-        assertThat(result.getData().getAdjournCaseGeneratedDate()).isEqualTo("2018-01-01");
+        assertThat(result.getData().getAdjournment().getGeneratedDate()).isEqualTo("2018-01-01");
     }
 
     @DisplayName("Call to about to submit handler will write manually uploaded adjourn notice to case")
@@ -185,7 +185,7 @@ public class AdjournCaseIt extends AbstractEventIt {
 
         PreSubmitCallbackResponse<SscsCaseData> result = getPreSubmitCallbackResponse();
 
-        assertThat(result.getData().getAdjournCasePreviewDocument()).isNull();
+        assertThat(result.getData().getAdjournment().getPreviewDocument()).isNull();
 
         assertThat(result.getErrors()).hasSize(1);
 
@@ -280,7 +280,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
         assertThat(result.getErrors()).isEmpty();
-        DynamicList results = result.getData().getAdjournCaseNextHearingVenueSelected();
+        DynamicList results = result.getData().getAdjournment().getNextHearingVenueSelected();
         assertThat(results.getListItems()).isNotEmpty();
     }
 
@@ -371,7 +371,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertThat(payload.getHearingType()).isEqualTo(hearingType);
         assertThat(payload.getAdditionalDirections().get(0)).isEqualTo("something else");
         assertThat(payload.getReasonsForDecision().get(0)).isEqualTo("Reasons 1");
-        assertThat(payload.getPanelMembersExcluded()).isEqualTo("yes");
+        assertThat(payload.getPanelMembersExcluded()).isEqualTo("Yes");
         assertThat(payload.getAppellantName()).isEqualTo(TEST_NAME);
         assertThat(payload.getInterpreterDescription()).isEqualTo(interpreterDescription);
     }
@@ -381,7 +381,7 @@ public class AdjournCaseIt extends AbstractEventIt {
 
         assertThat(result.getErrors()).isEmpty();
 
-        assertThat(result.getData().getAdjournCasePreviewDocument().getDocumentUrl()).isEqualTo(DOCUMENT_URL);
+        assertThat(result.getData().getAdjournment().getPreviewDocument().getDocumentUrl()).isEqualTo(DOCUMENT_URL);
     }
 
     private PreSubmitCallbackResponse<SscsCaseData> getPreSubmitCallbackResponse() throws Exception {
