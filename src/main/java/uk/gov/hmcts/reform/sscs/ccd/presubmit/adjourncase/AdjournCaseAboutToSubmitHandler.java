@@ -1,9 +1,13 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
 import java.time.LocalDate;
 import java.util.Objects;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,13 +18,17 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private PreviewDocumentService previewDocumentService;
+
+    private final ListAssistHearingMessageHelper hearingMessageHelper;
 
     @Autowired
     public AdjournCaseAboutToSubmitHandler(PreviewDocumentService previewDocumentService) {
@@ -42,6 +50,11 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
         }
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+
+        if (LIST_ASSIST == sscsCaseData.getSchedulingAndListingFields().getHearingRoute()
+            && READY_TO_LIST == sscsCaseData.getState()) {
+            hearingMessageHelper.sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
+        }
 
         // Due to a bug with CCD related to hidden fields, this field not being set
         // on the final submission from CCD, so we need to reset it here
