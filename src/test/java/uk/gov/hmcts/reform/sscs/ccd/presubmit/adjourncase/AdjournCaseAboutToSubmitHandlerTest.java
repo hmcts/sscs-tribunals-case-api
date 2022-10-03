@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,6 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
+import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 
 @RunWith(JUnitParamsRunner.class)
 public class AdjournCaseAboutToSubmitHandlerTest {
@@ -57,6 +57,9 @@ public class AdjournCaseAboutToSubmitHandlerTest {
 
     @Mock
     private ListAssistHearingMessageHelper hearingMessageHelper;
+
+    @Mock
+    private PreviewDocumentService previewDocumentService;
 
     private SscsCaseData sscsCaseData;
     private AutoCloseable autoCloseable;
@@ -174,21 +177,39 @@ public class AdjournCaseAboutToSubmitHandlerTest {
 
     @DisplayName("When adjournment is enabled and case is LA, then should send a new hearing request in hearings API")
     @Test
-    public void createsHearingRequest() {
+    public void createsHearingRequestWhenReadyToList() {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
+        sscsCaseData.setAdjournCaseCanCaseBeListedRightAway("no");
+        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties("no");
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(hearingMessageHelper, times(1)).sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(),
-            CancellationReason.OTHER);
+        verify(hearingMessageHelper, times(1))
+            .sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
+
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @DisplayName("When adjournment is enabled and case is LA and case is not listable right away "
+        + "and directions ARE being made to parties, then should not send any messages")
+    @Test
+    public void doesNotCreateHearingRequestWhenNotReadyToList() {
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
+        sscsCaseData.setAdjournCaseCanCaseBeListedRightAway("no");
+        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties("yes");
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verifyNoInteractions(hearingMessageHelper);
 
         assertThat(response.getErrors()).isEmpty();
     }
 
     @DisplayName("When adjournment is disabled and case is LA, then should not send any messages")
     @Test
-    public void doesNotCreateHearingRequest() {
+    public void doesNotCreateHearingRequestWhenFeatureFlagDisabled() {
         ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", false);
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
 
