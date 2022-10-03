@@ -52,9 +52,9 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
         previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, sscsCaseData.getAdjournCasePreviewDocument());
 
         if (SscsUtil.isSAndLCase(sscsCaseData)
+            && isAdjournmentEnabled // TODO SSCS-10951
             && (sscsCaseData.isAdjournCaseAbleToBeListedRightAway()
             || isNoOrNull(sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties()))
-            && isAdjournmentEnabled // TODO SSCS-10951
         ) {
             hearingMessageHelper.sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
         } else if (sscsCaseData.getAdjournCaseInterpreterRequired() != null) {

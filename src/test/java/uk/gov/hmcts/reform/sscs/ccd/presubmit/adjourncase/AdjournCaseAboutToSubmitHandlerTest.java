@@ -10,9 +10,10 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
@@ -100,8 +101,8 @@ public class AdjournCaseAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getData().getSscsDocument().size());
-        assertEquals((String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))), response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        verify(previewDocumentService, times(1)).writePreviewDocumentToSscsDocument(
+            sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, null);
     }
 
     @Test
@@ -179,8 +180,8 @@ public class AdjournCaseAboutToSubmitHandlerTest {
     @Test
     public void createsHearingRequestWhenReadyToList() {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
-        sscsCaseData.setAdjournCaseCanCaseBeListedRightAway("no");
-        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties("no");
+        sscsCaseData.setAdjournCaseCanCaseBeListedRightAway(NO.getValue());
+        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties(NO.getValue());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -196,8 +197,8 @@ public class AdjournCaseAboutToSubmitHandlerTest {
     @Test
     public void doesNotCreateHearingRequestWhenNotReadyToList() {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
-        sscsCaseData.setAdjournCaseCanCaseBeListedRightAway("no");
-        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties("yes");
+        sscsCaseData.setAdjournCaseCanCaseBeListedRightAway(NO.getValue());
+        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties(YES.getValue());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
