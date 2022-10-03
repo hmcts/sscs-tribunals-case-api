@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +52,8 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
         previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, sscsCaseData.getAdjournCasePreviewDocument());
 
         if (SscsUtil.isSAndLCase(sscsCaseData)
-            && sscsCaseData.isAdjournCaseAbleToBeListedRightAway()
+            && (sscsCaseData.isAdjournCaseAbleToBeListedRightAway()
+            || isNoOrNull(sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties()))
             && isAdjournmentEnabled // TODO SSCS-10951
         ) {
             hearingMessageHelper.sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
