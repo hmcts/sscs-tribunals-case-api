@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 
 import java.time.LocalDate;
@@ -56,6 +57,7 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             || isNoOrNull(sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties()))
         ) {
             hearingMessageHelper.sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
+            sscsCaseData.setIsAdjournmentInProgress(YES);
         } else if (sscsCaseData.getAdjournCaseInterpreterRequired() != null) {
             HearingOptions hearingOptions = HearingOptions.builder().build();
             if (sscsCaseData.getAppeal().getHearingOptions() != null) {
