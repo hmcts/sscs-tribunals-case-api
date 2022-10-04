@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -12,7 +11,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNME
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
@@ -219,8 +217,6 @@ public class AdjournCaseAboutToSubmitHandlerTest {
         sscsCaseData.setAdjournCaseCanCaseBeListedRightAway(canBeListedRightAway.getValue());
         sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties(directionsBeingMade.getValue());
 
-        PreSubmitCallbackResponse<SscsCaseData> response =
-            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        return response;
+        return handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 }
