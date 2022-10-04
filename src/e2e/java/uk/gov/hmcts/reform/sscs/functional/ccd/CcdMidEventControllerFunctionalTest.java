@@ -104,28 +104,6 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
         assertThat(ccdEventResponse.getErrors().iterator().next()).isEqualTo("Unable to extract restoreCaseFileName");
     }
 
-    @DisplayName("Preview adjourn case should populate adjourn case preview document")
-    @Test
-    public void testPreviewAdjournCaseLA() throws IOException {
-        HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(getJsonCallbackForTest(
-            "handlers/adjourncase/adjournCaseLACallback.json")), "PreviewAdjournCase");
-        CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
-        assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(200);
-        assertThat(ccdEventResponse.getData().getAdjournCasePreviewDocument()).isNotNull();
-    }
-
-    @DisplayName("Admin restore cases should return an error for data without restore cases date")
-    @Test
-    public void testAdminRestoreCasesLA() throws IOException {
-        HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(getJsonCallbackForTest(
-            "handlers/adjourncase/adjournCaseLACallback.json")), "AdminRestoreCases");
-        CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
-        assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(200);
-        assertThat(ccdEventResponse.getWarnings().size()).isEqualTo(0);
-        assertThat(ccdEventResponse.getErrors().size()).isEqualTo(1);
-        assertThat(ccdEventResponse.getErrors().iterator().next()).isEqualTo("Unable to extract restoreCaseFileName");
-    }
-
     private CcdEventResponse getCcdEventResponse(HttpResponse httpResponse) throws IOException {
         String response = EntityUtils.toString(httpResponse.getEntity());
         return objectMapper.readValue(response, CcdEventResponse.class);
