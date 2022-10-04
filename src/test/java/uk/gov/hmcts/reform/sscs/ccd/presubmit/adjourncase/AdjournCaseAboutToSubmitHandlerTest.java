@@ -169,10 +169,7 @@ public class AdjournCaseAboutToSubmitHandlerTest {
     public void testNoDirections() {
         PreSubmitCallbackResponse<SscsCaseData> response = cannotBeListedAndNoDirectionsGiven();
 
-        verify(hearingMessageHelper, times(1))
-            .sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
-
-        assertThat(response.getErrors()).isEmpty();
+        assertHearingCreated(response);
     }
 
     @DisplayName("When adjournment is enabled and case is LA and case can be listed right away "
@@ -181,9 +178,7 @@ public class AdjournCaseAboutToSubmitHandlerTest {
     public void testListableRightAway() {
         PreSubmitCallbackResponse<SscsCaseData> response = canBeListed();
 
-        verifyNoInteractions(hearingMessageHelper);
-
-        assertThat(response.getErrors()).isEmpty();
+        assertHearingCreated(response);
     }
 
     @DisplayName("When adjournment is enabled and case is LA and case cannot be listed right away "
@@ -199,6 +194,13 @@ public class AdjournCaseAboutToSubmitHandlerTest {
 
     private PreSubmitCallbackResponse<SscsCaseData> cannotBeListedAndNoDirectionsGiven() {
         return getResponseWithYesNoCanBeListedAndYesNoDirections(NO, NO);
+    }
+
+    private void assertHearingCreated(PreSubmitCallbackResponse<SscsCaseData> response) {
+        verify(hearingMessageHelper, times(1))
+            .sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
+
+        assertThat(response.getErrors()).isEmpty();
     }
 
     private PreSubmitCallbackResponse<SscsCaseData> canBeListed() {
