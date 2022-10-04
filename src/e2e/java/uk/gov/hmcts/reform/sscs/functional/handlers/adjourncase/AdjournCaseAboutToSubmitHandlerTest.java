@@ -33,16 +33,28 @@ public class AdjournCaseAboutToSubmitHandlerTest extends BaseHandler {
     @DisplayName("Given about to submit callback for Gaps event, should set fields")
     @Test
     public void testGaps() throws IOException {
-        extracted("adjournCaseGapsCallback.json", "spanish", "Yes");
+        gapsUpdatesInterpreterAndLanguage();
     }
 
     @DisplayName("Given about to submit callback for List Assist event, should set fields")
     @Test
     public void testListAssist() throws IOException {
-        extracted("adjournCaseLACallback.json", null, "No");
+        listAssistDoesNotUpdateInterpreterAndLanguage();
     }
 
-    private void extracted(String jsonPath, String language, String interpreter) throws IOException {
+    private void gapsUpdatesInterpreterAndLanguage() throws IOException {
+        expectedFieldsFromJsonWithLanguageAndInterpreterRequired("adjournCaseGapsCallback.json", "spanish", "Yes");
+    }
+
+    private void listAssistDoesNotUpdateInterpreterAndLanguage() throws IOException {
+        expectedFieldsFromJsonWithLanguageAndInterpreterRequired("adjournCaseLACallback.json", null, "No");
+    }
+
+    private void expectedFieldsFromJsonWithLanguageAndInterpreterRequired(
+        String jsonPath,
+        String language,
+        String interpreter
+    ) throws IOException {
         String response = RestAssured.given()
             .log().method().log().headers().log().uri().log().body(true)
             .contentType(ContentType.JSON)
