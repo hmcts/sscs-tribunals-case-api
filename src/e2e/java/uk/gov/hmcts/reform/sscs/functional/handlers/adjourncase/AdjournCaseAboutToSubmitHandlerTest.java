@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.sscs.functional.handlers.adjourncase;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -10,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
+import java.io.IOException;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
