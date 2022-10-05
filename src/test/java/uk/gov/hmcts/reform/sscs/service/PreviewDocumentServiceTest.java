@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -42,8 +43,9 @@ public class PreviewDocumentServiceTest {
             .build();
     }
 
+    @DisplayName("Given draft adjournment notice already exists on case, then overwrite existing draft")
     @Test
-    public void givenDraftAdjournmentNoticeAlreadyExistsOnCase_thenOverwriteExistingDraft() {
+    public void testOverwriteDraft() {
         previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, sscsCaseData.getAdjournCasePreviewDocument());
 
         assertThat(sscsCaseData.getSscsDocument())
