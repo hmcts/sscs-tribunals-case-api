@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.mockito.ArgumentCaptor;
@@ -104,30 +103,6 @@ public class AdjournCaseIT extends AbstractEventIt {
         noticeGeneratedWithExpectedDetails();
     }
 
-    /**
-     * Due to a CCD bug ( https://tools.hmcts.net/jira/browse/RDM-8200 ) we have had
-     * to implement a workaround in AdjournCaseAboutToSubmitHandler to set
-     * the generated date to now, even though it is already being determined by the
-     * preview document handler.  This is because on submission, the correct generated date
-     * (the one referenced in the preview document) is being overwritten to a null value.
-     * Once RDM-8200 is fixed, and we remove the workaround, this test should be changed
-     * to assert that a "something has gone wrong" error is displayed instead of
-     * previewing the document, as a null generated date would indicate that the
-     * date in the preview document hasn't been set.
-     *
-     */
-    @DisplayName("Call to about to submit handler will write adjourn notice to case with generated date as now "
-        + "when generated date not set")
-    @Test
-    @Ignore // TODO amend to expect "something has gone wrong" error
-    public void testDateNotSet() throws Exception {
-        setup();
-        setJsonAndReplace(
-            "callback/adjournCaseValidSubmissionWithNullGeneratedDate.json", DIRECTIONS_DUE_DATE_PLACEHOLDER, DATE_2019);
-
-        noticeGeneratedWithExpectedDetailsAndDate(LocalDate.now().toString());
-    }
-
     @DisplayName("Call to about to submit handler will write adjourn notice to case with generated date as set")
     @Test
     public void testDateSet() throws Exception {
@@ -135,7 +110,8 @@ public class AdjournCaseIT extends AbstractEventIt {
         setJsonAndReplace(
             "callback/adjournCaseValidSubmissionWithSetGeneratedDate.json", DIRECTIONS_DUE_DATE_PLACEHOLDER, DATE_2019);
 
-        noticeGeneratedWithExpectedDetailsAndDate("2018-01-01");
+        PreSubmitCallbackResponse<SscsCaseData> result = noticeGeneratedWithExpectedDetails();
+        assertThat(result.getData().getAdjournCaseGeneratedDate()).isEqualTo("2018-01-01");
     }
 
     @DisplayName("Call to about to submit handler will write manually uploaded adjourn notice to case")
@@ -328,11 +304,6 @@ public class AdjournCaseIT extends AbstractEventIt {
         assertThat(document.getDocumentFileName()).containsPattern(
             Pattern.compile("Draft Adjournment Notice generated on \\d{1,2}-\\d{1,2}-\\d{4}\\.pdf"));
         return result;
-    }
-
-    private void noticeGeneratedWithExpectedDetailsAndDate(String generatedDate) throws Exception {
-        PreSubmitCallbackResponse<SscsCaseData> result = noticeGeneratedWithExpectedDetails();
-        assertThat(result.getData().getAdjournCaseGeneratedDate()).isEqualTo(generatedDate);
     }
 
     private static void checkPayloadDetailsNoVenue(
