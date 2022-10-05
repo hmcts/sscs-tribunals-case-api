@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -83,7 +84,7 @@ public class AdjournCaseIT extends AbstractEventIt {
     public void testMidEventCallbackWithDueDateInFuture() throws Exception {
         setup();
         setJsonAndReplace(NOT_LISTED_STRAIGHT_AWAY_WITH_DIRECTIONS_MADE_JSON,
-            List.of("DIRECTIONS_DUE_DATE_PLACEHOLDER"),
+            List.of(DIRECTIONS_DUE_DATE_PLACEHOLDER),
             List.of(LocalDate.now().plus(1, ChronoUnit.DAYS).toString()));
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEvent"));
@@ -97,9 +98,9 @@ public class AdjournCaseIT extends AbstractEventIt {
     @Test
     public void testAdjournNotice() throws Exception {
         setup();
-        setJsonAndReplace(NOT_LISTED_STRAIGHT_AWAY_WITH_DIRECTIONS_MADE_JSON, "DIRECTIONS_DUE_DATE_PLACEHOLDER", DATE_2019);
+        setJsonAndReplace(NOT_LISTED_STRAIGHT_AWAY_WITH_DIRECTIONS_MADE_JSON, DIRECTIONS_DUE_DATE_PLACEHOLDER, DATE_2019);
 
-        assertNoticeGeneratedWithExpectedDetails();
+        noticeGeneratedWithExpectedDetails();
     }
 
 
@@ -116,55 +117,26 @@ public class AdjournCaseIT extends AbstractEventIt {
      * date in the preview document hasn't been set.
      *
      */
-    @Ignore
+    @DisplayName("Call to about to submit handler will write adjourn notice to case with generated date as now "
+        + "when generated date not set")
     @Test
-    public void callToAboutToSubmitHandler_willWriteAdjournNoticeToCaseWithGeneratedDateAsNowWhenGeneratedDateNotSet() throws Exception {
+    @Ignore // TODO amend to expect "something has gone wrong" error
+    public void testDateNotSet() throws Exception {
         setup();
         setJsonAndReplace(
-            "callback/adjournCaseValidSubmissionWithNullGeneratedDate.json", "DIRECTIONS_DUE_DATE_PLACEHOLDER", DATE_2019);
+            "callback/adjournCaseValidSubmissionWithNullGeneratedDate.json", DIRECTIONS_DUE_DATE_PLACEHOLDER, DATE_2019);
 
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, CCD_ABOUT_TO_SUBMIT));
-        assertHttpStatus(response, HttpStatus.OK);
-        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-
-        assertThat(result.getErrors()).isEmpty();
-
-        assertThat(result.getData().getOutcome()).isNull();
-
-        assertThat(result.getData().getSscsDocument().get(0).getValue().getDocumentType()).isEqualTo(DRAFT_ADJOURNMENT_NOTICE.getValue());
-        assertThat(result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded()).isEqualTo(LocalDate.now().toString());
-        assertThat(result.getData().getSscsDocument().get(0).getValue().getDocumentFileName()).isEqualTo("Draft Adjournment Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf");
-
-        assertThat(result.getData().getAdjournCaseGeneratedDate()).isEqualTo(LocalDate.now().toString());
+        noticeGeneratedWithExpectedDetailsAndDate(LocalDate.now().toString());
     }
 
-    /**
-     * This test asserts that whatever the value of the existing generated date from CCD
-     * submitted as part of the payload to the AdjournCaseAboutToSubmitHandler,
-     * then that date is updated to now() after the AdjournCaseAboutToSubmitHandler is called.
-     * This is due to a workaround we have implemented in the AdjournCaseAboutToSubmitHandler
-     *
-     */
-    @Ignore
+    @DisplayName("Call to about to submit handler will write adjourn notice to case with generated date as set")
     @Test
-    public void callToAboutToSubmitHandler_willWriteAdjournNoticeToCaseWithGeneratedDateOfNowWhenGeneratedDateSet() throws Exception {
+    public void testDateSet() throws Exception {
         setup();
         setJsonAndReplace(
-            "callback/adjournCaseValidSubmissionWithSetGeneratedDate.json", "DIRECTIONS_DUE_DATE_PLACEHOLDER", DATE_2019);
+            "callback/adjournCaseValidSubmissionWithSetGeneratedDate.json", DIRECTIONS_DUE_DATE_PLACEHOLDER, DATE_2019);
 
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
-        assertHttpStatus(response, HttpStatus.OK);
-        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-
-        assertThat(result.getErrors()).isEmpty();
-
-        assertThat(result.getData().getOutcome()).isNull();
-
-        assertThat(result.getData().getSscsDocument().get(0).getValue().getDocumentType()).isEqualTo(DRAFT_ADJOURNMENT_NOTICE.getValue());
-        assertThat(result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded()).isEqualTo(LocalDate.now().toString());
-        assertThat(result.getData().getSscsDocument().get(0).getValue().getDocumentFileName()).isEqualTo("Draft Adjournment Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf");
-
-        assertThat(result.getData().getAdjournCaseGeneratedDate()).isEqualTo(LocalDate.now().toString());
+        noticeGeneratedWithExpectedDetailsAndDate("2018-01-01");
     }
 
     @DisplayName("Call to about to submit handler will write manually uploaded adjourn notice to case")
@@ -173,7 +145,7 @@ public class AdjournCaseIT extends AbstractEventIt {
     public void testManuallyUploadedAdjournNotice() throws Exception {
         setup("callback/adjournCaseManuallyGenerated.json");
         
-        assertNoticeGeneratedWithExpectedDetails();
+        noticeGeneratedWithExpectedDetails();
     }
 
     @DisplayName("Call to mid event preview adjourn case callback will preview the document for face to face")
@@ -189,7 +161,8 @@ public class AdjournCaseIT extends AbstractEventIt {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final AdjournCaseTemplateBody payload = parentPayload.getAdjournCaseTemplateBody();
 
-        checkPayloadDetailsAtVenue(parentPayload,
+        checkPayloadDetailsAtVenue(
+            parentPayload,
             payload,
             FIRST_IN_THE_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED,
             null
@@ -227,15 +200,8 @@ public class AdjournCaseIT extends AbstractEventIt {
             "callback/adjournCaseGeneratedFaceToFaceWithInterpreterRequiredAndLanguageNotSet.json");
 
         String documentUrl = "document.url";
-        when(generateFile.assemble(any())).thenReturn(documentUrl);
-
-        when(userDetails.getFullName()).thenReturn(JUDGE_FULL_NAME);
-
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
-
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewAdjournCase"));
-        assertHttpStatus(response, HttpStatus.OK);
-        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+        PreSubmitCallbackResponse<SscsCaseData> result =
+            getPreSubmitCallbackResponse(documentUrl);
 
         assertThat(result.getData().getAdjournCasePreviewDocument()).isNull();
 
@@ -342,7 +308,6 @@ public class AdjournCaseIT extends AbstractEventIt {
     public void testPopulateVenueDropdown() throws Exception {
         setup();
         String nextHearingDateSpecificDate = "2020-07-01";
-        final String expectedNextHearingDateSpecificDateInDocument = "01/07/2020";
         setJsonAndReplace("callback/adjournCaseGeneratedFaceToFaceWhenCaseNotListedStraightAwayWithoutDirectionsMade.json",
             "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER",
             nextHearingDateSpecificDate);
@@ -355,7 +320,8 @@ public class AdjournCaseIT extends AbstractEventIt {
         assertThat(results.getListItems()).isNotEmpty();
     }
 
-    private void assertNoticeGeneratedWithExpectedDetails() throws Exception {
+    @NotNull
+    private PreSubmitCallbackResponse<SscsCaseData> noticeGeneratedWithExpectedDetails() throws Exception {
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, CCD_ABOUT_TO_SUBMIT));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
@@ -367,6 +333,12 @@ public class AdjournCaseIT extends AbstractEventIt {
         assertThat(result.getData().getSscsDocument().get(0).getValue().getDocumentType()).isEqualTo(DRAFT_ADJOURNMENT_NOTICE.getValue());
         assertThat(result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded()).isEqualTo(LocalDate.now().toString());
         assertThat(result.getData().getSscsDocument().get(0).getValue().getDocumentFileName()).isEqualTo("Draft Adjournment Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf");
+        return result;
+    }
+
+    private void noticeGeneratedWithExpectedDetailsAndDate(String generatedDate) throws Exception {
+        PreSubmitCallbackResponse<SscsCaseData> result = noticeGeneratedWithExpectedDetails();
+        assertThat(result.getData().getAdjournCaseGeneratedDate()).isEqualTo(generatedDate);
     }
 
 
@@ -444,6 +416,14 @@ public class AdjournCaseIT extends AbstractEventIt {
 
     private void checkDocumentNoErrors() throws Exception {
         String documentUrl = "document.url";
+        PreSubmitCallbackResponse<SscsCaseData> result = getPreSubmitCallbackResponse(documentUrl);
+
+        assertThat(result.getErrors()).isEmpty();
+
+        assertThat(result.getData().getAdjournCasePreviewDocument().getDocumentUrl()).isEqualTo(documentUrl);
+    }
+
+    private PreSubmitCallbackResponse<SscsCaseData> getPreSubmitCallbackResponse(String documentUrl) throws Exception {
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
         when(userDetails.getFullName()).thenReturn(JUDGE_FULL_NAME);
@@ -452,11 +432,7 @@ public class AdjournCaseIT extends AbstractEventIt {
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewAdjournCase"));
         assertHttpStatus(response, HttpStatus.OK);
-        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-
-        assertThat(result.getErrors()).isEmpty();
-
-        assertThat(result.getData().getAdjournCasePreviewDocument().getDocumentUrl()).isEqualTo(documentUrl);
+        return deserialize(response.getContentAsString());
     }
 
 }
