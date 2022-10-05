@@ -34,7 +34,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class AdjournCaseIT extends AbstractEventIt {
+public class AdjournCaseIt extends AbstractEventIt {
 
     public static final String DIRECTIONS_DUE_DATE_PLACEHOLDER = "DIRECTIONS_DUE_DATE_PLACEHOLDER";
     public static final String NOT_LISTED_STRAIGHT_AWAY_WITH_DIRECTIONS_MADE_JSON =
