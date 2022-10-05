@@ -32,20 +32,12 @@ public class AdjournCaseAboutToSubmitHandlerTest extends BaseHandler {
     @DisplayName("Given about to submit callback for Gaps event, should set fields")
     @Test
     public void testGaps() throws IOException {
-        gapsUpdatesInterpreterAndLanguage();
+        expectedFieldsFromJsonWithLanguageAndInterpreterRequired("adjournCaseGapsCallback.json", "spanish", "Yes");
     }
 
     @DisplayName("Given about to submit callback for List Assist event, should set fields")
     @Test
     public void testListAssist() throws IOException {
-        listAssistDoesNotUpdateInterpreterAndLanguage();
-    }
-
-    private void gapsUpdatesInterpreterAndLanguage() throws IOException {
-        expectedFieldsFromJsonWithLanguageAndInterpreterRequired("adjournCaseGapsCallback.json", "spanish", "Yes");
-    }
-
-    private void listAssistDoesNotUpdateInterpreterAndLanguage() throws IOException {
         expectedFieldsFromJsonWithLanguageAndInterpreterRequired("adjournCaseLACallback.json", null, "No");
     }
 
