@@ -9,9 +9,9 @@ import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpSt
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
@@ -103,15 +104,13 @@ public class AdjournCaseIT extends AbstractEventIt {
         noticeGeneratedWithExpectedDetails();
     }
 
-
-
     /**
      * Due to a CCD bug ( https://tools.hmcts.net/jira/browse/RDM-8200 ) we have had
      * to implement a workaround in AdjournCaseAboutToSubmitHandler to set
      * the generated date to now, even though it is already being determined by the
      * preview document handler.  This is because on submission, the correct generated date
      * (the one referenced in the preview document) is being overwritten to a null value.
-     * Once RDM-8200 is fixed and we remove the workaround, this test should be changed
+     * Once RDM-8200 is fixed, and we remove the workaround, this test should be changed
      * to assert that a "something has gone wrong" error is displayed instead of
      * previewing the document, as a null generated date would indicate that the
      * date in the preview document hasn't been set.
@@ -152,21 +151,10 @@ public class AdjournCaseIT extends AbstractEventIt {
     @Test
     public void testFaceToFace() throws Exception {
         setup();
-        json = getJson("callback/adjournCaseGeneratedFaceToFaceWhenCaseNotListedStraightAwayWithoutDirectionsMade.json");
+        json = getJson(
+            "callback/adjournCaseGeneratedFaceToFaceWhenCaseNotListedStraightAwayWithoutDirectionsMade.json");
 
-        checkDocumentNoErrors();
-
-        ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
-        verify(generateFile).assemble(capture.capture());
-        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
-        final AdjournCaseTemplateBody payload = parentPayload.getAdjournCaseTemplateBody();
-
-        checkPayloadDetailsAtVenue(
-            parentPayload,
-            payload,
-            FIRST_IN_THE_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED,
-            null
-        );
+        checkStandardDocumentNoInterpreter();
     }
 
     @DisplayName("Call to mid event preview adjourn case callback will preview the document for face to face "
@@ -219,19 +207,7 @@ public class AdjournCaseIT extends AbstractEventIt {
         json = getJson(
             "callback/adjournCaseGeneratedFaceToFaceWithInterpreterNotRequiredAndLanguageSet.json");
 
-        checkDocumentNoErrors();
-
-        ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
-        verify(generateFile).assemble(capture.capture());
-        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
-        final AdjournCaseTemplateBody payload = parentPayload.getAdjournCaseTemplateBody();
-
-        checkPayloadDetailsAtVenue(
-            parentPayload,
-            payload,
-            FIRST_IN_THE_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED,
-            null
-        );
+        checkStandardDocumentNoInterpreter();
     }
 
     @DisplayName("Call to mid event preview adjourn case callback will preview the document for telephone")
@@ -320,6 +296,22 @@ public class AdjournCaseIT extends AbstractEventIt {
         assertThat(results.getListItems()).isNotEmpty();
     }
 
+    private void checkStandardDocumentNoInterpreter() throws Exception {
+        checkDocumentNoErrors();
+
+        ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
+        verify(generateFile).assemble(capture.capture());
+        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
+        final AdjournCaseTemplateBody payload = parentPayload.getAdjournCaseTemplateBody();
+
+        checkPayloadDetailsAtVenue(
+            parentPayload,
+            payload,
+            FIRST_IN_THE_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED,
+            null
+        );
+    }
+
     @NotNull
     private PreSubmitCallbackResponse<SscsCaseData> noticeGeneratedWithExpectedDetails() throws Exception {
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, CCD_ABOUT_TO_SUBMIT));
@@ -330,9 +322,11 @@ public class AdjournCaseIT extends AbstractEventIt {
 
         assertThat(result.getData().getOutcome()).isNull();
 
-        assertThat(result.getData().getSscsDocument().get(0).getValue().getDocumentType()).isEqualTo(DRAFT_ADJOURNMENT_NOTICE.getValue());
-        assertThat(result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded()).isEqualTo(LocalDate.now().toString());
-        assertThat(result.getData().getSscsDocument().get(0).getValue().getDocumentFileName()).isEqualTo("Draft Adjournment Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf");
+        SscsDocumentDetails document = result.getData().getSscsDocument().get(0).getValue();
+        assertThat(document.getDocumentType()).isEqualTo(DRAFT_ADJOURNMENT_NOTICE.getValue());
+        assertThat(document.getDocumentDateAdded()).isEqualTo(LocalDate.now().toString());
+        assertThat(document.getDocumentFileName()).containsPattern(
+            Pattern.compile("Draft Adjournment Notice generated on \\d{1,2}-\\d{1,2}-\\d{4}\\.pdf"));
         return result;
     }
 
@@ -340,7 +334,6 @@ public class AdjournCaseIT extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = noticeGeneratedWithExpectedDetails();
         assertThat(result.getData().getAdjournCaseGeneratedDate()).isEqualTo(generatedDate);
     }
-
 
     private static void checkPayloadDetailsNoVenue(
         NoticeIssuedTemplateBody parentPayload,
@@ -350,15 +343,8 @@ public class AdjournCaseIT extends AbstractEventIt {
         String nextHearingTimeslot,
         String hearingType
     ) {
-        checkPayloadDetails(
-            parentPayload,
-            payload,
-            nextHearingDate,
-            nextHearingType,
-            nextHearingTimeslot,
-            hearingType,
-            null
-        );
+        checkPayloadDetails(parentPayload, payload, nextHearingDate, nextHearingType,
+            nextHearingTimeslot, hearingType, null);
         assertThat(payload.isNextHearingAtVenue()).isFalse();
         assertThat(payload.getNextHearingVenue()).isNull();
     }
@@ -369,15 +355,8 @@ public class AdjournCaseIT extends AbstractEventIt {
         String nextHearingDate,
         String interpreterDescription
     ) {
-        checkPayloadDetails(
-            parentPayload,
-            payload,
-            nextHearingDate,
-            FACE_TO_FACE_HEARING,
-            A_STANDARD_TIME_SLOT,
-            FACE_TO_FACE,
-            interpreterDescription
-        );
+        checkPayloadDetails(parentPayload, payload, nextHearingDate, FACE_TO_FACE_HEARING,
+            A_STANDARD_TIME_SLOT, FACE_TO_FACE, interpreterDescription);
         assertThat(payload.isNextHearingAtVenue()).isTrue();
         assertThat(payload.getNextHearingVenue()).isEqualTo(CHESTER_MAGISTRATE_S_COURT);
     }
