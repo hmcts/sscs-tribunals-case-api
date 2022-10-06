@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -11,6 +12,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +53,7 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
+        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).dwpIsOfficerAttending("Yes").build();
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
@@ -59,7 +62,6 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Test
     public void givenValidCallback_thenReturnTrue() {
-
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
     }
 
@@ -162,5 +164,30 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
             USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void givenAHmctsResponseReviewedEventWithDwpIsOfficerAttending_thenSetPoToAttendValue() {
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response.getData().getSchedulingAndListingFields()
+            .getDefaultOverrideFields().getPoToAttend());
+        assertEquals(YES, response.getData().getSchedulingAndListingFields()
+            .getDefaultOverrideFields().getPoToAttend());
+    }
+
+    @Test
+    public void givenDefaultOverrideValuesWithNoAttendWillBeUpdatedByDwpIsOfficerAttendingValue() {
+        OverrideFields defaultOverrideFields = OverrideFields.builder()
+            .poToAttend(NO)
+            .build();
+
+        callback.getCaseDetails().getCaseData().getSchedulingAndListingFields()
+            .setDefaultOverrideFields(defaultOverrideFields);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(YES, response.getData().getSchedulingAndListingFields()
+            .getDefaultOverrideFields().getPoToAttend());
     }
 }
