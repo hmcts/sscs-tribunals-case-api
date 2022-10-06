@@ -32,7 +32,7 @@ public class AdditionalComposeServiceRunner {
         for (String additionalService : additionalFiles) {
             String path = BASE_COMPOSE_PATH + additionalService;
 
-            ProcessBuilder processBuilder = new ProcessBuilder("docker", "compose", "-f", path, "up")
+            ProcessBuilder processBuilder = new ProcessBuilder("docker", "compose", "-f", path, "up", "-d")
                 .inheritIO();
 
             Process process = processBuilder.start();
