@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ListingValues;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -86,15 +86,15 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
     }
 
     private void setDefaultOverrideFields(SscsCaseData sscsCaseData) {
-        OverrideFields defaultOverrideFields = sscsCaseData.getSchedulingAndListingFields().getDefaultOverrideFields();
-        if (isNull(defaultOverrideFields)) {
-            defaultOverrideFields = OverrideFields.builder()
+        ListingValues defaultListingValues = sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues();
+        if (isNull(defaultListingValues)) {
+            defaultListingValues = ListingValues.builder()
                 .poToAttend(YesNo.isYes(sscsCaseData.getDwpIsOfficerAttending()) ? YesNo.YES : YesNo.NO)
                 .build();
         } else {
-            defaultOverrideFields.setPoToAttend(YesNo.isYes(sscsCaseData.getDwpIsOfficerAttending())
+            defaultListingValues.setPoToAttend(YesNo.isYes(sscsCaseData.getDwpIsOfficerAttending())
                 ? YesNo.YES : YesNo.NO);
         }
-        sscsCaseData.getSchedulingAndListingFields().setDefaultOverrideFields(defaultOverrideFields);
+        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(defaultListingValues);
     }
 }

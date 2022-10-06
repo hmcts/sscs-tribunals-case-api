@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ListingValues;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -59,11 +60,11 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
                 schedulingAndListingFields.setOverrideFields(overrideFields);
             }
 
-            OverrideFields listingValues = schedulingAndListingFields.getDefaultOverrideFields();
+            ListingValues listingValues = schedulingAndListingFields.getDefaultListingValues();
 
             if (isNull(listingValues)) {
-                listingValues = new OverrideFields();
-                schedulingAndListingFields.setDefaultOverrideFields(listingValues);
+                listingValues = new ListingValues();
+                schedulingAndListingFields.setDefaultListingValues(listingValues);
             }
 
             utils.generateInterpreterLanguageFields(overrideFields);
