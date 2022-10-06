@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
@@ -35,7 +36,11 @@ public class GenerateCoversheetAboutToSubmitHandlerTest {
     public void setUp() {
         openMocks(this);
         when(callback.getEvent()).thenReturn(EventType.GENERATE_COVERSHEET);
-        SscsCaseData sscsCaseData = SscsCaseData.builder().previewDocument(DocumentLink.builder().build()).build();
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .documentStaging(DocumentStaging.builder()
+                .previewDocument(DocumentLink.builder().build())
+                .build())
+            .build();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         handler = new GenerateCoversheetAboutToSubmitHandler();
@@ -50,6 +55,6 @@ public class GenerateCoversheetAboutToSubmitHandlerTest {
     @Test
     public void setsThePreviewDocumentFieldToNull() {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getPreviewDocument());
+        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
     }
 }

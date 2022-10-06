@@ -32,18 +32,12 @@ public class IssueDocumentHandler {
     protected void clearTransientFields(SscsCaseData caseData, State beforeState) {
         clearBasicTransientFields(caseData);
         caseData.setExtensionNextEventDl(null);
-        caseData.setSignedBy(null);
-        caseData.setSignedRole(null);
-
     }
 
     protected void clearBasicTransientFields(SscsCaseData caseData) {
-        caseData.setBodyContent(null);
-        caseData.setDirectionNoticeContent(null);
-        caseData.setPreviewDocument(null);
-        caseData.setGenerateNotice(null);
+        caseData.setDocumentGeneration(DocumentGeneration.builder().build());
+        caseData.setDocumentStaging(DocumentStaging.builder().build());
         caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(null);
-        caseData.setDateAdded(null);
         caseData.setSscsInterlocDirectionDocument(null);
         caseData.setSscsInterlocDecisionDocument(null);
         caseData.setAdjournCasePreviewDocument(null);
@@ -57,11 +51,11 @@ public class IssueDocumentHandler {
                 .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
                 .shouldHideNino(isBenefitTypeValidToHideNino(caseData.getBenefitType()))
                 .respondents(getRespondents(caseData))
-                .noticeBody(Optional.ofNullable(caseData.getBodyContent())
-                        .orElse(caseData.getDirectionNoticeContent()))
-                .userName(caseData.getSignedBy())
+                .noticeBody(Optional.ofNullable(caseData.getDocumentGeneration().getBodyContent())
+                        .orElse(caseData.getDocumentGeneration().getDirectionNoticeContent()))
+                .userName(caseData.getDocumentGeneration().getSignedBy())
                 .noticeType(documentTypeLabel.toUpperCase())
-                .userRole(caseData.getSignedRole())
+                .userRole(caseData.getDocumentGeneration().getSignedRole())
                 .dateAdded(dateAdded)
                 .generatedDate(generatedDate)
                 .build();
@@ -120,7 +114,7 @@ public class IssueDocumentHandler {
 
         String documentUrl = Optional.ofNullable(getDocumentFromCaseData(caseData)).map(DocumentLink::getDocumentUrl).orElse(null);
 
-        LocalDate dateAdded = Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now());
+        LocalDate dateAdded = Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now());
 
         String documentTypeLabel = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
 
@@ -166,7 +160,7 @@ public class IssueDocumentHandler {
      * Override this method if previewDocument is not the correct field to set.
      */
     protected void setDocumentOnCaseData(SscsCaseData caseData, DocumentLink file) {
-        caseData.setPreviewDocument(file);
+        caseData.getDocumentStaging().setPreviewDocument(file);
     }
 
     /**
@@ -175,7 +169,7 @@ public class IssueDocumentHandler {
      * @return DocumentLink
      */
     protected DocumentLink getDocumentFromCaseData(SscsCaseData caseData) {
-        return caseData.getPreviewDocument();
+        return caseData.getDocumentStaging().getPreviewDocument();
     }
 
     protected String buildFullName(SscsCaseData caseData) {

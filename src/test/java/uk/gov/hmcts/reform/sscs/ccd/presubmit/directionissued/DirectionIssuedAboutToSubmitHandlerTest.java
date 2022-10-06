@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.DIRECTION_ACTION_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REJECT_HEARING_RECORDING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
@@ -94,28 +95,32 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         docs.add(document);
 
         sscsCaseData = SscsCaseData.builder()
-                .generateNotice("Yes")
+            .documentGeneration(DocumentGeneration.builder()
+                .generateNotice(YES)
                 .signedBy("User")
-                .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
                 .signedRole("Judge")
+                .build())
+            .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
+            .documentStaging(DocumentStaging.builder()
                 .dateAdded(LocalDate.now().minusDays(1))
-                .sscsDocument(docs)
                 .previewDocument(DocumentLink.builder()
-                        .documentUrl(DOCUMENT_URL)
-                        .documentBinaryUrl(DOCUMENT_URL + "/binary")
-                        .documentFilename("directionIssued.pdf")
-                        .build())
-                .appeal(Appeal.builder()
-                        .appellant(Appellant.builder()
-                                .name(Name.builder().build())
-                                .identity(Identity.builder().build())
-                                .build())
-                        .build()).build();
+                    .documentUrl(DOCUMENT_URL)
+                    .documentBinaryUrl(DOCUMENT_URL + "/binary")
+                    .documentFilename("directionIssued.pdf")
+                    .build())
+                .build())
+            .sscsDocument(docs)
+            .appeal(Appeal.builder()
+                    .appellant(Appellant.builder()
+                            .name(Name.builder().build())
+                            .identity(Identity.builder().build())
+                            .build())
+                    .build()).build();
 
         expectedDocument = SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
-                        .documentFileName(sscsCaseData.getPreviewDocument().getDocumentFilename())
-                        .documentLink(sscsCaseData.getPreviewDocument())
+                        .documentFileName(sscsCaseData.getDocumentStaging().getPreviewDocument().getDocumentFilename())
+                        .documentLink(sscsCaseData.getDocumentStaging().getPreviewDocument())
                         .documentDateAdded(LocalDate.now().minusDays(1).toString())
                         .documentType(DocumentType.DIRECTION_NOTICE.getValue())
                         .build()).build();
@@ -162,11 +167,11 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     public void willCopyThePreviewFileToTheInterlocDirectionDocumentAndAddFooter() {
         when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getPreviewDocument());
-        assertNull(response.getData().getSignedBy());
-        assertNull(response.getData().getSignedRole());
-        assertNull(response.getData().getGenerateNotice());
-        assertNull(response.getData().getDateAdded());
+        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
+        assertNull(response.getData().getDocumentGeneration().getSignedBy());
+        assertNull(response.getData().getDocumentGeneration().getSignedRole());
+        assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
+        assertNull(response.getData().getDocumentStaging().getDateAdded());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(DocumentType.DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         assertNull(response.getData().getInterlocReviewState());
@@ -175,7 +180,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void givenDirectionNoticeAlreadyExistsAndThenManuallyUploadANewNotice_thenIssueTheNewDocumentWithFooter() {
-        sscsCaseData.setPreviewDocument(null);
+        sscsCaseData.getDocumentStaging().setPreviewDocument(null);
 
         List<SscsDocument> sscsDocuments = new ArrayList<>();
         SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder()
@@ -510,7 +515,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     @Parameters({"file.png", "file.jpg", "file.doc"})
     public void givenManuallyUploadedFileIsNotAPdf_thenAddAnErrorToResponse(String filename) {
-        sscsCaseData.setPreviewDocument(null);
+        sscsCaseData.getDocumentStaging().setPreviewDocument(null);
 
         SscsInterlocDirectionDocument theDocument = SscsInterlocDirectionDocument.builder()
                 .documentType(DocumentType.DECISION_NOTICE.getValue())
@@ -529,7 +534,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void givenNoPdfIsUploaded_thenAddAnErrorToResponse() {
-        sscsCaseData.setPreviewDocument(null);
+        sscsCaseData.getDocumentStaging().setPreviewDocument(null);
 
         sscsCaseData.setSscsInterlocDirectionDocument(null);
 

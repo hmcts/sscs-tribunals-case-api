@@ -19,7 +19,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Note;
@@ -149,7 +151,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     }
 
     private void addDirectionNotice(SscsCaseData caseData) {
-        DocumentLink url = caseData.getPreviewDocument();
+        DocumentLink url = caseData.getDocumentStaging().getPreviewDocument();
         String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         SscsDocumentTranslationStatus documentTranslationStatus = null;
         if (caseData.isLanguagePreferenceWelsh()) {
@@ -175,14 +177,9 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     }
 
     private void clearTransientFields(SscsCaseData caseData) {
-        caseData.setBodyContent(null);
-        caseData.setDirectionNoticeContent(null);
-        caseData.setPreviewDocument(null);
-        caseData.setGenerateNotice(null);
+        caseData.setDocumentGeneration(DocumentGeneration.builder().build());
+        caseData.setDocumentStaging(DocumentStaging.builder().build());
         caseData.setReservedToJudge(null);
-        caseData.setSignedBy(null);
-        caseData.setSignedRole(null);
-        caseData.setDateAdded(null);
         caseData.setTempNoteDetail(null);
         caseData.setShowRip1DocPage(null);
 

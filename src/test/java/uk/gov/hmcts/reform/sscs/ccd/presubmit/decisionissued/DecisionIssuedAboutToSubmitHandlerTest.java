@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DecisionType.STRIKE_OUT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.STRUCK_OUT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -34,7 +35,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
@@ -98,34 +101,38 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         docs.add(document);
 
         sscsCaseData = SscsCaseData.builder()
-                .state(State.INTERLOCUTORY_REVIEW_STATE)
-                .generateNotice("Yes")
+            .state(State.INTERLOCUTORY_REVIEW_STATE)
+            .documentGeneration(DocumentGeneration.builder()
+                .generateNotice(YES)
                 .signedBy("User")
                 .signedRole("Judge")
+                .build())
+            .documentStaging(DocumentStaging.builder()
                 .dateAdded(LocalDate.now().minusDays(1))
-                .sscsDocument(docs)
-                .decisionType(STRIKE_OUT.getValue())
-                .directionDueDate("01/02/2020")
                 .previewDocument(DocumentLink.builder()
-                        .documentUrl(DOCUMENT_URL)
-                        .documentBinaryUrl(DOCUMENT_URL + "/binary")
-                        .documentFilename("decisionIssued.pdf")
-                        .build())
-                .appeal(Appeal.builder()
-                        .appellant(Appellant.builder()
-                                .name(Name.builder().build())
-                                .identity(Identity.builder().build())
-                                .build())
-                        .build())
-                .schedulingAndListingFields(SchedulingAndListingFields.builder()
-                        .hearingRoute(HearingRoute.LIST_ASSIST)
-                        .build())
-                .build();
+                    .documentUrl(DOCUMENT_URL)
+                    .documentBinaryUrl(DOCUMENT_URL + "/binary")
+                    .documentFilename("decisionIssued.pdf")
+                    .build())
+                .build())
+            .sscsDocument(docs)
+            .decisionType(STRIKE_OUT.getValue())
+            .directionDueDate("01/02/2020")
+            .appeal(Appeal.builder()
+                    .appellant(Appellant.builder()
+                            .name(Name.builder().build())
+                            .identity(Identity.builder().build())
+                            .build())
+                    .build())
+            .schedulingAndListingFields(SchedulingAndListingFields.builder()
+                    .hearingRoute(HearingRoute.LIST_ASSIST)
+                    .build())
+            .build();
 
         expectedDocument = SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
-                        .documentFileName(sscsCaseData.getPreviewDocument().getDocumentFilename())
-                        .documentLink(sscsCaseData.getPreviewDocument())
+                        .documentFileName(sscsCaseData.getDocumentStaging().getPreviewDocument().getDocumentFilename())
+                        .documentLink(sscsCaseData.getDocumentStaging().getPreviewDocument())
                         .documentDateAdded(LocalDate.now().minusDays(1).toString())
                         .documentType(DocumentType.DECISION_NOTICE.getValue())
                         .build()).build();
@@ -183,11 +190,11 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getPreviewDocument());
-        assertNull(response.getData().getSignedBy());
-        assertNull(response.getData().getSignedRole());
-        assertNull(response.getData().getGenerateNotice());
-        assertNull(response.getData().getDateAdded());
+        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
+        assertNull(response.getData().getDocumentGeneration().getSignedBy());
+        assertNull(response.getData().getDocumentGeneration().getSignedRole());
+        assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
+        assertNull(response.getData().getDocumentStaging().getDateAdded());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()),
                 any(), eq(DocumentType.DECISION_NOTICE), any(), any(), eq(null), eq(null));
@@ -198,7 +205,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void given2ManuallyUploadedDecisionDocumentsOneWithNoDate_thenIssueDocumentWithNoDate() {
-        sscsCaseData.setPreviewDocument(null);
+        sscsCaseData.getDocumentStaging().setPreviewDocument(null);
 
         List<SscsDocument> sscsDocuments = new ArrayList<>();
         SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder()
@@ -291,7 +298,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void givenNoPdfIsUploaded_thenAddAnErrorToResponse() {
-        sscsCaseData.setPreviewDocument(null);
+        sscsCaseData.getDocumentStaging().setPreviewDocument(null);
 
         sscsCaseData.setSscsInterlocDecisionDocument(null);
 
@@ -306,7 +313,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     @Test
     @Parameters({"file.png", "file.jpg", "file.doc"})
     public void givenManuallyUploadedFileIsNotAPdf_thenAddAnErrorToResponse(String filename) {
-        sscsCaseData.setPreviewDocument(null);
+        sscsCaseData.getDocumentStaging().setPreviewDocument(null);
 
         SscsInterlocDecisionDocument theDocument = SscsInterlocDecisionDocument.builder()
                 .documentType(DocumentType.DECISION_NOTICE.getValue())
