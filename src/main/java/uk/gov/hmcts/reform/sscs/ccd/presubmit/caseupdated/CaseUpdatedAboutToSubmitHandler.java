@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
+import uk.gov.hmcts.reform.sscs.service.VenueService;
 
 @Component
 @Slf4j
@@ -41,6 +42,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final DwpAddressLookupService dwpAddressLookupService;
     private final IdamService idamService;
     private final RefDataService refDataService;
+    private final VenueService venueService;
     private final boolean caseAccessManagementFeature;
 
     @SuppressWarnings("squid:S107")
@@ -50,6 +52,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                     DwpAddressLookupService dwpAddressLookupService,
                                     IdamService idamService,
                                     RefDataService refDataService,
+                                    VenueService venueService,
                                     @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
@@ -58,6 +61,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         this.idamService = idamService;
         this.refDataService = refDataService;
         this.caseAccessManagementFeature = caseAccessManagementFeature;
+        this.venueService = venueService;
     }
 
     @Override
@@ -210,23 +214,31 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private void updateProcessingVenueIfRequired(CaseDetails<SscsCaseData> caseDetails, String rpcEpimsId) {
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
         String postCode = resolvePostCode(sscsCaseData);
-        log.info("updateProcessingVenueIfRequired for post code " + postCode);
+        log.info("Checking whether processing venue requires updating for post code {}, case {}", postCode, caseDetails.getId());
+
         String venue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
 
-        log.info("venue i s {}", venue);
         if (venue != null && !venue.equalsIgnoreCase(sscsCaseData.getProcessingVenue())) {
-            log.info("Case id: {} - setting venue name to {} from {}", caseDetails.getId(), venue, sscsCaseData.getProcessingVenue());
+            log.info("Processing venue requires updating for case {}: setting venue name to {} from {}", caseDetails.getId(), venue,
+                sscsCaseData.getProcessingVenue());
 
             sscsCaseData.setProcessingVenue(venue);
 
             if (caseAccessManagementFeature && StringUtils.isNotEmpty(venue)) {
-                CourtVenue courtVenue = refDataService.getVenueRefData(venue);
-                if (courtVenue != null) {
-                    sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
-                            .baseLocation(rpcEpimsId)
-                            .region(courtVenue.getRegionId()).build());
-                }
+                String venueEpimsId = venueService.getEpimsIdForVenue(venue);
+                CourtVenue courtVenue = refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId);
+
+                sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
+                    .baseLocation(rpcEpimsId)
+                    .region(courtVenue.getRegionId()).build());
+
+                log.info("Successfully updated case management location details for case {}. Processing venue {}, epimsId {}",
+                    caseDetails.getId(), venue, venueEpimsId);
+
             }
+        } else {
+            log.info("Processing venue has not changed or is null, skipping update for case {}, venue: {}",
+                caseDetails.getId(), venue);
         }
     }
 
