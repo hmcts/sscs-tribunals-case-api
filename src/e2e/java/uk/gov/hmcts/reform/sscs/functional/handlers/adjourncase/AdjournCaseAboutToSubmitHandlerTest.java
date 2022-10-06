@@ -32,34 +32,19 @@ public class AdjournCaseAboutToSubmitHandlerTest extends BaseHandler {
     @DisplayName("Given about to submit callback for Gaps event, should set fields")
     @Test
     public void testGaps() throws IOException {
-        expectedFieldsFromJsonWithLanguageAndInterpreterRequired("adjournCaseGapsCallback.json", "spanish", "Yes");
-    }
-
-    @DisplayName("Given about to submit callback for List Assist event, should set fields")
-    @Test
-    public void testListAssist() throws IOException {
-        expectedFieldsFromJsonWithLanguageAndInterpreterRequired("adjournCaseLACallback.json", null, "No");
-    }
-
-    private void expectedFieldsFromJsonWithLanguageAndInterpreterRequired(
-        String jsonPath,
-        String language,
-        String interpreter
-    ) throws IOException {
         String response = RestAssured.given()
             .log().method().log().headers().log().uri().log().body(true)
             .contentType(ContentType.JSON)
             .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
             .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
-            .body(getJsonCallbackForTest("handlers/adjourncase/" + jsonPath))
+            .body(getJsonCallbackForTest("handlers/adjourncase/adjournCaseGapsCallback.json"))
             .post("/ccdAboutToSubmit")
             .then()
             .statusCode(HttpStatus.SC_OK)
             .log().all(true).extract().body().asString();
 
-
         JsonNode root = mapper.readTree(response);
-        SscsCaseData result = mapper.readValue(root.path("data").toPrettyString(), new TypeReference<SscsCaseData>(){});
+        SscsCaseData result = mapper.readValue(root.path("data").toPrettyString(), new TypeReference<>(){});
 
         assertThat(result.getAdjournCaseAdditionalDirections())
             .hasSize(1)
@@ -87,7 +72,7 @@ public class AdjournCaseAboutToSubmitHandlerTest extends BaseHandler {
             .extracting(CollectionItem::getValue)
             .containsOnly("Testing reason");
         assertThat(result.getAdjournCasePreviewDocument().getDocumentUrl()).isNotNull();
-        assertThat(result.getAppeal().getHearingOptions().getLanguages()).isEqualTo(language);
-        assertThat(result.getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo(interpreter);
+        assertThat(result.getAppeal().getHearingOptions().getLanguages()).isEqualTo("spanish");
+        assertThat(result.getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo("Yes");
     }
 }
