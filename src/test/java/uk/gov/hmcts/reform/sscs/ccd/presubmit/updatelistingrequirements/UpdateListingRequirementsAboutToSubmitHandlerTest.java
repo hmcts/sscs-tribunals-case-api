@@ -79,7 +79,11 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
     public void handleUpdateListingRequirementsNonGapsSwitchOverFeature() {
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", false);
         sscsCaseData = CaseDataUtils.buildCaseData();
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
         assertEquals(0, response.getErrors().size());
     }
 
@@ -97,7 +101,11 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
             anyString(),any(HearingRoute.class),any(HearingState.class),eq(null)))
             .willReturn(true);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
         assertEquals(0, response.getErrors().size());
 
         assertThat(response.getData()).isNotNull();
@@ -119,7 +127,11 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
             anyString(),any(HearingRoute.class),any(HearingState.class),eq(null)))
             .willReturn(false);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
         assertEquals(1, response.getErrors().size());
 
         assertThat(response.getData()).isNotNull();
@@ -129,7 +141,11 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
     public void handleUpdateListingRequirementsGapsSwitchOverFeatureNoOverrides() {
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
         assertEquals(0, response.getErrors().size());
     }
 
@@ -140,7 +156,11 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
         given(caseDetails.getState()).willReturn(State.UNKNOWN);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
         assertEquals(0, response.getErrors().size());
     }
 }
