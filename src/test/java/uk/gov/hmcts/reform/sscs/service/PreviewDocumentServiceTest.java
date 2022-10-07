@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 @RunWith(MockitoJUnitRunner.class)
 public class PreviewDocumentServiceTest {
 
+    public static final String OLD_DRAFT_DOC = "oldDraft.doc";
     @InjectMocks
     private PreviewDocumentService previewDocumentService;
     private SscsCaseData sscsCaseData;
@@ -31,7 +32,7 @@ public class PreviewDocumentServiceTest {
         List<SscsDocument> docs = new ArrayList<>(List.of(
             SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
-                    .documentFileName("oldDraft.doc")
+                    .documentFileName(OLD_DRAFT_DOC)
                     .documentType(DRAFT_ADJOURNMENT_NOTICE.getValue())
                     .build())
                 .build()
@@ -45,7 +46,7 @@ public class PreviewDocumentServiceTest {
 
     @DisplayName("Given draft adjournment notice already exists on case, then overwrite existing draft")
     @Test
-    public void testOverwriteDraft() {
+    public void givenDraftAdjournmentNoticeAlreadyExists_thenOverwritesExistingDraft() {
         previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, sscsCaseData.getAdjournCasePreviewDocument());
 
         assertThat(sscsCaseData.getSscsDocument())
