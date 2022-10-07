@@ -45,7 +45,8 @@ public class AdjournCaseIt extends AbstractEventIt {
     public static final String NINO = "JT 12 34 56 D";
     public static final String DRAFT_ADJOURNMENT_NOTICE1 = "DRAFT ADJOURNMENT NOTICE";
     public static final String CHESTER_MAGISTRATE_S_COURT = "Chester Magistrate's Court";
-    public static final String FIRST_IN_THE_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED = "It will be first in the morning session on a date to be fixed";
+    public static final String FIRST_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED =
+        "It will be first in the morning session on a date to be fixed";
     public static final String FACE_TO_FACE_HEARING = "face to face hearing";
     public static final String A_STANDARD_TIME_SLOT = "a standard time slot";
     public static final String JUDGE_FULL_NAME = "Judge Full Name";
@@ -64,7 +65,7 @@ public class AdjournCaseIt extends AbstractEventIt {
 
     @DisplayName("Call to mid event callback when path is YES NO YES will validate the data when due date in past")
     @Test
-    public void testMidEventCallbackWithDueDateInPast() throws Exception {
+    public void givenCallToMidEventCallbackWithPathYesNoYesThenValidatesDataWithDueDateInPast() throws Exception {
         setup();
         setJsonAndReplace(NOT_LISTED_STRAIGHT_AWAY_WITH_DIRECTIONS_MADE_JSON,
             List.of(DIRECTIONS_DUE_DATE_PLACEHOLDER),
@@ -80,7 +81,7 @@ public class AdjournCaseIt extends AbstractEventIt {
 
     @DisplayName("Call to mid event callback when path is YES NO YES will validate the data when due date in future")
     @Test
-    public void testMidEventCallbackWithDueDateInFuture() throws Exception {
+    public void givenCallToMidEventCallbackWithPathYesNoYesThenValidatesDataWhenDueDateInFuture() throws Exception {
         setup();
         setJsonAndReplace(NOT_LISTED_STRAIGHT_AWAY_WITH_DIRECTIONS_MADE_JSON,
             List.of(DIRECTIONS_DUE_DATE_PLACEHOLDER),
@@ -95,7 +96,7 @@ public class AdjournCaseIt extends AbstractEventIt {
 
     @DisplayName("Call to about to submit handler will write adjourn notice to case")
     @Test
-    public void testAdjournNotice() throws Exception {
+    public void givenCallToAboutToSubmitHandlerThenWritesAdjournNoticeToCase() throws Exception {
         setup();
         setJsonAndReplace(NOT_LISTED_STRAIGHT_AWAY_WITH_DIRECTIONS_MADE_JSON, DIRECTIONS_DUE_DATE_PLACEHOLDER, DATE_2019);
 
@@ -104,7 +105,7 @@ public class AdjournCaseIt extends AbstractEventIt {
 
     @DisplayName("Call to about to submit handler will write adjourn notice to case with generated date as set")
     @Test
-    public void testDateSet() throws Exception {
+    public void givenCallToAboutToSubmitHandlerThenWritesAdjournNoticeToCaseWithGeneratedDateAsSet() throws Exception {
         setup();
         setJsonAndReplace(
             "callback/adjournCaseValidSubmissionWithSetGeneratedDate.json", DIRECTIONS_DUE_DATE_PLACEHOLDER, DATE_2019);
@@ -116,7 +117,7 @@ public class AdjournCaseIt extends AbstractEventIt {
     @DisplayName("Call to about to submit handler will write manually uploaded adjourn notice to case")
     @Test
     //FIXME: Might need to improve the data for this test once manual route has been fully implemented
-    public void testManuallyUploadedAdjournNotice() throws Exception {
+    public void givenCallToAboutToSubmitHandlerThenWritesManuallyUploadedAdjournNoticeToCase() throws Exception {
         setup("callback/adjournCaseManuallyGenerated.json");
         
         noticeGeneratedWithExpectedDetails();
@@ -124,7 +125,7 @@ public class AdjournCaseIt extends AbstractEventIt {
 
     @DisplayName("Call to mid event preview adjourn case callback will preview the document for face to face")
     @Test
-    public void testFaceToFace() throws Exception {
+    public void givenCallToMidEventPreviewAdjournCaseCallbackThenPreviewsTheDocumentForFaceToFace() throws Exception {
         setup();
         json = getJson(
             "callback/adjournCaseGeneratedFaceToFaceWhenCaseNotListedStraightAwayWithoutDirectionsMade.json");
@@ -135,7 +136,9 @@ public class AdjournCaseIt extends AbstractEventIt {
     @DisplayName("Call to mid event preview adjourn case callback will preview the document for face to face "
         + "when interpreter required and language set")
     @Test
-    public void testFaceToFaceWithInterpreterAndLanguage() throws Exception {
+    public void givenCallToMidEventPreviewAdjournCaseCallbackThenPreviewsTheDocumentForFaceToFaceWhenInterpreterRequiredAndLanguageSet()
+        throws Exception
+    {
         setup();
         json =  getJson(
             "callback/adjournCaseGeneratedFaceToFaceWithInterpreterRequiredAndLanguageSet.json");
@@ -157,7 +160,9 @@ public class AdjournCaseIt extends AbstractEventIt {
     @DisplayName("Call to mid event preview adjourn case callback will not preview the document for face to face "
         + "when interpreter required and language not set")
     @Test
-    public void testFaceToFaceWithInterpreterAndNoLanguage() throws Exception {
+    public void givenCallToMidEventPreviewAdjournCaseCallbackThenPreviewsTheDocumentForFaceToFaceWhenInterpreterRequiredAndLanguageNotSet()
+        throws Exception
+    {
         setup();
         json =  getJson(
             "callback/adjournCaseGeneratedFaceToFaceWithInterpreterRequiredAndLanguageNotSet.json");
@@ -177,7 +182,9 @@ public class AdjournCaseIt extends AbstractEventIt {
     @DisplayName("Call to mid event preview adjourn case callback will preview the document for face to face "
         + "when interpreter not required and language set")
     @Test
-    public void testFaceToFaceWithNoInterpreterAndLanguage() throws Exception {
+    public void givenCallToMidEventPreviewAdjournCaseCallbackThenPreviewsTheDocumentForFaceToFaceWhenInterpreterNotRequiredAndLanguageSet()
+        throws Exception
+    {
         setup();
         json = getJson(
             "callback/adjournCaseGeneratedFaceToFaceWithInterpreterNotRequiredAndLanguageSet.json");
@@ -187,7 +194,7 @@ public class AdjournCaseIt extends AbstractEventIt {
 
     @DisplayName("Call to mid event preview adjourn case callback will preview the document for telephone")
     @Test
-    public void testTelephone() throws Exception {
+    public void givenCallToMidEventPreviewAdjournCaseCallbackThenPreviewsTheDocumentForTelephone() throws Exception {
         setup();
         json = getJson(
             "callback/adjournCaseGeneratedTelephoneWhenCaseNotListedStraightAwayWithoutDirectionsMade.json");
@@ -201,7 +208,7 @@ public class AdjournCaseIt extends AbstractEventIt {
 
         checkPayloadDetailsNoVenue(parentPayload,
             payload,
-            FIRST_IN_THE_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED,
+            FIRST_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED,
             "telephone hearing",
             A_STANDARD_TIME_SLOT,
             "telephone"
@@ -210,7 +217,7 @@ public class AdjournCaseIt extends AbstractEventIt {
 
     @DisplayName("Call to mid event preview adjourn case callback will preview the document for video")
     @Test
-    public void testVideo() throws Exception {
+    public void givenCallToMidEventPreviewAdjournCaseCallbackThenPreviewsTheDocumentForVideo() throws Exception {
         setup();
         json = getJson(
             "callback/adjournCaseGeneratedVideoWhenCaseNotListedStraightAwayWithoutDirectionsMade.json");
@@ -233,7 +240,7 @@ public class AdjournCaseIt extends AbstractEventIt {
 
     @DisplayName("Call to mid event preview adjourn case callback will preview the document for paper")
     @Test
-    public void testPaper() throws Exception {
+    public void givenCallToMidEventPreviewAdjournCaseCallbackThenPreviewsTheDocumentForPaper() throws Exception {
         setup();
         json = getJson(
             "callback/adjournCaseGeneratedPaperWhenCaseNotListedStraightAwayWithoutDirectionsMade.json");
@@ -247,7 +254,7 @@ public class AdjournCaseIt extends AbstractEventIt {
 
         checkPayloadDetailsNoVenue(parentPayload,
             payload,
-            FIRST_IN_THE_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED,
+            FIRST_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED,
             "decision on the papers",
             null,
             "paper"
@@ -256,7 +263,7 @@ public class AdjournCaseIt extends AbstractEventIt {
 
     @DisplayName("Call to populate venue dropdown will populate next hearing venue selected list")
     @Test
-    public void testPopulateVenueDropdown() throws Exception {
+    public void givenCallToPopulateVenueDropdownThenPopulatesNextHearingVenueSelectedList() throws Exception {
         setup();
         String nextHearingDateSpecificDate = "2020-07-01";
         setJsonAndReplace("callback/adjournCaseGeneratedFaceToFaceWhenCaseNotListedStraightAwayWithoutDirectionsMade.json",
@@ -282,7 +289,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         checkPayloadDetailsAtVenue(
             parentPayload,
             payload,
-            FIRST_IN_THE_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED,
+            FIRST_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED,
             null
         );
     }
