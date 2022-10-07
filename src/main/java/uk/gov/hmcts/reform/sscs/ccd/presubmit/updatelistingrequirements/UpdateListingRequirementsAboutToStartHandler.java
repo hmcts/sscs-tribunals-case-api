@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ListingValues;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -60,10 +59,10 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
                 schedulingAndListingFields.setOverrideFields(overrideFields);
             }
 
-            ListingValues listingValues = schedulingAndListingFields.getDefaultListingValues();
+            OverrideFields listingValues = schedulingAndListingFields.getDefaultListingValues();
 
             if (isNull(listingValues)) {
-                listingValues = new ListingValues();
+                listingValues = new OverrideFields();
                 schedulingAndListingFields.setDefaultListingValues(listingValues);
             }
 

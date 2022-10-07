@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
@@ -16,10 +15,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ListingValues;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 
@@ -54,8 +51,6 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        setDefaultOverrideFields(sscsCaseData);
-
         State state = callback.getCaseDetails().getState();
         HearingRoute hearingRoute = sscsCaseData.getSchedulingAndListingFields().getHearingRoute();
 
@@ -83,18 +78,5 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             }
         }
         return callbackResponse;
-    }
-
-    private void setDefaultOverrideFields(SscsCaseData sscsCaseData) {
-        ListingValues defaultListingValues = sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues();
-        if (isNull(defaultListingValues)) {
-            defaultListingValues = ListingValues.builder()
-                .poToAttend(YesNo.isYes(sscsCaseData.getDwpIsOfficerAttending()) ? YesNo.YES : YesNo.NO)
-                .build();
-        } else {
-            defaultListingValues.setPoToAttend(YesNo.isYes(sscsCaseData.getDwpIsOfficerAttending())
-                ? YesNo.YES : YesNo.NO);
-        }
-        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(defaultListingValues);
     }
 }
