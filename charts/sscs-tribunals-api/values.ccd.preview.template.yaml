@@ -159,6 +159,8 @@ ccd:
     s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     enableKeyVaults: true
     devMode: true
+    postgresUsername: hmcts
+    postgresPassword: hmcts
 
   am-role-assignment-service:
     java:
