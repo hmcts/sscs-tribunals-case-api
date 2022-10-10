@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,13 +66,13 @@ public class IssueAdjournmentNoticeAboutToStartHandlerTest {
     @Test
     public void givenANonIssueAdjournmentEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        assertFalse(handler.canHandle(ABOUT_TO_START, callback));
+        assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
     }
 
     @Test
     @Parameters({"ABOUT_TO_SUBMIT", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
-        assertFalse(handler.canHandle(callbackType, callback));
+        assertThat(handler.canHandle(callbackType, callback)).isFalse();
     }
 
     @Test
@@ -94,7 +93,7 @@ public class IssueAdjournmentNoticeAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         String error = result.getErrors().stream().findFirst().orElse("");
-        assertEquals("No draft adjournment notice found on case. Please use 'Adjourn case' event or upload your adjourn case document.", error);
+        assertThat("No draft adjournment notice found on case. Please use 'Adjourn case' event or upload your adjourn case document.").isEqualTo(error);
     }
 
     @Test(expected = IllegalStateException.class)
