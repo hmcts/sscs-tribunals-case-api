@@ -14,7 +14,7 @@
         <packageUrl regex="true">^pkg:maven/com.fasterxml.jackson.core/jackson-databind@.*$</packageUrl>
         <cve>CVE-2020-36518</cve>
     </suppress>
-    <suppress until = "2022-10-11">
+    <suppress until = "2022-10-21">
         <notes><![CDATA[
         file name: jackson-databind-2.11.4.jar
         ]]></notes>
