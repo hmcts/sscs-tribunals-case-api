@@ -10,7 +10,6 @@
           "value": "Nothing else"
         }
       ],
-      "hearingRoute": "gaps",
       "adjournCaseCanCaseBeListedRightAway": "Yes",
       "adjournCaseDisabilityQualifiedPanelMemberName": "Bob Smith",
       "adjournCaseGenerateNotice": "Yes",
@@ -251,6 +250,7 @@
           }
         ]
       },
+      "hearingRoute": "gaps",
       "interlocReferralDate": "2020-07-21",
       "interlocReviewState": "reviewByJudge",
       "isWaiverNeeded": "Yes",

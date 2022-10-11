@@ -43,6 +43,8 @@ import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 public class AdjournCaseAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
+    public static final String FRENCH = "French";
+    public static final String SPANISH = "Spanish";
 
     @InjectMocks
     private AdjournCaseAboutToSubmitHandler handler;
@@ -110,16 +112,16 @@ public class AdjournCaseAboutToSubmitHandlerTest {
     @Test
     public void givenAdjournmentEventWithLanguageInterpreterRequiredAndCaseHasExistingInterpreter_overwriteExistingInterpreter() {
         callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterRequired(YES.getValue());
-        callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterLanguage("Spanish");
+        callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterLanguage(SPANISH);
         callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder()
             .languageInterpreter(NO.getValue())
-            .languages("French")
+            .languages(FRENCH)
             .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo(YES.getValue());
-        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo("Spanish");
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo(SPANISH);
     }
 
     @DisplayName("Given an adjournment event with language interpreter required and interpreter language set, "
@@ -127,12 +129,12 @@ public class AdjournCaseAboutToSubmitHandlerTest {
     @Test
     public void givenAdjournmentEventWithLanguageInterpreterRequiredAndLanguageSet_thenDoNotDisplayError() {
         callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterRequired(YES.getValue());
-        callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterLanguage("Spanish");
+        callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterLanguage(SPANISH);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo(YES.getValue());
-        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo("Spanish");
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo(SPANISH);
     }
 
     @DisplayName("Given a non callback type, then return false")
