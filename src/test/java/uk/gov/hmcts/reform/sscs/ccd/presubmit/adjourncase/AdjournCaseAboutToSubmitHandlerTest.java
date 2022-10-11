@@ -221,8 +221,8 @@ public class AdjournCaseAboutToSubmitHandlerTest {
 
     private PreSubmitCallbackResponse<SscsCaseData> getResponseWithYesNoCanBeListedAndYesNoDirections(
         YesNo canBeListedRightAway,
-        YesNo directionsBeingMade)
-    {
+        YesNo directionsBeingMade
+    ) {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
         sscsCaseData.setAdjournCaseCanCaseBeListedRightAway(canBeListedRightAway.getValue());
         sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties(directionsBeingMade.getValue());
