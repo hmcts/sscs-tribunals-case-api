@@ -900,6 +900,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         assertEquals(expectedAppointeeName, payload.getAppointeeFullName());
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
+        assertEquals("Appellant Lastname", body.getAppellantName());
         assertEquals(dateOfDecision, body.getDateOfDecision());
         assertEquals(allowed, body.isAllowed());
         assertEquals(isSetAside, body.isSetAside());

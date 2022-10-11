@@ -102,7 +102,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
             writeFinalDecisionBuilder.dateOfDecision(null);
         }
 
-        writeFinalDecisionBuilder.appellantName(buildName(caseData, true));
+        writeFinalDecisionBuilder.appellantName(buildName(caseData, false));
         if ("na".equals(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType())) {
             caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(null);
         }
@@ -204,7 +204,6 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
                     pair.getRight())).collect(Collectors.toList());
 
         descriptors.sort(new DescriptorLexicographicalComparator());
-
         return descriptors;
     }
 

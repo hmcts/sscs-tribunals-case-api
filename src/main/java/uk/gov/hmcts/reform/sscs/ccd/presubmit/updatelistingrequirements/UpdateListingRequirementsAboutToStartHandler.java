@@ -59,11 +59,6 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
             log.info("{} Languages in DynamicList for caseId {}",
                 overrideFields.getAppellantInterpreter().getInterpreterLanguage().getListItems().size(),
                 sscsCaseData.getCcdCaseId());
-
-            utils.generateReservedToJudgeFields(overrideFields);
-            log.info("{} Judges in DynamicList for caseId {}",
-                overrideFields.getReservedToJudge().getReservedMember().getListItems().size(),
-                sscsCaseData.getCcdCaseId());
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);

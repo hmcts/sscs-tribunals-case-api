@@ -17,7 +17,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.7.0'
     id 'org.owasp.dependencycheck' version '6.2.2'
     id 'au.com.dius.pact' version '4.2.14'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.320'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.380'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -345,7 +345,7 @@ dependencyManagement {
         }
 
         //CVE-2022-25857
-        dependencySet(group: 'org.yaml', version: '1.31') {
+        dependencySet(group: 'org.yaml', version: '1.33') {
             entry 'snakeyaml'
         }
 
@@ -395,7 +395,7 @@ dependencies {
     //remove when secure doc store is live
     compile group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.15.6'
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.18.0'
     compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.56'
 
     compile group: 'com.azure', name: 'azure-core', version: versions.azureCore
@@ -435,6 +435,7 @@ dependencies {
     testAnnotationProcessor "org.projectlombok:lombok:$versions.lombok"
     e2eCompile "org.projectlombok:lombok:$versions.lombok"
     e2eAnnotationProcessor "org.projectlombok:lombok:$versions.lombok"
+    integrationTestAnnotationProcessor "org.projectlombok:lombok:$versions.lombok"
 
     testCompile "org.junit.jupiter:junit-jupiter-api:$versions.junitJupiter"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:$versions.junitJupiter"
@@ -615,6 +616,7 @@ bootWithCCD {
     environment 'DOC_ASSEMBLY_URL', 'http://localhost:4631'
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'evidence'
     environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
+    environment 'CASE_ACCESS_MANAGEMENT_FEATURE', 'true'
     environment 'CASE_DOCUMENT_S2S_AUTHORISED_SERVICES', 'ccd_case_document_am_api,ccd_gw,xui_webapp,ccd_data,bulk_scan_processor,sscs'
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,payment-api,xui_webapp,sscs,ccd_case_document_am_api,am_role_assignment_service'
 }

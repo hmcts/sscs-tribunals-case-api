@@ -24,7 +24,7 @@ public final class ProcessAudioVideoActionHelper {
 
         populateActionListWithItems(listOptions, ISSUE_DIRECTIONS_NOTICE);
 
-        if (hasJudgeRole || hasSuperUserRole) {
+        if (hasJudgeRole || hasSuperUserRole || hasTcwRole) {
             populateActionListWithItems(listOptions, ADMIT_EVIDENCE);
             populateActionListWithItems(listOptions, EXCLUDE_EVIDENCE);
         }
