@@ -157,8 +157,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         + "when interpreter required and language set")
     @Test
     public void givenCallToMidEventPreviewAdjournCaseCallbackThenPreviewsTheDocumentForFaceToFaceWhenInterpreterRequiredAndLanguageSet()
-        throws Exception
-    {
+        throws Exception {
         setup();
         json =  getJson(GENERATED_FACE_TO_FACE_WITH_INTERPRETER_REQUIRED_AND_LANGUAGE_SET_JSON);
 
@@ -181,8 +180,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         + "when interpreter required and language not set")
     @Test
     public void givenCallToMidEventPreviewAdjournCaseCallbackThenPreviewsTheDocumentForFaceToFaceWhenInterpreterRequiredAndLanguageNotSet()
-        throws Exception
-    {
+        throws Exception {
         setup();
         json =  getJson(GENERATED_FACE_TO_FACE_WITH_INTERPRETER_REQUIRED_AND_LANGUAGE_NOT_SET_JSON);
 
@@ -200,8 +198,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         + "when interpreter not required and language set")
     @Test
     public void givenCallToMidEventPreviewAdjournCaseCallbackThenPreviewsTheDocumentForFaceToFaceWhenInterpreterNotRequiredAndLanguageSet()
-        throws Exception
-    {
+        throws Exception {
         setup();
         json = getJson(GENERATED_FACE_TO_FACE_WITH_INTERPRETER_NOT_REQUIRED_AND_LANGUAGE_SET_JSON);
 
