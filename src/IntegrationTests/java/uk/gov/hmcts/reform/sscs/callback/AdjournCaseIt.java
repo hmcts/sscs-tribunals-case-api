@@ -4,11 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -37,13 +38,33 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 public class AdjournCaseIt extends AbstractEventIt {
 
     public static final String DIRECTIONS_DUE_DATE_PLACEHOLDER = "DIRECTIONS_DUE_DATE_PLACEHOLDER";
-    public static final String NOT_LISTED_STRAIGHT_AWAY_WITH_DIRECTIONS_MADE_JSON =
+    public static final String GENERATED_VIDEO_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITH_DIRECTIONS_MADE_JSON =
         "callback/adjournCaseGeneratedVideoWhenCaseNotListedStraightAwayWithDirectionsMade.json";
+    public static final String GENERATED_PAPER_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITHOUT_DIRECTIONS_MADE_JSON =
+        "callback/adjournCaseGeneratedPaperWhenCaseNotListedStraightAwayWithoutDirectionsMade.json";
+    public static final String GENERATED_FACE_TO_FACE_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITHOUT_DIRECTIONS_MADE_JSON =
+        "callback/adjournCaseGeneratedFaceToFaceWhenCaseNotListedStraightAwayWithoutDirectionsMade.json";
+    public static final String VALID_SUBMISSION_WITH_SET_GENERATED_DATE_JSON =
+        "callback/adjournCaseValidSubmissionWithSetGeneratedDate.json";
+    public static final String MANUALLY_GENERATED_JSON = "callback/adjournCaseManuallyGenerated.json";
+    public static final String GENERATED_FACE_TO_FACE_WITH_INTERPRETER_REQUIRED_AND_LANGUAGE_SET_JSON =
+        "callback/adjournCaseGeneratedFaceToFaceWithInterpreterRequiredAndLanguageSet.json";
+    public static final String GENERATED_FACE_TO_FACE_WITH_INTERPRETER_REQUIRED_AND_LANGUAGE_NOT_SET_JSON =
+        "callback/adjournCaseGeneratedFaceToFaceWithInterpreterRequiredAndLanguageNotSet.json";
+    public static final String GENERATED_FACE_TO_FACE_WITH_INTERPRETER_NOT_REQUIRED_AND_LANGUAGE_SET_JSON =
+        "callback/adjournCaseGeneratedFaceToFaceWithInterpreterNotRequiredAndLanguageSet.json";
+    public static final String GENERATED_TELEPHONE_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITHOUT_DIRECTIONS_MADE_JSON =
+        "callback/adjournCaseGeneratedTelephoneWhenCaseNotListedStraightAwayWithoutDirectionsMade.json";
+    public static final String GENERATED_VIDEO_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITHOUT_DIRECTIONS_MADE_JSON =
+        "callback/adjournCaseGeneratedVideoWhenCaseNotListedStraightAwayWithoutDirectionsMade.json";
     public static final String CCD_ABOUT_TO_SUBMIT = "/ccdAboutToSubmit";
-    public static final String AN_TEST = "An Test";
+    public static final String CCD_MID_EVENT_PREVIEW_ADJOURN_CASE = "/ccdMidEventPreviewAdjournCase";
+    public static final String CCD_MID_EVENT_ADJOURN_CASE_POPULATE_VENUE_DROPDOWN = "/ccdMidEventAdjournCasePopulateVenueDropdown";
+    public static final String CCD_MID_EVENT = "/ccdMidEvent";
+    public static final String TEST_NAME = "Ann Test";
     public static final String CASE_ID = "12345656789";
     public static final String NINO = "JT 12 34 56 D";
-    public static final String DRAFT_ADJOURNMENT_NOTICE1 = "DRAFT ADJOURNMENT NOTICE";
+    public static final String DRAFT_ADJOURNMENT_NOTICE = "DRAFT ADJOURNMENT NOTICE";
     public static final String CHESTER_MAGISTRATE_S_COURT = "Chester Magistrate's Court";
     public static final String FIRST_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED =
         "It will be first in the morning session on a date to be fixed";
@@ -55,11 +76,11 @@ public class AdjournCaseIt extends AbstractEventIt {
     public static final String REASONS_1 = "Reasons 1";
     public static final String DATE_2017 = "2017-07-17";
     public static final String DATE_2019 = "2019-10-10";
+    public static final String DOCUMENT_URL = "document.url";
     @MockBean
     private IdamClient idamClient;
     @MockBean
     private GenerateFile generateFile;
-
     @MockBean
     private UserDetails userDetails;
 
@@ -67,11 +88,11 @@ public class AdjournCaseIt extends AbstractEventIt {
     @Test
     public void givenCallToMidEventCallbackWithPathYesNoYesThenValidatesDataWithDueDateInPast() throws Exception {
         setup();
-        setJsonAndReplace(NOT_LISTED_STRAIGHT_AWAY_WITH_DIRECTIONS_MADE_JSON,
+        setJsonAndReplace(GENERATED_VIDEO_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITH_DIRECTIONS_MADE_JSON,
             List.of(DIRECTIONS_DUE_DATE_PLACEHOLDER),
             List.of(DATE_2019));
 
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEvent"));
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, CCD_MID_EVENT));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
@@ -83,11 +104,11 @@ public class AdjournCaseIt extends AbstractEventIt {
     @Test
     public void givenCallToMidEventCallbackWithPathYesNoYesThenValidatesDataWhenDueDateInFuture() throws Exception {
         setup();
-        setJsonAndReplace(NOT_LISTED_STRAIGHT_AWAY_WITH_DIRECTIONS_MADE_JSON,
+        setJsonAndReplace(GENERATED_VIDEO_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITH_DIRECTIONS_MADE_JSON,
             List.of(DIRECTIONS_DUE_DATE_PLACEHOLDER),
             List.of(LocalDate.now().plus(1, ChronoUnit.DAYS).toString()));
 
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEvent"));
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, CCD_MID_EVENT));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
@@ -98,7 +119,8 @@ public class AdjournCaseIt extends AbstractEventIt {
     @Test
     public void givenCallToAboutToSubmitHandlerThenWritesAdjournNoticeToCase() throws Exception {
         setup();
-        setJsonAndReplace(NOT_LISTED_STRAIGHT_AWAY_WITH_DIRECTIONS_MADE_JSON, DIRECTIONS_DUE_DATE_PLACEHOLDER, DATE_2019);
+        setJsonAndReplace(GENERATED_VIDEO_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITH_DIRECTIONS_MADE_JSON,
+            DIRECTIONS_DUE_DATE_PLACEHOLDER, DATE_2019);
 
         noticeGeneratedWithExpectedDetails();
     }
@@ -107,8 +129,7 @@ public class AdjournCaseIt extends AbstractEventIt {
     @Test
     public void givenCallToAboutToSubmitHandlerThenWritesAdjournNoticeToCaseWithGeneratedDateAsSet() throws Exception {
         setup();
-        setJsonAndReplace(
-            "callback/adjournCaseValidSubmissionWithSetGeneratedDate.json", DIRECTIONS_DUE_DATE_PLACEHOLDER, DATE_2019);
+        setJsonAndReplace(VALID_SUBMISSION_WITH_SET_GENERATED_DATE_JSON, DIRECTIONS_DUE_DATE_PLACEHOLDER, DATE_2019);
 
         PreSubmitCallbackResponse<SscsCaseData> result = noticeGeneratedWithExpectedDetails();
         assertThat(result.getData().getAdjournCaseGeneratedDate()).isEqualTo("2018-01-01");
@@ -118,7 +139,7 @@ public class AdjournCaseIt extends AbstractEventIt {
     @Test
     //FIXME: Might need to improve the data for this test once manual route has been fully implemented
     public void givenCallToAboutToSubmitHandlerThenWritesManuallyUploadedAdjournNoticeToCase() throws Exception {
-        setup("callback/adjournCaseManuallyGenerated.json");
+        setup(MANUALLY_GENERATED_JSON);
         
         noticeGeneratedWithExpectedDetails();
     }
@@ -127,8 +148,7 @@ public class AdjournCaseIt extends AbstractEventIt {
     @Test
     public void givenCallToMidEventPreviewAdjournCaseCallbackThenPreviewsTheDocumentForFaceToFace() throws Exception {
         setup();
-        json = getJson(
-            "callback/adjournCaseGeneratedFaceToFaceWhenCaseNotListedStraightAwayWithoutDirectionsMade.json");
+        json = getJson(GENERATED_FACE_TO_FACE_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITHOUT_DIRECTIONS_MADE_JSON);
 
         checkStandardDocumentNoInterpreter();
     }
@@ -140,8 +160,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         throws Exception
     {
         setup();
-        json =  getJson(
-            "callback/adjournCaseGeneratedFaceToFaceWithInterpreterRequiredAndLanguageSet.json");
+        json =  getJson(GENERATED_FACE_TO_FACE_WITH_INTERPRETER_REQUIRED_AND_LANGUAGE_SET_JSON);
 
         checkDocumentNoErrors();
 
@@ -150,7 +169,8 @@ public class AdjournCaseIt extends AbstractEventIt {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final AdjournCaseTemplateBody payload = parentPayload.getAdjournCaseTemplateBody();
 
-        checkPayloadDetailsAtVenue(parentPayload,
+        checkPayloadDetailsAtVenue(
+            parentPayload,
             payload,
             "It will be first in the afternoon session on a date to be fixed",
             "an interpreter in French"
@@ -164,12 +184,9 @@ public class AdjournCaseIt extends AbstractEventIt {
         throws Exception
     {
         setup();
-        json =  getJson(
-            "callback/adjournCaseGeneratedFaceToFaceWithInterpreterRequiredAndLanguageNotSet.json");
+        json =  getJson(GENERATED_FACE_TO_FACE_WITH_INTERPRETER_REQUIRED_AND_LANGUAGE_NOT_SET_JSON);
 
-        String documentUrl = "document.url";
-        PreSubmitCallbackResponse<SscsCaseData> result =
-            getPreSubmitCallbackResponse(documentUrl);
+        PreSubmitCallbackResponse<SscsCaseData> result = getPreSubmitCallbackResponse();
 
         assertThat(result.getData().getAdjournCasePreviewDocument()).isNull();
 
@@ -186,8 +203,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         throws Exception
     {
         setup();
-        json = getJson(
-            "callback/adjournCaseGeneratedFaceToFaceWithInterpreterNotRequiredAndLanguageSet.json");
+        json = getJson(GENERATED_FACE_TO_FACE_WITH_INTERPRETER_NOT_REQUIRED_AND_LANGUAGE_SET_JSON);
 
         checkStandardDocumentNoInterpreter();
     }
@@ -196,8 +212,7 @@ public class AdjournCaseIt extends AbstractEventIt {
     @Test
     public void givenCallToMidEventPreviewAdjournCaseCallbackThenPreviewsTheDocumentForTelephone() throws Exception {
         setup();
-        json = getJson(
-            "callback/adjournCaseGeneratedTelephoneWhenCaseNotListedStraightAwayWithoutDirectionsMade.json");
+        json = getJson(GENERATED_TELEPHONE_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITHOUT_DIRECTIONS_MADE_JSON);
 
         checkDocumentNoErrors();
 
@@ -206,7 +221,8 @@ public class AdjournCaseIt extends AbstractEventIt {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final AdjournCaseTemplateBody payload = parentPayload.getAdjournCaseTemplateBody();
 
-        checkPayloadDetailsNoVenue(parentPayload,
+        checkPayloadDetailsNoVenue(
+            parentPayload,
             payload,
             FIRST_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED,
             "telephone hearing",
@@ -219,8 +235,7 @@ public class AdjournCaseIt extends AbstractEventIt {
     @Test
     public void givenCallToMidEventPreviewAdjournCaseCallbackThenPreviewsTheDocumentForVideo() throws Exception {
         setup();
-        json = getJson(
-            "callback/adjournCaseGeneratedVideoWhenCaseNotListedStraightAwayWithoutDirectionsMade.json");
+        json = getJson(GENERATED_VIDEO_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITHOUT_DIRECTIONS_MADE_JSON);
 
         checkDocumentNoErrors();
 
@@ -229,7 +244,8 @@ public class AdjournCaseIt extends AbstractEventIt {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final AdjournCaseTemplateBody payload = parentPayload.getAdjournCaseTemplateBody();
 
-        checkPayloadDetailsNoVenue(parentPayload,
+        checkPayloadDetailsNoVenue(
+            parentPayload,
             payload,
             "It will be first in the session on a date to be fixed",
             "video hearing",
@@ -242,8 +258,7 @@ public class AdjournCaseIt extends AbstractEventIt {
     @Test
     public void givenCallToMidEventPreviewAdjournCaseCallbackThenPreviewsTheDocumentForPaper() throws Exception {
         setup();
-        json = getJson(
-            "callback/adjournCaseGeneratedPaperWhenCaseNotListedStraightAwayWithoutDirectionsMade.json");
+        json = getJson(GENERATED_PAPER_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITHOUT_DIRECTIONS_MADE_JSON);
 
         checkDocumentNoErrors();
 
@@ -252,7 +267,8 @@ public class AdjournCaseIt extends AbstractEventIt {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final AdjournCaseTemplateBody payload = parentPayload.getAdjournCaseTemplateBody();
 
-        checkPayloadDetailsNoVenue(parentPayload,
+        checkPayloadDetailsNoVenue(
+            parentPayload,
             payload,
             FIRST_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED,
             "decision on the papers",
@@ -266,11 +282,11 @@ public class AdjournCaseIt extends AbstractEventIt {
     public void givenCallToPopulateVenueDropdownThenPopulatesNextHearingVenueSelectedList() throws Exception {
         setup();
         String nextHearingDateSpecificDate = "2020-07-01";
-        setJsonAndReplace("callback/adjournCaseGeneratedFaceToFaceWhenCaseNotListedStraightAwayWithoutDirectionsMade.json",
+        setJsonAndReplace(GENERATED_FACE_TO_FACE_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITHOUT_DIRECTIONS_MADE_JSON,
             "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER",
             nextHearingDateSpecificDate);
 
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventAdjournCasePopulateVenueDropdown"));
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, CCD_MID_EVENT_ADJOURN_CASE_POPULATE_VENUE_DROPDOWN));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
         assertThat(result.getErrors()).isEmpty();
@@ -305,10 +321,12 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertThat(result.getData().getOutcome()).isNull();
 
         SscsDocumentDetails document = result.getData().getSscsDocument().get(0).getValue();
-        assertThat(document.getDocumentType()).isEqualTo(DRAFT_ADJOURNMENT_NOTICE.getValue());
+        assertThat(document.getDocumentType()).isEqualTo(DocumentType.DRAFT_ADJOURNMENT_NOTICE.getValue());
         assertThat(document.getDocumentDateAdded()).isEqualTo(LocalDate.now().toString());
         assertThat(document.getDocumentFileName()).containsPattern(
             Pattern.compile("Draft Adjournment Notice generated on \\d{1,2}-\\d{1,2}-\\d{4}\\.pdf"));
+        assertThat(document.getDocumentFileName()).contains(
+            LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
         return result;
     }
 
@@ -347,11 +365,11 @@ public class AdjournCaseIt extends AbstractEventIt {
         String hearingType,
         String interpreterDescription
     ) {
-        assertThat(parentPayload.getAppellantFullName()).isEqualTo(AN_TEST);
+        assertThat(parentPayload.getAppellantFullName()).isEqualTo(TEST_NAME);
         assertThat(parentPayload.getCaseId()).isEqualTo(CASE_ID);
         assertThat(parentPayload.getNino()).isEqualTo(NINO);
         assertThat(parentPayload.getAppointeeFullName()).isEqualTo(null);
-        assertThat(parentPayload.getNoticeType()).isEqualTo(DRAFT_ADJOURNMENT_NOTICE1);
+        assertThat(parentPayload.getNoticeType()).isEqualTo(DRAFT_ADJOURNMENT_NOTICE);
         assertThat(parentPayload.getUserName()).isEqualTo(JUDGE_FULL_NAME);
         assertThat(payload.getHeldOn()).isEqualTo(LocalDate.parse(DATE_2017));
         assertThat(payload.getHeldAt()).isEqualTo(CHESTER_MAGISTRATE_S_COURT);
@@ -366,27 +384,26 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertThat(payload.getAdditionalDirections().get(0)).isEqualTo(SOMETHING_ELSE);
         assertThat(payload.getReasonsForDecision().get(0)).isEqualTo(REASONS_1);
         assertThat(payload.getPanelMembersExcluded()).isEqualTo("yes");
-        assertThat(payload.getAppellantName()).isEqualTo(AN_TEST);
+        assertThat(payload.getAppellantName()).isEqualTo(TEST_NAME);
         assertThat(payload.getInterpreterDescription()).isEqualTo(interpreterDescription);
     }
 
     private void checkDocumentNoErrors() throws Exception {
-        String documentUrl = "document.url";
-        PreSubmitCallbackResponse<SscsCaseData> result = getPreSubmitCallbackResponse(documentUrl);
+        PreSubmitCallbackResponse<SscsCaseData> result = getPreSubmitCallbackResponse();
 
         assertThat(result.getErrors()).isEmpty();
 
-        assertThat(result.getData().getAdjournCasePreviewDocument().getDocumentUrl()).isEqualTo(documentUrl);
+        assertThat(result.getData().getAdjournCasePreviewDocument().getDocumentUrl()).isEqualTo(DOCUMENT_URL);
     }
 
-    private PreSubmitCallbackResponse<SscsCaseData> getPreSubmitCallbackResponse(String documentUrl) throws Exception {
-        when(generateFile.assemble(any())).thenReturn(documentUrl);
+    private PreSubmitCallbackResponse<SscsCaseData> getPreSubmitCallbackResponse() throws Exception {
+        when(generateFile.assemble(any())).thenReturn(DOCUMENT_URL);
 
         when(userDetails.getFullName()).thenReturn(JUDGE_FULL_NAME);
 
         when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
 
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewAdjournCase"));
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, CCD_MID_EVENT_PREVIEW_ADJOURN_CASE));
         assertHttpStatus(response, HttpStatus.OK);
         return deserialize(response.getContentAsString());
     }

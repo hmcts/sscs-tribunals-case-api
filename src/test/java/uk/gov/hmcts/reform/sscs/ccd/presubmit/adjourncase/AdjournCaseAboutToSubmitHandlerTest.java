@@ -45,6 +45,7 @@ public class AdjournCaseAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     public static final String FRENCH = "French";
     public static final String SPANISH = "Spanish";
+    public static final String OLD_DRAFT_DOC = "oldDraft.doc";
 
     @InjectMocks
     private AdjournCaseAboutToSubmitHandler handler;
@@ -96,7 +97,12 @@ public class AdjournCaseAboutToSubmitHandlerTest {
     @DisplayName("Given draft adjournment notice already exists on case, then overwrite existing draft")
     @Test
     public void givenAdjournmentNoticeAlreadyExistsOnCase_thenOverwriteExistingDraft() {
-        SscsDocument doc = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("oldDraft.doc").documentType(DRAFT_ADJOURNMENT_NOTICE.getValue()).build()).build();
+        SscsDocument doc = SscsDocument.builder().value(
+            SscsDocumentDetails.builder()
+                .documentFileName(OLD_DRAFT_DOC)
+                .documentType(DRAFT_ADJOURNMENT_NOTICE.getValue())
+                .build())
+            .build();
         List<SscsDocument> docs = new ArrayList<>();
         docs.add(doc);
         callback.getCaseDetails().getCaseData().setSscsDocument(docs);
