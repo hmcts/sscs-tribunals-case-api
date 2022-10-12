@@ -64,7 +64,7 @@ public class OtherPartyDataUtil {
     }
 
     public static boolean haveOtherPartiesChanged(List<CcdValue<OtherParty>> before, List<CcdValue<OtherParty>> after) {
-        if (isNull(before) && isNull(after)) {
+        if (isEmpty(before) && isEmpty(after)) {
             return false;
         }
         return hasCollectionChanged(before, after)
