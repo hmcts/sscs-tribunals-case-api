@@ -1,0 +1,26 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPattern": "/refdata/location/court-venues\\?epimms_id=.*"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "court_venue_id": "312314",
+        "epimms_id": "534654",
+        "site_name": "Test",
+        "region_id": "11",
+        "region": "Scotland",
+        "court_type_id": "31",
+        "open_for_public": "YES",
+        "court_status": "Open",
+        "court_open_date": null,
+        "is_hearing_location": "Y"
+      }
+    ]
+  }
+}

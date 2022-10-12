@@ -1,6 +1,11 @@
 package uk.gov.hmcts.reform.sscs;
 
+import static java.lang.Boolean.parseBoolean;
+
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +37,7 @@ public class AdditionalComposeServiceRunner {
         for (String additionalService : additionalFiles) {
             String path = BASE_COMPOSE_PATH + additionalService;
 
-            ProcessBuilder processBuilder = new ProcessBuilder("docker", "compose", "-f", path, "up", "-d")
+            ProcessBuilder processBuilder = new ProcessBuilder(buildComposeCommand(path))
                 .inheritIO();
 
             Process process = processBuilder.start();
@@ -46,5 +51,16 @@ public class AdditionalComposeServiceRunner {
                 log.info("Successfully started additional services in {}", additionalService);
             }
         }
+    }
+
+    private List<String> buildComposeCommand(String path) {
+
+        List<String> command = new ArrayList<>(Arrays.asList("docker", "compose", "-f", path, "up", "-d"));
+
+        if (parseBoolean(System.getenv("FORCE_RECREATE_ADDITIONAL_CONTAINERS"))) {
+            command.add("--force-recreate");
+        }
+
+        return command;
     }
 }
