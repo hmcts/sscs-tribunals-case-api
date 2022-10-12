@@ -598,7 +598,8 @@ bootWithCCD {
     //---Additional compose services---
     //Place any extra compose files you'd like to be started automatically here. These should be
     //in the folder /src/cftlib/resources/docker/ and comma delimited.
-    environment 'ADDITIONAL_COMPOSE_FILES', 'cft-lib-doc-stack.yml,cft-lib-doc-assembly.yml'
+    environment 'ADDITIONAL_COMPOSE_FILES', 'cft-lib-doc-stack.yml,cft-lib-doc-assembly.yml,cft-lib-ref-data-wiremock.yml'
+    environment 'FORCE_RECREATE_ADDITIONAL_CONTAINERS', 'true'
 
     environment 'XUI_PORT', '3455'
     environment 'RSE_LIB_S2S_PORT', '4502'
@@ -612,7 +613,9 @@ bootWithCCD {
     environment 'DOC_ASSEMBLY_URL', 'http://localhost:4631'
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'evidence'
     environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
-    environment 'CASE_ACCESS_MANAGEMENT_FEATURE', 'true'
     environment 'CASE_DOCUMENT_S2S_AUTHORISED_SERVICES', 'ccd_case_document_am_api,ccd_gw,xui_webapp,ccd_data,bulk_scan_processor,sscs'
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,payment-api,xui_webapp,sscs,ccd_case_document_am_api,am_role_assignment_service'
+    environment 'CASE_ACCESS_MANAGEMENT_FEATURE', 'true'
+    //Wiremock
+    environment 'RD_LOCATION_REF_API_URL', 'http://localhost:8084'
 }
