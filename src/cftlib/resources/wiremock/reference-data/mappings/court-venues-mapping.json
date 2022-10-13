@@ -10,16 +10,18 @@
     },
     "jsonBody": [
       {
-        "court_venue_id": "312314",
-        "epimms_id": "534654",
-        "site_name": "Test",
-        "region_id": "11",
-        "region": "Scotland",
+        "epimms_id": "324167",
+        "site_name": "Cardiff Civil and Family Justice Centre",
+        "region_id": "7",
+        "region": "Wales",
+        "court_type": "Social Security and Child Support Tribunal",
         "court_type_id": "31",
-        "open_for_public": "YES",
+        "postcode": "CF10 1ET",
         "court_status": "Open",
         "court_open_date": null,
-        "is_hearing_location": "Y"
+        "court_name": "CARDIFF CIVIL AND FAMILY JUSTICE CENTRE",
+        "venue_name": "Cardiff (CJC)",
+        "location_type": "COURT"
       }
     ]
   }
