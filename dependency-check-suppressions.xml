@@ -15,20 +15,14 @@
         <packageUrl regex="true">^pkg:maven/org.elasticsearch/elasticsearch@.*$</packageUrl>
         <cve>CVE-2022-23708</cve>
     </suppress>
-    <suppress until = "2022-10-11">
-        <notes><![CDATA[
-                jackson-databind-2.11.4.jar
-        ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com.fasterxml.jackson.core/jackson-databind@.*$</packageUrl>
-        <cve>CVE-2020-36518</cve>
-    </suppress>
-    <suppress until = "2022-10-11">
+    <suppress until = "2022-11-21">
         <notes><![CDATA[
         file name: jackson-databind-2.11.4.jar
         ]]></notes>
         <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
         <cve>CVE-2022-42003</cve>
         <cve>CVE-2022-42004</cve>
+	    <cve>CVE-2020-36518</cve>
     </suppress>
     <suppress until = "2022-11-01">
         <notes><![CDATA[

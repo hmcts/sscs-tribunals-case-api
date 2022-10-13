@@ -278,9 +278,28 @@ dependencyManagement {
             entry 'netty-common'
         }
 
-        dependencySet(group: 'com.fasterxml.jackson.core', version: '2.13.4') {
-            entry 'jackson-databind'
-            entry 'jackson-core'
+        //CVE-2021-27568
+        dependencySet(group: 'net.minidev', version: '2.4.7') {
+            entry 'json-smart'
+            entry 'accessors-smart'
+        }
+
+        dependencySet(group: 'org.yaml', version: '1.31') {
+            entry 'snakeyaml'
+        }
+
+        //CVE-2021-30468
+        dependencySet(group: 'org.apache.cxf', version: '3.4.5') {
+            entry 'cxf-core'
+            entry 'cxf-rt-frontend-jaxrs'
+            entry 'cxf-rt-rs-client'
+            entry 'cxf-rt-security'
+            entry 'cxf-rt-transports-http'
+        }
+
+        //CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
+        dependencySet(group: 'org.apache.commons', version: '1.21') {
+            entry 'commons-compress'
         }
 
         //CVE-2022-25857
@@ -547,7 +566,9 @@ bootWithCCD {
     //---Additional compose services---
     //Place any extra compose files you'd like to be started automatically here. These should be
     //in the folder /src/cftlib/resources/docker/ and comma delimited.
-    environment 'ADDITIONAL_COMPOSE_FILES', 'cft-lib-doc-stack.yml,cft-lib-doc-assembly.yml'
+    environment 'ADDITIONAL_COMPOSE_FILES', 'cft-lib-doc-stack.yml,cft-lib-doc-assembly.yml,cft-lib-ref-data-wiremock.yml'
+    //Turn this on to automatically recreate containers above. Useful for debugging if you make changes.
+    environment 'FORCE_RECREATE_ADDITIONAL_CONTAINERS', 'false'
 
     environment 'XUI_PORT', '3455'
     environment 'RSE_LIB_S2S_PORT', '4502'
@@ -561,7 +582,9 @@ bootWithCCD {
     environment 'DOC_ASSEMBLY_URL', 'http://localhost:4631'
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'evidence'
     environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
-    environment 'CASE_ACCESS_MANAGEMENT_FEATURE', 'true'
     environment 'CASE_DOCUMENT_S2S_AUTHORISED_SERVICES', 'ccd_case_document_am_api,ccd_gw,xui_webapp,ccd_data,bulk_scan_processor,sscs'
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,payment-api,xui_webapp,sscs,ccd_case_document_am_api,am_role_assignment_service'
+    environment 'CASE_ACCESS_MANAGEMENT_FEATURE', 'true'
+    //Wiremock
+    environment 'RD_LOCATION_REF_API_URL', 'http://localhost:8084'
 }
