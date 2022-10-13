@@ -278,6 +278,11 @@ dependencyManagement {
             entry 'netty-common'
         }
 
+        dependencySet(group: 'com.fasterxml.jackson.core', version: '2.13.4') {
+            entry 'jackson-databind'
+            entry 'jackson-core'
+        }
+
         //CVE-2021-27568
         dependencySet(group: 'net.minidev', version: '2.4.7') {
             entry 'json-smart'
