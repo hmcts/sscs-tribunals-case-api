@@ -1,0 +1,28 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPattern": "/refdata/location/court-venues\\?epimms_id=.*"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "epimms_id": "324167",
+        "site_name": "Cardiff Civil and Family Justice Centre",
+        "region_id": "7",
+        "region": "Wales",
+        "court_type": "Social Security and Child Support Tribunal",
+        "court_type_id": "31",
+        "postcode": "CF10 1ET",
+        "court_status": "Open",
+        "court_open_date": null,
+        "court_name": "CARDIFF CIVIL AND FAMILY JUSTICE CENTRE",
+        "venue_name": "Cardiff (CJC)",
+        "location_type": "COURT"
+      }
+    ]
+  }
+}

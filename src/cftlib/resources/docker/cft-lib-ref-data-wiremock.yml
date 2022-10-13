@@ -1,0 +1,18 @@
+---
+version: '3.5'
+
+name: cft-lib-ref-data-wiremock
+
+services:
+  ref-data-wiremock:
+    image: wiremock/wiremock
+    ports:
+      - 8084:8080
+    volumes:
+      - ../wiremock/reference-data/:/home/wiremock
+    networks:
+      - cftlib_default
+
+networks:
+  cftlib_default:
+    external: true
