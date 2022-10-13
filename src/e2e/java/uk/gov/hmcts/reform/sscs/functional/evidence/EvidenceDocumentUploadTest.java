@@ -17,6 +17,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Objects;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,6 +37,7 @@ import uk.gov.hmcts.reform.sscs.functional.sya.SubmitHelper;
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @SpringBootTest
+@Slf4j
 public class EvidenceDocumentUploadTest {
 
     @Value("${test-url}")
@@ -76,6 +79,8 @@ public class EvidenceDocumentUploadTest {
 
     private Response uploadAndVerifyEvidenceDocumentUpload() {
         URL resource = getClass().getClassLoader().getResource("evidence/evidence-document.pdf");
+
+        log.info("base uri {}", baseURI);
 
         return given()
             .multiPart("file", new File(Objects.requireNonNull(resource).getPath()), MediaType.APPLICATION_PDF_VALUE)
