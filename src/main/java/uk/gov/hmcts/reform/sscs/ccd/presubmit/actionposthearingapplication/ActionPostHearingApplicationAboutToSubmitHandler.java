@@ -15,25 +15,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
-import uk.gov.hmcts.reform.sscs.service.FooterService;
-import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
-import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class ActionPostHearingApplicationAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
-    public static final String POSTPONEMENT_DETAILS_SENT_TO_JUDGE_PREFIX = "Postponement sent to judge - ";
-
-    private final UserDetailsService userDetailsService;
-    private final PostponementRequestService postponementRequestService;
-    private final FooterService footerService;
-    private final ListAssistHearingMessageHelper hearingMessageHelper;
-    @Value("${feature.snl.enabled}")
-    private boolean isScheduleListingEnabled;
+    @Value("${feature.postHearings.enabled}")
+    private boolean isPostHearingsEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -42,7 +31,7 @@ public class ActionPostHearingApplicationAboutToSubmitHandler implements PreSubm
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
             && callback.getEvent() == EventType.ACTION_POST_HEARING_APPLICATION
-            && isScheduleListingEnabled;
+            && isPostHearingsEnabled;
     }
 
     @Override

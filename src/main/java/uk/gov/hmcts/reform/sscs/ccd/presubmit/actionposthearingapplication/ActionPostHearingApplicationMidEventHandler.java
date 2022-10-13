@@ -25,19 +25,16 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @RequiredArgsConstructor
 public class ActionPostHearingApplicationMidEventHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     public static final String PAGE_ID_GENERATE_NOTICE = "generateNotice";
-
     private final DocumentConfiguration documentConfiguration;
-
     private final GenerateFile generateFile;
-
-    @Value("${feature.snl.enabled}")
-    private boolean isScheduleListingEnabled;
+    @Value("${feature.postHearings.enabled}")
+    private boolean isPostHearingsEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType.equals(CallbackType.MID_EVENT)
             && callback.getEvent() == EventType.ACTION_POST_HEARING_APPLICATION
-            && isScheduleListingEnabled;
+            && isPostHearingsEnabled;
     }
 
     @Override

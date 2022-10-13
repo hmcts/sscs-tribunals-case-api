@@ -75,7 +75,7 @@ public class ActionPostHearingApplicationMidEventHandlerTest {
 
     @Before
     public void setUp() {
-        ReflectionTestUtils.setField(handler, "isScheduleListingEnabled", true);
+        ReflectionTestUtils.setField(handler, "isPostHearingsEnabled", true);
 
         when(documentConfiguration.getDocuments()).thenReturn(new HashMap<>(Map.of(
             LanguagePreference.ENGLISH,  new HashMap<>(Map.of(
@@ -113,8 +113,8 @@ public class ActionPostHearingApplicationMidEventHandlerTest {
     }
 
     @Test
-    public void givenSchedulingAndListingEnabledFalse_thenReturnFalse() {
-        ReflectionTestUtils.setField(handler, "isScheduleListingEnabled", false);
+    public void givenPostHearingsEnabledFalse_thenReturnFalse() {
+        ReflectionTestUtils.setField(handler, "isPostHearingsEnabled", false);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
