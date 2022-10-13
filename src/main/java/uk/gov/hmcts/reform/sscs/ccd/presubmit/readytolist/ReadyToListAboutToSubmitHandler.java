@@ -66,6 +66,11 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
             .map(RegionalProcessingCenter::getHearingRoute)
             .findFirst().orElse(HearingRoute.LIST_ASSIST);
 
+        if (sscsCaseData.getHearings() == null || sscsCaseData.getHearings().isEmpty()
+            || HearingStatus.CANCELLED.equals(sscsCaseData.getHearings().get(0).getValue().getHearingStatus())) {
+            route = HearingRoute.LIST_ASSIST;
+        }
+
         return HearingHandler.valueOf(route.name()).handle(sscsCaseData, gapsSwitchOverFeature,
             hearingMessagingServiceFactory.getMessagingService(route));
     }
