@@ -1,0 +1,42 @@
+---
+version: '3.5'
+
+name: cft-lib-work-allocation
+
+services:
+  camunda-local-bpm:
+    image:  hmctsprivate.azurecr.io/camunda/bpm:latest
+    environment:
+      CAMUNDA_DB_HOST: shared-database-pg12
+      CAMUNDA_DB_PORT: 5432
+      CAMUNDA_DB_USER_NAME: postgres
+      CAMUNDA_DB_PASSWORD: postgres
+      "camunda.bpm.database.schema-update": true
+      CAMUNDA_API_AUTH_ENABLED: false
+      S2S_URL: ${S2S_URL:-http://service-auth-provider-api}
+      camundaGroups.work-allocation.s2sServiceNames: wa_task_management_api,wa_workflow_api,wa_case_event_handler,wa_camunda_pipeline_upload,sscs
+      WA_AUTO_CONFIGURE_TASKS_ENABLED: true
+      TASK_MANAGEMENT_API_URL: ${TASK_MANAGEMENT_API_URL:-http://localhost:8087}
+      TZ: Europe/London
+    ports:
+      - 8999:8999
+    networks:
+      - cftlib_default
+
+  ccd-message-publisher:
+    image: hmctspublic.azurecr.io/ccd/message-publisher:latest
+    environment:
+      DATA_STORE_DB_HOST: shared-database-pg12
+      DATA_STORE_DB_PORT: 5432
+      DATA_STORE_DB_USERNAME: postgres
+      DATA_STORE_DB_PASSWORD: postgres
+      SERVICE_BUS_CONNECTION_STRING: ${ASB_SERVICE_BUS_CONNECTION_STRING:-Endpoint=sb://ccd-servicebus-demo.servicebus.windows.net/;SharedAccessKeyName=SendAndRecieveCCDMessage;SharedAccessKey=REPLACEME}
+      CCD_CASE_EVENTS_DESTINATION:
+    ports:
+      - 4456:4456
+    networks:
+      - cftlib_default
+
+networks:
+  cftlib_default:
+    external: true

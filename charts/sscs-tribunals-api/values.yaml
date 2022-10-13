@@ -26,6 +26,7 @@ java:
         - docmosis-endpoint
         - docmosis-api-key
         - AppInsightsInstrumentationKey
+        - name: hmcts-private-creds
         - name: sscs-asb-connection-string
           alias: HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING
   environment:

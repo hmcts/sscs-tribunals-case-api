@@ -12,18 +12,23 @@ public class CftlibConfig implements CFTLibConfigurer {
     @Override
     public void configure(CFTLib lib) throws Exception {
         lib.createIdamUser("system.update@hmcts.net",
-                "caseworker",
-                "caseworker-sscs",
-                "caseworker-sscs-superuser",
-                "caseworker-sscs-clerk",
-                "caseworker-sscs-systemupdate",
-                "caseworker-sscs-judge",
-                "caseworker-sscs-dwpresponsewriter",
-                "caseworker-sscs-registrar"
+            "caseworker",
+            "caseworker-sscs",
+            "caseworker-sscs-superuser",
+            "caseworker-sscs-clerk",
+            "caseworker-sscs-systemupdate",
+            "caseworker-sscs-judge",
+            "caseworker-sscs-dwpresponsewriter",
+            "caseworker-sscs-registrar",
+            "caseworker-wa",
+            "caseworker-wa-task-configuration"
         );
         lib.createIdamUser("local.test@example.com",
             "caseworker",
-            "caseworker-sscs"
+            "caseworker-sscs",
+            "caseworker-wa",
+            "caseworker-wa-configuration",
+            "caseworker-ia-caseofficer"
         );
         lib.createIdamUser("super-user@example.com",
             "caseworker",
@@ -59,21 +64,24 @@ public class CftlibConfig implements CFTLibConfigurer {
             "caseworker-sscs-hmrcresponsewriter"
         );
         lib.createRoles(
-                "caseworker-sscs-superuser",
-                "caseworker-sscs-clerk",
-                "caseworker-sscs-systemupdate",
-                "caseworker-sscs-judge",
-                "caseworker-sscs-dwpresponsewriter",
-                "caseworker-sscs-hmrcresponsewriter",
-                "caseworker-sscs-registrar",
-                "caseworker-sscs-callagent",
-                "caseworker-sscs-teamleader",
-                "caseworker-sscs-panelmember",
-                "caseworker-sscs-bulkscan",
-                "caseworker-sscs-anonymouscitizen",
-                "caseworker-sscs-pcqextractor",
-                "citizen",
-                "caseworker-sscs"
+            "caseworker-sscs-superuser",
+            "caseworker-sscs-clerk",
+            "caseworker-sscs-systemupdate",
+            "caseworker-sscs-judge",
+            "caseworker-sscs-dwpresponsewriter",
+            "caseworker-sscs-hmrcresponsewriter",
+            "caseworker-sscs-registrar",
+            "caseworker-sscs-callagent",
+            "caseworker-sscs-teamleader",
+            "caseworker-sscs-panelmember",
+            "caseworker-sscs-bulkscan",
+            "caseworker-sscs-anonymouscitizen",
+            "caseworker-sscs-pcqextractor",
+            "citizen",
+            "caseworker-sscs",
+            "caseworker-wa",
+            "caseworker-wa-configuration",
+            "caseworker-ia-caseofficer"
         );
         var def = Files.readAllBytes(Path.of("../sscs-ccd-definitions/releases/CCD_SSCSDefinition_vdev_LOCAL.xlsx"));
         lib.importDefinition(def);
