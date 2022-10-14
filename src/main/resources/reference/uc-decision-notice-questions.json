@@ -1,0 +1,709 @@
+[
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_ucPhysicalDisabilities",
+       "DisplayOrder" : "10",
+       "ListElementCode":"consciousness",
+       "ListElement":"10. Consciousness during waking moments."
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_ucPhysicalDisabilities",
+       "DisplayOrder" : "9",
+       "ListElementCode":"lossOfControl",
+       "ListElement":"9. Absence or loss of control whilst conscious leading to extensive evacuation of the bowel and/or bladder, other than enuresis (bed- wetting), despite the wearing or use of any aids or adaptations which are normally or could reasonably be worn or used."
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_ucPhysicalDisabilities",
+       "DisplayOrder" : "8",
+       "ListElementCode":"navigation",
+       "ListElement":"8. Navigation and maintaining safety using a guide dog or other aid if either or both are normally used or could reasonably be used."
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_ucPhysicalDisabilities",
+       "DisplayOrder" : "7",
+       "ListElementCode":"communication",
+       "ListElement":"7. Understanding communication by: (i) verbal means (such as hearing or lip reading) alone; (ii) non-verbal means (such as reading 16 point print or Braille) alone; or (iii) a combination of sub-paragraphs (i) and (ii), using any aid that is normally or could reasonably be used, unaided by another person."
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_ucPhysicalDisabilities",
+       "DisplayOrder" : "6",
+       "ListElementCode":"makingSelfUnderstood",
+       "ListElement":"6. Making self understood through speaking, writing, typing, or other means which are normally or could reasonably be used, unaided by another person."
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_ucPhysicalDisabilities",
+       "DisplayOrder" : "5",
+       "ListElementCode":"manualDexterity",
+       "ListElement":"5. Manual dexterity."
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_ucPhysicalDisabilities",
+       "DisplayOrder" : "4",
+       "ListElementCode":"pickingUp",
+       "ListElement":"4. Picking up and moving or transferring by the use of the upper body and arms."
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_ucPhysicalDisabilities",
+       "DisplayOrder" : "3",
+       "ListElementCode":"reaching",
+       "ListElement":"3. Reaching."
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_ucPhysicalDisabilities",
+       "DisplayOrder" : "2",
+       "ListElementCode":"standingAndSitting",
+       "ListElement":"2. Standing and sitting."
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_ucPhysicalDisabilities",
+       "DisplayOrder" : "1",
+       "ListElementCode":"mobilisingUnaided",
+       "ListElement":"1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used."
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_ucMentalAssessment",
+        "DisplayOrder" : "7",
+       "ListElementCode":"appropriatenessOfBehaviour",
+       "ListElement":"17. Appropriateness of behaviour with other people, due to cognitive impairment or mental disorder."
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_ucMentalAssessment",
+       "DisplayOrder" : "6",
+       "ListElementCode":"socialEngagement",
+       "ListElement":"16. Coping with social engagement due to cognitive impairment or mental disorder."
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_ucMentalAssessment",
+       "DisplayOrder" : "5",
+       "ListElementCode":"gettingAbout",
+       "ListElement":"15. Getting about."
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_ucMentalAssessment",
+       "DisplayOrder" : "4",
+       "ListElementCode":"copingWithChange",
+       "ListElement":"14. Coping with change."
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_ucMentalAssessment",
+       "DisplayOrder" : "3",
+       "ListElementCode":"personalAction",
+       "ListElement":"13. Initiating and completing personal action (which means planning, organisation, problem solving, prioritising or switching tasks)."
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_ucMentalAssessment",
+       "DisplayOrder" : "2",
+       "ListElementCode":"awarenessOfHazards",
+       "ListElement":"12. Awareness of everyday hazards (such as boiling water or sharp objects)."
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_ucMentalAssessment",
+       "DisplayOrder" : "1",
+       "ListElementCode":"learningTasks",
+       "ListElement":"11. Learning tasks."
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionMobilisingUnaidedQuestion",
+       "DisplayOrder" : "5",
+       "ListElementCode": "mobilisingUnaided1e",
+       "ListElement": "1e. None of the above applies. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionMobilisingUnaidedQuestion",
+       "DisplayOrder" : "4",
+       "ListElementCode": "mobilisingUnaided1d",
+       "ListElement": "1d. Cannot, unaided by another person, either: mobilise more than 200 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 200 metres within a reasonable timescale because of significant discomfort or exhaustion. (6 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionMobilisingUnaidedQuestion",
+       "DisplayOrder" : "3",
+       "ListElementCode": "mobilisingUnaided1c",
+       "ListElement": "1c. Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion. (9 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionMobilisingUnaidedQuestion",
+       "DisplayOrder" : "2",
+       "ListElementCode": "mobilisingUnaided1b",
+       "ListElement": "1b. Cannot, unaided by another person, mount or descend two steps even with the support of a handrail. (9 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionMobilisingUnaidedQuestion",
+       "DisplayOrder" : "1",
+       "ListElementCode": "mobilisingUnaided1a",
+       "ListElement": "1a. Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion. (15 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionStandingAndSittingQuestion",
+       "DisplayOrder" : "4",
+       "ListElementCode": "standingAndSitting2d",
+       "ListElement": "2d. None of the above applies. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionStandingAndSittingQuestion",
+       "DisplayOrder" : "3",
+       "ListElementCode": "standingAndSitting2c",
+       "ListElement": "2c. Cannot, for the majority of the time, remain at a work station: (i) standing unassisted by another person (even if free to move around); (ii) sitting (even in an adjustable chair); or (iii) a combination of paragraphs (i) and (ii), for more than an hour before needing to move away in order to avoid significant discomfort or exhaustion. (6 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionStandingAndSittingQuestion",
+       "DisplayOrder" : "2",
+       "ListElementCode": "standingAndSitting2b",
+       "ListElement": "2b. Cannot, for the majority of the time, remain at a work station: (i) standing unassisted by another person (even if free to move around); (ii) sitting (even in an adjustable chair); or (iii) a combination of paragraphs (i) and (ii), for more than 30 minutes, before needing to move away in order to avoid significant discomfort or exhaustion. (9 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionStandingAndSittingQuestion",
+       "DisplayOrder" : "1",
+       "ListElementCode": "standingAndSitting2a",
+       "ListElement": "2a. Cannot move between one seated position and another seated position which are located next to one another without receiving physical assistance from another person. (15 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionReachingQuestion",
+       "DisplayOrder" : "4",
+       "ListElementCode": "reaching3d",
+       "ListElement": "3d. None of the above applies. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionReachingQuestion",
+       "DisplayOrder" : "3",
+       "ListElementCode": "reaching3c",
+       "ListElement": "3c. Cannot raise either arm above head height as if to reach for something. (6 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionReachingQuestion",
+       "DisplayOrder" : "2",
+       "ListElementCode": "reaching3b",
+       "ListElement": "3b. Cannot raise either arm to top of head as if to put on a hat. (9 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionReachingQuestion",
+       "DisplayOrder" : "1",
+       "ListElementCode": "reaching3a",
+       "ListElement": "3a. Cannot raise either arm as if to put something in the top pocket of a coat or jacket. (15 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionPickingUpQuestion",
+       "DisplayOrder" : "4",
+       "ListElementCode": "pickingUp4d",
+       "ListElement": "4d. None of the above applies. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionPickingUpQuestion",
+       "DisplayOrder" : "3",
+       "ListElementCode": "pickingUp4c",
+       "ListElement": "4c. Cannot transfer a light but bulky object such as an empty cardboard box. (6 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionPickingUpQuestion",
+       "DisplayOrder" : "2",
+       "ListElementCode": "pickingUp4b",
+       "ListElement": "4b. Cannot pick up and move a one litre carton full of liquid. (9 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionPickingUpQuestion",
+       "DisplayOrder" : "1",
+       "ListElementCode": "pickingUp4a",
+       "ListElement": "4a. Cannot pick up and move a 0.5 litre carton full of liquid. (15 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionManualDexterityQuestion",
+       "DisplayOrder" : "5",
+       "ListElementCode": "manualDexterity5e",
+       "ListElement": "5e. None of the above applies. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionManualDexterityQuestion",
+       "DisplayOrder" : "4",
+       "ListElementCode": "manualDexterity5d",
+       "ListElement": "5d. Cannot single-handedly use a suitable keyboard or mouse. (9 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionManualDexterityQuestion",
+       "DisplayOrder" : "3",
+       "ListElementCode": "manualDexterity5c",
+       "ListElement": "5c. Cannot use a pen or pencil to make a meaningful mark with either hand. (9 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionManualDexterityQuestion",
+       "DisplayOrder" : "2",
+       "ListElementCode": "manualDexterity5b",
+       "ListElement": "5b. Cannot pick up a £1 coin or equivalent with either hand. (15 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionManualDexterityQuestion",
+       "DisplayOrder" : "1",
+       "ListElementCode": "manualDexterity5a",
+       "ListElement": "5a. Cannot press a button (such as a telephone keypad) with either hand or cannot turn the pages of a book with either hand. (15 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionMakingSelfUnderstoodQuestion",
+       "DisplayOrder" : "4",
+       "ListElementCode": "manualDexterity6d",
+       "ListElement": "6d. None of the above applies. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionMakingSelfUnderstoodQuestion",
+       "DisplayOrder" : "3",
+       "ListElementCode": "manualDexterity6c",
+       "ListElement": "6c. Has some difficulty conveying a simple message to strangers. (6 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionMakingSelfUnderstoodQuestion",
+       "DisplayOrder" : "2",
+       "ListElementCode": "manualDexterity6b",
+       "ListElement": "6b. Has significant difficulty conveying a simple message to strangers. (15 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionMakingSelfUnderstoodQuestion",
+       "DisplayOrder" : "1",
+       "ListElementCode": "manualDexterity6a",
+       "ListElement": "6a. Cannot convey a simple message, such as the presence of a hazard. (15 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionCommunicationQuestion",
+       "DisplayOrder" : "4",
+       "ListElementCode": "decisionCommunication7d",
+       "ListElement": "7d. None of the above applies. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionCommunicationQuestion",
+       "DisplayOrder" : "3",
+       "ListElementCode": "decisionCommunication7c",
+       "ListElement": "7c. Has some difficulty understanding a simple message from a stranger due to sensory impairment. (6 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionCommunicationQuestion",
+       "DisplayOrder" : "2",
+       "ListElementCode": "decisionCommunication7b",
+       "ListElement": "7b. Has significant difficulty understanding a simple message from a stranger due to sensory impairment. (15 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionCommunicationQuestion",
+       "DisplayOrder" : "1",
+       "ListElementCode": "decisionCommunication7a",
+       "ListElement": "7a. Cannot understand a simple message, such as the location of a fire escape, due to sensory impairment. (15 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionNavigationQuestion",
+       "DisplayOrder" : "4",
+       "ListElementCode": "decisionNavigation8d",
+       "ListElement": "8d. None of the above applies. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionNavigationQuestion",
+       "DisplayOrder" : "3",
+       "ListElementCode": "decisionNavigation8c",
+       "ListElement": "8c. Unable to navigate around unfamiliar surroundings, without being accompanied by another person, due to sensory impairment. (9 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionNavigationQuestion",
+       "DisplayOrder" : "2",
+       "ListElementCode": "decisionNavigation8b",
+       "ListElement": "8b. Cannot safely complete a potentially hazardous task such as crossing the road, without being accompanied by another person, due to sensory impairment. (15 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionNavigationQuestion",
+       "DisplayOrder" : "1",
+       "ListElementCode": "decisionNavigation8a",
+       "ListElement": "8a. Unable to navigate around familiar surroundings, without being accompanied by another person, due to sensory impairment. (15 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionLossOfControlQuestion",
+       "DisplayOrder" : "3",
+       "ListElementCode": "lossOfControl9c",
+       "ListElement": "9c. Neither of the above applies. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionLossOfControlQuestion",
+       "DisplayOrder" : "2",
+       "ListElementCode": "lossOfControl9b",
+       "ListElement": "9b. The majority of the time is at risk of loss of control leading to extensive evacuation of the bowel and/or voiding of the bladder, sufficient to require cleaning and a change in clothing, if not able to reach a toilet quickly. (6 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionLossOfControlQuestion",
+       "DisplayOrder" : "1",
+       "ListElementCode": "lossOfControl9a",
+       "ListElement": "9a. At least once a month experiences: (i) loss of control leading to extensive evacuation of the bowel and/or voiding of the bladder; or (ii) substantial leakage of the contents of a collecting device, sufficient to require cleaning and a change in clothing. (15 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionConsciousnessQuestion",
+       "DisplayOrder" : "3",
+       "ListElementCode": "consciousness10c",
+       "ListElement": "10c. Neither of the above applies. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionConsciousnessQuestion",
+       "DisplayOrder" : "2",
+       "ListElementCode": "consciousness10b",
+       "ListElement": "10b. At least once a month, has an involuntary episode of lost or altered consciousness resulting in significantly disrupted awareness or concentration. (6 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionConsciousnessQuestion",
+       "DisplayOrder" : "1",
+       "ListElementCode": "consciousness10a",
+       "ListElement": "10a. At least once a week, has an involuntary episode of lost or altered consciousness resulting in significantly disrupted awareness or concentration. (15 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionLearningTasksQuestion",
+       "DisplayOrder" : "4",
+       "ListElementCode": "learningTasks11d",
+       "ListElement": "11d. None of the above applies. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionLearningTasksQuestion",
+       "DisplayOrder" : "3",
+       "ListElementCode": "learningTasks11c",
+       "ListElement": "11c. Cannot learn anything beyond a moderately complex task, such as the steps involved in operating a washing machine to clean clothes. (6 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionLearningTasksQuestion",
+       "DisplayOrder" : "2",
+       "ListElementCode": "learningTasks11b",
+       "ListElement": "11b. Cannot learn anything beyond a simple task, such as setting an alarm clock. (9 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionLearningTasksQuestion",
+       "DisplayOrder" : "1",
+       "ListElementCode": "learningTasks11a",
+       "ListElement": "11a. Cannot learn how to complete a simple task, such as setting an alarm clock. (15 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionAwarenessOfHazardsQuestion",
+       "DisplayOrder" : "4",
+       "ListElementCode": "awarenessOfHazards12d",
+       "ListElement": "12d. None of the above applies. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionAwarenessOfHazardsQuestion",
+       "DisplayOrder" : "3",
+       "ListElementCode": "awarenessOfHazards12c",
+       "ListElement": "12c. Reduced awareness of everyday hazards leads to a significant risk of: (i) injury to self or others; or (ii) damage to property or possessions, such that the claimant occasionally requires supervision to maintain safety. (6 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionAwarenessOfHazardsQuestion",
+       "DisplayOrder" : "2",
+       "ListElementCode": "awarenessOfHazards12b",
+       "ListElement": "12b. Reduced awareness of everyday hazards leads to a significant risk of: (i) injury to self or others; or (ii) damage to property or possessions, such that the claimant frequently requires supervision to maintain safety. (9 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionAwarenessOfHazardsQuestion",
+       "DisplayOrder" : "1",
+       "ListElementCode": "awarenessOfHazards12a",
+       "ListElement": "12a. Reduced awareness of everyday hazards leads to a significant risk of: (i) injury to self or others; or (ii) damage to property or possessions, such that the claimant requires supervision for the majority of the time to maintain safety. (15 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionPersonalActionQuestion",
+       "DisplayOrder" : "4",
+       "ListElementCode": "personalAction13d",
+       "ListElement": "13d. None of the above applies. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionPersonalActionQuestion",
+       "DisplayOrder" : "3",
+       "ListElementCode": "personalAction13c",
+       "ListElement": "13c. Frequently cannot, due to impaired mental function, reliably initiate or complete at least two sequential personal actions. (6 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionPersonalActionQuestion",
+       "DisplayOrder" : "2",
+       "ListElementCode": "personalAction13b",
+       "ListElement": "13b. Cannot, due to impaired mental function, reliably initiate or complete at least two sequential personal actions for the majority of the time. (9 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionPersonalActionQuestion",
+       "DisplayOrder" : "1",
+       "ListElementCode": "personalAction13a",
+       "ListElement": "13a. Cannot, due to impaired mental function, reliably initiate or complete at least two sequential personal actions. (15 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionCopingWithChangeQuestion",
+       "DisplayOrder" : "4",
+       "ListElementCode": "copingWithChange14d",
+       "ListElement": "14d. None of the above applies. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionCopingWithChangeQuestion",
+       "DisplayOrder" : "3",
+       "ListElementCode": "copingWithChange14c",
+       "ListElement": "14c. Cannot cope with minor unplanned change (such as the timing of an appointment on the day it is due to occur), to the extent that, overall, day to day life is made significantly more difficult. (6 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionCopingWithChangeQuestion",
+       "DisplayOrder" : "2",
+       "ListElementCode": "copingWithChange14b",
+       "ListElement": "14b. Cannot cope with minor planned change (such as a pre- arranged change to the routine time scheduled for a lunch break), to the extent that, overall, day to day life is made significantly more difficult. (9 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionCopingWithChangeQuestion",
+       "DisplayOrder" : "1",
+       "ListElementCode": "copingWithChange14a",
+       "ListElement": "14a. Cannot cope with any change to the extent that day to day life cannot be managed. (15 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionGettingAboutQuestion",
+       "DisplayOrder" : "4",
+       "ListElementCode": "gettingAbout15d",
+       "ListElement": "15d. None of the above applies. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionGettingAboutQuestion",
+       "DisplayOrder" : "3",
+       "ListElementCode": "gettingAbout15c",
+       "ListElement": "15c. Is unable to get to a specified place with which the claimant is unfamiliar without being accompanied by another person. (6 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionGettingAboutQuestion",
+       "DisplayOrder" : "2",
+       "ListElementCode": "gettingAbout15b",
+       "ListElement": "15b. Is unable to get to a specified place with which the claimant is familiar, without being accompanied by another person. (9 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionGettingAboutQuestion",
+       "DisplayOrder" : "1",
+       "ListElementCode": "gettingAbout15a",
+       "ListElement": "15a. Cannot get to any place outside the claimant’s home with which the claimant is familiar. (15 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionSocialEngagementQuestion",
+       "DisplayOrder" : "4",
+       "ListElementCode": "socialEngagement16d",
+       "ListElement": "16d. None of the above applies. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionSocialEngagementQuestion",
+       "DisplayOrder" : "3",
+       "ListElementCode": "socialEngagement16c",
+       "ListElement": "16c. Engagement in social contact with someone unfamiliar to the claimant is not possible for the majority of the time due to difficulty relating to others or significant distress experienced by the claimant. (6 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionSocialEngagementQuestion",
+       "DisplayOrder" : "2",
+       "ListElementCode": "socialEngagement16b",
+       "ListElement": "16b. Engagement in social contact with someone unfamiliar to the claimant is always precluded due to difficulty relating to others or significant distress experienced by the claimant. (9 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionSocialEngagementQuestion",
+       "DisplayOrder" : "1",
+       "ListElementCode": "socialEngagement16a",
+       "ListElement": "16a. Engagement in social contact is always precluded due to difficulty relating to others or significant distress experienced by the claimant. (15 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionBehaviourQuestion",
+       "DisplayOrder" : "4",
+       "ListElementCode": "appropriatenessOfBehaviour17d",
+       "ListElement": "17d. None of the above applies. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionBehaviourQuestion",
+       "DisplayOrder" : "3",
+       "ListElementCode": "appropriatenessOfBehaviour17c",
+       "ListElement": "17c. Occasionally has uncontrollable episodes of aggressive or disinhibited behaviour that would be unreasonable in any workplace. (9 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID": "FL_ucWriteFinalDecisionBehaviourQuestion",
+       "DisplayOrder" : "2",
+       "ListElementCode": "appropriatenessOfBehaviour17b",
+       "ListElement": "17b. Frequently has uncontrollable episodes of aggressive or disinhibited behaviour that would be unreasonable in any workplace. (15 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "DisplayOrder" : "1",
+       "ID": "FL_ucWriteFinalDecisionBehaviourQuestion",
+       "ListElementCode": "appropriatenessOfBehaviour17a",
+       "ListElement": "17a. Has, on a daily basis, uncontrollable episodes of aggressive or disinhibited behaviour that would be unreasonable in any workplace. (15 points)"
+    },
+    {
+      "LiveFrom": "01/01/2018",
+      "ID": "FL_schedule7Activities",
+      "DisplayOrder" : "16",
+      "ListElementCode": "schedule7ChewingOrSwallowing",
+      "ListElement": "16. Chewing or swallowing food or drink. (a) Cannot chew or swallow food or drink; (b) Cannot chew or swallow food or drink without repeatedly stopping or experiencing breathlessness or severe discomfort; (c) Cannot chew or swallow food or drink without repeatedly receiving regular prompting given by someone else in the claimant’s presence; or (d) Owing to a severe disorder of mood or behaviour, fails to: (i) chew or swallow food or drink; or (ii) chew or swallow food or drink without regular prompting given by someone else in the claimant’s presence."
+    },
+    {
+      "LiveFrom": "01/01/2018",
+      "ID": "FL_schedule7Activities",
+      "DisplayOrder" : "15",
+      "ListElementCode": "schedule7ConveyingFoodOrDrink",
+      "ListElement": "15. Conveying food or drink to the mouth. (a) Cannot convey food or drink to the claimant’s own mouth without receiving physical assistance from someone else; (b) Cannot convey food or drink to the claimant’s own mouth without repeatedly stopping or experiencing breathlessness or severe discomfort; (c) Cannot convey food or drink to the claimant’s own mouth without receiving regular prompting given by someone else in the claimant’s presence; or (d) Owing to a severe disorder of mood or behaviour, fails to convey food or drink to the claimant’s own mouth without receiving: (i) physical assistance from someone else; or (ii) regular prompting given by someone else in the claimant’s presence."
+    },
+    {
+      "LiveFrom": "01/01/2018",
+      "ID": "FL_schedule7Activities",
+      "DisplayOrder" : "14",
+      "ListElementCode": "schedule7AppropriatenessOfBehaviour",
+      "ListElement": "14. Appropriateness of behaviour with other people, due to cognitive impairment or mental disorder. Has, on a daily basis, uncontrollable episodes of aggressive or disinhibited behaviour that would be unreasonable in any workplace."
+    },
+    {
+      "LiveFrom": "01/01/2018",
+      "ID": "FL_schedule7Activities",
+      "DisplayOrder" : "13",
+      "ListElementCode": "schedule7SocialEngagement",
+      "ListElement": "13. Coping with social engagement, due to cognitive impairment or mental disorder. Engagement in social contact is always precluded due to difficulty relating to others or significant distress experienced by the claimant."
+    },
+    {
+      "LiveFrom": "01/01/2018",
+      "ID": "FL_schedule7Activities",
+      "DisplayOrder" : "12",
+      "ListElementCode": "schedule7CopingWithChange",
+      "ListElement": "12. Coping with change. Cannot cope with any change, due to cognitive impairment or mental disorder, to the extent that day to day life cannot be managed."
+    },
+    {
+      "LiveFrom": "01/01/2018",
+      "ID": "FL_schedule7Activities",
+      "DisplayOrder" : "11",
+      "ListElementCode": "schedule7PersonalAction",
+      "ListElement": "11. Initiating and completing personal action (which means planning, organisation, problem solving, prioritising or switching tasks). Cannot, due to impaired mental function, reliably initiate or complete at least two sequential personal actions."
+    },
+    {
+      "LiveFrom": "01/01/2018",
+      "ID": "FL_schedule7Activities",
+      "DisplayOrder" : "10",
+      "ListElementCode": "schedule7AwarenessOfHazards",
+      "ListElement": "10. Awareness of hazard. Reduced awareness of everyday hazards, due to cognitive impairment or mental disorder, leads to a significant risk of: (a) injury to self or others; or (b) damage to property or possessions, such that the claimant requires supervision for the majority of the time to maintain safety."
+    },
+    {
+      "LiveFrom": "01/01/2018",
+      "ID": "FL_schedule7Activities",
+      "DisplayOrder" : "9",
+      "ListElementCode": "schedule7LearningTasks",
+      "ListElement": "9. Learning tasks. Cannot learn how to complete a simple task, such as setting an alarm clock, due to cognitive impairment or mental disorder."
+    },
+    {
+      "LiveFrom": "01/01/2018",
+      "ID": "FL_schedule7Activities",
+      "DisplayOrder" : "8",
+      "ListElementCode": "schedule7LossOfControl",
+      "ListElement": "8. Absence or loss of control whilst conscious leading to extensive evacuation of the bowel and/or voiding of the bladder, other than enuresis (bed-wetting), despite the wearing or use of any aids or adaptations which are normally or could reasonably be worn or used."
+    },
+    {
+      "LiveFrom": "01/01/2018",
+      "ID": "FL_schedule7Activities",
+      "DisplayOrder" : "7",
+      "ListElementCode": "schedule7Communication",
+      "ListElement": "7. Understanding communication by: (i) verbal means (such as hearing or lip reading) alone; (ii) non-verbal means (such as reading 16 point print or Braille) alone; or (iii) a combination of sub- paragraphs (i)  and (ii), using any aid that is normally, or could reasonably, be used unaided by another person. Cannot understand a simple message, such as the location of a fire escape, due to sensory impairment."
+    },
+    {
+      "LiveFrom": "01/01/2018",
+      "ID": "FL_schedule7Activities",
+      "DisplayOrder" : "6",
+      "ListElementCode": "schedule7MakingSelfUnderstood",
+      "ListElement": "6. Making self understood through speaking, writing, typing, or other means which are normally, or could reasonably be, used unaided by another person. Cannot convey a simple message, such as the presence of a hazard."
+    },
+    {
+      "LiveFrom": "01/01/2018",
+      "ID": "FL_schedule7Activities",
+      "DisplayOrder" : "5",
+      "ListElementCode": "schedule7ManualDexterity",
+      "ListElement": "5. Manual dexterity. Cannot press a button (such as a telephone keypad) with either hand or cannot turn the pages of a book with either hand."
+    },
+    {
+      "LiveFrom": "01/01/2018",
+      "ID": "FL_schedule7Activities",
+      "DisplayOrder" : "4",
+      "ListElementCode": "schedule7PickingUp",
+      "ListElement": "4. Picking up and moving or transferring by the use of the upper body and arms (excluding standing, sitting, bending or kneeling and all other activities specified in this Schedule). Cannot pick up and move a 0.5 litre carton full of liquid."
+    },
+    {
+      "LiveFrom": "01/01/2018",
+      "ID": "FL_schedule7Activities",
+      "DisplayOrder" : "3",
+      "ListElementCode": "schedule7Reaching",
+      "ListElement": "3. Reaching. Cannot raise either arm as if to put something in the top pocket of a coat or jacket."
+    },
+    {
+      "LiveFrom": "01/01/2018",
+      "ID": "FL_schedule7Activities",
+       "DisplayOrder" : "2",
+      "ListElementCode": "schedule7SittingPositions",
+      "ListElement": "2. Transferring from one seated position to another. Cannot move between one seated position and another seated position located next to one another without receiving physical assistance from another person."
+    },
+    {
+      "LiveFrom": "01/01/2018",
+      "ID": "FL_schedule7Activities",
+      "DisplayOrder" : "1",
+      "ListElementCode": "schedule7MobilisingUnaided",
+      "ListElement": "1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used. Cannot either: (a) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (b) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion."
+    }
+]
