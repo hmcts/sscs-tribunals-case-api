@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @RequiredArgsConstructor
 public class ActionPostHearingApplicationAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     @Value("${feature.postHearings.enabled}")
-    private boolean isPostHearingsEnabled;
+    private final boolean isPostHearingsEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {

@@ -10,10 +10,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -30,7 +28,6 @@ public class ActionPostHearingApplicationAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    @InjectMocks
     private ActionPostHearingApplicationAboutToSubmitHandler handler;
 
     @Mock
@@ -39,19 +36,19 @@ public class ActionPostHearingApplicationAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
-    private SscsCaseData sscsCaseData;
+    private SscsCaseData caseData;
 
     @Before
     public void setUp() {
-        ReflectionTestUtils.setField(handler, "isPostHearingsEnabled", true);
+        handler = new ActionPostHearingApplicationAboutToSubmitHandler(true);
 
         when(callback.getEvent()).thenReturn(ACTION_POST_HEARING_APPLICATION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
-        sscsCaseData = SscsCaseData.builder()
+        caseData = SscsCaseData.builder()
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
                 .hearingRoute(LIST_ASSIST).build())
-            .ccdCaseId("ccdId")
+            .ccdCaseId("1234")
             .documentGeneration(DocumentGeneration.builder()
                 .directionNoticeContent("Body Content")
                 .build())
@@ -64,7 +61,7 @@ public class ActionPostHearingApplicationAboutToSubmitHandlerTest {
                 .build())
             .build();
 
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
     }
 
     @Test
@@ -74,7 +71,7 @@ public class ActionPostHearingApplicationAboutToSubmitHandlerTest {
 
     @Test
     public void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        ReflectionTestUtils.setField(handler, "isPostHearingsEnabled", false);
+        handler = new ActionPostHearingApplicationAboutToSubmitHandler(false);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
@@ -89,7 +86,7 @@ public class ActionPostHearingApplicationAboutToSubmitHandlerTest {
 
     @Test
     public void givenNonLaCase_shouldReturnErrorWithCorrectMessage() {
-        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
+        caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
             .hearingRoute(GAPS)
             .build());
 

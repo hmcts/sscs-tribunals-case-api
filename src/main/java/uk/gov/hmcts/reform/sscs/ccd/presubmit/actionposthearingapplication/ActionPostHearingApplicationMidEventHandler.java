@@ -28,7 +28,7 @@ public class ActionPostHearingApplicationMidEventHandler extends IssueDocumentHa
     private final DocumentConfiguration documentConfiguration;
     private final GenerateFile generateFile;
     @Value("${feature.postHearings.enabled}")
-    private boolean isPostHearingsEnabled;
+    private final boolean isPostHearingsEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {

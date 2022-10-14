@@ -24,10 +24,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -59,7 +57,7 @@ public class ActionPostHearingApplicationMidEventHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
-    private SscsCaseData sscsCaseData;
+    private SscsCaseData caseData;
 
     private ArgumentCaptor<GenerateFileParams> capture;
 
@@ -69,13 +67,13 @@ public class ActionPostHearingApplicationMidEventHandlerTest {
     @Mock
     private DocumentConfiguration documentConfiguration;
 
-    @InjectMocks
     private ActionPostHearingApplicationMidEventHandler handler;
 
 
     @Before
     public void setUp() {
-        ReflectionTestUtils.setField(handler, "isPostHearingsEnabled", true);
+
+        handler = new ActionPostHearingApplicationMidEventHandler(documentConfiguration, generateFile, true);
 
         when(documentConfiguration.getDocuments()).thenReturn(new HashMap<>(Map.of(
             LanguagePreference.ENGLISH,  new HashMap<>(Map.of(
@@ -83,7 +81,7 @@ public class ActionPostHearingApplicationMidEventHandlerTest {
             ))
         ));
 
-        sscsCaseData = SscsCaseData.builder()
+        caseData = SscsCaseData.builder()
             .documentGeneration(DocumentGeneration.builder()
                 .generateNotice(YES)
                 .build())
@@ -99,7 +97,7 @@ public class ActionPostHearingApplicationMidEventHandlerTest {
         capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getEvent()).thenReturn(ACTION_POST_HEARING_APPLICATION);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
         when(generateFile.assemble(any())).thenReturn(URL);
         when(callback.getPageId()).thenReturn(PAGE_ID_GENERATE_NOTICE);
 
@@ -114,7 +112,7 @@ public class ActionPostHearingApplicationMidEventHandlerTest {
 
     @Test
     public void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        ReflectionTestUtils.setField(handler, "isPostHearingsEnabled", false);
+        handler = new ActionPostHearingApplicationMidEventHandler(documentConfiguration, generateFile, false);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
@@ -158,7 +156,7 @@ public class ActionPostHearingApplicationMidEventHandlerTest {
 
     @Test
     public void givenNonLaCase_shouldReturnErrorWithCorrectMessage() {
-        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
+        caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
             .hearingRoute(GAPS)
             .build());
 
