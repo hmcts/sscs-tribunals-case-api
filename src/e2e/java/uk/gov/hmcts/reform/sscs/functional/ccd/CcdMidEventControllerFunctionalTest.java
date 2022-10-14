@@ -19,12 +19,13 @@ import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.functional.mya.BaseFunctionTest;
 
 @Slf4j
 public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
 
+    public static final String ADJOURN_CASE_GAPS_CALLBACK_JSON = "handlers/adjourncase/adjournCaseGapsCallback.json";
+    public static final String WRITE_FINAL_DECISION_CALLBACK_JSON = "handlers/writefinaldecision/writeFinalDecisionCallback.json";
     @Autowired
     protected ObjectMapper objectMapper;
 
@@ -48,37 +49,41 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
                 .contentType(ContentType.JSON)
                 .header(new Header("ServiceAuthorization", "Invalid Value"))
                 .header(new Header("Authorization", idamService.getIdamOauth2Token()))
-                .body(getJsonCallbackForTest("handlers/writefinaldecision/writeFinalDecisionCallback.json"))
+                .body(getJsonCallbackForTest(WRITE_FINAL_DECISION_CALLBACK_JSON))
                 //.useRelaxedHttpsValidation()
                 .post("/ccdMidEvent")
                 .then()
                 .statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
     }
 
-    @DisplayName("Should return 200 with valid request")
+    @DisplayName("Should return HttpStatus.SC_OK with valid request")
     @Test
     public void testValidRequest() throws IOException {
-        HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(getJsonCallbackForTest("handlers/writefinaldecision/writeFinalDecisionCallback.json")), "");
-        assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(200);
+        HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(
+            getJsonCallbackForTest(WRITE_FINAL_DECISION_CALLBACK_JSON)), "");
+        assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
     }
 
     @DisplayName("Adjourn case populate venue dropdown should populate next hearing venue dropdown")
     @Test
     public void testAdjournCasePopulateVenueDropdown() throws IOException {
-        HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(getJsonCallbackForTest("handlers/writefinaldecision/writeFinalDecisionCallback.json")), "AdjournCasePopulateVenueDropdown");
+        HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(
+            getJsonCallbackForTest(WRITE_FINAL_DECISION_CALLBACK_JSON)), "AdjournCasePopulateVenueDropdown");
         CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
-        assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(200);
+        assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         DynamicList adjournCaseNextHearingVenueSelected = ccdEventResponse.getData().getAdjournCaseNextHearingVenueSelected();
-        assertThat(adjournCaseNextHearingVenueSelected.getValue()).isEqualTo(new DynamicListItem("", ""));
+        assertThat(adjournCaseNextHearingVenueSelected.getValue().getCode()).isEqualTo("");
+        assertThat(adjournCaseNextHearingVenueSelected.getValue().getLabel()).isEqualTo("");
         assertThat(adjournCaseNextHearingVenueSelected.getListItems()).hasSizeGreaterThan(2);
     }
 
     @DisplayName("Preview final decision should populate final decision preview document")
     @Test
     public void testPreviewFinalDecision() throws IOException {
-        HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(getJsonCallbackForTest("handlers/writefinaldecision/writeFinalDecisionCallback.json")), "PreviewFinalDecision");
+        HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(
+            getJsonCallbackForTest(WRITE_FINAL_DECISION_CALLBACK_JSON)), "PreviewFinalDecision");
         CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
-        assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(200);
+        assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         assertThat(ccdEventResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument()).isNotNull();
     }
 
@@ -86,9 +91,9 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
     @Test
     public void testPreviewAdjournCaseGaps() throws IOException {
         HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(getJsonCallbackForTest(
-            "handlers/adjourncase/adjournCaseGapsCallback.json")), "PreviewAdjournCase");
+            ADJOURN_CASE_GAPS_CALLBACK_JSON)), "PreviewAdjournCase");
         CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
-        assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(200);
+        assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         assertThat(ccdEventResponse.getData().getAdjournCasePreviewDocument()).isNotNull();
     }
 
@@ -96,12 +101,13 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
     @Test
     public void testAdminRestoreCasesGaps() throws IOException {
         HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(getJsonCallbackForTest(
-            "handlers/adjourncase/adjournCaseGapsCallback.json")), "AdminRestoreCases");
+            ADJOURN_CASE_GAPS_CALLBACK_JSON)), "AdminRestoreCases");
         CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
-        assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(200);
-        assertThat(ccdEventResponse.getWarnings().size()).isEqualTo(0);
-        assertThat(ccdEventResponse.getErrors().size()).isEqualTo(1);
-        assertThat(ccdEventResponse.getErrors().iterator().next()).isEqualTo("Unable to extract restoreCaseFileName");
+        assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(ccdEventResponse.getWarnings()).isEmpty();
+        assertThat(ccdEventResponse.getErrors())
+            .hasSize(1)
+            .containsOnly("Unable to extract restoreCaseFileName");
     }
 
     private CcdEventResponse getCcdEventResponse(HttpResponse httpResponse) throws IOException {
