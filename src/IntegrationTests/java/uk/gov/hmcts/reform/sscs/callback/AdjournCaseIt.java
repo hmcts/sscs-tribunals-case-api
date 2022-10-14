@@ -153,13 +153,11 @@ public class AdjournCaseIt extends AbstractEventIt {
     public void givenCallToMidEventPreviewAdjournCaseCallbackThenPreviewsTheDocumentForFaceToFaceWhenInterpreterRequiredAndLanguageSet()
         throws Exception {
         setup();
-        json =  getJson(GENERATED_FACE_TO_FACE_WITH_INTERPRETER_REQUIRED_AND_LANGUAGE_SET_JSON);
+        json = getJson(GENERATED_FACE_TO_FACE_WITH_INTERPRETER_REQUIRED_AND_LANGUAGE_SET_JSON);
 
         checkDocumentNoErrors();
 
-        ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
-        verify(generateFile).assemble(capture.capture());
-        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
+        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) getGenerateFileParamsArgumentCaptor().getValue().getFormPayload();
         final AdjournCaseTemplateBody payload = parentPayload.getAdjournCaseTemplateBody();
 
         checkPayloadDetailsAtVenue(
@@ -168,6 +166,13 @@ public class AdjournCaseIt extends AbstractEventIt {
             "It will be first in the afternoon session on a date to be fixed",
             "an interpreter in French"
         );
+    }
+
+    @NotNull
+    private ArgumentCaptor<GenerateFileParams> getGenerateFileParamsArgumentCaptor() {
+        ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
+        verify(generateFile).assemble(capture.capture());
+        return capture;
     }
 
     @DisplayName("Call to mid event preview adjourn case callback will not preview the document for face to face "
@@ -207,9 +212,7 @@ public class AdjournCaseIt extends AbstractEventIt {
 
         checkDocumentNoErrors();
 
-        ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
-        verify(generateFile).assemble(capture.capture());
-        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
+        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) getGenerateFileParamsArgumentCaptor().getValue().getFormPayload();
         final AdjournCaseTemplateBody payload = parentPayload.getAdjournCaseTemplateBody();
 
         checkPayloadDetailsNoVenue(
@@ -230,9 +233,7 @@ public class AdjournCaseIt extends AbstractEventIt {
 
         checkDocumentNoErrors();
 
-        ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
-        verify(generateFile).assemble(capture.capture());
-        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
+        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) getGenerateFileParamsArgumentCaptor().getValue().getFormPayload();
         final AdjournCaseTemplateBody payload = parentPayload.getAdjournCaseTemplateBody();
 
         checkPayloadDetailsNoVenue(
@@ -253,9 +254,7 @@ public class AdjournCaseIt extends AbstractEventIt {
 
         checkDocumentNoErrors();
 
-        ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
-        verify(generateFile).assemble(capture.capture());
-        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
+        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) getGenerateFileParamsArgumentCaptor().getValue().getFormPayload();
         final AdjournCaseTemplateBody payload = parentPayload.getAdjournCaseTemplateBody();
 
         checkPayloadDetailsNoVenue(
@@ -288,9 +287,7 @@ public class AdjournCaseIt extends AbstractEventIt {
     private void checkStandardDocumentNoInterpreter() throws Exception {
         checkDocumentNoErrors();
 
-        ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
-        verify(generateFile).assemble(capture.capture());
-        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
+        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) getGenerateFileParamsArgumentCaptor().getValue().getFormPayload();
         final AdjournCaseTemplateBody payload = parentPayload.getAdjournCaseTemplateBody();
 
         checkPayloadDetailsAtVenue(
@@ -317,7 +314,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertThat(document.getDocumentFileName()).containsPattern(
             Pattern.compile("Draft Adjournment Notice generated on \\d{1,2}-\\d{1,2}-\\d{4}\\.pdf"));
         assertThat(document.getDocumentFileName()).contains(
-            LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
+            LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
         return result;
     }
 
