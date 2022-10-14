@@ -61,7 +61,7 @@ public class AdjournCaseIt extends AbstractEventIt {
     public static final String CCD_MID_EVENT_PREVIEW_ADJOURN_CASE = "/ccdMidEventPreviewAdjournCase";
     public static final String CCD_MID_EVENT_ADJOURN_CASE_POPULATE_VENUE_DROPDOWN = "/ccdMidEventAdjournCasePopulateVenueDropdown";
     public static final String CCD_MID_EVENT = "/ccdMidEvent";
-    public static final String TEST_NAME = "Ann Test";
+    public static final String TEST_NAME = "An Test";
     public static final String CASE_ID = "12345656789";
     public static final String NINO = "JT 12 34 56 D";
     public static final String DRAFT_ADJOURNMENT_NOTICE = "DRAFT ADJOURNMENT NOTICE";
