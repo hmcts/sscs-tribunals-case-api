@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.LOCAL_DATE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -53,6 +56,9 @@ public class PreviewDocumentServiceTest {
             .hasSize(1)
             .extracting(AbstractDocument::getValue)
             .extracting(AbstractDocumentDetails::getDocumentFileName)
-            .allSatisfy(s -> assertThat(s).containsPattern(Pattern.compile("Draft Adjournment Notice generated on \\d{1,2}-\\d{1,2}-\\d{4}\\.pdf")));
+            .allSatisfy(fileName -> {
+                assertThat(fileName).containsPattern(Pattern.compile("Draft Adjournment Notice generated on \\d{1,2}-\\d{1,2}-\\d{4}\\.pdf"));
+                assertThat(fileName).contains(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+            });
     }
 }
