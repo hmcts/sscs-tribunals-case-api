@@ -62,18 +62,11 @@ public class AdjournCaseIt extends AbstractEventIt {
     public static final String CCD_MID_EVENT_ADJOURN_CASE_POPULATE_VENUE_DROPDOWN = "/ccdMidEventAdjournCasePopulateVenueDropdown";
     public static final String CCD_MID_EVENT = "/ccdMidEvent";
     public static final String TEST_NAME = "An Test";
-    public static final String CASE_ID = "12345656789";
-    public static final String NINO = "JT 12 34 56 D";
-    public static final String DRAFT_ADJOURNMENT_NOTICE = "DRAFT ADJOURNMENT NOTICE";
     public static final String CHESTER_MAGISTRATE_S_COURT = "Chester Magistrate's Court";
     public static final String FIRST_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED =
         "It will be first in the morning session on a date to be fixed";
-    public static final String FACE_TO_FACE_HEARING = "face to face hearing";
     public static final String A_STANDARD_TIME_SLOT = "a standard time slot";
     public static final String JUDGE_FULL_NAME = "Judge Full Name";
-    public static final String FACE_TO_FACE = "faceToFace";
-    public static final String SOMETHING_ELSE = "something else";
-    public static final String REASONS_1 = "Reasons 1";
     public static final String DATE_2017 = "2017-07-17";
     public static final String DATE_2019 = "2019-10-10";
     public static final String DOCUMENT_URL = "document.url";
@@ -347,8 +340,8 @@ public class AdjournCaseIt extends AbstractEventIt {
         String nextHearingDate,
         String interpreterDescription
     ) {
-        checkPayloadDetails(parentPayload, payload, nextHearingDate, FACE_TO_FACE_HEARING,
-            A_STANDARD_TIME_SLOT, FACE_TO_FACE, interpreterDescription);
+        checkPayloadDetails(parentPayload, payload, nextHearingDate, "face to face hearing",
+            A_STANDARD_TIME_SLOT, "faceToFace", interpreterDescription);
         assertThat(payload.isNextHearingAtVenue()).isTrue();
         assertThat(payload.getNextHearingVenue()).isEqualTo(CHESTER_MAGISTRATE_S_COURT);
     }
@@ -363,10 +356,10 @@ public class AdjournCaseIt extends AbstractEventIt {
         String interpreterDescription
     ) {
         assertThat(parentPayload.getAppellantFullName()).isEqualTo(TEST_NAME);
-        assertThat(parentPayload.getCaseId()).isEqualTo(CASE_ID);
-        assertThat(parentPayload.getNino()).isEqualTo(NINO);
+        assertThat(parentPayload.getCaseId()).isEqualTo("12345656789");
+        assertThat(parentPayload.getNino()).isEqualTo("JT 12 34 56 D");
         assertThat(parentPayload.getAppointeeFullName()).isEqualTo(null);
-        assertThat(parentPayload.getNoticeType()).isEqualTo(DRAFT_ADJOURNMENT_NOTICE);
+        assertThat(parentPayload.getNoticeType()).isEqualTo("DRAFT ADJOURNMENT NOTICE");
         assertThat(parentPayload.getUserName()).isEqualTo(JUDGE_FULL_NAME);
         assertThat(payload.getHeldOn()).isEqualTo(LocalDate.parse(DATE_2017));
         assertThat(payload.getHeldAt()).isEqualTo(CHESTER_MAGISTRATE_S_COURT);
@@ -378,8 +371,8 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertThat(payload.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME);
         assertThat(payload.getHeldOn()).isEqualTo(LocalDate.parse(DATE_2017));
         assertThat(payload.getHearingType()).isEqualTo(hearingType);
-        assertThat(payload.getAdditionalDirections().get(0)).isEqualTo(SOMETHING_ELSE);
-        assertThat(payload.getReasonsForDecision().get(0)).isEqualTo(REASONS_1);
+        assertThat(payload.getAdditionalDirections().get(0)).isEqualTo("something else");
+        assertThat(payload.getReasonsForDecision().get(0)).isEqualTo("Reasons 1");
         assertThat(payload.getPanelMembersExcluded()).isEqualTo("yes");
         assertThat(payload.getAppellantName()).isEqualTo(TEST_NAME);
         assertThat(payload.getInterpreterDescription()).isEqualTo(interpreterDescription);
