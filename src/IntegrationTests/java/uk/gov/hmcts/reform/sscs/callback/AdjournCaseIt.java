@@ -89,8 +89,9 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
-        assertThat(result.getErrors()).hasSize(1);
-        assertThat(result.getErrors()).containsOnly("Directions due date must be in the future");
+        assertThat(result.getErrors())
+            .hasSize(1)
+            .containsOnly("Directions due date must be in the future");
     }
 
     @DisplayName("Call to mid event callback when path is YES NO YES will validate the data when due date in future")
