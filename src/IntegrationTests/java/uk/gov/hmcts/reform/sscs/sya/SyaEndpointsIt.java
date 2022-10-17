@@ -292,13 +292,13 @@ public class SyaEndpointsIt extends AbstractEventIt {
 
     @Test
     @Parameters({"PIP, DWP PIP (1), Newcastle",
-            "ESA, Inverness DRT, Inverness DRT",
-            "UC,, Universal Credit",
-            "ESA, Coatbridge Benefit Centre,Coatbridge Benefit Centre",
-            "DLA, Disability Benefit Centre 4, DLA Child/Adult",
-            "carersAllowance,, Carers Allowance",
-            "attendanceAllowance, The Pension Service 11, Attendance Allowance",
-            "bereavementBenefit,, Bereavement Benefit"})
+        "ESA, Inverness DRT, Inverness DRT",
+        "UC,, Universal Credit",
+        "ESA, Coatbridge Benefit Centre,Coatbridge Benefit Centre",
+        "DLA, Disability Benefit Centre 4, DLA Child/Adult",
+        "carersAllowance,, Carers Allowance",
+        "attendanceAllowance, The Pension Service 11, Attendance Allowance",
+        "bereavementBenefit,, Bereavement Benefit"})
     public void givenAValidAppealForBenefitType_createValidAppealCreatedCaseWithDwpRegionalCentre(String benefitTypeCode, String dwpIssuingOffice, String expectedDwpRegionalCentre) throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 

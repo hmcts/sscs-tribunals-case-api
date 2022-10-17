@@ -27,16 +27,16 @@ public class StatementController {
                     + "The statement is saved as a piece of evidence for the case in CCD as a PDF."
     )
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Statement has been added to the appeal"),
-            @ApiResponse(code = 404, message = "No online hearing found with online hearing id")
+        @ApiResponse(code = 200, message = "Statement has been added to the appeal"),
+        @ApiResponse(code = 404, message = "No online hearing found with online hearing id")
     })
     @PostMapping(
             value = "/{identifier}/statement",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity uploadStatement(
-            @PathVariable("identifier") String identifier,
-            @RequestBody Statement statement) {
+        @PathVariable("identifier") String identifier,
+        @RequestBody Statement statement) {
         log.info("upload statement for caseId {} and tya code {}", identifier, statement.getTya());
         return appellantStatementService
                 .handleAppellantStatement(identifier, statement)

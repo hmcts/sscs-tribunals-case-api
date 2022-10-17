@@ -194,17 +194,16 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
     protected abstract void setDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData);
 
     protected List<Descriptor> getDescriptorsFromQuestionKeys(ActivityQuestionLookup activityQuestionlookup, SscsCaseData caseData, List<String> questionKeys) {
-
-        List<Descriptor> descriptors = questionKeys
-            .stream().map(questionKey -> new ImmutablePair<>(questionKey,
-                decisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData,
-                    questionKey))).filter(pair -> pair.getRight().isPresent()).map(pair ->
-                new ImmutablePair<>(pair.getLeft(), pair.getRight().get())).map(pair ->
-                buildDescriptorFromActivityAnswer(activityQuestionlookup.getByKey(pair.getLeft()),
-                    pair.getRight())).collect(Collectors.toList());
-
-        descriptors.sort(new DescriptorLexicographicalComparator());
-        return descriptors;
+        return questionKeys.stream()
+            .map(questionKey ->
+                new ImmutablePair<>(questionKey,
+                    decisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData, questionKey)))
+            .filter(pair -> pair.getRight().isPresent())
+            .map(pair -> new ImmutablePair<>(pair.getLeft(), pair.getRight().get()))
+            .map(pair ->
+                buildDescriptorFromActivityAnswer(activityQuestionlookup.getByKey(pair.getLeft()), pair.getRight()))
+            .sorted(new DescriptorLexicographicalComparator())
+            .collect(Collectors.toList());
     }
 
     protected Descriptor buildDescriptorFromActivityAnswer(ActivityQuestion activityQuestion, ActivityAnswer answer) {

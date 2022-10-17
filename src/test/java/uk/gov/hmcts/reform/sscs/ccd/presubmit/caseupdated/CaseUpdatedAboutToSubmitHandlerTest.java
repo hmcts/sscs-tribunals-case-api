@@ -417,9 +417,9 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @Ignore("commented out as case loader is failing on this validation checks, we need to do another data exercise to clean the data")
     @Test
     @Parameters({"!. House, House, House, House",
-            "~., 101 House, House, House",
-            " Ho.use, ., \"101 House, House",
-            " ., ãHouse, âHouse, &101 House"})
+        "~., 101 House, House, House",
+        " Ho.use, ., \"101 House, House",
+        " ., ãHouse, âHouse, &101 House"})
     public void givenACaseUpdateEventWithInvalidAppellantAddressDetails_thenReturnError(String line1, String line2, String town, String county) {
         Address appellantAddress = callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress();
         appellantAddress.setLine1(line1);
@@ -435,9 +435,9 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @Ignore("commented out as case loader is failing on this validation checks, we need to do another data exercise to clean the data")
     @Test
     @Parameters({"!. House, House, House, House",
-            "~., 101 House, House, House",
-            " Ho.use, ., \"101 House, House",
-            " ., ãHouse, âHouse, &101 House"})
+        "~., 101 House, House, House",
+        " Ho.use, ., \"101 House, House",
+        " ., ãHouse, âHouse, &101 House"})
     public void givenACaseUpdateEventWithInvalidRepresentativeAddressDetails_thenReturnError(String line1, String line2, String town, String county) {
         Representative representative = Representative.builder().address(buildAddress(line1, line2, county, town)).build();
         callback.getCaseDetails().getCaseData().getAppeal().setRep(representative);
@@ -450,9 +450,9 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @Ignore("commented out as case loader is failing on this validation checks, we need to do another data exercise to clean the data")
     @Test
     @Parameters({"!. House, House, House, House",
-            "~., 101 House, House, House",
-            " Ho.use, ., \"101 House, House",
-            " ., ãHouse, âHouse, &101 House"})
+        "~., 101 House, House, House",
+        " Ho.use, ., \"101 House, House",
+        " ., ãHouse, âHouse, &101 House"})
     public void givenACaseUpdateEventWithInvalidAppointeeAddressDetails_thenReturnError(String line1, String line2, String town, String county) {
         Appointee appointee = Appointee.builder().address(buildAddress(line1, line2, county, town)).build();
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(appointee);
@@ -465,9 +465,9 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @Ignore("commented out as case loader is failing on this validation checks, we need to do another data exercise to clean the data")
     @Test
     @Parameters({"!. House, House, House, House",
-            "~., 101 House, House, House",
-            " Ho.use, ., \"101 House, House",
-            " ., ãHouse, âHouse, &101 House"})
+        "~., 101 House, House, House",
+        " Ho.use, ., \"101 House, House",
+        " ., ãHouse, âHouse, &101 House"})
     public void givenACaseUpdateEventWithInvalidJointPartyAddressDetails_thenReturnError(String line1, String line2, String town, String county) {
         callback.getCaseDetails().getCaseData().getJointParty().setAddress(buildAddress(line1, line2, county, town));
 
@@ -478,10 +478,10 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"  ,   ,   ,   ",
-             "Ts. Test's Ltd, Ts. Test's Ltd, Ts. Test's Ltd, Ts. Test's Ltd",
-            "A“”\"’'?![]()/£:_+-%&, A“”\"’'?![]()/£:_+-%&, A“”\"’'?![]()/£:_+-%&, A“”\"’'?![]()/£:_+-%&",
-            "\\,Test Street,\\,Test Street,\\,Test Street,\\,Test Street",
-            ".dot Street,.dot Street,.dot Street,.dot Street"})
+        "Ts. Test's Ltd, Ts. Test's Ltd, Ts. Test's Ltd, Ts. Test's Ltd",
+        "A“”\"’'?![]()/£:_+-%&, A“”\"’'?![]()/£:_+-%&, A“”\"’'?![]()/£:_+-%&, A“”\"’'?![]()/£:_+-%&",
+        "\\,Test Street,\\,Test Street,\\,Test Street,\\,Test Street",
+        ".dot Street,.dot Street,.dot Street,.dot Street"})
     public void givenACaseUpdateEventWithAddressDetails_thenShouldNotReturnError(String line1, String line2, String town, String county) {
         Address address = buildAddress(line1, line2, county, town);
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAddress(address);
@@ -593,9 +593,9 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         assertThat(response.getWarnings(), hasItems("FTA issuing office is empty"));
         assertThat(response.getErrors(), hasItems("Benefit type code is invalid, should be one of: ESA, JSA, PIP, DLA, UC, carersAllowance, attendanceAllowance, "
-                        + "bereavementBenefit, industrialInjuriesDisablement, maternityAllowance, socialFund, incomeSupport, bereavementSupportPaymentScheme, "
-                        + "industrialDeathBenefit, pensionCredit, retirementPension, childSupport, taxCredit, guardiansAllowance, taxFreeChildcare, "
-                        + "homeResponsibilitiesProtection, childBenefit, thirtyHoursFreeChildcare, guaranteedMinimumPension, nationalInsuranceCredits"));
+            + "bereavementBenefit, industrialInjuriesDisablement, maternityAllowance, socialFund, incomeSupport, bereavementSupportPaymentScheme, "
+            + "industrialDeathBenefit, pensionCredit, retirementPension, childSupport, taxCredit, guardiansAllowance, taxFreeChildcare, "
+            + "homeResponsibilitiesProtection, childBenefit, thirtyHoursFreeChildcare, guaranteedMinimumPension, nationalInsuranceCredits"));
     }
 
     @Test
@@ -607,30 +607,30 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         assertEquals(1, response.getErrors().size());
         assertThat(response.getErrors(), hasItems("Benefit type code is invalid, should be one of: ESA, JSA, PIP, DLA, UC, carersAllowance, attendanceAllowance, "
-                + "bereavementBenefit, industrialInjuriesDisablement, maternityAllowance, socialFund, incomeSupport, bereavementSupportPaymentScheme, "
-                + "industrialDeathBenefit, pensionCredit, retirementPension, childSupport, taxCredit, guardiansAllowance, taxFreeChildcare, "
-                + "homeResponsibilitiesProtection, childBenefit, thirtyHoursFreeChildcare, guaranteedMinimumPension, nationalInsuranceCredits"));
+            + "bereavementBenefit, industrialInjuriesDisablement, maternityAllowance, socialFund, incomeSupport, bereavementSupportPaymentScheme, "
+            + "industrialDeathBenefit, pensionCredit, retirementPension, childSupport, taxCredit, guardiansAllowance, taxFreeChildcare, "
+            + "homeResponsibilitiesProtection, childBenefit, thirtyHoursFreeChildcare, guaranteedMinimumPension, nationalInsuranceCredits"));
     }
 
     @Test
     @Parameters({
-            "ESA,DWP issuing office is invalid\\, should one of: Balham DRT\\, Birkenhead LM DRT\\, Chesterfield DRT\\, Coatbridge Benefit Centre\\, Inverness DRT\\, Lowestoft DRT\\, Milton Keynes DRT\\, Norwich DRT\\, Sheffield DRT\\, Springburn DRT\\, Watford DRT\\, Wellingborough DRT\\, Worthing DRT\\, Recovery from Estates",
-            "PIP,DWP issuing office is invalid\\, should one of: 1\\, 2\\, 3\\, 4\\, 5\\, 6\\, 7\\, 8\\, 9\\, AE\\, Recovery from Estates",
-            "DLA,DWP issuing office is invalid\\, should one of: Disability Benefit Centre 4\\, The Pension Service 11\\, Recovery from Estates",
-            "UC,DWP issuing office is invalid\\, should one of: Universal Credit\\, Recovery from Estates",
-            "carersAllowance,DWP issuing office is invalid\\, should one of: Carer’s Allowance Dispute Resolution Team",
-            "bereavementBenefit,DWP issuing office is invalid\\, should one of: Pensions Dispute Resolution Team",
-            "attendanceAllowance,DWP issuing office is invalid\\, should one of: The Pension Service 11\\, Recovery from Estates",
-            "industrialInjuriesDisablement,DWP issuing office is invalid\\, should one of: Barrow IIDB Centre\\, Barnsley Benefit Centre",
-            "maternityAllowance,DWP issuing office is invalid\\, should one of: Walsall Benefit Centre",
-            "JSA,DWP issuing office is invalid\\, should one of: Worthing DRT\\, Birkenhead DRT\\, Inverness DRT\\, Recovery from Estates",
-            "socialFund,DWP issuing office is invalid\\, should one of: St Helens Sure Start Maternity Grant\\, Funeral Payment Dispute Resolution Team\\, Pensions Dispute Resolution Team",
-            "incomeSupport,DWP issuing office is invalid\\, should one of: Worthing DRT\\, Birkenhead DRT\\, Inverness DRT\\, Recovery from Estates",
-            "bereavementSupportPaymentScheme,DWP issuing office is invalid\\, should one of: Pensions Dispute Resolution Team",
-            "industrialDeathBenefit,DWP issuing office is invalid\\, should one of: Barrow IIDB Centre\\, Barnsley Benefit Centre",
-            "pensionCredit,DWP issuing office is invalid\\, should one of: Pensions Dispute Resolution Team\\, Recovery from Estates",
-            "retirementPension,DWP issuing office is invalid\\, should one of: Pensions Dispute Resolution Team\\, Recovery from Estates",
-            "childSupport,DWP issuing office is invalid\\, should one of: Child Maintenance Service Group",
+        "ESA,DWP issuing office is invalid\\, should one of: Balham DRT\\, Birkenhead LM DRT\\, Chesterfield DRT\\, Coatbridge Benefit Centre\\, Inverness DRT\\, Lowestoft DRT\\, Milton Keynes DRT\\, Norwich DRT\\, Sheffield DRT\\, Springburn DRT\\, Watford DRT\\, Wellingborough DRT\\, Worthing DRT\\, Recovery from Estates",
+        "PIP,DWP issuing office is invalid\\, should one of: 1\\, 2\\, 3\\, 4\\, 5\\, 6\\, 7\\, 8\\, 9\\, AE\\, Recovery from Estates",
+        "DLA,DWP issuing office is invalid\\, should one of: Disability Benefit Centre 4\\, The Pension Service 11\\, Recovery from Estates",
+        "UC,DWP issuing office is invalid\\, should one of: Universal Credit\\, Recovery from Estates",
+        "carersAllowance,DWP issuing office is invalid\\, should one of: Carer’s Allowance Dispute Resolution Team",
+        "bereavementBenefit,DWP issuing office is invalid\\, should one of: Pensions Dispute Resolution Team",
+        "attendanceAllowance,DWP issuing office is invalid\\, should one of: The Pension Service 11\\, Recovery from Estates",
+        "industrialInjuriesDisablement,DWP issuing office is invalid\\, should one of: Barrow IIDB Centre\\, Barnsley Benefit Centre",
+        "maternityAllowance,DWP issuing office is invalid\\, should one of: Walsall Benefit Centre",
+        "JSA,DWP issuing office is invalid\\, should one of: Worthing DRT\\, Birkenhead DRT\\, Inverness DRT\\, Recovery from Estates",
+        "socialFund,DWP issuing office is invalid\\, should one of: St Helens Sure Start Maternity Grant\\, Funeral Payment Dispute Resolution Team\\, Pensions Dispute Resolution Team",
+        "incomeSupport,DWP issuing office is invalid\\, should one of: Worthing DRT\\, Birkenhead DRT\\, Inverness DRT\\, Recovery from Estates",
+        "bereavementSupportPaymentScheme,DWP issuing office is invalid\\, should one of: Pensions Dispute Resolution Team",
+        "industrialDeathBenefit,DWP issuing office is invalid\\, should one of: Barrow IIDB Centre\\, Barnsley Benefit Centre",
+        "pensionCredit,DWP issuing office is invalid\\, should one of: Pensions Dispute Resolution Team\\, Recovery from Estates",
+        "retirementPension,DWP issuing office is invalid\\, should one of: Pensions Dispute Resolution Team\\, Recovery from Estates",
+        "childSupport,DWP issuing office is invalid\\, should one of: Child Maintenance Service Group",
     })
     public void givenValidBenefitTypeAndInvalidDwpIssuingOffice_thenAddWarningMessages(String benefitCode, String warning) {
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefitCode).build());
@@ -644,12 +644,12 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"PIP,1,Newcastle", "ESA,Balham DRT,Balham DRT", "DLA,Disability Benefit Centre 4,DLA Child/Adult", "UC,Universal Credit,Universal Credit",
-            "carersAllowance, Carer’s Allowance Dispute Resolution Team,Carers Allowance", "bereavementBenefit,Pensions Dispute Resolution Team,Bereavement Benefit",
-            "attendanceAllowance,The Pension Service 11,Attendance Allowance", "industrialInjuriesDisablement,Barrow IIDB Centre,IIDB Barrow", "maternityAllowance,Walsall Benefit Centre,Maternity Allowance",
-            "JSA,Worthing DRT,JSA Worthing", "socialFund,St Helens Sure Start Maternity Grant,SSMG","incomeSupport,Worthing DRT,IS Worthing",
-            "bereavementSupportPaymentScheme,Pensions Dispute Resolution Team,Bereavement Support Payment", "industrialDeathBenefit,Barrow IIDB Centre,IDB Barrow",
-            "pensionCredit,Pensions Dispute Resolution Team,Pension Credit", "retirementPension,Pensions Dispute Resolution Team,Retirement Pension",
-            "childSupport,Child Maintenance Service Group,Child Support"
+        "carersAllowance, Carer’s Allowance Dispute Resolution Team,Carers Allowance", "bereavementBenefit,Pensions Dispute Resolution Team,Bereavement Benefit",
+        "attendanceAllowance,The Pension Service 11,Attendance Allowance", "industrialInjuriesDisablement,Barrow IIDB Centre,IIDB Barrow", "maternityAllowance,Walsall Benefit Centre,Maternity Allowance",
+        "JSA,Worthing DRT,JSA Worthing", "socialFund,St Helens Sure Start Maternity Grant,SSMG","incomeSupport,Worthing DRT,IS Worthing",
+        "bereavementSupportPaymentScheme,Pensions Dispute Resolution Team,Bereavement Support Payment", "industrialDeathBenefit,Barrow IIDB Centre,IDB Barrow",
+        "pensionCredit,Pensions Dispute Resolution Team,Pension Credit", "retirementPension,Pensions Dispute Resolution Team,Retirement Pension",
+        "childSupport,Child Maintenance Service Group,Child Support"
     })
     public void givenValidBenefitTypeAndValidDwpIssuingOffice_thenThereIsNoWarningMessagesAndSetRegionalCenter(String benefitCode, String dwpIssuingOffice, String regionalCenter) {
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefitCode).build());
@@ -1190,10 +1190,10 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({
-            "guaranteedMinimumPension,Guaranteed Minimum Pension,054,0,0",
-            "nationalInsuranceCredits,Bereavement Benefit,test,0,2",
-            "socialFund,30 Hours Free Childcare,002,0,1",
-            "childSupport,Child Support,002,0,0"
+        "guaranteedMinimumPension,Guaranteed Minimum Pension,054,0,0",
+        "nationalInsuranceCredits,Bereavement Benefit,test,0,2",
+        "socialFund,30 Hours Free Childcare,002,0,1",
+        "childSupport,Child Support,002,0,0"
     })
     public void givenSscs5CaseBenefitCodeAndDescriptionSuperUser_thenErrorIsShownForInvalidSet(String code, String description,
                                                                                       String benefitCode, int error, int warnings) {
