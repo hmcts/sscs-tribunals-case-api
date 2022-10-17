@@ -15,7 +15,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.39.0'
     id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.7.0'
-    id 'org.owasp.dependencycheck' version '6.2.2'
+    id 'org.owasp.dependencycheck' version '7.2.1'
     id 'au.com.dius.pact' version '4.2.14'
     id 'com.github.hmcts.rse-cft-lib' version '0.19.380'
 }
@@ -85,8 +85,8 @@ sourceSets {
 }
 
 dependencies {
-    integrationTestCompile(sourceSets.test.output)
-    e2eCompile(sourceSets.test.output)
+    integrationTestImplementation(sourceSets.test.output)
+    e2eImplementation(sourceSets.test.output)
 }
 
 task integration(type: Test) {
@@ -144,8 +144,19 @@ dependencyUpdates.resolutionStrategy = {
 dependencyCheck {
     // Specifies if the build should be failed if a CVSS score above a specified level is identified.
     // range of 7-10 fails the build, anything lower and it doesn't fail the build
-    failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 7.0 : 11
+    failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild', 'true') == 'true' ? 7.0 : 11
     suppressionFile = 'dependency-check-suppressions.xml'
+
+    cveValidForHours = 24
+
+    analyzers {
+        retirejs {
+            enabled = false
+        }
+        ossIndex {
+            enabled = false
+        }
+    }
 }
 
 repositories {
@@ -198,38 +209,15 @@ sonarqube {
 }
 
 configurations {
-    integrationTestCompile.extendsFrom(testCompile)
-    integrationTestRuntime.extendsFrom(testRuntime)
-    e2eCompile.extendsFrom(testCompile)
-    e2eRuntime.extendsFrom(testRuntime)
-    contractTestCompile.extendsFrom(testCompile)
-    contractTestRuntime.extendsFrom(testRuntime)
+    integrationTestImplementation.extendsFrom(testImplementation)
+    integrationTestRuntimeOnly.extendsFrom(testRuntimeOnly)
+    e2eImplementation.extendsFrom(testImplementation)
+    e2eRuntimeOnly.extendsFrom(testRuntimeOnly)
+    contractTestImplementation.extendsFrom(testImplementation)
+    contractTestRuntimeOnly.extendsFrom(testRuntimeOnly)
 }
-
-
-def versions = [
-        assertj         : '3.21.0',
-        azureCore       : '1.27.0',
-        azureMessagingServiceBus: '7.6.0',
-        commonsIo       : '2.11.0',
-        gradlePitest    : '1.3.0',
-        jackson         : '2.11.4',
-        junitJupiter    : '5.7.2',
-        lombok          : '1.18.22',
-        pact            : '4.1.7',
-        pitest          : '1.4.2',
-        reactorCore     : '3.4.15',
-        reformLogging   : '5.1.7',
-        sonarPitest     : '0.5',
-        springfoxSwagger: '2.8.0'
-]
 
 ext["rest-assured.version"] = '4.2.0'
-ext['spring-security.version']='5.3.8.RELEASE'
-
-ext {
-    springCloudVersion = 'Hoxton.SR12'
-}
 
 dependencyManagement {
     dependencies {
@@ -275,13 +263,6 @@ dependencyManagement {
 
         dependencySet(group: 'org.apache.xmlgraphics', version: '1.14') {
             entry 'batik-all'
-        }
-
-        //CVE-2021-27807
-        dependencySet(group: 'org.apache.pdfbox', version: '2.0.24') {
-            entry 'pdfbox'
-            entry 'pdfbox-tools'
-            entry 'preflight'
         }
 
         //CVE-2021-22118
@@ -346,130 +327,166 @@ dependencyManagement {
             entry 'snakeyaml'
         }
 
-        imports {
-            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        //CVE-2021-42550
+        dependencySet(group: 'ch.qos.logback', version: '1.2.11') {
+            entry 'logback-core'
+            entry 'logback-classic'
         }
-    }
-}
 
-configurations.all {
-    resolutionStrategy {
-        eachDependency { DependencyResolveDetails details ->
-            if (details.requested.group in ['com.fasterxml.jackson.module', 'com.fasterxml.jackson.datatype']) {
-                details.useVersion versions.jackson
-            }
+        //CVE-2020-36518, CVE-2022-42003, CVE-2022-42004
+        dependencySet(group: 'com.fasterxml.jackson.core', version: '2.13.4') {
+            entry 'jackson-databind'
+            entry 'jackson-core'
+            entry 'jackson-annotations'
+        }
+
+        //CVE-2020-36518, CVE-2022-42003, CVE-2022-42004
+        dependencySet(group: 'com.fasterxml.jackson.datatype', version: '2.13.4') {
+            entry 'jackson-datatype-jsr310'
+            entry 'jackson-datatype-jdk8'
+        }
+
+        //CVE-2020-36518, CVE-2022-42003, CVE-2022-42004
+        dependencySet(group: 'com.fasterxml.jackson.dataformat', version: '2.13.4') {
+            entry 'jackson-dataformat-cbor'
+            entry 'jackson-dataformat-yaml'
+            entry 'jackson-dataformat-xml'
+            entry 'jackson-dataformat-smile'
+        }
+
+
+        dependency group: 'commons-io', name: 'commons-io', version: '2.11.0'
+
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:Hoxton.SR12"
         }
     }
 }
 
 dependencies {
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-activemq'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail'
 
-    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
-    compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.1'
-    compile group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
-    compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.3'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
+    implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.1'
+    implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
+    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.3'
 
-    compile group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.3'
+    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.3'
+    implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.1'
+    implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.8.6'
 
-    compile group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.4'
+    implementation group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.4'
 
-    compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
-    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
+    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.8.0'
+    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.8.0'
 
-    compile group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.7'
-    compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.2'
+    implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.7'
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.2'
 
-    compile group: 'com.github.hmcts', name: 'auth-checker-lib', version: '2.1.5'
-    compile group: 'com.github.hmcts', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
-    compile group: 'com.github.hmcts', name: 'java-logging', version: versions.reformLogging
-    compile group: 'com.github.hmcts', name: 'doc-assembly-client', version: '1.07'
-    compile("com.github.hmcts:ccd-case-document-am-client:1.7.2")
+    implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '2.1.5'
+    implementation group: 'com.github.hmcts', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
+    implementation group: 'com.github.hmcts', name: 'java-logging', version: '5.1.7'
+    implementation group: 'com.github.hmcts', name: 'doc-assembly-client', version: '1.07'
+    implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.2'
     //remove when secure doc store is live
-    compile group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
+    implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
+    implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.18.0'
-    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.56'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '4.19.0'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.5.0'
 
-    compile group: 'com.azure', name: 'azure-core', version: versions.azureCore
-    compile group: 'com.azure', name: 'azure-messaging-servicebus', version: versions.azureMessagingServiceBus
+    implementation group: 'com.azure', name: 'azure-core', version: '1.27.0'
+    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.6.0'
 
-    compile group: 'io.projectreactor', name: 'reactor-core', version: versions.reactorCore
+    implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.4.15'
 
-    compile group:'org.overviewproject', name: 'mime-types', version: '1.0.2'
+    implementation group:'org.overviewproject', name: 'mime-types', version: '1.0.2'
 
-    compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.6.0'
+    implementation group:'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+    implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.6.0'
 
-    compile 'javax.xml.bind:jaxb-api:2.3.1'
-    testCompile group: 'io.rest-assured', name: 'rest-assured'
-    testCompile group: 'com.github.hmcts', name: 'fortify-client', version: '1.2.2', classifier: 'all', {
+    implementation group: 'org.pitest', name: 'pitest', version:  '1.4.2'
+    implementation group:'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.3.0'
+    implementation group:'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: '0.5'
+
+    testImplementation group: 'io.rest-assured', name: 'rest-assured'
+    testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.2.2', classifier: 'all', {
         exclude group: 'commons-io', module: 'commons-io'
     }
-    compile group: 'commons-io', name: 'commons-io', version: versions.commonsIo
 
-    integrationTestCompile group: 'commons-io', name: 'commons-io', version: versions.commonsIo
+    implementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
 
-    compile "org.projectlombok:lombok:$versions.lombok"
-    annotationProcessor "org.projectlombok:lombok:$versions.lombok"
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
+    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.9'
+    implementation group: 'org.apache.pdfbox', name: 'xmpbox', version: '2.0.25'
+    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.25'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.4.1'
+    implementation group: 'org.apache.tika', name: 'tika-parsers', version: '2.4.1'
 
-    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
+    implementation group: 'org.json', name: 'json', version: '20220924'
+
+    implementation group: 'com.opencsv', name: 'opencsv', version: '5.6'
+
+    implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.58"
+
+    integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
+
+    e2eImplementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
+
+    implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
+
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
-    testCompile group: 'com.azure', name: 'azure-core', version: versions.azureCore
-    testCompile group: 'com.azure', name: 'azure-messaging-servicebus', version: versions.azureMessagingServiceBus
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '4.0.0'
-    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.28.0'
-    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.0.0'
-    testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
-    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.28.0'
-    testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
+    testImplementation group: 'com.azure', name: 'azure-core', version: '1.27.0'
+    testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.6.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.0.0'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.28.0'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.0.0'
+    testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.28.0'
+    testImplementation group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
-    testCompile 'pl.pragmatists:JUnitParams:1.1.1'
+    testImplementation group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
 
-    testCompileOnly "org.projectlombok:lombok:$versions.lombok"
-    testAnnotationProcessor "org.projectlombok:lombok:$versions.lombok"
-    e2eCompile "org.projectlombok:lombok:$versions.lombok"
-    e2eAnnotationProcessor "org.projectlombok:lombok:$versions.lombok"
-    integrationTestAnnotationProcessor "org.projectlombok:lombok:$versions.lombok"
+    testImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
+    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
+    e2eImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
+    e2eAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
+    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
 
-    testCompile "org.junit.jupiter:junit-jupiter-api:$versions.junitJupiter"
-    testRuntime "org.junit.jupiter:junit-jupiter-engine:$versions.junitJupiter"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:$versions.junitJupiter"
-    testImplementation "org.assertj:assertj-core:$versions.assertj"
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.2'
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.2'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.2'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.21.0'
 
-    e2eRuntime "org.junit.platform:junit-platform-commons:1.8.2"
-
-    compile group: 'org.pitest', name: 'pitest', version: versions.pitest
-    compile group:'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
-    compile group:'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: versions.sonarPitest
+    e2eRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.8.2'
 
     //pact contract testing
-    contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact
-    contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact
-    contractTestCompile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.1.7'
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.7'
 
-    contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact
-    contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'java8',  version: versions.pact
-    contractTestRuntime group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
+    contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.1.7'
+    contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'java8',  version: '4.1.7'
 
-    contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    contractTestCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junitJupiter
-    contractTestRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junitJupiter
+    contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+    contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.2'
+    contractTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.2'
 
-    contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junitJupiter
-    contractTestRuntime "org.junit.platform:junit-platform-commons:1.8.1"
+    contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.2'
+    contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.9.1'
 
-    contractTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.31')
-    contractTestCompile sourceSets.main.runtimeClasspath
-    contractTestCompile sourceSets.test.runtimeClasspath
+    contractTestImplementation sourceSets.main.runtimeClasspath
+    contractTestImplementation sourceSets.test.runtimeClasspath
 
-    cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
-    cftlibAnnotationProcessor "org.projectlombok:lombok:$versions.lombok"
+    cftlibImplementation group: 'org.springframework.boot', name: 'spring-boot-devtools'
+    cftlibAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
 
 }
 // this is required to force Java running on the Azure Windows Server OS into using
@@ -546,7 +563,7 @@ task runAndPublishConsumerPactTests(type: Test){
 
 task getSscsCommonVersion{
     doLast {
-        print versions.sscsCommon
+        print '4.18.0'
     }
 }
 
@@ -602,7 +619,9 @@ bootWithCCD {
     //---Additional compose services---
     //Place any extra compose files you'd like to be started automatically here. These should be
     //in the folder /src/cftlib/resources/docker/ and comma delimited.
-    environment 'ADDITIONAL_COMPOSE_FILES', 'cft-lib-activemq.yml,cft-lib-doc-stack.yml,cft-lib-doc-assembly.yml'
+    environment 'ADDITIONAL_COMPOSE_FILES', 'cft-lib-activemq.yml,cft-lib-doc-stack.yml,cft-lib-doc-assembly.yml,cft-lib-ref-data-wiremock.yml'
+    //Turn this on to automatically recreate containers above. Useful for debugging if you make changes.
+    environment 'FORCE_RECREATE_ADDITIONAL_CONTAINERS', 'false'
 
     environment 'XUI_PORT', '3455'
     environment 'RSE_LIB_S2S_PORT', '4502'
@@ -616,11 +635,13 @@ bootWithCCD {
     environment 'DOC_ASSEMBLY_URL', 'http://localhost:4631'
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'evidence'
     environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
-    environment 'CASE_ACCESS_MANAGEMENT_FEATURE', 'false'
     environment 'CASE_DOCUMENT_S2S_AUTHORISED_SERVICES', 'ccd_case_document_am_api,ccd_gw,xui_webapp,ccd_data,bulk_scan_processor,sscs'
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,payment-api,xui_webapp,sscs,ccd_case_document_am_api,am_role_assignment_service'
-    environment 'GAPS_SWITCHOVER_FEATURE', 'true'
-    environment 'SCHEDULE_LISTING_FEATURE', 'true'
+    environment 'CASE_ACCESS_MANAGEMENT_FEATURE', 'true'
+    //Wiremock
+    environment 'RD_LOCATION_REF_API_URL', 'http://localhost:8084'
+
+    // New queue
     environment 'HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING', 'Endpoint=http://localhost:5672/;SharedAccessKeyName=admin;SharedAccessKey=admin;'
     environment 'HEARINGS_EVENT_QUEUE_NAME', 'tribunals-to-hearings-queue'
 }
