@@ -18,7 +18,4 @@ done
 
 echo "Secret fetching complete"
 
-# Login in to hmctsprivate azure container registry to pull camunda
-$(dirname "$0")/login.sh
-
 ./gradlew bootWithCCD

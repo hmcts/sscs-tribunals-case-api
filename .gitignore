@@ -33,3 +33,4 @@ bin/
 *.hprof
 
 /build.gradle.log
+/gradle-build.log
