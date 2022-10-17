@@ -9,8 +9,7 @@ services:
     ports:
       - 61616:61616
       - 8161:8161
-    environment:
-      executable: "blob"
+      - 5672:5672
     networks:
       - cftlib_default
 

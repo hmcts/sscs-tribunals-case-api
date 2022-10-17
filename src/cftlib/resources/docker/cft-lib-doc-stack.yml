@@ -1,7 +1,7 @@
 ---
 version: '3.5'
 
-name: cft-lib-doc-stack
+#name: cft-lib-doc-stack
 
 services:
   dm-store:

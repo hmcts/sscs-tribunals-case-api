@@ -1,7 +1,7 @@
 ---
 version: '3.5'
 
-name: cft-lib-doc-assembly
+#name: cft-lib-doc-assembly
 
 services:
   rpa-dg-docassembly-api:

@@ -3,9 +3,14 @@ package uk.gov.hmcts.reform.sscs.service.servicebus;
 import com.azure.messaging.servicebus.ServiceBusMessage;
 import com.azure.messaging.servicebus.ServiceBusSenderClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.microsoft.applicationinsights.core.dependencies.google.gson.Gson;
+import javax.jms.Destination;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
+import org.springframework.jms.annotation.JmsListener;
+import org.springframework.jms.core.JmsTemplate;
 import uk.gov.hmcts.reform.sscs.model.servicebus.SessionAwareMessagingService;
 import uk.gov.hmcts.reform.sscs.model.servicebus.SessionAwareRequest;
 
@@ -17,18 +22,16 @@ public class SessionAwareServiceBusMessagingService implements SessionAwareMessa
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Override
+    private final JmsTemplate jmsTemplate;
+
+
     public boolean sendMessage(SessionAwareRequest message) {
 
         try {
 
-            ServiceBusMessage serviceBusMessage = new ServiceBusMessage(objectMapper.writeValueAsString(message));
-            serviceBusMessage.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            serviceBusMessage.getApplicationProperties().put("_type", "uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest");
+            //ServiceBusMessage serviceBusMessage = new ServiceBusMessage(objectMapper.writeValueAsString(message));
+            jmsTemplate.convertAndSend("tribunals-to-hearings-queue", message);
 
-            log.info("About to send request with body: {}", serviceBusMessage.getBody().toString());
-
-            senderClient.sendMessage(serviceBusMessage);
 
         } catch (Exception ex) {
             log.error("Unable to send message {}. Cause: {}", message, ex);
