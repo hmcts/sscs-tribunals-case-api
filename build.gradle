@@ -383,6 +383,7 @@ dependencies {
     implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.3'
 
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.3'
+    implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.1'
 
     implementation group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.4'
 
@@ -400,8 +401,8 @@ dependencies {
     //remove when secure doc store is live
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '4.18.0-RC-CVE-Fix-3'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.56-RC-CVE-Fix'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '4.19.0'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.5.0'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.27.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.6.0'
@@ -422,6 +423,8 @@ dependencies {
     }
 
     implementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
+
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
 
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
     
