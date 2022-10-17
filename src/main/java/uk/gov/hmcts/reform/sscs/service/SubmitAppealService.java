@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService.getFirstHalfOfPostcode;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;

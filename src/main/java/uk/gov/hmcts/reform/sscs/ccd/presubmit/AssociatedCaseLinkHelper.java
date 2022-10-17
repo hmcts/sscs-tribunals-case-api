@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -74,7 +73,7 @@ public class AssociatedCaseLinkHelper {
         if (!matchedByNinoCases.isEmpty() && !StringUtils.isEmpty(caseId)) {
             for (SscsCaseDetails sscsCaseDetails: matchedByNinoCases) {
                 SscsCaseData sscsCaseData = sscsCaseDetails.getData();
-                List<CaseLink> linkList = Optional.ofNullable(sscsCaseData.getAssociatedCase()).orElse(Lists.newArrayList());
+                List<CaseLink> linkList = Optional.ofNullable(sscsCaseData.getAssociatedCase()).orElse(new ArrayList<>());
                 linkList.add(CaseLink.builder().value(
                         CaseLinkDetails.builder().caseReference(caseId).build()).build());
                 Set<CaseLink> uniqueLinkSet = new HashSet<>(linkList);
