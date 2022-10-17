@@ -265,13 +265,6 @@ dependencyManagement {
             entry 'batik-all'
         }
 
-        //CVE-2021-27807
-        dependencySet(group: 'org.apache.pdfbox', version: '2.0.24') {
-            entry 'pdfbox'
-            entry 'pdfbox-tools'
-            entry 'preflight'
-        }
-
         //CVE-2021-22118
         dependencySet(group: 'org.springframework', version: '5.2.22.RELEASE') {
             entry 'spring-aop'
@@ -384,6 +377,7 @@ dependencies {
 
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.3'
     implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.1'
+    implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.8.6'
 
     implementation group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.4'
 
@@ -400,6 +394,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.2'
     //remove when secure doc store is live
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
+    implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: '4.19.0'
     implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.5.0'
@@ -425,9 +420,20 @@ dependencies {
     implementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
 
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
+    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.9'
+    implementation group: 'org.apache.pdfbox', name: 'xmpbox', version: '2.0.25'
+    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.25'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.4.1'
+    implementation group: 'org.apache.tika', name: 'tika-parsers', version: '2.4.1'
+
+    implementation group: 'org.json', name: 'json', version: '20220924'
+
+    implementation group: 'com.opencsv', name: 'opencsv', version: '5.6'
+
+    implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.58"
 
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
-    
+
     e2eImplementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
 
     implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
