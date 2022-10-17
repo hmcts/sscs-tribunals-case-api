@@ -377,7 +377,7 @@ dependencies {
     compile group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
     compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.3'
 
-    compile group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.3'
+    compile group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.1'
 
     compile group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.4'
 
