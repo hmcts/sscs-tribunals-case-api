@@ -6,7 +6,8 @@ import uk.gov.hmcts.reform.ccd.client.model.Event;
 
 public final class PactDslFixtureHelper {
 
-    private PactDslFixtureHelper(){
+    private PactDslFixtureHelper() {
+
     }
 
     public static final String SOME_AUTHORIZATION_TOKEN = "Bearer UserAuthToken";

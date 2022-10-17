@@ -54,8 +54,8 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({
-            "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE",
-            "ABOUT_TO_START,CANCEL_TRANSLATIONS"
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE",
+        "ABOUT_TO_START,CANCEL_TRANSLATIONS"
     })
     public void givenCanHandleIsCalledWithInvalidCallBack_shouldReturnCorrectFalse(@Nullable CallbackType callbackType, @Nullable EventType eventType) {
         Callback<SscsCaseData> callback = buildCallback(eventType, State.VALID_APPEAL);

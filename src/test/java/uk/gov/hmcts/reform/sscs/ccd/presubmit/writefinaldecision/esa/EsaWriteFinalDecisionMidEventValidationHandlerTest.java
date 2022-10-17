@@ -134,9 +134,9 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Test
     @Parameters({
-            "YES, NO",
-            "NO,YES",
-            "null, NO"
+        "YES, NO",
+        "NO,YES",
+        "null, NO"
     })
     public void givenEsaCaseWithWcaAppealFlow_thenSetShowSummaryOfOutcomePage(
             @Nullable YesNo wcaFlow, YesNo expectedShowResult) {
@@ -166,13 +166,13 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Test
     @Parameters({
-            "YES, allowed, YES",
-            "YES, refused, NO",
-            "NO, allowed, NO",
-            "NO, refused, NO",
-            "null, allowed, NO",
-            "NO, null, NO",
-            "null, null, NO",
+        "YES, allowed, YES",
+        "YES, refused, NO",
+        "NO, allowed, NO",
+        "NO, refused, NO",
+        "null, allowed, NO",
+        "NO, null, NO",
+        "null, null, NO",
     })
     public void givenEsaCaseWithWcaAppealFlowAndAllowedFlow_thenSetShowDwpReassessAwardPage(
             @Nullable YesNo wcaFlow, @Nullable String allowedFlow, YesNo expectedShowResult) {
