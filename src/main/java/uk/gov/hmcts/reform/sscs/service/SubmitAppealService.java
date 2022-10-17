@@ -56,6 +56,7 @@ public class SubmitAppealService {
     private final ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
     private final AirLookupService airLookupService;
     private final RefDataService refDataService;
+    private final VenueService venueService;
     private final boolean caseAccessManagementFeature;
 
     @SuppressWarnings("squid:S107")
@@ -66,6 +67,7 @@ public class SubmitAppealService {
                         ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
                         AirLookupService airLookupService,
                         RefDataService refDataService,
+                        VenueService venueService,
                         @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature) {
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
@@ -75,6 +77,7 @@ public class SubmitAppealService {
         this.airLookupService = airLookupService;
         this.refDataService = refDataService;
         this.caseAccessManagementFeature = caseAccessManagementFeature;
+        this.venueService = venueService;
     }
 
     public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
@@ -254,16 +257,17 @@ public class SubmitAppealService {
         sscsCaseData.setProcessingVenue(processingVenue);
 
         if (caseAccessManagementFeature
-            && StringUtils.isNotEmpty(processingVenue)
-            && rpc != null) {
-            log.info("Getting venue details for " + processingVenue);
-            CourtVenue courtVenue = refDataService.getVenueRefData(processingVenue);
+                && StringUtils.isNotEmpty(processingVenue)
+                && rpc != null) {
+            String venueEpimsId = venueService.getEpimsIdForVenue(processingVenue);
+            CourtVenue courtVenue = refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId);
 
-            if (courtVenue != null) {
-                sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
-                        .baseLocation(rpc.getEpimsId())
-                        .region(courtVenue.getRegionId()).build());
-            }
+            sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
+                .baseLocation(rpc.getEpimsId())
+                .region(courtVenue.getRegionId()).build());
+
+            log.info("Successfully updated case management location details for case {}. Processing venue {}, epimsId {}",
+                appeal.getCcdCaseId(), processingVenue, venueEpimsId);
         }
 
         log.info("{} - setting venue name to {}",

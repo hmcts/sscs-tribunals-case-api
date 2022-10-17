@@ -6,8 +6,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
@@ -52,5 +57,28 @@ public class PostponementRequestService {
     private void ensureSscsDocumentsIsNotNull(SscsCaseData sscsCaseData) {
         final List<SscsDocument> sscsDocuments = (sscsCaseData.getSscsDocument() == null) ? new ArrayList<>() : sscsCaseData.getSscsDocument();
         sscsCaseData.setSscsDocument(sscsDocuments);
+    }
+
+    public void addCurrentHearingToExcludeDates(PreSubmitCallbackResponse<SscsCaseData> response) {
+        SscsCaseData caseData = response.getData();
+        Hearing hearing = caseData.getLatestHearing();
+        if (hearing == null) {
+            response.addError("There are no hearing to postpone");
+            return;
+        }
+
+        ExcludeDate excludedDate = ExcludeDate.builder()
+            .value(DateRange.builder()
+                .start(hearing.getValue().getStart().toLocalDate().toString())
+                .end(hearing.getValue().getEnd().toLocalDate().toString())
+                .build())
+            .build();
+
+        List<ExcludeDate> excludeDates = Optional.ofNullable(caseData.getAppeal().getHearingOptions().getExcludeDates())
+            .orElse(new ArrayList<>());
+
+        excludeDates.add(excludedDate);
+
+        caseData.getAppeal().getHearingOptions().setExcludeDates(excludeDates);
     }
 }

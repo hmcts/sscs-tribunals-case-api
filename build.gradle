@@ -17,7 +17,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.7.0'
     id 'org.owasp.dependencycheck' version '6.2.2'
     id 'au.com.dius.pact' version '4.2.14'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.320'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.380'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -217,13 +217,11 @@ def versions = [
         junitJupiter    : '5.7.2',
         lombok          : '1.18.22',
         pact            : '4.1.7',
-        pdfEmailCommon  : '1.4.56',
         pitest          : '1.4.2',
         reactorCore     : '3.4.15',
         reformLogging   : '5.1.7',
         sonarPitest     : '0.5',
-        springfoxSwagger: '2.8.0',
-        sscsCommon      : '4.14.4'
+        springfoxSwagger: '2.8.0'
 ]
 
 ext["rest-assured.version"] = '4.2.0'
@@ -346,6 +344,11 @@ dependencyManagement {
             entry 'commons-compress'
         }
 
+        //CVE-2022-25857
+        dependencySet(group: 'org.yaml', version: '1.33') {
+            entry 'snakeyaml'
+        }
+
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
         }
@@ -392,8 +395,8 @@ dependencies {
     //remove when secure doc store is live
     compile group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'com.github.hmcts', name: 'sscs-common', version: versions.sscsCommon
-    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: versions.pdfEmailCommon
+    compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.18.0'
+    compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.56'
 
     compile group: 'com.azure', name: 'azure-core', version: versions.azureCore
     compile group: 'com.azure', name: 'azure-messaging-servicebus', version: versions.azureMessagingServiceBus
@@ -432,6 +435,7 @@ dependencies {
     testAnnotationProcessor "org.projectlombok:lombok:$versions.lombok"
     e2eCompile "org.projectlombok:lombok:$versions.lombok"
     e2eAnnotationProcessor "org.projectlombok:lombok:$versions.lombok"
+    integrationTestAnnotationProcessor "org.projectlombok:lombok:$versions.lombok"
 
     testCompile "org.junit.jupiter:junit-jupiter-api:$versions.junitJupiter"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:$versions.junitJupiter"
@@ -460,14 +464,13 @@ dependencies {
     contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junitJupiter
     contractTestRuntime "org.junit.platform:junit-platform-commons:1.8.1"
 
-    contractTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.30') {
-        force = true
-    }
-
+    contractTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.31')
     contractTestCompile sourceSets.main.runtimeClasspath
     contractTestCompile sourceSets.test.runtimeClasspath
 
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
+    cftlibAnnotationProcessor "org.projectlombok:lombok:$versions.lombok"
+
 }
 // this is required to force Java running on the Azure Windows Server OS into using
 // UTF-8 as the default character set instead of windows-1252 which causes issues
@@ -586,13 +589,23 @@ task generateXls(type: Exec) {
 
 bootWithCCD {
     dependsOn generateXls
-
-    //Uncomment to launch with debug
-    //jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
     authMode = uk.gov.hmcts.rse.AuthMode.Local
 
+    //---Debug-----
+    //Uncomment to launch with debug
+    //jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
+
+    //---Extra ccd loging----
     //Uncomment for ccd callback logging
     //environment 'LOG_CALLBACK_DETAILS', '*'
+
+    //---Additional compose services---
+    //Place any extra compose files you'd like to be started automatically here. These should be
+    //in the folder /src/cftlib/resources/docker/ and comma delimited.
+    environment 'ADDITIONAL_COMPOSE_FILES', 'cft-lib-doc-stack.yml,cft-lib-doc-assembly.yml,cft-lib-ref-data-wiremock.yml'
+    //Turn this on to automatically recreate containers above. Useful for debugging if you make changes.
+    environment 'FORCE_RECREATE_ADDITIONAL_CONTAINERS', 'false'
+
     environment 'XUI_PORT', '3455'
     environment 'RSE_LIB_S2S_PORT', '4502'
     //URLs for services running in Docker require host.docker.internal to resolve properly
@@ -607,4 +620,7 @@ bootWithCCD {
     environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
     environment 'CASE_DOCUMENT_S2S_AUTHORISED_SERVICES', 'ccd_case_document_am_api,ccd_gw,xui_webapp,ccd_data,bulk_scan_processor,sscs'
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,payment-api,xui_webapp,sscs,ccd_case_document_am_api,am_role_assignment_service'
+    environment 'CASE_ACCESS_MANAGEMENT_FEATURE', 'true'
+    //Wiremock
+    environment 'RD_LOCATION_REF_API_URL', 'http://localhost:8084'
 }

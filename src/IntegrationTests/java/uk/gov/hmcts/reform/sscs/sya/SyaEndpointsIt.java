@@ -142,6 +142,14 @@ public class SyaEndpointsIt extends AbstractEventIt {
                 .willReturn(new UserInfo("16","userId", "dummy@email.com", "test", "test",
                 Arrays.asList("caseworker", "citizen")));
 
+        given(refDataApi.courtVenueByEpimsId("token", "authToken", "239985"))
+            .willReturn(List.of(CourtVenue.builder()
+                .regionId("2")
+                .courtTypeId("31")
+                .courtStatus("Open")
+                .venueName("Ashford")
+                .build()));
+
         UploadResponse uploadResponse = createUploadResponse();
         given(documentUploadClientApi.upload(eq(DUMMY_OAUTH_2_TOKEN), eq(AUTH_TOKEN), eq("sscs"),
             eq(Arrays.asList("caseworker", "citizen")), eq(Classification.RESTRICTED), any())).willReturn(uploadResponse);
@@ -153,8 +161,6 @@ public class SyaEndpointsIt extends AbstractEventIt {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
         given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
-
-        given(refDataApi.courtVenueByName("token", "authToken", "31")).willReturn(List.of(CourtVenue.builder().regionId("2").venueName("Ashford").build()));
 
         mockMvc.perform(post("/appeals")
             .contentType(MediaType.APPLICATION_JSON)
