@@ -13,7 +13,6 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.12'
     id 'com.gorylenko.gradle-git-properties' version '2.3.1'
     id 'com.github.ben-manes.versions' version '0.39.0'
-    id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.7.0'
     id 'org.owasp.dependencycheck' version '7.2.1'
     id 'au.com.dius.pact' version '4.2.14'
@@ -45,6 +44,8 @@ compileJava {
 compileTestJava {
     options.compilerArgs << '-Xlint:deprecation'
 }
+
+tasks.withType(Copy).all { duplicatesStrategy 'warn' }
 
 mainClassName = 'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication'
 
@@ -172,6 +173,8 @@ repositories {
         url 'https://repo.spring.io/libs-milestone'
     }
 }
+
+processResources.dependsOn(generateGitProperties)
 
 project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
 check.dependsOn integration

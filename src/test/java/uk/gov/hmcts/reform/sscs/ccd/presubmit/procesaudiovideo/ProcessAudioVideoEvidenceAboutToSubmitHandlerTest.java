@@ -602,7 +602,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({
-            "SEND_TO_JUDGE", "SEND_TO_ADMIN"
+        "SEND_TO_JUDGE", "SEND_TO_ADMIN"
     })
     public void shouldAddNote_whenActionIsSelected(ProcessAudioVideoActionDynamicListItems action) {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(action.getCode()));
@@ -683,10 +683,10 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"ADMIT_EVIDENCE, AWAITING_INFORMATION, AWAITING_INFORMATION",
-            "ADMIT_EVIDENCE, REVIEW_BY_JUDGE, REVIEW_BY_JUDGE",
-            "ADMIT_EVIDENCE, AWAITING_ADMIN_ACTION, AWAITING_ADMIN_ACTION",
-            "SEND_TO_ADMIN, CLEAR_INTERLOC_REVIEW_STATE, null",
-            "SEND_TO_ADMIN, null, AWAITING_ADMIN_ACTION",
+        "ADMIT_EVIDENCE, REVIEW_BY_JUDGE, REVIEW_BY_JUDGE",
+        "ADMIT_EVIDENCE, AWAITING_ADMIN_ACTION, AWAITING_ADMIN_ACTION",
+        "SEND_TO_ADMIN, CLEAR_INTERLOC_REVIEW_STATE, null",
+        "SEND_TO_ADMIN, null, AWAITING_ADMIN_ACTION",
     })
     public void givenProcessAudioVideoReviewStateSelected_overrideTheInterlocReviewState(ProcessAudioVideoActionDynamicListItems action,
                                                                                          @Nullable ProcessAudioVideoReviewState overrideState,

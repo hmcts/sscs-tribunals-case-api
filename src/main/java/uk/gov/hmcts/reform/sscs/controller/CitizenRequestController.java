@@ -29,8 +29,8 @@ public class CitizenRequestController {
             notes = "Returns hearing recordings given the CCD case id",
             response = HearingRecordingResponse.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Hearing Recordings", response = HearingRecordingResponse.class),
-            @ApiResponse(code = 404, message = "No online hearing found with online hearing id")})
+        @ApiResponse(code = 200, message = "Hearing Recordings", response = HearingRecordingResponse.class),
+        @ApiResponse(code = 404, message = "No online hearing found with online hearing id")})
     @GetMapping(value = "/{identifier}/hearingrecording", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<HearingRecordingResponse> getHearingRecording(@RequestHeader(AUTHORIZATION) String authorisation,
                                                                         @PathVariable("identifier") String identifier) {
@@ -43,8 +43,8 @@ public class CitizenRequestController {
     @ApiOperation(value = "submitHearingRecordingRequest",
             notes = "Request hearing recordings of given hearing ids of the CCD case")
     @ApiResponses(value = {
-            @ApiResponse(code = 204, message = "Hearing recordings requested"),
-            @ApiResponse(code = 404, message = "No online hearing found with online hearing ids")
+        @ApiResponse(code = 204, message = "Hearing recordings requested"),
+        @ApiResponse(code = 404, message = "No online hearing found with online hearing ids")
     })
     @PostMapping(value = "/{identifier}/recordingrequest",
             produces = APPLICATION_JSON_VALUE)

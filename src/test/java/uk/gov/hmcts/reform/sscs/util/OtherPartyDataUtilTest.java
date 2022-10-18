@@ -299,9 +299,9 @@ public class OtherPartyDataUtilTest {
 
     @Test
     @Parameters({
-            "1, OtherParty 1",
-            "3, Appointee 3",
-            "4, Rep 4"
+        "1, OtherParty 1",
+        "3, Appointee 3",
+        "4, Rep 4"
     })
 
     public void getOtherPartyNameFromId_forOtherPartyRepReturnsRepName(String otherPartyId, String expectedName) {
