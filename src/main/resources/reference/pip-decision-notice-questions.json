@@ -1,0 +1,555 @@
+[
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_mobilityActivities",
+       "DisplayOrder" : "2",
+       "ListElementCode":"movingAround",
+       "ListElement":"Moving around"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_mobilityActivities",
+        "DisplayOrder" : "1",
+       "ListElementCode":"planningAndFollowing",
+       "ListElement":"Planning and following journeys"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_dailyLivingActivities",
+       "DisplayOrder" : "10",
+       "ListElementCode":"budgetingDecisions",
+       "ListElement":"Making budgeting decisions"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_dailyLivingActivities",
+       "DisplayOrder" : "9",
+       "ListElementCode":"engagingWithOthers",
+       "ListElement":"Engaging with other people face to face"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_dailyLivingActivities",
+       "DisplayOrder" : "8",
+       "ListElementCode":"readingUnderstanding",
+       "ListElement":"Reading and understanding signs, symbols and words"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_dailyLivingActivities",
+       "DisplayOrder" : "7",
+       "ListElementCode":"communicating",
+       "ListElement":"Communicating verbally"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_dailyLivingActivities",
+       "DisplayOrder" : "6",
+       "ListElementCode":"dressingAndUndressing",
+       "ListElement":"Dressing and undressing"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_dailyLivingActivities",
+       "DisplayOrder" : "5",
+       "ListElementCode":"managingToiletNeeds",
+       "ListElement":"Managing toilet needs or incontinence"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_dailyLivingActivities",
+       "DisplayOrder" : "4",
+       "ListElementCode":"washingAndBathing",
+       "ListElement":"Washing and bathing"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_dailyLivingActivities",
+       "DisplayOrder" : "3",
+       "ListElementCode":"managingTherapy",
+       "ListElement":"Managing therapy or monitoring a health condition"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_dailyLivingActivities",
+       "DisplayOrder" : "2",
+       "ListElementCode":"takingNutrition",
+       "ListElement":"Taking nutrition"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_dailyLivingActivities",
+       "DisplayOrder" : "1",
+       "ListElementCode":"preparingFood",
+       "ListElement":"Preparing food"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionPreparingFoodQuestions",
+       "DisplayOrder" : "6",
+       "ListElementCode":"preparingFood1f",
+       "ListElement":"1f. Cannot prepare and cook food. (8 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionPreparingFoodQuestions",
+       "DisplayOrder" : "5",
+       "ListElementCode":"preparingFood1e",
+       "ListElement":"1e. Needs supervision or assistance to either prepare or cook a simple meal. (4 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionPreparingFoodQuestions",
+       "DisplayOrder" : "4",
+       "ListElementCode":"preparingFood1d",
+       "ListElement":"1d. Needs prompting to be able to either prepare or cook a simple meal. (2 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionPreparingFoodQuestions",
+       "DisplayOrder" : "3",
+       "ListElementCode":"preparingFood1c",
+       "ListElement":"1c. Cannot cook a simple meal using a conventional cooker but is able to do so using a microwave. (2 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionPreparingFoodQuestions",
+       "DisplayOrder" : "2",
+       "ListElementCode":"preparingFood1b",
+       "ListElement":"1b. Needs to use an aid or appliance to be able to either prepare or cook a simple meal. (2 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionPreparingFoodQuestions",
+       "DisplayOrder" : "1",
+       "ListElementCode":"preparingFood1a",
+       "ListElement":"1a. Can prepare and cook a simple meal unaided. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionTakingNutritionQuestions",
+       "DisplayOrder" : "6",
+       "ListElementCode":"takingNutrition2f",
+       "ListElement":"2f. Cannot convey food and drink to their mouth and needs another person to do so. (10 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionTakingNutritionQuestions",
+       "DisplayOrder" : "5",
+       "ListElementCode":"takingNutrition2e",
+       "ListElement":"2e. Needs assistance to be able to manage a therapeutic source to take nutrition. (6 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionTakingNutritionQuestions",
+       "DisplayOrder" : "4",
+       "ListElementCode":"takingNutrition2d",
+       "ListElement":"2d. Needs prompting to be able to take nutrition. (4 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionTakingNutritionQuestions",
+       "DisplayOrder" : "3",
+       "ListElementCode":"takingNutrition2c",
+       "ListElement":"2c. Needs a therapeutic source to take nutrition. (2 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionTakingNutritionQuestions",
+       "DisplayOrder" : "2",
+       "ListElementCode":"takingNutrition2b",
+       "ListElement":"2b. Needs either - (i) to use an aid or appliance to take nutrition; or (ii) supervision to be able to take nutrition; or (iii) assistance to be able to cut up food. (2 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionTakingNutritionQuestions",
+       "DisplayOrder" : "1",
+       "ListElementCode":"takingNutrition2a",
+       "ListElement":"2a. Can take nutrition unaided. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionManagingTherapyQuestions",
+       "DisplayOrder" : "6",
+       "ListElementCode":"managingTherapy3f",
+       "ListElement":"3f. Needs supervision, prompting or assistance to be able to manage therapy that takes more than 14 hours a week. (8 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionManagingTherapyQuestions",
+       "DisplayOrder" : "5",
+       "ListElementCode":"managingTherapy3e",
+       "ListElement":"3e. Needs supervision, prompting or assistance to be able to manage therapy that takes more than 7 but no more than 14 hours a week. (6 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionManagingTherapyQuestions",
+       "DisplayOrder" : "4",
+       "ListElementCode":"managingTherapy3d",
+       "ListElement":"3d. Needs supervision, prompting or assistance to be able to manage therapy that takes more than 3.5 but no more than 7 hours a week. (4 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionManagingTherapyQuestions",
+       "DisplayOrder" : "3",
+       "ListElementCode":"managingTherapy3c",
+       "ListElement":"3c. Needs supervision, prompting or assistance to be able to manage therapy that takes no more than 3.5 hours a week. (2 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionManagingTherapyQuestions",
+       "DisplayOrder" : "2",
+       "ListElementCode":"managingTherapy3b",
+       "ListElement":"3b. Needs any one or more of the following - (i) to use an aid or appliance to be able to manage medication; (ii) supervision, prompting or assistance to be able to manage medication; (iii) supervision, prompting or assistance to be able to monitor a health condition. (1 point)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionManagingTherapyQuestions",
+       "DisplayOrder" : "1",
+       "ListElementCode":"managingTherapy3a",
+       "ListElement":"3a. Either - (i) does not receive medication or therapy or need to monitor a health condition; or (ii) can manage medication or therapy or monitor a health condition unaided. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionWashingAndBathingQuestions",
+       "DisplayOrder" : "7",
+       "ListElementCode":"washingAndBathing4g",
+       "ListElement":"4g. Cannot wash and bathe at all and needs another person to wash their entire body. (8 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionWashingAndBathingQuestions",
+       "DisplayOrder" : "6",
+       "ListElementCode":"washingAndBathing4f",
+       "ListElement":"4f. Needs assistance to be able to wash their body between the shoulders and waist. (4 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionWashingAndBathingQuestions",
+       "DisplayOrder" : "5",
+       "ListElementCode":"washingAndBathing4e",
+       "ListElement":"4e. Needs assistance to be able to get in or out of a bath or shower. (3 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionWashingAndBathingQuestions",
+       "DisplayOrder" : "4",
+       "ListElementCode":"washingAndBathing4d",
+       "ListElement":"4d. Needs assistance to be able to wash either their hair or body below the waist. (2 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionWashingAndBathingQuestions",
+       "DisplayOrder" : "3",
+       "ListElementCode":"washingAndBathing4c",
+       "ListElement":"4c. Needs supervision or prompting to be able to wash or bathe. (2 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionWashingAndBathingQuestions",
+       "DisplayOrder" : "2",
+       "ListElementCode":"washingAndBathing4b",
+       "ListElement":"4b. Needs to use an aid or appliance to be able to wash or bathe. (2 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionWashingAndBathingQuestions",
+       "DisplayOrder" : "1",
+       "ListElementCode":"washingAndBathing4a",
+       "ListElement":"4a. Can wash and bathe unaided. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionManagingToiletNeedsQuestions",
+       "DisplayOrder" : "6",
+       "ListElementCode":"managingToiletNeeds5f",
+       "ListElement":"5f. Needs assistance to be able to manage incontinence of both bladder and bowel. (8 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionManagingToiletNeedsQuestions",
+       "DisplayOrder" : "5",
+       "ListElementCode":"managingToiletNeeds5e",
+       "ListElement":"5e. Needs assistance to be able to manage incontinence of either bladder or bowel. (6 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionManagingToiletNeedsQuestions",
+       "DisplayOrder" : "4",
+       "ListElementCode":"managingToiletNeeds5d",
+       "ListElement":"5d. Needs assistance to be able to manage toilet needs. (4 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionManagingToiletNeedsQuestions",
+       "DisplayOrder" : "3",
+       "ListElementCode":"managingToiletNeeds5c",
+       "ListElement":"5c. Needs supervision or prompting to be able to manage toilet needs. (2 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionManagingToiletNeedsQuestions",
+       "DisplayOrder" : "2",
+       "ListElementCode":"managingToiletNeeds5b",
+       "ListElement":"5b. Needs to use an aid or appliance to be able to manage toilet needs or incontinence. (2 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionManagingToiletNeedsQuestions",
+       "DisplayOrder" : "1",
+       "ListElementCode":"managingToiletNeeds5a",
+       "ListElement":"5a. Can manage toilet needs or incontinence unaided. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionDressingAndUndressingQuestions",
+       "DisplayOrder" : "6",
+       "ListElementCode":"dressingAndUndressing6f",
+       "ListElement":"6f. Cannot dress or undress at all. (8 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionDressingAndUndressingQuestions",
+       "DisplayOrder" : "5",
+       "ListElementCode":"dressingAndUndressing6e",
+       "ListElement":"6e. Needs assistance to be able to dress or undress their upper body. (4 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionDressingAndUndressingQuestions",
+       "DisplayOrder" : "4",
+       "ListElementCode":"dressingAndUndressing6d",
+       "ListElement":"6d. Needs assistance to be able to dress or undress their lower body. (2 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionDressingAndUndressingQuestions",
+       "DisplayOrder" : "3",
+       "ListElementCode":"dressingAndUndressing6c",
+       "ListElement":"6c. Needs either -  (i) prompting to be able to dress, undress or determine appropriate circumstances for remaining clothed; or (ii) prompting or assistance to be able to select appropriate clothing. (2 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionDressingAndUndressingQuestions",
+       "DisplayOrder" : "2",
+       "ListElementCode":"dressingAndUndressing6b",
+       "ListElement":"6b. Needs to use an aid or appliance to be able to dress or undress. (2 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionDressingAndUndressingQuestions",
+       "DisplayOrder" : "1",
+       "ListElementCode":"dressingAndUndressing6a",
+       "ListElement":"6a. Can dress and undress unaided. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionCommunicatingQuestions",
+       "DisplayOrder" : "5",
+       "ListElementCode":"communicating7e",
+       "ListElement":"7e. Cannot express or understand verbal information at all even with communication support. (12 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionCommunicatingQuestions",
+       "DisplayOrder" : "4",
+       "ListElementCode":"communicating7d",
+       "ListElement":"7d. Needs communication support to be able to express or understand basic verbal information. (8 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionCommunicatingQuestions",
+       "DisplayOrder" : "3",
+       "ListElementCode":"communicating7c",
+       "ListElement":"7c. Needs communication support to be able to express or understand complex verbal information. (4 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionCommunicatingQuestions",
+       "DisplayOrder" : "2",
+       "ListElementCode":"communicating7b",
+       "ListElement":"7b. Needs to use an aid or appliance to be able to speak or hear. (2 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionCommunicatingQuestions",
+       "DisplayOrder" : "1",
+       "ListElementCode":"communicating7a",
+       "ListElement":"7a. Can express and understand verbal information unaided. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionReadingUnderstandingQuestions",
+       "DisplayOrder" : "5",
+       "ListElementCode":"readingAndUnderstanding8e",
+       "ListElement":"8e. Cannot read or understand signs, symbols or words at all. (8 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionReadingUnderstandingQuestions",
+       "DisplayOrder" : "4",
+       "ListElementCode":"readingAndUnderstanding8d",
+       "ListElement":"8d. Needs prompting to be able to read or understand basic written information. (4 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionReadingUnderstandingQuestions",
+       "DisplayOrder" : "3",
+       "ListElementCode":"readingAndUnderstanding8c",
+       "ListElement":"8c. Needs prompting to be able to read or understand complex written information. (2 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionReadingUnderstandingQuestions",
+       "DisplayOrder" : "2",
+       "ListElementCode":"readingAndUnderstanding8b",
+       "ListElement":"8b. Needs to use an aid or appliance, other than spectacles or contact lenses, to be able to read or understand either basic or complex written information. (2 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionReadingUnderstandingQuestions",
+       "DisplayOrder" : "1",
+       "ListElementCode":"readingAndUnderstanding8a",
+       "ListElement":"8a. Can read and understand basic and complex written information either unaided or using spectacles or contact lenses. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionEngagingWithOthersQuestions",
+       "DisplayOrder" : "4",
+       "ListElementCode":"engagingWithOtherPeople9d",
+       "ListElement":"9d. Cannot engage with other people due to such engagement causing either - (i) overwhelming psychological distress to the claimant; or (ii) the claimant to exhibit behaviour which would result in a substantial risk of harm to the claimant or another person. (8 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionEngagingWithOthersQuestions",
+       "DisplayOrder" : "3",
+       "ListElementCode":"engagingWithOtherPeople9c",
+       "ListElement":"9c. Needs social support to be able to engage with other people. (4 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionEngagingWithOthersQuestions",
+       "DisplayOrder" : "2",
+       "ListElementCode":"engagingWithOtherPeople9b",
+       "ListElement":"9b. Needs prompting to be able to engage with other people. (2 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionEngagingWithOthersQuestions",
+       "DisplayOrder" : "1",
+       "ListElementCode":"engagingWithOtherPeople9a",
+       "ListElement":"9a. Can engage with other people unaided. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionBudgetingDecisionsQuestions",
+       "DisplayOrder" : "4",
+       "ListElementCode":"makingBudgetingDecisions10d",
+       "ListElement":"10d. Cannot make any budgeting decisions at all. (6 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionBudgetingDecisionsQuestions",
+       "DisplayOrder" : "3",
+       "ListElementCode":"makingBudgetingDecisions10c",
+       "ListElement":"10c. Needs prompting or assistance to be able to make simple budgeting decisions. (4 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionBudgetingDecisionsQuestions",
+       "DisplayOrder" : "2",
+       "ListElementCode":"makingBudgetingDecisions10b",
+       "ListElement":"10b. Needs prompting or assistance to be able to make complex budgeting decisions. (2 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionBudgetingDecisionsQuestions",
+       "DisplayOrder" : "1",
+       "ListElementCode":"makingBudgetingDecisions10a",
+       "ListElement":"10a. Can manage complex budgeting decisions unaided. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionPlanningFollowingQuestions",
+       "DisplayOrder" : "6",
+       "ListElementCode":"planningAndFollowing11f",
+       "ListElement":"11f. Cannot follow the route of a familiar journey without another person, an assistance dog or an orientation aid. (12 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionPlanningFollowingQuestions",
+       "DisplayOrder" : "5",
+       "ListElementCode":"planningAndFollowing11e",
+       "ListElement":"11e. Cannot undertake any journey because it would cause overwhelming psychological distress to the claimant. (10 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionPlanningFollowingQuestions",
+       "DisplayOrder" : "4",
+       "ListElementCode":"planningAndFollowing11d",
+       "ListElement":"11d. Cannot follow the route of an unfamiliar journey without another person, assistance dog or orientation aid. (10 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionPlanningFollowingQuestions",
+       "DisplayOrder" : "3",
+       "ListElementCode":"planningAndFollowing11c",
+       "ListElement":"11c. Cannot plan the route of a journey. (8 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionPlanningFollowingQuestions",
+       "DisplayOrder" : "2",
+       "ListElementCode":"planningAndFollowing11b",
+       "ListElement":"11b. Needs prompting to be able to undertake any journey to avoid overwhelming psychological distress to the claimant. (4 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionPlanningFollowingQuestions",
+       "DisplayOrder" : "1",
+       "ListElementCode":"planningAndFollowing11a",
+       "ListElement":"11a. Can plan and follow the route of a journey unaided. (0 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionMovingAroundQuestions",
+       "DisplayOrder" : "6",
+       "ListElementCode":"movingAround12f",
+       "ListElement":"12f. Cannot, either aided or unaided,  stand; or (ii) move more than 1 metre. (12 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionMovingAroundQuestions",
+       "DisplayOrder" : "5",
+       "ListElementCode":"movingAround12e",
+       "ListElement":"12e. Can stand and then move more than 1 metre but no more than 20 metres, either aided or unaided. (12 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionMovingAroundQuestions",
+       "DisplayOrder" : "4",
+       "ListElementCode":"movingAround12d",
+       "ListElement":"12d. Can stand and then move using an aid or appliance more than 20 metres but no more than 50 metres. (10 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionMovingAroundQuestions",
+       "DisplayOrder" : "3",
+       "ListElementCode":"movingAround12c",
+       "ListElement":"12c. Can stand and then move unaided more than 20 metres but no more than 50 metres. (8 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionMovingAroundQuestions",
+       "DisplayOrder" : "2",
+       "ListElementCode":"movingAround12b",
+       "ListElement":"12b. Can stand and then move more than 50 metres but no more than 200 metres, either aided or unaided. (4 points)"
+    },
+    {
+       "LiveFrom":"01/01/2018",
+       "ID":"FL_pipWriteFinalDecisionMovingAroundQuestions",
+       "DisplayOrder" : "1",
+       "ListElementCode":"movingAround12a",
+       "ListElement":"12a. Can stand and then move more than 200 metres, either aided or unaided. (0 points)"
+    }
+]
