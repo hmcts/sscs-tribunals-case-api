@@ -37,8 +37,8 @@ public class IssueDocumentHandlerTest {
     }
 
     @Parameters({"PIP", "ESA", "UC", "JSA", "DLA", "UC", "carersAllowance", "attendanceAllowance",
-            "bereavementBenefit", "industrialInjuriesDisablement", "maternityAllowance", "socialFund",
-            "incomeSupport", "bereavementSupportPaymentScheme", "industrialDeathBenefit", "pensionCredit", "retirementPension"})
+        "bereavementBenefit", "industrialInjuriesDisablement", "maternityAllowance", "socialFund",
+        "incomeSupport", "bereavementSupportPaymentScheme", "industrialDeathBenefit", "pensionCredit", "retirementPension"})
     public void givenAnSscs1BenefitType_thenAddDwpAsRespondent(String benefit) {
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefit).build()).build()).build();
         List<Respondent> respondents = handler.getRespondents(sscsCaseData);
@@ -57,7 +57,7 @@ public class IssueDocumentHandlerTest {
 
     @Test
     @Parameters({"taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection", "childBenefit",
-            "thirtyHoursFreeChildcare", "guaranteedMinimumPension", "nationalInsuranceCredits"})
+        "thirtyHoursFreeChildcare", "guaranteedMinimumPension", "nationalInsuranceCredits"})
     public void givenAnSscs5BenefitType_thenAddHmrcAsRespondent(String benefit) {
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefit).build()).build()).build();
 

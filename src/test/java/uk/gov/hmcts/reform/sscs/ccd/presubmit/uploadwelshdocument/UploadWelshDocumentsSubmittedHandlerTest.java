@@ -184,8 +184,8 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
 
     @Test
     @Parameters({
-            "DORMANT_APPEAL_STATE",
-            "VOID_STATE",
+        "DORMANT_APPEAL_STATE",
+        "VOID_STATE",
     })
     public void shouldSetReinstatementRequestWithWelshAndNonWelshReinstatementDocumentsWhenVoidOrDormant(State state) {
 

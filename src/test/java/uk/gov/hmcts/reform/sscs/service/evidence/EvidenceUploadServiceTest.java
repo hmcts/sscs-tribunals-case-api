@@ -644,12 +644,12 @@ public class EvidenceUploadServiceTest {
 
     @Test
     @Parameters({
-            JP_EMAIL + ", JOINT_PARTY, null, null",
-            REP_EMAIL + ", REP, null, null",
-            APPELLANT_EMAIL + ", APPELLANT, null, null",
-            OTHER_PARTY_EMAIL + ", OTHER_PARTY, 1, Oyster Smith",
-            OTHER_PARTY_REP_EMAIL + ", OTHER_PARTY_REP, 2, Raj Smith",
-            OTHER_PARTY_APPOINTEE_EMAIL + ", OTHER_PARTY_APPOINTEE, 4, Apple Smith"})
+        JP_EMAIL + ", JOINT_PARTY, null, null",
+        REP_EMAIL + ", REP, null, null",
+        APPELLANT_EMAIL + ", APPELLANT, null, null",
+        OTHER_PARTY_EMAIL + ", OTHER_PARTY, 1, Oyster Smith",
+        OTHER_PARTY_REP_EMAIL + ", OTHER_PARTY_REP, 2, Raj Smith",
+        OTHER_PARTY_APPOINTEE_EMAIL + ", OTHER_PARTY_APPOINTEE, 4, Apple Smith"})
     public void givenSscsDocAndAudio_thenSetTheUploaderFromSubscriptionEmail(String idamEmail, UploadParty uploader,
                                                                              @Nullable String otherPartyId,
                                                                              @Nullable String otherPartyName) {

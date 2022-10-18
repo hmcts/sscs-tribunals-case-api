@@ -6,7 +6,7 @@ public class SyaBenefitType {
 
     private String code;
 
-    public SyaBenefitType(){
+    public SyaBenefitType() {
         //
     }
 

@@ -60,13 +60,13 @@ public class Sscs1PdfHandlerTest {
 
     @Test
     @Parameters({
-            "CREATE_APPEAL_PDF",
-            "VALID_APPEAL_CREATED",
-            "DRAFT_TO_VALID_APPEAL_CREATED",
-            "NON_COMPLIANT",
-            "DRAFT_TO_NON_COMPLIANT",
-            "INCOMPLETE_APPLICATION_RECEIVED",
-            "DRAFT_TO_INCOMPLETE_APPLICATION",
+        "CREATE_APPEAL_PDF",
+        "VALID_APPEAL_CREATED",
+        "DRAFT_TO_VALID_APPEAL_CREATED",
+        "NON_COMPLIANT",
+        "DRAFT_TO_NON_COMPLIANT",
+        "INCOMPLETE_APPLICATION_RECEIVED",
+        "DRAFT_TO_INCOMPLETE_APPLICATION",
     })
     public void givenASscs1PdfHandlerEventForSyaCases_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -76,13 +76,13 @@ public class Sscs1PdfHandlerTest {
 
     @Test
     @Parameters({
-            "CREATE_APPEAL_PDF, true",
-            "VALID_APPEAL_CREATED, false",
-            "DRAFT_TO_VALID_APPEAL_CREATED, false",
-            "NON_COMPLIANT, false",
-            "DRAFT_TO_NON_COMPLIANT, false",
-            "INCOMPLETE_APPLICATION_RECEIVED, false",
-            "DRAFT_TO_INCOMPLETE_APPLICATION, false",
+        "CREATE_APPEAL_PDF, true",
+        "VALID_APPEAL_CREATED, false",
+        "DRAFT_TO_VALID_APPEAL_CREATED, false",
+        "NON_COMPLIANT, false",
+        "DRAFT_TO_NON_COMPLIANT, false",
+        "INCOMPLETE_APPLICATION_RECEIVED, false",
+        "DRAFT_TO_INCOMPLETE_APPLICATION, false",
     })
     public void givenASscs1PdfHandlerEventForBulkScanCases_thenReturnAllowableValue(EventType eventType, boolean allowable) {
         caseDetails.getCaseData().getAppeal().setReceivedVia("Paper");

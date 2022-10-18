@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition
 @Slf4j
 public abstract class DecisionNoticeQuestionService {
 
+    public static final String REFERENCE_DECISION_NOTICE_QUESTIONS_JSON = "reference/%s-decision-notice-questions.json";
     private JSONArray decisionNoticeJson;
     private String benefitType;
     private List<Class<? extends PointsCondition<?>>> pointsConditionClasses;
@@ -29,10 +30,11 @@ public abstract class DecisionNoticeQuestionService {
     }
 
     protected DecisionNoticeQuestionService(String benefitType, List<Class<? extends PointsCondition<?>>> pointsConditionClasses) throws IOException {
-        String decisionNoticeQuestions = IOUtils.resourceToString("reference-data/" + benefitType.toLowerCase() + "-decision-notice-questions.txt",
-            StandardCharsets.UTF_8, Thread.currentThread().getContextClassLoader());
+        String path = String.format(REFERENCE_DECISION_NOTICE_QUESTIONS_JSON, benefitType.toLowerCase());
+        String decisionNoticeQuestions =
+            IOUtils.resourceToString(path, StandardCharsets.UTF_8, Thread.currentThread().getContextClassLoader());
 
-        decisionNoticeJson = new JSONArray("[" + decisionNoticeQuestions + "]");
+        decisionNoticeJson = new JSONArray(decisionNoticeQuestions);
         this.benefitType = benefitType;
         this.pointsConditionClasses = pointsConditionClasses;
     }
