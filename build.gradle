@@ -399,7 +399,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '4.19.0-RC-SSCS-10914'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '4.20.1'
     implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.5.0'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.27.0'
@@ -423,7 +423,7 @@ dependencies {
     implementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
 
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
-    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.9'
+    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.10.0'
     implementation group: 'org.apache.pdfbox', name: 'xmpbox', version: '2.0.25'
     implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.25'
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.4.1'
