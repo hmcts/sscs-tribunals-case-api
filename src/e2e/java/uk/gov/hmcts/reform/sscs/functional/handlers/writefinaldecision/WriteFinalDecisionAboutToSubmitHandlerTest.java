@@ -35,18 +35,16 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest extends BaseHandler {
     private static final String USER_AUTHORISATION = "Bearer token";
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
-    WriteFinalDecisionAboutToSubmitHandler handler;
+    private WriteFinalDecisionAboutToSubmitHandler handler;
     private SscsCaseData sscsCaseData;
     @Mock
     private DecisionNoticeService decisionNoticeService;
-
     @Mock
     private Callback<SscsCaseData> callback;
     @Mock
-    PreviewDocumentService previewDocumentService;
-
+    private PreviewDocumentService previewDocumentService;
     @Mock
-    DecisionNoticeOutcomeService decisionNoticeOutcomeService;
+    private DecisionNoticeOutcomeService decisionNoticeOutcomeService;
 
     @Before
     public void setUp() {
