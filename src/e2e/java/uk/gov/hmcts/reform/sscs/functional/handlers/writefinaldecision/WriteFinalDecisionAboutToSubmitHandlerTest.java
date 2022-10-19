@@ -50,6 +50,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest extends BaseHandler {
 
     @Before
     public void setUp() {
+        super.setUp();
         openMocks(this);
 
         handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeService, previewDocumentService);
