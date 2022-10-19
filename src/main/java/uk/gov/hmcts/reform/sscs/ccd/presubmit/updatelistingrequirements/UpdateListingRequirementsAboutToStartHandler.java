@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.UpdateListingRequirementsUtil;
@@ -33,11 +34,12 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
 
         return callbackType.equals(CallbackType.ABOUT_TO_START)
             && (callback.getEvent() == EventType.UPDATE_LISTING_REQUIREMENTS);
-
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType,
+                                                          Callback<SscsCaseData> callback,
+                                                          String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -45,14 +47,16 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         if (isScheduleListingEnabled) {
+            log.info("Handling override fields update listing requirements event for caseId {}",
+                sscsCaseData.getCcdCaseId());
 
-            log.info("Handling override fields update listing requirements event for caseId {}", sscsCaseData.getCcdCaseId());
+            SchedulingAndListingFields schedulingAndListingFields = sscsCaseData.getSchedulingAndListingFields();
 
-            OverrideFields overrideFields = sscsCaseData.getSchedulingAndListingFields().getOverrideFields();
+            OverrideFields overrideFields = schedulingAndListingFields.getOverrideFields();
 
             if (isNull(overrideFields)) {
                 overrideFields = new OverrideFields();
-                sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
+                schedulingAndListingFields.setOverrideFields(overrideFields);
             }
 
             utils.generateInterpreterLanguageFields(overrideFields);
@@ -63,6 +67,4 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
-
-
 }

@@ -40,7 +40,9 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType,
+                                                          Callback<SscsCaseData> callback,
+                                                          String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -50,14 +52,15 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         State state = callback.getCaseDetails().getState();
-
         HearingRoute hearingRoute = sscsCaseData.getSchedulingAndListingFields().getHearingRoute();
+
         if (gapsSwitchOverFeature
             && state == State.READY_TO_LIST
             && hearingRoute == LIST_ASSIST
             && nonNull(sscsCaseData.getSchedulingAndListingFields().getOverrideFields())) {
             String caseId = sscsCaseData.getCcdCaseId();
-            log.info("UpdateListingRequirements List Assist request, Update Hearing, amend reasons: {}, for case ID: {}",
+            log.info("UpdateListingRequirements List Assist request, Update Hearing,"
+                    + "amend reasons: {}, for case ID: {}",
                 sscsCaseData.getSchedulingAndListingFields().getAmendReasons(), caseId);
 
             HearingState hearingState = UPDATE_HEARING;
