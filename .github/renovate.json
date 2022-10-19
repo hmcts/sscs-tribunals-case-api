@@ -13,7 +13,8 @@
     },
     {
       "matchPackagePatterns": ["org.springframework"],
-      "addLabels": ["high-priority"]
+      "addLabels": ["high-priority"],
+      "prPriority": 99
     }
   ],
   "helm-requirements": {
