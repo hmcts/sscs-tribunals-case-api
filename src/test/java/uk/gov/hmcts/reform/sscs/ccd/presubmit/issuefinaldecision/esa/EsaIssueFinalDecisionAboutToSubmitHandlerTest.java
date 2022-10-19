@@ -162,6 +162,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
     }
+
     @Test
     public void givenANonIssueFinalDecisionEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
