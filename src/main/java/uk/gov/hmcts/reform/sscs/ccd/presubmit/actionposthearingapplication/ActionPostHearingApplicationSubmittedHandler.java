@@ -90,22 +90,27 @@ public class ActionPostHearingApplicationSubmittedHandler implements PreSubmitCa
     @Nullable
     private static CcdCallbackMap getCcdCallbackMap(ActionPostHearingApplication actionPostHearing,
                                                     ActionPostHearingTypes typeSelected) {
-        if (SET_ASIDE == typeSelected) {
-            CcdCallbackMap action = actionPostHearing.getActionSetAside().getAction();
-            if (action == SetAsideActions.REFUSE
-                && isYes(actionPostHearing.getActionSetAside().getRequestStatementOfReasons())) {
-                action = SetAsideActions.REFUSE_SOR;
-            }
-            return action;
-        } else if (CORRECTION == typeSelected) {
-            return actionPostHearing.getActionCorrection().getAction();
-        } else if (STATEMENT_OF_REASONS == typeSelected) {
-            return actionPostHearing.getActionStatementOfReasons().getAction();
-        } else if (PERMISSION_TO_APPEAL == typeSelected) {
-            return actionPostHearing.getActionPermissionToAppeal().getAction();
-        } else if (LIBERTY_TO_APPLY == typeSelected) {
-            return actionPostHearing.getActionLibertyToApply().getAction();
+        if (isNull(typeSelected)) {
+            return null;
         }
-        return null;
+        switch (typeSelected) {
+            case SET_ASIDE:
+                CcdCallbackMap action = actionPostHearing.getActionSetAside().getAction();
+                if (action == SetAsideActions.REFUSE
+                    && isYes(actionPostHearing.getActionSetAside().getRequestStatementOfReasons())) {
+                    action = SetAsideActions.REFUSE_SOR;
+                }
+                return action;
+            case CORRECTION:
+                return actionPostHearing.getActionCorrection().getAction();
+            case STATEMENT_OF_REASONS:
+                return actionPostHearing.getActionStatementOfReasons().getAction();
+            case PERMISSION_TO_APPEAL:
+                return actionPostHearing.getActionPermissionToAppeal().getAction();
+            case LIBERTY_TO_APPLY:
+                return actionPostHearing.getActionLibertyToApply().getAction();
+            default:
+                return null;
+        }
     }
 }
