@@ -89,10 +89,14 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             return preSubmitCallbackResponse;
         }
 
-        sscsCaseData.setDwpState(FINAL_DECISION_ISSUED.getId());
         createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
         clearTransientFields(preSubmitCallbackResponse);
 
+        if (!(State.READY_TO_LIST.equals(sscsCaseData.getState())
+            || State.WITH_DWP.equals(sscsCaseData.getState()))) {
+            sscsCaseData.setDwpState(FINAL_DECISION_ISSUED.getId());
+            sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
+        }
         if (eligibleForHearingsCancel.test(callback)) {
             log.info("Issue Final Decision: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());

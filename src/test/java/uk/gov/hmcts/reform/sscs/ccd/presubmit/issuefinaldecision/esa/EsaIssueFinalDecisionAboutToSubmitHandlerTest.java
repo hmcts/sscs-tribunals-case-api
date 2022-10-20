@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.esa;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -36,20 +38,7 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsEsaCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.IssueFinalDecisionAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
@@ -164,6 +153,14 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(caseDetails.getState()).thenReturn(State.HEARING);
+    }
+
+    private void commonSetUp() {
+        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
     }
 
     @Test
@@ -414,5 +411,40 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+    }
+
+    @Test
+    public void givenAnIssueFinalDecisionEvent_shouldUpdateStateAndDwpStateWhenStateIsNotReadyToListOrWithFta() {
+        commonSetUp();
+
+        callback.getCaseDetails().getCaseData().setState(State.VOID_STATE);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getState(), is(State.DORMANT_APPEAL_STATE));
+        assertThat(response.getData().getDwpState(), is(FINAL_DECISION_ISSUED.getId()));
+    }
+
+    @Test
+    public void givenAnIssueFinalDecisionEvent_shouldNotUpdateStateAndDwpStateWhenStateIsReadyToList() {
+        commonSetUp();
+
+        callback.getCaseDetails().getCaseData().setState(State.READY_TO_LIST);
+        callback.getCaseDetails().getCaseData().setDwpState(DwpState.DIRECTION_RESPONDED.getId());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getState(), is(State.READY_TO_LIST));
+        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_RESPONDED.getId()));
+    }
+
+    @Test
+    public void givenAnIssueFinalDecisionEvent_shouldNotUpdateStateAndDwpStateWhenStateIsWithFta() {
+        commonSetUp();
+
+        callback.getCaseDetails().getCaseData().setState(State.WITH_DWP);
+        callback.getCaseDetails().getCaseData().setDwpState(DwpState.DIRECTION_RESPONDED.getId());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getState(), is(State.WITH_DWP));
+        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_RESPONDED.getId()));
     }
 }
