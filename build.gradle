@@ -34,8 +34,8 @@ gitProperties {
 group = 'uk.gov.hmcts.reform'
 version = '1.0.0'
 
-sourceCompatibility = 11
-targetCompatibility = 11
+sourceCompatibility = JavaVersion.VERSION_14
+targetCompatibility = JavaVersion.VERSION_14
 
 compileJava {
     options.compilerArgs << '-parameters' << '-Xlint:deprecation' << "-Xlint:unchecked"
@@ -114,7 +114,7 @@ task fortifyScan(type: JavaExec)  {
 }
 
 jacoco {
-    toolVersion = "0.8.2"
+    toolVersion = "0.8.8"
 }
 
 jacocoTestReport {
