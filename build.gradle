@@ -431,16 +431,16 @@ dependencies {
 
     implementation group: 'org.json', name: 'json', version: '20220924'
 
-    implementation group: 'com.opencsv', name: 'opencsv', version: '5.6'
+    implementation group: 'com.opencsv', name: 'opencsv', version: '5.7.0'
 
-    implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.58"
+    implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.73"
 
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
 
     e2eImplementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
 
-    implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
+    implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
 
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
@@ -456,11 +456,11 @@ dependencies {
 
     testImplementation group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
 
-    testImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
-    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
-    e2eImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
-    e2eAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
-    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
+    testImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
+    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
+    e2eImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
+    e2eAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
+    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
 
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.2'
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.2'
@@ -487,7 +487,7 @@ dependencies {
     contractTestImplementation sourceSets.test.runtimeClasspath
 
     cftlibImplementation group: 'org.springframework.boot', name: 'spring-boot-devtools'
-    cftlibAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
+    cftlibAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
 
 }
 // this is required to force Java running on the Azure Windows Server OS into using
