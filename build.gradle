@@ -445,6 +445,8 @@ dependencies {
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
+    testImplementation group: 'org.apache.httpcomponents', name: 'fluent-hc', version:  '4.5.13'
+
     testImplementation group: 'com.azure', name: 'azure-core', version: '1.27.0'
     testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.6.0'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.8.0'
