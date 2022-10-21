@@ -16,7 +16,7 @@
         "org.springframework",
         "io.spring"
       ],
-      "prPriority": 25,
+      "prPriority": 75,
       "groupName": "Spring All"
     },
     {
@@ -30,7 +30,7 @@
         "uk.gov.hmcts.java",
         "hmcts.rse-cft-lib"
       ],
-      "prPriority": 15,
+      "prPriority": 50,
       "groupName": "HMCTS Non SSCS Core"
     },
     {
@@ -40,7 +40,7 @@
         "hmcts:send"
       ],
       "groupName": "HMCTS Non SSCS Non Core",
-      "prPriority": 10
+      "prPriority": 45
     },
     {
       "matchPackagePatterns": [
@@ -51,7 +51,7 @@
         "jacoco",
         "serenity"
       ],
-      "prPriority": 5,
+      "prPriority": 20,
       "groupName": "Automated Checks"
     },
     {
@@ -64,7 +64,7 @@
         "json-unit",
         "pact.consumer"
       ],
-      "prPriority": 4,
+      "prPriority": 15,
       "groupName": "Testing"
     },
     {
@@ -78,7 +78,7 @@
         "xml.bind",
         "net.bytebuddy"
       ],
-      "prPriority": 3,
+      "prPriority": 10,
       "groupName": "Tools"
     },
     {
@@ -86,7 +86,7 @@
         "org.apache.tika",
         "org.apache.pdfbox"
       ],
-      "prPriority": 1,
+      "prPriority": 5,
       "groupName": "Document Processing"
     },
     {
@@ -102,7 +102,7 @@
         "qpid",
         "rest-assured"
       ],
-      "prPriority": 1,
+      "prPriority": 5,
       "groupName": "Networking"
     },
     {
@@ -110,7 +110,7 @@
         "org.postgresql",
         "org.elasticsearch"
       ],
-      "prPriority": 1,
+      "prPriority": 5,
       "groupName": "Databases"
     }
   ],
