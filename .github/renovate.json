@@ -12,6 +12,14 @@
       "prPriority": 100
     },
     {
+      "matchPackagePrefixes": [
+        "org.springframework",
+        "io.spring"
+      ],
+      "prPriority": 25,
+      "groupName": "Spring All"
+    },
+    {
       "matchPackagePatterns": [
         "hmcts:ccd",
         "hmcts:auth",
@@ -33,14 +41,6 @@
       ],
       "groupName": "HMCTS Non SSCS Non Core",
       "prPriority": 10
-    },
-    {
-      "matchPackagePrefixes": [
-        "org.springframework",
-        "io.spring"
-      ],
-      "prPriority": 5,
-      "groupName": "Spring All"
     },
     {
       "matchPackagePatterns": [
