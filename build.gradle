@@ -449,12 +449,15 @@ dependencies {
 
     testImplementation group: 'com.azure', name: 'azure-core', version: '1.27.0'
     testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.6.0'
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.8.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.8.1'
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.36.0'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.8.1'
-    testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.36.0'
     testImplementation group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
+
+    // https://mvnrepository.com/artifact/net.bytebuddy/byte-buddy-dep
+    testImplementation group: 'net.bytebuddy', name: 'byte-buddy-dep', version: '1.12.18'
+
 
     testImplementation group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
 
