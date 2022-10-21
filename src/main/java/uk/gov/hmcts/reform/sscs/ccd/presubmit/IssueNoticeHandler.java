@@ -64,7 +64,7 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
     }
 
     protected String buildSignedInJudgeSurname(String userAuthorisation) {
-        return userDetailsService.buildLoggedInUserName(userAuthorisation);
+        return userDetailsService.buildLoggedInUserSurname(userAuthorisation);
     }
 
 }
