@@ -10,6 +10,107 @@
     {
       "matchPackageNames": ["com.github.hmcts:sscs-common"],
       "prPriority": 100
+    },
+    {
+      "matchPackagePatterns": [
+        "hmcts:ccd",
+        "hmcts:auth",
+        "hmcts:java",
+        "hmcts:properties",
+        "hmcts:idam",
+        "hmcts:fortify",
+        "uk.gov.hmcts.java",
+        "hmcts.rse-cft-lib"
+      ],
+      "prPriority": 15,
+      "groupName": "HMCTS Non SSCS Core"
+    },
+    {
+      "matchPackagePatterns": [
+        "hmcts:cmc",
+        "hmcts:doc",
+        "hmcts:send"
+      ],
+      "groupName": "HMCTS Non SSCS Non Core",
+      "prPriority": 10
+    },
+    {
+      "matchPackagePrefixes": [
+        "org.springframework",
+        "io.spring"
+      ],
+      "prPriority": 5,
+      "groupName": "Spring All"
+    },
+    {
+      "matchPackagePatterns": [
+        "org.apache.tika",
+        "org.apache.pdfbox"
+      ],
+      "groupName": "Document Processing"
+    },
+    {
+      "matchPackagePatterns": [
+        "dependencycheck",
+        "sonarqube",
+        "checkstyle",
+        "pitest",
+        "jacoco",
+        "serenity"
+      ],
+      "prPriority": 1,
+      "groupName": "Automated Checks"
+    },
+    {
+      "matchPackagePatterns": [
+        "assertj",
+        "junit",
+        "jupiter",
+        "powermock",
+        "mockito",
+        "json-unit",
+        "pact.consumer"
+      ],
+      "prPriority": 1,
+      "groupName": "Testing"
+    },
+    {
+      "matchPackagePatterns": [
+        "commons-io",
+        "org.apache.commons",
+        "lombok",
+        "json-schema-validator",
+        "com.opencsv",
+        "org.json",
+        "xml.bind",
+        "net.bytebuddy"
+      ],
+      "prPriority": 1,
+      "groupName": "Tools"
+    },
+    {
+      "matchPackagePatterns": [
+        "io.github.openfeign",
+        "openfeign.form",
+        "commons-fileupload",
+        "okhttp",
+        "springfox",
+        "springdoc",
+        "com.azure",
+        "com.microsoft.azure",
+        "qpid",
+        "rest-assured"
+      ],
+      "prPriority": 1,
+      "groupName": "Networking"
+    },
+    {
+      "matchPackagePatterns": [
+        "org.postgresql",
+        "org.elasticsearch"
+      ],
+      "prPriority": 1,
+      "groupName": "Databases"
     }
   ],
   "helm-requirements": {
