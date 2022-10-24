@@ -467,12 +467,10 @@ dependencies {
     e2eAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
     integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
 
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.1'
-    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.9.1'
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.1'
-    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.23.1'
+    testImplementation platform(group: 'org.junit', name: 'junit-bom', version: '5.9.1')
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter'
 
-    e2eRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.9.1'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.23.1'
 
     //pact contract testing
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.15'
@@ -482,11 +480,6 @@ dependencies {
     contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'java8',  version: '4.1.39'
 
     contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.1'
-    contractTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.9.1'
-
-    contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.1'
-    contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.9.1'
 
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
