@@ -3,11 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionposthearingapplication;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.ActionPostHearingTypes.CORRECTION;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.ActionPostHearingTypes.LIBERTY_TO_APPLY;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.ActionPostHearingTypes.PERMISSION_TO_APPEAL;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.ActionPostHearingTypes.SET_ASIDE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.ActionPostHearingTypes.STATEMENT_OF_REASONS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import lombok.RequiredArgsConstructor;
@@ -78,10 +73,15 @@ public class ActionPostHearingApplicationSubmittedHandler implements PreSubmitCa
         }
 
         if (nonNull(action.getCallbackEvent())) {
-            SscsCaseDetails updateCaseDetails = ccdService.updateCase(
+            SscsCaseDetails updatedCaseDetails = ccdService.updateCase(
                 caseData, caseId, action.getCallbackEvent().getCcdType(), action.getCallbackSummary(),
                 action.getCallbackDescription(), idamService.getIdamTokens());
-            return new PreSubmitCallbackResponse<>(updateCaseDetails.getData());
+            caseData = updatedCaseDetails.getData();
+            response = new PreSubmitCallbackResponse<>(caseData);
+        }
+
+        if (nonNull(action.getPostCallbackDwpState())) {
+            caseData.setDwpState(action.getPostCallbackDwpState().getId());
         }
 
         return response;

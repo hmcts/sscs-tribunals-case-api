@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LibertyToApplyActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PermissionToAppealActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
@@ -125,12 +126,20 @@ public class ActionPostHearingApplicationSubmittedHandlerTest {
 
 
     @Test
-    @Parameters({"GRANT", "REFUSE", "ISSUE_DIRECTIONS"})
+    @Parameters({"GRANT", "ISSUE_DIRECTIONS"})
     public void givenActionTypeSetAsideSelected_shouldReturnCallCorrectCallback(SetAsideActions value) {
         caseData.getActionPostHearingApplication().setTypeSelected(SET_ASIDE);
         caseData.getActionPostHearingApplication().getActionSetAside().setAction(value);
 
-        verifyCcdUpdatedCorrectly(value);
+        verifyCcdUpdatedCorrectly(value, null);
+    }
+
+    @Test
+    public void givenActionTypeSetAsideSelected_shouldReturnCallCorrectCallback() {
+        caseData.getActionPostHearingApplication().setTypeSelected(SET_ASIDE);
+        caseData.getActionPostHearingApplication().getActionSetAside().setAction(SetAsideActions.REFUSE);
+
+        verifyCcdUpdatedCorrectly(SetAsideActions.REFUSE, DwpState.SET_ASIDE_REFUSED.getId());
     }
 
     @Test
@@ -139,7 +148,7 @@ public class ActionPostHearingApplicationSubmittedHandlerTest {
         caseData.getActionPostHearingApplication().getActionSetAside().setAction(SetAsideActions.REFUSE);
         caseData.getActionPostHearingApplication().getActionSetAside().setRequestStatementOfReasons(YES);
 
-        verifyCcdUpdatedCorrectly(SetAsideActions.REFUSE_SOR);
+        verifyCcdUpdatedCorrectly(SetAsideActions.REFUSE_SOR, null);
     }
 
 
@@ -149,7 +158,7 @@ public class ActionPostHearingApplicationSubmittedHandlerTest {
         caseData.getActionPostHearingApplication().setTypeSelected(CORRECTION);
         caseData.getActionPostHearingApplication().getActionCorrection().setAction(value);
 
-        verifyCcdUpdatedCorrectly(value);
+        verifyCcdUpdatedCorrectly(value, null);
     }
 
     @Test
@@ -158,7 +167,7 @@ public class ActionPostHearingApplicationSubmittedHandlerTest {
         caseData.getActionPostHearingApplication().setTypeSelected(STATEMENT_OF_REASONS);
         caseData.getActionPostHearingApplication().getActionStatementOfReasons().setAction(value);
 
-        verifyCcdUpdatedCorrectly(value);
+        verifyCcdUpdatedCorrectly(value, null);
     }
 
     @Test
@@ -171,6 +180,9 @@ public class ActionPostHearingApplicationSubmittedHandlerTest {
             handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
+
+        assertThat(response.getData().getDwpState()).isNull();
+
         verifyNoInteractions(ccdService);
     }
 
@@ -184,6 +196,9 @@ public class ActionPostHearingApplicationSubmittedHandlerTest {
             handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
+
+        assertThat(response.getData().getDwpState()).isNull();
+
         verifyNoInteractions(ccdService);
     }
 
@@ -213,7 +228,7 @@ public class ActionPostHearingApplicationSubmittedHandlerTest {
             .containsOnly("Cannot process Action Post Hearing Application on non Scheduling & Listing Case");
     }
 
-    private void verifyCcdUpdatedCorrectly(CcdCallbackMap callbackMap) {
+    private void verifyCcdUpdatedCorrectly(CcdCallbackMap callbackMap, String dwpState) {
         when(ccdService.updateCase(caseData, CASE_ID, callbackMap.getCallbackEvent().getCcdType(),
             callbackMap.getCallbackSummary(), callbackMap.getCallbackDescription(),
             idamTokens))
@@ -223,6 +238,9 @@ public class ActionPostHearingApplicationSubmittedHandlerTest {
             handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
+
+        assertThat(response.getData().getDwpState()).isEqualTo(dwpState);
+
         verify(ccdService, times(1))
             .updateCase(caseData, CASE_ID, callbackMap.getCallbackEvent().getCcdType(),
                 callbackMap.getCallbackSummary(), callbackMap.getCallbackDescription(),
