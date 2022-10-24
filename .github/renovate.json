@@ -62,7 +62,7 @@
         "powermock",
         "mockito",
         "json-unit",
-        "pact.consumer"
+        "pact"
       ],
       "prPriority": 15,
       "groupName": "Testing"
