@@ -2,12 +2,12 @@ package uk.gov.hmcts.reform.sscs.config;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
 import uk.gov.hmcts.reform.auth.checker.core.user.User;
 import uk.gov.hmcts.reform.auth.checker.spring.useronly.AuthCheckerUserOnlyFilter;
@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.auth.checker.spring.useronly.AuthCheckerUserOnlyFilte
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration {
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final RequestAuthorizer<User> userRequestAuthorizer;
     private final AuthenticationManager authenticationManager;
@@ -28,8 +28,13 @@ public class SecurityConfiguration {
         this.authenticationManager = authenticationManager;
     }
 
-    @Bean
-    public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+    @Override
+    public void configure(WebSecurity web) {
+        web.ignoring().anyRequest();
+    }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
 
         AuthCheckerUserOnlyFilter<User> authCheckerUserOnlyFilter =
             new AuthCheckerUserOnlyFilter<>(userRequestAuthorizer);
@@ -60,7 +65,5 @@ public class SecurityConfiguration {
             .antMatchers("/api/citizen").authenticated()
             .antMatchers("/api/request").authenticated();
         // @formatter:on
-
-        return http.build();
     }
 }
