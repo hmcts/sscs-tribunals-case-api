@@ -72,16 +72,17 @@ public class ActionPostHearingApplicationSubmittedHandler implements PreSubmitCa
             return response;
         }
 
+        if (nonNull(action.getPostCallbackDwpState())) {
+            log.info("Action Post Hearing Application: setting DwpState to {} for case {}",
+                action.getPostCallbackDwpState().getId(), caseId);
+            caseData.setDwpState(action.getPostCallbackDwpState().getId());
+        }
+
         if (nonNull(action.getCallbackEvent())) {
             SscsCaseDetails updatedCaseDetails = ccdService.updateCase(
                 caseData, caseId, action.getCallbackEvent().getCcdType(), action.getCallbackSummary(),
                 action.getCallbackDescription(), idamService.getIdamTokens());
-            caseData = updatedCaseDetails.getData();
-            response = new PreSubmitCallbackResponse<>(caseData);
-        }
-
-        if (nonNull(action.getPostCallbackDwpState())) {
-            caseData.setDwpState(action.getPostCallbackDwpState().getId());
+            response = new PreSubmitCallbackResponse<>(updatedCaseDetails.getData());
         }
 
         return response;
