@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.domain.wrapper;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Objects;
 
 public class HearingArrangements {
@@ -24,43 +24,43 @@ public class HearingArrangements {
         this.otherArrangements = otherArrangements;
     }
 
-    @ApiModelProperty(example = "true", required = true)
+    @Schema(example = "true", required = true)
     @JsonProperty(value = "language_interpreter")
     public boolean isLanguageInterpreter() {
         return languageInterpreter;
     }
 
-    @ApiModelProperty(example = "French")
+    @Schema(example = "French")
     @JsonProperty(value = "languages")
     public String getLanguages() {
         return languages;
     }
 
-    @ApiModelProperty(example = "true", required = true)
+    @Schema(example = "true", required = true)
     @JsonProperty(value = "sign_language_interpreter")
     public boolean isSignLanguageInterpreter() {
         return signLanguageInterpreter;
     }
 
-    @ApiModelProperty(example = "BSL")
+    @Schema(example = "BSL")
     @JsonProperty(value = "sign_language_type")
     public String getSignLangaugeType() {
         return signLangaugeType;
     }
 
-    @ApiModelProperty(example = "true", required = true)
+    @Schema(example = "true", required = true)
     @JsonProperty(value = "hearing_loop_required")
     public boolean isHearingLoopRequired() {
         return hearingLoopRequired;
     }
 
-    @ApiModelProperty(example = "true", required = true)
+    @Schema(example = "true", required = true)
     @JsonProperty(value = "disabled_access_required")
     public boolean isDisabledAccessRequired() {
         return disabledAccessRequired;
     }
 
-    @ApiModelProperty(example = "some other arrangements", required = true)
+    @Schema(example = "some other arrangements", required = true)
     @JsonProperty(value = "other_arrangements")
     public String getOtherArrangements() {
         return otherArrangements;

@@ -7,10 +7,12 @@ import static org.springframework.http.ResponseEntity.created;
 import static uk.gov.hmcts.reform.sscs.controller.SyaController.logBadRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,21 +57,21 @@ public class CreateCaseController {
         this.idamService = idamService;
     }
 
-    @ApiOperation(value = "Create a case",
-        notes = "Creates a case in CCD with an online panel which can the be used for a online hearing. This "
+    @Operation(summary = "Create a case",
+        description = "Creates a case in CCD with an online panel which can the be used for a online hearing. This "
             + "endpoint is just for test and should only be present in test environments. The email address "
             + "used will need to be unique for all other cases in CCD with an online panel if we want to load "
             + "it for the MYA process."
     )
     @ApiResponses(value = {
-        @ApiResponse(code = 201, message = "Case has been created")
+        @ApiResponse(responseCode = "201", description = "Case has been created")
     })
     @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping(value = "/api/case", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, String>> createCase(
-        @ApiParam(value = "email address of the appellant must be unique in CCD", example = "foo@bar.com", required = true)
+        @Parameter(description = "email address of the appellant must be unique in CCD", example = "foo@bar.com", required = true)
         @RequestParam("email")String email,
-        @ApiParam(value = "mobile number of appellant. Optional if not set will not subscribe for sms.")
+        @Parameter(description = "mobile number of appellant. Optional if not set will not subscribe for sms.")
         @RequestParam(value = "mobile", required = false) String mobile,
         @RequestParam(value = "hearingType", defaultValue = "oral") String hearingType
     ) throws URISyntaxException {
@@ -143,11 +145,12 @@ public class CreateCaseController {
     }
 
 
-    @ApiOperation(value = "submitTestAppeal",
-        notes = "Creates a case from the SYA details - Used for tests. Changes the mrn date and nino to a random value",
-        response = String.class, responseContainer = "Test appeal details")
+    @Operation(summary = "submitTestAppeal",
+        description = "Creates a case from the SYA details - Used for tests. Changes the mrn date and nino to a random value")
     @ApiResponses(value = {
-        @ApiResponse(code = 201, message = "Submitted test appeal successfully", response = String.class)})
+        @ApiResponse(responseCode = "201", description = "Submitted test appeal successfully", content = {
+            @Content(schema = @Schema(implementation = String.class))})
+    })
     @PostMapping(value = "/api/appeals", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createAppeals(@RequestHeader(value = AUTHORIZATION, required = false)
                                                         String authorisation, @RequestBody SyaCaseWrapper syaCaseWrapper) {

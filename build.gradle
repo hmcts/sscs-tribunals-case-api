@@ -384,8 +384,7 @@ dependencies {
 
     implementation group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.4'
 
-    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.10.5'
-    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.10.5'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.12'
 
     implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.10'
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.10.0'
