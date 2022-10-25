@@ -6,9 +6,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.util.ObjectMapperTestUtil.convertObje
 import static uk.gov.hmcts.reform.sscs.ccd.util.PactDslBuilderForCaseDetailsList.buildCaseDetailsDsl;
 import static uk.gov.hmcts.reform.sscs.ccd.util.PactDslFixtureHelper.getCaseDataContent;
 
-import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
+import au.com.dius.pact.consumer.dsl.PactBuilder;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
-import au.com.dius.pact.core.model.RequestResponsePact;
+import au.com.dius.pact.core.model.V4Pact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import java.util.Map;
 import org.json.JSONException;
@@ -21,8 +21,9 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 public class SubmitEventForCaseWorkerConsumerTest extends CcdConsumerTestBase {
 
     @Pact(provider = "ccdDataStoreAPI_Cases", consumer = "sscs_tribunalsCaseApi")
-    public RequestResponsePact submitEventForCaseWorker(PactDslWithProvider builder) throws Exception {
+    public V4Pact submitEventForCaseWorker(PactBuilder builder) throws Exception {
         return builder
+            .usingLegacyDsl()
             .given("A Submit Event for a Caseworker is requested", setUpStateMapForProviderWithCaseData(caseDataContent))
             .uponReceiving("A Submit Event for a Caseworker")
             .path(buildPath())
@@ -35,7 +36,7 @@ public class SubmitEventForCaseWorkerConsumerTest extends CcdConsumerTestBase {
             .status(201)
             .body(buildCaseDetailsDsl(CASE_ID))
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .toPact();
+            .toPact(V4Pact.class);
     }
 
     @Test
