@@ -4,9 +4,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.util.ObjectMapperTestUtil.convertObje
 import static uk.gov.hmcts.reform.sscs.ccd.util.PactDslBuilderForCaseDetailsList.buildCaseDetailsDsl;
 import static uk.gov.hmcts.reform.sscs.ccd.util.PactDslFixtureHelper.getCaseDataContent;
 
-import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
+import au.com.dius.pact.consumer.dsl.PactBuilder;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
-import au.com.dius.pact.core.model.RequestResponsePact;
+import au.com.dius.pact.core.model.V4Pact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
@@ -16,8 +16,9 @@ import org.springframework.http.MediaType;
 public class SubmitForCitizenConsumerTest extends CcdConsumerTestBase {
 
     @Pact(provider = "ccdDataStoreAPI_Cases", consumer = "sscs_tribunalsCaseApi")
-    public RequestResponsePact submitForCitizen(PactDslWithProvider builder) throws Exception {
+    public V4Pact submitForCitizen(PactBuilder builder) throws Exception {
         return builder
+            .usingLegacyDsl()
             .given("A Submit for a Citizen is requested", setUpStateMapForProviderWithoutCaseData())
             .uponReceiving("A Submit For a Citizen")
             .path(buildPath())
@@ -31,7 +32,7 @@ public class SubmitForCitizenConsumerTest extends CcdConsumerTestBase {
             .status(HttpStatus.SC_CREATED)
             .body(buildCaseDetailsDsl(CASE_ID))
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .toPact();
+            .toPact(V4Pact.class);
     }
 
     @Test

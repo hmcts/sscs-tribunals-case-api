@@ -15,7 +15,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.39.0'
     id "info.solidsoft.pitest" version '1.9.0'
     id 'org.owasp.dependencycheck' version '7.3.0'
-    id 'au.com.dius.pact' version '4.2.14'
+    id 'au.com.dius.pact' version '4.3.15'
     id 'com.github.hmcts.rse-cft-lib' version '0.19.380'
 }
 
@@ -445,14 +445,19 @@ dependencies {
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
+    testImplementation group: 'org.apache.httpcomponents', name: 'fluent-hc', version:  '4.5.13'
+
     testImplementation group: 'com.azure', name: 'azure-core', version: '1.27.0'
     testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.6.0'
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.0.0'
-    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.28.0'
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.0.0'
-    testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
-    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.28.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.8.1'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.36.0'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.8.1'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.36.0'
     testImplementation group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
+
+    // https://mvnrepository.com/artifact/net.bytebuddy/byte-buddy-dep
+    testImplementation group: 'net.bytebuddy', name: 'byte-buddy-dep', version: '1.12.18'
+
 
     testImplementation group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
 
@@ -462,26 +467,15 @@ dependencies {
     e2eAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
     integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
 
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.2'
-    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.2'
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.2'
-    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.21.0'
+    testImplementation platform(group: 'org.junit', name: 'junit-bom', version: '5.9.1')
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter'
 
-    e2eRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.8.2'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.23.1'
 
     //pact contract testing
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.1.7'
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.7'
-
-    contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.1.7'
-    contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'java8',  version: '4.1.7'
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.15'
 
     contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.2'
-    contractTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.2'
-
-    contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.2'
-    contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.9.1'
 
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
