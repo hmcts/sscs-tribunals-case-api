@@ -384,11 +384,11 @@ dependencies {
 
     implementation group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.4'
 
-    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.8.0'
-    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.8.0'
+    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.10.5'
+    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.10.5'
 
-    implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.7'
-    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.2'
+    implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.10'
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.10.0'
 
     implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '2.1.5'
     implementation group: 'com.github.hmcts', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
@@ -402,8 +402,8 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: '4.20.2'
     implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.5.0'
 
-    implementation group: 'com.azure', name: 'azure-core', version: '1.27.0'
-    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.6.0'
+    implementation group: 'com.azure', name: 'azure-core', version: '1.33.0'
+    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.12.0'
 
     implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.4.15'
 
@@ -445,14 +445,17 @@ dependencies {
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
+
     testImplementation group: 'org.apache.httpcomponents', name: 'fluent-hc', version:  '4.5.13'
 
-    testImplementation group: 'com.azure', name: 'azure-core', version: '1.27.0'
-    testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.6.0'
+    testImplementation group: 'com.azure', name: 'azure-core', version: '1.33.0'
+    testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.12.0'
+
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.8.1'
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.36.0'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.8.1'
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.36.0'
+
     testImplementation group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
     // https://mvnrepository.com/artifact/net.bytebuddy/byte-buddy-dep
