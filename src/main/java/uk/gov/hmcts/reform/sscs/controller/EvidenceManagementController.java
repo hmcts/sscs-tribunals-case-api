@@ -4,9 +4,9 @@ import static uk.gov.hmcts.reform.sscs.service.SubmitAppealService.DM_STORE_USER
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,13 +49,13 @@ public class EvidenceManagementController {
         this.idamService = idamService;
     }
 
-    @ApiOperation(value = "Upload additional evidence converted to PDF",
-        notes = "Uploads evidence for an appeal which will be held in a draft state against the case that is not "
+    @Operation(summary = "Upload additional evidence converted to PDF",
+        description = "Uploads evidence for an appeal which will be held in a draft state against the case that is not "
             + "visible by a caseworker in CCD. You will need to submit the evidence for it to be visbale in CCD "
             + "by a caseworker. You need to have an appeal in CCD."
     )
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Evidence has been added to the appeal"),
+        @ApiResponse(responseCode = "200", description = "Evidence has been added to the appeal"),
     })
     @PostMapping(
         value = "/evidence/upload",
