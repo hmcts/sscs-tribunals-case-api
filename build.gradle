@@ -406,7 +406,7 @@ dependencies {
 
     implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.4.15'
 
-    implementation group:'org.overviewproject', name: 'mime-types', version: '1.0.2'
+    implementation group:'org.overviewproject', name: 'mime-types', version: '1.0.4'
 
     implementation group:'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
 
