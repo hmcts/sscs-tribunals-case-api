@@ -378,7 +378,7 @@ dependencies {
     implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
     implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.3'
 
-    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.3'
+    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.1'
     implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.1'
     implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.1'
 
