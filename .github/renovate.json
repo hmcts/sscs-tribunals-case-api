@@ -1,10 +1,5 @@
 {
   "extends": [
-    "config:base",
-    ":dependencyDashboard",
-    ":semanticPrefixChore",
-    ":rebaseStalePrs",
-    ":prConcurrentLimit10",
     "github>hmcts/sscs-common//.github/sscs-renovate.json"
   ]
 }

@@ -3,10 +3,10 @@ package uk.gov.hmcts.reform.sscs.controller;
 import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.unprocessableEntity;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -39,15 +39,15 @@ public class EvidenceUploadController {
         this.coversheetService = coversheetService;
     }
 
-    @ApiOperation(value = "Upload evidence",
-        notes = "Uploads evidence for an appeal which will be held in a draft state against the case that is not "
+    @Operation(summary = "Upload evidence",
+        description = "Uploads evidence for an appeal which will be held in a draft state against the case that is not "
             + "visible by a caseworker in CCD. You will need to submit the evidence for it to be visible in CCD "
             + "by a caseworker. You need to have an appeal in CCD."
     )
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Evidence has been added to the appeal"),
-        @ApiResponse(code = 404, message = "No online hearing found with online hearing id"),
-        @ApiResponse(code = 422, message = "The file cannot be added to the document store")
+        @ApiResponse(responseCode = "200", description = "Evidence has been added to the appeal"),
+        @ApiResponse(responseCode = "404", description = "No online hearing found with online hearing id"),
+        @ApiResponse(responseCode = "422", description = "The file cannot be added to the document store")
     })
     @PutMapping(
         value = "{identifier}/evidence",
@@ -55,7 +55,7 @@ public class EvidenceUploadController {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Evidence> uploadEvidence(
-        @ApiParam(value = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx") @PathVariable("identifier") String identifier,
+        @Parameter(description = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx") @PathVariable("identifier") String identifier,
         @RequestParam("file") MultipartFile file
     ) {
         return uploadEvidence(() -> evidenceUploadService.uploadDraftEvidence(identifier, file));
@@ -72,11 +72,11 @@ public class EvidenceUploadController {
         }
     }
 
-    @ApiOperation(value = "List evidence for a hearing",
-        notes = "Lists the evidence that has already been uploaded for a hearing but is still in a draft state."
+    @Operation(summary = "List evidence for a hearing",
+        description = "Lists the evidence that has already been uploaded for a hearing but is still in a draft state."
     )
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "List of draft evidence")
+        @ApiResponse(responseCode = "200", description = "List of draft evidence")
     })
     @GetMapping(
         value = "{identifier}/evidence",
@@ -88,13 +88,13 @@ public class EvidenceUploadController {
         return ResponseEntity.ok(evidenceUploadService.listDraftHearingEvidence(identifier));
     }
 
-    @ApiOperation(value = "Delete MYA evidence",
-            notes = "Deletes evidence for a MYA appeal. You need to have an appeal in CCD and an online hearing in MYA "
+    @Operation(summary = "Delete MYA evidence",
+            description = "Deletes evidence for a MYA appeal. You need to have an appeal in CCD and an online hearing in MYA "
                     + "that references the appeal in CCD."
     )
     @ApiResponses(value = {
-        @ApiResponse(code = 204, message = "Evidence deleted "),
-        @ApiResponse(code = 404, message = "No online hearing found with online hearing id"),
+        @ApiResponse(responseCode = "204", description = "Evidence deleted "),
+        @ApiResponse(responseCode = "404", description = "No online hearing found with online hearing id"),
     })
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @DeleteMapping(
@@ -102,7 +102,7 @@ public class EvidenceUploadController {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Void> deleteEvidence(
-        @ApiParam(value = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx")
+        @Parameter(description = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx")
         @PathVariable("identifier") String identifier,
         @PathVariable("evidenceId") String evidenceId
     ) {
@@ -110,16 +110,16 @@ public class EvidenceUploadController {
         return hearingFound ? ResponseEntity.noContent().build() : notFound().build();
     }
 
-    @ApiOperation(value = "Submit MYA evidence",
-        notes = "Submits the evidence attached to the request. This means it will be "
+    @Operation(summary = "Submit MYA evidence",
+        description = "Submits the evidence attached to the request. This means it will be "
             + "visible in CCD by a caseworker. You need to have an appeal in CCD "
             + "and an online hearing in the references the appeal in CCD. Will create a cover sheet for the "
             + "evidence uploaded containing the file names and a description from the appellant."
     )
     @ApiResponses(value = {
-        @ApiResponse(code = 204, message = "Evidence has been submitted to the appeal"),
-        @ApiResponse(code = 404, message = "No online hearing found with online hearing id"),
-        @ApiResponse(code = 422, message = "The file cannot be added to the document store")
+        @ApiResponse(responseCode = "204", description = "Evidence has been submitted to the appeal"),
+        @ApiResponse(responseCode = "404", description = "No online hearing found with online hearing id"),
+        @ApiResponse(responseCode = "422", description = "The file cannot be added to the document store")
     })
     @PostMapping(
             value = "{identifier}/singleevidence",
@@ -127,7 +127,7 @@ public class EvidenceUploadController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity submitSingleEvidence(
-        @ApiParam(value = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx") @PathVariable("identifier") String identifier,
+        @Parameter(description = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx") @PathVariable("identifier") String identifier,
         @RequestParam("file") MultipartFile file,
         @RequestParam("body") String body,
         @RequestParam("idamEmail") String idamEmail
@@ -136,15 +136,15 @@ public class EvidenceUploadController {
         return evidenceSubmitted ? ResponseEntity.noContent().build() : notFound().build();
     }
 
-    @ApiOperation(value = "Submit MYA evidence",
-        notes = "Submits the evidence that has already been uploaded in a draft state. This means it will be "
+    @Operation(summary = "Submit MYA evidence",
+        description = "Submits the evidence that has already been uploaded in a draft state. This means it will be "
             + "visible in CCD by a caseworker. You need to have an appeal in CCD "
             + "and an online hearing in the references the appeal in CCD. Will create a cover sheet for the "
             + "evidence uploaded containing the file names and a description from the appellant."
     )
     @ApiResponses(value = {
-        @ApiResponse(code = 204, message = "Evidence has been submitted to the appeal"),
-        @ApiResponse(code = 404, message = "No online hearing found with online hearing id")
+        @ApiResponse(responseCode = "204", description = "Evidence has been submitted to the appeal"),
+        @ApiResponse(responseCode = "404", description = "No online hearing found with online hearing id")
     })
     @PostMapping(
         value = "{identifier}/evidence",
@@ -158,20 +158,20 @@ public class EvidenceUploadController {
         return evidenceSubmitted ? ResponseEntity.noContent().build() : notFound().build();
     }
 
-    @ApiOperation(value = "Get evidence cover sheet",
-        notes = "Generates a PDF file that can be printed out and added as a cover sheet to evidence that is to be "
+    @Operation(summary = "Get evidence cover sheet",
+        description = "Generates a PDF file that can be printed out and added as a cover sheet to evidence that is to be "
             + "posted in. Can use either the CCD case id which is a number or online hearing id which is a GUUID."
     )
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "A PDF cover sheet"),
-        @ApiResponse(code = 404, message = "No online hearing found with online hearing id")
+        @ApiResponse(responseCode = "200", description = "A PDF cover sheet"),
+        @ApiResponse(responseCode = "404", description = "No online hearing found with online hearing id")
     })
     @GetMapping(
         value = "{identifier}/evidence/coversheet",
         produces = MediaType.APPLICATION_PDF_VALUE
     )
     public ResponseEntity<ByteArrayResource> getCoverSheet(
-        @ApiParam(value = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx") @PathVariable("identifier") String identifier
+        @Parameter(description = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx") @PathVariable("identifier") String identifier
     ) {
         Optional<byte[]> coverSheet = coversheetService.createCoverSheet(identifier);
         return coverSheet.map(pdfBytes ->
