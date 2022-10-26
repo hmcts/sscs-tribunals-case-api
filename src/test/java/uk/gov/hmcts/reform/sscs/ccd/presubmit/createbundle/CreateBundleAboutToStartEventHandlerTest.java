@@ -12,12 +12,10 @@ import static uk.gov.hmcts.reform.sscs.idam.UserRole.SYSTEM_USER;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import junitparams.JUnitParamsRunner;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -30,7 +28,6 @@ import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 import uk.gov.hmcts.reform.sscs.service.bundle.BundleAudioVideoPdfService;
 
 
-@RunWith(JUnitParamsRunner.class)
 public class CreateBundleAboutToStartEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
@@ -55,7 +52,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
     @Mock
     private IdamService idamService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         dwpDocumentService = new DwpDocumentService();
