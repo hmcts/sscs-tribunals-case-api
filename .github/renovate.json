@@ -8,6 +8,10 @@
   ],
   "packageRules": [
     {
+      "matchPackageNames": ["com.github.hmcts:ccd-case-document-am-client"],
+      "allowedVersions": "/^\\d+\\.\\d+\\.\\d+$/"
+    },
+    {
       "matchPackageNames": ["com.github.hmcts:sscs-common"],
       "prPriority": 100
     },
