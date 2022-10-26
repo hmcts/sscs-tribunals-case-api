@@ -382,7 +382,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.1'
     implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.1'
 
-    implementation group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.4'
+    implementation group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.8'
 
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.12'
 
