@@ -611,7 +611,7 @@ bootWithCCD {
 
     //---Debug-----
     //Uncomment to launch with debug
-    //jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
+    jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
 
     //---Extra ccd loging----
     //Uncomment for ccd callback logging

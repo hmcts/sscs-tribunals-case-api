@@ -3,20 +3,31 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 import uk.gov.hmcts.reform.sscs.service.adjourncase.AdjournCaseService;
+import uk.gov.hmcts.reform.sscs.util.DynamicListLangauageUtil;
 
 @Component
 @Slf4j
 public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    private final DynamicListLangauageUtil utils;
+
+    @Autowired
+    public AdjournCaseAboutToStartHandler(DynamicListLangauageUtil utils) {
+        this.utils = utils;
+    }
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.ABOUT_TO_START
@@ -35,7 +46,11 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        DynamicList languageList = utils.generateInterpreterLanguageFields(sscsCaseData.getAdjournCaseInterpreterLanguage());
+
         clearTransientFields(preSubmitCallbackResponse);
+
+        sscsCaseData.setAdjournCaseInterpreterLanguage(languageList);
 
         return preSubmitCallbackResponse;
     }

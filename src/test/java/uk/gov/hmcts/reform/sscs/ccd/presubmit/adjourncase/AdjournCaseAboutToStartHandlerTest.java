@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
@@ -16,16 +18,21 @@ import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.util.DynamicListLangauageUtil;
 
 @RunWith(JUnitParamsRunner.class)
 public class AdjournCaseAboutToStartHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     private AdjournCaseAboutToStartHandler handler;
+
+    @Mock
+    private DynamicListLangauageUtil dynamicListLangauageUtil;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -38,7 +45,7 @@ public class AdjournCaseAboutToStartHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new AdjournCaseAboutToStartHandler();
+        handler = new AdjournCaseAboutToStartHandler(dynamicListLangauageUtil);
 
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -61,7 +68,7 @@ public class AdjournCaseAboutToStartHandlerTest {
                 .adjournCaseNextHearingListingDuration("")
                 .adjournCaseNextHearingListingDurationUnits("")
                 .adjournCaseInterpreterRequired("")
-                .adjournCaseInterpreterLanguage("")
+                .adjournCaseInterpreterLanguage(null)
                 .adjournCaseNextHearingDateType("")
                 .adjournCaseNextHearingDateOrPeriod("")
                 .adjournCaseNextHearingDateOrTime("")
@@ -147,7 +154,7 @@ public class AdjournCaseAboutToStartHandlerTest {
         assertEquals("", sscsCaseData.getAdjournCaseNextHearingListingDuration());
         assertEquals("", sscsCaseData.getAdjournCaseNextHearingListingDurationUnits());
         assertEquals("", sscsCaseData.getAdjournCaseInterpreterRequired());
-        assertEquals("", sscsCaseData.getAdjournCaseInterpreterLanguage());
+        assertEquals(null, sscsCaseData.getAdjournCaseInterpreterLanguage());
         assertEquals("", sscsCaseData.getAdjournCaseNextHearingDateType());
         assertEquals("", sscsCaseData.getAdjournCaseNextHearingDateOrPeriod());
         assertEquals("", sscsCaseData.getAdjournCaseNextHearingDateOrTime());

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 
 import java.time.LocalDate;
@@ -21,6 +22,8 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody.AdjournCaseTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
+import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.LanguageService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
@@ -35,12 +38,15 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     private static final String DOCUMENT_DATE_PATTERN = "dd/MM/yyyy";
     public static final String IN_CHAMBERS = "In chambers";
 
+    private final SignLanguagesService signLanguagesService;
+
     @Autowired
     public AdjournCasePreviewService(GenerateFile generateFile, UserDetailsService userDetailsService, VenueDataLoader venueDataLoader,
-                                     LanguageService languageService, @Value("${doc_assembly.adjourn_case}") String templateId) {
+                                     LanguageService languageService, @Value("${doc_assembly.adjourn_case}") String templateId, SignLanguagesService signLanguagesService) {
         super(generateFile, userDetailsService, languagePreference -> templateId);
         this.venueDataLoader = venueDataLoader;
         this.languageService = languageService;
+        this.signLanguagesService = signLanguagesService;
     }
 
     private LocalDate getDateForPeriodAfterIssueDate(LocalDate issueDate, String period) {
@@ -141,9 +147,14 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     private void setIntepreterDescriptionIfRequired(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData) {
         if ("yes".equalsIgnoreCase(caseData.getAdjournCaseInterpreterRequired())) {
             if (caseData.getAdjournCaseInterpreterLanguage() != null) {
-                adjournCaseBuilder.interpreterDescription(
-                    languageService.getInterpreterDescriptionForLanguageKey(
-                        caseData.getAdjournCaseInterpreterLanguage()));
+                String languageLabel = caseData.getAdjournCaseInterpreterLanguage().getValue().getLabel();
+                String languageKey = caseData.getAdjournCaseInterpreterLanguage().getValue().getCode();
+                Language language = signLanguagesService.getLanguageByHmcReference(languageKey);
+                String interpreterDescription = String.format("an interpreter in %s", languageLabel);
+                if (nonNull(language)) {
+                    interpreterDescription = String.format("a sign language interpreter (%s)", languageLabel);
+                }
+                adjournCaseBuilder.interpreterDescription(interpreterDescription);
             } else {
                 throw new IllegalStateException("An interpreter is required but no language is set");
             }

@@ -97,7 +97,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
             .adjournCaseNextHearingListingDuration("")
             .adjournCaseNextHearingListingDurationUnits("")
             .adjournCaseInterpreterRequired("")
-            .adjournCaseInterpreterLanguage("")
+            .adjournCaseInterpreterLanguage(null)
             .adjournCaseNextHearingDateType("")
             .adjournCaseNextHearingDateOrPeriod("")
             .adjournCaseNextHearingDateOrTime("")

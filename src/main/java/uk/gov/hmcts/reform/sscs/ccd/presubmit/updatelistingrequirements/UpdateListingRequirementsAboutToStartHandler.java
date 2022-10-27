@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.util.UpdateListingRequirementsUtil;
+import uk.gov.hmcts.reform.sscs.util.DynamicListLangauageUtil;
 
 @Service
 @Slf4j
@@ -25,7 +25,7 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
     @Value("${feature.snl.enabled}")
     private boolean isScheduleListingEnabled;
 
-    private final UpdateListingRequirementsUtil utils;
+    private final DynamicListLangauageUtil utils;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -59,7 +59,6 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
                 schedulingAndListingFields.setOverrideFields(overrideFields);
             }
 
-            utils.generateInterpreterLanguageFields(overrideFields);
             log.info("{} Languages in DynamicList for caseId {}",
                 overrideFields.getAppellantInterpreter().getInterpreterLanguage().getListItems().size(),
                 sscsCaseData.getCcdCaseId());

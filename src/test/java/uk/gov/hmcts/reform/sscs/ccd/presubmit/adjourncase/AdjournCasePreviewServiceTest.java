@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.LanguageService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
@@ -57,11 +58,14 @@ public class AdjournCasePreviewServiceTest {
     @Mock
     private VenueDataLoader venueDataLoader;
 
+    @Mock
+    private SignLanguagesService signLanguagesService;
+
     @Before
     public void setUp() throws IOException {
         openMocks(this);
         service = new AdjournCasePreviewService(generateFile, userDetailsService,
-            venueDataLoader, new LanguageService(), TEMPLATE_ID);
+            venueDataLoader, new LanguageService(), TEMPLATE_ID, signLanguagesService);
 
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -251,7 +255,7 @@ public class AdjournCasePreviewServiceTest {
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
         sscsCaseData.setAdjournCaseInterpreterRequired("Yes");
-        sscsCaseData.setAdjournCaseInterpreterLanguage("french");
+        sscsCaseData.setAdjournCaseInterpreterLanguage( new DynamicList("French"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
@@ -309,7 +313,7 @@ public class AdjournCasePreviewServiceTest {
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
         sscsCaseData.setAdjournCaseInterpreterRequired("No");
-        sscsCaseData.setAdjournCaseInterpreterLanguage("french");
+        sscsCaseData.setAdjournCaseInterpreterLanguage( new DynamicList("French"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
@@ -348,7 +352,7 @@ public class AdjournCasePreviewServiceTest {
         sscsCaseData.setAdjournCaseGenerateNotice("yes");
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
-        sscsCaseData.setAdjournCaseInterpreterLanguage("french");
+        sscsCaseData.setAdjournCaseInterpreterLanguage(new DynamicList("French"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 

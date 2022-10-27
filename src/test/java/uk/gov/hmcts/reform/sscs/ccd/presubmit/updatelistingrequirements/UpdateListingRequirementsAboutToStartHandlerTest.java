@@ -4,9 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,15 +17,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
-import uk.gov.hmcts.reform.sscs.util.UpdateListingRequirementsUtil;
+import uk.gov.hmcts.reform.sscs.util.DynamicListLangauageUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UpdateListingRequirementsAboutToStartHandlerTest {
@@ -38,7 +32,7 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
     @Mock
     private SscsCaseData sscsCaseData;
     @Mock
-    UpdateListingRequirementsUtil updateListingRequirementsUtil;
+    DynamicListLangauageUtil dynamicListLangauageUtil;
     @InjectMocks
     private UpdateListingRequirementsAboutToStartHandler handler;
 
@@ -75,9 +69,6 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
                 .build())
             .build();
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
-
-        willDoNothing().given(updateListingRequirementsUtil)
-            .generateInterpreterLanguageFields(any(OverrideFields.class));
 
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
 

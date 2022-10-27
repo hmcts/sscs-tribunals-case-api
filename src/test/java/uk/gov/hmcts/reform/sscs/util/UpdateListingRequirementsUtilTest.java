@@ -39,7 +39,7 @@ public class UpdateListingRequirementsUtilTest {
     @Mock
     private JudicialRefDataApi judicialRefData;
     @InjectMocks
-    private UpdateListingRequirementsUtil updateListingRequirementsUtil;
+    private DynamicListLangauageUtil dynamicListLangauageUtil;
     private List<JudicialUser> response;
 
 
@@ -63,15 +63,9 @@ public class UpdateListingRequirementsUtilTest {
         Language verbalLanguage = new Language("fre", "French", null, null, null);
         given(verbalLanguagesService.getVerbalLanguages()).willReturn(List.of(verbalLanguage));
 
-        OverrideFields overrideFields = OverrideFields.builder()
-            .appellantInterpreter(HearingInterpreter.builder()
-                .interpreterLanguage(new DynamicList(null,null))
-                .build())
-            .build();
+        DynamicList list = dynamicListLangauageUtil.generateInterpreterLanguageFields(null);
 
-        updateListingRequirementsUtil.generateInterpreterLanguageFields(overrideFields);
-
-        List<DynamicListItem> result = overrideFields.getAppellantInterpreter().getInterpreterLanguage().getListItems();
+        List<DynamicListItem> result = list.getListItems();
 
         assertThat(result)
             .hasSize(2)
@@ -87,15 +81,9 @@ public class UpdateListingRequirementsUtilTest {
         Language verbalLanguage = new Language("fre", "French", null, null, null);
         given(verbalLanguagesService.getVerbalLanguages()).willReturn(List.of(verbalLanguage));
 
-        OverrideFields overrideFields = OverrideFields.builder()
-            .appellantInterpreter(HearingInterpreter.builder()
-                .interpreterLanguage(null)
-                .build())
-            .build();
+        DynamicList list = dynamicListLangauageUtil.generateInterpreterLanguageFields(null);
 
-        updateListingRequirementsUtil.generateInterpreterLanguageFields(overrideFields);
-
-        List<DynamicListItem> result = overrideFields.getAppellantInterpreter().getInterpreterLanguage().getListItems();
+        List<DynamicListItem> result = list.getListItems();
 
         assertThat(result)
             .hasSize(2)
@@ -111,13 +99,9 @@ public class UpdateListingRequirementsUtilTest {
         Language verbalLanguage = new Language("fre", "French", null, null, null);
         given(verbalLanguagesService.getVerbalLanguages()).willReturn(List.of(verbalLanguage));
 
-        OverrideFields overrideFields = OverrideFields.builder()
-            .appellantInterpreter(null)
-            .build();
+        DynamicList list = dynamicListLangauageUtil.generateInterpreterLanguageFields(null);
 
-        updateListingRequirementsUtil.generateInterpreterLanguageFields(overrideFields);
-
-        List<DynamicListItem> result = overrideFields.getAppellantInterpreter().getInterpreterLanguage().getListItems();
+        List<DynamicListItem> result = list.getListItems();
 
         assertThat(result)
             .hasSize(2)

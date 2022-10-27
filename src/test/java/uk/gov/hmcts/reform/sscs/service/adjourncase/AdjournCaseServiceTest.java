@@ -33,7 +33,7 @@ public class AdjournCaseServiceTest {
             .adjournCaseNextHearingListingDuration("")
             .adjournCaseNextHearingListingDurationUnits("")
             .adjournCaseInterpreterRequired("")
-            .adjournCaseInterpreterLanguage("")
+            .adjournCaseInterpreterLanguage(null)
             .adjournCaseNextHearingDateType("")
             .adjournCaseNextHearingDateOrPeriod("")
             .adjournCaseNextHearingDateOrTime("")
