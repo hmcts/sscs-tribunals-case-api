@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.domain.wrapper;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Objects;
 
 public class FinalDecision {
@@ -11,7 +11,7 @@ public class FinalDecision {
         this.reason = reason;
     }
 
-    @ApiModelProperty(example = "Some final reason for the decision", required = false)
+    @Schema(example = "Some final reason for the decision", required = false)
     @JsonProperty(value = "reason")
     public String getReason() {
         return reason;
