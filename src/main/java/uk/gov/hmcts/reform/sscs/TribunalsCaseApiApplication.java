@@ -46,7 +46,6 @@ import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
 @ComponentScan(basePackages = {"uk.gov.hmcts.reform"})
 @EnableScheduling
 @EnableRetry
-@EnableJms
 public class TribunalsCaseApiApplication {
 
     @Value("${appeal.email.host}")

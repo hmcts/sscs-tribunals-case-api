@@ -370,6 +370,7 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-activemq'
 
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.1'
@@ -610,7 +611,7 @@ bootWithCCD {
 
     //---Debug-----
     //Uncomment to launch with debug
-    jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
+    // jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
 
     //---Extra ccd loging----
     //Uncomment for ccd callback logging
@@ -637,11 +638,17 @@ bootWithCCD {
     environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
     environment 'CASE_DOCUMENT_S2S_AUTHORISED_SERVICES', 'ccd_case_document_am_api,ccd_gw,xui_webapp,ccd_data,bulk_scan_processor,sscs'
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,payment-api,xui_webapp,sscs,ccd_case_document_am_api,am_role_assignment_service'
-    environment 'CASE_ACCESS_MANAGEMENT_FEATURE', 'true'
+
     //Wiremock
     environment 'RD_LOCATION_REF_API_URL', 'http://localhost:8084'
 
-    // New queue
-    environment 'HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING', 'Endpoint=http://localhost:5672/;SharedAccessKeyName=admin;SharedAccessKey=admin;'
-    environment 'HEARINGS_EVENT_QUEUE_NAME', 'tribunals-to-hearings-queue'
+    // Features
+    environment 'GAPS_SWITCHOVER_FEATURE', 'true'
+    environment 'CASE_ACCESS_MANAGEMENT_FEATURE', 'true'
+
+    // Local Queue
+    environment 'JMS_NAMESPACE', 'localhost:5672'
+    environment 'JMS_HEARINGS_EVENT_QUEUE_NAME', 'tribunals-to-hearings-queue'
+    environment 'JMS_AMQP_CONNECTION_TEMPLATE', 'amqp://%1s?amqp.idleTimeout=%2d'
+    environment 'ENABLE_JMS', 'true'
 }
