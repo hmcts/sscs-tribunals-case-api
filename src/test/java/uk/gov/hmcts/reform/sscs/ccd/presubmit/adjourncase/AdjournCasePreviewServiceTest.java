@@ -1747,6 +1747,42 @@ public class AdjournCasePreviewServiceTest {
     }
 
     @Test
+    public void givenInterpreterLanguageRequiredAndNotProvided_thenDisplayAnErrorInterpreterLanguageNotSet() {
+
+        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseInterpreterRequired("yes");
+        sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
+        sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
+        sscsCaseData.setAdjournCaseNextHearingFirstAvailableDateAfterDate("2020-01-01");
+        sscsCaseData.setAdjournCaseTime(AdjournCaseTime.builder().build());
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("An interpreter is required but no language is set", error);
+        assertNull(response.getData().getAdjournCasePreviewDocument());
+    }
+
+    @Test
+    public void givenInterpreterLanguageRequiredAndProvided_thenErrorShouldNotBeInterpreterLanguageNotSet() {
+
+        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseInterpreterRequired("yes");
+        DynamicListItem item = new DynamicListItem("signPalantypist", "Sign Palantypist/Speech to TX");
+        sscsCaseData.setAdjournCaseInterpreterLanguage(new DynamicList(item, Arrays.asList()));
+        sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
+        sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
+        sscsCaseData.setAdjournCaseNextHearingFirstAvailableDateAfterDate("2020-01-01");
+        sscsCaseData.setAdjournCaseTime(AdjournCaseTime.builder().build());
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertNotEquals("An interpreter is required but no language is set", error);
+        assertNull(response.getData().getAdjournCasePreviewDocument());
+    }
+
+    @Test
     @Parameters(named = "faceToFaceNextHearingTypeParameter")
     public void givenCaseWithSameVenueSetForFaceToFace_thenCorrectlySetTheVenueToBeThePreviousVenue(String nextHearingType, String nextHearingTypeText) {
         sscsCaseData.setAdjournCaseGenerateNotice("yes");

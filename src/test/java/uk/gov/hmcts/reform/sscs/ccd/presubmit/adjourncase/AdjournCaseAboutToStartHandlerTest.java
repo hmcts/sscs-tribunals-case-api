@@ -29,6 +29,8 @@ import uk.gov.hmcts.reform.sscs.util.DynamicListLangauageUtil;
 public class AdjournCaseAboutToStartHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
+
+    @InjectMocks
     private AdjournCaseAboutToStartHandler handler;
 
     @Mock

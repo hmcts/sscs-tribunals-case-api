@@ -72,6 +72,10 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
 
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
 
+        given(dynamicListLangauageUtil
+            .generateInterpreterLanguageFields(any(DynamicList.class)))
+            .willReturn(new DynamicList(new DynamicListItem("", ""), new ArrayList<>()));
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
     }

@@ -10,10 +10,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLangauageUtil;
 
@@ -58,6 +55,17 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
                 overrideFields = new OverrideFields();
                 schedulingAndListingFields.setOverrideFields(overrideFields);
             }
+
+            if (isNull(overrideFields.getAppellantInterpreter())
+                || isNull(overrideFields.getAppellantInterpreter().getInterpreterLanguage())) {
+                overrideFields.setAppellantInterpreter(HearingInterpreter.builder()
+                    .interpreterLanguage(new DynamicList(null, null))
+                    .build());
+            }
+
+            DynamicList languageList = utils.generateInterpreterLanguageFields(overrideFields.getAppellantInterpreter().getInterpreterLanguage());
+
+            overrideFields.getAppellantInterpreter().setInterpreterLanguage(languageList);
 
             log.info("{} Languages in DynamicList for caseId {}",
                 overrideFields.getAppellantInterpreter().getInterpreterLanguage().getListItems().size(),

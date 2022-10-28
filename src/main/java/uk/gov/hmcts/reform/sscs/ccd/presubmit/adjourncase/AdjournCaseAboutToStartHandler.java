@@ -20,14 +20,11 @@ import uk.gov.hmcts.reform.sscs.util.DynamicListLangauageUtil;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final DynamicListLangauageUtil utils;
 
-    @Autowired
-    public AdjournCaseAboutToStartHandler(DynamicListLangauageUtil utils) {
-        this.utils = utils;
-    }
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.ABOUT_TO_START
@@ -46,9 +43,9 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        DynamicList languageList = utils.generateInterpreterLanguageFields(sscsCaseData.getAdjournCaseInterpreterLanguage());
-
         clearTransientFields(preSubmitCallbackResponse);
+
+        DynamicList languageList = utils.generateInterpreterLanguageFields(sscsCaseData.getAdjournCaseInterpreterLanguage());
 
         sscsCaseData.setAdjournCaseInterpreterLanguage(languageList);
 
