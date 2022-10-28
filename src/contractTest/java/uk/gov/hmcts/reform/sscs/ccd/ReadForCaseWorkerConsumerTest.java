@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.sscs.ccd;
 
 import static uk.gov.hmcts.reform.sscs.ccd.util.PactDslBuilderForCaseDetailsList.buildCaseDetailsDsl;
 
-import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
+import au.com.dius.pact.consumer.dsl.PactBuilder;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
-import au.com.dius.pact.core.model.RequestResponsePact;
+import au.com.dius.pact.core.model.V4Pact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
@@ -15,8 +15,9 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 public class ReadForCaseWorkerConsumerTest extends CcdConsumerTestBase {
 
     @Pact(provider = "ccdDataStoreAPI_Cases", consumer = "sscs_tribunalsCaseApi")
-    public RequestResponsePact readForCaseDetails(PactDslWithProvider builder) {
+    public V4Pact readForCaseDetails(PactBuilder builder) {
         return builder
+            .usingLegacyDsl()
             .given("A Read for a Caseworker is requested", setUpStateMapForProviderWithCaseData(caseDataContent))
             .uponReceiving("A Read For a Caseworker")
             .path(buildPath())
@@ -28,7 +29,7 @@ public class ReadForCaseWorkerConsumerTest extends CcdConsumerTestBase {
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .status(200)
             .body(buildCaseDetailsDsl(CASE_ID))
-            .toPact();
+            .toPact(V4Pact.class);
     }
 
     @Test

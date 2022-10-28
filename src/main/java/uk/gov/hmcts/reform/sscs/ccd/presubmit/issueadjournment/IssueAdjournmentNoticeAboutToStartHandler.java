@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
 
@@ -44,10 +45,12 @@ public class IssueAdjournmentNoticeAboutToStartHandler implements PreSubmitCallb
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (sscsCaseData.getAdjournCasePreviewDocument() != null) {
+        // Given the user selects No to generate notice option and has uploaded their custom adjournment notice document.
+        // Then don't generate the system default adjournment notice document.
+        if (YesNo.isYes(sscsCaseData.getAdjournCaseGenerateNotice())) {
             previewService.preview(callback, DocumentType.ADJOURNMENT_NOTICE, userAuthorisation, true);
-        } else {
-            response.addError("No draft adjournment notice found on case. Please use 'Adjourn case' event before trying to issue.");
+        } else if (sscsCaseData.getAdjournCasePreviewDocument() == null) {
+            response.addError("No draft adjournment notice found on case. Please use 'Adjourn case' event or upload your adjourn case document.");
         }
 
         return response;

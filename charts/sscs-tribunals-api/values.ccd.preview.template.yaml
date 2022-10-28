@@ -303,10 +303,9 @@ ccd:
       - sscs.superuser@mailinator.com|SSCS|Benefit|appealCreated
       - sscs-citizen2@hmcts.net|SSCS|Benefit|appealCreated
 
-  #Use this image to import your CCD definition. To have an image available, create a tag and push it. Must be the
-  #non-prod sheets.
+  #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-10914-4nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-10914-5nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:

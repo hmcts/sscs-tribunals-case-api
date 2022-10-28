@@ -33,16 +33,15 @@ import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
 
 @SpringBootApplication
-@EnableFeignClients(basePackages =
-        {
-                "uk.gov.hmcts.reform.authorisation",
-                "uk.gov.hmcts.reform.sscs.idam",
-                "uk.gov.hmcts.reform.sscs.document",
-                "uk.gov.hmcts.reform.docassembly",
-                "uk.gov.hmcts.reform.sscs.thirdparty",
-                "uk.gov.hmcts.reform.idam",
-                "uk.gov.hmcts.reform.sscs.client"
-        })
+@EnableFeignClients(basePackages = {
+    "uk.gov.hmcts.reform.authorisation",
+    "uk.gov.hmcts.reform.sscs.idam",
+    "uk.gov.hmcts.reform.sscs.document",
+    "uk.gov.hmcts.reform.docassembly",
+    "uk.gov.hmcts.reform.sscs.thirdparty",
+    "uk.gov.hmcts.reform.idam",
+    "uk.gov.hmcts.reform.sscs.client"
+})
 @ComponentScan(basePackages = {"uk.gov.hmcts.reform"})
 @EnableScheduling
 @EnableRetry

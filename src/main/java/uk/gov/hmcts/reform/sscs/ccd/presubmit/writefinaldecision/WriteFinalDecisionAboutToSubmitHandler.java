@@ -45,6 +45,7 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         }
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        State state = sscsCaseData.getState();
 
         // Due to a bug with CCD related to hidden fields, this field is not being set
         // on the final submission from CCD, so we need to reset it here
@@ -67,6 +68,11 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             DecisionNoticeOutcomeService outcomeService = decisionNoticeService.getOutcomeService(benefitType);
 
             outcomeService.validate(preSubmitCallbackResponse, sscsCaseData);
+
+            if (!(State.READY_TO_LIST.equals(state)
+                || State.WITH_DWP.equals(sscsCaseData.getState()))) {
+                sscsCaseData.setPreviousState(state);
+            }
 
             previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_DECISION_NOTICE, sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         }

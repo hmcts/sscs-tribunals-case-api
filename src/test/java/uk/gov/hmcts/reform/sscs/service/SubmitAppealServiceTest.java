@@ -907,18 +907,18 @@ public class SubmitAppealServiceTest {
 
     @Test
     @Parameters({
-            "PIP, n1w1 wal, Birmingham, appellant, 1, 21",
-            "ESA, n1w1 wal, Birmingham, appellant, 1, 21",
-            "UC, n1w1 wal, Birmingham, appellant, 1, 21",
-            "PIP, NN85 1ss, Northampton, appellant, 2, 30",
-            "ESA, NN85 1ss, Northampton, appellant, 2, 30",
-            "UC, NN85 1ss, Northampton, appellant, 2, 30",
-            "PIP, n1w1 wal, Birmingham, appointee, 1, 21",
-            "ESA, n1w1 wal, Birmingham, appointee, 1, 21",
-            "UC, n1w1 wal, Birmingham, appointee, 1, 21",
-            "PIP, NN85 1ss, Northampton, appointee, 2, 30",
-            "ESA, NN85 1ss, Northampton, appointee, 2, 30",
-            "UC, NN85 1ss, Northampton, appointee, 2, 30",
+        "PIP, n1w1 wal, Birmingham, appellant, 1, 21",
+        "ESA, n1w1 wal, Birmingham, appellant, 1, 21",
+        "UC, n1w1 wal, Birmingham, appellant, 1, 21",
+        "PIP, NN85 1ss, Northampton, appellant, 2, 30",
+        "ESA, NN85 1ss, Northampton, appellant, 2, 30",
+        "UC, NN85 1ss, Northampton, appellant, 2, 30",
+        "PIP, n1w1 wal, Birmingham, appointee, 1, 21",
+        "ESA, n1w1 wal, Birmingham, appointee, 1, 21",
+        "UC, n1w1 wal, Birmingham, appointee, 1, 21",
+        "PIP, NN85 1ss, Northampton, appointee, 2, 30",
+        "ESA, NN85 1ss, Northampton, appointee, 2, 30",
+        "UC, NN85 1ss, Northampton, appointee, 2, 30",
     })
     public void shouldSetProcessingVenueBasedOnBenefitTypeAndPostCode(String benefitCode, String postcode, String expectedVenue, String appellantOrAppointee, String epimsId, String regionId) {
         String firstHalfOfPostcode = RegionalProcessingCenterService.getFirstHalfOfPostcode(postcode);

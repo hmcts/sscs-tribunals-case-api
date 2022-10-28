@@ -50,7 +50,7 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
+        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).dwpIsOfficerAttending("Yes").build();
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
@@ -59,7 +59,6 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Test
     public void givenValidCallback_thenReturnTrue() {
-
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
     }
 
@@ -79,7 +78,11 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
     public void handleUpdateListingRequirementsNonGapsSwitchOverFeature() {
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", false);
         sscsCaseData = CaseDataUtils.buildCaseData();
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
         assertEquals(0, response.getErrors().size());
     }
 
@@ -97,7 +100,11 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
             anyString(),any(HearingRoute.class),any(HearingState.class),eq(null)))
             .willReturn(true);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
         assertEquals(0, response.getErrors().size());
 
         assertThat(response.getData()).isNotNull();
@@ -119,7 +126,11 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
             anyString(),any(HearingRoute.class),any(HearingState.class),eq(null)))
             .willReturn(false);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
         assertEquals(1, response.getErrors().size());
 
         assertThat(response.getData()).isNotNull();
@@ -129,7 +140,11 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
     public void handleUpdateListingRequirementsGapsSwitchOverFeatureNoOverrides() {
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
         assertEquals(0, response.getErrors().size());
     }
 
@@ -140,7 +155,11 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
         given(caseDetails.getState()).willReturn(State.UNKNOWN);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
         assertEquals(0, response.getErrors().size());
     }
 }

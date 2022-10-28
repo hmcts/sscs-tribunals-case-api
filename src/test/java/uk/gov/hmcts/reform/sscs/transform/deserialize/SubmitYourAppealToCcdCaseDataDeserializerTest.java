@@ -70,8 +70,8 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     }
 
     @Parameters({"DWP PIP ( 9),PIP,DWP PIP (9)", "null,carersAllowance,null",
-            "null,bereavementBenefit,null","null,maternityAllowance,null",
-            "null,bereavementSupportPaymentScheme,null"})
+        "null,bereavementBenefit,null","null,maternityAllowance,null",
+        "null,bereavementSupportPaymentScheme,null"})
     @Test
     public void syaDwpIssuingOfficeTest(String issuingOffice, String benefitCode, String expectedIssuing) {
 

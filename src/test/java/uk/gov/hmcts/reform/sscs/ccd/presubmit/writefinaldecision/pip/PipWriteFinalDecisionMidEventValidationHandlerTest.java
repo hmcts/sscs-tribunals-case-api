@@ -698,12 +698,12 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Test
     @Parameters({
-            "Yes, Yes, NO",
-            "Yes, No, NO",
-            "No, Yes, YES",
-            "No, No, NO",
-            "null, No, NO",
-            "No, null, NO",
+        "Yes, Yes, NO",
+        "Yes, No, NO",
+        "No, Yes, YES",
+        "No, No, NO",
+        "null, No, NO",
+        "No, null, NO",
     })
     public void givenPipCaseWithDescriptorFlowAndGenerateNoticeFlow_thenSetShowSummaryOfOutcomePage(
             @Nullable String descriptorFlow, @Nullable String generateNoticeFlow, YesNo expectedShowResult) {
@@ -733,11 +733,11 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Test
     @Parameters({
-            "STANDARD_RATE, STANDARD_RATE",
-            "ENHANCED_RATE, ENHANCED_RATE",
-            "NOT_CONSIDERED, STANDARD_RATE",
-            "STANDARD_RATE, NO_AWARD",
-            "NO_AWARD, ENHANCED_RATE"
+        "STANDARD_RATE, STANDARD_RATE",
+        "ENHANCED_RATE, ENHANCED_RATE",
+        "NOT_CONSIDERED, STANDARD_RATE",
+        "STANDARD_RATE, NO_AWARD",
+        "NO_AWARD, ENHANCED_RATE"
     })
     @Override
     public void shouldExhibitBenefitSpecificBehaviourWhenAnAnAwardIsGivenAndNoActivitiesSelected(AwardType dailyLiving, AwardType mobility) {

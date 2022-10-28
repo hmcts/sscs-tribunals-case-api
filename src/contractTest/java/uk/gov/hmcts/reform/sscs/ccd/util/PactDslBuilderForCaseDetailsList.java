@@ -1,15 +1,16 @@
 package uk.gov.hmcts.reform.sscs.ccd.util;
 
+import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonArray;
+import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonBody;
 import static au.com.dius.pact.consumer.dsl.PactDslJsonRootValue.stringMatcher;
-import static io.pactfoundation.consumer.dsl.LambdaDsl.newJsonArray;
-import static io.pactfoundation.consumer.dsl.LambdaDsl.newJsonBody;
 
 import au.com.dius.pact.consumer.dsl.DslPart;
-import io.pactfoundation.consumer.dsl.LambdaDslObject;
+import au.com.dius.pact.consumer.dsl.LambdaDslObject;
 
 public final class PactDslBuilderForCaseDetailsList {
 
-    private PactDslBuilderForCaseDetailsList(){
+    private PactDslBuilderForCaseDetailsList() {
+
     }
 
     public static final String REGEX_DATE = "^((19|2[0-9])[0-9]{2})-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$";
@@ -18,7 +19,7 @@ public final class PactDslBuilderForCaseDetailsList {
     public static DslPart buildStartEventReponse(String eventId) {
         return newJsonBody((o) -> {
             o.stringType("event_id", eventId)
-                .stringType("token", null)
+                .stringType("token")
                 .object("case_details", (cd) -> {
                     cd.numberType("id", 2000);
                     cd.stringValue("jurisdiction", "SSCS");
@@ -30,11 +31,11 @@ public final class PactDslBuilderForCaseDetailsList {
     public static DslPart buildStartEventResponseWithEmptyCaseDetails(String eventId) {
         return newJsonBody((o) -> {
             o.stringType("event_id", eventId)
-                .stringType("token", null)
+                .stringType("token")
                 .object("case_details", (cd) -> {
-                    cd.numberType("id", null);
+                    cd.numberType("id");
                     cd.stringMatcher("jurisdiction", ALPHABETIC_REGEX, "SSCS");
-                    cd.stringType("callback_response_status", null);
+                    cd.stringType("callback_response_status");
                     cd.stringMatcher("case_type_id", ALPHABETIC_REGEX, "Benefit");
                     cd.object("case_data", data -> {
                     });
@@ -172,7 +173,7 @@ public final class PactDslBuilderForCaseDetailsList {
                 .minArrayLike("cases", 1, (cd) -> {
                     cd.numberType("id", 200);
                     cd.stringType("jurisdiction", "SSCS");
-                    cd.stringType("callback_response_status", null);
+                    cd.stringType("callback_response_status");
                     cd.object("case_data", (dataMap) -> {
                         getCaseData(dataMap);
                     });
