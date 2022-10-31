@@ -260,7 +260,7 @@ public class AdjournCasePreviewServiceTest {
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
         sscsCaseData.setAdjournCaseInterpreterRequired("Yes");
-        sscsCaseData.setAdjournCaseInterpreterLanguage( new DynamicList("French"));
+        sscsCaseData.setAdjournCaseInterpreterLanguage(new DynamicList("French"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
@@ -318,7 +318,7 @@ public class AdjournCasePreviewServiceTest {
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
         sscsCaseData.setAdjournCaseInterpreterRequired("No");
-        sscsCaseData.setAdjournCaseInterpreterLanguage( new DynamicList("French"));
+        sscsCaseData.setAdjournCaseInterpreterLanguage(new DynamicList("French"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
@@ -1789,7 +1789,7 @@ public class AdjournCasePreviewServiceTest {
 
 
     @Test
-    public void givenASignLanguageAmericanSignKey_ThenExtractTheInterpreterDescription(){
+    public void givenASignLanguageAmericanSignKey_ThenExtractTheInterpreterDescription() {
         DynamicListItem item = new DynamicListItem("signAmericanSign", "Sign (American Sign)");
         sscsCaseData.setAdjournCaseGenerateNotice("yes");
         sscsCaseData.setAdjournCaseInterpreterRequired("yes");
@@ -1800,7 +1800,7 @@ public class AdjournCasePreviewServiceTest {
     }
 
     @Test
-    public void givenAValidNonSignLanguageKey_ThenExtractTheInterpreterDescription(){
+    public void givenAValidNonSignLanguageKey_ThenExtractTheInterpreterDescription() {
         when(signLanguagesService.getLanguageByHmcReference(anyString())).thenReturn(null);
         DynamicListItem item = new DynamicListItem("senegalFrench", "Senegal (French) Olof Dialect");
         sscsCaseData.setAdjournCaseGenerateNotice("yes");
@@ -1810,8 +1810,9 @@ public class AdjournCasePreviewServiceTest {
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
         assertEquals("an interpreter in Senegal (French) Olof Dialect", templateBody.getAdjournCaseTemplateBody().getInterpreterDescription());
     }
+
     @Test
-    public void givenAnInvalidLanguageKey_ThenReturnErrorLanguageNotSet(){
+    public void givenAnInvalidLanguageKey_ThenReturnErrorLanguageNotSet() {
         DynamicListItem item = new DynamicListItem("something", null);
         sscsCaseData.setAdjournCaseGenerateNotice("yes");
         sscsCaseData.setAdjournCaseInterpreterRequired("yes");
