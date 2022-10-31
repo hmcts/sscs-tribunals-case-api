@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 
@@ -148,6 +149,9 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         if ("yes".equalsIgnoreCase(caseData.getAdjournCaseInterpreterRequired())) {
             if (caseData.getAdjournCaseInterpreterLanguage() != null) {
                 String languageLabel = caseData.getAdjournCaseInterpreterLanguage().getValue().getLabel();
+                if (isNull(languageLabel)) {
+                    throw new IllegalStateException("Language label is not set");
+                }
                 String languageKey = caseData.getAdjournCaseInterpreterLanguage().getValue().getCode();
                 Language language = signLanguagesService.getLanguageByHmcReference(languageKey);
                 String interpreterDescription = String.format("an interpreter in %s", languageLabel);

@@ -94,7 +94,9 @@ public class AdjournCasePreviewServiceTest {
                     .identity(Identity.builder().build())
                     .build())
                 .build()).build();
-
+        sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
+        sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
+        sscsCaseData.setAdjournCaseTime(AdjournCaseTime.builder().build());
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         capture = ArgumentCaptor.forClass(GenerateFileParams.class);
@@ -159,12 +161,13 @@ public class AdjournCasePreviewServiceTest {
 
     }
 
-    private void commonSetupForInterpreterDescription(SscsCaseData sscsCaseData) {
+    private NoticeIssuedTemplateBody setAdjournmentAndGetTemplateBody(SscsCaseData sscsCaseData, DynamicListItem item) {
         sscsCaseData.setAdjournCaseGenerateNotice("yes");
-        sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
-        sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
-        sscsCaseData.setAdjournCaseTime(AdjournCaseTime.builder().build());
         sscsCaseData.setAdjournCaseInterpreterRequired("yes");
+        sscsCaseData.setAdjournCaseInterpreterLanguage(new DynamicList(item, Arrays.asList()));
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
+        return templateBody;
     }
 
     private void assertCommonPreviewParams(AdjournCaseTemplateBody body, String endDate, boolean nullReasonsExpected) {
@@ -1794,152 +1797,112 @@ public class AdjournCasePreviewServiceTest {
 
     @Test
     public void givenASignPalantypistKey_ThenExtractTheInterpreterDescription(){
-        commonSetupForInterpreterDescription(sscsCaseData);
         DynamicListItem item = new DynamicListItem("signPalantypist", "Sign Palantypist/Speech to TX");
-        sscsCaseData.setAdjournCaseInterpreterLanguage(new DynamicList(item, Arrays.asList()));
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
+        NoticeIssuedTemplateBody templateBody = setAdjournmentAndGetTemplateBody(sscsCaseData, item);
         assertEquals("a sign language interpreter (Sign Palantypist/Speech to TX)", templateBody.getAdjournCaseTemplateBody().getInterpreterDescription());
     }
 
     @Test
     public void givenASignLanguageOthersKey_ThenExtractTheInterpreterDescription(){
-        commonSetupForInterpreterDescription(sscsCaseData);
-        DynamicListItem item = new DynamicListItem("signLanguage (Others", "Others");
-        sscsCaseData.setAdjournCaseInterpreterLanguage(new DynamicList(item, Arrays.asList()));
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
+        DynamicListItem item = new DynamicListItem("signLanguage (Others)", "Others");
+        NoticeIssuedTemplateBody templateBody = setAdjournmentAndGetTemplateBody(sscsCaseData, item);
         assertEquals("a sign language interpreter (Others)", templateBody.getAdjournCaseTemplateBody().getInterpreterDescription());
     }
 
     @Test
     public void givenASignLanguageVisualFrameKey_ThenExtractTheInterpreterDescription(){
-        commonSetupForInterpreterDescription(sscsCaseData);
         DynamicListItem item = new DynamicListItem("signVisualFrame", "Visual Frame");
-        sscsCaseData.setAdjournCaseInterpreterLanguage(new DynamicList(item, Arrays.asList()));
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
+        NoticeIssuedTemplateBody templateBody = setAdjournmentAndGetTemplateBody(sscsCaseData, item);
         assertEquals("a sign language interpreter (Visual Frame)", templateBody.getAdjournCaseTemplateBody().getInterpreterDescription());
     }
 
     @Test
     public void givenASignLanguageSseKey_ThenExtractTheInterpreterDescription(){
-        commonSetupForInterpreterDescription(sscsCaseData);
         DynamicListItem item = new DynamicListItem("signSse", "Sign (SSE)");
-        sscsCaseData.setAdjournCaseInterpreterLanguage(new DynamicList(item, Arrays.asList()));
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
+        NoticeIssuedTemplateBody templateBody = setAdjournmentAndGetTemplateBody(sscsCaseData, item);
         assertEquals("a sign language interpreter (Sign (SSE))", templateBody.getAdjournCaseTemplateBody().getInterpreterDescription());
     }
 
     @Test
     public void givenASignLanguageRelayKey_ThenExtractTheInterpreterDescription(){
-        commonSetupForInterpreterDescription(sscsCaseData);
         DynamicListItem item = new DynamicListItem("signRelay", "Sign Relay");
-        sscsCaseData.setAdjournCaseInterpreterLanguage(new DynamicList(item, Arrays.asList()));
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
+        NoticeIssuedTemplateBody templateBody = setAdjournmentAndGetTemplateBody(sscsCaseData, item);
         assertEquals("a sign language interpreter (Sign Relay)", templateBody.getAdjournCaseTemplateBody().getInterpreterDescription());
     }
 
     @Test
     public void givenASignLanguageNoteTakerKey_ThenExtractTheInterpreterDescription(){
-        commonSetupForInterpreterDescription(sscsCaseData);
         DynamicListItem item = new DynamicListItem("signNoteTaker", "Sign (Note Taker)");
-        sscsCaseData.setAdjournCaseInterpreterLanguage(new DynamicList(item, Arrays.asList()));
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
+        NoticeIssuedTemplateBody templateBody = setAdjournmentAndGetTemplateBody(sscsCaseData, item);
         assertEquals("a sign language interpreter (Sign (Note Taker))", templateBody.getAdjournCaseTemplateBody().getInterpreterDescription());
     }
 
     @Test
     public void givenASignLanguageManualAlphabetKey_ThenExtractTheInterpreterDescription(){
-        commonSetupForInterpreterDescription(sscsCaseData);
         DynamicListItem item = new DynamicListItem("signManualAlphabet", "Sign (Manual Alphabet)");
-        sscsCaseData.setAdjournCaseInterpreterLanguage(new DynamicList(item, Arrays.asList()));
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
+        NoticeIssuedTemplateBody templateBody = setAdjournmentAndGetTemplateBody(sscsCaseData, item);
         assertEquals("a sign language interpreter (Sign (Manual Alphabet))", templateBody.getAdjournCaseTemplateBody().getInterpreterDescription());
     }
 
     @Test
     public void givenASignLanguageMakatonKey_ThenExtractTheInterpreterDescription(){
-        commonSetupForInterpreterDescription(sscsCaseData);
         DynamicListItem item = new DynamicListItem("signMakaton", "Sign Makaton");
-        sscsCaseData.setAdjournCaseInterpreterLanguage(new DynamicList(item, Arrays.asList()));
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
+        NoticeIssuedTemplateBody templateBody = setAdjournmentAndGetTemplateBody(sscsCaseData, item);
         assertEquals("a sign language interpreter (Sign Makaton)", templateBody.getAdjournCaseTemplateBody().getInterpreterDescription());
     }
 
     @Test
     public void givenASignLanguageLipspeakerKey_ThenExtractTheInterpreterDescription(){
-        commonSetupForInterpreterDescription(sscsCaseData);
         DynamicListItem item = new DynamicListItem("signLipSpeaker", "Sign Lip Speaker");
-        sscsCaseData.setAdjournCaseInterpreterLanguage(new DynamicList(item, Arrays.asList()));
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
+        NoticeIssuedTemplateBody templateBody = setAdjournmentAndGetTemplateBody(sscsCaseData, item);
         assertEquals("a sign language interpreter (Sign Lip Speaker)", templateBody.getAdjournCaseTemplateBody().getInterpreterDescription());
     }
 
     @Test
     public void givenASignLanguageInternationalSignKey_ThenExtractTheInterpreterDescription(){
-        commonSetupForInterpreterDescription(sscsCaseData);
         DynamicListItem item = new DynamicListItem("signInternationalSign", "Sign International Sign");
-        sscsCaseData.setAdjournCaseInterpreterLanguage(new DynamicList(item, Arrays.asList()));
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
+        NoticeIssuedTemplateBody templateBody = setAdjournmentAndGetTemplateBody(sscsCaseData, item);
         assertEquals("a sign language interpreter (Sign International Sign)", templateBody.getAdjournCaseTemplateBody().getInterpreterDescription());
     }
 
     @Test
     public void givenASignLanguageDeafBlindKey_ThenExtractTheInterpreterDescription(){
-        commonSetupForInterpreterDescription(sscsCaseData);
         DynamicListItem item = new DynamicListItem("signDeafBlind", "Sign (Deaf Blind ‑ Hands on)");
-        sscsCaseData.setAdjournCaseInterpreterLanguage(new DynamicList(item, Arrays.asList()));
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
+        NoticeIssuedTemplateBody templateBody = setAdjournmentAndGetTemplateBody(sscsCaseData, item);
         assertEquals("a sign language interpreter (Sign (Deaf Blind ‑ Hands on))", templateBody.getAdjournCaseTemplateBody().getInterpreterDescription());
     }
 
     @Test
     public void givenASignLanguageBslKey_ThenExtractTheInterpreterDescription(){
-        commonSetupForInterpreterDescription(sscsCaseData);
         DynamicListItem item = new DynamicListItem("signBsl", "Sign BSL");
-        sscsCaseData.setAdjournCaseInterpreterLanguage(new DynamicList(item, Arrays.asList()));
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
+        NoticeIssuedTemplateBody templateBody = setAdjournmentAndGetTemplateBody(sscsCaseData, item);
         assertEquals("a sign language interpreter (Sign BSL)", templateBody.getAdjournCaseTemplateBody().getInterpreterDescription());
     }
 
     @Test
     public void givenASignLanguageAmericanSignKey_ThenExtractTheInterpreterDescription(){
-        commonSetupForInterpreterDescription(sscsCaseData);
         DynamicListItem item = new DynamicListItem("signAmericanSign", "Sign (American Sign)");
-        sscsCaseData.setAdjournCaseInterpreterLanguage(new DynamicList(item, Arrays.asList()));
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
+        NoticeIssuedTemplateBody templateBody = setAdjournmentAndGetTemplateBody(sscsCaseData, item);
         assertEquals("a sign language interpreter (Sign (American Sign))", templateBody.getAdjournCaseTemplateBody().getInterpreterDescription());
     }
 
     @Test
     public void givenAValidNonSignLanguageKey_ThenExtractTheInterpreterDescription(){
-        commonSetupForInterpreterDescription(sscsCaseData);
+        when(signLanguagesService.getLanguageByHmcReference(anyString())).thenReturn(null);
         DynamicListItem item = new DynamicListItem("senegalFrench", "Senegal (French) Olof Dialect");
-        sscsCaseData.setAdjournCaseInterpreterLanguage(new DynamicList(item, Arrays.asList()));
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
-        assertEquals("a sign language interpreter (Senegal (French) Olof Dialect)", templateBody.getAdjournCaseTemplateBody().getInterpreterDescription());
+        NoticeIssuedTemplateBody templateBody = setAdjournmentAndGetTemplateBody(sscsCaseData, item);
+        assertEquals("an interpreter in Senegal (French) Olof Dialect", templateBody.getAdjournCaseTemplateBody().getInterpreterDescription());
     }
 
     @Test
-    public void givenAnInvalidLanguageKey_ThenReturnNullInterpreterDescription(){
-        commonSetupForInterpreterDescription(sscsCaseData);
+    public void givenAnInvalidLanguageKey_ThenReturnErrorLanguageNotSet(){
         DynamicListItem item = new DynamicListItem("something", null);
+        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseInterpreterRequired("yes");
         sscsCaseData.setAdjournCaseInterpreterLanguage(new DynamicList(item, Arrays.asList()));
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
-        assertEquals("a sign language interpreter (null)", templateBody.getAdjournCaseTemplateBody().getInterpreterDescription());
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Language label is not set", error);
     }
 
     @Test
