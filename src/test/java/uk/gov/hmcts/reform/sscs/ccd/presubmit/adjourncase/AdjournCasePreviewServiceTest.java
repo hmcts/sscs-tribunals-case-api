@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -1761,10 +1762,10 @@ public class AdjournCasePreviewServiceTest {
         sscsCaseData.setAdjournCaseTime(AdjournCaseTime.builder().build());
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("An interpreter is required but no language is set", error);
-        assertNull(response.getData().getAdjournCasePreviewDocument());
+        assertThat(response.getErrors())
+            .hasSize(1);
+        assertThat(response.getErrors())
+            .containsOnly("An interpreter is required but no language is set");
     }
 
     @Test
