@@ -38,6 +38,10 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     private static final String DOCUMENT_DATE_PATTERN = "dd/MM/yyyy";
     public static final String IN_CHAMBERS = "In chambers";
 
+    private static final String SIGN_LANGUAGE_NAME_PREFIX_1 = "Sign (";
+    private static final String SIGN_LANGUAGE_NAME_PREFIX_2 = "Sign Language (";
+    public static final String REFERENCE_LANGUAGES_JSON = "reference/languages.json";
+
     private final SignLanguagesService signLanguagesService;
 
     @Autowired
@@ -144,6 +148,17 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         return builder.build();
     }
 
+    private String getSignLanguageType(String languageName) {
+
+        if (languageName.startsWith(SIGN_LANGUAGE_NAME_PREFIX_1) && languageName.endsWith(")")) {
+            return languageName.substring(SIGN_LANGUAGE_NAME_PREFIX_1.length(), languageName.length() - 1);
+        } else  if (languageName.startsWith(SIGN_LANGUAGE_NAME_PREFIX_2) && languageName.endsWith(")")) {
+            return languageName.substring(SIGN_LANGUAGE_NAME_PREFIX_2.length(), languageName.length() - 1);
+        } else {
+            return languageName;
+        }
+    }
+
     private void setIntepreterDescriptionIfRequired(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData) {
         if ("yes".equalsIgnoreCase(caseData.getAdjournCaseInterpreterRequired())) {
             if (caseData.getAdjournCaseInterpreterLanguage() != null) {
@@ -151,9 +166,11 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                 String languageKey = caseData.getAdjournCaseInterpreterLanguage().getValue().getCode();
                 Language language = signLanguagesService.getLanguageByHmcReference(languageKey);
                 String interpreterDescription = String.format("an interpreter in %s", languageLabel);
-                if (nonNull(language)) {
-                    interpreterDescription = String.format("a sign language interpreter (%s)", languageLabel);
+                if (languageKey.startsWith("sign")) {
+                    String signLanguageType = getSignLanguageType(languageLabel);
+                    interpreterDescription = String.format("a sign language interpreter (%s)", signLanguageType);
                 }
+
                 adjournCaseBuilder.interpreterDescription(interpreterDescription);
             } else {
                 throw new IllegalStateException("An interpreter is required but no language is set");

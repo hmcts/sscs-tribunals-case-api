@@ -47,7 +47,6 @@ public class AdjournCaseAboutToStartHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new AdjournCaseAboutToStartHandler(dynamicListLangauageUtil);
 
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
