@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 
+import java.time.LocalDate;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
-import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
@@ -51,8 +51,7 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, sscsCaseData.getAdjournCasePreviewDocument());
 
-        if (SscsUtil.isSAndLCase(sscsCaseData)
-            && isAdjournmentEnabled // TODO SSCS-10951
+        if (isAdjournmentEnabled // TODO SSCS-10951
             && (sscsCaseData.isAdjournCaseAbleToBeListedRightAway()
             || isNoOrNull(sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties()))
         ) {
@@ -68,6 +67,7 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             sscsCaseData.getAppeal().setHearingOptions(hearingOptions);
         }
 
+        sscsCaseData.setAdjournCaseGeneratedDate(LocalDate.now().toString());
         return preSubmitCallbackResponse;
     }
 }
