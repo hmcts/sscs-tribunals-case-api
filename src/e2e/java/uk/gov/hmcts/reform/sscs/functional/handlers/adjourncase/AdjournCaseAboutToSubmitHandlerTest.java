@@ -12,7 +12,11 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
+
+import java.util.Arrays;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
@@ -36,7 +40,7 @@ public class AdjournCaseAboutToSubmitHandlerTest extends BaseHandler {
             .assertThat().body("adjournCaseCanCaseBeListedRightAway", equalTo("Yes"))
             .assertThat().body("adjournCaseDisabilityQualifiedPanelMemberName", equalTo("Bob Smith"))
             .assertThat().body("adjournCaseGenerateNotice", equalTo("Yes"))
-            .assertThat().body("adjournCaseInterpreterLanguage", equalTo("spanish"))
+            .assertThat().body("adjournCaseInterpreterLanguageList.value.code", equalTo("spanish"))
             .assertThat().body("adjournCaseInterpreterRequired", equalTo("Yes"))
             .assertThat().body("adjournCaseMedicallyQualifiedPanelMemberName", equalTo("Wendy Rowe"))
             .assertThat().body("adjournCaseNextHearingDateType", equalTo("dateToBeFixed"))
