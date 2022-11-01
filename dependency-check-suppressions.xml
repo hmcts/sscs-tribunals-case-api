@@ -14,14 +14,14 @@
     <packageUrl regex="true">^pkg:maven/org.springframework/spring-core@.*$</packageUrl>
     <cve>CVE-2016-1000027</cve>
   </suppress>
-  <suppress until = "2022-11-01">
+  <suppress until = "2022-12-01">
     <notes><![CDATA[
                 spring-web-5.3.22.jar
         ]]></notes>
     <packageUrl regex="true">^pkg:maven/org.springframework/spring-web@.*$</packageUrl>
     <cve>CVE-2016-1000027</cve>
   </suppress>
-  <suppress until = "2022-11-01">
+  <suppress until = "2022-12-01">
     <notes><![CDATA[
                 spring-security-crypto-5.4.10.jar, spring-security-web-5.4.10.jar
         ]]></notes>
@@ -29,35 +29,35 @@
     <cve>CVE-2022-22978</cve>
     <cve>CVE-2022-22976</cve>
   </suppress>
-  <suppress until = "2022-11-01">
+  <suppress until = "2022-12-01">
     <notes><![CDATA[
     file name: spring-cloud-openfeign-core-2.2.9.RELEASE.jar
     ]]></notes>
     <packageUrl regex="true">^pkg:maven/org.springframework\.cloud/spring-cloud-openfeign-core@.*$</packageUrl>
     <cve>CVE-2021-22044</cve>
   </suppress>
-  <suppress until = "2022-11-01">
+  <suppress until = "2022-12-01">
     <notes><![CDATA[
    file name: spring-cloud-netflix-archaius-2.2.9.RELEASE.jar
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/org\.springframework\.cloud/spring\-cloud\-netflix\-.*@.*$</packageUrl>
     <cve>CVE-2021-22053</cve>
   </suppress>
-  <suppress until = "2022-11-01">
+  <suppress until = "2022-12-01">
     <notes><![CDATA[
    file name: spring-cloud-starter-openfeign-2.2.9.RELEASE.jar
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/org\.springframework\.cloud/spring\-cloud\-starter\-openfeign@.*$</packageUrl>
     <cve>CVE-2021-22044</cve>
   </suppress>
-  <suppress until = "2022-11-01">
+  <suppress until = "2022-12-01">
     <notes><![CDATA[
    file name: jackson-databind-2.13.4.jar
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
     <cve>CVE-2022-42003</cve>
   </suppress>
-  <suppress until = "2022-11-01">
+  <suppress until = "2022-12-01">
     <notes><![CDATA[
         file name: commons-text-1.9.jar
         ]]></notes>
