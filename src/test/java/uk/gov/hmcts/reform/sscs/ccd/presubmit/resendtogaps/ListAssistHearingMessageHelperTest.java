@@ -35,19 +35,35 @@ public class ListAssistHearingMessageHelperTest {
     @InjectMocks
     private ListAssistHearingMessageHelper messageHelper;
 
+    @BeforeEach
+    public void setUp() {
+        when(hearingMessagingServiceFactory.getMessagingService(LIST_ASSIST)).thenReturn(sessionAwareServiceBusMessagingService);
+    }
+
     @Test
     public void shouldSendExpectedCancellationMessage() {
-        when(hearingMessagingServiceFactory.getMessagingService(LIST_ASSIST)).thenReturn(sessionAwareServiceBusMessagingService);
-
         messageHelper.sendListAssistCancelHearingMessage("1234", CancellationReason.OTHER);
 
         verify(sessionAwareServiceBusMessagingService).sendMessage(hearingRequestCaptor.capture());
 
         HearingRequest actualRequest = hearingRequestCaptor.getValue();
-        assertEquals("1234", actualRequest.getCcdCaseId());
-        assertEquals(LIST_ASSIST, actualRequest.getHearingRoute());
-        assertEquals(CANCEL_HEARING, actualRequest.getHearingState());
-        assertThat(actualRequest.getCancellationReason(), is(CancellationReason.OTHER));
+        assertThat(actualRequest.getCcdCaseId()).isEqualTo("1234");
+        assertThat(actualRequest.getHearingRoute()).isEqualTo(LIST_ASSIST);
+        assertThat(actualRequest.getHearingState()).isEqualTo(CANCEL_HEARING);
+        assertThat(actualRequest.getCancellationReason()).isEqualTo(CancellationReason.OTHER);
     }
 
+    @Test
+    public void shouldSendExpectedCreateMessage() {
+        messageHelper.sendListAssistCreateHearingMessage("5678");
+
+        verify(sessionAwareServiceBusMessagingService).sendMessage(hearingRequestCaptor.capture());
+
+        HearingRequest actualRequest = hearingRequestCaptor.getValue();
+
+        assertThat(actualRequest.getCcdCaseId()).isEqualTo("5678");
+        assertThat(actualRequest.getHearingRoute()).isEqualTo(LIST_ASSIST);
+        assertThat(actualRequest.getHearingState()).isEqualTo(HearingState.CREATE_HEARING);
+        assertThat(actualRequest.getCancellationReason()).isNull();
+    }
 }
