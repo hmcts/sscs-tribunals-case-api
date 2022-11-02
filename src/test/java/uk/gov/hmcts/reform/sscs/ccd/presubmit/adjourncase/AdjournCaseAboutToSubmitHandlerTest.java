@@ -14,11 +14,12 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -144,9 +145,9 @@ public class AdjournCaseAboutToSubmitHandlerTest {
     }
 
     @DisplayName("Given a non callback type, then return false")
-    @Test
-    @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
-    public void givenNonCallbackType_thenReturnFalse(CallbackType callbackType) {
+    @ParameterizedTest
+    @ValueSource(strings = {"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
+    void givenNonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertThat(handler.canHandle(callbackType, callback)).isFalse();
     }
 
