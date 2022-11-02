@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
@@ -51,7 +52,8 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, sscsCaseData.getAdjournCasePreviewDocument());
 
-        if (isAdjournmentEnabled // TODO SSCS-10951
+        if (SscsUtil.isSAndLCase(sscsCaseData)
+            && isAdjournmentEnabled // TODO SSCS-10951
             && (sscsCaseData.isAdjournCaseAbleToBeListedRightAway()
             || isNoOrNull(sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties()))
         ) {
