@@ -15,7 +15,6 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.servicebus.HearingMessagingServiceFactory;
@@ -47,25 +46,25 @@ public class ListAssistHearingMessageHelperTest {
     @Test
     public void shouldSendExpectedCancellationMessage() {
         messageHelper.sendListAssistCancelHearingMessage(CCD_CASE_ID, CancellationReason.OTHER);
-        confirmMessageSentWithHearingStateAndCancellationReason(CANCEL_HEARING, CancellationReason.OTHER);
-    }
-
-    @Test
-    public void shouldSendExpectedCreateMessage() {
-        messageHelper.sendListAssistCreateHearingMessage(CCD_CASE_ID);
-        confirmMessageSentWithHearingStateAndCancellationReason(CREATE_HEARING, null);
-    }
-
-    private void confirmMessageSentWithHearingStateAndCancellationReason(
-        HearingState hearingState,
-        CancellationReason cancellationReason
-    ) {
         verify(sessionAwareServiceBusMessagingService).sendMessage(hearingRequestCaptor.capture());
 
         HearingRequest actualRequest = hearingRequestCaptor.getValue();
         assertThat(actualRequest.getCcdCaseId()).isEqualTo(CCD_CASE_ID);
         assertThat(actualRequest.getHearingRoute()).isEqualTo(LIST_ASSIST);
-        assertThat(actualRequest.getHearingState()).isEqualTo(hearingState);
-        assertThat(actualRequest.getCancellationReason()).isEqualTo(cancellationReason);
+        assertThat(actualRequest.getHearingState()).isEqualTo(CANCEL_HEARING);
+        assertThat(actualRequest.getCancellationReason()).isEqualTo(CancellationReason.OTHER);
     }
+
+    @Test
+    public void shouldSendExpectedCreateMessage() {
+        messageHelper.sendListAssistCreateHearingMessage(CCD_CASE_ID);
+        verify(sessionAwareServiceBusMessagingService).sendMessage(hearingRequestCaptor.capture());
+
+        HearingRequest actualRequest = hearingRequestCaptor.getValue();
+        assertThat(actualRequest.getCcdCaseId()).isEqualTo(CCD_CASE_ID);
+        assertThat(actualRequest.getHearingRoute()).isEqualTo(LIST_ASSIST);
+        assertThat(actualRequest.getHearingState()).isEqualTo(CREATE_HEARING);
+        assertThat(actualRequest.getCancellationReason()).isNull();
+    }
+
 }

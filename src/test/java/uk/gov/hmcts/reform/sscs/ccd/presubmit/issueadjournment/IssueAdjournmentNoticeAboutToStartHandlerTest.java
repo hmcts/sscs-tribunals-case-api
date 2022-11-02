@@ -94,20 +94,19 @@ public class IssueAdjournmentNoticeAboutToStartHandlerTest {
     public void givenNoPreviewDecisionFoundOnCase_thenShowError() {
         sscsCaseData.setAdjournCasePreviewDocument(null);
         sscsCaseData.setAdjournCaseGenerateNotice("No");
-        expectError("No draft adjournment notice found on case.");
+        PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        String error = result.getErrors().stream().findFirst().orElse("");
+        assertThat(error).isEqualTo("No draft adjournment notice found on case. Please use 'Adjourn case' event or upload your adjourn case document.");
     }
 
     @Test
     public void givenNoGeneratedDateFoundOnCase_thenShowError() {
         sscsCaseData.setAdjournCaseGenerateNotice("Yes");
-        expectError("Adjourn case generated date not found.");
-    }
-
-    private void expectError(String expectedError) {
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         String error = result.getErrors().stream().findFirst().orElse("");
-        assertThat(error).isEqualTo(expectedError + " Please use 'Adjourn case' event or upload your adjourn case document.");
+        assertThat(error).isEqualTo("Adjourn case generated date not found. Please use 'Adjourn case' event or upload your adjourn case document.");
     }
 
     @Test(expected = IllegalStateException.class)
