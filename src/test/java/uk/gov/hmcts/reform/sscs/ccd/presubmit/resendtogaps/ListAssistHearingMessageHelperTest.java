@@ -1,13 +1,13 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.CANCEL_HEARING;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.CREATE_HEARING;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -15,6 +15,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.servicebus.HearingMessagingServiceFactory;
@@ -35,35 +36,36 @@ public class ListAssistHearingMessageHelperTest {
     @InjectMocks
     private ListAssistHearingMessageHelper messageHelper;
 
-    @BeforeEach
+    private static final String CCD_CASE_ID = "1234";
+
+    @Before
     public void setUp() {
-        when(hearingMessagingServiceFactory.getMessagingService(LIST_ASSIST)).thenReturn(sessionAwareServiceBusMessagingService);
+        when(hearingMessagingServiceFactory.getMessagingService(LIST_ASSIST))
+            .thenReturn(sessionAwareServiceBusMessagingService);
     }
 
     @Test
     public void shouldSendExpectedCancellationMessage() {
-        messageHelper.sendListAssistCancelHearingMessage("1234", CancellationReason.OTHER);
-
-        verify(sessionAwareServiceBusMessagingService).sendMessage(hearingRequestCaptor.capture());
-
-        HearingRequest actualRequest = hearingRequestCaptor.getValue();
-        assertThat(actualRequest.getCcdCaseId()).isEqualTo("1234");
-        assertThat(actualRequest.getHearingRoute()).isEqualTo(LIST_ASSIST);
-        assertThat(actualRequest.getHearingState()).isEqualTo(CANCEL_HEARING);
-        assertThat(actualRequest.getCancellationReason()).isEqualTo(CancellationReason.OTHER);
+        messageHelper.sendListAssistCancelHearingMessage(CCD_CASE_ID, CancellationReason.OTHER);
+        confirmMessageSentWithHearingStateAndCancellationReason(CANCEL_HEARING, CancellationReason.OTHER);
     }
 
     @Test
     public void shouldSendExpectedCreateMessage() {
-        messageHelper.sendListAssistCreateHearingMessage("5678");
+        messageHelper.sendListAssistCreateHearingMessage(CCD_CASE_ID);
+        confirmMessageSentWithHearingStateAndCancellationReason(CREATE_HEARING, null);
+    }
 
+    private void confirmMessageSentWithHearingStateAndCancellationReason(
+        HearingState hearingState,
+        CancellationReason cancellationReason
+    ) {
         verify(sessionAwareServiceBusMessagingService).sendMessage(hearingRequestCaptor.capture());
 
         HearingRequest actualRequest = hearingRequestCaptor.getValue();
-
-        assertThat(actualRequest.getCcdCaseId()).isEqualTo("5678");
+        assertThat(actualRequest.getCcdCaseId()).isEqualTo(CCD_CASE_ID);
         assertThat(actualRequest.getHearingRoute()).isEqualTo(LIST_ASSIST);
-        assertThat(actualRequest.getHearingState()).isEqualTo(HearingState.CREATE_HEARING);
-        assertThat(actualRequest.getCancellationReason()).isNull();
+        assertThat(actualRequest.getHearingState()).isEqualTo(hearingState);
+        assertThat(actualRequest.getCancellationReason()).isEqualTo(cancellationReason);
     }
 }
