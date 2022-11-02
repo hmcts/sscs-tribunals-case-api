@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -36,7 +37,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 
@@ -162,7 +162,7 @@ public class AdjournCaseAboutToSubmitHandlerTest {
     @Test
     public void givenFeatureFlagDisabled_thenNoMessageIsSent() {
         ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", false);
-        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -190,6 +190,13 @@ public class AdjournCaseAboutToSubmitHandlerTest {
         assertHearingCreated(response);
     }
 
+    private void assertHearingCreated(PreSubmitCallbackResponse<SscsCaseData> response) {
+        verify(hearingMessageHelper, times(1))
+            .sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
+
+        assertThat(response.getErrors()).isEmpty();
+    }
+
     @DisplayName("When adjournment is enabled and case is LA and case cannot be listed right away "
         + "and directions are being made, then should not send any messages")
     @Test
@@ -202,31 +209,25 @@ public class AdjournCaseAboutToSubmitHandlerTest {
     }
 
     private PreSubmitCallbackResponse<SscsCaseData> cannotBeListedAndNoDirectionsGiven() {
-        return getResponseWithYesNoCanBeListedAndYesNoDirections(NO, NO);
-    }
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
+        sscsCaseData.setAdjournCaseCanCaseBeListedRightAway(NO.getValue());
+        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties(NO.getValue());
 
-    private void assertHearingCreated(PreSubmitCallbackResponse<SscsCaseData> response) {
-        verify(hearingMessageHelper, times(1))
-            .sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
-
-        assertThat(response.getErrors()).isEmpty();
+        return handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 
     private PreSubmitCallbackResponse<SscsCaseData> canBeListed() {
-        return getResponseWithYesNoCanBeListedAndYesNoDirections(YES, NO);
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
+        sscsCaseData.setAdjournCaseCanCaseBeListedRightAway(YES.getValue());
+        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties(NO.getValue());
+
+        return handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 
     private PreSubmitCallbackResponse<SscsCaseData> cannotBeListedAndDirectionsGiven() {
-        return getResponseWithYesNoCanBeListedAndYesNoDirections(NO, YES);
-    }
-
-    private PreSubmitCallbackResponse<SscsCaseData> getResponseWithYesNoCanBeListedAndYesNoDirections(
-        YesNo canBeListedRightAway,
-        YesNo directionsBeingMade
-    ) {
-        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
-        sscsCaseData.setAdjournCaseCanCaseBeListedRightAway(canBeListedRightAway.getValue());
-        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties(directionsBeingMade.getValue());
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
+        sscsCaseData.setAdjournCaseCanCaseBeListedRightAway(NO.getValue());
+        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties(YES.getValue());
 
         return handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
