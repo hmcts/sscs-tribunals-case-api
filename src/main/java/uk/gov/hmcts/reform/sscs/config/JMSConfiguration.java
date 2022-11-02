@@ -37,11 +37,11 @@ public class JMSConfiguration {
     private Long idleTimeout;
 
     @Value("${jms.amqp-connection-string-template}")
-    public String AMQP_CONNECTION_STRING_TEMPLATE;
+    public String amqpConnectionStringTemplate;
 
     @Bean
     public ConnectionFactory tribunalsHearingsJmsConnectionFactory(@Value("${spring.application.name}") final String clientId) {
-        String connection = String.format(AMQP_CONNECTION_STRING_TEMPLATE, namespace, idleTimeout);
+        String connection = String.format(amqpConnectionStringTemplate, namespace, idleTimeout);
         JmsConnectionFactory jmsConnectionFactory = new JmsConnectionFactory(connection);
         jmsConnectionFactory.setUsername(username);
         jmsConnectionFactory.setPassword(password);
