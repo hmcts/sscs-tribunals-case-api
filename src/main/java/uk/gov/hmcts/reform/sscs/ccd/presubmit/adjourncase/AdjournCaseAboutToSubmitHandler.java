@@ -48,8 +48,6 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        final PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-
         previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, sscsCaseData.getAdjournCasePreviewDocument());
 
         if (SscsUtil.isSAndLCase(sscsCaseData)
@@ -69,7 +67,10 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             sscsCaseData.getAppeal().setHearingOptions(hearingOptions);
         }
 
-        sscsCaseData.setAdjournCaseGeneratedDate(LocalDate.now().toString());
-        return preSubmitCallbackResponse;
+        if (sscsCaseData.getAdjournCaseGeneratedDate() == null) {
+            sscsCaseData.setAdjournCaseGeneratedDate(LocalDate.now().toString());
+        }
+
+        return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 }
