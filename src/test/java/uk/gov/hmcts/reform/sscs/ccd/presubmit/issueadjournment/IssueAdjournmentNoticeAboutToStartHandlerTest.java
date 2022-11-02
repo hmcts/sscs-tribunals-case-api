@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -79,6 +80,7 @@ public class IssueAdjournmentNoticeAboutToStartHandlerTest {
     public void givenAboutToStartRequest_willGeneratePreviewFile() {
         PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(sscsCaseData);
         sscsCaseData.setAdjournCaseGenerateNotice("Yes");
+        sscsCaseData.setAdjournCaseGeneratedDate(LocalDate.now().toString());
 
         when(previewService.preview(callback, DocumentType.ADJOURNMENT_NOTICE, USER_AUTHORISATION, true)).thenReturn(response);
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -90,10 +92,20 @@ public class IssueAdjournmentNoticeAboutToStartHandlerTest {
     public void givenNoPreviewDecisionFoundOnCase_thenShowError() {
         sscsCaseData.setAdjournCasePreviewDocument(null);
         sscsCaseData.setAdjournCaseGenerateNotice("No");
+        expectError("No draft adjournment notice found on case.");
+    }
+
+    @Test
+    public void givenNoGeneratedDateFoundOnCase_thenShowError() {
+        sscsCaseData.setAdjournCaseGenerateNotice("Yes");
+        expectError("Adjourn case generated date not found.");
+    }
+
+    private void expectError(String expectedError) {
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         String error = result.getErrors().stream().findFirst().orElse("");
-        assertThat("No draft adjournment notice found on case. Please use 'Adjourn case' event or upload your adjourn case document.").isEqualTo(error);
+        assertThat(error).isEqualTo(expectedError + " Please use 'Adjourn case' event or upload your adjourn case document.");
     }
 
     @Test(expected = IllegalStateException.class)
