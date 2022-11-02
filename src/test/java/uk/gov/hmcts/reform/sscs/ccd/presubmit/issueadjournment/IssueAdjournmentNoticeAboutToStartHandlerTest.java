@@ -8,10 +8,11 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
 import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -70,19 +71,20 @@ public class IssueAdjournmentNoticeAboutToStartHandlerTest {
         assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
     }
 
-    @Test
-    @Parameters({"ABOUT_TO_SUBMIT", "MID_EVENT", "SUBMITTED"})
-    public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
+    @ParameterizedTest
+    @ValueSource(strings = {"ABOUT_TO_SUBMIT", "MID_EVENT", "SUBMITTED"})
+    void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertThat(handler.canHandle(callbackType, callback)).isFalse();
     }
 
     @Test
     public void givenAboutToStartRequest_willGeneratePreviewFile() {
-        PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
         sscsCaseData.setAdjournCaseGenerateNotice("Yes");
         sscsCaseData.setAdjournCaseGeneratedDate(LocalDate.now().toString());
 
-        when(previewService.preview(callback, DocumentType.ADJOURNMENT_NOTICE, USER_AUTHORISATION, true)).thenReturn(response);
+        when(previewService.preview(callback, DocumentType.ADJOURNMENT_NOTICE, USER_AUTHORISATION, true))
+            .thenReturn(response);
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         verify(previewService).preview(callback, DocumentType.ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
