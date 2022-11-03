@@ -95,6 +95,20 @@ public class AdjournCaseAboutToSubmitHandlerTest {
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
+    @DisplayName("Given caseDetails is null, then return false")
+    @Test
+    public void givenCaseDetailsIsNull_thenReturnFalse() {
+        when(callback.getCaseDetails()).thenReturn(null);
+        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
+    }
+
+    @DisplayName("Given caseData is null, then return false")
+    @Test
+    public void givenCaseDataIsNull_thenReturnFalse() {
+        when(callback.getCaseDetails().getCaseData()).thenReturn(null);
+        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
+    }
+
     @DisplayName("Given draft adjournment notice already exists on case, then overwrite existing draft")
     @Test
     public void givenAdjournmentNoticeAlreadyExistsOnCase_thenOverwriteExistingDraft() {
