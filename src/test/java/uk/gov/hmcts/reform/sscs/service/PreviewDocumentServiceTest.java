@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 
 import java.time.LocalDate;
@@ -8,12 +9,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -21,7 +20,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 
-@RunWith(MockitoJUnitRunner.class)
 public class PreviewDocumentServiceTest {
 
     public static final String OLD_DRAFT_DOC = "oldDraft.doc";
@@ -29,8 +27,9 @@ public class PreviewDocumentServiceTest {
     private PreviewDocumentService previewDocumentService;
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setup() {
+        openMocks(this);
         List<SscsDocument> docs = new ArrayList<>(List.of(
             SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
