@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
@@ -91,9 +92,19 @@ public class IssueAdjournmentNoticeAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenNoPreviewDecisionFoundOnCase_thenShowError() {
-        sscsCaseData.setAdjournCasePreviewDocument(null);
+    public void givenGenerateNoticeIsNo_andPreviewDocumentExists_thenPreviewServiceIsNotUsedAndNoError() {
         sscsCaseData.setAdjournCaseGenerateNotice("No");
+        sscsCaseData.setAdjournCasePreviewDocument(DocumentLink.builder().build());
+        PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        verifyNoInteractions(previewService);
+        assertThat(result.getErrors()).isEmpty();
+    }
+
+    @Test
+    public void givenNoPreviewDecisionFoundOnCase_thenShowError() {
+        sscsCaseData.setAdjournCaseGenerateNotice("No");
+        sscsCaseData.setAdjournCasePreviewDocument(null);
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         String error = result.getErrors().stream().findFirst().orElse("");
