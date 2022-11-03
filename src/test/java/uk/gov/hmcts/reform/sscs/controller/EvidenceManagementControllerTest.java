@@ -125,7 +125,7 @@ public class EvidenceManagementControllerTest {
 
         ResponseEntity<String> actualUploadResponseEmbedded = controller.upload(files);
 
-        String json = "{\"documents\": [{\"classification\":\"PUBLIC\",\"size\":656,\"mimeType\":\"application/pdf\",\"originalDocumentName\":\"docname\",\"createdOn\":null,\"ttl\":null,\"hashToken\":null,\"metadata\":null,\"_links\":{\"self\":{\"href\":\"selfURL\"},\"binary\":{\"href\":\"binaryUrl\"}}}]}";
+        String json = "{\"documents\": [{\"classification\":\"PUBLIC\",\"size\":656,\"mimeType\":\"application/pdf\",\"originalDocumentName\":\"docname\",\"createdOn\":null,\"modifiedOn\":null,\"createdBy\":null,\"lastModifiedBy\":null,\"ttl\":null,\"hashToken\":null,\"metadata\":null,\"_links\":{\"self\":{\"href\":\"selfURL\"},\"binary\":{\"href\":\"binaryUrl\"}}}]}";
 
         verify(evidenceManagementSecureDocStoreService, times(1)).upload(files, idamTokens);
         assertThat(actualUploadResponseEmbedded.getBody(), equalTo(json));

@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -22,21 +22,21 @@ public class StatementController {
         this.appellantStatementService = appellantStatementService;
     }
 
-    @ApiOperation(value = "Upload COR personal statement",
-            notes = "Uploads a personal statement for a COR appeal. You need to have an appeal in CCD. "
+    @Operation(summary = "Upload COR personal statement",
+            description = "Uploads a personal statement for a COR appeal. You need to have an appeal in CCD. "
                     + "The statement is saved as a piece of evidence for the case in CCD as a PDF."
     )
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Statement has been added to the appeal"),
-            @ApiResponse(code = 404, message = "No online hearing found with online hearing id")
+        @ApiResponse(responseCode = "200", description = "Statement has been added to the appeal"),
+        @ApiResponse(responseCode = "404", description = "No online hearing found with online hearing id")
     })
     @PostMapping(
             value = "/{identifier}/statement",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity uploadStatement(
-            @PathVariable("identifier") String identifier,
-            @RequestBody Statement statement) {
+        @PathVariable("identifier") String identifier,
+        @RequestBody Statement statement) {
         log.info("upload statement for caseId {} and tya code {}", identifier, statement.getTya());
         return appellantStatementService
                 .handleAppellantStatement(identifier, statement)

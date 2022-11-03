@@ -15,16 +15,17 @@ public class LanguageService {
 
     private static final String SIGN_LANGUAGE_NAME_PREFIX_1 = "Sign (";
     private static final String SIGN_LANGUAGE_NAME_PREFIX_2 = "Sign Language (";
+    public static final String REFERENCE_LANGUAGES_JSON = "reference/languages.json";
 
 
     private JSONArray languagesJson;
 
     @Autowired
     public LanguageService() throws IOException {
-        String languages = IOUtils.resourceToString("reference-data/languages.txt",
+        String languages = IOUtils.resourceToString(REFERENCE_LANGUAGES_JSON,
             StandardCharsets.UTF_8, Thread.currentThread().getContextClassLoader());
 
-        languagesJson = new JSONArray("[" + languages + "]");
+        languagesJson = new JSONArray(languages);
     }
 
 

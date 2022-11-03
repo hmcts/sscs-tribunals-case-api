@@ -111,9 +111,9 @@ public class InterlocServiceHandlerTest {
 
     @Test
     @Parameters({
-            "NON_COMPLIANT, reviewByTcw",
-            "NON_COMPLIANT_SEND_TO_INTERLOC, reviewByTcw",
-            "REINSTATE_APPEAL, awaitingAdminAction"
+        "NON_COMPLIANT, reviewByTcw",
+        "NON_COMPLIANT_SEND_TO_INTERLOC, reviewByTcw",
+        "REINSTATE_APPEAL, awaitingAdminAction"
     })
     public void givenEvent_thenSetInterlocReviewStateAndSetInterlocReferralDateToExpectedAndClearDirectionDueDate(
             EventType eventType,
@@ -130,9 +130,9 @@ public class InterlocServiceHandlerTest {
 
     @Test
     @Parameters({
-            "NON_COMPLIANT, reviewByTcw",
-            "NON_COMPLIANT_SEND_TO_INTERLOC, reviewByTcw",
-            "REINSTATE_APPEAL, awaitingAdminAction"
+        "NON_COMPLIANT, reviewByTcw",
+        "NON_COMPLIANT_SEND_TO_INTERLOC, reviewByTcw",
+        "REINSTATE_APPEAL, awaitingAdminAction"
     })
     public void givenWelshCaseEvent_thenSetInterlocReviewStateAndSetInterlocReferralDateToExpectedAndClearDirectionDueDate(
             EventType eventType,

@@ -74,15 +74,15 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
     }
 
     @Parameters({
-            "null, null",
-            "null, GRANTED",
-            "null, REFUSED",
-            "GRANTED, null",
-            "GRANTED, GRANTED",
-            "GRANTED, REFUSED",
-            "REFUSED, null",
-            "REFUSED, GRANTED",
-            "REFUSED, REFUSED"
+        "null, null",
+        "null, GRANTED",
+        "null, REFUSED",
+        "GRANTED, null",
+        "GRANTED, GRANTED",
+        "GRANTED, REFUSED",
+        "REFUSED, null",
+        "REFUSED, GRANTED",
+        "REFUSED, REFUSED"
     })
     @Test
     public void givenNoConfidentialityRequestsAreInProgressShouldDisplayAnError(@Nullable RequestOutcome appellantOutcome, @Nullable RequestOutcome jointPartyOutcome) {
@@ -147,15 +147,15 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
     }
 
     @Parameters({
-            "null, something",
-            "null, grantConfidentialityRequest",
-            "null, refuseConfidentialityRequest",
-            "GRANTED, something",
-            "GRANTED, grantConfidentialityRequest",
-            "GRANTED, refuseConfidentialityRequest",
-            "REFUSED, something",
-            "REFUSED, grantConfidentialityRequest",
-            "REFUSED, refuseConfidentialityRequest"
+        "null, something",
+        "null, grantConfidentialityRequest",
+        "null, refuseConfidentialityRequest",
+        "GRANTED, something",
+        "GRANTED, grantConfidentialityRequest",
+        "GRANTED, refuseConfidentialityRequest",
+        "REFUSED, something",
+        "REFUSED, grantConfidentialityRequest",
+        "REFUSED, refuseConfidentialityRequest"
     })
     @Test
     public void givenAppellantConfidentialityRequestOnlyIsInProgressShouldDisplayAnErrorIfAppellantGrantedSetAndJointPartyReviewValueSet(@Nullable RequestOutcome jointPartyRequestOutcome, @Nullable String jointPartyReviewValue) {
@@ -272,15 +272,15 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
     }
 
     @Parameters({
-            "null, something",
-            "null, grantConfidentialityRequest",
-            "null, refuseConfidentialityRequest",
-            "GRANTED, something",
-            "GRANTED, grantConfidentialityRequest",
-            "GRANTED, refuseConfidentialityRequest",
-            "REFUSED, something",
-            "REFUSED, grantConfidentialityRequest",
-            "REFUSED, refuseConfidentialityRequest"
+        "null, something",
+        "null, grantConfidentialityRequest",
+        "null, refuseConfidentialityRequest",
+        "GRANTED, something",
+        "GRANTED, grantConfidentialityRequest",
+        "GRANTED, refuseConfidentialityRequest",
+        "REFUSED, something",
+        "REFUSED, grantConfidentialityRequest",
+        "REFUSED, refuseConfidentialityRequest"
     })
     @Test
     public void givenJointPartyConfidentialityRequestOnlyIsInProgressShouldDisplayAnErrorIfJointPartyGrantedSetAndAppellantReviewValueSet(@Nullable RequestOutcome appellantRequestOutcome, @Nullable String appellantReviewValue) {
@@ -435,8 +435,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
     }
 
     @Parameters({
-            "grantConfidentialityRequest",
-            "refuseConfidentialityRequest"
+        "grantConfidentialityRequest",
+        "refuseConfidentialityRequest"
     })
     @Test
     public void givenBothRequestsInProgressShouldDisplayAnErrorIfAppellantReviewValuePopulatedAndJointPartyReviewValueSetIncorrectly(String appellantReviewValue) {
@@ -569,30 +569,30 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
     }
 
     @Parameters({
-            "null, null, null, null",
-            "null, GRANTED, null, null",
-            "null, REFUSED, null, null",
-            "null, IN_PROGRESS, null, grantConfidentialityRequest",
-            "null, IN_PROGRESS, null, refuseConfidentialityRequest",
-            "GRANTED, null, null, null",
-            "GRANTED, GRANTED, null, null",
-            "GRANTED, REFUSED, null, null",
-            "GRANTED, IN_PROGRESS, null, grantConfidentialityRequest",
-            "GRANTED, IN_PROGRESS, null, refuseConfidentialityRequest",
-            "REFUSED, null, null, null",
-            "REFUSED, GRANTED, null, null",
-            "REFUSED, REFUSED, null, null",
-            "REFUSED, IN_PROGRESS, null, grantConfidentialityRequest",
-            "REFUSED, IN_PROGRESS, null, refuseConfidentialityRequest",
-            "IN_PROGRESS, null, grantConfidentialityRequest, null",
-            "IN_PROGRESS, GRANTED, grantConfidentialityRequest, null",
-            "IN_PROGRESS, REFUSED, grantConfidentialityRequest, null",
-            "IN_PROGRESS, IN_PROGRESS, grantConfidentialityRequest, grantConfidentialityRequest",
-            "IN_PROGRESS, IN_PROGRESS, grantConfidentialityRequest, refuseConfidentialityRequest",
-            "IN_PROGRESS, GRANTED, refuseConfidentialityRequest, null",
-            "IN_PROGRESS, REFUSED, refuseConfidentialityRequest, null",
-            "IN_PROGRESS, IN_PROGRESS, refuseConfidentialityRequest, grantConfidentialityRequest",
-            "IN_PROGRESS, IN_PROGRESS, refuseConfidentialityRequest, refuseConfidentialityRequest"
+        "null, null, null, null",
+        "null, GRANTED, null, null",
+        "null, REFUSED, null, null",
+        "null, IN_PROGRESS, null, grantConfidentialityRequest",
+        "null, IN_PROGRESS, null, refuseConfidentialityRequest",
+        "GRANTED, null, null, null",
+        "GRANTED, GRANTED, null, null",
+        "GRANTED, REFUSED, null, null",
+        "GRANTED, IN_PROGRESS, null, grantConfidentialityRequest",
+        "GRANTED, IN_PROGRESS, null, refuseConfidentialityRequest",
+        "REFUSED, null, null, null",
+        "REFUSED, GRANTED, null, null",
+        "REFUSED, REFUSED, null, null",
+        "REFUSED, IN_PROGRESS, null, grantConfidentialityRequest",
+        "REFUSED, IN_PROGRESS, null, refuseConfidentialityRequest",
+        "IN_PROGRESS, null, grantConfidentialityRequest, null",
+        "IN_PROGRESS, GRANTED, grantConfidentialityRequest, null",
+        "IN_PROGRESS, REFUSED, grantConfidentialityRequest, null",
+        "IN_PROGRESS, IN_PROGRESS, grantConfidentialityRequest, grantConfidentialityRequest",
+        "IN_PROGRESS, IN_PROGRESS, grantConfidentialityRequest, refuseConfidentialityRequest",
+        "IN_PROGRESS, GRANTED, refuseConfidentialityRequest, null",
+        "IN_PROGRESS, REFUSED, refuseConfidentialityRequest, null",
+        "IN_PROGRESS, IN_PROGRESS, refuseConfidentialityRequest, grantConfidentialityRequest",
+        "IN_PROGRESS, IN_PROGRESS, refuseConfidentialityRequest, refuseConfidentialityRequest"
     })
     @Test
     public void givenConfidentialityRequestsCombinationShouldResetNotSetValuesToNull(@Nullable RequestOutcome appellantOutcome, @Nullable RequestOutcome jointPartyOutcome, @Nullable String appellantReviewText, @Nullable String jointPartyReviewText) {

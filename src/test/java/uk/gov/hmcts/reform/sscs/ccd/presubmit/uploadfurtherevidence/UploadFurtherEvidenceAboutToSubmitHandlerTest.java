@@ -98,16 +98,15 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({
-            "fileName, Please add a file name",
-            "documentType, Please select a document type",
-            "documentLink, Please upload a file",
-            "documentUrl, Please upload a file",
-            "invalidFileType;docx, You need to upload PDF\\, MP3 or MP4 documents only",
-            "invalidFileType;xlsx, You need to upload PDF\\, MP3 or MP4 documents only",
-            "invalidFileType;txt, You need to upload PDF\\, MP3 or MP4 documents only",
-            "invalidFileType;doc, You need to upload PDF\\, MP3 or MP4 documents only",
-            "invalidFileType;mov, You need to upload PDF\\, MP3 or MP4 documents only"}
-            )
+        "fileName, Please add a file name",
+        "documentType, Please select a document type",
+        "documentLink, Please upload a file",
+        "documentUrl, Please upload a file",
+        "invalidFileType;docx, You need to upload PDF\\, MP3 or MP4 documents only",
+        "invalidFileType;xlsx, You need to upload PDF\\, MP3 or MP4 documents only",
+        "invalidFileType;txt, You need to upload PDF\\, MP3 or MP4 documents only",
+        "invalidFileType;doc, You need to upload PDF\\, MP3 or MP4 documents only",
+        "invalidFileType;mov, You need to upload PDF\\, MP3 or MP4 documents only"})
     public void shouldCatchErrorInDraftFurtherEvidenceDocument(String nullField, String expectedErrorMessage) {
         final List<DraftSscsDocument> draftDocs = getDraftSscsDocuments(
                 nullField, nullField.startsWith("invalidFileType") ? format("doc.%s", nullField.split(";")[1]) : "document.pdf");

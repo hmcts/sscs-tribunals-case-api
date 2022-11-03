@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -14,7 +15,6 @@ import java.util.function.Predicate;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.compress.utils.Lists;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -89,10 +89,14 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             return preSubmitCallbackResponse;
         }
 
-        sscsCaseData.setDwpState(FINAL_DECISION_ISSUED.getId());
         createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
         clearTransientFields(preSubmitCallbackResponse);
 
+        if (!(State.READY_TO_LIST.equals(sscsCaseData.getState())
+            || State.WITH_DWP.equals(sscsCaseData.getState()))) {
+            sscsCaseData.setDwpState(FINAL_DECISION_ISSUED.getId());
+            sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
+        }
         if (eligibleForHearingsCancel.test(callback)) {
             log.info("Issue Final Decision: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());
@@ -176,7 +180,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate(null);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(null);
         sscsCaseData.setWcaAppeal(null);
-        sscsCaseData.getSscsFinalDecisionCaseData().setOtherPartyAttendedQuestions(Lists.newArrayList());
+        sscsCaseData.getSscsFinalDecisionCaseData().setOtherPartyAttendedQuestions(new ArrayList<>());
 
         //PIP
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(null);

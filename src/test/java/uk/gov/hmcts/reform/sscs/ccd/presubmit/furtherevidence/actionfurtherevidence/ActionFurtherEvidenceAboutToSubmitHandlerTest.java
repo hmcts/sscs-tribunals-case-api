@@ -912,11 +912,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({
-            "SEND_TO_INTERLOC_REVIEW_BY_JUDGE, Yes",
-            "SEND_TO_INTERLOC_REVIEW_BY_JUDGE, No",
-            "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, Yes",
-            "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, No",
-            "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, null"
+        "SEND_TO_INTERLOC_REVIEW_BY_JUDGE, Yes",
+        "SEND_TO_INTERLOC_REVIEW_BY_JUDGE, No",
+        "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, Yes",
+        "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, No",
+        "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, null"
     })
     public void givenConfidentialRequestWhenJointPartyExistsAndAlreadyHasConfidentialityFromOriginalSenderAppellant_thenUpdateCaseWithConfidentialFieldsAndDisplayWarning(
             FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem,
@@ -1314,8 +1314,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({
-            "otherParty,    1, Other Party",
-            "otherPartyRep, 2, Rep Party"
+        "otherParty,    1, Other Party",
+        "otherPartyRep, 2, Rep Party"
     })
     public void findOriginalSenderOtherPartyId(String otherPartyCode, String otherPartyId, String expectedName) {
         ScannedDocument scannedDocument = ScannedDocument
