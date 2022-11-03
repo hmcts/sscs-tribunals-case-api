@@ -3,14 +3,17 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
 import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
+import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -69,31 +72,52 @@ public class IssueAdjournmentNoticeAboutToStartHandlerTest {
         assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
     }
 
-    @Test
-    @Parameters({"ABOUT_TO_SUBMIT", "MID_EVENT", "SUBMITTED"})
-    public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
+    @ParameterizedTest
+    @ValueSource(strings = {"ABOUT_TO_SUBMIT", "MID_EVENT", "SUBMITTED"})
+    void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertThat(handler.canHandle(callbackType, callback)).isFalse();
     }
 
     @Test
     public void givenAboutToStartRequest_willGeneratePreviewFile() {
-        PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
         sscsCaseData.setAdjournCaseGenerateNotice("Yes");
+        sscsCaseData.setAdjournCaseGeneratedDate(LocalDate.now().toString());
 
-        when(previewService.preview(callback, DocumentType.ADJOURNMENT_NOTICE, USER_AUTHORISATION, true)).thenReturn(response);
+        when(previewService.preview(callback, DocumentType.ADJOURNMENT_NOTICE, USER_AUTHORISATION, true))
+            .thenReturn(response);
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         verify(previewService).preview(callback, DocumentType.ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
     }
 
     @Test
-    public void givenNoPreviewDecisionFoundOnCase_thenShowError() {
-        sscsCaseData.setAdjournCasePreviewDocument(null);
+    public void givenGenerateNoticeIsNo_andPreviewDocumentExists_thenPreviewServiceIsNotUsedAndNoError() {
         sscsCaseData.setAdjournCaseGenerateNotice("No");
+        sscsCaseData.setAdjournCasePreviewDocument(DocumentLink.builder().build());
+        PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        verifyNoInteractions(previewService);
+        assertThat(result.getErrors()).isEmpty();
+    }
+
+    @Test
+    public void givenNoPreviewDecisionFoundOnCase_thenShowError() {
+        sscsCaseData.setAdjournCaseGenerateNotice("No");
+        sscsCaseData.setAdjournCasePreviewDocument(null);
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         String error = result.getErrors().stream().findFirst().orElse("");
-        assertThat("No draft adjournment notice found on case. Please use 'Adjourn case' event or upload your adjourn case document.").isEqualTo(error);
+        assertThat(error).isEqualTo("No draft adjournment notice found on case. Please use 'Adjourn case' event or upload your adjourn case document.");
+    }
+
+    @Test
+    public void givenNoGeneratedDateFoundOnCase_thenShowError() {
+        sscsCaseData.setAdjournCaseGenerateNotice("Yes");
+        PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        String error = result.getErrors().stream().findFirst().orElse("");
+        assertThat(error).isEqualTo("Adjourn case generated date not found. Please use 'Adjourn case' event or upload your adjourn case document.");
     }
 
     @Test(expected = IllegalStateException.class)
