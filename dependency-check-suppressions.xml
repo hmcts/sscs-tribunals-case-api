@@ -61,7 +61,7 @@
     <notes><![CDATA[
         file name: commons-text-1.9.jar
         ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org.apache.commons/commons-text@1.9$</packageUrl>
-        <cve>CVE-2022-42889</cve>
-    </suppress>
+    <packageUrl regex="true">^pkg:maven/org.apache.commons/commons-text@1.9$</packageUrl>
+    <cve>CVE-2022-42889</cve>
+  </suppress>
 </suppressions>
