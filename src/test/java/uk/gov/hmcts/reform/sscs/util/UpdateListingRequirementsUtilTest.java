@@ -72,6 +72,24 @@ public class UpdateListingRequirementsUtilTest {
     }
 
     @Test
+    public void generateInterpreterLanguageFieldsWithDialectReference() {
+        Language signLanguage = new Language("sign-mkn", "Makaton", "signMakatonDF", "signMakatonDE", null);
+        given(signLanguagesService.getSignLanguages()).willReturn(List.of(signLanguage));
+
+        Language verbalLanguage = new Language("fre", "French", null, null, null);
+        given(verbalLanguagesService.getVerbalLanguages()).willReturn(List.of(verbalLanguage));
+
+        DynamicList list = dynamicListLangauageUtil.generateInterpreterLanguageFields(null);
+
+        List<DynamicListItem> result = list.getListItems();
+
+        assertThat(result)
+            .hasSize(2)
+            .extracting("code","label")
+            .containsExactlyInAnyOrder(tuple("fre","French"), tuple("sign-mkn-signMakatonDF", "signMakatonDE"));
+    }
+
+    @Test
     public void generateInterpreterLanguageFieldsInterpreterLanguageNull() {
         Language signLanguage = new Language("sign-mkn", "Makaton", null, null, null);
         given(signLanguagesService.getSignLanguages()).willReturn(List.of(signLanguage));
