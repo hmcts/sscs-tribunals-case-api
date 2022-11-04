@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -14,14 +15,12 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.ArrayList;
 import java.util.List;
-import junitparams.JUnitParamsRunner;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -32,7 +31,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 
-@RunWith(JUnitParamsRunner.class)
 public class AdjournCaseAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
@@ -59,7 +57,7 @@ public class AdjournCaseAboutToSubmitHandlerTest {
     private SscsCaseData sscsCaseData;
     private AutoCloseable autoCloseable;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         autoCloseable = openMocks(this);
         ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
@@ -75,7 +73,7 @@ public class AdjournCaseAboutToSubmitHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         autoCloseable.close();
     }
@@ -105,10 +103,10 @@ public class AdjournCaseAboutToSubmitHandlerTest {
     @Test
     public void givenAdjournmentNoticeAlreadyExistsOnCase_thenOverwriteExistingDraft() {
         SscsDocument doc = SscsDocument.builder().value(
-            SscsDocumentDetails.builder()
-                .documentFileName(OLD_DRAFT_DOC)
-                .documentType(DRAFT_ADJOURNMENT_NOTICE.getValue())
-                .build())
+                SscsDocumentDetails.builder()
+                    .documentFileName(OLD_DRAFT_DOC)
+                    .documentType(DRAFT_ADJOURNMENT_NOTICE.getValue())
+                    .build())
             .build();
         List<SscsDocument> docs = new ArrayList<>();
         docs.add(doc);
@@ -140,9 +138,10 @@ public class AdjournCaseAboutToSubmitHandlerTest {
     @DisplayName("Given an adjournment event with language interpreter required and interpreter language set, "
         + "then do not display error")
     @Test
-    public void givenAnAdjournmentEventWithLanguageInterpreterRequiredAndIntepreterLanguageSet_thenDoNotDisplayError() {
-        callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterRequired("Yes");
+    public void givenAdjournmentEventWithLanguageInterpreterRequiredAndLanguageSet_thenDoNotDisplayError() {
+        callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterRequired(YES.getValue());
         callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterLanguage(new DynamicList(SPANISH));
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo(YES.getValue());
@@ -157,10 +156,11 @@ public class AdjournCaseAboutToSubmitHandlerTest {
     }
 
     @DisplayName("Throws exception if it cannot handle the appeal")
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void givenCannotHandleAppeal_thenThrowsException() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThatThrownBy(() -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION))
+            .isInstanceOf(IllegalStateException.class);
     }
 
     @DisplayName("When adjournment is disabled and case is LA, then should not send any messages")

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -8,13 +9,11 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
-import junitparams.JUnitParamsRunner;
 import org.joda.time.LocalDate;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -27,7 +26,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 
-@RunWith(JUnitParamsRunner.class)
 public class IssueAdjournmentNoticeAboutToStartHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
@@ -48,7 +46,7 @@ public class IssueAdjournmentNoticeAboutToStartHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         handler = new IssueAdjournmentNoticeAboutToStartHandler(previewService);
@@ -120,9 +118,10 @@ public class IssueAdjournmentNoticeAboutToStartHandlerTest {
         assertThat(error).isEqualTo("Adjourn case generated date not found. Please use 'Adjourn case' event or upload your adjourn case document.");
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertThatThrownBy(() -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION))
+            .isInstanceOf(IllegalStateException.class);
     }
 }
