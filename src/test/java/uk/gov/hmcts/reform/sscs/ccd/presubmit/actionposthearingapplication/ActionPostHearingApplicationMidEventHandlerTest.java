@@ -50,7 +50,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 
 @ExtendWith(MockitoExtension.class)
-public class ActionPostHearingApplicationMidEventHandlerTest {
+class ActionPostHearingApplicationMidEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private static final String URL = "http://dm-store/documents/123";
@@ -115,6 +115,7 @@ public class ActionPostHearingApplicationMidEventHandlerTest {
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
         handler = new ActionPostHearingApplicationMidEventHandler(documentConfiguration, generateFile, false);
+        when(callback.getEvent()).thenReturn(ACTION_POST_HEARING_APPLICATION);
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
 

@@ -24,7 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @ExtendWith(MockitoExtension.class)
-public class ActionPostHearingApplicationAboutToSubmitHandlerTest {
+class ActionPostHearingApplicationAboutToSubmitHandlerTest {
 
     private static final String DOCUMENT_URL = "dm-store/documents/123";
 
@@ -81,6 +81,7 @@ public class ActionPostHearingApplicationAboutToSubmitHandlerTest {
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
         handler = new ActionPostHearingApplicationAboutToSubmitHandler(false);
+        when(callback.getEvent()).thenReturn(ACTION_POST_HEARING_APPLICATION);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 

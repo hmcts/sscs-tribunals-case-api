@@ -47,7 +47,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @ExtendWith(MockitoExtension.class)
-public class ActionPostHearingApplicationSubmittedHandlerTest {
+class ActionPostHearingApplicationSubmittedHandlerTest {
 
     private static final String DOCUMENT_URL = "dm-store/documents/123";
 
@@ -120,6 +120,7 @@ public class ActionPostHearingApplicationSubmittedHandlerTest {
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
         handler = new ActionPostHearingApplicationSubmittedHandler(ccdService, idamService, false);
+        when(callback.getEvent()).thenReturn(ACTION_POST_HEARING_APPLICATION);
         assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
     }
 
