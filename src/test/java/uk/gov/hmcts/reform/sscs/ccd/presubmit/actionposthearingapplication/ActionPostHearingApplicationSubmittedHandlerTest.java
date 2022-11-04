@@ -5,7 +5,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ActionPostHearingTypes.CORRECTION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ActionPostHearingTypes.LIBERTY_TO_APPLY;
@@ -17,13 +16,13 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ActionPostHearingApplication;
@@ -45,7 +44,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ActionPostHearingApplicationSubmittedHandlerTest {
 
     private static final String DOCUMENT_URL = "dm-store/documents/123";
@@ -71,19 +70,13 @@ public class ActionPostHearingApplicationSubmittedHandlerTest {
     private SscsCaseDetails caseDetailsCallback;
 
     private SscsCaseData caseData;
-    private AutoCloseable autoCloseable;
     private IdamTokens idamTokens;
 
-    @Before
-    public void setUp() {
-        autoCloseable = openMocks(this);
+    @BeforeEach
+    void setUp() {
         handler = new ActionPostHearingApplicationSubmittedHandler(ccdService, idamService, true);
 
         idamTokens = IdamTokens.builder().build();
-        when(idamService.getIdamTokens()).thenReturn(idamTokens);
-
-        when(callback.getEvent()).thenReturn(ACTION_POST_HEARING_APPLICATION);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
 
         caseData = SscsCaseData.builder()
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
@@ -103,31 +96,25 @@ public class ActionPostHearingApplicationSubmittedHandlerTest {
                 .typeSelected(SET_ASIDE)
                 .build())
             .build();
-
-        when(caseDetailsCallback.getData()).thenReturn(caseData);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-    }
-
-    @After
-    public void after() throws Exception {
-        autoCloseable.close();
     }
 
     @Test
-    public void givenAValidSubmittedEvent_thenReturnTrue() {
+    void givenAValidSubmittedEvent_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(ACTION_POST_HEARING_APPLICATION);
         assertThat(handler.canHandle(SUBMITTED, callback)).isTrue();
     }
 
     @Test
-    public void givenPostHearingsEnabledFalse_thenReturnFalse() {
+    void givenPostHearingsEnabledFalse_thenReturnFalse() {
         handler = new ActionPostHearingApplicationSubmittedHandler(ccdService, idamService, false);
         assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
     }
 
-
-    @Test
-    @Parameters({"GRANT", "ISSUE_DIRECTIONS"})
-    public void givenActionTypeSetAsideSelected_shouldReturnCallCorrectCallback(SetAsideActions value) {
+    @ParameterizedTest
+    @EnumSource(
+        value = SetAsideActions.class,
+        names = {"GRANT", "ISSUE_DIRECTIONS"})
+    void givenActionTypeSetAsideSelected_shouldReturnCallCorrectCallback(SetAsideActions value) {
         caseData.getActionPostHearingApplication().setTypeSelected(SET_ASIDE);
         caseData.getActionPostHearingApplication().getActionSetAside().setAction(value);
 
@@ -135,7 +122,7 @@ public class ActionPostHearingApplicationSubmittedHandlerTest {
     }
 
     @Test
-    public void givenActionTypeSetAsideSelected_shouldReturnCallCorrectCallback() {
+    void givenActionTypeSetAsideSelected_shouldReturnCallCorrectCallback() {
         caseData.getActionPostHearingApplication().setTypeSelected(SET_ASIDE);
         caseData.getActionPostHearingApplication().getActionSetAside().setAction(SetAsideActions.REFUSE);
 
@@ -143,7 +130,7 @@ public class ActionPostHearingApplicationSubmittedHandlerTest {
     }
 
     @Test
-    public void givenActionTypeSetAsideWithSorSelected_shouldReturnCallCorrectCallback() {
+    void givenActionTypeSetAsideWithSorSelected_shouldReturnCallCorrectCallback() {
         caseData.getActionPostHearingApplication().setTypeSelected(SET_ASIDE);
         caseData.getActionPostHearingApplication().getActionSetAside().setAction(SetAsideActions.REFUSE);
         caseData.getActionPostHearingApplication().getActionSetAside().setRequestStatementOfReasons(YES);
@@ -151,31 +138,33 @@ public class ActionPostHearingApplicationSubmittedHandlerTest {
         verifyCcdUpdatedCorrectly(SetAsideActions.REFUSE_SOR, null);
     }
 
-
-    @Test
-    @Parameters({"GRANT", "REFUSE", "SEND_TO_JUDGE"})
-    public void givenActionTypeCorrectionSelected_shouldReturnCallCorrectCallback(CorrectionActions value) {
+    @ParameterizedTest
+    @EnumSource(value = CorrectionActions.class)
+    void givenActionTypeCorrectionSelected_shouldReturnCallCorrectCallback(CorrectionActions value) {
         caseData.getActionPostHearingApplication().setTypeSelected(CORRECTION);
         caseData.getActionPostHearingApplication().getActionCorrection().setAction(value);
 
         verifyCcdUpdatedCorrectly(value, null);
     }
 
-    @Test
-    @Parameters({"GRANT", "REFUSE", "ISSUE_DIRECTIONS", "WRITE"})
-    public void givenActionTypeSorSelected_shouldReturnCallCorrectCallback(StatementOfReasonsActions value) {
+    @ParameterizedTest
+    @EnumSource(value = StatementOfReasonsActions.class)
+    void givenActionTypeSorSelected_shouldReturnCallCorrectCallback(StatementOfReasonsActions value) {
         caseData.getActionPostHearingApplication().setTypeSelected(STATEMENT_OF_REASONS);
         caseData.getActionPostHearingApplication().getActionStatementOfReasons().setAction(value);
 
         verifyCcdUpdatedCorrectly(value, null);
     }
 
-    @Test
-    @Parameters({"REFUSE"})
-    public void givenActionTypePtaSelected_shouldReturnCallCorrectCallback(PermissionToAppealActions value) {
+    @ParameterizedTest
+    @EnumSource(value = PermissionToAppealActions.class)
+    void givenActionTypePtaSelected_shouldReturnCallCorrectCallback(PermissionToAppealActions value) {
         caseData.getActionPostHearingApplication().setTypeSelected(PERMISSION_TO_APPEAL);
         caseData.getActionPostHearingApplication().getActionPermissionToAppeal().setAction(value);
 
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
@@ -186,12 +175,15 @@ public class ActionPostHearingApplicationSubmittedHandlerTest {
         verifyNoInteractions(ccdService);
     }
 
-    @Test
-    @Parameters({"REFUSE"})
-    public void givenActionTypeLtaSelected_shouldReturnCallCorrectCallback(LibertyToApplyActions value) {
+    @ParameterizedTest
+    @EnumSource(value = LibertyToApplyActions.class)
+    void givenActionTypeLtaSelected_shouldReturnCallCorrectCallback(LibertyToApplyActions value) {
         caseData.getActionPostHearingApplication().setTypeSelected(LIBERTY_TO_APPLY);
         caseData.getActionPostHearingApplication().getActionLibertyToApply().setAction(value);
 
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
@@ -204,8 +196,11 @@ public class ActionPostHearingApplicationSubmittedHandlerTest {
 
 
     @Test
-    public void givenNoActionTypeSelected_shouldReturnWithTheCorrectErrorMessage() {
+    void givenNoActionTypeSelected_shouldReturnWithTheCorrectErrorMessage() {
         caseData.getActionPostHearingApplication().setTypeSelected(null);
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
@@ -215,10 +210,13 @@ public class ActionPostHearingApplicationSubmittedHandlerTest {
     }
 
     @Test
-    public void givenNonLaCase_shouldReturnErrorWithCorrectMessage() {
+    void givenNonLaCase_shouldReturnErrorWithCorrectMessage() {
         caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
             .hearingRoute(GAPS)
             .build());
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
@@ -229,6 +227,13 @@ public class ActionPostHearingApplicationSubmittedHandlerTest {
     }
 
     private void verifyCcdUpdatedCorrectly(CcdCallbackMap callbackMap, String dwpState) {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetailsCallback.getData()).thenReturn(caseData);
+
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+
         when(ccdService.updateCase(caseData, CASE_ID, callbackMap.getCallbackEvent().getCcdType(),
             callbackMap.getCallbackSummary(), callbackMap.getCallbackDescription(),
             idamTokens))

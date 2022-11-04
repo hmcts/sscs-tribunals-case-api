@@ -31,3 +31,4 @@ bin/
 /src/main/resources/uk/gov/hmcts/reform/sscs/git.properties
 
 *.hprof
+*.log

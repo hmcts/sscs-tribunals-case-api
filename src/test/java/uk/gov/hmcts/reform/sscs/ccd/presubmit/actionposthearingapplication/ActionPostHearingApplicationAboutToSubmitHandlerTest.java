@@ -7,11 +7,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ACTION_POST_HEARING_
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ActionPostHearingApplicationAboutToSubmitHandlerTest {
 
     private static final String DOCUMENT_URL = "dm-store/documents/123";
@@ -38,12 +38,9 @@ public class ActionPostHearingApplicationAboutToSubmitHandlerTest {
 
     private SscsCaseData caseData;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         handler = new ActionPostHearingApplicationAboutToSubmitHandler(true);
-
-        when(callback.getEvent()).thenReturn(ACTION_POST_HEARING_APPLICATION);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
 
         caseData = SscsCaseData.builder()
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
@@ -60,23 +57,25 @@ public class ActionPostHearingApplicationAboutToSubmitHandlerTest {
                     .build())
                 .build())
             .build();
-
-        when(caseDetails.getCaseData()).thenReturn(caseData);
     }
 
     @Test
-    public void givenAValidAboutToSubmitEvent_thenReturnTrue() {
+    void givenAValidAboutToSubmitEvent_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(ACTION_POST_HEARING_APPLICATION);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
     }
 
     @Test
-    public void givenPostHearingsEnabledFalse_thenReturnFalse() {
+    void givenPostHearingsEnabledFalse_thenReturnFalse() {
         handler = new ActionPostHearingApplicationAboutToSubmitHandler(false);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
     @Test
-    public void givenLaCase_shouldReturnWithoutError() {
+    void givenLaCase_shouldReturnWithoutError() {
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -85,10 +84,13 @@ public class ActionPostHearingApplicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenNonLaCase_shouldReturnErrorWithCorrectMessage() {
+    void givenNonLaCase_shouldReturnErrorWithCorrectMessage() {
         caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
             .hearingRoute(GAPS)
             .build());
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

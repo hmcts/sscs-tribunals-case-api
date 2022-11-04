@@ -20,12 +20,12 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -43,9 +43,8 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ActionPostHearingApplicationMidEventHandlerTest {
-
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private static final String URL = "http://dm-store/documents/123";
@@ -70,16 +69,9 @@ public class ActionPostHearingApplicationMidEventHandlerTest {
     private ActionPostHearingApplicationMidEventHandler handler;
 
 
-    @Before
-    public void setUp() {
-
+    @BeforeEach
+    void setUp() {
         handler = new ActionPostHearingApplicationMidEventHandler(documentConfiguration, generateFile, true);
-
-        when(documentConfiguration.getDocuments()).thenReturn(new HashMap<>(Map.of(
-            LanguagePreference.ENGLISH,  new HashMap<>(Map.of(
-                DECISION_ISSUED, TEMPLATE_ID)
-            ))
-        ));
 
         caseData = SscsCaseData.builder()
             .documentGeneration(DocumentGeneration.builder()
@@ -95,29 +87,34 @@ public class ActionPostHearingApplicationMidEventHandlerTest {
             .build();
 
         capture = ArgumentCaptor.forClass(GenerateFileParams.class);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(callback.getEvent()).thenReturn(ACTION_POST_HEARING_APPLICATION);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-        when(generateFile.assemble(any())).thenReturn(URL);
-        when(callback.getPageId()).thenReturn(PAGE_ID_GENERATE_NOTICE);
-
-
     }
 
     @Test
-    public void givenAValidMidEvent_thenReturnTrue() {
+    void givenAValidMidEvent_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(ACTION_POST_HEARING_APPLICATION);
         assertThat(handler.canHandle(MID_EVENT, callback)).isTrue();
     }
 
     @Test
-    public void givenPostHearingsEnabledFalse_thenReturnFalse() {
+    void givenPostHearingsEnabledFalse_thenReturnFalse() {
         handler = new ActionPostHearingApplicationMidEventHandler(documentConfiguration, generateFile, false);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
     @Test
-    public void givenLanguagePreferenceIsEnglish_NoticeIsGeneratedAndPopulatedInPreviewDocumentField() {
+    void givenLanguagePreferenceIsEnglish_NoticeIsGeneratedAndPopulatedInPreviewDocumentField() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        when(generateFile.assemble(any())).thenReturn(URL);
+        when(callback.getPageId()).thenReturn(PAGE_ID_GENERATE_NOTICE);
+
+        when(documentConfiguration.getDocuments()).thenReturn(new HashMap<>(Map.of(
+            LanguagePreference.ENGLISH,  new HashMap<>(Map.of(
+                DECISION_ISSUED, TEMPLATE_ID)
+            ))
+        ));
+
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
@@ -144,7 +141,10 @@ public class ActionPostHearingApplicationMidEventHandlerTest {
     }
 
     @Test
-    public void givenOtherPageId_doNothing() {
+    void givenOtherPageId_doNothing() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
         when(callback.getPageId()).thenReturn("test page id");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -155,7 +155,10 @@ public class ActionPostHearingApplicationMidEventHandlerTest {
     }
 
     @Test
-    public void givenNonLaCase_shouldReturnErrorWithCorrectMessage() {
+    void givenNonLaCase_shouldReturnErrorWithCorrectMessage() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
         caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
             .hearingRoute(GAPS)
             .build());

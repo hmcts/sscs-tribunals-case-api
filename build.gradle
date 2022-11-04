@@ -90,6 +90,14 @@ dependencies {
     e2eImplementation(sourceSets.test.output)
 }
 
+tasks.withType(Test) {
+    useJUnitPlatform()
+
+    testLogging {
+        exceptionFormat = 'full'
+    }
+}
+
 task integration(type: Test) {
     setTestClassesDirs(sourceSets.integrationTest.output.classesDirs)
     setClasspath(sourceSets.integrationTest.runtimeClasspath)
@@ -120,8 +128,8 @@ jacoco {
 jacocoTestReport {
     executionData(test, integration)
     reports {
-        xml.enabled = true
-        csv.enabled = false
+        xml.required = true
+        csv.required = false
         xml.destination file("${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml")
     }
 }
@@ -501,8 +509,8 @@ bootJar {
 jacocoTestReport {
     executionData(test, integration)
     reports {
-        xml.enabled = true
-        csv.enabled = false
+        xml.required = true
+        csv.required = false
     }
 }
 
