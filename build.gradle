@@ -90,6 +90,14 @@ dependencies {
     e2eImplementation(sourceSets.test.output)
 }
 
+tasks.withType(Test) {
+    useJUnitPlatform()
+
+    testLogging {
+        exceptionFormat = 'full'
+    }
+}
+
 task integration(type: Test) {
     setTestClassesDirs(sourceSets.integrationTest.output.classesDirs)
     setClasspath(sourceSets.integrationTest.runtimeClasspath)
@@ -120,8 +128,8 @@ jacoco {
 jacocoTestReport {
     executionData(test, integration)
     reports {
-        xml.enabled = true
-        csv.enabled = false
+        xml.required = true
+        csv.required = false
         xml.destination file("${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml")
     }
 }
@@ -242,7 +250,7 @@ dependencyManagement {
             entry 'kotlin-reflect'
         }
         // CVE-2020-13934, CVE-2020-13935, CVE-2020-17527, CVE-2020-17527,
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.65') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.68') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-annotations-api'
@@ -398,8 +406,8 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '4.20.2'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.5.0'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '4.21.1'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.6.0'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.33.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.12.0'
@@ -501,8 +509,8 @@ bootJar {
 jacocoTestReport {
     executionData(test, integration)
     reports {
-        xml.enabled = true
-        csv.enabled = false
+        xml.required = true
+        csv.required = false
     }
 }
 

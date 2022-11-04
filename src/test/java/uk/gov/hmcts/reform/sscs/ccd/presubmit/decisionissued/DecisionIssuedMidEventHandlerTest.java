@@ -10,6 +10,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -30,6 +32,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
@@ -91,16 +94,18 @@ public class DecisionIssuedMidEventHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.DECISION_ISSUED);
 
         sscsCaseData = SscsCaseData.builder()
-                .generateNotice("Yes")
-                .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
-                .appeal(Appeal.builder()
-                        .appellant(Appellant.builder()
-                                .name(Name.builder().firstName("APPELLANT")
-                                        .lastName("LastNamE")
-                                        .build())
-                                .identity(Identity.builder().build())
-                                .build())
-                        .build()).build();
+            .documentGeneration(DocumentGeneration.builder()
+                .generateNotice(YES)
+                .build())
+            .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
+            .appeal(Appeal.builder()
+                    .appellant(Appellant.builder()
+                            .name(Name.builder().firstName("APPELLANT")
+                                    .lastName("LastNamE")
+                                    .build())
+                            .identity(Identity.builder().build())
+                            .build())
+                    .build()).build();
 
         capture = ArgumentCaptor.forClass(GenerateFileParams.class);
 
@@ -124,7 +129,7 @@ public class DecisionIssuedMidEventHandlerTest {
 
     @Test
     public void givenGenerateNoticeIsNo_thenReturnFalse() {
-        sscsCaseData.setGenerateNotice("No");
+        sscsCaseData.getDocumentGeneration().setGenerateNotice(NO);
         assertFalse(handler.canHandle(MID_EVENT, callback));
     }
 
@@ -138,12 +143,12 @@ public class DecisionIssuedMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertNotNull(response.getData().getPreviewDocument());
+        assertNotNull(response.getData().getDocumentStaging().getPreviewDocument());
         assertEquals(DocumentLink.builder()
                 .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
                 .documentBinaryUrl(URL + "/binary")
                 .documentUrl(URL)
-                .build(), response.getData().getPreviewDocument());
+                .build(), response.getData().getDocumentStaging().getPreviewDocument());
 
         verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname",
                 documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DECISION_ISSUED));

@@ -26,7 +26,7 @@ java:
         - docmosis-endpoint
         - docmosis-api-key
         - AppInsightsInstrumentationKey
-        - name: sscs-asb-connection-string
+        - name: sscs-servicebus-connection-string-tf
           alias: HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING
   environment:
     SERVER_PORT: 8080

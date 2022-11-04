@@ -67,7 +67,7 @@ public class DecisionIssuedIt extends AbstractEventIt {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getDocumentStaging().getPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -91,11 +91,11 @@ public class DecisionIssuedIt extends AbstractEventIt {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertNull(result.getData().getPreviewDocument());
-        assertNull(result.getData().getSignedRole());
-        assertNull(result.getData().getSignedBy());
-        assertNull(result.getData().getGenerateNotice());
-        assertNull(result.getData().getDateAdded());
+        assertNull(result.getData().getDocumentStaging().getPreviewDocument());
+        assertNull(result.getData().getDocumentGeneration().getSignedRole());
+        assertNull(result.getData().getDocumentGeneration().getSignedBy());
+        assertNull(result.getData().getDocumentGeneration().getGenerateNotice());
+        assertNull(result.getData().getDocumentStaging().getDateAdded());
         assertEquals(4, result.getData().getSscsDocument().size());
         assertEquals(DocumentType.DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
@@ -122,11 +122,11 @@ public class DecisionIssuedIt extends AbstractEventIt {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertNull(result.getData().getPreviewDocument());
-        assertNull(result.getData().getSignedRole());
-        assertNull(result.getData().getSignedBy());
-        assertNull(result.getData().getGenerateNotice());
-        assertNull(result.getData().getDateAdded());
+        assertNull(result.getData().getDocumentStaging().getPreviewDocument());
+        assertNull(result.getData().getDocumentGeneration().getSignedRole());
+        assertNull(result.getData().getDocumentGeneration().getSignedBy());
+        assertNull(result.getData().getDocumentGeneration().getGenerateNotice());
+        assertNull(result.getData().getDocumentStaging().getDateAdded());
         assertNull(result.getData().getExtensionNextEventDl());
         assertEquals(4, result.getData().getSscsDocument().size());
         assertEquals(DocumentType.DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());

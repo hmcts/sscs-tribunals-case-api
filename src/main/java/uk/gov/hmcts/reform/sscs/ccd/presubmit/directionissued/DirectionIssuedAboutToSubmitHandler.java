@@ -261,12 +261,12 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         DocumentLink url = null;
 
-        if (nonNull(caseData.getPreviewDocument()) && callback.getEvent() == EventType.DIRECTION_ISSUED) {
-            url = caseData.getPreviewDocument();
+        if (nonNull(caseData.getDocumentStaging().getPreviewDocument()) && callback.getEvent() == EventType.DIRECTION_ISSUED) {
+            url = caseData.getDocumentStaging().getPreviewDocument();
         } else if (caseData.getSscsInterlocDirectionDocument() != null && callback.getEvent() == EventType.DIRECTION_ISSUED) {
 
             url = caseData.getSscsInterlocDirectionDocument().getDocumentLink();
-            caseData.setDateAdded(caseData.getSscsInterlocDirectionDocument().getDocumentDateAdded());
+            caseData.getDocumentStaging().setDateAdded(caseData.getSscsInterlocDirectionDocument().getDocumentDateAdded());
 
             if (!isFileAPdf(caseData.getSscsInterlocDirectionDocument().getDocumentLink())) {
                 sscsCaseDataPreSubmitCallbackResponse.addError("You need to upload PDF documents only");
@@ -294,9 +294,9 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         if (callback.getEvent() == EventType.DIRECTION_ISSUED) {
             footerService.createFooterAndAddDocToCase(url, caseData, DocumentType.DIRECTION_NOTICE,
-                    Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now())
+                    Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now())
                             .format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-                    caseData.getDateAdded(), null, documentTranslationStatus);
+                    caseData.getDocumentStaging().getDateAdded(), null, documentTranslationStatus);
         }
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
