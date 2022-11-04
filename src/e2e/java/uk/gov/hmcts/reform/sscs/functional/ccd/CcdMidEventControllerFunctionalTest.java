@@ -36,7 +36,7 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
 
     @DisplayName("Should return 400 for no body")
     @Test
-    public void testNoBody() throws IOException {
+    public void shouldReturn400ForNoBody() throws IOException {
         HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(""), "");
         assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(400);
     }
@@ -58,7 +58,7 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
 
     @DisplayName("Should return HttpStatus.SC_OK with valid request")
     @Test
-    public void testValidRequest() throws IOException {
+    public void shouldReturnStatusOkForValidRequest() throws IOException {
         HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(
             getJsonCallbackForTest(WRITE_FINAL_DECISION_CALLBACK_JSON)), "");
         assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
