@@ -59,7 +59,7 @@ public class GenerateCoversheetAboutToStartHandler implements PreSubmitCallbackH
                 && sscsDocument.getValue().getDocumentLink() != null) {
             String location = sscsDocument.getValue().getDocumentLink().getDocumentUrl();
             DocumentLink newDoc = DocumentLink.builder().documentFilename(FILENAME).documentUrl(location).documentBinaryUrl(location + "/binary").build();
-            caseData.setPreviewDocument(newDoc);
+            caseData.getDocumentStaging().setPreviewDocument(newDoc);
         } else {
             response.addError("Error while trying to generate coversheet");
         }
