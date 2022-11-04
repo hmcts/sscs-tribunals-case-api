@@ -9,8 +9,10 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ACTION_POST_HEARING_APPLICATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DECISION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
@@ -23,6 +25,9 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,6 +43,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
@@ -96,9 +102,20 @@ public class ActionPostHearingApplicationMidEventHandlerTest {
     }
 
     @Test
+    void givenAInvalidEvent_thenReturnFalse() {
+        when(callback.getEvent()).thenReturn(READY_TO_LIST);
+        assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
+    }
+
+    @Test
+    void givenAInvalidCallbackType_thenReturnFalse() {
+        assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
+    }
+
+    @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
         handler = new ActionPostHearingApplicationMidEventHandler(documentConfiguration, generateFile, false);
-        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
+        assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
 
     @Test
@@ -138,6 +155,26 @@ public class ActionPostHearingApplicationMidEventHandlerTest {
         assertThat(payload.getNoticeType()).isEqualTo("DECISION NOTICE");
         assertThat(payload.getAppellantFullName()).isEqualTo("Appellant Lastname");
         assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+        value = YesNo.class,
+        names = {"NO"})
+    @NullSource
+    void givenGenerateNoticeNotYes_doNothing(YesNo value) {
+        caseData.getDocumentGeneration().setGenerateNotice(value);
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        when(callback.getPageId()).thenReturn("generateNotice");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+
+        verifyNoInteractions(generateFile);
     }
 
     @Test
