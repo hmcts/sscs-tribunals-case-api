@@ -2,11 +2,11 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
@@ -15,14 +15,15 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -39,6 +40,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 
+@ExtendWith(MockitoExtension.class)
 class AdjournCaseAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
@@ -63,27 +65,23 @@ class AdjournCaseAboutToSubmitHandlerTest {
     private PreviewDocumentService previewDocumentService;
 
     private SscsCaseData sscsCaseData;
-    private AutoCloseable autoCloseable;
+
+    private void setUpAdjournCaseMocks() {
+        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+    }
 
     @BeforeEach
     void setUp() {
-        autoCloseable = openMocks(this);
         ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
 
-        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
             .appeal(Appeal.builder().build())
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
                 .hearingRoute(HearingRoute.GAPS)
                 .build())
             .build();
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-        autoCloseable.close();
     }
 
     @DisplayName("Given a non adjourn case event, then return false")
@@ -96,20 +94,20 @@ class AdjournCaseAboutToSubmitHandlerTest {
     @DisplayName("Given caseDetails is null, then return false")
     @Test
     void givenCaseDetailsIsNull_thenReturnFalse() {
-        when(callback.getCaseDetails()).thenReturn(null);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
     @DisplayName("Given caseData is null, then return false")
     @Test
     void givenCaseDataIsNull_thenReturnFalse() {
-        when(callback.getCaseDetails().getCaseData()).thenReturn(null);
+        lenient().when(callback.getCaseDetails()).thenReturn(caseDetails);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
     @DisplayName("Given draft adjournment notice already exists on case, then overwrite existing draft")
     @Test
     void givenAdjournmentNoticeAlreadyExistsOnCase_thenOverwriteExistingDraft() {
+        setUpAdjournCaseMocks();
         SscsDocument doc = SscsDocument.builder().value(
             SscsDocumentDetails.builder()
                 .documentFileName(OLD_DRAFT_DOC)
@@ -130,6 +128,7 @@ class AdjournCaseAboutToSubmitHandlerTest {
         + "then overwrite existing interpreter in hearing options")
     @Test
     void givenAdjournmentEventWithLanguageInterpreterRequiredAndCaseHasExistingInterpreter_overwriteExistingInterpreter() {
+        setUpAdjournCaseMocks();
         callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterRequired(YES.getValue());
         callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterLanguage(SPANISH);
         callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder()
@@ -147,6 +146,7 @@ class AdjournCaseAboutToSubmitHandlerTest {
         + "then do not display error")
     @Test
     void givenAdjournmentEventWithLanguageInterpreterRequiredAndLanguageSet_thenDoNotDisplayError() {
+        setUpAdjournCaseMocks();
         callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterRequired(YES.getValue());
         callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterLanguage(SPANISH);
 
@@ -174,6 +174,7 @@ class AdjournCaseAboutToSubmitHandlerTest {
     @DisplayName("When adjournment is disabled and case is LA, then should not send any messages")
     @Test
     void givenFeatureFlagDisabled_thenNoMessageIsSent() {
+        setUpAdjournCaseMocks();
         ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", false);
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
 
@@ -189,6 +190,7 @@ class AdjournCaseAboutToSubmitHandlerTest {
         + "and no directions are being made, then should send a new hearing request in hearings API")
     @Test
     void givenCaseCannotBeListedRightAwayAndNoDirectionsBeingMade_thenNewHearingRequestSent() {
+        setUpAdjournCaseMocks();
         PreSubmitCallbackResponse<SscsCaseData> response = cannotBeListedAndNoDirectionsGiven();
 
         assertHearingCreatedAndAdjournmentInProgress(response);
@@ -198,6 +200,7 @@ class AdjournCaseAboutToSubmitHandlerTest {
         + "then should send a new hearing request in hearings API")
     @Test
     void givenCanBeListedRightAway_thenNewHearingRequestSent() {
+        setUpAdjournCaseMocks();
         PreSubmitCallbackResponse<SscsCaseData> response = canBeListed();
 
         assertHearingCreatedAndAdjournmentInProgress(response);
@@ -215,6 +218,7 @@ class AdjournCaseAboutToSubmitHandlerTest {
         + "and directions are being made, then should not send any messages")
     @Test
     void givenCaseCannotBeListedRightAwayAndDirectionsAreBeingMade_thenNoMessagesSent() {
+        setUpAdjournCaseMocks();
         PreSubmitCallbackResponse<SscsCaseData> response = cannotBeListedAndDirectionsGiven();
 
         verifyNoInteractions(hearingMessageHelper);
