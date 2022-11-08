@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service.adjourncase;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.nullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
 
 import java.util.Arrays;
@@ -41,6 +39,7 @@ public class AdjournCaseServiceTest {
             .adjournCaseNextHearingFirstAvailableDateAfterPeriod("")
             .adjournCaseReasons(List.of(new CollectionItem<>(null, "")))
             .adjournCaseAdditionalDirections(List.of(new CollectionItem<>(null, "")))
+            .adjournment(Adjournment.builder().build())
             .build();
 
     @Test
@@ -52,32 +51,33 @@ public class AdjournCaseServiceTest {
     }
 
     private void verifyTemporaryAdjournCaseFieldsAreCleared(SscsCaseData sscsCaseData) {
-        assertThat(sscsCaseData.getAdjournCaseDirectionsDueDate(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseGenerateNotice(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseTypeOfHearing(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseCanCaseBeListedRightAway(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseDirectionsDueDate(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseTypeOfNextHearing(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseNextHearingVenue(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseNextHearingVenueSelected(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCasePanelMembersExcluded(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseDisabilityQualifiedPanelMemberName(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseMedicallyQualifiedPanelMemberName(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseOtherPanelMemberName(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseNextHearingListingDurationType(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseNextHearingListingDuration(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseNextHearingListingDurationUnits(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseInterpreterRequired(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseInterpreterLanguage(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseNextHearingDateType(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseNextHearingDateOrPeriod(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseNextHearingDateOrTime(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseNextHearingFirstAvailableDateAfterDate(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseNextHearingFirstAvailableDateAfterPeriod(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseTime(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseReasons(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseAdditionalDirections(), is(nullValue()));
+        assertThat(sscsCaseData.getAdjournCaseDirectionsDueDate()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseGenerateNotice()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseTypeOfHearing()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseCanCaseBeListedRightAway()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseDirectionsDueDate()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseTypeOfNextHearing()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseNextHearingVenue()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseNextHearingVenueSelected()).isNull();
+        assertThat(sscsCaseData.getAdjournCasePanelMembersExcluded()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseDisabilityQualifiedPanelMemberName()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseMedicallyQualifiedPanelMemberName()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseOtherPanelMemberName()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseNextHearingListingDurationType()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseNextHearingListingDuration()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseNextHearingListingDurationUnits()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseInterpreterRequired()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseInterpreterLanguage()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseNextHearingDateType()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseNextHearingDateOrPeriod()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseNextHearingDateOrTime()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseNextHearingFirstAvailableDateAfterDate()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseNextHearingFirstAvailableDateAfterPeriod()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseTime()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseReasons()).isNull();
+        assertThat(sscsCaseData.getAdjournCaseAdditionalDirections()).isNull();
+        assertThat(sscsCaseData.getAdjournment()).isNull();
     }
 }

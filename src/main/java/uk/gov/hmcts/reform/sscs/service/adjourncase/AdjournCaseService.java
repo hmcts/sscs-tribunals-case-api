@@ -38,5 +38,6 @@ public class AdjournCaseService {
         sscsCaseData.setAdjournCaseTime(null);
         sscsCaseData.setAdjournCaseReasons(null);
         sscsCaseData.setAdjournCaseAdditionalDirections(null);
+        sscsCaseData.setIsAdjournmentInProgress(null);
     }
 }
