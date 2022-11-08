@@ -39,7 +39,7 @@ public class AdjournCaseServiceTest {
             .adjournCaseNextHearingFirstAvailableDateAfterPeriod("")
             .adjournCaseReasons(List.of(new CollectionItem<>(null, "")))
             .adjournCaseAdditionalDirections(List.of(new CollectionItem<>(null, "")))
-            .adjournment(Adjournment.builder().build())
+            .isAdjournmentInProgress(YesNo.YES)
             .build();
 
     @Test
@@ -78,6 +78,6 @@ public class AdjournCaseServiceTest {
         assertThat(sscsCaseData.getAdjournCaseTime()).isNull();
         assertThat(sscsCaseData.getAdjournCaseReasons()).isNull();
         assertThat(sscsCaseData.getAdjournCaseAdditionalDirections()).isNull();
-        assertThat(sscsCaseData.getAdjournment()).isNull();
+        assertThat(sscsCaseData.getIsAdjournmentInProgress()).isNull();
     }
 }

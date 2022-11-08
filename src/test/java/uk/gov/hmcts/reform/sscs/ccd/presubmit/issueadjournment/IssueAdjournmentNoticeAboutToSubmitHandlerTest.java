@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
@@ -70,13 +69,15 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
             .buildValidatorFactory()
             .getValidator();
 
-    @BeforeEach
-    void setUp() {
-        openMocks(this);
-        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, validator);
-
+    private void setUpIssueAdjournmentNoticeMocks() {
         when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT_NOTICE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+    }
+
+    @BeforeEach
+    void setUp() {
+        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, validator);
 
         List<SscsDocument> documentList = new ArrayList<>();
 
@@ -114,8 +115,6 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
             .adjournCaseAdditionalDirections(List.of(new CollectionItem<>(null, "")))
             .isAdjournmentInProgress(YES)
         .build();
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
     @Test
@@ -126,6 +125,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
 
     @Test
     void givenAnIssueAdjournmentEvent_thenCreateAdjournmentWithFooterAndSetStatesAndClearDraftDoc() {
+        setUpIssueAdjournmentNoticeMocks();
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         sscsCaseData.setAdjournCasePreviewDocument(docLink);
@@ -134,7 +134,6 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(ADJOURNMENT_NOTICE), any(), eq(null), eq(null), eq(null));
-
 
         assertThat(this.sscsCaseData.getDwpState()).isEqualTo(DwpState.ADJOURNMENT_NOTICE_ISSUED.getId());
         assertThat(this.sscsCaseData.getDirectionDueDate()).isEqualTo(LocalDate.now().plusDays(1).toString());
@@ -176,6 +175,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
 
     @Test
     void givenAnIssueAdjournmentEvent_thenCreateAdjournmentWithFooterAndTranslationRequired() {
+        setUpIssueAdjournmentNoticeMocks();
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         callback.getCaseDetails().getCaseData().setAdjournCasePreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().setAdjournCaseDirectionsDueDate(LocalDate.now().plusDays(1).toString());
@@ -185,7 +185,6 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
 
         verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(ADJOURNMENT_NOTICE), any(), eq(null), eq(null), eq(TRANSLATION_REQUIRED));
 
-
         assertThat(sscsCaseData.getDwpState()).isNull();
         assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.WELSH_TRANSLATION.getId());
         assertThat(sscsCaseData.getTranslationWorkOutstanding()).isEqualTo("Yes");
@@ -193,6 +192,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
 
     @Test
     void givenAnIssueAdjournmentEventWithDueDate_thenCreateAdjournmentWithGivenDueDate() {
+        setUpIssueAdjournmentNoticeMocks();
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         callback.getCaseDetails().getCaseData().setAdjournCasePreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().setAdjournCaseDirectionsDueDate(LocalDate.now().plusDays(1).toString());
@@ -204,6 +204,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
 
     @Test
     void givenAnIssueAdjournmentEventWithDueDateDaysOffset_thenCreateAdjournmentWithGivenDueDateOffset() {
+        setUpIssueAdjournmentNoticeMocks();
         callback.getCaseDetails().getCaseData().setAdjournCaseDirectionsDueDateDaysOffset("7");
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -213,6 +214,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
 
     @Test
     void givenAnIssueAdjournmentEventWithDirectionsToAllParties_thenSetStateToNotListable() {
+        setUpIssueAdjournmentNoticeMocks();
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         callback.getCaseDetails().getCaseData().setAdjournCasePreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().setAdjournCaseAreDirectionsBeingMadeToParties("Yes");
@@ -224,6 +226,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
 
     @Test
     void givenAnIssueAdjournmentEventWithNoDirections_thenSetStateToReadyToList() {
+        setUpIssueAdjournmentNoticeMocks();
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         callback.getCaseDetails().getCaseData().setAdjournCasePreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().setAdjournCaseAreDirectionsBeingMadeToParties("No");
@@ -235,6 +238,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
 
     @Test
     void givenAnIssueAdjournmentEventForWelshCase0_thenTheCaseStateShoyleStayUnchanged() {
+        setUpIssueAdjournmentNoticeMocks();
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         callback.getCaseDetails().getCaseData().setAdjournCasePreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("yes");
@@ -246,6 +250,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
 
     @Test
     void givenAnIssueAdjournmentEventAndNoDraftAdjournmentOnCase_thenDisplayAnError() {
+        setUpIssueAdjournmentNoticeMocks();
         callback.getCaseDetails().getCaseData().setAdjournCasePreviewDocument(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -256,6 +261,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
 
     @Test
     void givenANonPdfDecisionNotice_thenDisplayAnError() {
+        setUpIssueAdjournmentNoticeMocks();
         DocumentLink docLink = DocumentLink.builder().documentUrl("test.doc").build();
         sscsCaseData.setAdjournCasePreviewDocument(docLink);
 
