@@ -106,7 +106,21 @@ task functional(type: Test) {
     exclude "uk/gov/hmcts/reform/sscs/smoke/**"
 }
 
+task smoke(type: Test) {
+    group = 'verification'
+    description = 'Executes non-destructive smoke tests against a running Tribual Case API'
+    setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
+    setClasspath(sourceSets.functionalTest.runtimeClasspath)
+    include "uk/gov/hmcts/reform/sscs/smoke/**"
+    exclude "uk/gov/hmcts/reform/sscs/functional/**"
+}
 
+task contract(type: Test, description: 'Runs the pact contract tests.', group: 'Verification') {
+    description = "Runs the consumer Pact tests"
+    useJUnitPlatform()
+    testClassesDirs = sourceSets.contractTest.output.classesDirs
+    classpath = sourceSets.contractTest.runtimeClasspath
+}
 
 task fortifyScan(type: JavaExec)  {
     main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
@@ -369,6 +383,7 @@ dependencies {
 
     testImplementation platform(group: 'org.junit', name: 'junit-bom', version: '5.9.1')
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter'
+    testImplementation group: 'org.junit.vintage', name: 'junit-vintage-engine'
 
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.23.1'
 
@@ -425,24 +440,6 @@ pitest {
     timestampedReports = false
     mutationThreshold = 50
 }
-
-task smoke(type: Test) {
-    group = 'verification'
-    description = 'Executes non-destructive smoke tests against a running Tribual Case API'
-    setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
-    setClasspath(sourceSets.functionalTest.runtimeClasspath)
-    include "uk/gov/hmcts/reform/sscs/smoke/**"
-    exclude "uk/gov/hmcts/reform/sscs/functional/**"
-}
-
-task contract(type: Test, description: 'Runs the pact contract tests.', group: 'Verification') {
-    description = "Runs the consumer Pact tests"
-    useJUnitPlatform()
-    testClassesDirs = sourceSets.contractTest.output.classesDirs
-    classpath = sourceSets.contractTest.runtimeClasspath
-}
-
-
 
 project.ext {
     pacticipant = 'sscs_tribunalsCaseApi'
