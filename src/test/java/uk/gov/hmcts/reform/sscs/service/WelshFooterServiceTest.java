@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -68,23 +69,27 @@ public class WelshFooterServiceTest {
         docs.add(document);
 
         sscsCaseData = SscsCaseData.builder()
-                .generateNotice("Yes")
+            .documentGeneration(DocumentGeneration.builder()
+                .generateNotice(YES)
                 .signedBy("User")
-                .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
                 .signedRole("Judge")
+                .build())
+            .documentStaging(DocumentStaging.builder()
                 .dateAdded(LocalDate.now().minusDays(1))
-                .sscsWelshDocuments(docs)
                 .previewDocument(DocumentLink.builder()
-                        .documentUrl("dm-store/documents/123")
-                        .documentBinaryUrl("dm-store/documents/123/binary")
-                        .documentFilename("directionIssued.pdf")
-                        .build())
-                .appeal(Appeal.builder()
-                        .appellant(Appellant.builder()
-                                .name(Name.builder().build())
-                                .identity(Identity.builder().build())
-                                .build())
-                        .build()).build();
+                    .documentUrl("dm-store/documents/123")
+                    .documentBinaryUrl("dm-store/documents/123/binary")
+                    .documentFilename("directionIssued.pdf")
+                    .build())
+                .build())
+            .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
+            .sscsWelshDocuments(docs)
+            .appeal(Appeal.builder()
+                .appellant(Appellant.builder()
+                    .name(Name.builder().build())
+                    .identity(Identity.builder().build())
+                    .build())
+                .build()).build();
     }
 
     @Test

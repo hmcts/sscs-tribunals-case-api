@@ -87,58 +87,62 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         handler = new ProcessAudioVideoEvidenceAboutToSubmitHandler(footerService, userDetailsService);
 
         sscsCaseData = SscsCaseData.builder()
+            .documentGeneration(DocumentGeneration.builder()
                 .signedBy("User")
-                .processAudioVideoAction(new DynamicList(ISSUE_DIRECTIONS_NOTICE.getCode()))
                 .signedRole("Judge")
+                .build())
+            .processAudioVideoAction(new DynamicList(ISSUE_DIRECTIONS_NOTICE.getCode()))
+            .documentStaging(DocumentStaging.builder()
                 .dateAdded(LocalDate.now().minusDays(1))
-                .directionDueDate(LocalDate.now().plusDays(1).toString())
-                .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
                 .previewDocument(DocumentLink.builder()
-                        .documentUrl(DOCUMENT_URL)
-                        .documentBinaryUrl(DOCUMENT_URL + "/binary")
-                        .documentFilename("directionIssued.pdf")
-                        .build())
-                .interlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId())
-                .selectedAudioVideoEvidence(new DynamicList("test.com")).selectedAudioVideoEvidenceDetails(AudioVideoEvidenceDetails.builder()
-                        .documentLink(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
-                        .fileName("music.mp3")
+                    .documentUrl(DOCUMENT_URL)
+                    .documentBinaryUrl(DOCUMENT_URL + "/binary")
+                    .documentFilename("directionIssued.pdf")
+                    .build())
+                .build())
+            .directionDueDate(LocalDate.now().plusDays(1).toString())
+            .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
+            .interlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId())
+            .selectedAudioVideoEvidence(new DynamicList("test.com")).selectedAudioVideoEvidenceDetails(AudioVideoEvidenceDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
+                .fileName("music.mp3")
+                .partyUploaded(UploadParty.APPELLANT)
+                .dateAdded(LocalDate.now())
+                .statementOfEvidencePdf(DocumentLink.builder().documentFilename("statement1.pdf").documentUrl("statement1.url").documentBinaryUrl("statement1.url/binary").build())
+                .build())
+            .audioVideoEvidence(new ArrayList<>(Arrays.asList(AudioVideoEvidence.builder().value(
+                AudioVideoEvidenceDetails.builder()
+                    .documentLink(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
+                    .fileName("music.mp3")
+                    .partyUploaded(UploadParty.APPELLANT)
+                    .dateAdded(LocalDate.now())
+                    .statementOfEvidencePdf(DocumentLink.builder().documentFilename("statement1.pdf").build())
+                    .build())
+                .build(),
+                AudioVideoEvidence.builder().value(
+                    AudioVideoEvidenceDetails.builder()
+                        .documentLink(DocumentLink.builder().documentFilename("music1.mp3").documentUrl("test1.com").documentBinaryUrl("test.com/binary").build())
+                        .fileName("music1.mp3")
                         .partyUploaded(UploadParty.APPELLANT)
                         .dateAdded(LocalDate.now())
-                        .statementOfEvidencePdf(DocumentLink.builder().documentFilename("statement1.pdf").documentUrl("statement1.url").documentBinaryUrl("statement1.url/binary").build())
                         .build())
-                .audioVideoEvidence(new ArrayList<>(Arrays.asList(AudioVideoEvidence.builder().value(
-                        AudioVideoEvidenceDetails.builder()
-                                .documentLink(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
-                                .fileName("music.mp3")
-                                .partyUploaded(UploadParty.APPELLANT)
-                                .dateAdded(LocalDate.now())
-                                .statementOfEvidencePdf(DocumentLink.builder().documentFilename("statement1.pdf").build())
-                            .build())
-                        .build(),
-                        AudioVideoEvidence.builder().value(
-                                AudioVideoEvidenceDetails.builder()
-                                        .documentLink(DocumentLink.builder().documentFilename("music1.mp3").documentUrl("test1.com").documentBinaryUrl("test.com/binary").build())
-                                        .fileName("music1.mp3")
-                                        .partyUploaded(UploadParty.APPELLANT)
-                                        .dateAdded(LocalDate.now())
-                                        .build())
-                                .build())))
-                .appeal(Appeal.builder()
-                        .appellant(Appellant.builder()
-                                .name(Name.builder().firstName("APPELLANT")
-                                        .lastName("LastNamE")
-                                        .build())
-                                .identity(Identity.builder().build())
-                                .build())
-                        .build()).build();
+                    .build())))
+            .appeal(Appeal.builder()
+                .appellant(Appellant.builder()
+                    .name(Name.builder().firstName("APPELLANT")
+                        .lastName("LastNamE")
+                        .build())
+                    .identity(Identity.builder().build())
+                    .build())
+                .build()).build();
 
         expectedDocument = SscsDocument.builder()
-                .value(SscsDocumentDetails.builder()
-                        .documentFileName(sscsCaseData.getPreviewDocument().getDocumentFilename())
-                        .documentLink(sscsCaseData.getPreviewDocument())
-                        .documentDateAdded(LocalDate.now().minusDays(1).toString())
-                        .documentType(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE.getValue())
-                        .build()).build();
+            .value(SscsDocumentDetails.builder()
+                .documentFileName(sscsCaseData.getDocumentStaging().getPreviewDocument().getDocumentFilename())
+                .documentLink(sscsCaseData.getDocumentStaging().getPreviewDocument())
+                .documentDateAdded(LocalDate.now().minusDays(1).toString())
+                .documentType(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE.getValue())
+                .build()).build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getEvent()).thenReturn(EventType.PROCESS_AUDIO_VIDEO);
@@ -177,7 +181,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
 
     @Test
     public void shouldShowError_whenThereIsNoPreviewDocument() {
-        sscsCaseData.setPreviewDocument(null);
+        sscsCaseData.getDocumentStaging().setPreviewDocument(null);
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
@@ -189,11 +193,11 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(ADMIT_EVIDENCE.getCode()));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getPreviewDocument());
-        assertNull(response.getData().getSignedBy());
-        assertNull(response.getData().getSignedRole());
-        assertNull(response.getData().getGenerateNotice());
-        assertNull(response.getData().getDateAdded());
+        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
+        assertNull(response.getData().getDocumentGeneration().getSignedBy());
+        assertNull(response.getData().getDocumentGeneration().getSignedRole());
+        assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
+        assertNull(response.getData().getDocumentStaging().getDateAdded());
         assertNull(response.getData().getReservedToJudge());
 
         DocumentLink expectedDocumentLink = DocumentLink.builder().documentFilename("statement1.pdf").documentUrl("statement1.url").documentBinaryUrl("statement1.url/binary").build();
@@ -234,11 +238,11 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setSscsDocument(sscsDocuments);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getPreviewDocument());
-        assertNull(response.getData().getSignedBy());
-        assertNull(response.getData().getSignedRole());
-        assertNull(response.getData().getGenerateNotice());
-        assertNull(response.getData().getDateAdded());
+        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
+        assertNull(response.getData().getDocumentGeneration().getSignedBy());
+        assertNull(response.getData().getDocumentGeneration().getSignedRole());
+        assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
+        assertNull(response.getData().getDocumentStaging().getDateAdded());
         assertNull(response.getData().getReservedToJudge());
 
         DocumentLink expectedDocumentLink = DocumentLink.builder().documentFilename("statement1.pdf").documentUrl("statement1.url").documentBinaryUrl("statement1.url/binary").build();
@@ -305,11 +309,11 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setSscsDocument(sscsDocuments);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getPreviewDocument());
-        assertNull(response.getData().getSignedBy());
-        assertNull(response.getData().getSignedRole());
-        assertNull(response.getData().getGenerateNotice());
-        assertNull(response.getData().getDateAdded());
+        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
+        assertNull(response.getData().getDocumentGeneration().getSignedBy());
+        assertNull(response.getData().getDocumentGeneration().getSignedRole());
+        assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
+        assertNull(response.getData().getDocumentStaging().getDateAdded());
         assertNull(response.getData().getReservedToJudge());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
@@ -369,11 +373,11 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setAudioVideoEvidence(videoList);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getPreviewDocument());
-        assertNull(response.getData().getSignedBy());
-        assertNull(response.getData().getSignedRole());
-        assertNull(response.getData().getGenerateNotice());
-        assertNull(response.getData().getDateAdded());
+        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
+        assertNull(response.getData().getDocumentGeneration().getSignedBy());
+        assertNull(response.getData().getDocumentGeneration().getSignedRole());
+        assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
+        assertNull(response.getData().getDocumentStaging().getDateAdded());
         assertNull(response.getData().getReservedToJudge());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
@@ -410,11 +414,11 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setAudioVideoEvidence(videoList);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getPreviewDocument());
-        assertNull(response.getData().getSignedBy());
-        assertNull(response.getData().getSignedRole());
-        assertNull(response.getData().getGenerateNotice());
-        assertNull(response.getData().getDateAdded());
+        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
+        assertNull(response.getData().getDocumentGeneration().getSignedBy());
+        assertNull(response.getData().getDocumentGeneration().getSignedRole());
+        assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
+        assertNull(response.getData().getDocumentStaging().getDateAdded());
         assertNull(response.getData().getReservedToJudge());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
@@ -469,11 +473,11 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setDwpDocuments(dwpDocuments);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getPreviewDocument());
-        assertNull(response.getData().getSignedBy());
-        assertNull(response.getData().getSignedRole());
-        assertNull(response.getData().getGenerateNotice());
-        assertNull(response.getData().getDateAdded());
+        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
+        assertNull(response.getData().getDocumentGeneration().getSignedBy());
+        assertNull(response.getData().getDocumentGeneration().getSignedRole());
+        assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
+        assertNull(response.getData().getDocumentStaging().getDateAdded());
         assertNull(response.getData().getReservedToJudge());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
@@ -498,11 +502,11 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(EXCLUDE_EVIDENCE.getCode()));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getPreviewDocument());
-        assertNull(response.getData().getSignedBy());
-        assertNull(response.getData().getSignedRole());
-        assertNull(response.getData().getGenerateNotice());
-        assertNull(response.getData().getDateAdded());
+        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
+        assertNull(response.getData().getDocumentGeneration().getSignedBy());
+        assertNull(response.getData().getDocumentGeneration().getSignedRole());
+        assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
+        assertNull(response.getData().getDocumentStaging().getDateAdded());
         assertNull(response.getData().getReservedToJudge());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
@@ -518,11 +522,11 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.getAudioVideoEvidence().remove(1);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getPreviewDocument());
-        assertNull(response.getData().getSignedBy());
-        assertNull(response.getData().getSignedRole());
-        assertNull(response.getData().getGenerateNotice());
-        assertNull(response.getData().getDateAdded());
+        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
+        assertNull(response.getData().getDocumentGeneration().getSignedBy());
+        assertNull(response.getData().getDocumentGeneration().getSignedRole());
+        assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
+        assertNull(response.getData().getDocumentStaging().getDateAdded());
         assertNull(response.getData().getReservedToJudge());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
@@ -651,11 +655,11 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setAudioVideoEvidence(videoList);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getPreviewDocument());
-        assertNull(response.getData().getSignedBy());
-        assertNull(response.getData().getSignedRole());
-        assertNull(response.getData().getGenerateNotice());
-        assertNull(response.getData().getDateAdded());
+        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
+        assertNull(response.getData().getDocumentGeneration().getSignedBy());
+        assertNull(response.getData().getDocumentGeneration().getSignedRole());
+        assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
+        assertNull(response.getData().getDocumentStaging().getDateAdded());
         assertNull(response.getData().getReservedToJudge());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));

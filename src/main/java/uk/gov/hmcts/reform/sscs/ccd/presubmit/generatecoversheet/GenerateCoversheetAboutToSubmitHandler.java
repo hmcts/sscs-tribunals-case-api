@@ -29,7 +29,7 @@ public class GenerateCoversheetAboutToSubmitHandler implements PreSubmitCallback
         }
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        caseData.setPreviewDocument(null);
+        caseData.getDocumentStaging().setPreviewDocument(null);
 
         return new PreSubmitCallbackResponse<>(caseData);
     }

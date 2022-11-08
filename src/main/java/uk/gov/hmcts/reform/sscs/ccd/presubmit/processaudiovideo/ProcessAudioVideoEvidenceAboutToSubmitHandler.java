@@ -76,7 +76,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         }
 
         if (ACTIONS_THAT_REQUIRES_NOTICE.contains(caseData.getProcessAudioVideoAction().getValue().getCode())) {
-            if (isNull(caseData.getPreviewDocument())) {
+            if (isNull(caseData.getDocumentStaging().getPreviewDocument())) {
                 response.addError("There is no document notice");
             } else {
                 addDirectionNotice(caseData);
@@ -101,12 +101,12 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     }
 
     private void addDirectionNotice(SscsCaseData caseData) {
-        DocumentLink url = caseData.getPreviewDocument();
+        DocumentLink url = caseData.getDocumentStaging().getPreviewDocument();
         SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
         footerService.createFooterAndAddDocToCase(url, caseData, AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE,
-                Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now())
+                Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now())
                         .format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-                caseData.getDateAdded(), null, documentTranslationStatus);
+                caseData.getDocumentStaging().getDateAdded(), null, documentTranslationStatus);
     }
 
     private void processIfIssueDirectionNotice(SscsCaseData caseData) {
@@ -330,21 +330,15 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     }
 
     private void clearEmptyAudioVideoList(SscsCaseData caseData) {
-        if (caseData.getAudioVideoEvidence() != null && caseData.getAudioVideoEvidence().size() == 0) {
+        if (caseData.getAudioVideoEvidence() != null && caseData.getAudioVideoEvidence().isEmpty()) {
             caseData.setAudioVideoEvidence(null);
         }
     }
 
     private void clearTransientFields(SscsCaseData caseData) {
-        caseData.setBodyContent(null);
-        caseData.setDirectionNoticeContent(null);
-        caseData.setPreviewDocument(null);
-        caseData.setGenerateNotice(null);
+        caseData.setDocumentGeneration(DocumentGeneration.builder().build());
+        caseData.setDocumentStaging(DocumentStaging.builder().build());
         caseData.setReservedToJudge(null);
-        caseData.setGenerateNotice(null);
-        caseData.setSignedBy(null);
-        caseData.setSignedRole(null);
-        caseData.setDateAdded(null);
         caseData.setTempNoteDetail(null);
         caseData.setSelectedAudioVideoEvidenceDetails(null);
         caseData.setShowRip1DocPage(null);

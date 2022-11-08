@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.ISSUE_DIRECTIONS_NOTICE;
 
 import java.time.LocalDate;
@@ -72,12 +73,15 @@ public class ActionPostponementRequestMidEventHandlerTest {
         handler = new ActionPostponementRequestMidEventHandler(generateFile, documentConfiguration);
 
         sscsCaseData = SscsCaseData.builder()
-                .generateNotice("Yes").appeal(Appeal.builder().appellant(Appellant.builder()
-                        .name(Name.builder().firstName("APPELLANT").lastName("LastNamE").build())
-                        .identity(Identity.builder().build()).build()).build())
-                .directionDueDate(LocalDate.now().plusDays(1).toString())
-                .postponementRequest(PostponementRequest.builder().build())
-                .build();
+            .documentGeneration(DocumentGeneration.builder()
+                .generateNotice(YES)
+                .build())
+            .appeal(Appeal.builder().appellant(Appellant.builder()
+                    .name(Name.builder().firstName("APPELLANT").lastName("LastNamE").build())
+                    .identity(Identity.builder().build()).build()).build())
+            .directionDueDate(LocalDate.now().plusDays(1).toString())
+            .postponementRequest(PostponementRequest.builder().build())
+            .build();
 
         capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -112,14 +116,14 @@ public class ActionPostponementRequestMidEventHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
-        assertThat(response.getData().getPreviewDocument(), is(notNullValue()));
+        assertThat(response.getData().getDocumentStaging().getPreviewDocument(), is(notNullValue()));
         final DocumentLink expectedDocumentLink = DocumentLink.builder()
                 .documentFilename(String.format("Directions Notice issued on %s.pdf",
                         LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
                 .documentBinaryUrl(URL + "/binary")
                 .documentUrl(URL)
                 .build();
-        assertThat(response.getData().getPreviewDocument(), is(expectedDocumentLink));
+        assertThat(response.getData().getDocumentStaging().getPreviewDocument(), is(expectedDocumentLink));
 
         verify(generateFile, times(1)).assemble(any());
         verifyTemplateBody(

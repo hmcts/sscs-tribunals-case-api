@@ -1,14 +1,20 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import java.util.regex.Pattern;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -16,27 +22,41 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 
 public class PreviewDocumentServiceTest {
 
+    public static final String OLD_DRAFT_DOC = "oldDraft.doc";
+    @InjectMocks
     private PreviewDocumentService previewDocumentService;
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setup() {
-        previewDocumentService = new PreviewDocumentService();
-        sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
-                .appeal(Appeal.builder().build())
-                .build();
+        openMocks(this);
+        List<SscsDocument> docs = new ArrayList<>(List.of(
+            SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                    .documentFileName(OLD_DRAFT_DOC)
+                    .documentType(DRAFT_ADJOURNMENT_NOTICE.getValue())
+                    .build())
+                .build()
+        ));
+        sscsCaseData = SscsCaseData.builder()
+            .ccdCaseId("ccdId")
+            .appeal(Appeal.builder().build())
+            .sscsDocument(docs)
+            .build();
     }
 
+    @DisplayName("Given draft adjournment notice already exists on case, then overwrite existing draft")
     @Test
-    public void givenDraftFinalDecisionAlreadyExistsOnCase_thenOverwriteExistingDraft() {
-        SscsDocument doc = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("oldDraft.doc").documentType(DRAFT_ADJOURNMENT_NOTICE.getValue()).build()).build();
-        List<SscsDocument> docs = new ArrayList<>();
-        docs.add(doc);
-        sscsCaseData.setSscsDocument(docs);
-
+    public void givenDraftAdjournmentNoticeAlreadyExists_thenOverwritesExistingDraft() {
         previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, sscsCaseData.getAdjournCasePreviewDocument());
 
-        assertEquals(1, sscsCaseData.getSscsDocument().size());
-        assertEquals((String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))), sscsCaseData.getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertThat(sscsCaseData.getSscsDocument())
+            .hasSize(1)
+            .extracting(AbstractDocument::getValue)
+            .extracting(AbstractDocumentDetails::getDocumentFileName)
+            .allSatisfy(fileName -> {
+                assertThat(fileName).containsPattern(Pattern.compile("Draft Adjournment Notice generated on \\d{1,2}-\\d{1,2}-\\d{4}\\.pdf"));
+                assertThat(fileName).contains(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+            });
     }
 }
