@@ -1,15 +1,9 @@
-buildscript {
-    dependencies {
-        classpath("net.serenity-bdd:serenity-gradle-plugin:2.6.0")
-    }
-}
-
 plugins {
     id 'application'
     id 'pmd'
     id 'org.sonarqube' version '3.4.0.2513'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.3.5.RELEASE'
+    id 'org.springframework.boot' version '2.7.5'
     id 'uk.gov.hmcts.java' version '0.12.32'
     id 'com.gorylenko.gradle-git-properties' version '2.3.1'
     id 'com.github.ben-manes.versions' version '0.39.0'
@@ -68,11 +62,11 @@ sourceSets {
             srcDir('src/IntegrationTests/resources')
         }
     }
-    e2e {
+    functionalTest {
         java {
             compileClasspath += main.output + test.output
             runtimeClasspath += main.output + test.output
-            srcDir('src/e2e/java')
+            srcDir('src/functionalTest/java')
         }
     }
     contractTest {
@@ -87,7 +81,7 @@ sourceSets {
 
 dependencies {
     integrationTestImplementation(sourceSets.test.output)
-    e2eImplementation(sourceSets.test.output)
+    functionalTestImplementation(sourceSets.test.output)
 }
 
 tasks.withType(Test) {
@@ -104,11 +98,10 @@ task integration(type: Test) {
 }
 
 task functional(type: Test) {
-    useJUnitPlatform()
     group = 'Functional Tests'
     description = 'Executes non-destructive functional tests in AAT against a running CCD and notification service'
-    setTestClassesDirs(sourceSets.e2e.output.classesDirs)
-    setClasspath(sourceSets.e2e.runtimeClasspath)
+    setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
+    setClasspath(sourceSets.functionalTest.runtimeClasspath)
     include "uk/gov/hmcts/reform/sscs/functional/**"
     exclude "uk/gov/hmcts/reform/sscs/smoke/**"
 }
@@ -222,125 +215,17 @@ sonarqube {
 configurations {
     integrationTestImplementation.extendsFrom(testImplementation)
     integrationTestRuntimeOnly.extendsFrom(testRuntimeOnly)
-    e2eImplementation.extendsFrom(testImplementation)
-    e2eRuntimeOnly.extendsFrom(testRuntimeOnly)
+    functionalTestImplementation.extendsFrom(testImplementation)
+    functionalTestRuntimeOnly.extendsFrom(testRuntimeOnly)
     contractTestImplementation.extendsFrom(testImplementation)
     contractTestRuntimeOnly.extendsFrom(testRuntimeOnly)
 }
 
-ext["rest-assured.version"] = '4.2.0'
-
 dependencyManagement {
     dependencies {
-        dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
-        dependency group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.2'
-        dependency group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.17.2'
-
-        // resolves: CVE-2020-28052
-        dependency group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.69'
-        //CVE-2021-40690
-        dependency group: 'org.apache.santuario', name: 'xmlsec', version: '2.3.0'
-
-        // resolves: CVE-2019-10101, CVE-2019-10102, CVE-2019-10103, CVE-2020-15824
-        dependencySet(group: 'org.jetbrains.kotlin', version: '1.6.10') {
-            entry 'kotlin-stdlib'
-            entry 'kotlin-stdlib-common'
-            entry 'kotlin-stdlib-jdk8'
-            entry 'kotlin-stdlib-jdk7'
-            entry 'kotlin-reflect'
-        }
-        // CVE-2020-13934, CVE-2020-13935, CVE-2020-17527, CVE-2020-17527,
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.68') {
-            entry 'tomcat-embed-core'
-            entry 'tomcat-embed-el'
-            entry 'tomcat-annotations-api'
-            entry 'tomcat-embed-websocket'
-        }
-
-        // CVE-2020-17521
-        dependencySet(group: 'org.codehaus.groovy', version: '3.0.9') {
-            entry 'groovy'
-            entry 'groovy-json'
-            entry 'groovy-xml'
-        }
-
-        //CVE-2021-22112 CVE-2022-22978, CVE-2022-22976
-        dependencySet(group: 'org.springframework.security', version: '5.4.10') {
-            entry 'spring-security-crypto'
-            entry 'spring-security-config'
-            entry 'spring-security-core'
-            entry 'spring-security-web'
-        }
-
-        dependencySet(group: 'org.apache.xmlgraphics', version: '1.14') {
-            entry 'batik-all'
-        }
-
-        //CVE-2021-22118
-        dependencySet(group: 'org.springframework', version: '5.2.22.RELEASE') {
-            entry 'spring-aop'
-            entry 'spring-aspects'
-            entry 'spring-beans'
-            entry 'spring-context'
-            entry 'spring-context-support'
-            entry 'spring-core'
-            entry 'spring-expression'
-            entry 'spring-jcl'
-            entry 'spring-jdbc'
-            entry 'spring-orm'
-            entry 'spring-tx'
-            entry 'spring-web'
-            entry 'spring-webmvc'
-        }
-
-        dependencySet(group: 'io.netty', version: '4.1.79.Final') {
-            entry 'netty-handler'
-            entry 'netty-transport-native-epoll'
-            entry 'netty-transport-native-kqueue'
-            entry 'netty-codec-http'
-            entry 'netty-codec-http2'
-            entry 'netty-codec-socks'
-            entry 'netty-handler-proxy'
-            entry 'netty-codec'
-            entry 'netty-codec-dns'
-            entry 'netty-transport-native-unix-common'
-            entry 'netty-transport'
-            entry 'netty-buffer'
-            entry 'netty-resolver'
-            entry 'netty-resolver-dns'
-            entry 'netty-resolver-dns-native-macos'
-            entry 'netty-common'
-        }
-
-        //CVE-2021-27568
-        dependencySet(group: 'net.minidev', version: '2.4.7') {
-            entry 'json-smart'
-            entry 'accessors-smart'
-        }
-
-        //CVE-2021-30468
-        dependencySet(group: 'org.apache.cxf', version: '3.4.5') {
-            entry 'cxf-core'
-            entry 'cxf-rt-frontend-jaxrs'
-            entry 'cxf-rt-rs-client'
-            entry 'cxf-rt-security'
-            entry 'cxf-rt-transports-http'
-        }
-
-        //CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
-        dependencySet(group: 'org.apache.commons', version: '1.21') {
-            entry 'commons-compress'
-        }
-
         //CVE-2022-25857
         dependencySet(group: 'org.yaml', version: '1.33') {
             entry 'snakeyaml'
-        }
-
-        //CVE-2021-42550
-        dependencySet(group: 'ch.qos.logback', version: '1.2.11') {
-            entry 'logback-core'
-            entry 'logback-classic'
         }
 
         //CVE-2020-36518, CVE-2022-42003, CVE-2022-42004
@@ -364,11 +249,8 @@ dependencyManagement {
             entry 'jackson-dataformat-smile'
         }
 
-
-        dependency group: 'commons-io', name: 'commons-io', version: '2.11.0'
-
         imports {
-            mavenBom "org.springframework.cloud:spring-cloud-dependencies:Hoxton.SR12"
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:2021.0.4"
         }
     }
 }
@@ -381,10 +263,16 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail'
 
+    implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.7.5'
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.5'
+    implementation group: 'org.springframework.security', name: 'spring-security-config', version: '5.7.5'
+    implementation group: 'org.springframework.security', name: 'spring-security-web', version: '5.7.5'
+
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.1'
+
     implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
-    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.3'
+    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.6'
 
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.3'
     implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.1'
@@ -422,7 +310,9 @@ dependencies {
     implementation group:'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.9.0'
     implementation group:'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: '0.5'
 
-    testImplementation group: 'io.rest-assured', name: 'rest-assured'
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.2.0'
+    testImplementation group: 'io.rest-assured', name: 'xml-path', version: '5.2.0'
+    testImplementation group: 'io.rest-assured', name: 'json-path', version: '5.2.0'
     testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.3.0', classifier: 'all', {
         exclude group: 'commons-io', module: 'commons-io'
     }
@@ -444,7 +334,7 @@ dependencies {
 
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
 
-    e2eImplementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
+    functionalTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
 
     implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
@@ -473,8 +363,8 @@ dependencies {
 
     testImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
-    e2eImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
-    e2eAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
+    functionalTestImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
+    functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
     integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
 
     testImplementation platform(group: 'org.junit', name: 'junit-bom', version: '5.9.1')
@@ -539,8 +429,8 @@ pitest {
 task smoke(type: Test) {
     group = 'verification'
     description = 'Executes non-destructive smoke tests against a running Tribual Case API'
-    setTestClassesDirs(sourceSets.e2e.output.classesDirs)
-    setClasspath(sourceSets.e2e.runtimeClasspath)
+    setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
+    setClasspath(sourceSets.functionalTest.runtimeClasspath)
     include "uk/gov/hmcts/reform/sscs/smoke/**"
     exclude "uk/gov/hmcts/reform/sscs/functional/**"
 }
@@ -592,7 +482,6 @@ static def getCheckedOutGitCommitHash() {
     'git rev-parse --verify --short HEAD'.execute().text.trim()
 }
 
-apply plugin: 'org.springframework.boot'
 run {
     def debug = System.getProperty("debug")
     if (debug == 'true') {
