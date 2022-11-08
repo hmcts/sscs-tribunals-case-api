@@ -386,6 +386,8 @@ dependencies {
     testImplementation group: 'org.junit.vintage', name: 'junit-vintage-engine'
 
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.23.1'
+    // https://mvnrepository.com/artifact/org.awaitility/awaitility
+    testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.2.0'
 
     //pact contract testing
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.15'
