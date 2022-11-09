@@ -57,11 +57,11 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
 
         final PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         DocumentLink url = null;
-        if (nonNull(callback.getCaseDetails().getCaseData().getPreviewDocument()) && callback.getEvent() == EventType.DECISION_ISSUED) {
-            url = caseData.getPreviewDocument();
+        if (nonNull(callback.getCaseDetails().getCaseData().getDocumentStaging().getPreviewDocument()) && callback.getEvent() == EventType.DECISION_ISSUED) {
+            url = caseData.getDocumentStaging().getPreviewDocument();
         } else if (caseData.getSscsInterlocDecisionDocument() != null && callback.getEvent() == EventType.DECISION_ISSUED) {
             url = caseData.getSscsInterlocDecisionDocument().getDocumentLink();
-            caseData.setDateAdded(caseData.getSscsInterlocDecisionDocument().getDocumentDateAdded());
+            caseData.getDocumentStaging().setDateAdded(caseData.getSscsInterlocDecisionDocument().getDocumentDateAdded());
             if (!isFileAPdf(caseData.getSscsInterlocDecisionDocument().getDocumentLink())) {
                 sscsCaseDataPreSubmitCallbackResponse.addError("You need to upload PDF documents only");
                 return sscsCaseDataPreSubmitCallbackResponse;
@@ -77,9 +77,9 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
 
         if (callback.getEvent() == EventType.DECISION_ISSUED) {
             footerService.createFooterAndAddDocToCase(url, caseData, DocumentType.DECISION_NOTICE,
-                Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now())
+                Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now())
                     .format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-                caseData.getDateAdded(), null, documentTranslationStatus);
+                caseData.getDocumentStaging().getDateAdded(), null, documentTranslationStatus);
         }
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {

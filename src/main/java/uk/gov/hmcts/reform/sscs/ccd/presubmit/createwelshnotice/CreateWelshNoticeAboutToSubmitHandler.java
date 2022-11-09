@@ -81,7 +81,8 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
     private void createNoticeAndUpload(Callback<SscsCaseData> callback, SscsCaseData caseData) {
 
         Map<String, Object> placeholderMap = caseDataMap(callback.getCaseDetails().getCaseData());
-        LocalDate dateAdded = Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now());
+        LocalDate dateAdded =
+            Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now());
         final String filename = String.format("%s on %s.pdf", caseData.getDocumentTypes().getValue().getCode(),
                 dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
         byte[] content = docmosisPdfService.createPdf(placeholderMap, directionTemplatePath);
@@ -133,7 +134,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
 
     private Map<String, Object> caseDataMap(SscsCaseData caseData) {
         Map<String, Object> dataMap = new HashMap<>();
-        LocalDate dateAdded = Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now());
+        LocalDate dateAdded = Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now());
         String documentTypeLabel = getEnglishNoticeType(caseData.getDocumentTypes().getValue().getLabel() != null ? caseData.getDocumentTypes().getValue().getLabel() : caseData.getDocumentTypes().getValue().getCode());
 
         dataMap.put("appellant_full_name", buildFullName(caseData));
@@ -143,8 +144,8 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
         dataMap.put("cy_notice_type", getWelshNoticeType(documentTypeLabel));
         dataMap.put("en_notice_body", caseData.getEnglishBodyContent());
         dataMap.put("cy_notice_body", caseData.getWelshBodyContent());
-        dataMap.put("user_name", caseData.getSignedBy());
-        dataMap.put("user_role", caseData.getSignedRole());
+        dataMap.put("user_name", caseData.getDocumentGeneration().getSignedBy());
+        dataMap.put("user_role", caseData.getDocumentGeneration().getSignedRole());
         dataMap.put("date_added", dateAdded.toString());
         dataMap.put("generated_date", formatter.format(new Date()));
         dataMap.put("welsh_date_added", LocalDateToWelshStringConverter.convert(dateAdded));

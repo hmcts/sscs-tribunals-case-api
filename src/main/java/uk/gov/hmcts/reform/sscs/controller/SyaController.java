@@ -19,7 +19,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
@@ -115,12 +123,12 @@ public class SyaController {
 
 
     @Operation(summary = "getDraftAppeal", description = "Get a draft appeal")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Returns a draft appeal data if it exists.", content = {
-            @Content(schema = @Schema(implementation = SessionDraft.class))}),
-        @ApiResponse(responseCode = "204", description = "The user does not have any draft appeal."),
-        @ApiResponse(responseCode = "500", description = "Most probably the user is unauthorised.")
-    })
+    @ApiResponses(value =
+        {@ApiResponse(responseCode = "200", description = "Returns a draft appeal data if it exists.", content = {
+            @Content(schema = @Schema(implementation = SessionDraft.class))
+        }),
+            @ApiResponse(responseCode = "204", description = "The user does not have any draft appeal."),
+            @ApiResponse(responseCode = "500", description = "Most probably the user is unauthorised.")})
     @GetMapping(value = "/drafts", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<SessionDraft> getDraftAppeal(@RequestHeader(AUTHORIZATION) String authorisation) {
         Preconditions.checkNotNull(authorisation);
