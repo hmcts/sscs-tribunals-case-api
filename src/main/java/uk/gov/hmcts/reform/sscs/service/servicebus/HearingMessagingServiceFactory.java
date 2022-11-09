@@ -31,7 +31,7 @@ public class HearingMessagingServiceFactory {
     public SessionAwareMessagingService getMessagingService(HearingRoute hearingRoute) {
         if (HearingRoute.LIST_ASSIST == hearingRoute) {
             if (jmsEnabled) {
-                return new JMSMessagingService(jmsTemplate, tribunalsToHearingsQueue);
+                return new JmsMessagingService(jmsTemplate, tribunalsToHearingsQueue);
             } else {
                 return new SessionAwareServiceBusMessagingService(hearingServiceBusClient);
             }

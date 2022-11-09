@@ -2,14 +2,13 @@ package uk.gov.hmcts.reform.sscs.service.servicebus;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import uk.gov.hmcts.reform.sscs.model.servicebus.SessionAwareMessagingService;
 import uk.gov.hmcts.reform.sscs.model.servicebus.SessionAwareRequest;
 
 @Slf4j
 @RequiredArgsConstructor
-public class JMSMessagingService implements SessionAwareMessagingService {
+public class JmsMessagingService implements SessionAwareMessagingService {
 
     private final JmsTemplate jmsTemplate;
 

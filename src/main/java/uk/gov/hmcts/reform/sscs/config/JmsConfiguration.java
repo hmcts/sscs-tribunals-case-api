@@ -19,7 +19,7 @@ import org.springframework.jms.listener.DefaultMessageListenerContainer;
 @Configuration
 @EnableJms
 @ConditionalOnProperty(name = "jms.enabled", havingValue = "true")
-public class JMSConfiguration {
+public class JmsConfiguration {
 
     @Value("${jms.namespace}")
     private String namespace;
