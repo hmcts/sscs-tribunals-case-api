@@ -144,7 +144,6 @@ public class CreateCaseController {
         return sscsCaseData;
     }
 
-
     @Operation(summary = "submitTestAppeal",
         description = "Creates a case from the SYA details - Used for tests. Changes the mrn date and nino to a random value")
     @ApiResponses(value = {
