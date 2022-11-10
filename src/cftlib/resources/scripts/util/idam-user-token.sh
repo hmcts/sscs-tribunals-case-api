@@ -6,13 +6,13 @@
 ##    - password: ID assigned to user in generated token. Default to `London01`.
 ##
 
-IDAM_URL="http://localhost:5000"
 USERNAME=${1:-system.update@hmcts.net}
 PASSWORD=${2:-password}
 REDIRECT_URI="http://xui-webapp/oauth2/callback"
 CLIENT_ID="ccd_gateway"
 CLIENT_SECRET="OOOOOOOOOOOOOOOO"
 SCOPE="openid%20profile%20roles%20authorities"
+IDAM_URL="${IDAM_URL:-http://localhost:5000}"
 
 curl --silent --show-error \
   -H "Content-Type: application/x-www-form-urlencoded" \

@@ -21,7 +21,8 @@ public class CftlibConfig implements CFTLibConfigurer {
             "caseworker-sscs-dwpresponsewriter",
             "caseworker-sscs-registrar",
             "caseworker-wa",
-            "caseworker-wa-task-configuration"
+            "caseworker-wa-task-configuration",
+            "caseworker-ia-caseofficer"
         );
         lib.createIdamUser("local.test@example.com",
             "caseworker",
@@ -33,7 +34,10 @@ public class CftlibConfig implements CFTLibConfigurer {
         lib.createIdamUser("super-user@example.com",
             "caseworker",
             "caseworker-sscs",
-            "caseworker-sscs-superuser"
+            "caseworker-sscs-superuser",
+            "caseworker-wa",
+            "caseworker-wa-configuration",
+            "caseworker-ia-caseofficer"
         );
         lib.createIdamUser("sscs-citizen@hmcts.net",
             "citizen"

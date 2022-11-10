@@ -27,11 +27,14 @@ services:
     image: hmctspublic.azurecr.io/ccd/message-publisher:latest
     environment:
       DATA_STORE_DB_HOST: shared-database-pg12
+      DATA_STORE_DB_URL: jdbc:postgresql://shared-database-pg12:5432/ccd_data
       DATA_STORE_DB_PORT: 5432
+      DATA_STORE_DB_NAME: ccd_data
+      DATA_STORE_DB_OPTIONS: ?stringtype=unspecified
       DATA_STORE_DB_USERNAME: postgres
       DATA_STORE_DB_PASSWORD: postgres
-      SERVICE_BUS_CONNECTION_STRING: ${ASB_SERVICE_BUS_CONNECTION_STRING:-Endpoint=sb://ccd-servicebus-demo.servicebus.windows.net/;SharedAccessKeyName=SendAndRecieveCCDMessage;SharedAccessKey=REPLACEME}
-      CCD_CASE_EVENTS_DESTINATION:
+      SERVICE_BUS_CONNECTION_STRING: ${AZURE_SERVICE_BUS_CONNECTION_STRING:-Endpoint=sb://ccd-servicebus-demo.servicebus.windows.net/;SharedAccessKeyName=SendAndRecieveCCDMessage;SharedAccessKey=REPLACEME}
+        CCD_CASE_EVENTS_DESTINATION: ${AZURE_SERVUCE_BUS_TOPIC_NAME:-wa-case-event-handler-topic-sessions-ft}
     ports:
       - 4456:4456
     networks:

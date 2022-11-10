@@ -10,19 +10,19 @@
 ##    - microservice_name: Name of the microservice to obtain S2S token. Default to `ccd_gw`.
 ##
 
-USERNAME=${1:-system.update@hmcts.net}
+USERNAME=${1:-local.test@example.com}
 PASSWORD=${2:-password}
 ROLE_CLASSIFICATION="${3:-PUBLIC}"
 ROLE_NAME="${4:-"tribunal-caseworker"}"
-ROLE_ATTRIBUTES=${5:-"SSCS"}
+ROLE_ATTRIBUTES=${5:-"IA"}
 MICROSERVICE="${6:-ccd_gw}"
-ROLE_ASSIGNMENT_URL="${7:-http://localhost:4096}"
+ROLE_ASSIGNMENT_URL="${ROLE_ASSIGNMENT_URL:-http://localhost:4096}"
 
 BASEDIR=$(dirname "$0")
 
-USER_TOKEN=$($BASEDIR/idam-user-token.sh $USERNAME $PASSWORD)
 echo "USERNAME = ${USERNAME}"
 echo "PASSWORD = ${PASSWORD}"
+USER_TOKEN=$($BASEDIR/idam-user-token.sh $USERNAME $PASSWORD)
 echo "USER_TOKEN = ${USER_TOKEN}"
 USER_ID=$($BASEDIR/idam-user-id.sh $USER_TOKEN)
 echo "USER_ID = ${USER_ID}"

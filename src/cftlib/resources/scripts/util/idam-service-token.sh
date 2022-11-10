@@ -6,8 +6,8 @@
 ##
 ## Returns a valid IDAM service token for the given microservice.
 
-S2S_URL=${S2S_URL:-http://localhost:4502}
 microservice="${1:-ccd_gw}"
+S2S_URL="${S2S_URL:-http://localhost:4502}"
 
 curl --silent --show-error -X POST \
   -H "Content-Type: application/json" \

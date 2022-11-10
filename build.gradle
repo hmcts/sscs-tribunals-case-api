@@ -16,7 +16,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.9.0'
     id 'org.owasp.dependencycheck' version '7.3.0'
     id 'au.com.dius.pact' version '4.3.15'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.424'
+    id 'com.github.hmcts.rse-cft-lib' version 'DEV-SNAPSHOT'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -630,7 +630,7 @@ bootWithCCD {
     environment 'DM_STORE_BASE_URL', 'http://localhost:5005'
     environment 'S2S_URL', 'http://localhost:4502'
     environment 'DOC_ASSEMBLY_URL', 'http://localhost:4631'
-    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'ccd_data,camunda,evidence'
+    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'ccd_data,camunda,cft_task_db,evidence,wa_case_event_messages_db,wa_workflow_api'
     environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
     environment 'CASE_DOCUMENT_S2S_AUTHORISED_SERVICES', 'ccd_case_document_am_api,ccd_gw,xui_webapp,ccd_data,bulk_scan_processor,sscs'
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,payment-api,xui_webapp,sscs,ccd_case_document_am_api,am_role_assignment_service'
