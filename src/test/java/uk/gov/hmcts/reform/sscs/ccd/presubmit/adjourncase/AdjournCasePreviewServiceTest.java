@@ -72,7 +72,7 @@ import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 
 @RunWith(JUnitParamsRunner.class)
-class AdjournCasePreviewServiceParameterizedTest {
+class AdjournCasePreviewServiceTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String TEMPLATE_ID = "nuts.docx";
