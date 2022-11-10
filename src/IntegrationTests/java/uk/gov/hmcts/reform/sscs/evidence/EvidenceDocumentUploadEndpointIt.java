@@ -62,15 +62,6 @@ public class EvidenceDocumentUploadEndpointIt {
     }
 
     @Test
-    public void shouldThrow404ErrorIfNotEvidenceDocumentSubmitted() throws Exception {
-
-        MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-        mockMvc.perform(MockMvcRequestBuilders.multipart("/evidence/upload"))
-            .andExpect(status().is(404));
-
-    }
-
-    @Test
     public void shouldStoreTheEvidenceDocumentAndReturnMetadata() throws Exception {
         given(documentUploadClientApi.upload(eq(DUMMY_OAUTH_2_TOKEN), eq(AUTH_TOKEN), eq("sscs"),
             eq(Arrays.asList("caseworker", "citizen")), eq(Classification.RESTRICTED), any()))

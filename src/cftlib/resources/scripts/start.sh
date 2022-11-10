@@ -2,11 +2,11 @@
 
 declare -A secrets
 
-KEY_VAULT_NAME="sscs-aat"
+KEY_VAULT_NAME="dg-docassembly-aat"
 
 #Key-value array of secrets. key=azure secret name, value=desired environment variable
-secrets=(["docmosis-endpoint"]="DOCMOSIS_TEMPLATES_ENDPOINT_AUTH"
-["docmosis-api-key"]="DOCMOSIS_ACCESS_KEY")
+secrets=(["docmosis-templates-auth"]="DOCMOSIS_TEMPLATES_ENDPOINT_AUTH"
+["docmosis-access-key"]="DOCMOSIS_ACCESS_KEY")
 
 echo "Fetching secrets from $KEY_VAULT_NAME..."
 

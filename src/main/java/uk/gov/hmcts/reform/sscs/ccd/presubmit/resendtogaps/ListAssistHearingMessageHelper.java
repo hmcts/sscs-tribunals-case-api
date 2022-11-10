@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps;
 
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.CANCEL_HEARING;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.CREATE_HEARING;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +24,14 @@ public class ListAssistHearingMessageHelper {
         sendHearingMessage(ccdCaseId, LIST_ASSIST, CANCEL_HEARING, cancellationReason);
     }
 
+    public void sendListAssistCreateHearingMessage(final String ccdCaseId) {
+        sendHearingMessage(ccdCaseId, LIST_ASSIST, CREATE_HEARING, null);
+    }
+
     public boolean sendHearingMessage(final String ccdCaseId,
-                                      HearingRoute hearingRoute,
-                                      HearingState hearingState,
-                                      CancellationReason cancellationReason) {
+        HearingRoute hearingRoute,
+        HearingState hearingState,
+        CancellationReason cancellationReason) {
         HearingRequest hearingRequest = HearingRequest.builder(ccdCaseId)
             .hearingRoute(hearingRoute)
             .hearingState(hearingState)
