@@ -68,7 +68,7 @@ public class CcdMideventCallbackController {
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        sscsCaseData.setAdjournCaseNextHearingVenueSelected(adjournCaseCcdService.getVenueDynamicListForRpcName(
+        sscsCaseData.getAdjournment().setNextHearingVenueSelected(adjournCaseCcdService.getVenueDynamicListForRpcName(
             sscsCaseData.getRegionalProcessingCenter().getName()));
 
         return ok(preSubmitCallbackResponse);
