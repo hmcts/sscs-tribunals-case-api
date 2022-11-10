@@ -53,7 +53,7 @@ public class AdjournCaseAboutToSubmitHandlerTest extends BaseHandler {
         assertThat(result.getAdjournCaseCanCaseBeListedRightAway()).isEqualTo("Yes");
         assertThat(result.getAdjournCaseDisabilityQualifiedPanelMemberName()).isEqualTo("Bob Smith");
         assertThat(result.getAdjournCaseGenerateNotice()).isEqualTo("Yes");
-        assertThat(result.getAdjournCaseInterpreterLanguage()).isEqualTo("spanish");
+        assertThat(result.getAdjournCaseInterpreterLanguage().getValue().getCode()).isEqualTo("spanish");
         assertThat(result.getAdjournCaseInterpreterRequired()).isEqualTo("Yes");
         assertThat(result.getAdjournCaseMedicallyQualifiedPanelMemberName()).isEqualTo("Wendy Rowe");
         assertThat(result.getAdjournCaseNextHearingDateType()).isEqualTo("dateToBeFixed");
