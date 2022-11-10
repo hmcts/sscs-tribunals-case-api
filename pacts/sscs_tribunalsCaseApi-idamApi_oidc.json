@@ -1,0 +1,208 @@
+{
+  "consumer": {
+    "name": "sscs_tribunalsCaseApi"
+  },
+  "interactions": [
+    {
+      "comments": {
+        "text": [
+
+        ]
+      },
+      "description": "Provider receives a POST /o/token request from SSCS Tribunals API",
+      "key": "aa6d0c4d",
+      "pending": false,
+      "providerStates": [
+        {
+          "name": "a token is requested"
+        }
+      ],
+      "request": {
+        "body": {
+          "content": "redirect_uri=http%3A%2F%2Fwww.dummy-pact-service.com%2Fcallback&client_id=sscs&grant_type=password&username=system.update@hmcts.net&password=Pa55word11&client_secret=QM5RQQ53LZFOSIXJ&scope=openid profile roles",
+          "contentType": "application/x-www-form-urlencoded",
+          "contentTypeHint": "DEFAULT",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ]
+        },
+        "method": "POST",
+        "path": "/o/token"
+      },
+      "response": {
+        "body": {
+          "content": {
+            "access_token": "eyJ0eXAiOiJKV1QiLCJraWQiOiJiL082T3ZWdjEre",
+            "scope": "openid roles profile"
+          },
+          "contentType": "application/json",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "matchingRules": {
+          "body": {
+            "$.access_token": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.scope": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      },
+      "type": "Synchronous/HTTP"
+    },
+    {
+      "comments": {
+        "text": [
+
+        ]
+      },
+      "description": "A request for a UserInfo from SSCS Tribunals API",
+      "key": "dfb8244e",
+      "pending": false,
+      "providerStates": [
+        {
+          "name": "userinfo is requested"
+        }
+      ],
+      "request": {
+        "headers": {
+          "Authorization": [
+            "Bearer UserAuthToken"
+          ]
+        },
+        "matchingRules": {
+          "header": {
+            "Authorization": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "Bearer UserAuthToken"
+                }
+              ]
+            }
+          }
+        },
+        "method": "GET",
+        "path": "/o/userinfo"
+      },
+      "response": {
+        "body": {
+          "content": {
+            "familyName": "User",
+            "givenName": "Test",
+            "roles": [
+              "citizen"
+            ],
+            "sub": "61",
+            "uid": "sscs-citizen2@hmcts.net"
+          },
+          "contentType": "application/json; charset=UTF-8",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ]
+        },
+        "matchingRules": {
+          "body": {
+            "$.familyName": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.givenName": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.roles": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$.roles[*]": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.sub": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.uid": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          },
+          "header": {
+            "Content-Type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json(;\\s?charset=[\\w\\-]+)?"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      },
+      "type": "Synchronous/HTTP"
+    }
+  ],
+  "metadata": {
+    "pact-jvm": {
+      "version": "4.3.15"
+    },
+    "pactSpecification": {
+      "version": "4.0"
+    }
+  },
+  "provider": {
+    "name": "idamApi_oidc"
+  }
+}
