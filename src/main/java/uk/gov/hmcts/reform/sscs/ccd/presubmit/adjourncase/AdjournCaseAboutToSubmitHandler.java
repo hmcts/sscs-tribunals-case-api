@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -49,28 +50,31 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, sscsCaseData.getAdjournCasePreviewDocument());
+        previewDocumentService.writePreviewDocumentToSscsDocument(
+            sscsCaseData,
+            DRAFT_ADJOURNMENT_NOTICE,
+            sscsCaseData.getAdjournment().getPreviewDocument());
 
         if (SscsUtil.isSAndLCase(sscsCaseData)
             && isAdjournmentEnabled // TODO SSCS-10951
-            && (sscsCaseData.isAdjournCaseAbleToBeListedRightAway()
-            || isNoOrNull(sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties()))
+            && (isYes(sscsCaseData.getAdjournment().getCanCaseBeListedRightAway())
+            || isNoOrNull(sscsCaseData.getAdjournment().getAreDirectionsBeingMadeToParties()))
         ) {
             hearingMessageHelper.sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
-            sscsCaseData.setIsAdjournmentInProgress(YES);
-        } else if (sscsCaseData.getAdjournCaseInterpreterRequired() != null) {
+            sscsCaseData.getAdjournment().setIsAdjournmentInProgress(YES);
+        } else if (sscsCaseData.getAdjournment().getInterpreterRequired() != null) {
             HearingOptions hearingOptions = HearingOptions.builder().build();
             if (sscsCaseData.getAppeal().getHearingOptions() != null) {
                 hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
             }
-            hearingOptions.setLanguages(sscsCaseData.getAdjournCaseInterpreterLanguage());
-            hearingOptions.setLanguageInterpreter(sscsCaseData.getAdjournCaseInterpreterRequired());
+            hearingOptions.setLanguages(sscsCaseData.getAdjournment().getInterpreterLanguage().getValue().getCode());
+            hearingOptions.setLanguageInterpreter(sscsCaseData.getAdjournment().getInterpreterRequired().getValue());
 
             sscsCaseData.getAppeal().setHearingOptions(hearingOptions);
         }
 
-        if (sscsCaseData.getAdjournCaseGeneratedDate() == null) {
-            sscsCaseData.setAdjournCaseGeneratedDate(LocalDate.now().toString());
+        if (sscsCaseData.getAdjournment().getGeneratedDate() == null) {
+            sscsCaseData.getAdjournment().setGeneratedDate(LocalDate.now());
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);

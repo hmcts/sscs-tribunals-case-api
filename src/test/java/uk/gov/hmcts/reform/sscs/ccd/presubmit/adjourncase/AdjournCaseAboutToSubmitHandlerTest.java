@@ -30,6 +30,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
@@ -44,7 +46,6 @@ import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 class AdjournCaseAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-    public static final String FRENCH = "French";
     public static final String SPANISH = "Spanish";
     public static final String OLD_DRAFT_DOC = "oldDraft.doc";
 
@@ -129,11 +130,12 @@ class AdjournCaseAboutToSubmitHandlerTest {
     @Test
     void givenAdjournmentEventWithLanguageInterpreterRequiredAndCaseHasExistingInterpreter_overwriteExistingInterpreter() {
         setUpAdjournCaseMocks();
-        callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterRequired(YES.getValue());
-        callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterLanguage(SPANISH);
+        callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterRequired(YES);
+        callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterLanguage(new DynamicList(
+            new DynamicListItem("spanish", SPANISH), List.of()));
         callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder()
             .languageInterpreter(NO.getValue())
-            .languages(FRENCH)
+            .languages("French")
             .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -147,8 +149,9 @@ class AdjournCaseAboutToSubmitHandlerTest {
     @Test
     void givenAdjournmentEventWithLanguageInterpreterRequiredAndLanguageSet_thenDoNotDisplayError() {
         setUpAdjournCaseMocks();
-        callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterRequired(YES.getValue());
-        callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterLanguage(SPANISH);
+        callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterRequired(YES);
+        callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterLanguage(new DynamicList(
+            new DynamicListItem("spanish", SPANISH), List.of()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -211,7 +214,7 @@ class AdjournCaseAboutToSubmitHandlerTest {
             .sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
 
         assertThat(response.getErrors()).isEmpty();
-        assertThat(response.getData().getIsAdjournmentInProgress()).isEqualTo(YES);
+        assertThat(response.getData().getAdjournment().getIsAdjournmentInProgress()).isEqualTo(YES);
     }
 
     @DisplayName("When adjournment is enabled and case is LA and case cannot be listed right away "
@@ -228,24 +231,24 @@ class AdjournCaseAboutToSubmitHandlerTest {
 
     private PreSubmitCallbackResponse<SscsCaseData> cannotBeListedAndNoDirectionsGiven() {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
-        sscsCaseData.setAdjournCaseCanCaseBeListedRightAway(NO.getValue());
-        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties(NO.getValue());
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
+        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
 
         return handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 
     private PreSubmitCallbackResponse<SscsCaseData> canBeListed() {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
-        sscsCaseData.setAdjournCaseCanCaseBeListedRightAway(YES.getValue());
-        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties(NO.getValue());
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(YES);
+        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
 
         return handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 
     private PreSubmitCallbackResponse<SscsCaseData> cannotBeListedAndDirectionsGiven() {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
-        sscsCaseData.setAdjournCaseCanCaseBeListedRightAway(NO.getValue());
-        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties(YES.getValue());
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
+        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(YES);
 
         return handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
