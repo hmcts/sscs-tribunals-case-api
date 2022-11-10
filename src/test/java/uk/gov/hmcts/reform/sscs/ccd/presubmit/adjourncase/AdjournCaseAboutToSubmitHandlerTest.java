@@ -103,10 +103,10 @@ public class AdjournCaseAboutToSubmitHandlerTest {
     @Test
     public void givenAdjournmentNoticeAlreadyExistsOnCase_thenOverwriteExistingDraft() {
         SscsDocument doc = SscsDocument.builder().value(
-                SscsDocumentDetails.builder()
-                    .documentFileName(OLD_DRAFT_DOC)
-                    .documentType(DRAFT_ADJOURNMENT_NOTICE.getValue())
-                    .build())
+            SscsDocumentDetails.builder()
+                .documentFileName(OLD_DRAFT_DOC)
+                .documentType(DRAFT_ADJOURNMENT_NOTICE.getValue())
+                .build())
             .build();
         List<SscsDocument> docs = new ArrayList<>();
         docs.add(doc);
@@ -123,7 +123,9 @@ public class AdjournCaseAboutToSubmitHandlerTest {
     @Test
     public void givenAdjournmentEventWithLanguageInterpreterRequiredAndCaseHasExistingInterpreter_overwriteExistingInterpreter() {
         callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterRequired(YES.getValue());
+
         callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterLanguage(new DynamicList(SPANISH));
+
         callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder()
             .languageInterpreter(NO.getValue())
             .languages(FRENCH)
@@ -140,6 +142,7 @@ public class AdjournCaseAboutToSubmitHandlerTest {
     @Test
     public void givenAdjournmentEventWithLanguageInterpreterRequiredAndLanguageSet_thenDoNotDisplayError() {
         callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterRequired(YES.getValue());
+
         callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterLanguage(new DynamicList(SPANISH));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
