@@ -8,13 +8,21 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import java.util.*;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.AssociateCaseDetails;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.OnlineHearing;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -42,7 +50,7 @@ public class CitizenController {
         description = "Loads the cases that have been associated with a citizen in CCD. "
             + "Gets the user from the token in the Authorization header.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "A list of the hearings associated with a citizen.")
+        @ApiResponse(responseCode = "200", description  = "A list of the hearings associated with a citizen.")
     })
     public ResponseEntity<java.util.List<OnlineHearing>> getOnlineHearings(
         @Parameter(description = "user authorisation header", example = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdW")
@@ -57,7 +65,7 @@ public class CitizenController {
             + "been associated with the user. Gets the user from the token in the Authorization header."
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "A list of the hearings associated with a citizen and tya number.")
+        @ApiResponse(responseCode = "200", description  = "A list of the hearings associated with a citizen and tya number.")
     })
     public ResponseEntity<java.util.List<OnlineHearing>> getOnlineHearingsForTyaNumber(
         @Parameter(description = "user authorisation header", example = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdW")

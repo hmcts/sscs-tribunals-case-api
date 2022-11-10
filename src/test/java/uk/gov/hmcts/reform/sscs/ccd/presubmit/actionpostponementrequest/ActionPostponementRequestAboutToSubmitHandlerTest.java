@@ -29,7 +29,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
@@ -97,7 +99,9 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
             .appeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build())
-            .directionNoticeContent("Body Content")
+            .documentGeneration(DocumentGeneration.builder()
+                .directionNoticeContent("Body Content")
+                .build())
             .sscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder().build())
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
                 .hearingRoute(HearingRoute.LIST_ASSIST).build())
@@ -107,10 +111,12 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
                     .time("10:00")
                     .build())
                 .build()))
-            .previewDocument(DocumentLink.builder()
-                .documentUrl(DOCUMENT_URL)
-                .documentBinaryUrl(DOCUMENT_URL + "/binary")
-                .documentFilename("directionIssued.pdf")
+            .documentStaging(DocumentStaging.builder()
+                .previewDocument(DocumentLink.builder()
+                    .documentUrl(DOCUMENT_URL)
+                    .documentBinaryUrl(DOCUMENT_URL + "/binary")
+                    .documentFilename("directionIssued.pdf")
+                    .build())
                 .build())
             .interlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId())
             .postponementRequest(PostponementRequest.builder()
@@ -120,8 +126,8 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
         expectedDocument = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
-                .documentFileName(sscsCaseData.getPreviewDocument().getDocumentFilename())
-                .documentLink(sscsCaseData.getPreviewDocument())
+                .documentFileName(sscsCaseData.getDocumentStaging().getPreviewDocument().getDocumentFilename())
+                .documentLink(sscsCaseData.getDocumentStaging().getPreviewDocument())
                 .documentDateAdded(LocalDate.now().minusDays(1).toString())
                 .documentType(POSTPONEMENT_REQUEST_DIRECTION_NOTICE.getValue())
                 .build()).build();
@@ -189,7 +195,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getInterlocReferralReason()).isNull();
         assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest()).isEqualTo(NO);
         assertThat(response.getData().getDwpState()).isEqualTo(DwpState.HEARING_POSTPONED.getId());
-        assertThat(response.getData().getDirectionNoticeContent()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getDirectionNoticeContent()).isNull();
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
                 eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
     }
@@ -261,7 +267,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getInterlocReviewState()).isEqualTo(WELSH_TRANSLATION.getId());
         assertThat(response.getData().getTranslationWorkOutstanding()).isEqualTo(YES.getValue());
         System.out.println(response.getData().getSscsDocument());
-        assertThat(response.getData().getDirectionNoticeContent()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getDirectionNoticeContent()).isNull();
     }
 
     @Test

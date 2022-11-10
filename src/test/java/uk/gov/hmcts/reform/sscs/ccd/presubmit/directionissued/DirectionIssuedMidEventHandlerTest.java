@@ -10,6 +10,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -80,7 +82,9 @@ public class DirectionIssuedMidEventHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
         sscsCaseData = SscsCaseData.builder()
-                .generateNotice("Yes")
+            .documentGeneration(DocumentGeneration.builder()
+                .generateNotice(YES)
+                .build())
                 .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
                 .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
                 .appeal(Appeal.builder()
@@ -114,7 +118,7 @@ public class DirectionIssuedMidEventHandlerTest {
 
     @Test
     public void givenGenerateNoticeIsNo_thenReturnFalse() {
-        sscsCaseData.setGenerateNotice("No");
+        sscsCaseData.getDocumentGeneration().setGenerateNotice(NO);
         assertFalse(handler.canHandle(MID_EVENT, callback));
     }
 
@@ -128,12 +132,12 @@ public class DirectionIssuedMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertNotNull(response.getData().getPreviewDocument());
+        assertNotNull(response.getData().getDocumentStaging().getPreviewDocument());
         assertEquals(DocumentLink.builder()
-                .documentFilename(String.format("Directions Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-                .documentBinaryUrl(URL + "/binary")
-                .documentUrl(URL)
-                .build(), response.getData().getPreviewDocument());
+            .documentFilename(String.format("Directions Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), response.getData().getDocumentStaging().getPreviewDocument());
 
         verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname",
                 documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED),
