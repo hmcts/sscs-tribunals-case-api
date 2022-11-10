@@ -1,17 +1,20 @@
 package uk.gov.hmcts.reform.sscs.service.servicebus;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.jms.core.JmsTemplate;
 import uk.gov.hmcts.reform.sscs.model.servicebus.SessionAwareRequest;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class JmsMessagingServiceTest {
 
     @Mock
@@ -24,7 +27,7 @@ public class JmsMessagingServiceTest {
 
     private final String queueName = "queue";
 
-    @Before
+    @BeforeEach
     public void setUp() {
         jmsMessagingService = new JmsMessagingService(jmsTemplate, queueName);
     }
