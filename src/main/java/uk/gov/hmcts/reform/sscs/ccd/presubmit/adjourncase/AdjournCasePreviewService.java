@@ -205,7 +205,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
 
     private void setNextHearingDateAndTime(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData, LocalDate issueDate) {
-        String hearingDateSentence;
+        String hearingDateSentence = "";
         Adjournment adjournment = caseData.getAdjournment();
         if (adjournment.getNextHearingDateType() == AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE) {
             hearingDateSentence = buildSpecificTimeText(adjournment.getTime(), false);
@@ -233,9 +233,6 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
         } else if (adjournment.getNextHearingDateType() == AdjournCaseNextHearingDateType.DATE_TO_BE_FIXED) {
             hearingDateSentence = buildSpecificTimeText(adjournment.getTime(), true);
-
-        } else {
-            throw new IllegalStateException("Unknown next hearing date type for:" + adjournment.getNextHearingDateType());
         }
 
         adjournCaseBuilder.nextHearingDate(stripToEmpty(hearingDateSentence));
