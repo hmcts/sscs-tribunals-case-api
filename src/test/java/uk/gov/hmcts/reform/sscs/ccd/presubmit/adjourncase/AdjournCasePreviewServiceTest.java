@@ -5,7 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
@@ -33,13 +32,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import io.jsonwebtoken.lang.Collections;
 import junitparams.JUnitParamsRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -47,7 +44,6 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTime;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
@@ -300,7 +296,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
         sscsCaseData.getAdjournment().setInterpreterRequired(YES);
-        sscsCaseData.getAdjournment().setInterpreterLanguage(new DynamicList(new DynamicListItem("french", "French"), List.of()));
+        sscsCaseData.getAdjournment().setInterpreterLanguage(new DynamicList("French"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
@@ -358,7 +354,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
         sscsCaseData.getAdjournment().setInterpreterRequired(NO);
-        sscsCaseData.getAdjournment().setInterpreterLanguage(new DynamicList(new DynamicListItem("french", "French"), List.of()));
+        sscsCaseData.getAdjournment().setInterpreterLanguage(new DynamicList("French"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
@@ -397,7 +393,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
         sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
-        sscsCaseData.getAdjournment().setInterpreterLanguage(new DynamicList(new DynamicListItem("french", "French"), List.of()));
+        sscsCaseData.getAdjournment().setInterpreterLanguage(new DynamicList("French"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
@@ -856,7 +852,7 @@ class AdjournCasePreviewServiceTest {
         assertNotNull(body);
 
         if (isOralHearing(nextHearingType)) {
-            assertEquals("2 hours", body.getNextHearingTimeslot());
+            assertEquals("120 minutes", body.getNextHearingTimeslot());
         } else {
             assertNull(body.getNextHearingTimeslot());
         }
@@ -1764,23 +1760,6 @@ class AdjournCasePreviewServiceTest {
         assertEquals("Date or period indicator not available in case data", error);
         assertNull(response.getData().getAdjournment().getPreviewDocument());
 
-    }
-
-    @Test
-    void givenCaseWithFirstWithInvalidDateTime_thenDisplayAnErrorAndDoNotDisplayTheDocument() {
-
-        sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(FACE_TO_FACE);
-        sscsCaseData.getAdjournment().setNextHearingDateType(AdjournCaseNextHearingDateType.valueOf("unknownDateType"));
-
-        sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Unknown next hearing date type for:unknownDateType", error);
-        assertNull(response.getData().getAdjournment().getPreviewDocument());
     }
 
     @ParameterizedTest
