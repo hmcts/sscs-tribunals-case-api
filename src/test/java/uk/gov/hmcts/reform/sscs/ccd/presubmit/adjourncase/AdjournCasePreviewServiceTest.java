@@ -20,9 +20,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingPeriod.T
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue.SAME_VENUE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue.SOMEWHERE_ELSE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.FACE_TO_FACE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.PAPER;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.TELEPHONE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.VIDEO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -30,16 +27,12 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 import junitparams.JUnitParamsRunner;
-import junitparams.NamedParameters;
-import org.apache.commons.lang3.EnumUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -785,11 +778,11 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = "PAPER", mode = EXCLUDE)
-    void givenCaseWithDurationParameterButMissingUnitsWhenOralHearing_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("oralNextHearingTypeParameters")
+    void givenCaseWithDurationParameterButMissingUnitsWhenOralHearing_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType, String nextHearingTypeText) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
         sscsCaseData.getAdjournment().setNextHearingListingDuration(2);
 
@@ -803,8 +796,9 @@ class AdjournCasePreviewServiceTest {
         assertNull(response.getData().getAdjournment().getPreviewDocument());
     }
 
-    @Test
-    void givenCaseWithDurationParameterButMissingUnitsWhenPaperHearing_thenDisplayErrorAndDoNotGenerateDocument() {
+    @ParameterizedTest
+    @MethodSource("paperNextHearingTypeParameters")
+    void givenCaseWithDurationParameterButMissingUnitsWhenPaperHearing_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType, String nextHearingTypeText) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
         sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.PAPER);
@@ -823,7 +817,7 @@ class AdjournCasePreviewServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getAdjournment().getPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", AdjournCaseTypeOfHearing.PAPER.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
         assertNotNull(body);
