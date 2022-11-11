@@ -101,9 +101,9 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                 .map(CollectionItem::getValue).collect(Collectors.toList()));
         }
 
-        adjournCaseBuilder.hearingType(adjournment.getTypeOfHearing().toString());
+        adjournCaseBuilder.hearingType(String.valueOf(adjournment.getTypeOfHearing()));
 
-        HearingType nextHearingType = HearingType.getByKey(adjournment.getTypeOfNextHearing().toString());
+        HearingType nextHearingType = HearingType.getByKey(String.valueOf(adjournment.getTypeOfNextHearing()));
 
         if (HearingType.FACE_TO_FACE.equals(nextHearingType)) {
             handleFaceToFaceHearing(adjournment, adjournCaseBuilder, venueName);
@@ -118,7 +118,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         }
         adjournCaseBuilder.nextHearingType(nextHearingType.getValue());
 
-        adjournCaseBuilder.panelMembersExcluded(adjournment.getPanelMembersExcluded().toString());
+        adjournCaseBuilder.panelMembersExcluded(String.valueOf(adjournment.getPanelMembersExcluded()));
 
         setIntepreterDescriptionIfRequired(adjournCaseBuilder, caseData);
 
@@ -189,6 +189,9 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     }
 
     private String getTimeslotString(Integer duration, AdjournCaseNextHearingDurationUnits durationUnits) {
+        if (duration == null || durationUnits == null) {
+            return "";
+        }
         String formattedUnits = duration == 1
             ? durationUnits.toString().substring(0, durationUnits.toString().length() - 1)
             : durationUnits.toString();
