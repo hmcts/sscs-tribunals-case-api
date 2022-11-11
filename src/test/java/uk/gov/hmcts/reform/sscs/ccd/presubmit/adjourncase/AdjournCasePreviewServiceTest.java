@@ -27,11 +27,13 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import io.jsonwebtoken.lang.Collections;
 import junitparams.JUnitParamsRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -181,7 +183,7 @@ class AdjournCasePreviewServiceTest {
         );
     }
 
-    private static boolean isOralHearing(AdjournCaseTypeOfHearing nextHearingType) {
+    private static boolean isOralHearing(String nextHearingType) {
         return HearingType.FACE_TO_FACE.getKey().equals(nextHearingType.toString())
             || HearingType.TELEPHONE.getKey().equals(nextHearingType.toString())
             || HearingType.VIDEO.getKey().equals(nextHearingType.toString());
@@ -206,12 +208,12 @@ class AdjournCasePreviewServiceTest {
             assertEquals("My reasons for decision", body.getReasonsForDecision().get(0));
         }
         assertEquals("Something else.", body.getAdditionalDirections().get(0));
-        assertEquals(FACE_TO_FACE.getDescriptionEn(), body.getHearingType());
+        assertEquals(FACE_TO_FACE.getDescriptionEn().toLowerCase(), body.getHearingType());
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void willSetPreviewFileWithNullReasons_WhenReasonsListIsEmpty(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void willSetPreviewFileWithNullReasons_WhenReasonsListIsEmpty(String nextHearingType, String nextHearingTypeText) {
 
         final String endDate = "10-10-2020";
 
@@ -219,7 +221,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.getAdjournment().setReasons(new ArrayList<>());
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
@@ -231,7 +233,7 @@ class AdjournCasePreviewServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getAdjournment().getPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT ADJOURNMENT NOTICE", payload.getNoticeType());
@@ -248,14 +250,14 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void willSetPreviewFileWithNullReasons_WhenReasonsListIsNotEmpty(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void willSetPreviewFileWithNullReasons_WhenReasonsListIsNotEmpty(String nextHearingType, String nextHearingTypeText) {
 
         final String endDate = "10-10-2020";
 
         setCommonPreviewParams(sscsCaseData, endDate);
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(
@@ -271,7 +273,7 @@ class AdjournCasePreviewServiceTest {
             .build(), response.getData().getAdjournment().getPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(
-            NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+            NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT ADJOURNMENT NOTICE", payload.getNoticeType());
@@ -288,14 +290,14 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void willSetPreviewFileWithInterpreterDescription_WhenInterpreterRequiredAndLanguageIsSet(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void willSetPreviewFileWithInterpreterDescription_WhenInterpreterRequiredAndLanguageIsSet(String nextHearingType, String nextHearingTypeText) {
 
         final String endDate = "10-10-2020";
 
         setCommonPreviewParams(sscsCaseData, endDate);
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
         sscsCaseData.getAdjournment().setInterpreterRequired(YES);
         sscsCaseData.getAdjournment().setInterpreterLanguage(new DynamicList(new DynamicListItem("french", "French"), List.of()));
@@ -309,7 +311,7 @@ class AdjournCasePreviewServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getAdjournment().getPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT ADJOURNMENT NOTICE", payload.getNoticeType());
@@ -328,14 +330,14 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void willNotSetPreviewFileButWillDisplayError_WithInterpreterDescription_WhenInterpreterRequiredAndLanguageIsNotSet(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void willNotSetPreviewFileButWillDisplayError_WithInterpreterDescription_WhenInterpreterRequiredAndLanguageIsNotSet(String nextHearingType) {
 
         final String endDate = "10-10-2020";
 
         setCommonPreviewParams(sscsCaseData, endDate);
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
         sscsCaseData.getAdjournment().setInterpreterRequired(YES);
 
@@ -346,14 +348,14 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void willSetPreviewFileWithoutInterpreterDescription_WhenInterpreterNotRequiredAndLanguageIsSet(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void willSetPreviewFileWithoutInterpreterDescription_WhenInterpreterNotRequiredAndLanguageIsSet(String nextHearingType, String nextHearingTypeText) {
 
         final String endDate = "10-10-2020";
 
         setCommonPreviewParams(sscsCaseData, endDate);
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
         sscsCaseData.getAdjournment().setInterpreterRequired(NO);
         sscsCaseData.getAdjournment().setInterpreterLanguage(new DynamicList(new DynamicListItem("french", "French"), List.of()));
@@ -367,7 +369,7 @@ class AdjournCasePreviewServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getAdjournment().getPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT ADJOURNMENT NOTICE", payload.getNoticeType());
@@ -386,14 +388,14 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void willSetPreviewFileWithoutInterpreterDescription_WhenInterpreterRequiredNotSetAndLanguageIsSet(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void willSetPreviewFileWithoutInterpreterDescription_WhenInterpreterRequiredNotSetAndLanguageIsSet(String nextHearingType, String nextHearingTypeText) {
 
         final String endDate = "10-10-2020";
 
         setCommonPreviewParams(sscsCaseData, endDate);
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
         sscsCaseData.getAdjournment().setInterpreterLanguage(new DynamicList(new DynamicListItem("french", "French"), List.of()));
 
@@ -406,7 +408,7 @@ class AdjournCasePreviewServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getAdjournment().getPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT ADJOURNMENT NOTICE", payload.getNoticeType());
@@ -426,11 +428,11 @@ class AdjournCasePreviewServiceTest {
 
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenSignedInJudgeNameNotSet_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenSignedInJudgeNameNotSet_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         when(userDetailsService.buildLoggedInUserName("Bearer token")).thenThrow(new IllegalStateException("Unable to obtain signed in user details"));
@@ -446,11 +448,11 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenSignedInJudgeUserDetailsNotSet_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenSignedInJudgeUserDetailsNotSet_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
         when(userDetailsService.buildLoggedInUserName("Bearer token")).thenThrow(new IllegalStateException("Unable to obtain signed in user details"));
 
@@ -465,10 +467,10 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenGenerateNoticeNotSet_willNotSetPreviewFile(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenGenerateNoticeNotSet_willNotSetPreviewFile(String nextHearingType) {
 
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
@@ -477,11 +479,11 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithMultipleHearingsWithVenues_thenCorrectlySetHeldAtUsingTheFirstHearingInList(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenCaseWithMultipleHearingsWithVenues_thenCorrectlySetHeldAtUsingTheFirstHearingInList(String nextHearingType, String nextHearingTypeText) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
@@ -490,7 +492,7 @@ class AdjournCasePreviewServiceTest {
         Hearing hearing2 = Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-02").venue(Venue.builder().name("venue 2 name").build()).build()).build();
 
-        List<Hearing> hearings = List.of(hearing2, hearing1);
+        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
@@ -502,7 +504,7 @@ class AdjournCasePreviewServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getAdjournment().getPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
         assertNotNull(body);
 
@@ -511,11 +513,11 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithMultipleHearingsWithFirstInListWithNoVenueName_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenCaseWithMultipleHearingsWithFirstInListWithNoVenueName_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(null);;
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
@@ -524,7 +526,7 @@ class AdjournCasePreviewServiceTest {
         Hearing hearing2 = Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-02").venue(Venue.builder().build()).build()).build();
 
-        List<Hearing> hearings = List.of(hearing2, hearing1);
+        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
@@ -536,11 +538,11 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithMultipleHearingsWithFirstInListWithNoVenue_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenCaseWithMultipleHearingsWithFirstInListWithNoVenue_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
@@ -549,7 +551,7 @@ class AdjournCasePreviewServiceTest {
         Hearing hearing2 = Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").build()).build();
 
-        List<Hearing> hearings = List.of(hearing2, hearing1);
+        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
@@ -561,11 +563,11 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayAnErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayAnErrorAndDoNotGenerateDocument(String nextHearingType) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
@@ -573,7 +575,7 @@ class AdjournCasePreviewServiceTest {
 
         Hearing hearing2 = null;
 
-        sscsCaseData.setHearings(List.of(hearing2, hearing1));
+        sscsCaseData.setHearings(Arrays.asList(hearing2, hearing1));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(
             callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
@@ -585,11 +587,11 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDetails_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDetails_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
@@ -597,7 +599,7 @@ class AdjournCasePreviewServiceTest {
 
         Hearing hearing2 = Hearing.builder().build();
 
-        List<Hearing> hearings = List.of(hearing2, hearing1);
+        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
@@ -609,11 +611,11 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithEmptyHearingsList_thenDefaultHearingData(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenCaseWithEmptyHearingsList_thenDefaultHearingData(String nextHearingType, String nextHearingTypeText) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         List<Hearing> hearings = new ArrayList<>();
@@ -622,7 +624,7 @@ class AdjournCasePreviewServiceTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
         assertTrue(response.getErrors().isEmpty());
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
         assertNotNull(body);
@@ -634,17 +636,17 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithNullHearingsList_thenDefaultHearingData(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenCaseWithNullHearingsList_thenDefaultHearingData(String nextHearingType, String nextHearingTypeText) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
         assertTrue(response.getErrors().isEmpty());
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
         assertNotNull(body);
@@ -656,11 +658,11 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithMultipleHearingsWithHearingDates_thenCorrectlySetTheHeldOnUsingTheFirstHearingInList(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenCaseWithMultipleHearingsWithHearingDates_thenCorrectlySetTheHeldOnUsingTheFirstHearingInList(String nextHearingType, String nextHearingTypeText) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
@@ -669,7 +671,7 @@ class AdjournCasePreviewServiceTest {
         Hearing hearing2 = Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-02").venue(Venue.builder().name("Venue Name").build()).build()).build();
 
-        List<Hearing> hearings = List.of(hearing2, hearing1);
+        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
@@ -681,7 +683,7 @@ class AdjournCasePreviewServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getAdjournment().getPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
         assertNotNull(body);
@@ -691,11 +693,11 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDate_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDate_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
@@ -705,7 +707,7 @@ class AdjournCasePreviewServiceTest {
             .venue(Venue.builder().name("Venue Name").build())
             .build()).build();
 
-        List<Hearing> hearings = List.of(hearing2, hearing1);
+        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
@@ -716,11 +718,11 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayTwoErrorsAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayTwoErrorsAndDoNotGenerateDocument(String nextHearingType) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
@@ -729,7 +731,7 @@ class AdjournCasePreviewServiceTest {
 
         Hearing hearing2 = null;
 
-        List<Hearing> hearings = List.of(hearing2, hearing1);
+        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
@@ -744,11 +746,11 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithNoDurationEnumSource_thenCorrectlySetTheNextHearingTimeslot(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenCaseWithNoDurationEnumSource_thenCorrectlySetTheNextHearingTimeslot(String nextHearingType, String nextHearingTypeText) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
@@ -763,7 +765,7 @@ class AdjournCasePreviewServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getAdjournment().getPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
         assertNotNull(body);
@@ -779,7 +781,7 @@ class AdjournCasePreviewServiceTest {
 
     @ParameterizedTest
     @MethodSource("oralNextHearingTypeParameters")
-    void givenCaseWithDurationParameterButMissingUnitsWhenOralHearing_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType, String nextHearingTypeText) {
+    void givenCaseWithDurationParameterButMissingUnitsWhenOralHearing_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
         sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
@@ -801,7 +803,7 @@ class AdjournCasePreviewServiceTest {
     void givenCaseWithDurationParameterButMissingUnitsWhenPaperHearing_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType, String nextHearingTypeText) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.PAPER);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
         sscsCaseData.getAdjournment().setNextHearingListingDuration(2);
 
@@ -826,11 +828,11 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithTwoHourDuration_thenCorrectlySetTheNextHearingTimeslot(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenCaseWithTwoHourDuration_thenCorrectlySetTheNextHearingTimeslot(String nextHearingType, String nextHearingTypeText) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         sscsCaseData.getAdjournment().setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.MINUTES);
@@ -848,7 +850,7 @@ class AdjournCasePreviewServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getAdjournment().getPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
         assertNotNull(body);
@@ -861,11 +863,11 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithSixtyMinuteDuration_thenCorrectlySetTheNextHearingTimeslot(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenCaseWithSixtyMinuteDuration_thenCorrectlySetTheNextHearingTimeslot(String nextHearingType, String nextHearingTypeText) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         sscsCaseData.getAdjournment().setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.MINUTES);
@@ -883,7 +885,7 @@ class AdjournCasePreviewServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getAdjournment().getPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
         assertNotNull(body);
@@ -900,11 +902,11 @@ class AdjournCasePreviewServiceTest {
 
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithTwoSessionDuration_thenCorrectlySetTheNextHearingTimeslot(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenCaseWithTwoSessionDuration_thenCorrectlySetTheNextHearingTimeslot(String nextHearingType, String nextHearingTypeText) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         sscsCaseData.getAdjournment().setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS);
@@ -922,7 +924,7 @@ class AdjournCasePreviewServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getAdjournment().getPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
         assertNotNull(body);
@@ -937,11 +939,11 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithOneSessionDuration_thenCorrectlySetTheNextHearingTimeslot(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenCaseWithOneSessionDuration_thenCorrectlySetTheNextHearingTimeslot(String nextHearingType, String nextHearingTypeText) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         sscsCaseData.getAdjournment().setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS);
@@ -959,7 +961,7 @@ class AdjournCasePreviewServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getAdjournment().getPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
         assertNotNull(body);
@@ -974,11 +976,11 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithThreePanelMembers_thenCorrectlySetTheHeldBefore(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenCaseWithThreePanelMembers_thenCorrectlySetTheHeldBefore(String nextHearingType, String nextHearingTypeText) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         sscsCaseData.getAdjournment().setDisabilityQualifiedPanelMemberName("Mr Panel Member 1");
@@ -997,7 +999,7 @@ class AdjournCasePreviewServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getAdjournment().getPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
         assertNotNull(body);
@@ -1007,11 +1009,11 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithTwoPanelMembers_thenCorrectlySetTheHeldBefore(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenCaseWithTwoPanelMembers_thenCorrectlySetTheHeldBefore(String nextHearingType, String nextHearingTypeText) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         sscsCaseData.getAdjournment().setDisabilityQualifiedPanelMemberName("Mr Panel Member 1");
@@ -1029,7 +1031,7 @@ class AdjournCasePreviewServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getAdjournment().getPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
         assertNotNull(body);
@@ -1039,11 +1041,11 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithOnePanelMember_thenCorrectlySetTheHeldBefore(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenCaseWithOnePanelMember_thenCorrectlySetTheHeldBefore(String nextHearingType, String nextHearingTypeText) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         sscsCaseData.getAdjournment().setDisabilityQualifiedPanelMemberName("Mr Panel Member 1");
@@ -1060,7 +1062,7 @@ class AdjournCasePreviewServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getAdjournment().getPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
         assertNotNull(body);
@@ -1070,10 +1072,10 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithNoPanelMembersWithNullValues_thenCorrectlySetTheHeldBefore(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenCaseWithNoPanelMembersWithNullValues_thenCorrectlySetTheHeldBefore(String nextHearingType, String nextHearingTypeText) {
 
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
 
@@ -1089,7 +1091,7 @@ class AdjournCasePreviewServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getAdjournment().getPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
         assertNotNull(body);
@@ -1099,11 +1101,11 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithNoPanelMembersWithEmptyValues_thenCorrectlySetTheHeldBefore(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenCaseWithNoPanelMembersWithEmptyValues_thenCorrectlySetTheHeldBefore(String nextHearingType, String nextHearingTypeText) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
         sscsCaseData.getAdjournment().setMedicallyQualifiedPanelMemberName("");
         sscsCaseData.getAdjournment().setDisabilityQualifiedPanelMemberName("");
@@ -1120,7 +1122,7 @@ class AdjournCasePreviewServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getAdjournment().getPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
         assertNotNull(body);
@@ -1941,11 +1943,11 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void scottishRpcWillShowAScottishImage(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void scottishRpcWillShowAScottishImage(String nextHearingType, String nextHearingTypeText) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().name("Glasgow").build());
@@ -1955,15 +1957,15 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        verifyTemplateBody(NoticeIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        verifyTemplateBody(NoticeIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithAppointee_thenCorrectlySetTheNoticeNameWithAppellantAndAppointeeAppended(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenCaseWithAppointee_thenCorrectlySetTheNoticeNameWithAppellantAndAppointeeAppended(String nextHearingType, String nextHearingTypeText) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
         sscsCaseData.getAppeal().getAppellant().setIsAppointee("yes");
         sscsCaseData.getAppeal().getAppellant().setAppointee(Appointee.builder()
@@ -1978,49 +1980,49 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
-        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname", nextHearingTypeText, true);
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenDateIssuedParameterIsTrue_thenShowIssuedDateOnDocument(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenDateIssuedParameterIsTrue_thenShowIssuedDateOnDocument(String nextHearingType, String nextHearingTypeText) {
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         assertEquals(LocalDate.now(), payload.getDateIssued());
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenGeneratedDateIsAlreadySetForGeneratedFlow_thenDoSetNewGeneratedDate(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenGeneratedDateIsAlreadySetForGeneratedFlow_thenDoSetNewGeneratedDate(String nextHearingType, String nextHearingTypeText) {
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
         sscsCaseData.getAdjournment().setGeneratedDate(LOCAL_DATE);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenGeneratedDateIsAlreadySetNonGeneratedFlow_thenDoSetNewGeneratedDate(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("allNextHearingTypeParameters")
+    void givenGeneratedDateIsAlreadySetNonGeneratedFlow_thenDoSetNewGeneratedDate(String nextHearingType, String nextHearingTypeText) {
         sscsCaseData.getAdjournment().setGenerateNotice(NO);
         sscsCaseData.getAdjournment().setGeneratedDate(LOCAL_DATE);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
     }

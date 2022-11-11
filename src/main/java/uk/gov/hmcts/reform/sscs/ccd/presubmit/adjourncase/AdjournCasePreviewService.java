@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTime;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -101,7 +102,11 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                 .map(CollectionItem::getValue).collect(Collectors.toList()));
         }
 
-        adjournCaseBuilder.hearingType(String.valueOf(adjournment.getTypeOfHearing()));
+        String hearingType = adjournment.getTypeOfHearing() != null
+            ? adjournment.getTypeOfHearing().getDescriptionEn().toLowerCase()
+            : null;
+
+        adjournCaseBuilder.hearingType(hearingType);
 
         HearingType nextHearingType = HearingType.getByKey(String.valueOf(adjournment.getTypeOfNextHearing()));
 
