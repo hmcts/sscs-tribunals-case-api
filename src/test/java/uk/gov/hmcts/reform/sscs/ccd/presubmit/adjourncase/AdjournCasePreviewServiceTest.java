@@ -1135,11 +1135,11 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = "FACE_TO_FACE")
-    void givenCaseWithNoSelectedVenueNotSetForFaceToFace_thenCorrectlySetTheVenueToBeTheExistingVenue(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("faceToFaceNextHearingTypeParameters")
+    void givenCaseWithNoSelectedVenueNotSetForFaceToFace_thenCorrectlySetTheVenueToBeTheExistingVenue(String nextHearingType, String nextHearingTypeText) {
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
@@ -1147,7 +1147,7 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
         assertEquals("Gap venue name", templateBody.getAdjournCaseTemplateBody().getNextHearingVenue());
     }
 
@@ -1788,10 +1788,10 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = "FACE_TO_FACE")
-    void givenCaseWithSameVenueSetForFaceToFace_thenCorrectlySetTheVenueToBeThePreviousVenue(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("faceToFaceNextHearingTypeParameters")
+    void givenCaseWithSameVenueSetForFaceToFace_thenCorrectlySetTheVenueToBeThePreviousVenue(String nextHearingType, String nextHearingTypeText) {
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         DynamicListItem item = new DynamicListItem("someVenueId", "");
@@ -1805,15 +1805,15 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
         assertEquals("Gap venue name", templateBody.getAdjournCaseTemplateBody().getNextHearingVenue());
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = "FACE_TO_FACE")
-    void givenCaseWithSelectedVenueSetForFaceToFace_thenCorrectlySetTheVenueToBeTheNewVenue(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("faceToFaceNextHearingTypeParameters")
+    void givenCaseWithSelectedVenueSetForFaceToFace_thenCorrectlySetTheVenueToBeTheNewVenue(String nextHearingType, String nextHearingTypeText) {
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         DynamicListItem item = new DynamicListItem("someVenueId", "");
@@ -1827,13 +1827,13 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
         assertEquals("Gap venue name", templateBody.getAdjournCaseTemplateBody().getNextHearingVenue());
     }
 
     @ParameterizedTest
     @MethodSource("nonFaceToFaceNextHearingTypeParameters")
-    void givenCaseWithSelectedVenueSetForNonFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(String nextHearingType, String nextHearingTypeText) {
+    void givenCaseWithSelectedVenueSetForNonFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(String nextHearingType) {
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
         sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
@@ -1855,10 +1855,10 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = "FACE_TO_FACE")
-    void givenCaseWithSelectedVenueSetIncorrectlyForFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("faceToFaceNextHearingTypeParameters")
+    void givenCaseWithSelectedVenueSetIncorrectlyForFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(String nextHearingType) {
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         DynamicListItem listItem = new DynamicListItem("someUnknownVenueId", "");
@@ -1878,10 +1878,10 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = "FACE_TO_FACE")
-    void givenCaseWithSelectedVenueMissingListItemForFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("faceToFaceNextHearingTypeParameters")
+    void givenCaseWithSelectedVenueMissingListItemForFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(String nextHearingType) {
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         DynamicListItem listItem = new DynamicListItem("someUnknownVenueId", "");
@@ -1901,10 +1901,10 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = "FACE_TO_FACE")
-    void givenCaseWithSelectedVenueMissingListItemCodeForFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("faceToFaceNextHearingTypeParameters")
+    void givenCaseWithSelectedVenueMissingListItemCodeForFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(String nextHearingType) {
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         DynamicListItem listItem = new DynamicListItem("someUnknownVenueId", "");
@@ -1925,7 +1925,7 @@ class AdjournCasePreviewServiceTest {
 
     @ParameterizedTest
     @MethodSource("nonFaceToFaceNextHearingTypeParameters")
-    void givenCaseWithSelectedVenueSetIncorrectlyForNonFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(String nextHearingType, String nextHearingTypeText) {
+    void givenCaseWithSelectedVenueSetIncorrectlyForNonFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(String nextHearingType) {
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
         sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
