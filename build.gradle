@@ -512,7 +512,7 @@ bootWithCCD {
     //---Additional compose services---
     //Place any extra compose files you'd like to be started automatically here. These should be
     //in the folder /src/cftlib/resources/docker/ and comma delimited.
-    environment 'ADDITIONAL_COMPOSE_FILES', 'cft-lib-doc-stack.yml,cft-lib-doc-assembly.yml,cft-lib-ref-data-wiremock.yml'
+    environment 'ADDITIONAL_COMPOSE_FILES', 'cft-lib-doc-stack.yml,cft-lib-doc-assembly.yml,cft-lib-ref-data-wiremock.yml,cft-lib-em-stack.yml'
     //Turn this on to automatically recreate containers above. Useful for debugging if you make changes.
     environment 'FORCE_RECREATE_ADDITIONAL_CONTAINERS', 'false'
 
@@ -526,10 +526,10 @@ bootWithCCD {
     environment 'DM_STORE_BASE_URL', 'http://localhost:5005'
     environment 'S2S_URL', 'http://localhost:4502'
     environment 'DOC_ASSEMBLY_URL', 'http://localhost:4631'
-    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'evidence'
+    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'emstitch,evidence'
     environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
     environment 'CASE_DOCUMENT_S2S_AUTHORISED_SERVICES', 'ccd_case_document_am_api,ccd_gw,xui_webapp,ccd_data,bulk_scan_processor,sscs'
-    environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,payment-api,xui_webapp,sscs,ccd_case_document_am_api,am_role_assignment_service'
+    environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,payment-api,xui_webapp,sscs,ccd_case_document_am_api,am_role_assignment_service,em_ccd_orchestrator'
     environment 'CASE_ACCESS_MANAGEMENT_FEATURE', 'true'
     //Wiremock
     environment 'RD_LOCATION_REF_API_URL', 'http://localhost:8084'
