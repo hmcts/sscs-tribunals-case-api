@@ -10,6 +10,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod.PROVIDE_DATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType.DATE_TO_BE_FIXED;
@@ -19,6 +20,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingPeriod.T
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue.SAME_VENUE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue.SOMEWHERE_ELSE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.FACE_TO_FACE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.PAPER;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.TELEPHONE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.VIDEO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -26,14 +30,22 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Stream;
+
 import junitparams.JUnitParamsRunner;
+import junitparams.NamedParameters;
+import org.apache.commons.lang3.EnumUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -101,6 +113,7 @@ class AdjournCasePreviewServiceTest {
 
     @BeforeEach
     void setUp() throws IOException {
+        openMocks(this);
         service = new AdjournCasePreviewService(generateFile, userDetailsService,
             venueDataLoader, new LanguageService(), TEMPLATE_ID);
 
@@ -135,6 +148,44 @@ class AdjournCasePreviewServiceTest {
         capture = ArgumentCaptor.forClass(GenerateFileParams.class);
 
         when(generateFile.assemble(any())).thenReturn(URL);
+    }
+
+
+    private static Stream<Arguments> allNextHearingTypeParameters() {
+        return Stream.of(
+            Arguments.of("telephone", "telephone hearing"),
+            Arguments.of("video", "video hearing"),
+            Arguments.of("paper", "decision on the papers"),
+            Arguments.of("faceToFace", "face to face hearing")
+        );
+    }
+
+    private static Stream<Arguments> nonFaceToFaceNextHearingTypeParameters() {
+        return Stream.of(
+            Arguments.of("telephone", "telephone hearing"),
+            Arguments.of("video", "video hearing"),
+            Arguments.of("paper", "decision on the papers")
+        );
+    }
+
+    private static Stream<Arguments> paperNextHearingTypeParameters() {
+        return Stream.of(
+            Arguments.of("paper", "decision on the papers")
+        );
+    }
+
+    private static Stream<Arguments> oralNextHearingTypeParameters() {
+        return Stream.of(
+            Arguments.of("telephone", "telephone hearing"),
+            Arguments.of("video", "video hearing"),
+            Arguments.of("faceToFace", "face to face hearing")
+        );
+    }
+
+    private static Stream<Arguments> faceToFaceNextHearingTypeParameters() {
+        return Stream.of(
+            Arguments.of("faceToFace", "face to face hearing")
+        );
     }
 
     private static boolean isOralHearing(AdjournCaseTypeOfHearing nextHearingType) {
@@ -1101,11 +1152,10 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = "FACE_TO_FACE", mode = EXCLUDE)
-    void givenCaseWithNoSelectedVenueNotSetForNonFaceToFace_thenCorrectlySetTheVenueToBeNull(AdjournCaseTypeOfHearing nextHearingType) {
-
+    @MethodSource("nonFaceToFaceNextHearingTypeParameters")
+    void givenCaseWithNoSelectedVenueNotSetForNonFaceToFace_thenCorrectlySetTheVenueToBeNull(String nextHearingType, String nextHearingTypeText) {
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
 
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
@@ -1114,7 +1164,7 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingType.getDescriptionEn(), true);
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
     }
 
     // Scenarios for next hearing date
@@ -1782,10 +1832,10 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = "FACE_TO_FACE", mode = EXCLUDE)
-    void givenCaseWithSelectedVenueSetForNonFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("nonFaceToFaceNextHearingTypeParameters")
+    void givenCaseWithSelectedVenueSetForNonFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(String nextHearingType, String nextHearingTypeText) {
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         DynamicListItem item = new DynamicListItem("someVenueId", "");
@@ -1874,10 +1924,10 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = "FACE_TO_FACE", mode = EXCLUDE)
-    void givenCaseWithSelectedVenueSetIncorrectlyForNonFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(AdjournCaseTypeOfHearing nextHearingType) {
+    @MethodSource("nonFaceToFaceNextHearingTypeParameters")
+    void givenCaseWithSelectedVenueSetIncorrectlyForNonFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(String nextHearingType, String nextHearingTypeText) {
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(nextHearingType);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
 
         DynamicListItem listItem = new DynamicListItem("someUnknownVenueId", "");
