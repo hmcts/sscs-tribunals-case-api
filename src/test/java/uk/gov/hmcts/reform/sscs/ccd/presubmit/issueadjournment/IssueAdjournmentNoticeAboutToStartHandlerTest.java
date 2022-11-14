@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -55,79 +56,87 @@ class IssueAdjournmentNoticeAboutToStartHandlerTest {
     void setUp() {
         handler = new IssueAdjournmentNoticeAboutToStartHandler(previewService);
 
-        when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT_NOTICE);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
             .adjournment(Adjournment.builder()
                 .previewDocument(DocumentLink.builder().build())
                 .build())
             .build();
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        when(generateFile.assemble(any())).thenReturn(URL);
     }
 
-    @Test
-    void givenANonIssueAdjournmentEvent_thenReturnFalse() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
+    @Nested
+    class Main {
+
+        @BeforeEach
+        void setUp() {
+            when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT_NOTICE);
+            when(callback.getCaseDetails()).thenReturn(caseDetails);
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        }
+
+        @Test
+        void givenAboutToStartRequest_willGeneratePreviewFile() {
+            PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
+            sscsCaseData.getAdjournment().setGenerateNotice(YES);
+            sscsCaseData.getAdjournment().setGeneratedDate(LocalDate.now());
+
+            when(previewService.preview(callback, DocumentType.ADJOURNMENT_NOTICE, USER_AUTHORISATION, true))
+                .thenReturn(response);
+            handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+            verify(previewService).preview(callback, DocumentType.ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        }
+
+        @Test
+        void givenGenerateNoticeIsNo_andPreviewDocumentExists_thenPreviewServiceIsNotUsedAndNoError() {
+            sscsCaseData.getAdjournment().setGenerateNotice(NO);
+            sscsCaseData.getAdjournment().setPreviewDocument(DocumentLink.builder().build());
+            PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+            verifyNoInteractions(previewService);
+            assertThat(result.getErrors()).isEmpty();
+        }
+
+        @Test
+        void givenNoPreviewDecisionFoundOnCase_thenShowError() {
+            sscsCaseData.getAdjournment().setGenerateNotice(NO);
+            sscsCaseData.getAdjournment().setPreviewDocument(null);
+            PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+            String error = result.getErrors().stream().findFirst().orElse("");
+            assertThat(error).isEqualTo("No draft adjournment notice found on case. Please use 'Adjourn case' event or upload your adjourn case document.");
+        }
+
+        @Test
+        void givenNoGeneratedDateFoundOnCase_thenShowError() {
+            sscsCaseData.getAdjournment().setGenerateNotice(YES);
+            PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+            String error = result.getErrors().stream().findFirst().orElse("");
+            assertThat(error).isEqualTo("Adjourn case generated date not found. Please use 'Adjourn case' event or upload your adjourn case document.");
+        }
+
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"ABOUT_TO_SUBMIT", "MID_EVENT", "SUBMITTED"})
-    void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
-        assertThat(handler.canHandle(callbackType, callback)).isFalse();
-    }
+    @Nested
+    class Other {
+        @Test
+        void throwsExceptionIfItCannotHandleTheAppeal() {
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+            assertThatThrownBy(() -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION))
+                .isInstanceOf(IllegalStateException.class);
+        }
 
-    @Test
-    void givenAboutToStartRequest_willGeneratePreviewFile() {
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
-        sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        sscsCaseData.getAdjournment().setGeneratedDate(LocalDate.now());
+        @Test
+        void givenANonIssueAdjournmentEvent_thenReturnFalse() {
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+            assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
+        }
 
-        when(previewService.preview(callback, DocumentType.ADJOURNMENT_NOTICE, USER_AUTHORISATION, true))
-            .thenReturn(response);
-        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        verify(previewService).preview(callback, DocumentType.ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
-    }
-
-    @Test
-    void givenGenerateNoticeIsNo_andPreviewDocumentExists_thenPreviewServiceIsNotUsedAndNoError() {
-        sscsCaseData.getAdjournment().setGenerateNotice(NO);
-        sscsCaseData.getAdjournment().setPreviewDocument(DocumentLink.builder().build());
-        PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        verifyNoInteractions(previewService);
-        assertThat(result.getErrors()).isEmpty();
-    }
-
-    @Test
-    void givenNoPreviewDecisionFoundOnCase_thenShowError() {
-        sscsCaseData.getAdjournment().setGenerateNotice(NO);
-        sscsCaseData.getAdjournment().setPreviewDocument(null);
-        PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        String error = result.getErrors().stream().findFirst().orElse("");
-        assertThat(error).isEqualTo("No draft adjournment notice found on case. Please use 'Adjourn case' event or upload your adjourn case document.");
-    }
-
-    @Test
-    void givenNoGeneratedDateFoundOnCase_thenShowError() {
-        sscsCaseData.getAdjournment().setGenerateNotice(YES);
-        PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        String error = result.getErrors().stream().findFirst().orElse("");
-        assertThat(error).isEqualTo("Adjourn case generated date not found. Please use 'Adjourn case' event or upload your adjourn case document.");
-    }
-
-    @Test
-    void throwsExceptionIfItCannotHandleTheAppeal() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        assertThatThrownBy(() -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION))
-            .isInstanceOf(IllegalStateException.class);
+        @ParameterizedTest
+        @ValueSource(strings = {"ABOUT_TO_SUBMIT", "MID_EVENT", "SUBMITTED"})
+        void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
+            assertThat(handler.canHandle(callbackType, callback)).isFalse();
+        }
     }
 }
