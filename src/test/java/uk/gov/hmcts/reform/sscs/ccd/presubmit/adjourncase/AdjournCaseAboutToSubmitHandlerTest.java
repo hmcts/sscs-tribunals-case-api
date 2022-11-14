@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -67,12 +68,6 @@ class AdjournCaseAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    private void setUpAdjournCaseMocks() {
-        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-    }
-
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
@@ -85,147 +80,157 @@ class AdjournCaseAboutToSubmitHandlerTest {
             .build();
     }
 
-    @DisplayName("Given a non adjourn case event, then return false")
-    @Test
-    void givenNonAdjournCaseEvent_thenReturnFalse() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
-    }
+    @Nested
+    class Main {
 
-    @DisplayName("Given caseDetails is null, then return false")
-    @Test
-    void givenCaseDetailsIsNull_thenReturnFalse() {
-        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
-    }
+        @BeforeEach
+        void setup() {
+            when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
+            when(callback.getCaseDetails()).thenReturn(caseDetails);
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        }
 
-    @DisplayName("Given caseData is null, then return false")
-    @Test
-    void givenCaseDataIsNull_thenReturnFalse() {
-        lenient().when(callback.getCaseDetails()).thenReturn(caseDetails);
-        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
-    }
+        @DisplayName("Given draft adjournment notice already exists on case, then overwrite existing draft")
+        @Test
+        void givenAdjournmentNoticeAlreadyExistsOnCase_thenOverwriteExistingDraft() {
+            SscsDocument doc = SscsDocument.builder().value(
+                SscsDocumentDetails.builder()
+                    .documentFileName(OLD_DRAFT_DOC)
+                    .documentType(DRAFT_ADJOURNMENT_NOTICE.getValue())
+                    .build())
+                .build();
+            List<SscsDocument> docs = new ArrayList<>();
+            docs.add(doc);
+            callback.getCaseDetails().getCaseData().setSscsDocument(docs);
 
-    @DisplayName("Given draft adjournment notice already exists on case, then overwrite existing draft")
-    @Test
-    void givenAdjournmentNoticeAlreadyExistsOnCase_thenOverwriteExistingDraft() {
-        setUpAdjournCaseMocks();
-        SscsDocument doc = SscsDocument.builder().value(
-            SscsDocumentDetails.builder()
-                .documentFileName(OLD_DRAFT_DOC)
-                .documentType(DRAFT_ADJOURNMENT_NOTICE.getValue())
-                .build())
-            .build();
-        List<SscsDocument> docs = new ArrayList<>();
-        docs.add(doc);
-        callback.getCaseDetails().getCaseData().setSscsDocument(docs);
-
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        verify(previewDocumentService, times(1)).writePreviewDocumentToSscsDocument(
-            sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, null);
-    }
-
-    @DisplayName("Given an adjournment event with language interpreter required and case has existing interpreter, "
-        + "then overwrite existing interpreter in hearing options")
-    @Test
-    void givenAdjournmentEventWithLanguageInterpreterRequiredAndCaseHasExistingInterpreter_overwriteExistingInterpreter() {
-        setUpAdjournCaseMocks();
-        callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterRequired(YES);
-        callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterLanguage("spanish");
-        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder()
-            .languageInterpreter(NO.getValue())
-            .languages("French")
-            .build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo(YES.getValue());
-        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo(SPANISH);
-    }
-
-    @DisplayName("Given an adjournment event with language interpreter required and interpreter language set, "
-        + "then do not display error")
-    @Test
-    void givenAdjournmentEventWithLanguageInterpreterRequiredAndLanguageSet_thenDoNotDisplayError() {
-        setUpAdjournCaseMocks();
-        callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterRequired(YES);
-        callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterLanguage("spanish");
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo(YES.getValue());
-        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo(SPANISH);
-    }
-
-    @DisplayName("Given a non callback type, then return false")
-    @ParameterizedTest
-    @ValueSource(strings = {"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
-    void givenNonCallbackType_thenReturnFalse(CallbackType callbackType) {
-        assertThat(handler.canHandle(callbackType, callback)).isFalse();
-    }
-
-    @DisplayName("Throws exception if it cannot handle the appeal")
-    @Test
-    void givenCannotHandleAppeal_thenThrowsException() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        assertThatThrownBy(() -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION))
-            .isInstanceOf(IllegalStateException.class);
-    }
-
-    @DisplayName("When adjournment is disabled and case is LA, then should not send any messages")
-    @Test
-    void givenFeatureFlagDisabled_thenNoMessageIsSent() {
-        setUpAdjournCaseMocks();
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", false);
-        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
-
-        PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verifyNoInteractions(hearingMessageHelper);
+            verify(previewDocumentService, times(1)).writePreviewDocumentToSscsDocument(
+                sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, null);
+        }
 
-        assertThat(response.getErrors()).isEmpty();
+        @DisplayName("Given an adjournment event with language interpreter required and case has existing interpreter, "
+            + "then overwrite existing interpreter in hearing options")
+        @Test
+        void givenAdjournmentEventWithLanguageInterpreterRequiredAndCaseHasExistingInterpreter_overwriteExistingInterpreter() {
+            callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterRequired(YES);
+            callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterLanguage(SPANISH);
+            callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder()
+                .languageInterpreter(NO.getValue())
+                .languages("French")
+                .build());
+
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo(YES.getValue());
+            assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo(SPANISH);
+        }
+
+        @DisplayName("Given an adjournment event with language interpreter required and interpreter language set, "
+            + "then do not display error")
+        @Test
+        void givenAdjournmentEventWithLanguageInterpreterRequiredAndLanguageSet_thenDoNotDisplayError() {
+            callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterRequired(YES);
+            callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterLanguage(SPANISH);
+
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo(YES.getValue());
+            assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo(SPANISH);
+        }
+
+
+        @DisplayName("When adjournment is disabled and case is LA, then should not send any messages")
+        @Test
+        void givenFeatureFlagDisabled_thenNoMessageIsSent() {
+            ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", false);
+            sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
+
+            PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            verifyNoInteractions(hearingMessageHelper);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @DisplayName("When adjournment is enabled and case is LA and case cannot be listed right away "
+            + "and no directions are being made, then should send a new hearing request in hearings API")
+        @Test
+        void givenCaseCannotBeListedRightAwayAndNoDirectionsBeingMade_thenNewHearingRequestSent() {
+            PreSubmitCallbackResponse<SscsCaseData> response = cannotBeListedAndNoDirectionsGiven();
+
+            assertHearingCreatedAndAdjournmentInProgress(response);
+        }
+
+        @DisplayName("When adjournment is enabled and case is LA and case can be listed right away "
+            + "then should send a new hearing request in hearings API")
+        @Test
+        void givenCanBeListedRightAway_thenNewHearingRequestSent() {
+            PreSubmitCallbackResponse<SscsCaseData> response = canBeListed();
+
+            assertHearingCreatedAndAdjournmentInProgress(response);
+        }
+
+        private void assertHearingCreatedAndAdjournmentInProgress(PreSubmitCallbackResponse<SscsCaseData> response) {
+            verify(hearingMessageHelper, times(1))
+                .sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
+
+            assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getData().getAdjournment().getIsAdjournmentInProgress()).isEqualTo(YES);
+        }
+
+        @DisplayName("When adjournment is enabled and case is LA and case cannot be listed right away "
+            + "and directions are being made, then should not send any messages")
+        @Test
+        void givenCaseCannotBeListedRightAwayAndDirectionsAreBeingMade_thenNoMessagesSent() {
+            PreSubmitCallbackResponse<SscsCaseData> response = cannotBeListedAndDirectionsGiven();
+
+            verifyNoInteractions(hearingMessageHelper);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
     }
 
-    @DisplayName("When adjournment is enabled and case is LA and case cannot be listed right away "
-        + "and no directions are being made, then should send a new hearing request in hearings API")
-    @Test
-    void givenCaseCannotBeListedRightAwayAndNoDirectionsBeingMade_thenNewHearingRequestSent() {
-        setUpAdjournCaseMocks();
-        PreSubmitCallbackResponse<SscsCaseData> response = cannotBeListedAndNoDirectionsGiven();
+    @Nested
+    class Other {
 
-        assertHearingCreatedAndAdjournmentInProgress(response);
+        @DisplayName("Given a non callback type, then return false")
+        @ParameterizedTest
+        @ValueSource(strings = {"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
+        void givenNonCallbackType_thenReturnFalse(CallbackType callbackType) {
+            assertThat(handler.canHandle(callbackType, callback)).isFalse();
+        }
+
+        @DisplayName("Throws exception if it cannot handle the appeal")
+        @Test
+        void givenCannotHandleAppeal_thenThrowsException() {
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+            assertThatThrownBy(() -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION))
+                .isInstanceOf(IllegalStateException.class);
+        }
+
+        @DisplayName("Given a non adjourn case event, then return false")
+        @Test
+        void givenNonAdjournCaseEvent_thenReturnFalse() {
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+            assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
+        }
+
+        @DisplayName("Given caseDetails is null, then return false")
+        @Test
+        void givenCaseDetailsIsNull_thenReturnFalse() {
+            assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
+        }
+
+        @DisplayName("Given caseData is null, then return false")
+        @Test
+        void givenCaseDataIsNull_thenReturnFalse() {
+            lenient().when(callback.getCaseDetails()).thenReturn(caseDetails);
+            assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
+        }
     }
 
-    @DisplayName("When adjournment is enabled and case is LA and case can be listed right away "
-        + "then should send a new hearing request in hearings API")
-    @Test
-    void givenCanBeListedRightAway_thenNewHearingRequestSent() {
-        setUpAdjournCaseMocks();
-        PreSubmitCallbackResponse<SscsCaseData> response = canBeListed();
-
-        assertHearingCreatedAndAdjournmentInProgress(response);
-    }
-
-    private void assertHearingCreatedAndAdjournmentInProgress(PreSubmitCallbackResponse<SscsCaseData> response) {
-        verify(hearingMessageHelper, times(1))
-            .sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
-
-        assertThat(response.getErrors()).isEmpty();
-        assertThat(response.getData().getAdjournment().getIsAdjournmentInProgress()).isEqualTo(YES);
-    }
-
-    @DisplayName("When adjournment is enabled and case is LA and case cannot be listed right away "
-        + "and directions are being made, then should not send any messages")
-    @Test
-    void givenCaseCannotBeListedRightAwayAndDirectionsAreBeingMade_thenNoMessagesSent() {
-        setUpAdjournCaseMocks();
-        PreSubmitCallbackResponse<SscsCaseData> response = cannotBeListedAndDirectionsGiven();
-
-        verifyNoInteractions(hearingMessageHelper);
-
-        assertThat(response.getErrors()).isEmpty();
-    }
 
     private PreSubmitCallbackResponse<SscsCaseData> cannotBeListedAndNoDirectionsGiven() {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
