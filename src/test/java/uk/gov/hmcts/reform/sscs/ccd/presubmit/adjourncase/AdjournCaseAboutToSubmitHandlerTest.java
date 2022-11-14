@@ -131,8 +131,7 @@ class AdjournCaseAboutToSubmitHandlerTest {
     void givenAdjournmentEventWithLanguageInterpreterRequiredAndCaseHasExistingInterpreter_overwriteExistingInterpreter() {
         setUpAdjournCaseMocks();
         callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterRequired(YES);
-        callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterLanguage(new DynamicList(
-            new DynamicListItem("spanish", SPANISH), List.of()));
+        callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterLanguage("spanish");
         callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder()
             .languageInterpreter(NO.getValue())
             .languages("French")
@@ -150,8 +149,7 @@ class AdjournCaseAboutToSubmitHandlerTest {
     void givenAdjournmentEventWithLanguageInterpreterRequiredAndLanguageSet_thenDoNotDisplayError() {
         setUpAdjournCaseMocks();
         callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterRequired(YES);
-        callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterLanguage(new DynamicList(
-            new DynamicListItem("spanish", SPANISH), List.of()));
+        callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterLanguage("spanish");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

@@ -7,6 +7,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
+
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
@@ -34,7 +37,7 @@ public class AdjournCaseServiceTest {
             .nextHearingListingDuration(1)
             .nextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS)
             .interpreterRequired(NO)
-            .interpreterLanguage(new DynamicList(new DynamicListItem("spanish", "Spanish"), List.of()))
+            .interpreterLanguage("spanish")
             .nextHearingDateType(AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER)
             .nextHearingDateOrPeriod(AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD)
             .nextHearingDateOrTime("")
@@ -49,6 +52,6 @@ public class AdjournCaseServiceTest {
     @Test
     public void willRemoveTransientAdjournCaseData() {
         AdjournCaseService.clearTransientFields(sscsCaseData);
-        assertThat(sscsCaseData.getAdjournment()).isNull();
+        assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrProperties();
     }
 }
