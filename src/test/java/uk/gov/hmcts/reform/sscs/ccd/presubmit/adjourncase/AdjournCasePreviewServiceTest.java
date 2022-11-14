@@ -295,7 +295,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
         sscsCaseData.getAdjournment().setInterpreterRequired(YES);
-        sscsCaseData.getAdjournment().setInterpreterLanguage("French");
+        sscsCaseData.getAdjournment().setInterpreterLanguage("french");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
@@ -353,7 +353,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
         sscsCaseData.getAdjournment().setInterpreterRequired(NO);
-        sscsCaseData.getAdjournment().setInterpreterLanguage("French");
+        sscsCaseData.getAdjournment().setInterpreterLanguage("french");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
@@ -392,7 +392,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
         sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
-        sscsCaseData.getAdjournment().setInterpreterLanguage("French");
+        sscsCaseData.getAdjournment().setInterpreterLanguage("french");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
