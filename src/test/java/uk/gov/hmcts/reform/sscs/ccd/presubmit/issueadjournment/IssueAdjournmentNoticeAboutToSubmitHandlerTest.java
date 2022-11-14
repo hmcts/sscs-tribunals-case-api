@@ -283,8 +283,9 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
 
             PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-            String error = response.getErrors().stream().findFirst().orElse("");
-            assertThat(error).isEqualTo("You need to upload PDF documents only");
+            assertThat(response.getErrors())
+                .hasSize(1)
+                .containsOnly("You need to upload PDF documents only");
             assertThat(sscsCaseData.getSscsDocument().stream()
                 .filter(f -> f.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()))).hasSize(1);
         }
