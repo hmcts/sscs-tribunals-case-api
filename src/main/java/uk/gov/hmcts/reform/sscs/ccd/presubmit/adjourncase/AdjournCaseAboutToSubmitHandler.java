@@ -67,7 +67,7 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             if (sscsCaseData.getAppeal().getHearingOptions() != null) {
                 hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
             }
-            hearingOptions.setLanguages(sscsCaseData.getAdjournment().getInterpreterLanguage().getValue().getCode());
+            hearingOptions.setLanguages(sscsCaseData.getAdjournment().getInterpreterLanguage());
             hearingOptions.setLanguageInterpreter(sscsCaseData.getAdjournment().getInterpreterRequired().getValue());
 
             sscsCaseData.getAppeal().setHearingOptions(hearingOptions);
