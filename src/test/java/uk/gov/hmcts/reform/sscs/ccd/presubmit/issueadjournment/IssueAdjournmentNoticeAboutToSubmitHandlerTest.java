@@ -23,6 +23,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -80,12 +81,6 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
             .buildValidatorFactory()
             .getValidator();
 
-    private void setUpIssueAdjournmentNoticeMocks() {
-        when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT_NOTICE);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-    }
-
     @BeforeEach
     void setUp() {
         handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, validator);
@@ -131,174 +126,193 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
         .build();
     }
 
-    @Test
-    void givenANonIssueAdjournmentEvent_thenReturnFalse() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
+    @Nested
+    class Main {
+
+        @BeforeEach
+        void setUp() {
+            when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT_NOTICE);
+            when(callback.getCaseDetails()).thenReturn(caseDetails);
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        }
+
+
+
+        @Test
+        void givenAnIssueAdjournmentEvent_thenCreateAdjournmentWithFooterAndSetStatesAndClearDraftDoc() {
+
+            DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
+            final SscsCaseData newSscsCaseData = callback.getCaseDetails().getCaseData();
+            newSscsCaseData.getAdjournment().setPreviewDocument(docLink);
+            newSscsCaseData.getAdjournment().setDirectionsDueDate(LocalDate.now().plusDays(1));
+
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(ADJOURNMENT_NOTICE), any(), eq(null), eq(null), eq(null));
+
+            assertThat(sscsCaseData.getDwpState()).isEqualTo(DwpState.ADJOURNMENT_NOTICE_ISSUED.getId());
+            assertThat(sscsCaseData.getDirectionDueDate()).isEqualTo(LocalDate.now().plusDays(1).toString());
+            assertThat(sscsCaseData.getSscsDocument().stream()
+                .filter(f -> f.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()))).isEmpty();
+            verifyTemporaryAdjournCaseFieldsAreCleared(newSscsCaseData);
+        }
+
+        private void verifyTemporaryAdjournCaseFieldsAreCleared(SscsCaseData sscsCaseData) {
+            assertThat(sscsCaseData.getAdjournment().getDirectionsDueDate()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getGenerateNotice()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getTypeOfHearing()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getCanCaseBeListedRightAway()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getAreDirectionsBeingMadeToParties()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getDirectionsDueDate()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getTypeOfNextHearing()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getNextHearingVenue()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getNextHearingVenueSelected()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getPanelMembersExcluded()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getDisabilityQualifiedPanelMemberName()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getMedicallyQualifiedPanelMemberName()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getOtherPanelMemberName()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getNextHearingListingDurationType()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getNextHearingListingDuration()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getNextHearingListingDurationUnits()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getInterpreterRequired()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getInterpreterLanguage()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getNextHearingDateType()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getNextHearingDateOrPeriod()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getNextHearingDateOrTime()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getNextHearingFirstAvailableDateAfterDate()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getNextHearingFirstAvailableDateAfterPeriod()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getTime()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getReasons()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getAdditionalDirections()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getIsAdjournmentInProgress()).isNull();
+        }
+
+        @Test
+        void givenAnIssueAdjournmentEvent_thenCreateAdjournmentWithFooterAndTranslationRequired() {
+
+            DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
+            callback.getCaseDetails().getCaseData().getAdjournment().setPreviewDocument(docLink);
+            callback.getCaseDetails().getCaseData().getAdjournment().setDirectionsDueDate(LocalDate.now().plusDays(1));
+            callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("yes");
+
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(ADJOURNMENT_NOTICE), any(), eq(null), eq(null), eq(TRANSLATION_REQUIRED));
+
+            assertThat(sscsCaseData.getDwpState()).isNull();
+            assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.WELSH_TRANSLATION.getId());
+            assertThat(sscsCaseData.getTranslationWorkOutstanding()).isEqualTo("Yes");
+        }
+
+        @Test
+        void givenAnIssueAdjournmentEventWithDueDate_thenCreateAdjournmentWithGivenDueDate() {
+
+            DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
+            callback.getCaseDetails().getCaseData().getAdjournment().setPreviewDocument(docLink);
+            callback.getCaseDetails().getCaseData().getAdjournment().setDirectionsDueDate(LocalDate.now().plusDays(1));
+
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            assertThat(sscsCaseData.getDirectionDueDate()).isEqualTo(LocalDate.now().plusDays(1).toString());
+        }
+
+        @Test
+        void givenAnIssueAdjournmentEventWithDueDateDaysOffset_thenCreateAdjournmentWithGivenDueDateOffset() {
+
+            callback.getCaseDetails().getCaseData().getAdjournment().setDirectionsDueDateDaysOffset(AdjournCaseDaysOffset.FOURTEEN_DAYS);
+
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            assertThat(sscsCaseData.getDirectionDueDate()).isEqualTo(LocalDate.now().plusDays(14).toString());
+        }
+
+        @Test
+        void givenAnIssueAdjournmentEventWithDirectionsToAllParties_thenSetStateToNotListable() {
+
+            DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
+            callback.getCaseDetails().getCaseData().getAdjournment().setPreviewDocument(docLink);
+            callback.getCaseDetails().getCaseData().getAdjournment().setAreDirectionsBeingMadeToParties(YES);
+
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            assertThat(sscsCaseData.getState()).isEqualTo(NOT_LISTABLE);
+        }
+
+        @Test
+        void givenAnIssueAdjournmentEventWithNoDirections_thenSetStateToReadyToList() {
+
+            DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
+            callback.getCaseDetails().getCaseData().getAdjournment().setPreviewDocument(docLink);
+            callback.getCaseDetails().getCaseData().getAdjournment().setAreDirectionsBeingMadeToParties(NO);
+
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            assertThat(sscsCaseData.getState()).isEqualTo(READY_TO_LIST);
+        }
+
+        @Test
+        void givenAnIssueAdjournmentEventForWelshCase0_thenTheCaseStateShoyleStayUnchanged() {
+
+            DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
+            callback.getCaseDetails().getCaseData().getAdjournment().setPreviewDocument(docLink);
+            callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("yes");
+
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            assertThat(sscsCaseData.getState()).isEqualTo(HEARING);
+        }
+
+        @Test
+        void givenAnIssueAdjournmentEventAndNoDraftAdjournmentOnCase_thenDisplayAnError() {
+
+            callback.getCaseDetails().getCaseData().getAdjournment().setPreviewDocument(null);
+
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            String error = response.getErrors().stream().findFirst().orElse("");
+            assertThat(error).isEqualTo("There is no Draft Adjournment Notice on the case so adjournment cannot be issued");
+        }
+
+        @Test
+        void givenANonPdfDecisionNotice_thenDisplayAnError() {
+
+            DocumentLink docLink = DocumentLink.builder().documentUrl("test.doc").build();
+            sscsCaseData.getAdjournment().setPreviewDocument(docLink);
+
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            String error = response.getErrors().stream().findFirst().orElse("");
+            assertThat(error).isEqualTo("You need to upload PDF documents only");
+            assertThat(sscsCaseData.getSscsDocument().stream()
+                .filter(f -> f.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()))).hasSize(1);
+        }
     }
 
-    @Test
-    void givenAnIssueAdjournmentEvent_thenCreateAdjournmentWithFooterAndSetStatesAndClearDraftDoc() {
-        setUpIssueAdjournmentNoticeMocks();
-        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
-        final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        sscsCaseData.getAdjournment().setPreviewDocument(docLink);
-        sscsCaseData.getAdjournment().setDirectionsDueDate(LocalDate.now().plusDays(1));
+    @Nested
+    class Other {
 
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        @Test
+        void givenANonIssueAdjournmentEvent_thenReturnFalse() {
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+            assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
+        }
 
-        verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(ADJOURNMENT_NOTICE), any(), eq(null), eq(null), eq(null));
+        @ParameterizedTest
+        @EnumSource(value = CallbackType.class, names = {"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
+        void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
+            assertThat(handler.canHandle(callbackType, callback)).isFalse();
+        }
 
-        assertThat(this.sscsCaseData.getDwpState()).isEqualTo(DwpState.ADJOURNMENT_NOTICE_ISSUED.getId());
-        assertThat(this.sscsCaseData.getDirectionDueDate()).isEqualTo(LocalDate.now().plusDays(1).toString());
-        assertThat(this.sscsCaseData.getSscsDocument().stream()
-            .filter(f -> f.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()))).isEmpty();
-        verifyTemporaryAdjournCaseFieldsAreCleared(sscsCaseData);
+        @Test
+        void throwsExceptionIfItCannotHandleTheAppeal() {
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+            assertThatThrownBy(() -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION))
+                .isInstanceOf(IllegalStateException.class);
+        }
+
     }
 
-    private void verifyTemporaryAdjournCaseFieldsAreCleared(SscsCaseData sscsCaseData) {
-        assertThat(sscsCaseData.getAdjournment().getDirectionsDueDate()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getGenerateNotice()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getTypeOfHearing()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getCanCaseBeListedRightAway()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getAreDirectionsBeingMadeToParties()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getDirectionsDueDate()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getTypeOfNextHearing()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getNextHearingVenue()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getNextHearingVenueSelected()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getPanelMembersExcluded()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getDisabilityQualifiedPanelMemberName()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getMedicallyQualifiedPanelMemberName()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getOtherPanelMemberName()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getNextHearingListingDurationType()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getNextHearingListingDuration()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getNextHearingListingDurationUnits()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getInterpreterRequired()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getInterpreterLanguage()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getNextHearingDateType()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getNextHearingDateOrPeriod()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getNextHearingDateOrTime()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getNextHearingFirstAvailableDateAfterDate()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getNextHearingFirstAvailableDateAfterPeriod()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getTime()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getReasons()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getAdditionalDirections()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getIsAdjournmentInProgress()).isNull();
-    }
-
-    @Test
-    void givenAnIssueAdjournmentEvent_thenCreateAdjournmentWithFooterAndTranslationRequired() {
-        setUpIssueAdjournmentNoticeMocks();
-        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
-        callback.getCaseDetails().getCaseData().getAdjournment().setPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().getAdjournment().setDirectionsDueDate(LocalDate.now().plusDays(1));
-        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("yes");
-
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(ADJOURNMENT_NOTICE), any(), eq(null), eq(null), eq(TRANSLATION_REQUIRED));
-
-        assertThat(sscsCaseData.getDwpState()).isNull();
-        assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.WELSH_TRANSLATION.getId());
-        assertThat(sscsCaseData.getTranslationWorkOutstanding()).isEqualTo("Yes");
-    }
-
-    @Test
-    void givenAnIssueAdjournmentEventWithDueDate_thenCreateAdjournmentWithGivenDueDate() {
-        setUpIssueAdjournmentNoticeMocks();
-        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
-        callback.getCaseDetails().getCaseData().getAdjournment().setPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().getAdjournment().setDirectionsDueDate(LocalDate.now().plusDays(1));
-
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(sscsCaseData.getDirectionDueDate()).isEqualTo(LocalDate.now().plusDays(1).toString());
-    }
-
-    @Test
-    void givenAnIssueAdjournmentEventWithDueDateDaysOffset_thenCreateAdjournmentWithGivenDueDateOffset() {
-        setUpIssueAdjournmentNoticeMocks();
-        callback.getCaseDetails().getCaseData().getAdjournment().setDirectionsDueDateDaysOffset(AdjournCaseDaysOffset.FOURTEEN_DAYS);
-
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(sscsCaseData.getDirectionDueDate()).isEqualTo(LocalDate.now().plusDays(14).toString());
-    }
-
-    @Test
-    void givenAnIssueAdjournmentEventWithDirectionsToAllParties_thenSetStateToNotListable() {
-        setUpIssueAdjournmentNoticeMocks();
-        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
-        callback.getCaseDetails().getCaseData().getAdjournment().setPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().getAdjournment().setAreDirectionsBeingMadeToParties(YES);
-
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(sscsCaseData.getState()).isEqualTo(NOT_LISTABLE);
-    }
-
-    @Test
-    void givenAnIssueAdjournmentEventWithNoDirections_thenSetStateToReadyToList() {
-        setUpIssueAdjournmentNoticeMocks();
-        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
-        callback.getCaseDetails().getCaseData().getAdjournment().setPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().getAdjournment().setAreDirectionsBeingMadeToParties(NO);
-
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(sscsCaseData.getState()).isEqualTo(READY_TO_LIST);
-    }
-
-    @Test
-    void givenAnIssueAdjournmentEventForWelshCase0_thenTheCaseStateShoyleStayUnchanged() {
-        setUpIssueAdjournmentNoticeMocks();
-        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
-        callback.getCaseDetails().getCaseData().getAdjournment().setPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("yes");
-
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(sscsCaseData.getState()).isEqualTo(HEARING);
-    }
-
-    @Test
-    void givenAnIssueAdjournmentEventAndNoDraftAdjournmentOnCase_thenDisplayAnError() {
-        setUpIssueAdjournmentNoticeMocks();
-        callback.getCaseDetails().getCaseData().getAdjournment().setPreviewDocument(null);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertThat(error).isEqualTo("There is no Draft Adjournment Notice on the case so adjournment cannot be issued");
-    }
-
-    @Test
-    void givenANonPdfDecisionNotice_thenDisplayAnError() {
-        setUpIssueAdjournmentNoticeMocks();
-        DocumentLink docLink = DocumentLink.builder().documentUrl("test.doc").build();
-        sscsCaseData.getAdjournment().setPreviewDocument(docLink);
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertThat(error).isEqualTo("You need to upload PDF documents only");
-        assertThat(sscsCaseData.getSscsDocument().stream()
-            .filter(f -> f.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()))).hasSize(1);
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = CallbackType.class, names = {"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
-    void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
-        assertThat(handler.canHandle(callbackType, callback)).isFalse();
-    }
-
-    @Test
-    void throwsExceptionIfItCannotHandleTheAppeal() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        assertThatThrownBy(() -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION))
-            .isInstanceOf(IllegalStateException.class);
-    }
 }
