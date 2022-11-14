@@ -186,7 +186,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             if (caseData.getAdjournment().getInterpreterLanguage() != null) {
                 adjournCaseBuilder.interpreterDescription(
                     languageService.getInterpreterDescriptionForLanguageKey(
-                        caseData.getAdjournment().getInterpreterLanguage().getValue().getLabel()));
+                        caseData.getAdjournment().getInterpreterLanguage()));
             } else {
                 throw new IllegalStateException("An interpreter is required but no language is set");
             }

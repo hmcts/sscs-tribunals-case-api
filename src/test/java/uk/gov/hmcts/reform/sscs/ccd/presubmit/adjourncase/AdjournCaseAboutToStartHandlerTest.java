@@ -64,7 +64,7 @@ class AdjournCaseAboutToStartHandlerTest {
                 .nextHearingListingDuration(1)
                 .nextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS)
                 .interpreterRequired(NO)
-                .interpreterLanguage(new DynamicList(new DynamicListItem("spanish", "Spanish"), List.of()))
+                .interpreterLanguage("spanish")
                 .nextHearingDateType(AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER)
                 .nextHearingDateOrPeriod(AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD)
                 .nextHearingDateOrTime("")
@@ -153,7 +153,7 @@ class AdjournCaseAboutToStartHandlerTest {
         assertThat(adjournment.getNextHearingListingDuration()).isEqualTo(1);
         assertThat(adjournment.getNextHearingListingDurationUnits()).isEqualTo(AdjournCaseNextHearingDurationUnits.SESSIONS);
         assertThat(adjournment.getInterpreterRequired()).isEqualTo(NO);
-        assertThat(adjournment.getInterpreterLanguage()).isEqualTo(new DynamicList(new DynamicListItem("spanish", "Spanish"), List.of()));
+        assertThat(adjournment.getInterpreterLanguage()).isEqualTo("spanish");
         assertThat(adjournment.getNextHearingDateType()).isEqualTo(AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER);
         assertThat(adjournment.getNextHearingDateOrPeriod()).isEqualTo(AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD);
         assertThat(adjournment.getNextHearingDateOrTime()).isEmpty();
