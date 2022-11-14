@@ -15,6 +15,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -68,13 +69,6 @@ class AdjournCaseMidEventValidationHandlerTest {
     void setUp() {
         handler = new AdjournCaseMidEventValidationHandler(validator);
 
-        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer token")).thenReturn(userDetails);
-
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
             .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
@@ -87,212 +81,227 @@ class AdjournCaseMidEventValidationHandlerTest {
                     .identity(Identity.builder().build())
                     .build())
                 .build()).build();
-
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
-    @Test
-    void givenANonAdjournCaseEvent_thenReturnFalse() {
-        when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
-        assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
+    @Nested
+    class Main {
+
+        @BeforeEach
+        void setUp() {
+            when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
+            when(callback.getCaseDetails()).thenReturn(caseDetails);
+
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        }
+
+        @Test
+        void givenDirectionsDueDateIsToday_ThenDisplayAnError() {
+
+            sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(YES);
+
+            sscsCaseData.getAdjournment().setDirectionsDueDate(LocalDate.now());
+
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+            String error = response.getErrors().stream().findFirst().orElse("");
+            assertThat(error).isEqualTo("Directions due date must be in the future");
+        }
+
+        @Test
+        void givenDirectionsDueDateIsBeforeToday_ThenDisplayAnError() {
+
+            sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(YES);
+
+            sscsCaseData.getAdjournment().setDirectionsDueDate(LocalDate.now().minusDays(1));
+
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+            String error = response.getErrors().stream().findFirst().orElse("");
+            assertThat(error).isEqualTo("Directions due date must be in the future");
+        }
+
+        @Test
+        void givenDirectionsDueDateIsAfterTodayAndDaysOffsetSpecified_ThenDisplayAnError() {
+
+            sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(YES);
+
+            sscsCaseData.getAdjournment().setDirectionsDueDate(LocalDate.now().plusDays(1));
+            sscsCaseData.getAdjournment().setDirectionsDueDateDaysOffset(AdjournCaseDaysOffset.FOURTEEN_DAYS);
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+            String error = response.getErrors().stream().findFirst().orElse("");
+            assertThat(error).isEqualTo("Cannot specify both directions due date and directions due days offset");
+        }
+
+        @Test
+        void givenDirectionsDueDateIsAfterTodayAndDaysOffsetSpecifiedButZero_ThenDoNotDisplayAnError() {
+
+            sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(YES);
+
+            sscsCaseData.getAdjournment().setDirectionsDueDate(LocalDate.now().plusDays(1));
+            sscsCaseData.getAdjournment().setDirectionsDueDateDaysOffset(AdjournCaseDaysOffset.OTHER);
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void givenDirectionsDueDateIsNotSpecifiedAndDaysOffsetSpecified_ThenDoNotDisplayAnError() {
+
+            sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(YES);
+
+            sscsCaseData.getAdjournment().setDirectionsDueDateDaysOffset(AdjournCaseDaysOffset.FOURTEEN_DAYS);
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void givenNeitherDirectionsDueDateOrOffsetSpecified_ThenDisplayAnError() {
+
+            sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(YES);
+
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+            String error = response.getErrors().stream().findFirst().orElse("");
+            assertThat(error).isEqualTo("At least one of directions due date or directions due date offset must be specified");
+        }
+
+        @Test
+        void givenNeitherDirectionsDueDateOrOffsetSpecifiedButNoDirectionsToParties_ThenDoNotDisplayAnError() {
+
+            sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
+
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void givenDirectionsDueDateIsAfterToday_ThenDoNotDisplayAnError() {
+
+            sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
+
+            sscsCaseData.getAdjournment().setDirectionsDueDate(LocalDate.now().plusDays(1));
+
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void givenNextHearingDateRequiredForDateOrPeriodAndNextHearingAndDateIsAfterToday_ThenDoNotDisplayAnError() {
+
+            sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE_AFTER);
+            sscsCaseData.getAdjournment().setNextHearingDateOrPeriod(PROVIDE_DATE);
+            sscsCaseData.getAdjournment().setNextHearingFirstAvailableDateAfterDate(LocalDate.now().plusDays(1));
+
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void givenNextHearingDateRequiredForDateOrPeriodAndNextHearingAndDateIsToday_ThenDoNotDisplayAnError() {
+
+            sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE_AFTER);
+            sscsCaseData.getAdjournment().setNextHearingDateOrPeriod(PROVIDE_DATE);
+            sscsCaseData.getAdjournment().setNextHearingFirstAvailableDateAfterDate(LocalDate.now());
+
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void givenNextHearingDateRequiredForDateOrPeriodAndNextHearingAndDateBeforeToday_ThenDisplayAnError() {
+
+            sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE_AFTER);
+            sscsCaseData.getAdjournment().setNextHearingDateOrPeriod(PROVIDE_DATE);
+            sscsCaseData.getAdjournment().setNextHearingFirstAvailableDateAfterDate(LocalDate.now().minusDays(1));
+
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+            String error = response.getErrors().stream().findFirst().orElse("");
+            assertThat(error).isEqualTo("'First available date after' date cannot be in the past");
+        }
+
+        @Test
+        void givenNextHearingDateNotRequiredForDateOrPeriodAndNextHearingAndDateBeforeToday_ThenDoNotDisplayAnError() {
+
+            sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE_AFTER);
+            sscsCaseData.getAdjournment().setNextHearingDateOrPeriod(PROVIDE_PERIOD);
+            sscsCaseData.getAdjournment().setNextHearingFirstAvailableDateAfterDate(LocalDate.now().minusDays(1));
+
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+            assertThat(response.getErrors()).isEmpty();
+
+        }
+
+        @Test
+        void givenNextHearingDateRequiredForDateOrPeriodAndNextHearingDateNotSet_ThenDisplayAnError() {
+
+            sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE_AFTER);
+            sscsCaseData.getAdjournment().setNextHearingDateOrPeriod(PROVIDE_DATE);
+
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+            String error = response.getErrors().stream().findFirst().orElse("");
+            assertThat(error).isEqualTo("'First available date after' date must be provided");
+
+        }
+
     }
 
-    @ParameterizedTest
-    @EnumSource(value = CallbackType.class, names = {"ABOUT_TO_START", "ABOUT_TO_SUBMIT", "SUBMITTED"})
-    void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
-        assertThat(handler.canHandle(callbackType, callback)).isFalse();
-    }
+    @Nested
+    class Other {
+
+        @Test
+        void throwsExceptionIfItCannotHandleTheEvent() {
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+
+            assertThatThrownBy(() -> handler.handle(MID_EVENT, callback, USER_AUTHORISATION))
+                .isInstanceOf(IllegalStateException.class);
+        }
+
+        @Test
+        void givenANonAdjournCaseEvent_thenReturnFalse() {
+            when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
+            assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = CallbackType.class, names = {"ABOUT_TO_START", "ABOUT_TO_SUBMIT", "SUBMITTED"})
+        void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
+            assertThat(handler.canHandle(callbackType, callback)).isFalse();
+        }
 
-    @Test
-    void givenDirectionsDueDateIsToday_ThenDisplayAnError() {
-
-        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(YES);
-
-        sscsCaseData.getAdjournment().setDirectionsDueDate(LocalDate.now());
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertThat(error).isEqualTo("Directions due date must be in the future");
-    }
-
-    @Test
-    void givenDirectionsDueDateIsBeforeToday_ThenDisplayAnError() {
-
-        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(YES);
-
-        sscsCaseData.getAdjournment().setDirectionsDueDate(LocalDate.now().minusDays(1));
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertThat(error).isEqualTo("Directions due date must be in the future");
-    }
-
-    @Test
-    void givenDirectionsDueDateIsAfterTodayAndDaysOffsetSpecified_ThenDisplayAnError() {
-
-        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(YES);
-
-        sscsCaseData.getAdjournment().setDirectionsDueDate(LocalDate.now().plusDays(1));
-        sscsCaseData.getAdjournment().setDirectionsDueDateDaysOffset(AdjournCaseDaysOffset.FOURTEEN_DAYS);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertThat(error).isEqualTo("Cannot specify both directions due date and directions due days offset");
-    }
-
-    @Test
-    void givenDirectionsDueDateIsAfterTodayAndDaysOffsetSpecifiedButZero_ThenDoNotDisplayAnError() {
-
-        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(YES);
-
-        sscsCaseData.getAdjournment().setDirectionsDueDate(LocalDate.now().plusDays(1));
-        sscsCaseData.getAdjournment().setDirectionsDueDateDaysOffset(AdjournCaseDaysOffset.OTHER);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-    }
-
-    @Test
-    void givenDirectionsDueDateIsNotSpecifiedAndDaysOffsetSpecified_ThenDoNotDisplayAnError() {
-
-        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(YES);
-
-        sscsCaseData.getAdjournment().setDirectionsDueDateDaysOffset(AdjournCaseDaysOffset.FOURTEEN_DAYS);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-    }
-
-    @Test
-    void givenNeitherDirectionsDueDateOrOffsetSpecified_ThenDisplayAnError() {
-
-        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(YES);
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertThat(error).isEqualTo("At least one of directions due date or directions due date offset must be specified");
-    }
-
-    @Test
-    void givenNeitherDirectionsDueDateOrOffsetSpecifiedButNoDirectionsToParties_ThenDoNotDisplayAnError() {
-
-        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-    }
-
-    @Test
-    void givenDirectionsDueDateIsAfterToday_ThenDoNotDisplayAnError() {
-
-        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
-
-        sscsCaseData.getAdjournment().setDirectionsDueDate(LocalDate.now().plusDays(1));
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-    }
-
-    @Test
-    void givenNextHearingDateRequiredForDateOrPeriodAndNextHearingAndDateIsAfterToday_ThenDoNotDisplayAnError() {
-
-        sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE_AFTER);
-        sscsCaseData.getAdjournment().setNextHearingDateOrPeriod(PROVIDE_DATE);
-        sscsCaseData.getAdjournment().setNextHearingFirstAvailableDateAfterDate(LocalDate.now().plusDays(1));
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-    }
-
-    @Test
-    void givenNextHearingDateRequiredForDateOrPeriodAndNextHearingAndDateIsToday_ThenDoNotDisplayAnError() {
-
-        sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE_AFTER);
-        sscsCaseData.getAdjournment().setNextHearingDateOrPeriod(PROVIDE_DATE);
-        sscsCaseData.getAdjournment().setNextHearingFirstAvailableDateAfterDate(LocalDate.now());
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-    }
-
-    @Test
-    void givenNextHearingDateRequiredForDateOrPeriodAndNextHearingAndDateBeforeToday_ThenDisplayAnError() {
-
-        sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE_AFTER);
-        sscsCaseData.getAdjournment().setNextHearingDateOrPeriod(PROVIDE_DATE);
-        sscsCaseData.getAdjournment().setNextHearingFirstAvailableDateAfterDate(LocalDate.now().minusDays(1));
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertThat(error).isEqualTo("'First available date after' date cannot be in the past");
-    }
-
-    @Test
-    void givenNextHearingDateNotRequiredForDateOrPeriodAndNextHearingAndDateBeforeToday_ThenDoNotDisplayAnError() {
-
-        sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE_AFTER);
-        sscsCaseData.getAdjournment().setNextHearingDateOrPeriod(PROVIDE_PERIOD);
-        sscsCaseData.getAdjournment().setNextHearingFirstAvailableDateAfterDate(LocalDate.now().minusDays(1));
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-
-    }
-
-    @Test
-    void givenNextHearingDateRequiredForDateOrPeriodAndNextHearingDateNotSet_ThenDisplayAnError() {
-
-        sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE_AFTER);
-        sscsCaseData.getAdjournment().setNextHearingDateOrPeriod(PROVIDE_DATE);
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertThat(error).isEqualTo("'First available date after' date must be provided");
-
-    }
-
-    @Test
-    void throwsExceptionIfItCannotHandleTheEvent() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-
-        assertThatThrownBy(() -> handler.handle(MID_EVENT, callback, USER_AUTHORISATION))
-            .isInstanceOf(IllegalStateException.class);
     }
 }
