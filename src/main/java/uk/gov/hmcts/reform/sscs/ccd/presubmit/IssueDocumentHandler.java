@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -26,7 +28,6 @@ import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConvert
 public class IssueDocumentHandler {
 
     private static final String GLASGOW = "GLASGOW";
-    private static final DateTimeFormatter DATE_PATTERN = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     // Fields used for a short period in case progression are transient,
     // relevant for a short period of the case lifecycle.
@@ -110,7 +111,7 @@ public class IssueDocumentHandler {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         if ((ADJOURNMENT_NOTICE.equals(documentType) || DRAFT_ADJOURNMENT_NOTICE.equals(documentType))
-            && isNoOrNull(caseData.getAdjournment().getGenerateNotice())) {
+            && caseData.getAdjournment().getGenerateNotice() == null) {
             throw new IllegalStateException("Generate notice has not been set");
         }
 
