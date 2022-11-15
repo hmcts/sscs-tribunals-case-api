@@ -37,7 +37,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 @AutoConfigureMockMvc
 public class AdjournCaseIt extends AbstractEventIt {
 
-    public static final String DIRECTIONS_DUE_DATE_PLACEHOLDER = "DIRECTIONS_DUE_DATE_PLACEHOLDER";
+    public static final String DIRECTIONS_DUE_DATE_PLACEHOLDER = "2020-01-01";
     public static final String GENERATED_VIDEO_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITH_DIRECTIONS_MADE_JSON =
         "callback/adjournCaseGeneratedVideoWhenCaseNotListedStraightAwayWithDirectionsMade.json";
     public static final String GENERATED_PAPER_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITHOUT_DIRECTIONS_MADE_JSON =
@@ -371,7 +371,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertThat(payload.getHearingType()).isEqualTo(hearingType);
         assertThat(payload.getAdditionalDirections().get(0)).isEqualTo("something else");
         assertThat(payload.getReasonsForDecision().get(0)).isEqualTo("Reasons 1");
-        assertThat(payload.getPanelMembersExcluded()).isEqualTo("yes");
+        assertThat(payload.getPanelMembersExcluded()).isEqualTo("Yes");
         assertThat(payload.getAppellantName()).isEqualTo(TEST_NAME);
         assertThat(payload.getInterpreterDescription()).isEqualTo(interpreterDescription);
     }

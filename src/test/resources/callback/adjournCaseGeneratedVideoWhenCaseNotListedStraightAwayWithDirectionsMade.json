@@ -29,7 +29,7 @@
       "adjournCaseCanCaseBeListedRightAway" : "No",
       "adjournCaseAreDirectionsBeingMadeToParties" : "Yes",
       "adjournCaseTypeOfNextHearing" : "video",
-      "adjournCasePanelMembersExcluded" : "yes",
+      "adjournCasePanelMembersExcluded" : "Yes",
       "adjournCaseNextHearingDateType" : "dateToBeFixed",
       "adjournCaseNextHearingDateOrPeriod" : "provideDate",
       "adjournCaseTime": {
@@ -40,7 +40,7 @@
       },
       "adjournCaseAdditionalDirections": [{"id":null, "value":"something else"}],
       "adjournCaseReasons": [{"id":null, "value":"Reasons 1"}],
-      "adjournCaseDirectionsDueDate" : "DIRECTIONS_DUE_DATE_PLACEHOLDER",
+      "adjournCaseDirectionsDueDate" : "2020-01-01",
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
@@ -757,7 +757,7 @@
       "adjournCaseCanCaseBeListedRightAway" : "No",
       "adjournCaseAreDirectionsBeingMadeToParties" : "Yes",
       "adjournCaseTypeOfNextHearing" : "video",
-      "adjournCasePanelMembersExcluded" : "yes",
+      "adjournCasePanelMembersExcluded" : "Yes",
       "adjournCaseNextHearingDateType" : "dateToBeFixed",
       "adjournCaseNextHearingDateOrPeriod" : "provideDate",
       "adjournCaseTime" : {
@@ -766,7 +766,7 @@
       },
       "adjournCaseAnythingElse" : "something else",
       "adjournCaseReasons": [{"id":null,"value":"Reasons 1"}],
-      "adjournCaseDirectionsDueDate" : "DIRECTIONS_DUE_DATE_PLACEHOLDER",
+      "adjournCaseDirectionsDueDate" : "2020-01-01",
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
