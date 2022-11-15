@@ -63,8 +63,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     protected Map<LanguagePreference, Map<EventType, String>> getBenefitSpecificDocuments() {
         final Map<EventType, String> englishEventTypeDocs = new HashMap<>();
         final Map<EventType, String> welshEventTypeDocs = new HashMap<>();
-        welshEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00642");
-        englishEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00642.docx");
+        welshEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-final-decision-notice.docx");
+        englishEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-final-decision-notice.docx");
         Map<LanguagePreference, Map<EventType, String>> docs = new HashMap<>();
         docs.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
         docs.put(LanguagePreference.WELSH, welshEventTypeDocs);

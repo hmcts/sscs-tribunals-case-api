@@ -80,6 +80,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         final NoticeIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
 
         builder.userName(buildSignedInJudgeName(userAuthorisation));
+        builder.idamSurname(buildSignedInJudgeSurname(userAuthorisation));
 
         writeFinalDecisionBuilder.summaryOfOutcomeDecision(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDetailsOfDecision());
 
