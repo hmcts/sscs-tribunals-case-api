@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -218,17 +217,18 @@ class AdjournCaseAboutToSubmitHandlerTest {
         @DisplayName("Given caseDetails is null, then return false")
         @Test
         void givenCaseDetailsIsNull_thenReturnFalse() {
+            when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
             assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
         }
 
         @DisplayName("Given caseData is null, then return false")
         @Test
         void givenCaseDataIsNull_thenReturnFalse() {
-            lenient().when(callback.getCaseDetails()).thenReturn(caseDetails);
+            when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
+            when(callback.getCaseDetails()).thenReturn(caseDetails);
             assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
         }
     }
-
 
     private PreSubmitCallbackResponse<SscsCaseData> cannotBeListedAndNoDirectionsGiven() {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
