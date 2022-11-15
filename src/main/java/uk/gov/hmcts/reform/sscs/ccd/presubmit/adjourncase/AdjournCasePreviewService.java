@@ -57,6 +57,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         final NoticeIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
 
         builder.userName(buildSignedInJudgeName(userAuthorisation));
+        builder.idamSurname(buildSignedInJudgeSurname(userAuthorisation));
 
         adjournCaseBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 

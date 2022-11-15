@@ -16,10 +16,21 @@ public class UserDetailsService {
     }
 
     public String buildLoggedInUserName(String userAuthorisation) {
+        UserDetails userDetails = getUserDetails(userAuthorisation);
+        return userDetails.getFullName();
+    }
+
+    public String buildLoggedInUserSurname(String userAuthorisation) {
+        UserDetails userDetails = getUserDetails(userAuthorisation);
+        return userDetails.getSurname().orElse("");
+    }
+
+    private UserDetails getUserDetails(String userAuthorisation) throws IllegalStateException {
         UserDetails userDetails = idamClient.getUserDetails(userAuthorisation);
         if (userDetails == null) {
             throw new IllegalStateException("Unable to obtain signed in user details");
         }
-        return userDetails.getFullName();
+        return userDetails;
     }
+
 }
