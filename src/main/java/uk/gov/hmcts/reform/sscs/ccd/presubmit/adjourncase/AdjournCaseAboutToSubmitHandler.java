@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -45,16 +46,21 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType,
+                                                          Callback<SscsCaseData> callback,
+                                                          String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, sscsCaseData.getAdjournCasePreviewDocument());
+        previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData,
+            DRAFT_ADJOURNMENT_NOTICE,
+            sscsCaseData.getAdjournCasePreviewDocument());
 
-        if (isAdjournmentEnabled // TODO SSCS-10951
+        if (SscsUtil.isSAndLCase(sscsCaseData)
+            && isAdjournmentEnabled // TODO SSCS-10951
             && (sscsCaseData.isAdjournCaseAbleToBeListedRightAway()
             || isNoOrNull(sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties()))
         ) {
@@ -70,7 +76,6 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
 
             sscsCaseData.getAppeal().setHearingOptions(hearingOptions);
         }
-
 
         if (nonNull(sscsCaseData.getAdjournCaseNextHearingVenueSelected())) {
             String venueId = sscsCaseData.getAdjournCaseNextHearingVenueSelected().getValue().getCode();
