@@ -40,4 +40,14 @@ public class UserDetailsServiceTest {
         when(idamClient.getUserDetails(USER_AUTHORISATION)).thenReturn(null);
         userDetailsService.buildLoggedInUserName(USER_AUTHORISATION);
     }
+
+    @Test
+    public void givenUserAuthorisation_thenReturnUserSurname() {
+        when(idamClient.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+                .forename("John").surname("Lewis").build());
+
+        assertEquals("Lewis", userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION));
+    }
+
+
 }

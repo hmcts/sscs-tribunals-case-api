@@ -65,4 +65,7 @@ public class NoticeIssuedTemplateBody implements FormPayload {
     private AdjournCaseTemplateBody adjournCaseTemplateBody;
     @JsonProperty("write_final_decision_template_content")
     private WriteFinalDecisionTemplateContent writeFinalDecisionTemplateContent;
+    @JsonProperty("idam_surname")
+    private String idamSurname;
+
 }
