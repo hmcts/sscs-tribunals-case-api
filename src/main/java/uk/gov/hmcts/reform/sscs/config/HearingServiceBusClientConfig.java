@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnProperty(name = "azure.service-bus.tribunals-to-hearings-api.enableJMS", havingValue = "false")
+@ConditionalOnProperty(name = "jms.enabled", havingValue = "false")
 public class HearingServiceBusClientConfig {
 
     @Value("${azure.servicebus.hearings.connection-string}")
