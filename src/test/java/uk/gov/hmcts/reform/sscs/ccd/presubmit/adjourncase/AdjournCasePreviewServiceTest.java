@@ -203,7 +203,7 @@ class AdjournCasePreviewServiceTest {
             assertEquals("My reasons for decision", body.getReasonsForDecision().get(0));
         }
         assertEquals("Something else.", body.getAdditionalDirections().get(0));
-        assertEquals(FACE_TO_FACE.getDescriptionEn().toLowerCase(), body.getHearingType());
+        assertEquals("faceToFace", body.getHearingType());
     }
 
     @ParameterizedTest
