@@ -102,7 +102,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         }
 
         String hearingType = adjournment.getTypeOfHearing() != null
-            ? adjournment.getTypeOfHearing().getDescriptionEn().toLowerCase()
+            ? adjournment.getTypeOfHearing().toString()
             : null;
 
         adjournCaseBuilder.hearingType(hearingType);
