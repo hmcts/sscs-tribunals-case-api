@@ -192,10 +192,10 @@ class AdjournCaseAboutToSubmitHandlerTest {
     @Nested
     class Other {
 
-        @DisplayName("Given a non callback type, then return false")
+        @DisplayName("Given a non about to submit callback type, then return false")
         @ParameterizedTest
         @ValueSource(strings = {"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
-        void givenNonCallbackType_thenReturnFalse(CallbackType callbackType) {
+        void givenNonAboutToSubmitCallbackType_thenReturnFalse(CallbackType callbackType) {
             assertThat(handler.canHandle(callbackType, callback)).isFalse();
         }
 

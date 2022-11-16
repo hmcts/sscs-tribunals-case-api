@@ -115,31 +115,7 @@ class AdjournCaseAboutToStartHandlerTest {
 
             handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-            assertThat(sscsCaseData.getAdjournment().getGenerateNotice()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getTypeOfHearing()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getCanCaseBeListedRightAway()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getAreDirectionsBeingMadeToParties()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getDirectionsDueDate()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getTypeOfNextHearing()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getNextHearingVenue()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getNextHearingVenueSelected()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getPanelMembersExcluded()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getDisabilityQualifiedPanelMemberName()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getMedicallyQualifiedPanelMemberName()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getOtherPanelMemberName()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getNextHearingListingDurationType()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getNextHearingListingDuration()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getNextHearingListingDurationUnits()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getInterpreterRequired()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getInterpreterLanguage()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getNextHearingDateType()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getNextHearingDateOrPeriod()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getNextHearingDateOrTime()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getNextHearingFirstAvailableDateAfterDate()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getNextHearingFirstAvailableDateAfterPeriod()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getReasons()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getAdditionalDirections()).isNull();
+            assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrProperties();
         }
 
         @Test
@@ -180,6 +156,7 @@ class AdjournCaseAboutToStartHandlerTest {
             assertThat(adjournment.getNextHearingFirstAvailableDateAfterPeriod()).isEqualTo(AdjournCaseNextHearingPeriod.NINETY_DAYS);
             assertThat(adjournment.getReasons()).isEqualTo(List.of(new CollectionItem<>(null, "")));
             assertThat(adjournment.getAdditionalDirections()).isEqualTo(List.of(new CollectionItem<>(null, "")));
+            assertThat(adjournment.getAdjournmentInProgress()).isEqualTo(YES);
         }
     }
 
@@ -202,9 +179,8 @@ class AdjournCaseAboutToStartHandlerTest {
         void throwsExceptionIfItCannotHandleTheAppeal() {
             when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
-            assertThatThrownBy(() ->
-                handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION)
-                ).isInstanceOf(IllegalStateException.class);
+            assertThatThrownBy(() -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION))
+                .isInstanceOf(IllegalStateException.class);
         }
     }
 
