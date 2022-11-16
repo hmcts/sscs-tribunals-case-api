@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
-import static uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService.getFirstHalfOfPostcode;
 
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +18,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
-import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
-import uk.gov.hmcts.reform.sscs.service.VenueService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 
@@ -34,8 +31,6 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
     private final PreviewDocumentService previewDocumentService;
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
-
-    private final VenueService venueService;
 
     private final ListAssistHearingMessageHelper hearingMessageHelper;
 
@@ -84,13 +79,8 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         if (nonNull(sscsCaseData.getAdjournCaseNextHearingVenueSelected())) {
             String venueId = sscsCaseData.getAdjournCaseNextHearingVenueSelected().getValue().getCode();
-            String epimsId = venueService.getEpimsIdForVenueId(venueId);
 
-            VenueDetails venueDetails = venueService.getVenueDetailsForActiveVenueByEpimsId(epimsId);
-
-            String postCode = venueDetails.getVenAddressPostcode();
-            String firstHalfOfPostcode = getFirstHalfOfPostcode(postCode);
-            RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);
+            RegionalProcessingCenter rpc = regionalProcessingCenterService.getByVenueId(venueId);
 
             if (nonNull(rpc)) {
                 sscsCaseData.setRegion(rpc.getName());

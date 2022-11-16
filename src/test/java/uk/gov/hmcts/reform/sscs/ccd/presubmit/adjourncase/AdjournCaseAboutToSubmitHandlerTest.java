@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNME
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,14 +35,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
-import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
-import uk.gov.hmcts.reform.sscs.service.VenueService;
+import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 class AdjournCaseAboutToSubmitHandlerTest {
 
@@ -63,7 +64,7 @@ class AdjournCaseAboutToSubmitHandlerTest {
     private ListAssistHearingMessageHelper hearingMessageHelper;
 
     @Mock
-    private VenueService venueService;
+    private RegionalProcessingCenterService regionalProcessingCenterService;
 
     @SuppressWarnings("unused")
     @Mock
@@ -231,25 +232,21 @@ class AdjournCaseAboutToSubmitHandlerTest {
     @DisplayName("When we have changed the next hearing venue through an adjournment, show we change the region")
     @Test
     void givenAdjournCaseNextHearingVenueSelectedTrue_thenSetRegion() {
-        String venueId = "7";
-        String epimsId = "495952";
-        String regionalProcessingCentre = "SSCS Leeds";
+        String venueId = "185";
 
-        VenueDetails venueDetails = VenueDetails.builder().regionalProcessingCentre(regionalProcessingCentre).build();
-
-        DynamicListItem venue = new DynamicListItem(venueId, "York House");
+        DynamicListItem venue = new DynamicListItem(venueId, null);
         DynamicList adjournedNextVenue = new DynamicList(venue, null);
         sscsCaseData.setAdjournCaseNextHearingVenueSelected(adjournedNextVenue);
 
-        when(venueService.getEpimsIdForVenueId(venueId)).thenReturn(epimsId);
-        when(venueService.getVenueDetailsForActiveVenueByEpimsId(epimsId)).thenReturn(venueDetails);
+        RegionalProcessingCenter rpc = getRegionalProcessingCenter();
+        when(regionalProcessingCenterService.getByVenueId(venueId)).thenReturn(rpc);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
 
-        assertThat(sscsCaseData.getRegion()).isEqualTo(regionalProcessingCentre);
+        assertThat(sscsCaseData.getRegion()).isEqualTo("CARDIFF");
     }
 
     private PreSubmitCallbackResponse<SscsCaseData> cannotBeListedAndNoDirectionsGiven() {
