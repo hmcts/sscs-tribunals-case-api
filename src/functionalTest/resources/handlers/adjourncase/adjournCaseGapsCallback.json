@@ -55,7 +55,7 @@
       ],
       "adjournCaseTypeOfHearing": "faceToFace",
       "adjournCaseTypeOfNextHearing": "faceToFace",
-      "isAdjournmentInProgress": "Yes",
+      "adjournmentInProgress": "Yes",
       "appeal": {
         "appealReasons": {
           "otherReasons": "Another reason",
