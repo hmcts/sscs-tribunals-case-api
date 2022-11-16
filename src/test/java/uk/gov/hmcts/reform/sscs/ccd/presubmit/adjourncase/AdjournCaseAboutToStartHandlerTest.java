@@ -88,7 +88,7 @@ class AdjournCaseAboutToStartHandlerTest {
                 .nextHearingFirstAvailableDateAfterPeriod(AdjournCaseNextHearingPeriod.NINETY_DAYS)
                 .reasons(List.of(new CollectionItem<>(null, "")))
                 .additionalDirections(List.of(new CollectionItem<>(null, "")))
-                .isAdjournmentInProgress(YES)
+                .adjournmentInProgress(YES)
                 .build())
             .build();
     }

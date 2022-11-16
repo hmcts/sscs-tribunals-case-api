@@ -174,7 +174,7 @@ class AdjournCaseAboutToSubmitHandlerTest {
                 .sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
 
             assertThat(response.getErrors()).isEmpty();
-            assertThat(response.getData().getAdjournment().getIsAdjournmentInProgress()).isEqualTo(YES);
+            assertThat(response.getData().getAdjournment().getAdjournmentInProgress()).isEqualTo(YES);
         }
 
         @DisplayName("When adjournment is enabled and case is LA and case cannot be listed right away "
