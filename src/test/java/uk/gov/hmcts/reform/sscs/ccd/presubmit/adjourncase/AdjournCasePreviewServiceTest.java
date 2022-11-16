@@ -46,6 +46,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTime;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
@@ -76,10 +77,11 @@ import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 @RunWith(JUnitParamsRunner.class)
 class AdjournCasePreviewServiceTest {
 
+    private static final String END_DATE = "10-10-2020";
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String TEMPLATE_ID = "nuts.docx";
     private static final String URL = "http://dm-store/documents/123";
-    public static final LocalDate LOCAL_DATE = LocalDate.parse("2018-10-10");
+    private static final LocalDate LOCAL_DATE = LocalDate.parse("2018-10-10");
     private AdjournCasePreviewService service;
 
     @Mock
@@ -131,7 +133,24 @@ class AdjournCasePreviewServiceTest {
                         .build())
                     .identity(Identity.builder().build())
                     .build())
-                .build()).build();
+                .build())
+            .adjournment(Adjournment.builder()
+                .reasons(List.of(new CollectionItem<>(null, "My reasons for decision")))
+                .additionalDirections(List.of(new CollectionItem<>(null, "Something else.")))
+                .typeOfHearing(FACE_TO_FACE)
+                .build())
+            .hearings(List.of(Hearing.builder()
+                .value(HearingDetails.builder()
+                    .hearingDate("2019-01-01")
+                    .venue(Venue.builder()
+                        .name("Venue Name")
+                        .build())
+                    .venueId("someVenueId").build())
+                .build()))
+            .build();
+
+        sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).venueId("someVenueId").build()).build()));
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -179,18 +198,9 @@ class AdjournCasePreviewServiceTest {
     }
 
     private static boolean isOralHearing(String nextHearingType) {
-        return HearingType.FACE_TO_FACE.getKey().equals(nextHearingType.toString())
-            || HearingType.TELEPHONE.getKey().equals(nextHearingType.toString())
-            || HearingType.VIDEO.getKey().equals(nextHearingType.toString());
-    }
-
-    private void setCommonPreviewParams(SscsCaseData sscsCaseData, String endDate) {
-        sscsCaseData.getAdjournment().setReasons(List.of(new CollectionItem<>(null, "My reasons for decision")));
-        sscsCaseData.getAdjournment().setAdditionalDirections(List.of(new CollectionItem<>(null, "Something else.")));
-        sscsCaseData.getAdjournment().setTypeOfHearing(FACE_TO_FACE);
-        sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).venueId("someVenueId").build()).build()));
-
+        return HearingType.FACE_TO_FACE.getKey().equals(nextHearingType)
+            || HearingType.TELEPHONE.getKey().equals(nextHearingType)
+            || HearingType.VIDEO.getKey().equals(nextHearingType);
     }
 
     private void assertCommonPreviewParams(AdjournCaseTemplateBody body, String endDate, boolean nullReasonsExpected) {
@@ -210,9 +220,6 @@ class AdjournCasePreviewServiceTest {
     @MethodSource("allNextHearingTypeParameters")
     void willSetPreviewFileWithNullReasons_WhenReasonsListIsEmpty(String nextHearingType, String nextHearingTypeText) {
 
-        final String endDate = "10-10-2020";
-
-        setCommonPreviewParams(sscsCaseData, endDate);
         sscsCaseData.getAdjournment().setReasons(new ArrayList<>());
 
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
@@ -238,7 +245,7 @@ class AdjournCasePreviewServiceTest {
         assertNotNull(body);
 
         // Common assertions
-        assertCommonPreviewParams(body, endDate, true);
+        assertCommonPreviewParams(body, END_DATE, true);
 
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
@@ -248,9 +255,6 @@ class AdjournCasePreviewServiceTest {
     @MethodSource("allNextHearingTypeParameters")
     void willSetPreviewFileWithNullReasons_WhenReasonsListIsNotEmpty(String nextHearingType, String nextHearingTypeText) {
 
-        final String endDate = "10-10-2020";
-
-        setCommonPreviewParams(sscsCaseData, endDate);
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
         sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
@@ -278,7 +282,7 @@ class AdjournCasePreviewServiceTest {
         assertNotNull(body);
 
         // Common assertions
-        assertCommonPreviewParams(body, endDate, false);
+        assertCommonPreviewParams(body, END_DATE, false);
 
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
@@ -288,9 +292,6 @@ class AdjournCasePreviewServiceTest {
     @MethodSource("allNextHearingTypeParameters")
     void willSetPreviewFileWithInterpreterDescription_WhenInterpreterRequiredAndLanguageIsSet(String nextHearingType, String nextHearingTypeText) {
 
-        final String endDate = "10-10-2020";
-
-        setCommonPreviewParams(sscsCaseData, endDate);
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
         sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
@@ -316,7 +317,7 @@ class AdjournCasePreviewServiceTest {
         assertNotNull(body);
 
         // Common assertions
-        assertCommonPreviewParams(body, endDate, false);
+        assertCommonPreviewParams(body, END_DATE, false);
 
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
@@ -328,9 +329,6 @@ class AdjournCasePreviewServiceTest {
     @MethodSource("allNextHearingTypeParameters")
     void willNotSetPreviewFileButWillDisplayError_WithInterpreterDescription_WhenInterpreterRequiredAndLanguageIsNotSet(String nextHearingType) {
 
-        final String endDate = "10-10-2020";
-
-        setCommonPreviewParams(sscsCaseData, endDate);
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
         sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
@@ -346,9 +344,6 @@ class AdjournCasePreviewServiceTest {
     @MethodSource("allNextHearingTypeParameters")
     void willSetPreviewFileWithoutInterpreterDescription_WhenInterpreterNotRequiredAndLanguageIsSet(String nextHearingType, String nextHearingTypeText) {
 
-        final String endDate = "10-10-2020";
-
-        setCommonPreviewParams(sscsCaseData, endDate);
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
         sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
@@ -374,7 +369,7 @@ class AdjournCasePreviewServiceTest {
         assertNotNull(body);
 
         // Common assertions
-        assertCommonPreviewParams(body, endDate, false);
+        assertCommonPreviewParams(body, END_DATE, false);
 
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
@@ -386,9 +381,6 @@ class AdjournCasePreviewServiceTest {
     @MethodSource("allNextHearingTypeParameters")
     void willSetPreviewFileWithoutInterpreterDescription_WhenInterpreterRequiredNotSetAndLanguageIsSet(String nextHearingType, String nextHearingTypeText) {
 
-        final String endDate = "10-10-2020";
-
-        setCommonPreviewParams(sscsCaseData, endDate);
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
         sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
@@ -413,7 +405,7 @@ class AdjournCasePreviewServiceTest {
         assertNotNull(body);
 
         // Common assertions
-        assertCommonPreviewParams(body, endDate, false);
+        assertCommonPreviewParams(body, END_DATE, false);
 
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
@@ -637,6 +629,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
         sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
         sscsCaseData.getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
+        sscsCaseData.setHearings(null);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
@@ -684,7 +677,6 @@ class AdjournCasePreviewServiceTest {
         assertNotNull(body);
 
         assertEquals("2019-01-02", body.getHeldOn().toString());
-
     }
 
     @ParameterizedTest
