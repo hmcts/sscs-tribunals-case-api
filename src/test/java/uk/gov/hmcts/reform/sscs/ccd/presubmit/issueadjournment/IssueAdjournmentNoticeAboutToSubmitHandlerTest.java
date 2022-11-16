@@ -120,7 +120,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
                 .nextHearingFirstAvailableDateAfterPeriod(AdjournCaseNextHearingPeriod.NINETY_DAYS)
                 .reasons(List.of(new CollectionItem<>(null, "")))
                 .additionalDirections(List.of(new CollectionItem<>(null, "")))
-                .isAdjournmentInProgress(YES)
+                .adjournmentInProgress(YES)
                 .build())
         .build();
     }
@@ -184,7 +184,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
             assertThat(sscsCaseData.getAdjournment().getTime()).isNull();
             assertThat(sscsCaseData.getAdjournment().getReasons()).isNull();
             assertThat(sscsCaseData.getAdjournment().getAdditionalDirections()).isNull();
-            assertThat(sscsCaseData.getAdjournment().getIsAdjournmentInProgress()).isNull();
+            assertThat(sscsCaseData.getAdjournment().getAdjournmentInProgress()).isNull();
         }
 
         @Test
