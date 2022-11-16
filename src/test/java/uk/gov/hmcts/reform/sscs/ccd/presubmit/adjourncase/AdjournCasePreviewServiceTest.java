@@ -232,6 +232,27 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.getTypeOfHearingByCcdDefinition(nextHearingType));
     }
 
+    private static void checkPreviewDocument(PreSubmitCallbackResponse<SscsCaseData> response) {
+        assertNotNull(response.getData().getAdjournment().getPreviewDocument());
+        assertEquals(DocumentLink.builder()
+            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), response.getData().getAdjournment().getPreviewDocument());
+    }
+
+    private PreSubmitCallbackResponse<SscsCaseData> getSscsCaseDataPreSubmitCallbackResponse(boolean showIssueDate) {
+        return service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, showIssueDate);
+    }
+    
+    private PreSubmitCallbackResponse<SscsCaseData> getResponseShowIssueDate() {
+        return getSscsCaseDataPreSubmitCallbackResponse(true);
+    }
+
+    private PreSubmitCallbackResponse<SscsCaseData> getResponseDoNotShowIssueDate() {
+        return getSscsCaseDataPreSubmitCallbackResponse(false);
+    }
+
     @ParameterizedTest
     @MethodSource("allNextHearingTypeParameters")
     void willSetPreviewFileWithNullReasons_WhenReasonsListIsEmpty(String nextHearingType, String nextHearingTypeText) {
@@ -240,14 +261,9 @@ class AdjournCasePreviewServiceTest {
 
         setAdjournmentNextHearingType(nextHearingType);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
-        assertNotNull(response.getData().getAdjournment().getPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournment().getPreviewDocument());
+        checkPreviewDocument(response);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
@@ -259,17 +275,9 @@ class AdjournCasePreviewServiceTest {
     void willSetPreviewFileWithNullReasons_WhenReasonsListIsNotEmpty(String nextHearingType, String nextHearingTypeText) {
         setAdjournmentNextHearingType(nextHearingType);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(
-            callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
-        assertNotNull(response.getData().getAdjournment().getPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format(
-                "Draft Adjournment Notice generated on %s.pdf",
-                LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournment().getPreviewDocument());
+        checkPreviewDocument(response);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(
             NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
@@ -285,14 +293,9 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.getAdjournment().setInterpreterRequired(YES);
         sscsCaseData.getAdjournment().setInterpreterLanguage("french");
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
-        assertNotNull(response.getData().getAdjournment().getPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournment().getPreviewDocument());
+        checkPreviewDocument(response);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
@@ -308,7 +311,7 @@ class AdjournCasePreviewServiceTest {
 
         sscsCaseData.getAdjournment().setInterpreterRequired(YES);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
         assertNull(response.getData().getAdjournment().getPreviewDocument());
     }
@@ -321,14 +324,9 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.getAdjournment().setInterpreterRequired(NO);
         sscsCaseData.getAdjournment().setInterpreterLanguage("french");
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
-        assertNotNull(response.getData().getAdjournment().getPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournment().getPreviewDocument());
+        checkPreviewDocument(response);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
@@ -344,14 +342,9 @@ class AdjournCasePreviewServiceTest {
 
         sscsCaseData.getAdjournment().setInterpreterLanguage("french");
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
-        assertNotNull(response.getData().getAdjournment().getPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournment().getPreviewDocument());
+        checkPreviewDocument(response);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
@@ -371,7 +364,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to obtain signed in user details", error);
@@ -388,7 +381,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to obtain signed in user details", error);
@@ -401,7 +394,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.getAdjournment().setGenerateNotice(null);
         setAdjournmentNextHearingType(nextHearingType);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
         assertNull(response.getData().getAdjournment().getPreviewDocument());
     }
@@ -420,21 +413,15 @@ class AdjournCasePreviewServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
-        assertNotNull(response.getData().getAdjournment().getPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournment().getPreviewDocument());
+        checkPreviewDocument(response);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
         assertNotNull(body);
 
         assertEquals("Gap venue name", body.getHeldAt());
-
     }
 
     @ParameterizedTest
@@ -452,12 +439,11 @@ class AdjournCasePreviewServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing venue", error);
         assertNull(response.getData().getAdjournment().getPreviewDocument());
-
     }
 
     @ParameterizedTest
@@ -474,12 +460,11 @@ class AdjournCasePreviewServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing venue", error);
         assertNull(response.getData().getAdjournment().getPreviewDocument());
-
     }
 
     @ParameterizedTest
@@ -494,13 +479,11 @@ class AdjournCasePreviewServiceTest {
 
         sscsCaseData.setHearings(Arrays.asList(hearing2, hearing1));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(
-            callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing date or venue", error);
         assertNull(response.getData().getAdjournment().getPreviewDocument());
-
     }
 
     @ParameterizedTest
@@ -516,12 +499,11 @@ class AdjournCasePreviewServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing date or venue", error);
         assertNull(response.getData().getAdjournment().getPreviewDocument());
-
     }
 
     @ParameterizedTest
@@ -532,7 +514,7 @@ class AdjournCasePreviewServiceTest {
         List<Hearing> hearings = new ArrayList<>();
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
         assertTrue(response.getErrors().isEmpty());
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
@@ -552,7 +534,7 @@ class AdjournCasePreviewServiceTest {
         setAdjournmentNextHearingType(nextHearingType);
         sscsCaseData.setHearings(null);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
         assertTrue(response.getErrors().isEmpty());
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
@@ -580,14 +562,9 @@ class AdjournCasePreviewServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
-        assertNotNull(response.getData().getAdjournment().getPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournment().getPreviewDocument());
+        checkPreviewDocument(response);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
@@ -612,7 +589,7 @@ class AdjournCasePreviewServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing date", error);
@@ -633,7 +610,7 @@ class AdjournCasePreviewServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
         assertNull(response.getData().getAdjournment().getPreviewDocument());
 
@@ -641,7 +618,6 @@ class AdjournCasePreviewServiceTest {
         assertEquals("Unable to determine hearing date or venue", error);
         assertNull(response.getData().getAdjournment().getPreviewDocument());
         assertNull(response.getData().getAdjournment().getPreviewDocument());
-
     }
 
     @ParameterizedTest
@@ -652,14 +628,9 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
-        assertNotNull(response.getData().getAdjournment().getPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournment().getPreviewDocument());
+        checkPreviewDocument(response);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
@@ -680,7 +651,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Timeslot duration units not supplied on case data", error);
@@ -696,14 +667,9 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
-        assertNotNull(response.getData().getAdjournment().getPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournment().getPreviewDocument());
+        checkPreviewDocument(response);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
@@ -724,14 +690,9 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
-        assertNotNull(response.getData().getAdjournment().getPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournment().getPreviewDocument());
+        checkPreviewDocument(response);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
@@ -756,14 +717,9 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
-        assertNotNull(response.getData().getAdjournment().getPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournment().getPreviewDocument());
+        checkPreviewDocument(response);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
@@ -790,14 +746,9 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
-        assertNotNull(response.getData().getAdjournment().getPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournment().getPreviewDocument());
+        checkPreviewDocument(response);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
@@ -822,14 +773,9 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
-        assertNotNull(response.getData().getAdjournment().getPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournment().getPreviewDocument());
+        checkPreviewDocument(response);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
@@ -843,6 +789,7 @@ class AdjournCasePreviewServiceTest {
         }
     }
 
+
     @ParameterizedTest
     @MethodSource("allNextHearingTypeParameters")
     void givenCaseWithThreePanelMembers_thenCorrectlySetTheHeldBefore(String nextHearingType, String nextHearingTypeText) {
@@ -855,14 +802,9 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
-        assertNotNull(response.getData().getAdjournment().getPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournment().getPreviewDocument());
+        checkPreviewDocument(response);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
@@ -870,7 +812,6 @@ class AdjournCasePreviewServiceTest {
         assertNotNull(body);
 
         assertEquals("Judge Full Name, Mr Panel Member 1, Ms Panel Member 2 and Other Panel Member", body.getHeldBefore());
-
     }
 
     @ParameterizedTest
@@ -884,14 +825,9 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
-        assertNotNull(response.getData().getAdjournment().getPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournment().getPreviewDocument());
+        checkPreviewDocument(response);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
@@ -899,7 +835,6 @@ class AdjournCasePreviewServiceTest {
         assertNotNull(body);
 
         assertEquals("Judge Full Name, Mr Panel Member 1 and Ms Panel Member 2", body.getHeldBefore());
-
     }
 
     @ParameterizedTest
@@ -912,14 +847,9 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
-        assertNotNull(response.getData().getAdjournment().getPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournment().getPreviewDocument());
+        checkPreviewDocument(response);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
@@ -927,7 +857,6 @@ class AdjournCasePreviewServiceTest {
         assertNotNull(body);
 
         assertEquals("Judge Full Name and Mr Panel Member 1", body.getHeldBefore());
-
     }
 
     @ParameterizedTest
@@ -938,14 +867,9 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
-        assertNotNull(response.getData().getAdjournment().getPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournment().getPreviewDocument());
+        checkPreviewDocument(response);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
@@ -953,7 +877,6 @@ class AdjournCasePreviewServiceTest {
         assertNotNull(body);
 
         assertEquals("Judge Full Name", body.getHeldBefore());
-
     }
 
     @ParameterizedTest
@@ -967,14 +890,9 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
-        assertNotNull(response.getData().getAdjournment().getPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournment().getPreviewDocument());
+        checkPreviewDocument(response);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
@@ -1492,7 +1410,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Date or period indicator not available in case data", error);
@@ -1508,7 +1426,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("No value set for adjournCaseNextHearingFirstAvailableDateAfterDate in case data", error);
@@ -1524,7 +1442,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("No value set for adjournCaseNextHearingFirstAvailableDateAfterPeriod in case data", error);
@@ -1539,7 +1457,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Date or period indicator not available in case data", error);
@@ -1600,7 +1518,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseShowIssueDate();
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("adjournCaseNextHearingVenueSelected field should not be set", error);
@@ -1621,7 +1539,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to load venue details for id:someUnknownVenueId", error);
@@ -1642,7 +1560,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
                 .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("A next hearing venue of somewhere else has been specified but no venue has been selected", error);
@@ -1663,7 +1581,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
                 .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("A next hearing venue of somewhere else has been specified but no venue has been selected", error);
@@ -1684,7 +1602,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = getResponseDoNotShowIssueDate();
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("adjournCaseNextHearingVenueSelected field should not be set", error);
