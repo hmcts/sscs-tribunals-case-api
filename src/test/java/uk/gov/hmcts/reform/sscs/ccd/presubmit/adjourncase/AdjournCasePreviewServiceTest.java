@@ -1,10 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
@@ -83,8 +79,13 @@ class AdjournCasePreviewServiceTest {
     private static final String TEMPLATE_ID = "nuts.docx";
     private static final String URL = "http://dm-store/documents/123";
     private static final LocalDate LOCAL_DATE = LocalDate.parse("2018-10-10");
+
     private static final String ALL_NEXT_HEARING_TYPE_PARAMETERS =
         "uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewServiceTest#allNextHearingTypeParameters";
+    public static final Arguments TELEPHONE_ARGUMENTS = Arguments.of("telephone", "telephone hearing");
+    public static final Arguments VIDEO_ARGUMENTS = Arguments.of("video", "video hearing");
+    public static final Arguments PAPER_ARGUMENTS = Arguments.of("paper", "decision on the papers");
+    public static final Arguments FACE_TO_FACE_ARGUMENTS = Arguments.of("faceToFace", "face to face hearing");
 
     private AdjournCasePreviewService service;
 
@@ -169,32 +170,32 @@ class AdjournCasePreviewServiceTest {
 
     private static Stream<Arguments> allNextHearingTypeParameters() {
         return Stream.of(
-            Arguments.of("telephone", "telephone hearing"),
-            Arguments.of("video", "video hearing"),
-            Arguments.of("paper", "decision on the papers"),
-            Arguments.of("faceToFace", "face to face hearing")
+            TELEPHONE_ARGUMENTS,
+            VIDEO_ARGUMENTS,
+            PAPER_ARGUMENTS,
+            FACE_TO_FACE_ARGUMENTS
         );
     }
 
     private static Stream<Arguments> nonFaceToFaceNextHearingTypeParameters() {
         return Stream.of(
-            Arguments.of("telephone", "telephone hearing"),
-            Arguments.of("video", "video hearing"),
-            Arguments.of("paper", "decision on the papers")
+            TELEPHONE_ARGUMENTS,
+            VIDEO_ARGUMENTS,
+            PAPER_ARGUMENTS
         );
     }
 
     private static Stream<Arguments> oralNextHearingTypeParameters() {
         return Stream.of(
-            Arguments.of("telephone", "telephone hearing"),
-            Arguments.of("video", "video hearing"),
-            Arguments.of("faceToFace", "face to face hearing")
+            TELEPHONE_ARGUMENTS,
+            VIDEO_ARGUMENTS,
+            FACE_TO_FACE_ARGUMENTS
         );
     }
 
     private static Stream<Arguments> faceToFaceNextHearingTypeParameters() {
         return Stream.of(
-            Arguments.of("faceToFace", "face to face hearing")
+            FACE_TO_FACE_ARGUMENTS
         );
     }
 
@@ -207,36 +208,36 @@ class AdjournCasePreviewServiceTest {
             || HearingType.VIDEO.getValue().equals(nextHearingType);
 
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
-        assertEquals(image, payload.getImage());
+        assertThat(payload.getImage()).isEqualTo(image);
         if (isDraft) {
-            assertEquals("DRAFT ADJOURNMENT NOTICE", payload.getNoticeType());
+            assertThat(payload.getNoticeType()).isEqualTo("DRAFT ADJOURNMENT NOTICE");
         } else {
-            assertEquals("ADJOURNMENT NOTICE", payload.getNoticeType());
+            assertThat(payload.getNoticeType()).isEqualTo("ADJOURNMENT NOTICE");
         }
-        assertEquals(expectedName, payload.getAppellantFullName());
+        assertThat(payload.getAppellantFullName()).isEqualTo(expectedName);
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
-        assertNotNull(body);
+        assertThat(body).isNotNull();
         if (hasVenue) {
-            assertNotNull(body.getNextHearingVenue());
+            assertThat(body.getNextHearingVenue()).isNotNull();
         } else {
-            assertNull(body.getNextHearingVenue());
+            assertThat(body.getNextHearingVenue()).isNull();
         }
         if (AdjournCasePreviewService.IN_CHAMBERS.equals(body.getNextHearingVenue())) {
-            assertFalse(body.isNextHearingAtVenue());
+            assertThat(body.isNextHearingAtVenue()).isFalse();
         } else {
-            assertEquals(hasVenue, body.isNextHearingAtVenue());
+            assertThat(body.isNextHearingAtVenue()).isEqualTo(hasVenue);
         }
-        assertNotNull(body.getNextHearingDate());
-        assertNotNull(body.getNextHearingType());
-        assertEquals(nextHearingType, body.getNextHearingType());
+        assertThat(body.getNextHearingDate()).isNotNull();
+        assertThat(body.getNextHearingType()).isNotNull();
+        assertThat(body.getNextHearingType()).isEqualTo(nextHearingType);
         if (isOralHearing) {
-            assertNotNull(body.getNextHearingTimeslot());
+            assertThat(body.getNextHearingTimeslot()).isNotNull();
         } else {
-            assertNull(body.getNextHearingTimeslot());
+            assertThat(body.getNextHearingTimeslot()).isNull();
         }
-        assertNotNull(body.getHeldAt());
-        assertNotNull(body.getHeldBefore());
-        assertNotNull(body.getHeldOn());
+        assertThat(body.getHeldAt()).isNotNull();
+        assertThat(body.getHeldBefore()).isNotNull();
+        assertThat(body.getHeldOn()).isNotNull();
         return payload;
     }
 
@@ -275,31 +276,31 @@ class AdjournCasePreviewServiceTest {
     }
 
     private static AdjournCaseTemplateBody checkCommonPreviewParams(NoticeIssuedTemplateBody payload) {
-        assertEquals("Judge Full Name", payload.getUserName());
-        assertEquals("DRAFT ADJOURNMENT NOTICE", payload.getNoticeType());
+        assertThat(payload.getUserName()).isEqualTo("Judge Full Name");
+        assertThat(payload.getNoticeType()).isEqualTo("DRAFT ADJOURNMENT NOTICE");
 
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
 
-        assertNotNull(body);
-        assertEquals("Something else.", body.getAdditionalDirections().get(0));
-        assertEquals("faceToFace", body.getHearingType());
-        assertNull(payload.getDateIssued());
-        assertEquals(LocalDate.now(), payload.getGeneratedDate());
+        assertThat(body).isNotNull();
+        assertThat(body.getAdditionalDirections().get(0)).isEqualTo("Something else.");
+        assertThat(body.getHearingType()).isEqualTo("faceToFace");
+        assertThat(payload.getDateIssued()).isNull();
+        assertThat(payload.getGeneratedDate()).isEqualTo(LocalDate.now());
 
         return body;
     }
 
     private static AdjournCaseTemplateBody checkCommonPreviewParamsWithReasons(NoticeIssuedTemplateBody payload) {
         AdjournCaseTemplateBody body = checkCommonPreviewParams(payload);
-        assertNotNull(body.getReasonsForDecision());
-        assertFalse(body.getReasonsForDecision().isEmpty());
-        assertEquals("My reasons for decision", body.getReasonsForDecision().get(0));
+        assertThat(body.getReasonsForDecision()).isNotNull();
+        assertThat(body.getReasonsForDecision()).isNotEmpty();
+        assertThat(body.getReasonsForDecision().get(0)).isEqualTo("My reasons for decision");
         return body;
     }
 
     private static void checkCommonPreviewParamsWithNullReasons(NoticeIssuedTemplateBody payload) {
         AdjournCaseTemplateBody body = checkCommonPreviewParams(payload);
-        assertNull(body.getReasonsForDecision());
+        assertThat(body.getReasonsForDecision()).isNull();
     }
 
     private void setAdjournmentNextHearingType(String nextHearingType) {
@@ -307,12 +308,13 @@ class AdjournCasePreviewServiceTest {
     }
 
     private static void checkPreviewDocument(PreSubmitCallbackResponse<SscsCaseData> response) {
-        assertNotNull(response.getData().getAdjournment().getPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
+        assertThat(response.getData().getAdjournment().getPreviewDocument()).isNotNull();
+        assertThat(response.getData().getAdjournment().getPreviewDocument()).isEqualTo(DocumentLink.builder()
+            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf",
+                LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
-            .build(), response.getData().getAdjournment().getPreviewDocument());
+            .build());
     }
 
     private void checkTemplateBodyNextHearingDate(String expected) {
@@ -321,7 +323,7 @@ class AdjournCasePreviewServiceTest {
             "Appellant Lastname",
             "face to face hearing",
             true);
-        assertEquals(expected, body.getAdjournCaseTemplateBody().getNextHearingDate());
+        assertThat(body.getAdjournCaseTemplateBody().getNextHearingDate()).isEqualTo(expected);
     }
 
     @NotNull
@@ -333,7 +335,7 @@ class AdjournCasePreviewServiceTest {
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
-        assertNotNull(body);
+        assertThat(body).isNotNull();
         return body;
     }
 
@@ -351,9 +353,9 @@ class AdjournCasePreviewServiceTest {
 
     private void checkDocumentIsNotCreatedAndReturnsError(String expected) {
         final PreSubmitCallbackResponse<SscsCaseData> response = previewNoticeDoNotShowIssueDate();
-        String error = previewNoticeDoNotShowIssueDate().getErrors().stream().findFirst().orElse("");
-        assertEquals(expected, error);
-        assertNull(response.getData().getAdjournment().getPreviewDocument());
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertThat(error).isEqualTo(expected);
+        assertThat(response.getData().getAdjournment().getPreviewDocument()).isNull();
     }
 
     @ParameterizedTest
@@ -404,7 +406,7 @@ class AdjournCasePreviewServiceTest {
 
         AdjournCaseTemplateBody body = checkCommonPreviewParamsWithReasons(payload);
 
-        assertEquals("an interpreter in French", body.getInterpreterDescription());
+        assertThat(body.getInterpreterDescription()).isEqualTo("an interpreter in French");
     }
 
     @ParameterizedTest
@@ -433,7 +435,7 @@ class AdjournCasePreviewServiceTest {
 
         AdjournCaseTemplateBody body = checkCommonPreviewParamsWithReasons(payload);
 
-        assertNull(body.getInterpreterDescription());
+        assertThat(body.getInterpreterDescription()).isNull();
     }
 
     @ParameterizedTest
@@ -451,7 +453,7 @@ class AdjournCasePreviewServiceTest {
 
         AdjournCaseTemplateBody body = checkCommonPreviewParamsWithReasons(payload);
 
-        assertNull(body.getInterpreterDescription());
+        assertThat(body.getInterpreterDescription()).isNull();
     }
 
 
@@ -498,7 +500,7 @@ class AdjournCasePreviewServiceTest {
 
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
-        assertEquals("Gap venue name", body.getHeldAt());
+        assertThat(body.getHeldAt()).isEqualTo("Gap venue name");
     }
 
     @ParameterizedTest
@@ -506,7 +508,7 @@ class AdjournCasePreviewServiceTest {
     void givenCaseWithMultipleHearingsWithFirstInListWithNoVenueName_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType) {
         setAdjournmentNextHearingType(nextHearingType);
 
-        when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(null);;
+        when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(null);
         Hearing hearing1 = createHearingWithDateAndVenueName("2019-01-01", "venue 1 name");
 
         Hearing hearing2 = createHearingWithDateAndVenueName("2019-01-02", null);
@@ -586,16 +588,16 @@ class AdjournCasePreviewServiceTest {
     private void checkDefaultHearingDataForNullOrEmptyHearings(String nextHearingTypeText) {
         final PreSubmitCallbackResponse<SscsCaseData> response = previewNoticeDoNotShowIssueDate();
 
-        assertTrue(response.getErrors().isEmpty());
+        assertThat(response.getErrors()).isEmpty();
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
-        assertNotNull(body);
+        assertThat(body).isNotNull();
 
-        assertEquals(LocalDate.now().toString(), body.getHeldOn().toString());
-        assertEquals("In chambers", body.getHeldAt());
+        assertThat(body.getHeldOn()).hasToString(LocalDate.now().toString());
+        assertThat(body.getHeldAt()).isEqualTo("In chambers");
 
-        assertNotNull(response.getData().getAdjournment().getPreviewDocument());
+        assertThat(response.getData().getAdjournment().getPreviewDocument()).isNotNull();
     }
 
     @ParameterizedTest
@@ -612,7 +614,7 @@ class AdjournCasePreviewServiceTest {
 
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
-        assertEquals("2019-01-02", body.getHeldOn().toString());
+        assertThat(body.getHeldOn()).hasToString("2019-01-02");
     }
 
     @ParameterizedTest
@@ -662,9 +664,9 @@ class AdjournCasePreviewServiceTest {
             AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
             if (isOralHearing(nextHearingType)) {
-                assertEquals(expected, body.getNextHearingTimeslot());
+                assertThat(body.getNextHearingTimeslot()).isEqualTo(expected);
             } else {
-                assertNull(body.getNextHearingTimeslot());
+                assertThat(body.getNextHearingTimeslot()).isNull();
             }
         }
 
@@ -676,7 +678,7 @@ class AdjournCasePreviewServiceTest {
             AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
             if (isOralHearing(nextHearingType)) {
-                assertEquals("a standard time slot", body.getNextHearingTimeslot());
+                assertThat(body.getNextHearingTimeslot()).isEqualTo("a standard time slot");
             }
         }
 
@@ -687,7 +689,7 @@ class AdjournCasePreviewServiceTest {
 
             AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText("decision on the papers");
 
-            assertNull(body.getNextHearingTimeslot());
+            assertThat(body.getNextHearingTimeslot()).isNull();
         }
 
         @ParameterizedTest
@@ -741,7 +743,7 @@ class AdjournCasePreviewServiceTest {
         private void checkBodyHeldBefore(String nextHearingTypeText, String expected) {
             AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
-            assertEquals(expected, body.getHeldBefore());
+            assertThat(body.getHeldBefore()).isEqualTo(expected);
         }
 
         @ParameterizedTest
@@ -806,7 +808,7 @@ class AdjournCasePreviewServiceTest {
         previewNoticeShowIssueDate();
 
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
-        assertEquals("Gap venue name", templateBody.getAdjournCaseTemplateBody().getNextHearingVenue());
+        assertThat(templateBody.getAdjournCaseTemplateBody().getNextHearingVenue()).isEqualTo("Gap venue name");
     }
 
     @ParameterizedTest
@@ -935,7 +937,7 @@ class AdjournCasePreviewServiceTest {
         void givenCaseWithFirstAvailableDateAfterWithProvidePeriodAndNoPeriodSpecified_ThenDisplayErrorAndDoNotDisplayTheDocument() {
             adjournment.setNextHearingFirstAvailableDateAfterPeriod(null);
 
-            final PreSubmitCallbackResponse<SscsCaseData> response = previewNoticeDoNotShowIssueDate();
+            previewNoticeDoNotShowIssueDate();
 
             checkDocumentIsNotCreatedAndReturnsError("No value set for adjournCaseNextHearingFirstAvailableDateAfterPeriod in case data");
         }
@@ -1133,7 +1135,7 @@ class AdjournCasePreviewServiceTest {
         previewNoticeShowIssueDate();
 
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
-        assertEquals("Gap venue name", templateBody.getAdjournCaseTemplateBody().getNextHearingVenue());
+        assertThat(templateBody.getAdjournCaseTemplateBody().getNextHearingVenue()).isEqualTo("Gap venue name");
     }
 
     @ParameterizedTest
@@ -1150,7 +1152,7 @@ class AdjournCasePreviewServiceTest {
         previewNoticeShowIssueDate();
 
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
-        assertEquals("Gap venue name", templateBody.getAdjournCaseTemplateBody().getNextHearingVenue());
+        assertThat(templateBody.getAdjournCaseTemplateBody().getNextHearingVenue()).isEqualTo("Gap venue name");
     }
 
     @ParameterizedTest
@@ -1167,8 +1169,8 @@ class AdjournCasePreviewServiceTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = previewNoticeShowIssueDate();
 
         String error = previewNoticeDoNotShowIssueDate().getErrors().stream().findFirst().orElse("");
-        assertEquals("adjournCaseNextHearingVenueSelected field should not be set", error);
-        assertNull(response.getData().getAdjournment().getPreviewDocument());
+        assertThat(error).isEqualTo("adjournCaseNextHearingVenueSelected field should not be set");
+        assertThat(response.getData().getAdjournment().getPreviewDocument()).isNull();
     }
 
     @ParameterizedTest
@@ -1266,7 +1268,7 @@ class AdjournCasePreviewServiceTest {
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
-        assertEquals(LocalDate.now(), payload.getDateIssued());
+        assertThat(payload.getDateIssued()).isEqualTo(LocalDate.now());
     }
 
     @ParameterizedTest
@@ -1279,7 +1281,7 @@ class AdjournCasePreviewServiceTest {
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
-        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
+        assertThat(payload.getGeneratedDate()).hasToString(LocalDate.now().toString());
     }
 
     @ParameterizedTest
@@ -1293,7 +1295,7 @@ class AdjournCasePreviewServiceTest {
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
-        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
+        assertThat(payload.getGeneratedDate()).hasToString(LocalDate.now().toString());
     }
 
 }
