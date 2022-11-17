@@ -57,8 +57,6 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         SchedulingAndListingFields schedulingAndListingFields = sscsCaseData.getSchedulingAndListingFields();
 
         if (isScheduleListingEnabled && isMissingListingRequirements(schedulingAndListingFields)) {
-            sscsCaseData.setState(State.LISTING_ERROR);
-
             PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
             callbackResponse.addError("Cannot change state to ready to list. Missing listing requirements.");
 

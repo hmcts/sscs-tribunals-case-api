@@ -86,8 +86,10 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
         }
 
         if (isScheduleListingEnabled && isMissingListingRequirements(schedulingAndListingFields)) {
-            log.info("Missing information in Listing Requirements. Case state is now: {}", State.LISTING_ERROR);
             sscsCaseData.setState(State.LISTING_ERROR);
+
+            callbackResponse.addWarning("Missing information in Listing Requirements. Case state will be: "
+                + State.LISTING_ERROR);
         }
 
         return callbackResponse;
