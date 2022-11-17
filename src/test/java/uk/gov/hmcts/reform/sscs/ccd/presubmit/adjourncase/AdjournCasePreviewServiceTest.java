@@ -83,6 +83,9 @@ class AdjournCasePreviewServiceTest {
     private static final String TEMPLATE_ID = "nuts.docx";
     private static final String URL = "http://dm-store/documents/123";
     private static final LocalDate LOCAL_DATE = LocalDate.parse("2018-10-10");
+    private static final String ALL_NEXT_HEARING_TYPE_PARAMETERS =
+        "uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewServiceTest#allNextHearingTypeParameters";
+
     private AdjournCasePreviewService service;
 
     @Mock
@@ -177,12 +180,6 @@ class AdjournCasePreviewServiceTest {
         return Stream.of(
             Arguments.of("telephone", "telephone hearing"),
             Arguments.of("video", "video hearing"),
-            Arguments.of("paper", "decision on the papers")
-        );
-    }
-
-    private static Stream<Arguments> paperNextHearingTypeParameters() {
-        return Stream.of(
             Arguments.of("paper", "decision on the papers")
         );
     }
@@ -650,18 +647,6 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("allNextHearingTypeParameters")
-    void givenCaseWithNoDurationEnumSource_thenCorrectlySetTheNextHearingTimeslot(String nextHearingType, String nextHearingTypeText) {
-        setAdjournmentNextHearingType(nextHearingType);
-
-        AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
-
-        if (isOralHearing(nextHearingType)) {
-            assertEquals("a standard time slot", body.getNextHearingTimeslot());
-        }
-    }
-
-    @ParameterizedTest
     @MethodSource("oralNextHearingTypeParameters")
     void givenCaseWithDurationParameterButMissingUnitsWhenOralHearing_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType) {
         setAdjournmentNextHearingType(nextHearingType);
@@ -670,92 +655,88 @@ class AdjournCasePreviewServiceTest {
         checkDocumentIsNotCreatedAndReturnsError("Timeslot duration units not supplied on case data");
     }
 
-    @ParameterizedTest
-    @MethodSource("paperNextHearingTypeParameters")
-    void givenCaseWithDurationParameterButMissingUnitsWhenPaperHearing_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType, String nextHearingTypeText) {
-        setAdjournmentNextHearingType(nextHearingType);
-        adjournment.setNextHearingListingDuration(2);
+    @Nested
+    class Timeslot {
 
-        AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
+        private void checkOralHearingTimeslot(String nextHearingTypeText, String nextHearingType, String expected) {
+            AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
-        assertNull(body.getNextHearingTimeslot());
-    }
+            if (isOralHearing(nextHearingType)) {
+                assertEquals(expected, body.getNextHearingTimeslot());
+            } else {
+                assertNull(body.getNextHearingTimeslot());
+            }
+        }
 
-    @ParameterizedTest
-    @MethodSource("allNextHearingTypeParameters")
-    void givenCaseWith120MinutesDuration_thenCorrectlySetTheNextHearingTimeslot(String nextHearingType, String nextHearingTypeText) {
-        setAdjournmentNextHearingType(nextHearingType);
+        @ParameterizedTest
+        @MethodSource(ALL_NEXT_HEARING_TYPE_PARAMETERS)
+        void givenCaseWithNoDurationEnumSource_thenCorrectlySetTheNextHearingTimeslot(String nextHearingType, String nextHearingTypeText) {
+            setAdjournmentNextHearingType(nextHearingType);
 
-        adjournment.setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.MINUTES);
-        adjournment.setNextHearingListingDuration(120);
+            AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
-        AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
+            if (isOralHearing(nextHearingType)) {
+                assertEquals("a standard time slot", body.getNextHearingTimeslot());
+            }
+        }
 
-        if (isOralHearing(nextHearingType)) {
-            assertEquals("120 minutes", body.getNextHearingTimeslot());
-        } else {
+        @Test
+        void givenCaseWithDurationParameterButMissingUnitsWhenPaperHearing_thenDisplayErrorAndDoNotGenerateDocument() {
+            setAdjournmentNextHearingType("paper");
+            adjournment.setNextHearingListingDuration(2);
+
+            AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText("decision on the papers");
+
             assertNull(body.getNextHearingTimeslot());
         }
-    }
 
-    @ParameterizedTest
-    @MethodSource("allNextHearingTypeParameters")
-    void givenCaseWithOneMinuteDuration_thenCorrectlySetTheNextHearingTimeslot(String nextHearingType, String nextHearingTypeText) {
-        setAdjournmentNextHearingType(nextHearingType);
+        @ParameterizedTest
+        @MethodSource(ALL_NEXT_HEARING_TYPE_PARAMETERS)
+        void givenCaseWith120MinutesDuration_thenCorrectlySetTheNextHearingTimeslot(String nextHearingType, String nextHearingTypeText) {
+            setAdjournmentNextHearingType(nextHearingType);
 
-        adjournment.setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.MINUTES);
-        adjournment.setNextHearingListingDuration(1);
+            adjournment.setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.MINUTES);
+            adjournment.setNextHearingListingDuration(120);
 
-        AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
-
-        if (isOralHearing(nextHearingType)) {
-            assertEquals("1 minute", body.getNextHearingTimeslot());
-        } else {
-            assertNull(body.getNextHearingTimeslot());
+            checkOralHearingTimeslot(nextHearingTypeText, nextHearingType, "120 minutes");
         }
-    }
 
+        @ParameterizedTest
+        @MethodSource(ALL_NEXT_HEARING_TYPE_PARAMETERS)
+        void givenCaseWithOneMinuteDuration_thenCorrectlySetTheNextHearingTimeslot(String nextHearingType, String nextHearingTypeText) {
+            setAdjournmentNextHearingType(nextHearingType);
 
+            adjournment.setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.MINUTES);
+            adjournment.setNextHearingListingDuration(1);
 
-    @ParameterizedTest
-    @MethodSource("allNextHearingTypeParameters")
-    void givenCaseWithTwoSessionDuration_thenCorrectlySetTheNextHearingTimeslot(String nextHearingType, String nextHearingTypeText) {
-        setAdjournmentNextHearingType(nextHearingType);
-
-        adjournment.setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS);
-        adjournment.setNextHearingListingDuration(2);
-
-        AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
-
-        if (isOralHearing(nextHearingType)) {
-            assertEquals("2 sessions", body.getNextHearingTimeslot());
-        } else {
-            assertNull(body.getNextHearingTimeslot());
+            checkOralHearingTimeslot(nextHearingTypeText, nextHearingType, "1 minute");
         }
-    }
 
-    @ParameterizedTest
-    @MethodSource("allNextHearingTypeParameters")
-    void givenCaseWithOneSessionDuration_thenCorrectlySetTheNextHearingTimeslot(String nextHearingType, String nextHearingTypeText) {
-        setAdjournmentNextHearingType(nextHearingType);
+        @ParameterizedTest
+        @MethodSource(ALL_NEXT_HEARING_TYPE_PARAMETERS)
+        void givenCaseWithTwoSessionDuration_thenCorrectlySetTheNextHearingTimeslot(String nextHearingType, String nextHearingTypeText) {
+            setAdjournmentNextHearingType(nextHearingType);
 
-        adjournment.setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS);
-        adjournment.setNextHearingListingDuration(1);
+            adjournment.setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS);
+            adjournment.setNextHearingListingDuration(2);
 
-        AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
+            checkOralHearingTimeslot(nextHearingTypeText, nextHearingType, "2 sessions");
+        }
 
-        if (isOralHearing(nextHearingType)) {
-            assertEquals("1 session", body.getNextHearingTimeslot());
-        } else {
-            assertNull(body.getNextHearingTimeslot());
+        @ParameterizedTest
+        @MethodSource(ALL_NEXT_HEARING_TYPE_PARAMETERS)
+        void givenCaseWithOneSessionDuration_thenCorrectlySetTheNextHearingTimeslot(String nextHearingType, String nextHearingTypeText) {
+            setAdjournmentNextHearingType(nextHearingType);
+
+            adjournment.setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS);
+            adjournment.setNextHearingListingDuration(1);
+
+            checkOralHearingTimeslot(nextHearingTypeText, nextHearingType, "1 session");
         }
     }
 
     @Nested
     class PanelMembers {
-
-        static final String ALL_NEXT_HEARING_TYPE_PARAMETERS =
-            "uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewServiceTest#allNextHearingTypeParameters";
 
         private void checkBodyHeldBefore(String nextHearingTypeText, String expected) {
             AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
@@ -1023,74 +1004,78 @@ class AdjournCasePreviewServiceTest {
 
             checkTemplateBodyNextHearingDate("It will be re-scheduled on the first available date after 01/01/2020");
         }
+    }
+
+    @Nested
+    class DateToBeFixed {
+
+        @BeforeEach
+        void setUp() {
+            adjournment.setNextHearingDateType(DATE_TO_BE_FIXED);
+        }
 
         @Test
-        void givenCaseWithFirstAvailableDateAfterAndNotFirstOnSessionAndNoAfternoonSessionProvided_thenCorrectlyDisplayTheFirstAvailableDateAfterDate() {
-            adjournment.setNextHearingDateType(FIRST_AVAILABLE_DATE_AFTER);
-            adjournment.setNextHearingDateOrPeriod(PROVIDE_DATE);
-            adjournment.setNextHearingFirstAvailableDateAfterDate(LocalDate.parse("2020-01-01"));
+        void givenCaseWithDateToBeFixedAndNoFirstOnSessionAndNoTimeProvided_thenCorrectlyDisplayTheNextHearingDate() {
             adjournment.setTime(AdjournCaseTime.builder().build());
 
             previewNoticeShowIssueDate();
 
-            checkTemplateBodyNextHearingDate("It will be re-scheduled on the first available date after 01/01/2020");
+            checkTemplateBodyNextHearingDate("It will be re-scheduled on a date to be fixed");
         }
 
-    }
+        @Test
+        void givenCaseWithDateToBeFixedAndFirstOnSessionAndMorningSessionProvided_thenCorrectlyDisplayTheNextHearingDate() {
+            setAdjournmentHearingFirstOnSessionAtSpecificTime("am");
 
-    @Test
-    void givenCaseWithDateToBeFixedAndNoFirstOnSessionAndNoTimeProvided_thenCorrectlyDisplayTheNextHearingDate() {
-        adjournment.setNextHearingDateType(DATE_TO_BE_FIXED);
+            previewNoticeShowIssueDate();
 
-        adjournment.setTime(AdjournCaseTime.builder().build());
+            checkTemplateBodyNextHearingDate("It will be first in the morning session on a date to be fixed");
+        }
 
-        previewNoticeShowIssueDate();
+        @Test
+        void givenCaseWithDateToBeFixedAndFirstOnSessionAndAfternoonSessionProvided_thenCorrectlyDisplayTheNextHearingDate() {
+            setAdjournmentHearingFirstOnSessionAtSpecificTime("pm");
 
-        checkTemplateBodyNextHearingDate("It will be re-scheduled on a date to be fixed");
-    }
+            previewNoticeShowIssueDate();
 
-    @Test
-    void givenCaseWithDateToBeFixedAndFirstOnSessionAndMorningSessionProvided_thenCorrectlyDisplayTheNextHearingDate() {
-        adjournment.setNextHearingDateType(DATE_TO_BE_FIXED);
+            checkTemplateBodyNextHearingDate("It will be first in the afternoon session on a date to be fixed");
+        }
 
-        setAdjournmentHearingFirstOnSessionAtSpecificTime("am");
+        @Test
+        void givenCaseWithDateToBeFixedAndNotFirstOnSessionAndMorningSessionProvided_thenCorrectlyDisplayTheNextHearingDate() {
+            adjournment.setTime(AdjournCaseTime.builder().adjournCaseNextHearingSpecificTime("am").build());
 
-        previewNoticeShowIssueDate();
+            previewNoticeShowIssueDate();
 
-        checkTemplateBodyNextHearingDate("It will be first in the morning session on a date to be fixed");
-    }
+            checkTemplateBodyNextHearingDate("It will be in the morning session on a date to be fixed");
+        }
 
-    @Test
-    void givenCaseWithDateToBeFixedAndFirstOnSessionAndAfternoonSessionProvided_thenCorrectlyDisplayTheNextHearingDate() {
-        adjournment.setNextHearingDateType(DATE_TO_BE_FIXED);
+        @Test
+        void givenCaseWithDateToBeFixedAndNotFirstOnSessionAndAfternoonSessionProvided_thenCorrectlyDisplayTheNextHearingDate() {
+            adjournment.setTime(AdjournCaseTime.builder().adjournCaseNextHearingSpecificTime("pm").build());
 
-        setAdjournmentHearingFirstOnSessionAtSpecificTime("pm");
+            previewNoticeShowIssueDate();
 
-        previewNoticeShowIssueDate();
+            checkTemplateBodyNextHearingDate("It will be in the afternoon session on a date to be fixed");
+        }
 
-        checkTemplateBodyNextHearingDate("It will be first in the afternoon session on a date to be fixed");
-    }
+        @Test
+        void givenCaseWithDateToBeFixedAndNotFirstOnSessionAndNoAfternoonSessionProvided_thenCorrectlyDisplayTheFixedDate() {
+            adjournment.setTime(AdjournCaseTime.builder().build());
 
-    @Test
-    void givenCaseWithDateToBeFixedAndNotFirstOnSessionAndMorningSessionProvided_thenCorrectlyDisplayTheNextHearingDate() {
-        adjournment.setNextHearingDateType(DATE_TO_BE_FIXED);
+            previewNoticeShowIssueDate();
 
-        adjournment.setTime(AdjournCaseTime.builder().adjournCaseNextHearingSpecificTime("am").build());
+            checkTemplateBodyNextHearingDate("It will be re-scheduled on a date to be fixed");
+        }
 
-        previewNoticeShowIssueDate();
+        @Test
+        void givenCaseWithDateToBeFixedAndFirstOnSessionAndNoTimeProvided_thenCorrectlyDisplayTheNextHearingDate() {
+            setAdjournmentHearingFirstOnSessionWithNoSpecificTime();
 
-        checkTemplateBodyNextHearingDate("It will be in the morning session on a date to be fixed");
-    }
+            previewNoticeShowIssueDate();
 
-    @Test
-    void givenCaseWithDateToBeFixedAndNotFirstOnSessionAndAfternoonSessionProvided_thenCorrectlyDisplayTheNextHearingDate() {
-        adjournment.setNextHearingDateType(DATE_TO_BE_FIXED);
-
-        adjournment.setTime(AdjournCaseTime.builder().adjournCaseNextHearingSpecificTime("pm").build());
-
-        previewNoticeShowIssueDate();
-
-        checkTemplateBodyNextHearingDate("It will be in the afternoon session on a date to be fixed");
+            checkTemplateBodyNextHearingDate("It will be first in the session on a date to be fixed");
+        }
     }
 
     @Test
@@ -1103,33 +1088,12 @@ class AdjournCasePreviewServiceTest {
     }
 
     @Test
-    void givenCaseWithDateToBeFixedAndNotFirstOnSessionAndNoAfternoonSessionProvided_thenCorrectlyDisplayTheFixedDate() {
-        adjournment.setNextHearingDateType(DATE_TO_BE_FIXED);
-        adjournment.setTime(AdjournCaseTime.builder().build());
-
-        previewNoticeShowIssueDate();
-
-        checkTemplateBodyNextHearingDate("It will be re-scheduled on a date to be fixed");
-    }
-
-    @Test
     void givenCaseWithFirstAvailableDateAndNotAdjournCaseTimeAndNoAfternoonSessionProvided_thenCorrectlyDisplayTheFirstAvailableDateAfterDate() {
         adjournment.setTime(null);
 
         previewNoticeShowIssueDate();
 
         checkTemplateBodyNextHearingDate("It will be re-scheduled on the first available date");
-    }
-
-    @Test
-    void givenCaseWithDateToBeFixedAndFirstOnSessionAndNoTimeProvided_thenCorrectlyDisplayTheNextHearingDate() {
-        adjournment.setNextHearingDateType(DATE_TO_BE_FIXED);
-
-        setAdjournmentHearingFirstOnSessionWithNoSpecificTime();
-
-        previewNoticeShowIssueDate();
-
-        checkTemplateBodyNextHearingDate("It will be first in the session on a date to be fixed");
     }
 
     @Test
