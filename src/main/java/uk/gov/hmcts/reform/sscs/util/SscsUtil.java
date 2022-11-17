@@ -89,8 +89,8 @@ public class SscsUtil {
 
     public static boolean isMissingListingRequirements(SchedulingAndListingFields schedulingAndListingFields) {
         return isScheduleListingEnabled
-            && (isMissingListingRequirements(schedulingAndListingFields.getOverrideFields())
-            || isMissingListingRequirements(schedulingAndListingFields.getDefaultListingValues()));
+            && isMissingListingRequirements(schedulingAndListingFields.getOverrideFields())
+            && isMissingListingRequirements(schedulingAndListingFields.getDefaultListingValues());
     }
 
     private static boolean isMissingListingRequirements(OverrideFields listingRequirements) {
