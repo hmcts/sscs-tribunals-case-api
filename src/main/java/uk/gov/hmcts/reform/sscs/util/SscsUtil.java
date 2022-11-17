@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 
@@ -10,8 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -21,13 +24,14 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.PostponeRequestTemplateBody;
 
 @Slf4j
 public class SscsUtil {
+    @Value("${feature.snl.enabled}")
+    private static boolean isScheduleListingEnabled;
 
     private static final String TITLE = "Postponement Request from FTA";
     public static final String FILENAME = "Postponement Request.pdf";
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private SscsUtil() {
-        //
     }
 
     public static <T> List<T> mutableEmptyListIfNull(List<T> list) {
@@ -51,16 +55,15 @@ public class SscsUtil {
         String hearingVenue = sscsCaseData.getPostponementRequest().getPostponementRequestHearingVenue();
         LocalDate hearingDate = LocalDateTime.parse(sscsCaseData.getPostponementRequest().getPostponementRequestHearingDateAndTime()).toLocalDate();
 
-        StringBuilder additionalRequestDetails = new StringBuilder();
-        additionalRequestDetails.append("Date request received: ").append(LocalDate.now().format(DATE_TIME_FORMATTER)).append("\n");
-        additionalRequestDetails.append("Date of Hearing: ").append(hearingDate.format(DATE_TIME_FORMATTER)).append("\n");
-        additionalRequestDetails.append("Hearing Venue: ").append(hearingVenue).append("\n");
-        additionalRequestDetails.append("Reason for Postponement Request: ").append(requestDetails).append("\n");
+        String additionalRequestDetails = "Date request received: " + LocalDate.now().format(DATE_TIME_FORMATTER) + "\n"
+            + "Date of Hearing: " + hearingDate.format(DATE_TIME_FORMATTER) + "\n"
+            + "Hearing Venue: " + hearingVenue + "\n"
+            + "Reason for Postponement Request: " + requestDetails + "\n";
 
         GenerateFileParams params = GenerateFileParams.builder()
                 .renditionOutputLocation(null)
                 .templateId(templateId)
-                .formPayload(PostponeRequestTemplateBody.builder().title(TITLE).text(additionalRequestDetails.toString()).build())
+                .formPayload(PostponeRequestTemplateBody.builder().title(TITLE).text(additionalRequestDetails).build())
                 .userAuthentication(userAuthorisation)
                 .build();
         final String generatedFileUrl = generateFile.assemble(params);
@@ -84,4 +87,13 @@ public class SscsUtil {
         return allowedStates.contains(state);
     }
 
+    public static boolean isMissingListingRequirements(SchedulingAndListingFields schedulingAndListingFields) {
+        return isScheduleListingEnabled
+            && (isMissingListingRequirements(schedulingAndListingFields.getOverrideFields())
+            || isMissingListingRequirements(schedulingAndListingFields.getDefaultListingValues()));
+    }
+
+    private static boolean isMissingListingRequirements(OverrideFields listingRequirements) {
+        return isEmpty(listingRequirements.getDuration());
+    }
 }

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isMissingListingRequirements;
 
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -50,8 +51,13 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         }
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        SchedulingAndListingFields schedulingAndListingFields = sscsCaseData.getSchedulingAndListingFields();
 
-        if (HearingRoute.GAPS == sscsCaseData.getSchedulingAndListingFields().getHearingRoute()) {
+        if (isMissingListingRequirements(schedulingAndListingFields)) {
+            throw new IllegalStateException("Cannot change state to ready to list. Missing listing requirements.");
+        }
+
+        if (HearingRoute.GAPS == schedulingAndListingFields.getHearingRoute()) {
             return HearingHandler.GAPS.handle(sscsCaseData, gapsSwitchOverFeature,
                 hearingMessagingServiceFactory.getMessagingService(HearingRoute.GAPS));
         }
