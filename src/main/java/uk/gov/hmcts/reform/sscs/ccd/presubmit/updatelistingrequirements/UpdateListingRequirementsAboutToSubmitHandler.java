@@ -30,6 +30,9 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
     @Value("${feature.gaps-switchover.enabled}")
     private boolean gapsSwitchOverFeature;
 
+    @Value("${feature.snl.enabled}")
+    private boolean isScheduleListingEnabled;
+
     private final ListAssistHearingMessageHelper listAssistHearingMessageHelper;
 
     @Override
@@ -82,7 +85,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             }
         }
 
-        if (isMissingListingRequirements(schedulingAndListingFields)) {
+        if (isScheduleListingEnabled && isMissingListingRequirements(schedulingAndListingFields)) {
             log.info("Missing information in Listing Requirements. Case state is now: {}", State.LISTING_ERROR);
             sscsCaseData.setState(State.LISTING_ERROR);
         }

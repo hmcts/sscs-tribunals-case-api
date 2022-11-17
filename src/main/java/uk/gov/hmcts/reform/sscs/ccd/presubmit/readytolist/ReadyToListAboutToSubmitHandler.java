@@ -20,6 +20,9 @@ import uk.gov.hmcts.reform.sscs.service.servicebus.HearingMessagingServiceFactor
 @Slf4j
 public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    @Value("${feature.snl.enabled}")
+    private boolean isScheduleListingEnabled;
+
     private final boolean gapsSwitchOverFeature;
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
@@ -53,8 +56,13 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         SchedulingAndListingFields schedulingAndListingFields = sscsCaseData.getSchedulingAndListingFields();
 
-        if (isMissingListingRequirements(schedulingAndListingFields)) {
-            throw new IllegalStateException("Cannot change state to ready to list. Missing listing requirements.");
+        if (isScheduleListingEnabled && isMissingListingRequirements(schedulingAndListingFields)) {
+            sscsCaseData.setState(State.LISTING_ERROR);
+
+            PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+            callbackResponse.addError("Cannot change state to ready to list. Missing listing requirements.");
+
+            return callbackResponse;
         }
 
         if (HearingRoute.GAPS == schedulingAndListingFields.getHearingRoute()) {

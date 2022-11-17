@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
@@ -24,8 +25,6 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.PostponeRequestTemplateBody;
 
 @Slf4j
 public class SscsUtil {
-    @Value("${feature.snl.enabled}")
-    private static boolean isScheduleListingEnabled;
 
     private static final String TITLE = "Postponement Request from FTA";
     public static final String FILENAME = "Postponement Request.pdf";
@@ -88,12 +87,11 @@ public class SscsUtil {
     }
 
     public static boolean isMissingListingRequirements(SchedulingAndListingFields schedulingAndListingFields) {
-        return isScheduleListingEnabled
-            && isMissingListingRequirements(schedulingAndListingFields.getOverrideFields())
+        return isMissingListingRequirements(schedulingAndListingFields.getOverrideFields())
             && isMissingListingRequirements(schedulingAndListingFields.getDefaultListingValues());
     }
 
     private static boolean isMissingListingRequirements(OverrideFields listingRequirements) {
-        return isEmpty(listingRequirements.getDuration());
+        return isNull(listingRequirements) || isEmpty(listingRequirements.getDuration());
     }
 }
