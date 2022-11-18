@@ -22,7 +22,7 @@ services:
       - REFORM_TEAM=em-ccd-orchestrator
       - REFORM_ENVIRONMENT=docker
     ports:
-      - 8070:8080
+      - 4623:8080
     networks:
       - cftlib_default
     extra_hosts:
