@@ -276,6 +276,7 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-activemq'
 
     implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.7.5'
     implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.5'
@@ -319,6 +320,7 @@ dependencies {
     implementation group:'org.overviewproject', name: 'mime-types', version: '1.0.2'
 
     implementation group:'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+    implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.6.0'
 
     implementation group: 'org.pitest', name: 'pitest', version:  '1.9.8'
     implementation group:'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.9.0'
@@ -503,7 +505,7 @@ bootWithCCD {
 
     //---Debug-----
     //Uncomment to launch with debug
-    //jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
+    // jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
 
     //---Extra ccd loging----
     //Uncomment for ccd callback logging
@@ -512,7 +514,7 @@ bootWithCCD {
     //---Additional compose services---
     //Place any extra compose files you'd like to be started automatically here. These should be
     //in the folder /src/cftlib/resources/docker/ and comma delimited.
-    environment 'ADDITIONAL_COMPOSE_FILES', 'cft-lib-doc-stack.yml,cft-lib-doc-assembly.yml,cft-lib-ref-data-wiremock.yml,cft-lib-em-stack.yml'
+    environment 'ADDITIONAL_COMPOSE_FILES', 'cft-lib-activemq.yml,cft-lib-doc-stack.yml,cft-lib-doc-assembly.yml,cft-lib-ref-data-wiremock.yml,cft-lib-em-stack.yml'
     //Turn this on to automatically recreate containers above. Useful for debugging if you make changes.
     environment 'FORCE_RECREATE_ADDITIONAL_CONTAINERS', 'false'
 
@@ -530,7 +532,17 @@ bootWithCCD {
     environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
     environment 'CASE_DOCUMENT_S2S_AUTHORISED_SERVICES', 'ccd_case_document_am_api,ccd_gw,xui_webapp,ccd_data,bulk_scan_processor,sscs'
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,payment-api,xui_webapp,sscs,ccd_case_document_am_api,am_role_assignment_service,em_ccd_orchestrator'
-    environment 'CASE_ACCESS_MANAGEMENT_FEATURE', 'true'
+
     //Wiremock
     environment 'RD_LOCATION_REF_API_URL', 'http://localhost:8084'
+
+    // Features
+    environment 'GAPS_SWITCHOVER_FEATURE', 'true'
+    environment 'CASE_ACCESS_MANAGEMENT_FEATURE', 'true'
+
+    // Local Queue
+    environment 'JMS_NAMESPACE', 'localhost:5672'
+    environment 'JMS_HEARINGS_EVENT_QUEUE_NAME', 'tribunals-to-hearings-queue'
+    environment 'JMS_AMQP_CONNECTION_TEMPLATE', 'amqp://%1s?amqp.idleTimeout=%2d'
+    environment 'ENABLE_JMS', 'true'
 }

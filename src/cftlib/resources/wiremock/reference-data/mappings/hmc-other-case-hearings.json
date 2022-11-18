@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "ANY",
+    "urlPattern": "/hearing.*"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody":
+      {
+        "hmctsServiceCode": "BBA3",
+        "caseRef": 1234567890123456,
+        "caseHearings": []
+      }
+  }
+}
