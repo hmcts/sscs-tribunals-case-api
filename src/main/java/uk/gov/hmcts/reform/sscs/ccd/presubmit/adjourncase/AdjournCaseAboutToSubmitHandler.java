@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.resolvePostCode;
 
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
@@ -29,6 +31,8 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final PreviewDocumentService previewDocumentService;
+
+    private final AirLookupService airLookupService;
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
 
@@ -82,8 +86,16 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
 
             RegionalProcessingCenter rpc = regionalProcessingCenterService.getByVenueId(venueId);
 
+            sscsCaseData.setRegionalProcessingCenter(rpc);
+
             if (nonNull(rpc)) {
                 sscsCaseData.setRegion(rpc.getName());
+
+                String processingVenue = airLookupService.lookupAirVenueNameByPostCode(
+                    resolvePostCode(sscsCaseData),
+                    sscsCaseData.getAppeal().getBenefitType());
+
+                sscsCaseData.setProcessingVenue(processingVenue);
             }
         }
 

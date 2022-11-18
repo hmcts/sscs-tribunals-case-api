@@ -6,6 +6,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.checkConfidentiality;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.resolvePostCode;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -310,21 +311,4 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             return oldCaseDetails.getCaseData().getBenefitType();
         }
     }
-
-    private String resolvePostCode(SscsCaseData sscsCaseData) {
-        String postCode;
-
-        if ("yes".equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())) {
-            postCode = Optional.ofNullable(sscsCaseData.getAppeal().getAppellant().getAppointee())
-                .map(Appointee::getAddress)
-                .map(Address::getPostcode)
-                .filter(appointeePostCode -> !"".equals(appointeePostCode))
-                .orElse(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
-        } else {
-            postCode = sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
-        }
-
-        return postCode;
-    }
-
 }

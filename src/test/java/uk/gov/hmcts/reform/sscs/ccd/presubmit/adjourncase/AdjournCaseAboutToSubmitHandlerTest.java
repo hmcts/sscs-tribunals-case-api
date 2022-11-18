@@ -28,7 +28,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
@@ -41,6 +44,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
@@ -53,6 +57,9 @@ class AdjournCaseAboutToSubmitHandlerTest {
 
     @InjectMocks
     private AdjournCaseAboutToSubmitHandler handler;
+
+    @Mock
+    private AirLookupService airLookupService;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -81,7 +88,11 @@ class AdjournCaseAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
-            .appeal(Appeal.builder().build())
+            .appeal(Appeal.builder()
+                .appellant(Appellant.builder()
+                .address(Address.builder().postcode("CF10 1AA").build()).isAppointee(YES.getValue())
+                .build())
+                .build())
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
                 .hearingRoute(HearingRoute.GAPS)
                 .build())
@@ -239,6 +250,8 @@ class AdjournCaseAboutToSubmitHandlerTest {
         sscsCaseData.setAdjournCaseNextHearingVenueSelected(adjournedNextVenue);
 
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
+        when(airLookupService.lookupAirVenueNameByPostCode("CF10 1AA",
+            BenefitType.builder().code("PIP").build())).thenReturn("cardiff");
         when(regionalProcessingCenterService.getByVenueId(venueId)).thenReturn(rpc);
 
         PreSubmitCallbackResponse<SscsCaseData> response =

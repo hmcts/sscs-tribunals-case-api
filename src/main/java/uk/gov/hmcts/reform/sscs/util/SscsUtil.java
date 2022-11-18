@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,7 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -82,6 +87,18 @@ public class SscsUtil {
 
     public static boolean isValidCaseState(State state, List<State> allowedStates) {
         return allowedStates.contains(state);
+    }
+
+    public static String resolvePostCode(SscsCaseData sscsCaseData) {
+        if (YES.getValue().equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())) {
+            return Optional.ofNullable(sscsCaseData.getAppeal().getAppellant().getAppointee())
+                .map(Appointee::getAddress)
+                .map(Address::getPostcode)
+                .filter(StringUtils::isNotEmpty)
+                .orElse(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
+        }
+
+        return sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
     }
 
 }
