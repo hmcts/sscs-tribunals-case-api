@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.resolvePostCode;
 
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -92,7 +91,7 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
                 sscsCaseData.setRegion(rpc.getName());
 
                 String processingVenue = airLookupService.lookupAirVenueNameByPostCode(
-                    resolvePostCode(sscsCaseData),
+                    rpc.getPostcode(),
                     sscsCaseData.getAppeal().getBenefitType());
 
                 sscsCaseData.setProcessingVenue(processingVenue);

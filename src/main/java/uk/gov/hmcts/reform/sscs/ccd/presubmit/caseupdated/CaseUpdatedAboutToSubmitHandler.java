@@ -3,10 +3,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.checkConfidentiality;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.resolvePostCode;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -310,5 +310,17 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         } else {
             return oldCaseDetails.getCaseData().getBenefitType();
         }
+    }
+
+    private static String resolvePostCode(SscsCaseData sscsCaseData) {
+        if (YES.getValue().equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())) {
+            return Optional.ofNullable(sscsCaseData.getAppeal().getAppellant().getAppointee())
+                .map(Appointee::getAddress)
+                .map(Address::getPostcode)
+                .filter(StringUtils::isNotEmpty)
+                .orElse(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
+        }
+
+        return sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
     }
 }
