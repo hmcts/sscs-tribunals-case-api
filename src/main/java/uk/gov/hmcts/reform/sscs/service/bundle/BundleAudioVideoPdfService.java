@@ -97,10 +97,14 @@ public class BundleAudioVideoPdfService {
 
             String docUrl = document.getValue().getAvDocumentLink().getDocumentBinaryUrl().replace(documentManagementUrl, dmGatewayUrl);
 
+            String dateApproved = document.getValue().getDateApproved() != null ?
+                    DATEFORMATTER.format(LocalDate.parse(document.getValue().getDateApproved())) :
+                    null;
+
             return PdfTableDescriptor.builder().documentType(DocumentType.fromValue(document.getValue().getDocumentType()).getLabel())
                     .documentUrl(document.getValue().getAvDocumentLink().getDocumentFilename() + "|" + docUrl)
                     .dateAdded(DATEFORMATTER.format(LocalDate.parse(document.getValue().getDocumentDateAdded())))
-                    .dateApproved(DATEFORMATTER.format(LocalDate.parse(document.getValue().getDateApproved())))
+                    .dateApproved(dateApproved)
                     .uploadParty(getSubmittedByField(document.getValue()))
                     .build();
         }

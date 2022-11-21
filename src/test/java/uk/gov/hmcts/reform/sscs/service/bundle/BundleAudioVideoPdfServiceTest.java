@@ -221,6 +221,27 @@ public class BundleAudioVideoPdfServiceTest {
 
     }
 
+    @Test
+    public void givenApprovedDateIsNull_thenCreatePdf() {
+        List<SscsDocument> audioVideoDocuments = new ArrayList<>();
+        audioVideoDocuments.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
+                        .documentType("videoDocument")
+                        .documentDateAdded(now.toString())
+                        .partyUploaded(UploadParty.APPELLANT)
+                        .documentLink(DocumentLink.builder().documentFilename("statement.pdf").documentUrl("dm-store-url/123").documentBinaryUrl("dm-store-url/123/binary").build())
+                        .avDocumentLink(DocumentLink.builder().documentFilename("Myfilename.mp4").documentUrl("dm-store-url/123").documentBinaryUrl("dm-store-url/123/binary").build()).build())
+                .build());
+        caseDetails.getCaseData().setSscsDocument(audioVideoDocuments);
+
+        service.createAudioVideoPdf(caseDetails.getCaseData());
+
+        assertEquals(1, capture.getValue().getContent().size());
+        assertEquals("Video document", capture.getValue().getContent().get(0).getDocumentType());
+        assertNull(capture.getValue().getContent().get(0).getDateApproved());
+        assertEquals(nowFormatted, capture.getValue().getContent().get(0).getDateAdded());
+        assertEquals("Myfilename.mp4|gateway-link/123/binary", capture.getValue().getContent().get(0).getDocumentUrl());
+    }
+
     private SscsDocument createSscsDocument() {
         DocumentLink documentLink = DocumentLink.builder().documentUrl("some location").build();
         return SscsDocument.builder().value(SscsDocumentDetails.builder().documentLink(documentLink).build()).build();
