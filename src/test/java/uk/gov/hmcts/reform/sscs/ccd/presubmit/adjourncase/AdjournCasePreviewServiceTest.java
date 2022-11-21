@@ -68,6 +68,7 @@ import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.LanguageService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
@@ -110,11 +111,14 @@ class AdjournCasePreviewServiceTest {
     @Mock
     private VenueDataLoader venueDataLoader;
 
+    @Mock
+    private SignLanguagesService signLanguagesService;
+
     @BeforeEach
     void setUp() throws IOException {
         openMocks(this);
         service = new AdjournCasePreviewService(generateFile, userDetailsService,
-            venueDataLoader, new LanguageService(), TEMPLATE_ID);
+            venueDataLoader, new LanguageService(), TEMPLATE_ID, signLanguagesService);
 
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -396,7 +400,7 @@ class AdjournCasePreviewServiceTest {
         setAdjournmentNextHearingType(nextHearingType);
 
         adjournment.setInterpreterRequired(YES);
-        adjournment.setInterpreterLanguage("french");
+        adjournment.setInterpreterLanguage( new DynamicList("French"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = previewNoticeDoNotShowIssueDate();
 
@@ -425,7 +429,7 @@ class AdjournCasePreviewServiceTest {
         setAdjournmentNextHearingType(nextHearingType);
 
         adjournment.setInterpreterRequired(NO);
-        adjournment.setInterpreterLanguage("french");
+        adjournment.setInterpreterLanguage( new DynamicList("French"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = previewNoticeDoNotShowIssueDate();
 
@@ -443,7 +447,7 @@ class AdjournCasePreviewServiceTest {
     void willSetPreviewFileWithoutInterpreterDescription_WhenInterpreterRequiredNotSetAndLanguageIsSet(String nextHearingType, String nextHearingTypeText) {
         setAdjournmentNextHearingType(nextHearingType);
 
-        adjournment.setInterpreterLanguage("french");
+        adjournment.setInterpreterLanguage( new DynamicList("French"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = previewNoticeDoNotShowIssueDate();
 

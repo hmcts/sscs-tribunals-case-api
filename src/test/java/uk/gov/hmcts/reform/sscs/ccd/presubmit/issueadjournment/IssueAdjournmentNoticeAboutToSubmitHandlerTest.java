@@ -112,7 +112,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
                 .nextHearingListingDuration(2)
                 .nextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS)
                 .interpreterRequired(YES)
-                .interpreterLanguage("spanish")
+                .interpreterLanguage(new DynamicList("Spanish"))
                 .nextHearingDateType(AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER)
                 .nextHearingDateOrPeriod(AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD)
                 .nextHearingDateOrTime("")
