@@ -103,7 +103,7 @@ class AdjournCaseAboutToSubmitHandlerTest {
         @Test
         void givenAdjournmentEventWithLanguageInterpreterRequiredAndCaseHasExistingInterpreter_overwriteExistingInterpreter() {
             callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterRequired(YES);
-            callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterLanguage( new DynamicList(SPANISH));
+            callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterLanguage(new DynamicList(SPANISH));
             callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder()
                 .languageInterpreter(NO.getValue())
                 .languages("French")

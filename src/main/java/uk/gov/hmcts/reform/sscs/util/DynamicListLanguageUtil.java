@@ -29,8 +29,8 @@ public class DynamicListLanguageUtil {
 
         List<DynamicListItem> interpreterLanguage = generateInterpreterLanguage();
 
-            list.setListItems(interpreterLanguage);
-            return list;
+        list.setListItems(interpreterLanguage);
+        return list;
     }
 
     @NotNull

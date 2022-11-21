@@ -400,7 +400,7 @@ class AdjournCasePreviewServiceTest {
         setAdjournmentNextHearingType(nextHearingType);
 
         adjournment.setInterpreterRequired(YES);
-        adjournment.setInterpreterLanguage( new DynamicList("French"));
+        adjournment.setInterpreterLanguage(new DynamicList("French"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = previewNoticeDoNotShowIssueDate();
 
@@ -429,7 +429,7 @@ class AdjournCasePreviewServiceTest {
         setAdjournmentNextHearingType(nextHearingType);
 
         adjournment.setInterpreterRequired(NO);
-        adjournment.setInterpreterLanguage( new DynamicList("French"));
+        adjournment.setInterpreterLanguage(new DynamicList("French"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = previewNoticeDoNotShowIssueDate();
 
@@ -447,7 +447,7 @@ class AdjournCasePreviewServiceTest {
     void willSetPreviewFileWithoutInterpreterDescription_WhenInterpreterRequiredNotSetAndLanguageIsSet(String nextHearingType, String nextHearingTypeText) {
         setAdjournmentNextHearingType(nextHearingType);
 
-        adjournment.setInterpreterLanguage( new DynamicList("French"));
+        adjournment.setInterpreterLanguage(new DynamicList("French"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = previewNoticeDoNotShowIssueDate();
 
