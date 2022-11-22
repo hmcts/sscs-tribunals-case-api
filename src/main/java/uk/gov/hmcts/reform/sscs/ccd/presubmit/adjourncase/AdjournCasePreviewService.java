@@ -224,7 +224,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                     throw new IllegalStateException("No value set for adjournCaseNextHearingFirstAvailableDateAfterPeriod in case data");
                 }
                 hearingDateSentence = hearingDateSentence + " after " + getDateForPeriodAfterIssueDate(issueDate,
-                        adjournment.getNextHearingFirstAvailableDateAfterPeriod().getNumber())
+                        adjournment.getNextHearingFirstAvailableDateAfterPeriod().getCcdDefinition())
                     .format(DateTimeFormatter.ofPattern(DOCUMENT_DATE_PATTERN));
             } else {
                 throw new IllegalStateException("Date or period indicator not available in case data");
