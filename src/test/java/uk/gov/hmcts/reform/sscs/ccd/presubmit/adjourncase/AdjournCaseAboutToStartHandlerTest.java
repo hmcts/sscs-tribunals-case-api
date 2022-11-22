@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -93,95 +92,86 @@ class AdjournCaseAboutToStartHandlerTest {
             .build();
     }
 
-    @Nested
-    class Main {
+    @Test
+    void givenCaseHasAdjournedFieldsPopulatedAndNoDraftAdjournedDocs_thenClearTransientFields() {
+        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        @BeforeEach
-        void setUp() {
-            when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
-            when(callback.getCaseDetails()).thenReturn(caseDetails);
-            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        }
+        List<SscsDocument> documentList = new ArrayList<>();
 
-        @Test
-        void givenCaseHasAdjournedFieldsPopulatedAndNoDraftAdjournedDocs_thenClearTransientFields() {
+        SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(ADJOURNMENT_NOTICE.getValue()).build();
+        documentList.add(new SscsDocument(details));
 
-            List<SscsDocument> documentList = new ArrayList<>();
+        sscsCaseData.setSscsDocument(documentList);
 
-            SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(ADJOURNMENT_NOTICE.getValue()).build();
-            documentList.add(new SscsDocument(details));
+        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-            sscsCaseData.setSscsDocument(documentList);
-
-            handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-            assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrProperties();
-        }
-
-        @Test
-        void givenCaseHasAdjournedFieldsPopulatedAndDraftAdjournedDocs_thenDoNotClearTransientFields() {
-
-            List<SscsDocument> documentList = new ArrayList<>();
-
-            SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(DRAFT_ADJOURNMENT_NOTICE.getValue()).build();
-            documentList.add(new SscsDocument(details));
-
-            sscsCaseData.setSscsDocument(documentList);
-
-            handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-            Adjournment adjournment = sscsCaseData.getAdjournment();
-            assertThat(adjournment.getGenerateNotice()).isEqualTo(YES);
-            assertThat(adjournment.getTypeOfHearing()).isEqualTo(AdjournCaseTypeOfHearing.VIDEO);
-            assertThat(adjournment.getCanCaseBeListedRightAway()).isEqualTo(YES);
-            assertThat(adjournment.getAreDirectionsBeingMadeToParties()).isEqualTo(NO);
-            assertThat(adjournment.getDirectionsDueDateDaysOffset()).isEqualTo(AdjournCaseDaysOffset.FOURTEEN_DAYS);
-            assertThat(adjournment.getDirectionsDueDate()).isEqualTo(LocalDate.now().plusMonths(1));
-            assertThat(adjournment.getTypeOfNextHearing()).isEqualTo(AdjournCaseTypeOfHearing.FACE_TO_FACE);
-            assertThat(adjournment.getNextHearingVenue()).isEqualTo(AdjournCaseNextHearingVenue.SOMEWHERE_ELSE);
-            assertThat(adjournment.getNextHearingVenueSelected().getValue().getCode()).isEmpty();
-            assertThat(adjournment.getPanelMembersExcluded()).isEqualTo(AdjournCasePanelMembersExcluded.NO);
-            assertThat(adjournment.getDisabilityQualifiedPanelMemberName()).isEmpty();
-            assertThat(adjournment.getMedicallyQualifiedPanelMemberName()).isEmpty();
-            assertThat(adjournment.getOtherPanelMemberName()).isEmpty();
-            assertThat(adjournment.getNextHearingListingDurationType()).isEqualTo(AdjournCaseNextHearingDurationType.STANDARD);
-            assertThat(adjournment.getNextHearingListingDuration()).isEqualTo(1);
-            assertThat(adjournment.getNextHearingListingDurationUnits()).isEqualTo(AdjournCaseNextHearingDurationUnits.SESSIONS);
-            assertThat(adjournment.getInterpreterRequired()).isEqualTo(NO);
-            assertThat(adjournment.getInterpreterLanguage()).isEqualTo("spanish");
-            assertThat(adjournment.getNextHearingDateType()).isEqualTo(AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER);
-            assertThat(adjournment.getNextHearingDateOrPeriod()).isEqualTo(AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD);
-            assertThat(adjournment.getNextHearingDateOrTime()).isEmpty();
-            assertThat(adjournment.getNextHearingFirstAvailableDateAfterDate()).isEqualTo(LocalDate.now());
-            assertThat(adjournment.getNextHearingFirstAvailableDateAfterPeriod()).isEqualTo(AdjournCaseNextHearingPeriod.NINETY_DAYS);
-            assertThat(adjournment.getReasons()).isEqualTo(List.of(new CollectionItem<>(null, "")));
-            assertThat(adjournment.getAdditionalDirections()).isEqualTo(List.of(new CollectionItem<>(null, "")));
-            assertThat(adjournment.getAdjournmentInProgress()).isEqualTo(YES);
-        }
+        assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrProperties();
     }
 
-    @Nested
-    class Other {
+    @Test
+    void givenCaseHasAdjournedFieldsPopulatedAndDraftAdjournedDocs_thenDoNotClearTransientFields() {
+        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        @Test
-        void givenANonAdjournCaseEvent_thenReturnFalse() {
-            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-            assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
-        }
+        List<SscsDocument> documentList = new ArrayList<>();
 
-        @ParameterizedTest
-        @EnumSource(value = CallbackType.class, names = {"ABOUT_TO_SUBMIT", "MID_EVENT", "SUBMITTED"})
-        void givenANonAboutToStartCallbackType_thenReturnFalse(CallbackType callbackType) {
-            assertThat(handler.canHandle(callbackType, callback)).isFalse();
-        }
+        SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(DRAFT_ADJOURNMENT_NOTICE.getValue()).build();
+        documentList.add(new SscsDocument(details));
 
-        @Test
-        void throwsExceptionIfItCannotHandleTheAppeal() {
-            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+        sscsCaseData.setSscsDocument(documentList);
 
-            assertThatThrownBy(() -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION))
-                .isInstanceOf(IllegalStateException.class);
-        }
+        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        Adjournment adjournment = sscsCaseData.getAdjournment();
+        assertThat(adjournment.getGenerateNotice()).isEqualTo(YES);
+        assertThat(adjournment.getTypeOfHearing()).isEqualTo(AdjournCaseTypeOfHearing.VIDEO);
+        assertThat(adjournment.getCanCaseBeListedRightAway()).isEqualTo(YES);
+        assertThat(adjournment.getAreDirectionsBeingMadeToParties()).isEqualTo(NO);
+        assertThat(adjournment.getDirectionsDueDateDaysOffset()).isEqualTo(AdjournCaseDaysOffset.FOURTEEN_DAYS);
+        assertThat(adjournment.getDirectionsDueDate()).isEqualTo(LocalDate.now().plusMonths(1));
+        assertThat(adjournment.getTypeOfNextHearing()).isEqualTo(AdjournCaseTypeOfHearing.FACE_TO_FACE);
+        assertThat(adjournment.getNextHearingVenue()).isEqualTo(AdjournCaseNextHearingVenue.SOMEWHERE_ELSE);
+        assertThat(adjournment.getNextHearingVenueSelected().getValue().getCode()).isEmpty();
+        assertThat(adjournment.getPanelMembersExcluded()).isEqualTo(AdjournCasePanelMembersExcluded.NO);
+        assertThat(adjournment.getDisabilityQualifiedPanelMemberName()).isEmpty();
+        assertThat(adjournment.getMedicallyQualifiedPanelMemberName()).isEmpty();
+        assertThat(adjournment.getOtherPanelMemberName()).isEmpty();
+        assertThat(adjournment.getNextHearingListingDurationType()).isEqualTo(AdjournCaseNextHearingDurationType.STANDARD);
+        assertThat(adjournment.getNextHearingListingDuration()).isEqualTo(1);
+        assertThat(adjournment.getNextHearingListingDurationUnits()).isEqualTo(AdjournCaseNextHearingDurationUnits.SESSIONS);
+        assertThat(adjournment.getInterpreterRequired()).isEqualTo(NO);
+        assertThat(adjournment.getInterpreterLanguage()).isEqualTo("spanish");
+        assertThat(adjournment.getNextHearingDateType()).isEqualTo(AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER);
+        assertThat(adjournment.getNextHearingDateOrPeriod()).isEqualTo(AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD);
+        assertThat(adjournment.getNextHearingDateOrTime()).isEmpty();
+        assertThat(adjournment.getNextHearingFirstAvailableDateAfterDate()).isEqualTo(LocalDate.now());
+        assertThat(adjournment.getNextHearingFirstAvailableDateAfterPeriod()).isEqualTo(AdjournCaseNextHearingPeriod.NINETY_DAYS);
+        assertThat(adjournment.getReasons()).isEqualTo(List.of(new CollectionItem<>(null, "")));
+        assertThat(adjournment.getAdditionalDirections()).isEqualTo(List.of(new CollectionItem<>(null, "")));
+        assertThat(adjournment.getAdjournmentInProgress()).isEqualTo(YES);
+    }
+
+    @Test
+    void givenANonAdjournCaseEvent_thenReturnFalse() {
+        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+        assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CallbackType.class, names = {"ABOUT_TO_SUBMIT", "MID_EVENT", "SUBMITTED"})
+    void givenANonAboutToStartCallbackType_thenReturnFalse(CallbackType callbackType) {
+        assertThat(handler.canHandle(callbackType, callback)).isFalse();
+    }
+
+    @Test
+    void throwsExceptionIfItCannotHandleTheAppeal() {
+        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+
+        assertThatThrownBy(() -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION))
+            .isInstanceOf(IllegalStateException.class);
     }
 
 }

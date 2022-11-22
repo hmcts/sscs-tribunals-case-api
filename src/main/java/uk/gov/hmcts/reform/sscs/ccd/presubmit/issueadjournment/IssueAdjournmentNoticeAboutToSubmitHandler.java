@@ -100,7 +100,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             sscsCaseData.setDirectionDueDate(sscsCaseData.getAdjournment().getDirectionsDueDate().toString());
         } else if (sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset() != null) {
             sscsCaseData.setDirectionDueDate(LocalDate.now()
-                .plusDays(sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset().getNumber())
+                .plusDays(sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset().getCcdDefinition())
                 .toString());
         }
     }
