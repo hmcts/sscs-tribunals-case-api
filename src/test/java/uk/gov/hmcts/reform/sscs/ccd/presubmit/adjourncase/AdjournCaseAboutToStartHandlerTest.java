@@ -40,10 +40,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 
 @ExtendWith(MockitoExtension.class)
 class AdjournCaseAboutToStartHandlerTest {
 
+    @Mock
+    private DynamicListLanguageUtil dynamicListLanguageUtil;
     private static final String USER_AUTHORISATION = "Bearer token";
     private AdjournCaseAboutToStartHandler handler;
 
@@ -57,7 +60,7 @@ class AdjournCaseAboutToStartHandlerTest {
 
     @BeforeEach
     public void setUp() {
-        handler = new AdjournCaseAboutToStartHandler();
+        handler = new AdjournCaseAboutToStartHandler(dynamicListLanguageUtil);
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
                 .appeal(Appeal.builder().build())
@@ -79,7 +82,7 @@ class AdjournCaseAboutToStartHandlerTest {
                 .nextHearingListingDuration(1)
                 .nextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS)
                 .interpreterRequired(NO)
-                .interpreterLanguage("spanish")
+                .interpreterLanguage(new DynamicList("Spanish"))
                 .nextHearingDateType(AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER)
                 .nextHearingDateOrPeriod(AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD)
                 .nextHearingDateOrTime("")
@@ -143,7 +146,7 @@ class AdjournCaseAboutToStartHandlerTest {
         assertThat(adjournment.getNextHearingListingDuration()).isEqualTo(1);
         assertThat(adjournment.getNextHearingListingDurationUnits()).isEqualTo(AdjournCaseNextHearingDurationUnits.SESSIONS);
         assertThat(adjournment.getInterpreterRequired()).isEqualTo(NO);
-        assertThat(adjournment.getInterpreterLanguage()).isEqualTo("spanish");
+        assertThat(adjournment.getInterpreterLanguage()).isEqualTo(null);
         assertThat(adjournment.getNextHearingDateType()).isEqualTo(AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER);
         assertThat(adjournment.getNextHearingDateOrPeriod()).isEqualTo(AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD);
         assertThat(adjournment.getNextHearingDateOrTime()).isEmpty();

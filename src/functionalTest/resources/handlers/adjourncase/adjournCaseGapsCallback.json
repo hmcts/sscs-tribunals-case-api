@@ -13,7 +13,7 @@
       "adjournCaseCanCaseBeListedRightAway": "Yes",
       "adjournCaseDisabilityQualifiedPanelMemberName": "Bob Smith",
       "adjournCaseGenerateNotice": "Yes",
-      "adjournCaseInterpreterLanguage": "spanish",
+      "adjournCaseInterpreterLanguageList": "spanish",
       "adjournCaseInterpreterRequired": "Yes",
       "adjournCaseMedicallyQualifiedPanelMemberName": "Wendy Rowe",
       "adjournCaseNextHearingDateType": "dateToBeFixed",

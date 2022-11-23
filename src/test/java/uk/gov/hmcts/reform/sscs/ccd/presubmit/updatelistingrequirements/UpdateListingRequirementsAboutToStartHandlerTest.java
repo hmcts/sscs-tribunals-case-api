@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
-import uk.gov.hmcts.reform.sscs.util.UpdateListingRequirementsUtil;
+import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UpdateListingRequirementsAboutToStartHandlerTest {
@@ -38,7 +38,7 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
     @Mock
     private SscsCaseData sscsCaseData;
     @Mock
-    UpdateListingRequirementsUtil updateListingRequirementsUtil;
+    DynamicListLanguageUtil dynamicListLanguageUtil;
     @InjectMocks
     private UpdateListingRequirementsAboutToStartHandler handler;
 
@@ -75,9 +75,6 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
                 .build())
             .build();
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
-
-        willDoNothing().given(updateListingRequirementsUtil)
-            .generateInterpreterLanguageFields(any(OverrideFields.class));
 
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
 
