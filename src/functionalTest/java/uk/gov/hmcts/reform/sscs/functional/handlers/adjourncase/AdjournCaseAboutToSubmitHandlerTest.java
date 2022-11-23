@@ -24,9 +24,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
 @RunWith(SpringRunner.class)
@@ -53,33 +53,35 @@ public class AdjournCaseAboutToSubmitHandlerTest extends BaseHandler {
 
         JsonNode root = mapper.readTree(response);
         SscsCaseData result = mapper.readValue(root.path("data").toPrettyString(), new TypeReference<>(){});
+        Adjournment adjournment = result.getAdjournment();
 
-        assertThat(result.getAdjournment().getAdditionalDirections())
+        assertThat(adjournment.getAdditionalDirections())
             .hasSize(1)
             .extracting(CollectionItem::getValue)
             .containsOnly("Nothing else");
-        assertThat(result.getAdjournment().getCanCaseBeListedRightAway()).isEqualTo(YES);
-        assertThat(result.getAdjournment().getDisabilityQualifiedPanelMemberName()).isEqualTo("Bob Smith");
-        assertThat(result.getAdjournment().getGenerateNotice()).isEqualTo(YES);
-        assertThat(result.getAdjournment().getInterpreterLanguage().getValue().getCode()).isEqualTo("spanish");
-        assertThat(result.getAdjournment().getInterpreterRequired()).isEqualTo(YES);
-        assertThat(result.getAdjournment().getMedicallyQualifiedPanelMemberName()).isEqualTo("Wendy Rowe");
-        assertThat(result.getAdjournment().getNextHearingDateType()).isEqualTo(AdjournCaseNextHearingDateType.DATE_TO_BE_FIXED);
-        assertThat(result.getAdjournment().getNextHearingListingDuration()).isEqualTo(12);
-        assertThat(result.getAdjournment().getNextHearingListingDurationType()).isEqualTo(AdjournCaseNextHearingDurationType.STANDARD);
-        assertThat(result.getAdjournment().getNextHearingListingDurationUnits()).isEqualTo(AdjournCaseNextHearingDurationUnits.MINUTES);
-        assertThat(result.getAdjournment().getTime().getAdjournCaseNextHearingSpecificTime()).isEqualTo("am");
-        assertThat(result.getAdjournment().getNextHearingVenue()).isEqualTo(AdjournCaseNextHearingVenue.SOMEWHERE_ELSE);
-        assertThat(result.getAdjournment().getNextHearingVenueSelected().getValue().getCode()).isEqualTo("1256");
-        assertThat(result.getAdjournment().getOtherPanelMemberName()).isEqualTo("The Doctor");
-        assertThat(result.getAdjournment().getPanelMembersExcluded()).isEqualTo(AdjournCasePanelMembersExcluded.YES);
-        assertThat(result.getAdjournment().getTypeOfHearing()).isEqualTo(AdjournCaseTypeOfHearing.FACE_TO_FACE);
-        assertThat(result.getAdjournment().getTypeOfNextHearing()).isEqualTo(AdjournCaseTypeOfHearing.FACE_TO_FACE);
-        assertThat(result.getAdjournment().getReasons())
+        assertThat(adjournment.getCanCaseBeListedRightAway()).isEqualTo(YES);
+        assertThat(adjournment.getDisabilityQualifiedPanelMemberName()).isEqualTo("Bob Smith");
+        assertThat(adjournment.getGenerateNotice()).isEqualTo(YES);
+        assertThat(adjournment.getInterpreterLanguage()).isEqualTo("spanish");
+        assertThat(adjournment.getInterpreterRequired()).isEqualTo(YES);
+        assertThat(adjournment.getMedicallyQualifiedPanelMemberName()).isEqualTo("Wendy Rowe");
+        assertThat(adjournment.getNextHearingDateType()).isEqualTo(AdjournCaseNextHearingDateType.DATE_TO_BE_FIXED);
+        assertThat(adjournment.getNextHearingListingDuration()).isEqualTo(720);
+        assertThat(adjournment.getNextHearingListingDurationType()).isEqualTo(AdjournCaseNextHearingDurationType.STANDARD);
+        assertThat(adjournment.getNextHearingListingDurationUnits()).isEqualTo(AdjournCaseNextHearingDurationUnits.MINUTES);
+        assertThat(adjournment.getTime().getAdjournCaseNextHearingSpecificTime()).isEqualTo("am");
+        assertThat(adjournment.getNextHearingVenue()).isEqualTo(AdjournCaseNextHearingVenue.SOMEWHERE_ELSE);
+        assertThat(adjournment.getNextHearingVenueSelected().getValue().getCode()).isEqualTo("1256");
+        assertThat(adjournment.getOtherPanelMemberName()).isEqualTo("The Doctor");
+        assertThat(adjournment.getPanelMembersExcluded()).isEqualTo(AdjournCasePanelMembersExcluded.YES);
+        assertThat(adjournment.getTypeOfHearing()).isEqualTo(AdjournCaseTypeOfHearing.FACE_TO_FACE);
+        assertThat(adjournment.getTypeOfNextHearing()).isEqualTo(AdjournCaseTypeOfHearing.FACE_TO_FACE);
+        assertThat(adjournment.getReasons())
             .hasSize(1)
             .extracting(CollectionItem::getValue)
             .containsOnly("Testing reason");
-        assertThat(result.getAdjournment().getPreviewDocument().getDocumentUrl()).isNotNull();
+        assertThat(adjournment.getPreviewDocument().getDocumentUrl()).isNotNull();
+        assertThat(adjournment.getAdjournmentInProgress()).isEqualTo(YES);
         assertThat(result.getAppeal().getHearingOptions().getLanguages()).isEqualTo("spanish");
         assertThat(result.getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo("Yes");
     }
