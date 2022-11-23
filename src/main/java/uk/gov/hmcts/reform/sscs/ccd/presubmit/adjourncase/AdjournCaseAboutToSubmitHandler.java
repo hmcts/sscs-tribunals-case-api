@@ -60,8 +60,8 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             && (isYes(sscsCaseData.getAdjournment().getCanCaseBeListedRightAway())
             || isNoOrNull(sscsCaseData.getAdjournment().getAreDirectionsBeingMadeToParties()))
         ) {
-            hearingMessageHelper.sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
             sscsCaseData.getAdjournment().setAdjournmentInProgress(YES);
+            hearingMessageHelper.sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
         } else if (sscsCaseData.getAdjournment().getInterpreterRequired() != null) {
             HearingOptions hearingOptions = HearingOptions.builder().build();
             if (sscsCaseData.getAppeal().getHearingOptions() != null) {
