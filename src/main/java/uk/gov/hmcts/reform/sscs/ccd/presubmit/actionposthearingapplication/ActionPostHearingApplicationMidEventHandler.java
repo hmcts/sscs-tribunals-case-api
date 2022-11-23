@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
@@ -48,14 +47,7 @@ public class ActionPostHearingApplicationMidEventHandler extends IssueDocumentHa
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
-        if (!SscsUtil.isSAndLCase(caseData)) {
-            log.info("Action Post Hearing Application: Cannot process non Scheduling & Listing Case for Case ID {}",
-                caseId);
-            response.addError("Cannot process Action Post Hearing Application on non Scheduling & Listing Case");
-            return response;
-        }
-
-        ActionPostHearingTypes typeSelected = caseData.getActionPostHearingApplication().getTypeSelected();
+        ActionPostHearingTypes typeSelected = caseData.getPostHearing().getActionTypeSelected();
         log.info("Action Post Hearing Application: handing action {} for case {}", typeSelected,  caseId);
 
         if (PAGE_ID_GENERATE_NOTICE.equals(pageId) && isYes(caseData.getDocumentGeneration().getGenerateNotice())) {

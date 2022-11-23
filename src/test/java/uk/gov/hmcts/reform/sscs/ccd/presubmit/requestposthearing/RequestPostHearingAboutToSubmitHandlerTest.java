@@ -1,12 +1,11 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionposthearingapplication;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.requestposthearing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ACTION_POST_HEARING_APPLICATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REQUEST_POST_HEARING;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,20 +15,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @ExtendWith(MockitoExtension.class)
-class ActionPostHearingApplicationAboutToSubmitHandlerTest {
-
-    private static final String DOCUMENT_URL = "dm-store/documents/123";
-
+class RequestPostHearingAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private ActionPostHearingApplicationAboutToSubmitHandler handler;
+    private RequestPostHearingAboutToSubmitHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -41,28 +33,16 @@ class ActionPostHearingApplicationAboutToSubmitHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new ActionPostHearingApplicationAboutToSubmitHandler(true);
+        handler = new RequestPostHearingAboutToSubmitHandler(true);
 
         caseData = SscsCaseData.builder()
-            .schedulingAndListingFields(SchedulingAndListingFields.builder()
-                .hearingRoute(LIST_ASSIST).build())
             .ccdCaseId("1234")
-            .documentGeneration(DocumentGeneration.builder()
-                .directionNoticeContent("Body Content")
-                .build())
-            .documentStaging(DocumentStaging.builder()
-                .previewDocument(DocumentLink.builder()
-                    .documentUrl(DOCUMENT_URL)
-                    .documentBinaryUrl(DOCUMENT_URL + "/binary")
-                    .documentFilename("decisionIssued.pdf")
-                    .build())
-                .build())
             .build();
     }
 
     @Test
     void givenAValidAboutToSubmitEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(ACTION_POST_HEARING_APPLICATION);
+        when(callback.getEvent()).thenReturn(REQUEST_POST_HEARING);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
     }
 
@@ -79,8 +59,8 @@ class ActionPostHearingApplicationAboutToSubmitHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new ActionPostHearingApplicationAboutToSubmitHandler(false);
-        when(callback.getEvent()).thenReturn(ACTION_POST_HEARING_APPLICATION);
+        handler = new RequestPostHearingAboutToSubmitHandler(false);
+        when(callback.getEvent()).thenReturn(REQUEST_POST_HEARING);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 

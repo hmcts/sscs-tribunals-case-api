@@ -1,22 +1,19 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionposthearingapplication;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.requestposthearing;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ActionPostHearingTypes;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdCallbackMap;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RequestPostHearingTypes;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
@@ -24,9 +21,8 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ActionPostHearingApplicationSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class RequestPostHearingSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final CcdCallbackMapService ccdCallbackMapService;
-
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
@@ -36,7 +32,7 @@ public class ActionPostHearingApplicationSubmittedHandler implements PreSubmitCa
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.SUBMITTED)
-            && callback.getEvent() == EventType.ACTION_POST_HEARING_APPLICATION
+            && callback.getEvent() == EventType.REQUEST_POST_HEARING
             && isPostHearingsEnabled;
     }
 
@@ -50,13 +46,13 @@ public class ActionPostHearingApplicationSubmittedHandler implements PreSubmitCa
         Long caseId = Long.valueOf(caseData.getCcdCaseId());
 
         PostHearing postHearing = caseData.getPostHearing();
-        ActionPostHearingTypes typeSelected = postHearing.getActionTypeSelected();
-        log.info("Action Post Hearing Application: handing actionPostHearing {} for case {}", typeSelected,  caseId);
+        RequestPostHearingTypes typeSelected = postHearing.getRequestTypeSelected();
+        log.info("Post Hearing Request: handing actionPostHearing {} for case {}", typeSelected,  caseId);
 
-        CcdCallbackMap callbackMap = getCcdCallbackMap(postHearing, typeSelected);
+        CcdCallbackMap callbackMap = postHearing.getRequestTypeSelected();
 
         if (isNull(callbackMap)) {
-            response.addError(String.format("Invalid Action Post Hearing Application Type Selected %s or action "
+            response.addError(String.format("Invalid Post Hearing Request Type Selected %s or request "
                     + "selected as callback is null",
                 typeSelected));
             return response;
@@ -65,32 +61,5 @@ public class ActionPostHearingApplicationSubmittedHandler implements PreSubmitCa
         caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
 
         return new PreSubmitCallbackResponse<>(caseData);
-    }
-
-    @Nullable
-    private static CcdCallbackMap getCcdCallbackMap(PostHearing postHearing,
-                                                    ActionPostHearingTypes typeSelected) {
-        if (isNull(typeSelected)) {
-            return null;
-        }
-        switch (typeSelected) {
-            case SET_ASIDE:
-                CcdCallbackMap action = postHearing.getSetAside().getAction();
-                if (action == SetAsideActions.REFUSE
-                    && isYes(postHearing.getSetAside().getRequestStatementOfReasons())) {
-                    action = SetAsideActions.REFUSE_SOR;
-                }
-                return action;
-            case CORRECTION:
-                return postHearing.getCorrection().getAction();
-            case STATEMENT_OF_REASONS:
-                return postHearing.getStatementOfReasons().getAction();
-            case PERMISSION_TO_APPEAL:
-                return postHearing.getPermissionToAppeal().getAction();
-            case LIBERTY_TO_APPLY:
-                return postHearing.getLibertyToApply().getAction();
-            default:
-                return null;
-        }
     }
 }
