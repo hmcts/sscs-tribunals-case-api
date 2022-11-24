@@ -47,7 +47,7 @@ public class RequestPostHearingSubmittedHandler implements PreSubmitCallbackHand
 
         PostHearing postHearing = caseData.getPostHearing();
         RequestPostHearingTypes typeSelected = postHearing.getRequestTypeSelected();
-        log.info("Post Hearing Request: handing actionPostHearing {} for case {}", typeSelected,  caseId);
+        log.info("Post Hearing Request: handing postHearing {} for case {}", typeSelected,  caseId);
 
         CcdCallbackMap callbackMap = postHearing.getRequestTypeSelected();
 
