@@ -16,6 +16,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue.SO
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.FACE_TO_FACE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService.IN_CHAMBERS;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -30,7 +31,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -162,52 +162,56 @@ class AdjournCasePreviewServiceTest {
         capture = ArgumentCaptor.forClass(GenerateFileParams.class);
     }
 
-    private NoticeIssuedTemplateBody verifyTemplateBody(String image, String expectedName, String nextHearingType, boolean isDraft) {
+    private NoticeIssuedTemplateBody verifyTemplateBody(String image, String expectedName, String nextHearingTypeText) {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
-
-        final boolean hasVenue = HearingType.FACE_TO_FACE.getValue().equals(nextHearingType);
-        final boolean isOralHearing = HearingType.FACE_TO_FACE.getValue().equals(nextHearingType)
-            || HearingType.TELEPHONE.getValue().equals(nextHearingType)
-            || HearingType.VIDEO.getValue().equals(nextHearingType);
 
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         assertThat(payload.getImage()).isEqualTo(image);
-        if (isDraft) {
-            assertThat(payload.getNoticeType()).isEqualTo("DRAFT ADJOURNMENT NOTICE");
-        } else {
-            assertThat(payload.getNoticeType()).isEqualTo("ADJOURNMENT NOTICE");
-        }
+        assertThat(payload.getNoticeType()).isEqualTo("DRAFT ADJOURNMENT NOTICE");
         assertThat(payload.getAppellantFullName()).isEqualTo(expectedName);
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
         assertThat(body).isNotNull();
-        if (hasVenue) {
-            assertThat(body.getNextHearingVenue()).isNotNull();
-        } else {
-            assertThat(body.getNextHearingVenue()).isNull();
-        }
-        if (AdjournCasePreviewService.IN_CHAMBERS.equals(body.getNextHearingVenue())) {
-            assertThat(body.isNextHearingAtVenue()).isFalse();
-        } else {
-            assertThat(body.isNextHearingAtVenue()).isEqualTo(hasVenue);
-        }
         assertThat(body.getNextHearingDate()).isNotNull();
         assertThat(body.getNextHearingType()).isNotNull();
-        assertThat(body.getNextHearingType()).isEqualTo(nextHearingType);
-        if (isOralHearing) {
-            assertThat(body.getNextHearingTimeslot()).isNotNull();
-        } else {
-            assertThat(body.getNextHearingTimeslot()).isNull();
-        }
+        assertThat(body.getNextHearingType()).isEqualTo(nextHearingTypeText);
         assertThat(body.getHeldAt()).isNotNull();
         assertThat(body.getHeldBefore()).isNotNull();
         assertThat(body.getHeldOn()).isNotNull();
+
+        if (HearingType.FACE_TO_FACE.getValue().equals(nextHearingTypeText)) {
+            verifyFaceToFaceTemplateBody(body);
+        } else if (HearingType.PAPER.getValue().equals(nextHearingTypeText)) {
+            verifyPaperTemplateBody(body);
+        } else {
+            verifyVideoOrTelephoneTemplateBody(body);
+        }
         return payload;
     }
 
+    private static void verifyVideoOrTelephoneTemplateBody(AdjournCaseTemplateBody body) {
+        assertThat(body.getNextHearingVenue()).isNull();
+        assertThat(body.isNextHearingAtVenue()).isFalse();
+        assertThat(body.getNextHearingTimeslot()).isNotNull();
+    }
+
+    private static void verifyFaceToFaceTemplateBody(AdjournCaseTemplateBody body) {
+        String nextHearingVenue = body.getNextHearingVenue();
+        assertThat(nextHearingVenue).isNotNull();
+        boolean nextHearingAtVenue = !nextHearingVenue.equals(IN_CHAMBERS);
+        assertThat(body.isNextHearingAtVenue()).isEqualTo(nextHearingAtVenue);
+        assertThat(body.getNextHearingTimeslot()).isNotNull();
+    }
+
+    private static void verifyPaperTemplateBody(AdjournCaseTemplateBody body) {
+        assertThat(body.getNextHearingVenue()).isNull();
+        assertThat(body.isNextHearingAtVenue()).isFalse();
+        assertThat(body.getNextHearingTimeslot()).isNull();
+    }
+
     private static boolean isOralHearing(AdjournCaseTypeOfHearing nextHearingType) {
-        return HearingType.FACE_TO_FACE.getKey().equals(nextHearingType.getCcdDefinition())
-            || HearingType.TELEPHONE.getKey().equals(nextHearingType.getCcdDefinition())
-            || HearingType.VIDEO.getKey().equals(nextHearingType.getCcdDefinition());
+        return AdjournCaseTypeOfHearing.FACE_TO_FACE.equals(nextHearingType)
+            || AdjournCaseTypeOfHearing.TELEPHONE.equals(nextHearingType)
+            || AdjournCaseTypeOfHearing.VIDEO.equals(nextHearingType);
     }
 
     private void checkOralHearingTimeslot(String nextHearingTypeText, AdjournCaseTypeOfHearing nextHearingType, String expected) {
@@ -269,8 +273,8 @@ class AdjournCasePreviewServiceTest {
         NoticeIssuedTemplateBody body = verifyTemplateBody(
             NoticeIssuedTemplateBody.ENGLISH_IMAGE,
             APPELLANT_FULL_NAME,
-            "face to face hearing",
-            true);
+            "face to face hearing"
+        );
         assertThat(body.getAdjournCaseTemplateBody().getNextHearingDate()).isEqualTo(expected);
     }
 
@@ -281,7 +285,7 @@ class AdjournCasePreviewServiceTest {
 
         checkPreviewDocument(response);
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText, true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
 
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
         assertThat(body).isNotNull();
@@ -314,20 +318,15 @@ class AdjournCasePreviewServiceTest {
 
         HearingType hearingType = HearingType.getByKey(nextHearingType.getCcdDefinition());
         String nextHearingTypeText = hearingType.getValue();
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText, true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
 
         AdjournCaseTemplateBody body = checkCommonPreviewParams(payload);
         assertThat(body.getReasonsForDecision()).isNull();
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void willSetPreviewFileWithNullReasons_WhenReasonsListIsNotEmpty(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void willSetPreviewFileWithNullReasons_WhenReasonsListIsNotEmpty(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -339,23 +338,19 @@ class AdjournCasePreviewServiceTest {
 
         checkPreviewDocument(response);
 
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         NoticeIssuedTemplateBody payload = verifyTemplateBody(
-            NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText, true);
+            NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
 
         AdjournCaseTemplateBody body = checkCommonPreviewParams(payload);
-        assertThat(body.getReasonsForDecision()).isNotNull();
-        assertThat(body.getReasonsForDecision()).isNotEmpty();
-        assertThat(body.getReasonsForDecision().get(0)).isEqualTo(REASONS);
+        assertThat(body.getReasonsForDecision())
+            .hasSize(1)
+            .containsOnly(REASONS);
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void willSetPreviewFileWithInterpreterDescription_WhenInterpreterRequiredAndLanguageIsSet(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void willSetPreviewFileWithInterpreterDescription_WhenInterpreterRequiredAndLanguageIsSet(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -369,23 +364,19 @@ class AdjournCasePreviewServiceTest {
 
         checkPreviewDocument(response);
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText, true);
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
 
         AdjournCaseTemplateBody body = checkCommonPreviewParams(payload);
-        assertThat(body.getReasonsForDecision()).isNotNull();
-        assertThat(body.getReasonsForDecision()).isNotEmpty();
-        assertThat(body.getReasonsForDecision().get(0)).isEqualTo(REASONS);
+        assertThat(body.getReasonsForDecision())
+            .hasSize(1)
+            .containsOnly(REASONS);
 
         assertThat(body.getInterpreterDescription()).isEqualTo("an interpreter in French");
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void willNotSetPreviewFileButWillDisplayError_WithInterpreterDescription_WhenInterpreterRequiredAndLanguageIsNotSet(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
@@ -397,13 +388,8 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void willSetPreviewFileWithoutInterpreterDescription_WhenInterpreterNotRequiredAndLanguageIsSet(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void willSetPreviewFileWithoutInterpreterDescription_WhenInterpreterNotRequiredAndLanguageIsSet(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -417,24 +403,20 @@ class AdjournCasePreviewServiceTest {
 
         checkPreviewDocument(response);
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText, true);
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
 
         AdjournCaseTemplateBody body = checkCommonPreviewParams(payload);
-        assertThat(body.getReasonsForDecision()).isNotNull();
-        assertThat(body.getReasonsForDecision()).isNotEmpty();
-        assertThat(body.getReasonsForDecision().get(0)).isEqualTo(REASONS);
+        assertThat(body.getReasonsForDecision())
+            .hasSize(1)
+            .containsOnly(REASONS);
 
         assertThat(body.getInterpreterDescription()).isNull();
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void willSetPreviewFileWithoutInterpreterDescription_WhenInterpreterRequiredNotSetAndLanguageIsSet(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void willSetPreviewFileWithoutInterpreterDescription_WhenInterpreterRequiredNotSetAndLanguageIsSet(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -447,23 +429,19 @@ class AdjournCasePreviewServiceTest {
 
         checkPreviewDocument(response);
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText, true);
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
 
         AdjournCaseTemplateBody body = checkCommonPreviewParams(payload);
-        assertThat(body.getReasonsForDecision()).isNotNull();
-        assertThat(body.getReasonsForDecision()).isNotEmpty();
-        assertThat(body.getReasonsForDecision().get(0)).isEqualTo(REASONS);
+        assertThat(body.getReasonsForDecision())
+            .hasSize(1)
+            .containsOnly(REASONS);
 
         assertThat(body.getInterpreterDescription()).isNull();
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenSignedInJudgeNameNotSet_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
 
@@ -475,12 +453,7 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenSignedInJudgeUserDetailsNotSet_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
 
@@ -492,12 +465,7 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenGenerateNoticeNotSet_willNotSetPreviewFile(AdjournCaseTypeOfHearing nextHearingType) {
         adjournment.setGenerateNotice(null);
         adjournment.setTypeOfNextHearing(nextHearingType);
@@ -506,13 +474,8 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void givenCaseWithMultipleHearingsWithVenues_thenCorrectlySetHeldAtUsingTheFirstHearingInList(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenCaseWithMultipleHearingsWithVenues_thenCorrectlySetHeldAtUsingTheFirstHearingInList(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -526,18 +489,14 @@ class AdjournCasePreviewServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
         assertThat(body.getHeldAt()).isEqualTo(GAP_VENUE_NAME);
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithMultipleHearingsWithFirstInListWithNoVenueName_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
@@ -556,12 +515,7 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithMultipleHearingsWithFirstInListWithNoVenue_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
 
@@ -579,12 +533,7 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayAnErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
 
@@ -600,12 +549,7 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDetails_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
 
@@ -622,13 +566,8 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void givenCaseWithEmptyHearingsList_thenDefaultHearingData(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenCaseWithEmptyHearingsList_thenDefaultHearingData(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -637,17 +576,13 @@ class AdjournCasePreviewServiceTest {
         List<Hearing> hearings = new ArrayList<>();
         sscsCaseData.setHearings(hearings);
 
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         checkDefaultHearingDataForNullOrEmptyHearings(nextHearingTypeText);
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void givenCaseWithNullHearingsList_thenDefaultHearingData(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenCaseWithNullHearingsList_thenDefaultHearingData(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -655,6 +590,7 @@ class AdjournCasePreviewServiceTest {
 
         sscsCaseData.setHearings(null);
 
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         checkDefaultHearingDataForNullOrEmptyHearings(nextHearingTypeText);
     }
 
@@ -663,7 +599,7 @@ class AdjournCasePreviewServiceTest {
             service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
         assertThat(response.getErrors()).isEmpty();
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText, true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
 
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
         assertThat(body).isNotNull();
@@ -675,13 +611,8 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void givenCaseWithMultipleHearingsWithHearingDates_thenCorrectlySetTheHeldOnUsingTheFirstHearingInList(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenCaseWithMultipleHearingsWithHearingDates_thenCorrectlySetTheHeldOnUsingTheFirstHearingInList(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -695,18 +626,14 @@ class AdjournCasePreviewServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
         assertThat(body.getHeldOn()).hasToString("2019-01-02");
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDate_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
@@ -724,12 +651,7 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayTwoErrorsAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
 
@@ -746,11 +668,7 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "FACE_TO_FACE,face to face hearing"
-    })
+    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"TELEPHONE", "VIDEO", "FACE_TO_FACE"})
     void givenCaseWithDurationParameterButMissingUnitsWhenOralHearing_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
@@ -762,19 +680,15 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void givenCaseWithNoDurationEnumSource_thenCorrectlySetTheNextHearingTimeslot(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenCaseWithNoDurationEnumSource_thenCorrectlySetTheNextHearingTimeslot(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
 
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
         if (isOralHearing(nextHearingType)) {
@@ -797,13 +711,8 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void givenCaseWith120MinutesDuration_thenCorrectlySetTheNextHearingTimeslot(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenCaseWith120MinutesDuration_thenCorrectlySetTheNextHearingTimeslot(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -812,17 +721,13 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.MINUTES);
         adjournment.setNextHearingListingDuration(120);
 
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         checkOralHearingTimeslot(nextHearingTypeText, nextHearingType, "120 minutes");
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void givenCaseWithOneMinuteDuration_thenCorrectlySetTheNextHearingTimeslot(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenCaseWithOneMinuteDuration_thenCorrectlySetTheNextHearingTimeslot(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -831,17 +736,13 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.MINUTES);
         adjournment.setNextHearingListingDuration(1);
 
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         checkOralHearingTimeslot(nextHearingTypeText, nextHearingType, "1 minute");
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void givenCaseWithTwoSessionDuration_thenCorrectlySetTheNextHearingTimeslot(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenCaseWithTwoSessionDuration_thenCorrectlySetTheNextHearingTimeslot(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -850,17 +751,13 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS);
         adjournment.setNextHearingListingDuration(2);
 
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         checkOralHearingTimeslot(nextHearingTypeText, nextHearingType, "2 sessions");
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void givenCaseWithOneSessionDuration_thenCorrectlySetTheNextHearingTimeslot(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenCaseWithOneSessionDuration_thenCorrectlySetTheNextHearingTimeslot(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -869,17 +766,13 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS);
         adjournment.setNextHearingListingDuration(1);
 
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         checkOralHearingTimeslot(nextHearingTypeText, nextHearingType, "1 session");
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void givenCaseWithThreePanelMembers_thenCorrectlySetTheHeldBefore(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenCaseWithThreePanelMembers_thenCorrectlySetTheHeldBefore(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -889,19 +782,15 @@ class AdjournCasePreviewServiceTest {
         adjournment.setMedicallyQualifiedPanelMemberName("Ms Panel Member 2");
         adjournment.setOtherPanelMemberName("Other Panel Member");
 
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
         assertThat(body.getHeldBefore()).isEqualTo("Judge Full Name, Mr Panel Member 1, Ms Panel Member 2 and Other Panel Member");
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void givenCaseWithTwoPanelMembers_thenCorrectlySetTheHeldBefore(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenCaseWithTwoPanelMembers_thenCorrectlySetTheHeldBefore(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -910,19 +799,15 @@ class AdjournCasePreviewServiceTest {
         adjournment.setDisabilityQualifiedPanelMemberName("Mr Panel Member 1");
         adjournment.setMedicallyQualifiedPanelMemberName("Ms Panel Member 2");
 
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
         assertThat(body.getHeldBefore()).isEqualTo("Judge Full Name, Mr Panel Member 1 and Ms Panel Member 2");
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void givenCaseWithOnePanelMember_thenCorrectlySetTheHeldBefore(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenCaseWithOnePanelMember_thenCorrectlySetTheHeldBefore(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -930,38 +815,30 @@ class AdjournCasePreviewServiceTest {
         adjournment.setTypeOfNextHearing(nextHearingType);
         adjournment.setDisabilityQualifiedPanelMemberName("Mr Panel Member 1");
 
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
         assertThat(body.getHeldBefore()).isEqualTo("Judge Full Name and Mr Panel Member 1");
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void givenCaseWithNoPanelMembersWithNullValues_thenCorrectlySetTheHeldBefore(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenCaseWithNoPanelMembersWithNullValues_thenCorrectlySetTheHeldBefore(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
 
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
         assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME);
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void givenCaseWithNoPanelMembersWithEmptyValues_thenCorrectlySetTheHeldBefore(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenCaseWithNoPanelMembersWithEmptyValues_thenCorrectlySetTheHeldBefore(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -970,14 +847,15 @@ class AdjournCasePreviewServiceTest {
         adjournment.setMedicallyQualifiedPanelMemberName("");
         adjournment.setDisabilityQualifiedPanelMemberName("");
 
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
         assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME);
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"FACE_TO_FACE,face to face hearing"})
-    void givenCaseWithNoSelectedVenueNotSetForFaceToFace_thenCorrectlySetTheVenueToBeTheExistingVenue(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"FACE_TO_FACE"})
+    void givenCaseWithNoSelectedVenueNotSetForFaceToFace_thenCorrectlySetTheVenueToBeTheExistingVenue(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -986,17 +864,14 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText, true);
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
         assertThat(templateBody.getAdjournCaseTemplateBody().getNextHearingVenue()).isEqualTo(GAP_VENUE_NAME);
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers"
-    })
-    void givenCaseWithNoSelectedVenueNotSetForNonFaceToFace_thenCorrectlySetTheVenueToBeNull(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"TELEPHONE", "VIDEO", "PAPER"})
+    void givenCaseWithNoSelectedVenueNotSetForNonFaceToFace_thenCorrectlySetTheVenueToBeNull(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -1005,7 +880,8 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText, true);
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
     }
 
     @Test
@@ -1444,8 +1320,8 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"FACE_TO_FACE,face to face hearing"})
-    void givenCaseWithSameVenueSetForFaceToFace_thenCorrectlySetTheVenueToBeThePreviousVenue(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"FACE_TO_FACE"})
+    void givenCaseWithSameVenueSetForFaceToFace_thenCorrectlySetTheVenueToBeThePreviousVenue(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -1460,13 +1336,14 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText, true);
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
         assertThat(templateBody.getAdjournCaseTemplateBody().getNextHearingVenue()).isEqualTo(GAP_VENUE_NAME);
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"FACE_TO_FACE,face to face hearing"})
-    void givenCaseWithSelectedVenueSetForFaceToFace_thenCorrectlySetTheVenueToBeTheNewVenue(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"FACE_TO_FACE"})
+    void givenCaseWithSelectedVenueSetForFaceToFace_thenCorrectlySetTheVenueToBeTheNewVenue(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getVenueDetailsMap()).thenReturn(venueDetailsMap);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
@@ -1482,16 +1359,13 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText, true);
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
         assertThat(templateBody.getAdjournCaseTemplateBody().getNextHearingVenue()).isEqualTo(GAP_VENUE_NAME);
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers"
-    })
+    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"TELEPHONE", "VIDEO", "PAPER"})
     void givenCaseWithSelectedVenueSetForNonFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
@@ -1513,7 +1387,7 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"FACE_TO_FACE,face to face hearing"})
+    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"FACE_TO_FACE"})
     void givenCaseWithSelectedVenueSetIncorrectlyForFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
@@ -1530,7 +1404,7 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"FACE_TO_FACE,face to face hearing"})
+    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"FACE_TO_FACE"})
     void givenCaseWithSelectedVenueMissingListItemForFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
@@ -1547,7 +1421,7 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"FACE_TO_FACE,face to face hearing"})
+    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"FACE_TO_FACE"})
     void givenCaseWithSelectedVenueMissingListItemCodeForFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
@@ -1564,11 +1438,7 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers"
-    })
+    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"TELEPHONE", "VIDEO", "PAPER"})
     void givenCaseWithSelectedVenueSetIncorrectlyForNonFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
@@ -1585,13 +1455,8 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void scottishRpcWillShowAScottishImage(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void scottishRpcWillShowAScottishImage(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -1602,17 +1467,13 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        verifyTemplateBody(NoticeIssuedTemplateBody.SCOTTISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText, true);
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        verifyTemplateBody(NoticeIssuedTemplateBody.SCOTTISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void givenCaseWithAppointee_thenCorrectlySetTheNoticeNameWithAppellantAndAppointeeAppended(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenCaseWithAppointee_thenCorrectlySetTheNoticeNameWithAppellantAndAppointeeAppended(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -1629,17 +1490,13 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
-        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname", nextHearingTypeText, true);
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname", nextHearingTypeText);
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void givenDateIssuedParameterIsTrue_thenShowIssuedDateOnDocument(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenDateIssuedParameterIsTrue_thenShowIssuedDateOnDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -1648,19 +1505,15 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText, true);
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
 
         assertThat(payload.getDateIssued()).isEqualTo(LocalDate.now());
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void givenGeneratedDateIsAlreadySetForGeneratedFlow_thenDoSetNewGeneratedDate(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenGeneratedDateIsAlreadySetForGeneratedFlow_thenDoSetNewGeneratedDate(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -1670,19 +1523,15 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText, true);
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
 
         assertThat(payload.getGeneratedDate()).hasToString(LocalDate.now().toString());
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-        "TELEPHONE,telephone hearing",
-        "VIDEO,video hearing",
-        "PAPER,decision on the papers",
-        "FACE_TO_FACE,face to face hearing"
-    })
-    void givenGeneratedDateIsAlreadySetNonGeneratedFlow_thenDoSetNewGeneratedDate(AdjournCaseTypeOfHearing nextHearingType, String nextHearingTypeText) {
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenGeneratedDateIsAlreadySetNonGeneratedFlow_thenDoSetNewGeneratedDate(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -1693,7 +1542,8 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText, true);
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
 
         assertThat(payload.getGeneratedDate()).hasToString(LocalDate.now().toString());
     }
