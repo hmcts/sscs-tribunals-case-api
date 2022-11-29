@@ -134,7 +134,7 @@ class AdjournCaseAboutToStartHandlerTest {
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         Adjournment adjournment = sscsCaseData.getAdjournment();
-        assertThat(adjournment).hasNoNullFieldsOrProperties();
+        assertThat(adjournment).hasNoNullFieldsOrPropertiesExcept("interpreterLanguage");
     }
 
     @Test
