@@ -70,8 +70,7 @@ public enum SyaJsonMessageSerializer {
     WANTS_SUPPORT_WITHOUT_ARRANGEMENTS("wantsSupportWithoutArrangements.json"),
     WANTS_SUPPORT_WITHOUT_ARRANGEMENTS_CCD("wantsSupportWithoutArrangementsCcd.json"),
     WANTS_SUPPORT_WITHOUT_SCHEDULE("wantsSupportWithoutSchedule.json"),
-    WANTS_SUPPORT_WITHOUT_SCHEDULE_CCD("wantsSupportWithoutScheduleCcd.json"),
-    POSTPONE_HEARING_CALLBACK_CCD("postponeHearingCallback.json");
+    WANTS_SUPPORT_WITHOUT_SCHEDULE_CCD("wantsSupportWithoutScheduleCcd.json");
 
     private final String serializedMessage;
 

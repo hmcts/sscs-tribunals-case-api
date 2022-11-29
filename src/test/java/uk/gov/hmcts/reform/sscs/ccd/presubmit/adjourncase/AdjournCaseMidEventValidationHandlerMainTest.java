@@ -37,8 +37,9 @@ class AdjournCaseMidEventValidationHandlerMainTest extends AdjournCaseMidEventVa
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertThat(error).isEqualTo("Directions due date must be in the future");
+        assertThat(response.getErrors())
+            .hasSize(1)
+            .containsOnly("Directions due date must be in the future");
     }
 
     @Test
@@ -52,8 +53,9 @@ class AdjournCaseMidEventValidationHandlerMainTest extends AdjournCaseMidEventVa
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertThat(error).isEqualTo("Directions due date must be in the future");
+        assertThat(response.getErrors())
+            .hasSize(1)
+            .containsOnly("Directions due date must be in the future");
     }
 
     @Test
@@ -67,8 +69,9 @@ class AdjournCaseMidEventValidationHandlerMainTest extends AdjournCaseMidEventVa
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertThat(error).isEqualTo("Cannot specify both directions due date and directions due days offset");
+        assertThat(response.getErrors())
+            .hasSize(1)
+            .containsOnly("Cannot specify both directions due date and directions due days offset");
     }
 
     @Test
@@ -107,8 +110,9 @@ class AdjournCaseMidEventValidationHandlerMainTest extends AdjournCaseMidEventVa
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertThat(error).isEqualTo("At least one of directions due date or directions due date offset must be specified");
+        assertThat(response.getErrors())
+            .hasSize(1)
+            .containsOnly("At least one of directions due date or directions due date offset must be specified");
     }
 
     @Test
@@ -176,8 +180,9 @@ class AdjournCaseMidEventValidationHandlerMainTest extends AdjournCaseMidEventVa
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertThat(error).isEqualTo("'First available date after' date cannot be in the past");
+        assertThat(response.getErrors())
+            .hasSize(1)
+            .containsOnly("'First available date after' date cannot be in the past");
     }
 
     @Test
@@ -205,9 +210,9 @@ class AdjournCaseMidEventValidationHandlerMainTest extends AdjournCaseMidEventVa
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertThat(error).isEqualTo("'First available date after' date must be provided");
-
+        assertThat(response.getErrors())
+            .hasSize(1)
+            .containsOnly("'First available date after' date must be provided");
     }
 
 }

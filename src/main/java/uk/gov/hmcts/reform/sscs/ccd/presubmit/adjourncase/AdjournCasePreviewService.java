@@ -54,10 +54,6 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         this.languageService = languageService;
     }
 
-    private LocalDate getDateForPeriodAfterIssueDate(LocalDate issueDate, Integer period) {
-        return issueDate.plusDays(period);
-    }
-
     @Override
     protected NoticeIssuedTemplateBody createPayload(
         PreSubmitCallbackResponse<SscsCaseData> response,
@@ -199,7 +195,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         String formattedUnits = duration == 1
             ? durationUnits.toString().substring(0, durationUnits.toString().length() - 1)
             : durationUnits.toString();
-        return duration + " " +  formattedUnits;
+        return String.format("%d %s", duration, formattedUnits);
     }
 
 
@@ -223,9 +219,10 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                 if (adjournment.getNextHearingFirstAvailableDateAfterPeriod() == null) {
                     throw new IllegalStateException("No value set for adjournCaseNextHearingFirstAvailableDateAfterPeriod in case data");
                 }
-                hearingDateSentence = hearingDateSentence + " after " + getDateForPeriodAfterIssueDate(issueDate,
-                        adjournment.getNextHearingFirstAvailableDateAfterPeriod().getCcdDefinition())
-                    .format(DateTimeFormatter.ofPattern(DOCUMENT_DATE_PATTERN));
+                hearingDateSentence = String.format("%s after %s",
+                    hearingDateSentence,
+                    issueDate.plusDays(adjournment.getNextHearingFirstAvailableDateAfterPeriod().getCcdDefinition())
+                        .format(DateTimeFormatter.ofPattern(DOCUMENT_DATE_PATTERN)));
             } else {
                 throw new IllegalStateException("Date or period indicator not available in case data");
             }

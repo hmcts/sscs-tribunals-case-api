@@ -29,13 +29,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingPeriod;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTime;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -70,7 +71,7 @@ class AdjournCaseAboutToStartHandlerTest {
                 .directionsDueDate(LocalDate.now().plusMonths(1))
                 .typeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE)
                 .nextHearingVenue(AdjournCaseNextHearingVenue.SOMEWHERE_ELSE)
-                .nextHearingVenueSelected(new DynamicList(new DynamicListItem("",""), List.of(new DynamicListItem("", ""))))
+                .nextHearingVenueSelected(new DynamicList("testListItem"))
                 .panelMembersExcluded(AdjournCasePanelMembersExcluded.NO)
                 .disabilityQualifiedPanelMemberName("")
                 .medicallyQualifiedPanelMemberName("")
@@ -85,8 +86,11 @@ class AdjournCaseAboutToStartHandlerTest {
                 .nextHearingDateOrTime("")
                 .nextHearingFirstAvailableDateAfterDate(LocalDate.now())
                 .nextHearingFirstAvailableDateAfterPeriod(AdjournCaseNextHearingPeriod.NINETY_DAYS)
+                .time(AdjournCaseTime.builder().build())
                 .reasons(List.of(new CollectionItem<>(null, "")))
                 .additionalDirections(List.of(new CollectionItem<>(null, "")))
+                .previewDocument(DocumentLink.builder().build())
+                .generatedDate(LocalDate.now())
                 .adjournmentInProgress(YES)
                 .build())
             .build();
@@ -107,7 +111,8 @@ class AdjournCaseAboutToStartHandlerTest {
 
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrProperties();
+        assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrPropertiesExcept("adjournmentInProgress");
+        assertThat(sscsCaseData.getAdjournment().getAdjournmentInProgress()).isEqualTo(NO);
     }
 
     @Test
@@ -126,32 +131,7 @@ class AdjournCaseAboutToStartHandlerTest {
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         Adjournment adjournment = sscsCaseData.getAdjournment();
-        assertThat(adjournment.getGenerateNotice()).isEqualTo(YES);
-        assertThat(adjournment.getTypeOfHearing()).isEqualTo(AdjournCaseTypeOfHearing.VIDEO);
-        assertThat(adjournment.getCanCaseBeListedRightAway()).isEqualTo(YES);
-        assertThat(adjournment.getAreDirectionsBeingMadeToParties()).isEqualTo(NO);
-        assertThat(adjournment.getDirectionsDueDateDaysOffset()).isEqualTo(AdjournCaseDaysOffset.FOURTEEN_DAYS);
-        assertThat(adjournment.getDirectionsDueDate()).isEqualTo(LocalDate.now().plusMonths(1));
-        assertThat(adjournment.getTypeOfNextHearing()).isEqualTo(AdjournCaseTypeOfHearing.FACE_TO_FACE);
-        assertThat(adjournment.getNextHearingVenue()).isEqualTo(AdjournCaseNextHearingVenue.SOMEWHERE_ELSE);
-        assertThat(adjournment.getNextHearingVenueSelected().getValue().getCode()).isEmpty();
-        assertThat(adjournment.getPanelMembersExcluded()).isEqualTo(AdjournCasePanelMembersExcluded.NO);
-        assertThat(adjournment.getDisabilityQualifiedPanelMemberName()).isEmpty();
-        assertThat(adjournment.getMedicallyQualifiedPanelMemberName()).isEmpty();
-        assertThat(adjournment.getOtherPanelMemberName()).isEmpty();
-        assertThat(adjournment.getNextHearingListingDurationType()).isEqualTo(AdjournCaseNextHearingDurationType.STANDARD);
-        assertThat(adjournment.getNextHearingListingDuration()).isEqualTo(1);
-        assertThat(adjournment.getNextHearingListingDurationUnits()).isEqualTo(AdjournCaseNextHearingDurationUnits.SESSIONS);
-        assertThat(adjournment.getInterpreterRequired()).isEqualTo(NO);
-        assertThat(adjournment.getInterpreterLanguage()).isEqualTo("spanish");
-        assertThat(adjournment.getNextHearingDateType()).isEqualTo(AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER);
-        assertThat(adjournment.getNextHearingDateOrPeriod()).isEqualTo(AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD);
-        assertThat(adjournment.getNextHearingDateOrTime()).isEmpty();
-        assertThat(adjournment.getNextHearingFirstAvailableDateAfterDate()).isEqualTo(LocalDate.now());
-        assertThat(adjournment.getNextHearingFirstAvailableDateAfterPeriod()).isEqualTo(AdjournCaseNextHearingPeriod.NINETY_DAYS);
-        assertThat(adjournment.getReasons()).isEqualTo(List.of(new CollectionItem<>(null, "")));
-        assertThat(adjournment.getAdditionalDirections()).isEqualTo(List.of(new CollectionItem<>(null, "")));
-        assertThat(adjournment.getAdjournmentInProgress()).isEqualTo(YES);
+        assertThat(adjournment).hasNoNullFieldsOrProperties();
     }
 
     @Test

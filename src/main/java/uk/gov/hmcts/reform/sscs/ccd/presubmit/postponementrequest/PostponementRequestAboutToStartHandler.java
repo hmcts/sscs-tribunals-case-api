@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.postponementrequest;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -11,6 +12,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
@@ -48,8 +51,18 @@ public class PostponementRequestAboutToStartHandler implements PreSubmitCallback
         }
 
         Hearing hearing = sscsCaseData.getLatestHearing();
+
         if (isNull(hearing)) {
-            response.addError("There are no hearing to postpone");
+            response.addError("There is not a hearing to postpone");
+            return response;
+        }
+
+        HearingStatus hearingStatus = Optional.ofNullable(hearing.getValue())
+            .map(HearingDetails::getHearingStatus)
+            .orElse(null);
+
+        if (!HearingStatus.LISTED.equals(hearingStatus)) {
+            response.addError("There not a listed hearing to postpone");
             return response;
         }
 

@@ -24,6 +24,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 
 class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
@@ -49,40 +51,16 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdjournmen
 
         assertThat(sscsCaseData.getDwpState()).isEqualTo(DwpState.ADJOURNMENT_NOTICE_ISSUED.getId());
         assertThat(sscsCaseData.getDirectionDueDate()).isEqualTo(LocalDate.now().plusDays(1).toString());
+
+        assertThat(sscsCaseData.getSscsDocument())
+            .map(SscsDocument::getValue)
+            .map(SscsDocumentDetails::getDocumentType)
+            .doesNotContain(DRAFT_ADJOURNMENT_NOTICE.getValue());
+
         assertThat(sscsCaseData.getSscsDocument().stream()
             .filter(f -> f.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()))).isEmpty();
-        verifyTemporaryAdjournCaseFieldsAreCleared(newSscsCaseData);
-    }
-
-    private void verifyTemporaryAdjournCaseFieldsAreCleared(SscsCaseData sscsCaseData) {
-        assertThat(sscsCaseData.getAdjournment().getDirectionsDueDate()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getGenerateNotice()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getTypeOfHearing()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getCanCaseBeListedRightAway()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getAreDirectionsBeingMadeToParties()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getDirectionsDueDate()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getTypeOfNextHearing()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getNextHearingVenue()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getNextHearingVenueSelected()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getPanelMembersExcluded()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getDisabilityQualifiedPanelMemberName()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getMedicallyQualifiedPanelMemberName()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getOtherPanelMemberName()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getNextHearingListingDurationType()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getNextHearingListingDuration()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getNextHearingListingDurationUnits()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getInterpreterRequired()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getInterpreterLanguage()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getNextHearingDateType()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getNextHearingDateOrPeriod()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getNextHearingDateOrTime()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getNextHearingFirstAvailableDateAfterDate()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getNextHearingFirstAvailableDateAfterPeriod()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getTime()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getReasons()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getAdditionalDirections()).isNull();
-        assertThat(sscsCaseData.getAdjournment().getAdjournmentInProgress()).isNull();
+        assertThat(newSscsCaseData.getAdjournment()).hasAllNullFieldsOrPropertiesExcept("adjournmentInProgress");
+        assertThat(newSscsCaseData.getAdjournment().getAdjournmentInProgress()).isEqualTo(NO);
     }
 
     @Test
@@ -167,8 +145,9 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdjournmen
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertThat(error).isEqualTo("There is no Draft Adjournment Notice on the case so adjournment cannot be issued");
+        assertThat(response.getErrors())
+            .hasSize(1)
+            .containsOnly("There is no Draft Adjournment Notice on the case so adjournment cannot be issued");
     }
 
     @Test
@@ -184,6 +163,13 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdjournmen
         assertThat(response.getErrors())
             .hasSize(1)
             .containsOnly("You need to upload PDF documents only");
+
+
+        assertThat(sscsCaseData.getSscsDocument())
+            .map(SscsDocument::getValue)
+            .map(SscsDocumentDetails::getDocumentType)
+            .containsOnly(DRAFT_ADJOURNMENT_NOTICE.getValue());
+
         assertThat(sscsCaseData.getSscsDocument().stream()
             .filter(f -> f.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()))).hasSize(1);
     }

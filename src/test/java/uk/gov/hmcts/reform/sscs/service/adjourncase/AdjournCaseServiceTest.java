@@ -20,10 +20,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-
 
 public class AdjournCaseServiceTest {
 
@@ -51,11 +51,13 @@ public class AdjournCaseServiceTest {
             .interpreterLanguage("spanish")
             .nextHearingDateType(AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER)
             .nextHearingDateOrPeriod(AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD)
-            .nextHearingDateOrTime("")
             .nextHearingFirstAvailableDateAfterDate(null)
             .nextHearingFirstAvailableDateAfterPeriod(AdjournCaseNextHearingPeriod.NINETY_DAYS)
+            .nextHearingDateOrTime("")
             .reasons(List.of(new CollectionItem<>(null, "")))
             .additionalDirections(List.of(new CollectionItem<>(null, "")))
+            .previewDocument(DocumentLink.builder().build())
+            .generatedDate(LocalDate.now())
             .adjournmentInProgress(YES)
             .build())
         .build();
@@ -63,6 +65,7 @@ public class AdjournCaseServiceTest {
     @Test
     public void willRemoveTransientAdjournCaseData() {
         AdjournCaseService.clearTransientFields(sscsCaseData);
-        assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrProperties();
+        assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrPropertiesExcept("adjournmentInProgress");
+        assertThat(sscsCaseData.getAdjournment().getAdjournmentInProgress()).isEqualTo(NO);
     }
 }
