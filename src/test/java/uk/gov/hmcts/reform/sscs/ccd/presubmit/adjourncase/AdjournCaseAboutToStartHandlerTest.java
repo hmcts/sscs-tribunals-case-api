@@ -134,32 +134,7 @@ class AdjournCaseAboutToStartHandlerTest {
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         Adjournment adjournment = sscsCaseData.getAdjournment();
-        assertThat(adjournment.getGenerateNotice()).isEqualTo(YES);
-        assertThat(adjournment.getTypeOfHearing()).isEqualTo(AdjournCaseTypeOfHearing.VIDEO);
-        assertThat(adjournment.getCanCaseBeListedRightAway()).isEqualTo(YES);
-        assertThat(adjournment.getAreDirectionsBeingMadeToParties()).isEqualTo(NO);
-        assertThat(adjournment.getDirectionsDueDateDaysOffset()).isEqualTo(AdjournCaseDaysOffset.FOURTEEN_DAYS);
-        assertThat(adjournment.getDirectionsDueDate()).isEqualTo(LocalDate.now().plusMonths(1));
-        assertThat(adjournment.getTypeOfNextHearing()).isEqualTo(AdjournCaseTypeOfHearing.FACE_TO_FACE);
-        assertThat(adjournment.getNextHearingVenue()).isEqualTo(AdjournCaseNextHearingVenue.SOMEWHERE_ELSE);
-        assertThat(adjournment.getNextHearingVenueSelected().getValue().getCode()).isEmpty();
-        assertThat(adjournment.getPanelMembersExcluded()).isEqualTo(AdjournCasePanelMembersExcluded.NO);
-        assertThat(adjournment.getDisabilityQualifiedPanelMemberName()).isEmpty();
-        assertThat(adjournment.getMedicallyQualifiedPanelMemberName()).isEmpty();
-        assertThat(adjournment.getOtherPanelMemberName()).isEmpty();
-        assertThat(adjournment.getNextHearingListingDurationType()).isEqualTo(AdjournCaseNextHearingDurationType.STANDARD);
-        assertThat(adjournment.getNextHearingListingDuration()).isEqualTo(1);
-        assertThat(adjournment.getNextHearingListingDurationUnits()).isEqualTo(AdjournCaseNextHearingDurationUnits.SESSIONS);
-        assertThat(adjournment.getInterpreterRequired()).isEqualTo(NO);
-        assertThat(adjournment.getInterpreterLanguage()).isEqualTo(null);
-        assertThat(adjournment.getNextHearingDateType()).isEqualTo(AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER);
-        assertThat(adjournment.getNextHearingDateOrPeriod()).isEqualTo(AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD);
-        assertThat(adjournment.getNextHearingDateOrTime()).isEmpty();
-        assertThat(adjournment.getNextHearingFirstAvailableDateAfterDate()).isEqualTo(LocalDate.now());
-        assertThat(adjournment.getNextHearingFirstAvailableDateAfterPeriod()).isEqualTo(AdjournCaseNextHearingPeriod.NINETY_DAYS);
-        assertThat(adjournment.getReasons()).isEqualTo(List.of(new CollectionItem<>(null, "")));
-        assertThat(adjournment.getAdditionalDirections()).isEqualTo(List.of(new CollectionItem<>(null, "")));
-        assertThat(adjournment.getAdjournmentInProgress()).isEqualTo(YES);
+        assertThat(adjournment).hasNoNullFieldsOrProperties();
     }
 
     @Test
