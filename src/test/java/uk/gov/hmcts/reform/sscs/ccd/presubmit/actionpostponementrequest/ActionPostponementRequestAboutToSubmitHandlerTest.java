@@ -278,6 +278,10 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
+        assertThat(response.getErrors())
+            .hasSize(1)
+            .contains("Cannot process Action postponement request on non Scheduling & Listing Case");
+
         verifyNoInteractions(hearingMessageHelper);
     }
 }
