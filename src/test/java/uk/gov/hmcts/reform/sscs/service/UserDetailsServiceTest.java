@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 @RunWith(SpringRunner.class)
@@ -29,8 +30,8 @@ public class UserDetailsServiceTest {
 
     @Test
     public void givenUserAuthorisation_thenReturnUserFullName() {
-        when(idamClient.getUserInfo(USER_AUTHORISATION)).thenReturn(UserInfo.builder()
-                .givenName("John").familyName("Lewis").build());
+        when(idamClient.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+                .forename("John").surname("Lewis").build());
 
         assertEquals("John Lewis", userDetailsService.buildLoggedInUserName(USER_AUTHORISATION));
     }
@@ -43,8 +44,8 @@ public class UserDetailsServiceTest {
 
     @Test
     public void givenUserAuthorisation_thenReturnUserSurname() {
-        when(idamClient.getUserInfo(USER_AUTHORISATION)).thenReturn(UserInfo.builder()
-                .givenName("John").familyName("Lewis").build());
+        when(idamClient.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+                .forename("John").surname("Lewis").build());
 
         assertEquals("Lewis", userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION));
     }
