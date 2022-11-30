@@ -151,7 +151,7 @@ public class DecisionIssuedMidEventHandlerTest {
                 .build(), response.getData().getDocumentStaging().getPreviewDocument());
 
         verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname",
-                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DECISION_ISSUED));
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED));
     }
 
     @Test
@@ -161,7 +161,7 @@ public class DecisionIssuedMidEventHandlerTest {
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         verifyTemplateBody(NoticeIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname",
-                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DECISION_ISSUED));
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED));
     }
 
     @Test
