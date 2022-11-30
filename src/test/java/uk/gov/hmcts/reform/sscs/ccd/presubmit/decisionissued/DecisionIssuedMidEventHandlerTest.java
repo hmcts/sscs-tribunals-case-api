@@ -176,8 +176,9 @@ public class DecisionIssuedMidEventHandlerTest {
 
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname",
-                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DECISION_ISSUED));
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE,
+                "Appointee Surname, appointee for Appellant Lastname",
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED));
     }
 
     @Test
