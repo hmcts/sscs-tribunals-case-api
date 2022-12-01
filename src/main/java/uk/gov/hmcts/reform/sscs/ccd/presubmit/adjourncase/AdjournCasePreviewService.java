@@ -53,7 +53,8 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
     @Autowired
     public AdjournCasePreviewService(GenerateFile generateFile, UserDetailsService userDetailsService, VenueDataLoader venueDataLoader,
-                                     LanguageService languageService, @Value("${doc_assembly.adjourn_case}") String templateId, SignLanguagesService signLanguagesService) {
+                                     LanguageService languageService, @Value("${doc_assembly.adjourn_case}") String templateId,
+                                     SignLanguagesService signLanguagesService) {
         super(generateFile, userDetailsService, languagePreference -> templateId);
         this.venueDataLoader = venueDataLoader;
         this.languageService = languageService;
@@ -187,9 +188,9 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             if (caseData.getAdjournment().getInterpreterLanguage() != null) {
                 String languageLabel = caseData.getAdjournment().getInterpreterLanguage().getValue().getLabel();
                 String languageKey = caseData.getAdjournment().getInterpreterLanguage().getValue().getCode();
-                Language language = signLanguagesService.getLanguageByHmcReference(languageKey);
+                Language hmrcRefLanguage = signLanguagesService.getLanguageByHmcReference(languageKey);
                 String interpreterDescription = String.format("an interpreter in %s", languageLabel);
-                if (nonNull(language)) {
+                if (nonNull(hmrcRefLanguage)) {
                     interpreterDescription = String.format("a sign language interpreter (%s)", languageLabel);
                 }
                 adjournCaseBuilder.interpreterDescription(interpreterDescription);

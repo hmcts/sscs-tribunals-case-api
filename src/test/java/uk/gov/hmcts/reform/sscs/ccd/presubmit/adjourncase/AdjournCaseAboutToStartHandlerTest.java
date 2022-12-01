@@ -48,6 +48,7 @@ class AdjournCaseAboutToStartHandlerTest {
 
     @Mock
     private DynamicListLanguageUtil dynamicListLanguageUtil;
+
     private static final String USER_AUTHORISATION = "Bearer token";
     private AdjournCaseAboutToStartHandler handler;
 
