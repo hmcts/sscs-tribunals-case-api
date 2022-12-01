@@ -19,6 +19,7 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "caseworker-sscs-systemupdate",
                 "caseworker-sscs-judge",
                 "caseworker-sscs-dwpresponsewriter",
+                "caseworker-sscs-hmrcresponsewriter",
                 "caseworker-sscs-registrar"
         );
         lib.createIdamUser("local.test@example.com",
@@ -73,7 +74,8 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "caseworker-sscs-anonymouscitizen",
                 "caseworker-sscs-pcqextractor",
                 "citizen",
-                "caseworker-sscs"
+                "caseworker-sscs",
+                "caseworker"
         );
         var def = Files.readAllBytes(Path.of("../sscs-ccd-definitions/releases/CCD_SSCSDefinition_vdev_LOCAL.xlsx"));
         lib.importDefinition(def);
