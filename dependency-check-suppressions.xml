@@ -19,7 +19,7 @@
    file name: qpid-jms-client-1.6.0.jar
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/org.apache.qpid/qpid-jms-client@.*$</packageUrl>
-    <cve>CVE-2016-3094,CVE-2016-4432</cve>
+    <cve>CVE-2016-3094</cve>
   </suppress>
   <suppress until = "2022-12-14">
     <notes><![CDATA[
