@@ -324,7 +324,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: 'S-10914-4'
+      CCD_DEF_VERSION: '5.17.5-9939'
     secrets: []
     userRoles:
       - citizen
