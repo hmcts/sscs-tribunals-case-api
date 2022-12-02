@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.functional.handlers.PdfHelper.getPdf;
 import java.io.IOException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.UploadDocument;
 public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler {
 
     @Test
+    @Ignore
     public void checkEditedDocumentInTheBundleIsCorrect() throws IOException {
         SscsCaseDetails caseDetails = createCase();
         List<UploadDocument> docs = List.of(
@@ -79,6 +81,7 @@ public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler 
     }
 
     @Test
+    @Ignore
     public void checkBundleAdditionIsAddedCorrectly() throws IOException {
         SscsCaseDetails caseDetails = createCase();
         List<UploadDocument> docs = List.of(
