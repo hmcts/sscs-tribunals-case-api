@@ -7,27 +7,26 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_EVIDENCE_BUNDLE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_RESPONSE;
-import static uk.gov.hmcts.reform.sscs.idam.UserRole.SYSTEM_USER;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
+import junitparams.JUnitParamsRunner;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
-import uk.gov.hmcts.reform.sscs.idam.UserRole;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 import uk.gov.hmcts.reform.sscs.service.bundle.BundleAudioVideoPdfService;
 
 
+@RunWith(JUnitParamsRunner.class)
 public class CreateBundleAboutToStartEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
@@ -52,7 +51,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
     @Mock
     private IdamService idamService;
 
-    @BeforeEach
+    @Before
     public void setUp() {
         openMocks(this);
         dwpDocumentService = new DwpDocumentService();
@@ -64,7 +63,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first last", "first", "last", Arrays.asList(SYSTEM_USER.getValue())));
+        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first last", "first", "last", Arrays.asList("caseworker-sscs-clerk")));
     }
 
     @Test
@@ -152,11 +151,10 @@ public class CreateBundleAboutToStartEventHandlerTest {
         verifyNoInteractions(serviceRequestExecutor);
     }
 
-    @ParameterizedTest
-    @EnumSource(value = UserRole.class, names = { "SUPER_USER", "CTSC_CLERK" })
-    public void givenEmptyDwpEvidenceBundleDocumentLinkWithDwpDocumentsPatternForSuperUser_thenReturnWarning(UserRole role) {
+    @Test
+    public void givenEmptyDwpEvidenceBundleDocumentLinkWithDwpDocumentsPatternForSuperUser_thenReturnWarning() {
 
-        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first last", "first", "last", Arrays.asList(role.getValue())));
+        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first last", "first", "last", Arrays.asList("caseworker-sscs-superuser")));
 
         List<DwpDocument> dwpDocuments = new ArrayList<>();
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).build()).build());
@@ -174,10 +172,9 @@ public class CreateBundleAboutToStartEventHandlerTest {
 
     }
 
-    @ParameterizedTest
-    @EnumSource(value = UserRole.class, names = { "SUPER_USER", "CTSC_CLERK" })
-    public void givenEmptyDwpEvidenceBundleDocumentLinkWithOldPatternForSuperUser_thenReturnWarning(UserRole role) {
-        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first last", "first", "last", Arrays.asList(role.getValue())));
+    @Test
+    public void givenEmptyDwpEvidenceBundleDocumentLinkWithOldPatternForSuperUser_thenReturnWarning() {
+        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first last", "first", "last", Arrays.asList("caseworker-sscs-superuser")));
 
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().build());
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
@@ -192,10 +189,9 @@ public class CreateBundleAboutToStartEventHandlerTest {
         verifyNoInteractions(serviceRequestExecutor);
     }
 
-    @ParameterizedTest
-    @EnumSource(value = UserRole.class, names = { "SUPER_USER", "CTSC_CLERK" })
-    public void givenEmptyDwpResponseDocumentLinkWithDwpDocumentsPatternForSuperUser_thenReturnWarning(UserRole role) {
-        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first last", "first", "last", Arrays.asList(role.getValue())));
+    @Test
+    public void givenEmptyDwpResponseDocumentLinkWithDwpDocumentsPatternForSuperUser_thenReturnWarning() {
+        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first last", "first", "last", Arrays.asList("caseworker-sscs-superuser")));
         List<DwpDocument> dwpDocuments = new ArrayList<>();
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).build()).build());
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
@@ -211,10 +207,9 @@ public class CreateBundleAboutToStartEventHandlerTest {
         verifyNoInteractions(serviceRequestExecutor);
     }
 
-    @ParameterizedTest
-    @EnumSource(value = UserRole.class, names = { "SUPER_USER", "CTSC_CLERK" })
-    public void givenEmptyDwpResponseDocumentLinkWithOldPatternForSuperUser_thenReturnWarning(UserRole role) {
-        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first last", "first", "last", Arrays.asList(role.getValue())));
+    @Test
+    public void givenEmptyDwpResponseDocumentLinkWithOldPatternForSuperUser_thenReturnWarning() {
+        when(idamService.getUserDetails(any())).thenReturn(new UserDetails("id", "email@email.com", "first last", "first", "last", Arrays.asList("caseworker-sscs-superuser")));
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().build());
 
