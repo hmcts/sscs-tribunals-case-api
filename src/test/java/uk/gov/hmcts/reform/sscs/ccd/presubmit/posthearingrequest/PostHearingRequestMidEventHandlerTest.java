@@ -1,11 +1,11 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.requestposthearing;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingrequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REQUEST_POST_HEARING;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 @ExtendWith(MockitoExtension.class)
-class RequestPostHearingMidEventHandlerTest {
+class PostHearingRequestMidEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     @Mock
@@ -33,19 +33,19 @@ class RequestPostHearingMidEventHandlerTest {
 
     private SscsCaseData caseData;
 
-    private RequestPostHearingMidEventHandler handler;
+    private PostHearingRequestMidEventHandler handler;
 
 
     @BeforeEach
     void setUp() {
-        handler = new RequestPostHearingMidEventHandler(true);
+        handler = new PostHearingRequestMidEventHandler(true);
 
         caseData = SscsCaseData.builder().build();
     }
 
     @Test
     void givenAValidMidEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(REQUEST_POST_HEARING);
+        when(callback.getEvent()).thenReturn(POST_HEARING_REQUEST);
         assertThat(handler.canHandle(MID_EVENT, callback)).isTrue();
     }
 
@@ -62,8 +62,8 @@ class RequestPostHearingMidEventHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new RequestPostHearingMidEventHandler(false);
-        when(callback.getEvent()).thenReturn(REQUEST_POST_HEARING);
+        handler = new PostHearingRequestMidEventHandler(false);
+        when(callback.getEvent()).thenReturn(POST_HEARING_REQUEST);
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
 

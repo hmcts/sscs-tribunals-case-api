@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.requestposthearing;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
 import static java.util.Objects.requireNonNull;
 
@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class RequestPostHearingAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class PostHearingReviewAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
@@ -27,7 +27,7 @@ public class RequestPostHearingAboutToStartHandler implements PreSubmitCallbackH
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_START)
-            && callback.getEvent() == EventType.REQUEST_POST_HEARING
+            && callback.getEvent() == EventType.POST_HEARING_REVIEW
             && isPostHearingsEnabled;
     }
 
@@ -38,10 +38,10 @@ public class RequestPostHearingAboutToStartHandler implements PreSubmitCallbackH
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
-        String caseId = caseData.getCcdCaseId();
         if (!SscsUtil.isSAndLCase(caseData)) {
-            log.info("Post Hearing Request: Cannot process non Scheduling & Listing Case for Case ID {}", caseId);
-            response.addError("Cannot process Post Hearing Request on non Scheduling & Listing Case");
+            log.error("Review Post Hearing App: Cannot process non Scheduling & Listing Case for Case ID {}",
+                caseData.getCcdCaseId());
+            response.addError("Cannot process Action Post Hearing Application on non Scheduling & Listing Case");
             return response;
         }
 

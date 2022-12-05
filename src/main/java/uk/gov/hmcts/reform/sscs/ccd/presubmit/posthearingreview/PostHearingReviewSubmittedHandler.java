@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionposthearingapplication;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ActionPostHearingTypes;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdCallbackMap;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -24,7 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ActionPostHearingApplicationSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final CcdCallbackMapService ccdCallbackMapService;
 
     @Value("${feature.postHearings.enabled}")
@@ -36,7 +36,7 @@ public class ActionPostHearingApplicationSubmittedHandler implements PreSubmitCa
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.SUBMITTED)
-            && callback.getEvent() == EventType.ACTION_POST_HEARING_APPLICATION
+            && callback.getEvent() == EventType.POST_HEARING_REVIEW
             && isPostHearingsEnabled;
     }
 
@@ -50,8 +50,8 @@ public class ActionPostHearingApplicationSubmittedHandler implements PreSubmitCa
         Long caseId = Long.valueOf(caseData.getCcdCaseId());
 
         PostHearing postHearing = caseData.getPostHearing();
-        ActionPostHearingTypes typeSelected = postHearing.getActionTypeSelected();
-        log.info("Action Post Hearing Application: handling actionPostHearing {} for case {}", typeSelected,  caseId);
+        PostHearingReviewType typeSelected = postHearing.getReviewType();
+        log.info("Review Post Hearing App: handling actionPostHearing {} for case {}", typeSelected,  caseId);
 
         CcdCallbackMap callbackMap = getCcdCallbackMap(postHearing, typeSelected);
 
@@ -69,7 +69,7 @@ public class ActionPostHearingApplicationSubmittedHandler implements PreSubmitCa
 
     @Nullable
     private static CcdCallbackMap getCcdCallbackMap(PostHearing postHearing,
-                                                    ActionPostHearingTypes typeSelected) {
+                                                    PostHearingReviewType typeSelected) {
         if (isNull(typeSelected)) {
             return null;
         }

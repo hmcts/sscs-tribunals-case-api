@@ -1,5 +1,6 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionposthearingapplication;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingrequest;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 import lombok.RequiredArgsConstructor;
@@ -9,15 +10,19 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdCallbackMap;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.util.SscsUtil;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ActionPostHearingApplicationAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class PostHearingRequestSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+    private final CcdCallbackMapService ccdCallbackMapService;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
@@ -26,8 +31,8 @@ public class ActionPostHearingApplicationAboutToStartHandler implements PreSubmi
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        return callbackType.equals(CallbackType.ABOUT_TO_START)
-            && callback.getEvent() == EventType.ACTION_POST_HEARING_APPLICATION
+        return callbackType.equals(CallbackType.SUBMITTED)
+            && callback.getEvent() == EventType.POST_HEARING_REQUEST
             && isPostHearingsEnabled;
     }
 
@@ -37,16 +42,24 @@ public class ActionPostHearingApplicationAboutToStartHandler implements PreSubmi
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
-        
-        if (!SscsUtil.isSAndLCase(caseData)) {
-            log.info("Action Post Hearing Application: Cannot process non Scheduling & Listing Case for Case ID {}",
-                caseData.getCcdCaseId());
-            response.addError("Cannot process Action Post Hearing Application on non Scheduling & Listing Case");
+
+        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+
+        PostHearing postHearing = caseData.getPostHearing();
+        PostHearingRequestType typeSelected = postHearing.getRequestType();
+        log.info("Post Hearing Request: handling postHearing {} for case {}", typeSelected,  caseId);
+
+        CcdCallbackMap callbackMap = postHearing.getRequestType();
+
+        if (isNull(callbackMap)) {
+            response.addError(String.format("Invalid Post Hearing Request Type Selected %s or request "
+                    + "selected as callback is null",
+                typeSelected));
             return response;
         }
 
-        SscsUtil.clearDocumentTransientFields(caseData);
+        caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
 
-        return response;
+        return new PreSubmitCallbackResponse<>(caseData);
     }
 }

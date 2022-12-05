@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.requestposthearing;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingrequest;
 
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat.GENERATE;
@@ -13,15 +13,15 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RequestPostHearingTypes;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class RequestPostHearingMidEventHandler  implements PreSubmitCallbackHandler<SscsCaseData> {
+public class PostHearingRequestMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     public static final String PAGE_ID_GENERATE_DOCUMENT = "generateDocument";
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
@@ -29,7 +29,7 @@ public class RequestPostHearingMidEventHandler  implements PreSubmitCallbackHand
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType.equals(CallbackType.MID_EVENT)
-            && callback.getEvent() == EventType.REQUEST_POST_HEARING
+            && callback.getEvent() == EventType.POST_HEARING_REQUEST
             && isPostHearingsEnabled;
     }
 
@@ -44,7 +44,7 @@ public class RequestPostHearingMidEventHandler  implements PreSubmitCallbackHand
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
-        RequestPostHearingTypes typeSelected = caseData.getPostHearing().getRequestTypeSelected();
+        PostHearingRequestType typeSelected = caseData.getPostHearing().getRequestType();
         log.info("Post Hearing Request: handling action {} for case {}", typeSelected,  caseId);
 
         RequestFormat requestFormat = getRequestFormat(caseData.getPostHearing());
@@ -59,7 +59,7 @@ public class RequestPostHearingMidEventHandler  implements PreSubmitCallbackHand
 
     @Nullable
     private static RequestFormat getRequestFormat(PostHearing postHearing) {
-        RequestPostHearingTypes typeSelected = postHearing.getRequestTypeSelected();
+        PostHearingRequestType typeSelected = postHearing.getRequestType();
         if (isNull(typeSelected)) {
             return null;
         }

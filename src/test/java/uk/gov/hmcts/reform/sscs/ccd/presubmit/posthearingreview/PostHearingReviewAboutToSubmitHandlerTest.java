@@ -1,10 +1,10 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionposthearingapplication;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ACTION_POST_HEARING_APPLICATION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REVIEW;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 
@@ -23,13 +23,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @ExtendWith(MockitoExtension.class)
-class ActionPostHearingApplicationAboutToSubmitHandlerTest {
+class PostHearingReviewAboutToSubmitHandlerTest {
 
     private static final String DOCUMENT_URL = "dm-store/documents/123";
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private ActionPostHearingApplicationAboutToSubmitHandler handler;
+    private PostHearingReviewAboutToSubmitHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -41,7 +41,7 @@ class ActionPostHearingApplicationAboutToSubmitHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new ActionPostHearingApplicationAboutToSubmitHandler(true);
+        handler = new PostHearingReviewAboutToSubmitHandler(true);
 
         caseData = SscsCaseData.builder()
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
@@ -62,7 +62,7 @@ class ActionPostHearingApplicationAboutToSubmitHandlerTest {
 
     @Test
     void givenAValidAboutToSubmitEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(ACTION_POST_HEARING_APPLICATION);
+        when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
     }
 
@@ -79,8 +79,8 @@ class ActionPostHearingApplicationAboutToSubmitHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new ActionPostHearingApplicationAboutToSubmitHandler(false);
-        when(callback.getEvent()).thenReturn(ACTION_POST_HEARING_APPLICATION);
+        handler = new PostHearingReviewAboutToSubmitHandler(false);
+        when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 

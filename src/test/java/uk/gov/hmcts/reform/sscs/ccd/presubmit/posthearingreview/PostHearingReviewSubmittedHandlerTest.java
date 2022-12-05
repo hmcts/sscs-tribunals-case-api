@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionposthearingapplication;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
@@ -6,14 +6,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.ActionPostHearingTypes.CORRECTION;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.ActionPostHearingTypes.LIBERTY_TO_APPLY;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.ActionPostHearingTypes.PERMISSION_TO_APPEAL;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.ActionPostHearingTypes.SET_ASIDE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.ActionPostHearingTypes.STATEMENT_OF_REASONS;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ACTION_POST_HEARING_APPLICATION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REVIEW;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.CORRECTION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.LIBERTY_TO_APPLY;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.PERMISSION_TO_APPEAL;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.SET_ASIDE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.STATEMENT_OF_REASONS;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,14 +40,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 
 @ExtendWith(MockitoExtension.class)
-class ActionPostHearingApplicationSubmittedHandlerTest {
+class PostHearingReviewSubmittedHandlerTest {
 
     private static final String DOCUMENT_URL = "dm-store/documents/123";
 
     private static final String USER_AUTHORISATION = "Bearer token";
     public static final long CASE_ID = 1234L;
 
-    private ActionPostHearingApplicationSubmittedHandler handler;
+    private PostHearingReviewSubmittedHandler handler;
 
     @Mock
     private CcdCallbackMapService ccdCallbackMapService;
@@ -62,7 +62,7 @@ class ActionPostHearingApplicationSubmittedHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new ActionPostHearingApplicationSubmittedHandler(ccdCallbackMapService, true);
+        handler = new PostHearingReviewSubmittedHandler(ccdCallbackMapService, true);
 
         caseData = SscsCaseData.builder()
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
@@ -79,14 +79,14 @@ class ActionPostHearingApplicationSubmittedHandlerTest {
                     .build())
                 .build())
             .postHearing(PostHearing.builder()
-                .actionTypeSelected(SET_ASIDE)
+                .reviewType(SET_ASIDE)
                 .build())
             .build();
     }
 
     @Test
     void givenAValidSubmittedEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(ACTION_POST_HEARING_APPLICATION);
+        when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(SUBMITTED, callback)).isTrue();
     }
 
@@ -103,15 +103,15 @@ class ActionPostHearingApplicationSubmittedHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new ActionPostHearingApplicationSubmittedHandler(ccdCallbackMapService, false);
-        when(callback.getEvent()).thenReturn(ACTION_POST_HEARING_APPLICATION);
+        handler = new PostHearingReviewSubmittedHandler(ccdCallbackMapService, false);
+        when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
     }
 
     @ParameterizedTest
     @EnumSource(value = SetAsideActions.class)
     void givenActionTypeSetAsideSelected_shouldReturnCallCorrectCallback(SetAsideActions value) {
-        caseData.getPostHearing().setActionTypeSelected(SET_ASIDE);
+        caseData.getPostHearing().setReviewType(SET_ASIDE);
         caseData.getPostHearing().getSetAside().setAction(value);
 
         verifyCcdCallbackCalledCorrectly(value);
@@ -120,7 +120,7 @@ class ActionPostHearingApplicationSubmittedHandlerTest {
     @ParameterizedTest
     @EnumSource(value = CorrectionActions.class)
     void givenActionTypeCorrectionSelected_shouldReturnCallCorrectCallback(CorrectionActions value) {
-        caseData.getPostHearing().setActionTypeSelected(CORRECTION);
+        caseData.getPostHearing().setReviewType(CORRECTION);
         caseData.getPostHearing().getCorrection().setAction(value);
 
         verifyCcdCallbackCalledCorrectly(value);
@@ -129,7 +129,7 @@ class ActionPostHearingApplicationSubmittedHandlerTest {
     @ParameterizedTest
     @EnumSource(value = StatementOfReasonsActions.class)
     void givenActionTypeSorSelected_shouldReturnCallCorrectCallback(StatementOfReasonsActions value) {
-        caseData.getPostHearing().setActionTypeSelected(STATEMENT_OF_REASONS);
+        caseData.getPostHearing().setReviewType(STATEMENT_OF_REASONS);
         caseData.getPostHearing().getStatementOfReasons().setAction(value);
 
         verifyCcdCallbackCalledCorrectly(value);
@@ -138,7 +138,7 @@ class ActionPostHearingApplicationSubmittedHandlerTest {
     @ParameterizedTest
     @EnumSource(value = PermissionToAppealActions.class)
     void givenActionTypePtaSelected_shouldReturnCallCorrectCallback(PermissionToAppealActions value) {
-        caseData.getPostHearing().setActionTypeSelected(PERMISSION_TO_APPEAL);
+        caseData.getPostHearing().setReviewType(PERMISSION_TO_APPEAL);
         caseData.getPostHearing().getPermissionToAppeal().setAction(value);
 
         verifyCcdCallbackCalledCorrectly(value);
@@ -147,7 +147,7 @@ class ActionPostHearingApplicationSubmittedHandlerTest {
     @ParameterizedTest
     @EnumSource(value = LibertyToApplyActions.class)
     void givenActionTypeLtaSelected_shouldReturnCallCorrectCallback(LibertyToApplyActions value) {
-        caseData.getPostHearing().setActionTypeSelected(LIBERTY_TO_APPLY);
+        caseData.getPostHearing().setReviewType(LIBERTY_TO_APPLY);
         caseData.getPostHearing().getLibertyToApply().setAction(value);
 
         verifyCcdCallbackCalledCorrectly(value);
@@ -156,7 +156,7 @@ class ActionPostHearingApplicationSubmittedHandlerTest {
 
     @Test
     void givenNoActionTypeSelected_shouldReturnWithTheCorrectErrorMessage() {
-        caseData.getPostHearing().setActionTypeSelected(null);
+        caseData.getPostHearing().setReviewType(null);
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionposthearingapplication;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingrequest;
 
 import static java.util.Objects.requireNonNull;
 
@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ActionPostHearingTypes;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ActionPostHearingApplicationAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
@@ -28,7 +28,7 @@ public class ActionPostHearingApplicationAboutToSubmitHandler implements PreSubm
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() == EventType.ACTION_POST_HEARING_APPLICATION
+            && callback.getEvent() == EventType.POST_HEARING_REQUEST
             && isPostHearingsEnabled;
     }
 
@@ -41,8 +41,8 @@ public class ActionPostHearingApplicationAboutToSubmitHandler implements PreSubm
 
         String caseId = caseData.getCcdCaseId();
 
-        ActionPostHearingTypes typeSelected = caseData.getPostHearing().getActionTypeSelected();
-        log.info("Action Post Hearing Application: handling action {} for case {}", typeSelected,  caseId);
+        PostHearingRequestType typeSelected = caseData.getPostHearing().getRequestType();
+        log.info("Post Hearing Request: handling action {} for case {}", typeSelected,  caseId);
 
         SscsUtil.clearDocumentTransientFields(caseData);
 

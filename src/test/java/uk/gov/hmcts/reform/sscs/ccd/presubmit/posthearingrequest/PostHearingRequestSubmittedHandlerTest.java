@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.requestposthearing;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingrequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
@@ -6,9 +6,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REQUEST_POST_HEARING;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestPostHearingTypes.SET_ASIDE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType.SET_ASIDE;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,17 +21,17 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RequestPostHearingTypes;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 
 @ExtendWith(MockitoExtension.class)
-class RequestPostHearingSubmittedHandlerTest {
+class PostHearingRequestSubmittedHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     public static final long CASE_ID = 1234L;
 
-    private RequestPostHearingSubmittedHandler handler;
+    private PostHearingRequestSubmittedHandler handler;
 
     @Mock
     private CcdCallbackMapService ccdCallbackMapService;
@@ -46,19 +46,19 @@ class RequestPostHearingSubmittedHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new RequestPostHearingSubmittedHandler(ccdCallbackMapService, true);
+        handler = new PostHearingRequestSubmittedHandler(ccdCallbackMapService, true);
 
         caseData = SscsCaseData.builder()
             .ccdCaseId(String.valueOf(CASE_ID))
             .postHearing(PostHearing.builder()
-                .requestTypeSelected(SET_ASIDE)
+                .requestType(SET_ASIDE)
                 .build())
             .build();
     }
 
     @Test
     void givenAValidSubmittedEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(REQUEST_POST_HEARING);
+        when(callback.getEvent()).thenReturn(POST_HEARING_REQUEST);
         assertThat(handler.canHandle(SUBMITTED, callback)).isTrue();
     }
 
@@ -75,15 +75,15 @@ class RequestPostHearingSubmittedHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new RequestPostHearingSubmittedHandler(ccdCallbackMapService, false);
-        when(callback.getEvent()).thenReturn(REQUEST_POST_HEARING);
+        handler = new PostHearingRequestSubmittedHandler(ccdCallbackMapService, false);
+        when(callback.getEvent()).thenReturn(POST_HEARING_REQUEST);
         assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
     }
 
     @ParameterizedTest
-    @EnumSource(value = RequestPostHearingTypes.class)
-    void givenRequestPostHearingTypes_shouldReturnCallCorrectCallback(RequestPostHearingTypes value) {
-        caseData.getPostHearing().setRequestTypeSelected(value);
+    @EnumSource(value = PostHearingRequestType.class)
+    void givenRequestPostHearingTypes_shouldReturnCallCorrectCallback(PostHearingRequestType value) {
+        caseData.getPostHearing().setRequestType(value);
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
@@ -104,7 +104,7 @@ class RequestPostHearingSubmittedHandlerTest {
 
     @Test
     void givenNoActionTypeSelected_shouldReturnWithTheCorrectErrorMessage() {
-        caseData.getPostHearing().setRequestTypeSelected(null);
+        caseData.getPostHearing().setRequestType(null);
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);

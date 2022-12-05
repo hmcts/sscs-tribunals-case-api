@@ -1,11 +1,11 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.requestposthearing;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingrequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REQUEST_POST_HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 
@@ -21,10 +21,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @ExtendWith(MockitoExtension.class)
-class RequestPostHearingAboutToStartHandlerTest {
+class PostHearingRequestAboutToStartHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private RequestPostHearingAboutToStartHandler handler;
+    private PostHearingRequestAboutToStartHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -36,7 +36,7 @@ class RequestPostHearingAboutToStartHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new RequestPostHearingAboutToStartHandler(true);
+        handler = new PostHearingRequestAboutToStartHandler(true);
 
         caseData = SscsCaseData.builder()
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
@@ -47,7 +47,7 @@ class RequestPostHearingAboutToStartHandlerTest {
 
     @Test
     void givenAValidAboutToSubmitEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(REQUEST_POST_HEARING);
+        when(callback.getEvent()).thenReturn(POST_HEARING_REQUEST);
         assertThat(handler.canHandle(ABOUT_TO_START, callback)).isTrue();
     }
 
@@ -64,8 +64,8 @@ class RequestPostHearingAboutToStartHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new RequestPostHearingAboutToStartHandler(false);
-        when(callback.getEvent()).thenReturn(REQUEST_POST_HEARING);
+        handler = new PostHearingRequestAboutToStartHandler(false);
+        when(callback.getEvent()).thenReturn(POST_HEARING_REQUEST);
         assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
     }
 
