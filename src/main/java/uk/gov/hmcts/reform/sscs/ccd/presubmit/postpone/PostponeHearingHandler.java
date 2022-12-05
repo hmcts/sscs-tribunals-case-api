@@ -55,7 +55,7 @@ public class PostponeHearingHandler implements PreSubmitCallbackHandler<SscsCase
 
         EventType postponementEvent = caseData.getPostponement().getPostponementEvent();
 
-        log.info("Action postponement request: handing event {} for case {}", postponementEvent, caseId);
+        log.info("Action postponement request: handling event {} for case {}", postponementEvent, caseId);
 
         if (!SscsUtil.isSAndLCase(caseData)) {
             log.info("Hearing postponed: Cannot process non Scheduling & Listing Case for Case ID {}", caseId);

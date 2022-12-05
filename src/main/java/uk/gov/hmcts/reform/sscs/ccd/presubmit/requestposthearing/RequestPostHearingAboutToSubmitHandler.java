@@ -42,7 +42,7 @@ public class RequestPostHearingAboutToSubmitHandler implements PreSubmitCallback
         String caseId = caseData.getCcdCaseId();
 
         RequestPostHearingTypes typeSelected = caseData.getPostHearing().getRequestTypeSelected();
-        log.info("Post Hearing Request: handing action {} for case {}", typeSelected,  caseId);
+        log.info("Post Hearing Request: handling action {} for case {}", typeSelected,  caseId);
 
         SscsUtil.clearDocumentTransientFields(caseData);
 

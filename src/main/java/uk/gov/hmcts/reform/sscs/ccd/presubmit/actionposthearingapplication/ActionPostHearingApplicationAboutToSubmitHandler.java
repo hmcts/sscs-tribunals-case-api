@@ -42,7 +42,7 @@ public class ActionPostHearingApplicationAboutToSubmitHandler implements PreSubm
         String caseId = caseData.getCcdCaseId();
 
         ActionPostHearingTypes typeSelected = caseData.getPostHearing().getActionTypeSelected();
-        log.info("Action Post Hearing Application: handing action {} for case {}", typeSelected,  caseId);
+        log.info("Action Post Hearing Application: handling action {} for case {}", typeSelected,  caseId);
 
         SscsUtil.clearDocumentTransientFields(caseData);
 

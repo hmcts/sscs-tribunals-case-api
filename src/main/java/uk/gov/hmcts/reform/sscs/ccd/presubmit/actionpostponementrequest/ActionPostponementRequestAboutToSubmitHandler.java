@@ -84,7 +84,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         }
 
         String actionRequested = sscsCaseData.getPostponementRequest().getActionPostponementRequestSelected();
-        log.info("Action postponement request: handing action {} for case {}", actionRequested, caseId);
+        log.info("Action postponement request: handling action {} for case {}", actionRequested, caseId);
         if (SEND_TO_JUDGE.getValue().equals(actionRequested)) {
             sendToJudge(userAuthorisation, sscsCaseData);
         } else if (REFUSE.getValue().equals(actionRequested)) {

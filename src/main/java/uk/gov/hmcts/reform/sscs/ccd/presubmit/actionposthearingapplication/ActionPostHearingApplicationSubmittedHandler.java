@@ -51,7 +51,7 @@ public class ActionPostHearingApplicationSubmittedHandler implements PreSubmitCa
 
         PostHearing postHearing = caseData.getPostHearing();
         ActionPostHearingTypes typeSelected = postHearing.getActionTypeSelected();
-        log.info("Action Post Hearing Application: handing actionPostHearing {} for case {}", typeSelected,  caseId);
+        log.info("Action Post Hearing Application: handling actionPostHearing {} for case {}", typeSelected,  caseId);
 
         CcdCallbackMap callbackMap = getCcdCallbackMap(postHearing, typeSelected);
 

@@ -48,7 +48,7 @@ public class ActionPostHearingApplicationMidEventHandler extends IssueDocumentHa
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
         ActionPostHearingTypes typeSelected = caseData.getPostHearing().getActionTypeSelected();
-        log.info("Action Post Hearing Application: handing action {} for case {}", typeSelected,  caseId);
+        log.info("Action Post Hearing Application: handling action {} for case {}", typeSelected,  caseId);
 
         if (PAGE_ID_GENERATE_NOTICE.equals(pageId) && isYes(caseData.getDocumentGeneration().getGenerateNotice())) {
             log.info("Action Post Hearing Application: Generating notice for caseId {}", caseId);

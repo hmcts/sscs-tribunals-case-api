@@ -45,7 +45,7 @@ public class RequestPostHearingMidEventHandler  implements PreSubmitCallbackHand
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
         RequestPostHearingTypes typeSelected = caseData.getPostHearing().getRequestTypeSelected();
-        log.info("Post Hearing Request: handing action {} for case {}", typeSelected,  caseId);
+        log.info("Post Hearing Request: handling action {} for case {}", typeSelected,  caseId);
 
         RequestFormat requestFormat = getRequestFormat(caseData.getPostHearing());
 
@@ -63,6 +63,7 @@ public class RequestPostHearingMidEventHandler  implements PreSubmitCallbackHand
         if (isNull(typeSelected)) {
             return null;
         }
+
         switch (typeSelected) {
             case SET_ASIDE:
                 return postHearing.getSetAside().getRequestFormat();
