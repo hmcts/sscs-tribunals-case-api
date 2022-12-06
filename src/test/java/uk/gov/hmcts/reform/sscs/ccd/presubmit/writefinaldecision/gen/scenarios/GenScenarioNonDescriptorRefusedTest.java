@@ -40,7 +40,7 @@ public class GenScenarioNonDescriptorRefusedTest {
                 + "\n"
                 + "Something else\n"
                 + "\n"
-                + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. No Presenting Officer attended on behalf of the Respondent.\n"
+                + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative did not attend.\n"
                 + "\n";
 
         Assert.assertEquals(7, content.getComponents().size());
