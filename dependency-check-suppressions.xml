@@ -9,7 +9,6 @@
     <cve>CVE-2016-3094</cve>
   </suppress>
   <suppress until = "2022-12-01">
-    >>>>>>> master
     <notes><![CDATA[
                 spring-core-5.3.22.jar
         ]]></notes>
