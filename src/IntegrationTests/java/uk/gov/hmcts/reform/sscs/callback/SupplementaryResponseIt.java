@@ -3,9 +3,9 @@ package uk.gov.hmcts.reform.sscs.callback;
 import static java.lang.Long.parseLong;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -25,7 +25,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.supplementaryresponse.SupplementaryResponseAboutToSubmitHandler;
 
 @SpringBootTest
@@ -71,7 +71,7 @@ public class SupplementaryResponseIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         assertThat(result.getData().getEvidenceHandled(), is(YesNo.NO.getValue()));
-        assertThat(result.getData().getDwpState(), is(DwpState.SUPPLEMENTARY_RESPONSE.getId()));
+        assertThat(result.getData().getDwpState(), is(DwpState.SUPPLEMENTARY_RESPONSE));
         assertThat(result.getData().getScannedDocuments().size(), is(1));
         assertThat(result.getData().getScannedDocuments().get(0).getValue().getFileName(), is(SUP_RESPONSE_DOC_PDF_NAME));
     }
@@ -88,7 +88,7 @@ public class SupplementaryResponseIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         assertThat(result.getData().getEvidenceHandled(), is(YesNo.NO.getValue()));
-        assertThat(result.getData().getDwpState(), is(DwpState.SUPPLEMENTARY_RESPONSE.getId()));
+        assertThat(result.getData().getDwpState(), is(DwpState.SUPPLEMENTARY_RESPONSE));
         assertThat(result.getData().getScannedDocuments().size(), is(2));
         assertThat(result.getData().getScannedDocuments().stream()
                 .anyMatch(sd -> sd.getValue().getFileName().equals(SUP_RESPONSE_DOC_PDF_NAME)), is(true));
@@ -101,7 +101,7 @@ public class SupplementaryResponseIt extends AbstractEventIt {
 
         sscsCaseData.setDwpSupplementaryResponseDoc(getGenericDwpResponseDocument(SUP_RESPONSE_DOC_PDF_NAME));
         sscsCaseData.setDwpOtherDoc(getGenericDwpResponseDocument(SUP_RESPONSE_DOC_MP3_NAME));
-        sscsCaseData.setInterlocReviewState(InterlocReviewState.NONE.getId());
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.NONE);
         setJson();
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
@@ -109,13 +109,13 @@ public class SupplementaryResponseIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         assertThat(result.getData().getEvidenceHandled(), is(YesNo.NO.getValue()));
-        assertThat(result.getData().getDwpState(), is(DwpState.SUPPLEMENTARY_RESPONSE.getId()));
+        assertThat(result.getData().getDwpState(), is(DwpState.SUPPLEMENTARY_RESPONSE));
         assertThat(result.getData().getScannedDocuments().size(), is(1));
         assertThat(result.getData().getScannedDocuments().get(0).getValue().getFileName(), is(SUP_RESPONSE_DOC_PDF_NAME));
         assertThat(result.getData().getAudioVideoEvidence().size(), is(1));
         assertThat(result.getData().getAudioVideoEvidence().get(0).getValue().getFileName(), is(SUP_RESPONSE_DOC_MP3_NAME));
-        assertThat(result.getData().getInterlocReferralReason(), is(REVIEW_AUDIO_VIDEO_EVIDENCE.getId()));
-        assertThat(result.getData().getInterlocReviewState(), is(REVIEW_BY_TCW.getId()));
+        assertThat(result.getData().getInterlocReferralReason(), is(REVIEW_AUDIO_VIDEO_EVIDENCE));
+        assertThat(result.getData().getInterlocReviewState(), is(REVIEW_BY_TCW));
     }
 
     @Test
@@ -123,7 +123,7 @@ public class SupplementaryResponseIt extends AbstractEventIt {
 
         sscsCaseData.setDwpSupplementaryResponseDoc(getGenericDwpResponseDocument(SUP_RESPONSE_DOC_PDF_NAME));
         sscsCaseData.setDwpOtherDoc(getGenericDwpResponseDocument(SUP_RESPONSE_DOC_MP3_NAME));
-        sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
+        sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
         setJson();
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
@@ -131,12 +131,12 @@ public class SupplementaryResponseIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         assertThat(result.getData().getEvidenceHandled(), is(YesNo.NO.getValue()));
-        assertThat(result.getData().getDwpState(), is(DwpState.SUPPLEMENTARY_RESPONSE.getId()));
+        assertThat(result.getData().getDwpState(), is(DwpState.SUPPLEMENTARY_RESPONSE));
         assertThat(result.getData().getScannedDocuments().size(), is(1));
         assertThat(result.getData().getScannedDocuments().get(0).getValue().getFileName(), is(SUP_RESPONSE_DOC_PDF_NAME));
         assertThat(result.getData().getAudioVideoEvidence().size(), is(1));
         assertThat(result.getData().getAudioVideoEvidence().get(0).getValue().getFileName(), is(SUP_RESPONSE_DOC_MP3_NAME));
-        assertThat(result.getData().getInterlocReferralReason(), is(REVIEW_AUDIO_VIDEO_EVIDENCE.getId()));
+        assertThat(result.getData().getInterlocReferralReason(), is(REVIEW_AUDIO_VIDEO_EVIDENCE));
     }
 
     @NotNull

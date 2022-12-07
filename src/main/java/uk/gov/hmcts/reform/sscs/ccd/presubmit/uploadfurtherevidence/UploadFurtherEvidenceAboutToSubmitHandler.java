@@ -8,11 +8,10 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.getOriginalSender;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.isValidAudioVideoDocumentType;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
@@ -97,8 +96,8 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     preSubmitCallbackResponse.addError("You need to upload PDF, MP3 or MP4 documents only");
                 }
             });
-            if (!equalsIgnoreCase(sscsCaseData.getInterlocReviewState(), REVIEW_BY_TCW.getId())
-                    && !equalsIgnoreCase(sscsCaseData.getInterlocReviewState(), REVIEW_BY_JUDGE.getId())
+            if (sscsCaseData.getInterlocReviewState() != REVIEW_BY_TCW
+                    && sscsCaseData.getInterlocReviewState() != REVIEW_BY_JUDGE
                     && hasMp3OrMp4(sscsCaseData.getDraftFurtherEvidenceDocuments())) {
                 preSubmitCallbackResponse.addError("As you have uploaded an MP3 or MP4 file, please set interlocutory review state to 'Review by TCW'");
             }
@@ -109,8 +108,8 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
             SscsCaseData beforeData = callback.getCaseDetailsBefore().map(CaseDetails::getCaseData).orElse(null);
 
-            if (beforeData != null && REVIEW_BY_JUDGE.getId().equals(beforeData.getInterlocReviewState())) {
-                sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
+            if (beforeData != null && REVIEW_BY_JUDGE.equals(beforeData.getInterlocReviewState())) {
+                sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
             }
 
             if (isEmpty(preSubmitCallbackResponse.getErrors())) {
@@ -171,7 +170,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             audioVideoEvidence.addAll(newAudioVideoEvidence);
             sort(newAudioVideoEvidence);
             sscsCaseData.setAudioVideoEvidence(audioVideoEvidence);
-            sscsCaseData.setInterlocReferralReason(REVIEW_AUDIO_VIDEO_EVIDENCE.getId());
+            sscsCaseData.setInterlocReferralReason(REVIEW_AUDIO_VIDEO_EVIDENCE);
         }
     }
 

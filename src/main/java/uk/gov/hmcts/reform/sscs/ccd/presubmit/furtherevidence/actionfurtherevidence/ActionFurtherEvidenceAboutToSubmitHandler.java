@@ -38,7 +38,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.ScannedDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
@@ -200,7 +200,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
             if (!State.WITH_DWP.equals(callback.getCaseDetails().getState())) {
                 sscsCaseData.setDwpFurtherEvidenceStates(FURTHER_EVIDENCE_RECEIVED);
-                sscsCaseData.setDwpState(DwpState.FE_RECEIVED.getId());
+                sscsCaseData.setDwpState(DwpState.FE_RECEIVED);
             }
 
         }
@@ -421,7 +421,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         if (!sscsCaseData.isLanguagePreferenceWelsh()) {
             sscsCaseData.setReinstatementRegistered(LocalDate.now());
             sscsCaseData.setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
-            sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
+            sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
             State previousState = sscsCaseData.getPreviousState();
             if (previousState == null || State.DORMANT_APPEAL_STATE == previousState
                     || State.VOID_STATE == previousState) {

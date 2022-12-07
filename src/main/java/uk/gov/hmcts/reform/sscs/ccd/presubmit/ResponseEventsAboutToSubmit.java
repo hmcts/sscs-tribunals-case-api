@@ -87,7 +87,7 @@ public class ResponseEventsAboutToSubmit {
         sscsCaseData.setIssueCode(issueCode);
         sscsCaseData.setBenefitCode("001");
         sscsCaseData.setCaseCode("001" + issueCode);
-        sscsCaseData.setDwpState(DwpState.RESPONSE_SUBMITTED_DWP.getId());
+        sscsCaseData.setDwpState(DwpState.RESPONSE_SUBMITTED_DWP);
     }
 
     private void validateChangedCaseCode(PreSubmitCallbackResponse<SscsCaseData> response, Callback<SscsCaseData> callback) {

@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
@@ -88,8 +90,8 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("reviewByTcw", response.getData().getInterlocReviewState());
-        assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
+        assertEquals(REVIEW_BY_TCW, response.getData().getInterlocReviewState());
+        assertEquals(LocalDate.now(), response.getData().getInterlocReferralDate());
         assertNull(response.getData().getDirectionDueDate());
     }
 
@@ -101,8 +103,8 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("reviewByJudge", response.getData().getInterlocReviewState());
-        assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
+        assertEquals(REVIEW_BY_JUDGE, response.getData().getInterlocReviewState());
+        assertEquals(LocalDate.now(), response.getData().getInterlocReferralDate());
         assertNull(response.getData().getDirectionDueDate());
     }
 

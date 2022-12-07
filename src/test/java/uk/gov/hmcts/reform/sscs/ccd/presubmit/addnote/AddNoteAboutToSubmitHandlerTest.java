@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
@@ -76,7 +76,7 @@ public class AddNoteAboutToSubmitHandlerTest {
     public void testTempNoteFilledIsNullAndResponseReviewedEvent_thenNoteIsAdded() {
         when(callback.getEvent()).thenReturn(HMCTS_RESPONSE_REVIEWED);
         sscsCaseData.setTempNoteDetail(null);
-        sscsCaseData.setInterlocReferralReason("over300Pages");
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.OVER_300_PAGES);
         sscsCaseData.setSelectWhoReviewsCase(new DynamicList("Review by Judge"));
 
         PreSubmitCallbackResponse<SscsCaseData> response =
@@ -105,7 +105,7 @@ public class AddNoteAboutToSubmitHandlerTest {
     public void testInterlocReferralReasonIsNoneAndResponseReviewedEvent_thenNoNoteIsAdded() {
         when(callback.getEvent()).thenReturn(HMCTS_RESPONSE_REVIEWED);
         sscsCaseData.setTempNoteDetail(null);
-        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.NONE.getId());
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.NONE);
         sscsCaseData.setSelectWhoReviewsCase(new DynamicList("Review by Judge"));
 
         PreSubmitCallbackResponse<SscsCaseData> response =
@@ -148,22 +148,25 @@ public class AddNoteAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"timeExtension, Time extension",
-                 "phmeRequest, PHE request",
-                 "over300Pages, Over 300 pages",
-                 "over13months, Over 13 months",
-                 "other, Other",
-                 "noResponseToDirection, No response to a direction"})
-    public void ifEventIsResponseReviewed_AddInterlocReferralReasonToNote(String interlocReferralId, String interlocReferralLabel) {
+    @Parameters({
+        "TIME_EXTENSION",
+        "PHE_REQUEST",
+        "OVER_300_PAGES",
+        "OVER_13_MONTHS",
+        "OTHER",
+        "NO_RESPONSE_TO_DIRECTION"
+    })
+    public void ifEventIsResponseReviewed_AddInterlocReferralReasonToNote(InterlocReferralReason value) {
         when(callback.getEvent()).thenReturn(HMCTS_RESPONSE_REVIEWED);
         sscsCaseData.setTempNoteDetail("Here is my note");
-        sscsCaseData.setInterlocReferralReason(interlocReferralId);
+        sscsCaseData.setInterlocReferralReason(value);
         sscsCaseData.setSelectWhoReviewsCase(new DynamicList("Review by Judge"));
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        String expectedNote = "Referred to interloc for review by judge - " + interlocReferralLabel + " - Here is my note";
+        String expectedNote = String.format("Referred to interloc for review by judge - %s - Here is my note",
+            value.getDescription());
 
         assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
         assertEquals(expectedNote, response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());

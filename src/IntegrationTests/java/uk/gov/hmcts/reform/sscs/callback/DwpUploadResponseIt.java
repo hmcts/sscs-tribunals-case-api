@@ -4,10 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.PHE_REQUEST;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -60,11 +60,11 @@ public class DwpUploadResponseIt extends AbstractEventIt {
         assertEquals("sscs1", result.getData().getSscsDocument().get(1).getValue().getDocumentType());
         assertEquals("appellantEvidence", result.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertNull(result.getData().getSscsDocument().get(1).getValue().getPartyUploaded());
-        assertEquals(DwpState.RESPONSE_SUBMITTED_DWP.getId(), result.getData().getDwpState());
+        assertEquals(DwpState.RESPONSE_SUBMITTED_DWP, result.getData().getDwpState());
         assertEquals(1, result.getData().getAudioVideoEvidence().size());
         assertNull(result.getData().getAudioVideoEvidence().get(0).getValue().getRip1Document());
-        assertEquals(REVIEW_BY_TCW.getId(), result.getData().getInterlocReviewState());
-        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), result.getData().getInterlocReferralReason());
+        assertEquals(REVIEW_BY_TCW, result.getData().getInterlocReviewState());
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE, result.getData().getInterlocReferralReason());
 
     }
 
@@ -85,8 +85,8 @@ public class DwpUploadResponseIt extends AbstractEventIt {
         assertEquals("appellantEvidence", result.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals(1, result.getData().getAudioVideoEvidence().size());
         assertNull(result.getData().getAudioVideoEvidence().get(0).getValue().getRip1Document());
-        assertEquals(REVIEW_BY_TCW.getId(), result.getData().getInterlocReviewState());
-        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), result.getData().getInterlocReferralReason());
+        assertEquals(REVIEW_BY_TCW, result.getData().getInterlocReviewState());
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE, result.getData().getInterlocReferralReason());
     }
 
     @Test
@@ -104,8 +104,8 @@ public class DwpUploadResponseIt extends AbstractEventIt {
         assertEquals(2, result.getData().getAudioVideoEvidence().size());
         assertNotNull(result.getData().getAudioVideoEvidence().get(0).getValue().getRip1Document());
         assertNotNull(result.getData().getAudioVideoEvidence().get(1).getValue().getRip1Document());
-        assertEquals(PHE_REQUEST.getId(), result.getData().getInterlocReferralReason());
-        assertEquals(REVIEW_BY_JUDGE.getId(), result.getData().getInterlocReviewState());
+        assertEquals(PHE_REQUEST, result.getData().getInterlocReferralReason());
+        assertEquals(REVIEW_BY_JUDGE, result.getData().getInterlocReviewState());
     }
 
     @Test

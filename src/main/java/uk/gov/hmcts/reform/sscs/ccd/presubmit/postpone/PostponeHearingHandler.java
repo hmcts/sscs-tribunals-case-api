@@ -84,7 +84,7 @@ public class PostponeHearingHandler implements PreSubmitCallbackHandler<SscsCase
             return response;
         }
 
-        caseData.setDwpState(DwpState.HEARING_POSTPONED.getId());
+        caseData.setDwpState(DwpState.HEARING_POSTPONED);
 
         ccdService.updateCase(caseData, caseId, postponementEvent.getCcdType(),
             summary, description, idamService.getIdamTokens());

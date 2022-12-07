@@ -6,7 +6,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.DIRECTION_ACTION_REQUIRED;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_INFORMATION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -27,9 +29,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ProcessedAction;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
@@ -86,8 +88,8 @@ public class ProcessAudioVideoIt extends AbstractEventIt {
         SscsCaseData caseData = result.getData();
 
         assertNull(caseData.getInterlocReviewState());
-        assertEquals(InterlocReferralReason.NONE.getId(), caseData.getInterlocReferralReason());
-        assertEquals(DIRECTION_ACTION_REQUIRED.getId(), caseData.getDwpState());
+        assertEquals(InterlocReferralReason.NONE, caseData.getInterlocReferralReason());
+        assertEquals(DIRECTION_ACTION_REQUIRED, caseData.getDwpState());
         assertEquals(2, caseData.getSscsDocument().size());
         assertEquals("Addition A - Audio/Video evidence direction notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".pdf", caseData.getSscsDocument().get(1).getValue().getDocumentFileName());
         assertEquals("A", caseData.getSscsDocument().get(1).getValue().getBundleAddition());
@@ -110,8 +112,8 @@ public class ProcessAudioVideoIt extends AbstractEventIt {
         SscsCaseData caseData = result.getData();
 
         assertNull(caseData.getInterlocReviewState());
-        assertEquals(InterlocReferralReason.NONE.getId(), caseData.getInterlocReferralReason());
-        assertEquals(DIRECTION_ACTION_REQUIRED.getId(), caseData.getDwpState());
+        assertEquals(InterlocReferralReason.NONE, caseData.getInterlocReferralReason());
+        assertEquals(DIRECTION_ACTION_REQUIRED, caseData.getDwpState());
         assertEquals(2, caseData.getSscsDocument().size());
         assertEquals("Addition A - Audio/Video evidence direction notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".pdf", caseData.getSscsDocument().get(1).getValue().getDocumentFileName());
         assertEquals("A", caseData.getSscsDocument().get(1).getValue().getBundleAddition());
@@ -137,8 +139,8 @@ public class ProcessAudioVideoIt extends AbstractEventIt {
         SscsCaseData caseData = result.getData();
 
         assertNull(caseData.getInterlocReviewState());
-        assertEquals(InterlocReferralReason.NONE.getId(), caseData.getInterlocReferralReason());
-        assertEquals(DIRECTION_ACTION_REQUIRED.getId(), caseData.getDwpState());
+        assertEquals(InterlocReferralReason.NONE, caseData.getInterlocReferralReason());
+        assertEquals(DIRECTION_ACTION_REQUIRED, caseData.getDwpState());
         assertEquals(1, caseData.getSscsDocument().size());
         assertNull(caseData.getAudioVideoEvidence());
     }
@@ -154,9 +156,9 @@ public class ProcessAudioVideoIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
         SscsCaseData caseData = result.getData();
 
-        assertEquals(REVIEW_BY_JUDGE.getId(), caseData.getInterlocReviewState());
-        assertEquals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), caseData.getInterlocReferralReason());
-        assertEquals(LocalDate.now().toString(), caseData.getInterlocReferralDate());
+        assertEquals(REVIEW_BY_JUDGE, caseData.getInterlocReviewState());
+        assertEquals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE, caseData.getInterlocReferralReason());
+        assertEquals(LocalDate.now(), caseData.getInterlocReferralDate());
         assertEquals(1, caseData.getAppealNotePad().getNotesCollection().size());
         assertEquals(ProcessedAction.SENT_TO_JUDGE.getValue(), caseData.getAudioVideoEvidence().get(0).getValue().getProcessedAction().getValue());
     }
@@ -172,8 +174,8 @@ public class ProcessAudioVideoIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
         SscsCaseData caseData = result.getData();
 
-        assertEquals(AWAITING_ADMIN_ACTION.getId(), caseData.getInterlocReviewState());
-        assertEquals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), caseData.getInterlocReferralReason());
+        assertEquals(AWAITING_ADMIN_ACTION, caseData.getInterlocReviewState());
+        assertEquals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE, caseData.getInterlocReferralReason());
         assertEquals(1, caseData.getAppealNotePad().getNotesCollection().size());
         assertEquals(ProcessedAction.SENT_TO_ADMIN.getValue(), caseData.getAudioVideoEvidence().get(0).getValue().getProcessedAction().getValue());
     }
@@ -189,12 +191,12 @@ public class ProcessAudioVideoIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
         SscsCaseData caseData = result.getData();
 
-        assertEquals(AWAITING_INFORMATION.getId(), caseData.getInterlocReviewState());
-        assertEquals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), caseData.getInterlocReferralReason());
-        assertEquals(DIRECTION_ACTION_REQUIRED.getId(), caseData.getDwpState());
+        assertEquals(AWAITING_INFORMATION, caseData.getInterlocReviewState());
+        assertEquals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE, caseData.getInterlocReferralReason());
+        assertEquals(DIRECTION_ACTION_REQUIRED, caseData.getDwpState());
         assertEquals(1, caseData.getSscsDocument().size());
-        assertEquals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), caseData.getInterlocReferralReason());
-        assertEquals(LocalDate.now().toString(), caseData.getInterlocReferralDate());
+        assertEquals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE, caseData.getInterlocReferralReason());
+        assertEquals(LocalDate.now(), caseData.getInterlocReferralDate());
         assertEquals(ProcessedAction.DIRECTION_ISSUED.getValue(), caseData.getAudioVideoEvidence().get(0).getValue().getProcessedAction().getValue());
         assertEquals("2120-10-10", caseData.getDirectionDueDate());
     }

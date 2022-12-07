@@ -5,9 +5,10 @@ import static java.util.Collections.sort;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.assignNewOtherPartyData;
@@ -39,7 +40,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
@@ -186,12 +186,12 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         sscsCaseData.setDwpUploadAudioVideoEvidence(null);
 
         if (StringUtils.equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "phme")) {
-            sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
+            sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
         } else {
-            if (!REVIEW_BY_JUDGE.getId().equals(sscsCaseData.getInterlocReviewState())) {
-                sscsCaseData.setInterlocReviewState(REVIEW_BY_TCW.getId());
+            if (REVIEW_BY_JUDGE != sscsCaseData.getInterlocReviewState()) {
+                sscsCaseData.setInterlocReviewState(REVIEW_BY_TCW);
             }
-            sscsCaseData.setInterlocReferralReason(REVIEW_AUDIO_VIDEO_EVIDENCE.getId());
+            sscsCaseData.setInterlocReferralReason(REVIEW_AUDIO_VIDEO_EVIDENCE);
         }
     }
 
@@ -289,11 +289,11 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 && sscsCaseData.getDwpEditedResponseDocument() != null
                 && sscsCaseData.getDwpEditedResponseDocument().getDocumentLink() != null) {
 
-            sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
+            sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
 
             if (StringUtils.equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "phme")) {
-                sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHE_REQUEST.getId());
-                sscsCaseData.setInterlocReferralDate(LocalDate.now().toString());
+                sscsCaseData.setInterlocReferralReason(PHE_REQUEST);
+                sscsCaseData.setInterlocReferralDate(LocalDate.now());
                 String note = "Referred to interloc for review by judge - PHE request";
                 addNoteService.addNote(userAuthorisation, sscsCaseData, note);
             }

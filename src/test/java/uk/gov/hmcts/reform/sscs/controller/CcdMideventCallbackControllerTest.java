@@ -46,6 +46,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
@@ -128,7 +129,8 @@ public class CcdMideventCallbackControllerTest {
                 new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
                 Optional.empty(), INTERLOC_INFORMATION_RECEIVED, false));
 
-        PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(SscsCaseData.builder().interlocReviewState("new_state").build());
+        PreSubmitCallbackResponse response =
+            new PreSubmitCallbackResponse(SscsCaseData.builder().interlocReviewState(InterlocReviewState.WELSH_TRANSLATION).build());
         when(writeFinalDecisionPreviewDecisionService.preview(any(),eq(DocumentType.DRAFT_DECISION_NOTICE), anyString(), eq(false)))
                 .thenReturn(response);
 
@@ -138,7 +140,7 @@ public class CcdMideventCallbackControllerTest {
                 .header("Authorization", "")
                 .content(content))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{'data': {'interlocReviewState': 'new_state'}}"));
+                .andExpect(content().json("{\"data\": {\"interlocReviewState\": \"welshTranslation\"}}"));
     }
 
     @Test
@@ -164,7 +166,7 @@ public class CcdMideventCallbackControllerTest {
 
         String expectedErrorsString = Arrays.asList("\"" + status.toString() + "\"").toString();
 
-        String expectedJsonErrorsAndWarningsString = "{'errors': " + expectedErrorsString + "}, {'warnings' : []}";
+        String expectedJsonErrorsAndWarningsString = "{\"errors\": " + expectedErrorsString + "}, {\"warnings\" : []}";
 
         mockMvc.perform(post("/ccdMidEventAdminRestoreCases")
             .contentType(MediaType.APPLICATION_JSON)
@@ -197,7 +199,7 @@ public class CcdMideventCallbackControllerTest {
 
         String expectedErrorsString = Arrays.asList("\"" + status.toString() + "\"").toString();
 
-        String expectedJsonErrorsAndWarningsString = "{'errors': " + expectedErrorsString + "}, {'warnings' : []}";
+        String expectedJsonErrorsAndWarningsString = "{\"errors\": " + expectedErrorsString + "}, {\"warnings\" : []}";
 
         mockMvc.perform(post("/ccdMidEventAdminRestoreCases")
             .contentType(MediaType.APPLICATION_JSON)
@@ -230,7 +232,7 @@ public class CcdMideventCallbackControllerTest {
 
         String expectedWarningsString = Arrays.asList("\"" + status.toString() + "\"", "Completed - no more cases").toString();
 
-        String expectedJsonErrorsAndWarningsString = "{'warnings': " + expectedWarningsString + "}, {'errors' : []}";
+        String expectedJsonErrorsAndWarningsString = "{\"warnings\": " + expectedWarningsString + "}, {\"errors\" : []}";
 
         mockMvc.perform(post("/ccdMidEventAdminRestoreCases")
             .contentType(MediaType.APPLICATION_JSON)
@@ -260,7 +262,7 @@ public class CcdMideventCallbackControllerTest {
 
         String expectedErrorsString = Arrays.asList("anything").toString();
 
-        String expectedJsonErrorsAndWarningsString = "{'errors': " + expectedErrorsString + "}, {'warnings' : []}";
+        String expectedJsonErrorsAndWarningsString = "{\"errors\": " + expectedErrorsString + "}, {\"warnings\" : []}";
 
         mockMvc.perform(post("/ccdMidEventAdminRestoreCases")
             .contentType(MediaType.APPLICATION_JSON)
@@ -288,7 +290,7 @@ public class CcdMideventCallbackControllerTest {
 
         String expectedErrorsString = Arrays.asList("anything").toString();
 
-        String expectedJsonErrorsAndWarningsString = "{'errors': " + expectedErrorsString + "}, {'warnings' : []}";
+        String expectedJsonErrorsAndWarningsString = "{\"errors\": " + expectedErrorsString + "}, {\"warnings\" : []}";
 
         mockMvc.perform(post("/ccdMidEventAdminRestoreCases")
             .contentType(MediaType.APPLICATION_JSON)
@@ -326,7 +328,7 @@ public class CcdMideventCallbackControllerTest {
 
         String expectedWarningsString = Arrays.asList("\"" + status.toString() + "\"", "Completed - no more cases").toString();
 
-        String expectedJsonErrorsAndWarningsString = "{'warnings': " + expectedWarningsString + "}, {'errors' : []}";
+        String expectedJsonErrorsAndWarningsString = "{\"warnings\": " + expectedWarningsString + "}, {\"errors\" : []}";
 
         mockMvc.perform(post("/ccdMidEventAdminRestoreCases")
             .contentType(MediaType.APPLICATION_JSON)

@@ -32,8 +32,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -132,13 +132,13 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
     @Test
     @Parameters({
-        "informationReceivedForInterlocJudge, reviewByJudge, interlocInformationReceivedActionFurtherEvidence",
-        "informationReceivedForInterlocTcw, reviewByTcw, interlocInformationReceivedActionFurtherEvidence",
-        "sendToInterlocReviewByJudge, reviewByJudge, validSendToInterloc",
-        "sendToInterlocReviewByTcw, reviewByTcw, validSendToInterloc"
+        "informationReceivedForInterlocJudge, REVIEW_BY_JUDGE, interlocInformationReceivedActionFurtherEvidence",
+        "informationReceivedForInterlocTcw, REVIEW_BY_TCW, interlocInformationReceivedActionFurtherEvidence",
+        "sendToInterlocReviewByJudge, REVIEW_BY_JUDGE, validSendToInterloc",
+        "sendToInterlocReviewByTcw, REVIEW_BY_TCW, validSendToInterloc"
     })
     public void givenFurtherEvidenceActionSelectedOption_shouldTriggerEventAndUpdateCaseCorrectly(
-            String furtherEvidenceActionSelectedOption, String interlocReviewState, String eventType) {
+            String furtherEvidenceActionSelectedOption, InterlocReviewState interlocReviewState, String eventType) {
 
         Callback<SscsCaseData> callback = buildCallback(furtherEvidenceActionSelectedOption, ACTION_FURTHER_EVIDENCE);
 
@@ -156,7 +156,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         if (furtherEvidenceActionSelectedOption.equals("informationReceivedForInterlocJudge")
                 || furtherEvidenceActionSelectedOption.equals("informationReceivedForInterlocTcw")) {
-            assertThat(captor.getValue().getInterlocReferralDate(), is(LocalDate.now().toString()));
+            assertThat(captor.getValue().getInterlocReferralDate(), is(LocalDate.now()));
         }
 
         then(ccdService).should(times(1))
@@ -267,8 +267,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), captor.getValue().getInterlocReviewState());
-        assertEquals(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId(), captor.getValue().getInterlocReferralReason());
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW, captor.getValue().getInterlocReviewState());
+        assertEquals(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST, captor.getValue().getInterlocReferralReason());
 
         then(ccdService).should(times(1))
                 .updateCase(eq(callback.getCaseDetails().getCaseData()), eq(123L), eq(eventType),
