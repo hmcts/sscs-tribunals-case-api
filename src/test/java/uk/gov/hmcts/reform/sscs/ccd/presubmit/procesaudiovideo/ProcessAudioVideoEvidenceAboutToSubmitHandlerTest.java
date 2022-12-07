@@ -78,7 +78,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         openMocks(this);
 
         Map<EventType, String> englishEventTypeDocs = new HashMap<>();
-        englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-draft-decision-notice.docx");
+        englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-directions-notice.docx");
 
         Map<LanguagePreference, Map<EventType, String>> documents = new HashMap<>();
         documents.put(LanguagePreference.ENGLISH, englishEventTypeDocs);

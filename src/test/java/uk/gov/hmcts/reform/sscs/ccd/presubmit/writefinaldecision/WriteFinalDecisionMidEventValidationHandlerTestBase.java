@@ -22,6 +22,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -48,6 +49,10 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
     @Mock
     protected UserDetails userDetails;
+
+    @Mock
+    protected UserInfo userInfo;
+
 
     @Mock
     protected DecisionNoticeService decisionNoticeService;
@@ -80,7 +85,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
         when(userDetails.getFullName()).thenReturn("Judge Full Name");
 
-        when(idamClient.getUserDetails("Bearer token")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer token")).thenReturn(userInfo);
 
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")

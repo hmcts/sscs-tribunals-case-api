@@ -37,7 +37,7 @@ public class UserDetailsServiceTest {
 
     @Test(expected = IllegalStateException.class)
     public void givenUserNotFound_thenThrowAnException() {
-        when(idamClient.getUserDetails(USER_AUTHORISATION)).thenReturn(null);
+        when(idamClient.getUserInfo(USER_AUTHORISATION)).thenReturn(null);
         userDetailsService.buildLoggedInUserName(USER_AUTHORISATION);
     }
 
