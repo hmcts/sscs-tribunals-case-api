@@ -178,6 +178,6 @@ class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandle
 
         assertThat(response.getErrors()).isEmpty();
 
-        assertThat(sscsCaseData.getRegion()).isEqualTo("CARDIFF");
+        assertThat(sscsCaseData.getRegion()).isEqualTo(rpc.getCity());
     }
 }
