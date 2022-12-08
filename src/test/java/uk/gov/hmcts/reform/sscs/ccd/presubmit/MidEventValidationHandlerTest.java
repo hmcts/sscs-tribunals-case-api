@@ -18,6 +18,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -44,6 +45,9 @@ public class MidEventValidationHandlerTest {
     @Mock
     private UserDetails userDetails;
 
+    @Mock
+    private UserInfo userInfo;
+
     private SscsCaseData sscsCaseData;
 
     protected static Validator validator = Validation.byDefaultProvider()
@@ -60,7 +64,7 @@ public class MidEventValidationHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.NOT_LISTABLE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
-        when(idamClient.getUserDetails("Bearer token")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer token")).thenReturn(userInfo);
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
                 .appeal(Appeal.builder().build())

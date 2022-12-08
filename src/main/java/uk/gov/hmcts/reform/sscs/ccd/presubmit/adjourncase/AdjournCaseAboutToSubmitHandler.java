@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
@@ -57,30 +60,35 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
         }
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        Adjournment adjournment = sscsCaseData.getAdjournment();
 
-        previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData,
+        previewDocumentService.writePreviewDocumentToSscsDocument(
+            sscsCaseData,
             DRAFT_ADJOURNMENT_NOTICE,
-            sscsCaseData.getAdjournCasePreviewDocument());
+            adjournment.getPreviewDocument());
 
         if (SscsUtil.isSAndLCase(sscsCaseData)
             && isAdjournmentEnabled // TODO SSCS-10951
-            && (sscsCaseData.isAdjournCaseAbleToBeListedRightAway()
-            || isNoOrNull(sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties()))) {
+            && (isYes(adjournment.getCanCaseBeListedRightAway())
+            || isNoOrNull(adjournment.getAreDirectionsBeingMadeToParties()))
+        ) {
+            adjournment.setAdjournmentInProgress(YES);
             hearingMessageHelper.sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
-        } else if (sscsCaseData.getAdjournCaseInterpreterRequired() != null) {
+        }
+
+        if (adjournment.getInterpreterRequired() != null) {
             HearingOptions hearingOptions = HearingOptions.builder().build();
             if (sscsCaseData.getAppeal().getHearingOptions() != null) {
                 hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
             }
-
-            hearingOptions.setLanguages(sscsCaseData.getAdjournCaseInterpreterLanguage());
-            hearingOptions.setLanguageInterpreter(sscsCaseData.getAdjournCaseInterpreterRequired());
+            hearingOptions.setLanguages(adjournment.getInterpreterLanguage());
+            hearingOptions.setLanguageInterpreter(adjournment.getInterpreterRequired().getValue());
 
             sscsCaseData.getAppeal().setHearingOptions(hearingOptions);
         }
 
-        if (nonNull(sscsCaseData.getAdjournCaseNextHearingVenueSelected())) {
-            String venueId = sscsCaseData.getAdjournCaseNextHearingVenueSelected().getValue().getCode();
+        if (nonNull(adjournment.getNextHearingVenueSelected())) {
+            String venueId = adjournment.getNextHearingVenueSelected().getValue().getCode();
 
             RegionalProcessingCenter rpc = regionalProcessingCenterService.getByVenueId(venueId);
 
@@ -96,9 +104,8 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
                 sscsCaseData.setProcessingVenue(processingVenue);
             }
         }
-
-        if (sscsCaseData.getAdjournCaseGeneratedDate() == null) {
-            sscsCaseData.setAdjournCaseGeneratedDate(LocalDate.now().toString());
+        if (adjournment.getGeneratedDate() == null) {
+            adjournment.setGeneratedDate(LocalDate.now());
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
