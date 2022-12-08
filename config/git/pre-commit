@@ -5,7 +5,7 @@ echo "*****Running pre commit tasks******"
 # This is required for windows users, committing with GitHub Desktop
 # Github desktops git bundle does not contain the required binaries to run gradlew
 # Requires the standard git for windows binaries adding to the PATH
-export PATH=$PATH":/c/Program Files/Git/usr/bin"
+export PATH="$PATH:/c/Program Files/Git/usr/bin"
 
 git stash -q --keep-index
 
