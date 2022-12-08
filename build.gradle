@@ -3,7 +3,7 @@ plugins {
     id 'pmd'
     id 'org.sonarqube' version '3.5.0.2730'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.7.5'
+    id 'org.springframework.boot' version '2.7.6'
     id 'uk.gov.hmcts.java' version '0.12.33'
     id 'com.gorylenko.gradle-git-properties' version '2.3.1'
     id 'com.github.ben-manes.versions' version '0.39.0'
@@ -264,7 +264,7 @@ dependencyManagement {
         }
 
         imports {
-            mavenBom "org.springframework.cloud:spring-cloud-dependencies:2021.0.4"
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:2021.0.5"
         }
     }
 }
@@ -278,13 +278,13 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-activemq'
 
-    implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.7.5'
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.5'
-    implementation group: 'org.springframework.security', name: 'spring-security-config', version: '5.7.5'
-    implementation group: 'org.springframework.security', name: 'spring-security-web', version: '5.7.5'
+    implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.8.0'
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.0'
+    implementation group: 'org.springframework.security', name: 'spring-security-config', version: '5.8.0'
+    implementation group: 'org.springframework.security', name: 'spring-security-web', version: '5.8.0'
 
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
-    implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.1'
+    implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.4'
 
     implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
     implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.6'
