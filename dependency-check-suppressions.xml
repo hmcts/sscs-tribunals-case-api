@@ -24,7 +24,7 @@
   </suppress>
   <suppress until = "2023-01-01">
     <notes><![CDATA[
-   file name: commons-fileupload-1.4.jar
+   file name: commons-fileupload-1.4.jar - this is a mistaken tag for Apache Commons Net
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/commons\-fileupload/commons\-fileupload@.*$</packageUrl>
     <cve>CVE-2021-37533</cve>
