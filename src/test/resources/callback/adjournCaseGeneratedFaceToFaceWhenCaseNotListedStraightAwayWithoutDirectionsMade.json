@@ -29,7 +29,7 @@
       "adjournCaseCanCaseBeListedRightAway" : "No",
       "adjournCaseAreDirectionsBeingMadeToParties" : "No",
       "adjournCaseTypeOfNextHearing" : "faceToFace",
-      "adjournCasePanelMembersExcluded" : "yes",
+      "adjournCasePanelMembersExcluded" : "Yes",
       "adjournCaseNextHearingDateType" : "dateToBeFixed",
       "adjournCaseNextHearingDateOrPeriod" : "provideDate",
       "adjournCaseTime": {

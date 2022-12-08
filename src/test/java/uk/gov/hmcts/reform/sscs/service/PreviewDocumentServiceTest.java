@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 
 import java.time.LocalDate;
@@ -12,7 +11,9 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -20,7 +21,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 
-public class PreviewDocumentServiceTest {
+@ExtendWith(MockitoExtension.class)
+class PreviewDocumentServiceTest {
 
     public static final String OLD_DRAFT_DOC = "oldDraft.doc";
     @InjectMocks
@@ -28,8 +30,7 @@ public class PreviewDocumentServiceTest {
     private SscsCaseData sscsCaseData;
 
     @BeforeEach
-    public void setup() {
-        openMocks(this);
+    void setup() {
         List<SscsDocument> docs = new ArrayList<>(List.of(
             SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
@@ -47,8 +48,8 @@ public class PreviewDocumentServiceTest {
 
     @DisplayName("Given draft adjournment notice already exists on case, then overwrite existing draft")
     @Test
-    public void givenDraftAdjournmentNoticeAlreadyExists_thenOverwritesExistingDraft() {
-        previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, sscsCaseData.getAdjournCasePreviewDocument());
+    void givenDraftAdjournmentNoticeAlreadyExists_thenOverwritesExistingDraft() {
+        previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, sscsCaseData.getAdjournment().getPreviewDocument());
 
         assertThat(sscsCaseData.getSscsDocument())
             .hasSize(1)

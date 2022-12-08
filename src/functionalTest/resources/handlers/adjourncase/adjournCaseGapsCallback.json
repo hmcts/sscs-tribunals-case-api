@@ -17,9 +17,9 @@
       "adjournCaseInterpreterRequired": "Yes",
       "adjournCaseMedicallyQualifiedPanelMemberName": "Wendy Rowe",
       "adjournCaseNextHearingDateType": "dateToBeFixed",
-      "adjournCaseNextHearingListingDuration": "12",
-      "adjournCaseNextHearingListingDurationType": "setTime",
-      "adjournCaseNextHearingListingDurationUnits": "hours",
+      "adjournCaseNextHearingListingDuration": 720,
+      "adjournCaseNextHearingListingDurationType": "standardTimeSlot",
+      "adjournCaseNextHearingListingDurationUnits": "minutes",
       "adjournCaseTime": {
         "adjournCaseNextHearingSpecificTime": "am"
       },
@@ -55,6 +55,7 @@
       ],
       "adjournCaseTypeOfHearing": "faceToFace",
       "adjournCaseTypeOfNextHearing": "faceToFace",
+      "adjournmentInProgress": "Yes",
       "appeal": {
         "appealReasons": {
           "otherReasons": "Another reason",
