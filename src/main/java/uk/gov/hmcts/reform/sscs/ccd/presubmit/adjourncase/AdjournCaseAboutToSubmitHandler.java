@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ORAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.PAPER;
@@ -84,32 +85,6 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             sscsCaseData.getAdjournment().setGeneratedDate(LocalDate.now());
         }
 
-        updateHearingChannel(sscsCaseData);
-
         return new PreSubmitCallbackResponse<>(sscsCaseData);
-    }
-
-    private static void updateHearingChannel(SscsCaseData sscsCaseData) {
-
-        if (sscsCaseData.getAdjournment().getTypeOfNextHearing() != null) {
-            log.info(String.format("Update the hearing channel %s", sscsCaseData.getAdjournment().getTypeOfNextHearing()));
-            final Hearing latestHearing = sscsCaseData.getLatestHearing();
-            if (latestHearing != null && latestHearing.getValue() != null) {
-                final HearingChannel hearingChannel = getNextHearingChannel(sscsCaseData);
-                latestHearing.getValue().setHearingChannel(hearingChannel);
-                if (hearingChannel.getValueTribunals().equalsIgnoreCase(PAPER.getValue())) {
-                    sscsCaseData.getAppeal().setHearingType(PAPER.getValue());
-                } else {
-                    sscsCaseData.getAppeal().setHearingType(ORAL.getValue());
-                }
-            }
-        }
-    }
-
-    private static HearingChannel getNextHearingChannel(SscsCaseData caseData) {
-        return Arrays.stream(HearingChannel.values())
-                .filter(hearingChannel -> caseData.getAdjournment().getTypeOfNextHearing().getHearingChannel().getValueTribunals().equalsIgnoreCase(
-                        hearingChannel.getValueTribunals()))
-                .findFirst().orElse(HearingChannel.PAPER);
     }
 }
