@@ -157,12 +157,18 @@ class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandle
 
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
         String postcode = rpc.getPostcode();
+        String processingVenue = "cardiff";
+
+        BenefitType benefitType = BenefitType.builder().code("PIP").build();
+
+        when(airLookupService.lookupAirVenueNameByPostCode(postcode, benefitType)).thenReturn(processingVenue);
+        when(regionalProcessingCenterService.getByVenueId(venueId)).thenReturn(rpc);
 
         DynamicListItem venue = new DynamicListItem(venueId, null);
         DynamicList adjournedNextVenue = new DynamicList(venue, null);
-        BenefitType benefitType = BenefitType.builder().code("PIP").build();
 
         sscsCaseData.getAdjournment().setNextHearingVenueSelected(adjournedNextVenue);
+        sscsCaseData.setRegion("SUTTON");
         sscsCaseData.setAppeal(Appeal.builder()
             .appellant(Appellant.builder()
                 .address(Address.builder().postcode(postcode).build()).isAppointee(YES.getValue())
@@ -170,14 +176,12 @@ class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandle
             .benefitType(benefitType)
             .build());
 
-        when(airLookupService.lookupAirVenueNameByPostCode(postcode, benefitType)).thenReturn("cardiff");
-        when(regionalProcessingCenterService.getByVenueId(venueId)).thenReturn(rpc);
-
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
 
-        assertThat(sscsCaseData.getRegion()).isEqualTo(rpc.getCity());
+        assertThat(sscsCaseData.getRegion()).isEqualTo(rpc.getName());
+        assertThat(sscsCaseData.getProcessingVenue()).isEqualTo(processingVenue);
     }
 }
