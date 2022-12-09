@@ -10,21 +10,38 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNME
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
+import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandlerTestBase {
+
+    @Mock
+    private AirLookupService airLookupService;
+
+    @Mock
+    private RegionalProcessingCenterService regionalProcessingCenterService;
 
     @BeforeEach
     void setUpMocks() {
@@ -133,4 +150,72 @@ class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandle
         assertThat(response.getErrors()).isEmpty();
     }
 
+    @DisplayName("When we have changed the next hearing venue through an adjournment, show we change the region")
+    @Test
+    void givenAdjournCaseNextHearingVenueSelectedTrue_thenSetRegion() {
+        String venueId = "185";
+
+        RegionalProcessingCenter rpc = getRegionalProcessingCenter();
+        String postcode = rpc.getPostcode();
+        String processingVenue = "cardiff";
+
+        BenefitType benefitType = BenefitType.builder().code("PIP").build();
+
+        when(airLookupService.lookupAirVenueNameByPostCode(postcode, benefitType)).thenReturn(processingVenue);
+        when(regionalProcessingCenterService.getByVenueId(venueId)).thenReturn(rpc);
+
+        DynamicListItem venue = new DynamicListItem(venueId, null);
+        DynamicList adjournedNextVenue = new DynamicList(venue, null);
+
+        String originalRegion = "SUTTON";
+        String originalProcessingVenue = "Staines";
+
+        sscsCaseData.getAdjournment().setNextHearingVenueSelected(adjournedNextVenue);
+        sscsCaseData.setRegion(originalRegion);
+        sscsCaseData.setProcessingVenue(originalProcessingVenue);
+        sscsCaseData.setAppeal(Appeal.builder()
+            .appellant(Appellant.builder()
+                .address(Address.builder().postcode(postcode).build()).isAppointee(YES.getValue())
+                .build())
+            .benefitType(benefitType)
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+
+        assertThat(sscsCaseData.getRegion()).isEqualTo(rpc.getName());
+        assertThat(sscsCaseData.getRegion()).isNotEqualTo(originalRegion);
+
+        assertThat(sscsCaseData.getProcessingVenue()).isEqualTo(processingVenue);
+        assertThat(sscsCaseData.getProcessingVenue()).isNotEqualTo(originalProcessingVenue);
+    }
+
+    @DisplayName("When we have changed the next hearing venue through an adjournment, but the region is null,"
+        + " keep the original region and processing venue")
+    @Test
+    void givenRpcIsNull_thenDontSetRegion() {
+        String venueId = "01010101010101";
+
+        when(regionalProcessingCenterService.getByVenueId(venueId)).thenReturn(null);
+
+        DynamicListItem venue = new DynamicListItem(venueId, null);
+        DynamicList adjournedNextVenue = new DynamicList(venue, null);
+
+        String originalRegion = "SUTTON";
+        String originalProcessingVenue = "Staines";
+
+        sscsCaseData.getAdjournment().setNextHearingVenueSelected(adjournedNextVenue);
+        sscsCaseData.setRegion(originalRegion);
+        sscsCaseData.setProcessingVenue(originalProcessingVenue);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+
+        assertThat(sscsCaseData.getRegion()).isEqualTo(originalRegion);
+        assertThat(sscsCaseData.getProcessingVenue()).isEqualTo(originalProcessingVenue);
+    }
 }
