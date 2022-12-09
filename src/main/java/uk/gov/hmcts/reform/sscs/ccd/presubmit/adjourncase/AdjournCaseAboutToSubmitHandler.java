@@ -1,15 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ORAL;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.PAPER;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,12 +15,10 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
-import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
