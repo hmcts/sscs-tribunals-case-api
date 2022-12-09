@@ -22,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
@@ -100,18 +101,8 @@ class AdjournCaseAboutToStartHandlerTest {
     @Test
     void givenCaseHasAdjournedFieldsPopulatedAndNoDraftAdjournedDocs_thenClearTransientFields_andSetAdjournmentInProgressToNoIfFeatureFlagEnabled() {
         ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true); // TODO SSCS-10951
-        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        List<SscsDocument> documentList = new ArrayList<>();
-
-        SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(ADJOURNMENT_NOTICE.getValue()).build();
-        documentList.add(new SscsDocument(details));
-
-        sscsCaseData.setSscsDocument(documentList);
-
-        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        handleAboutToStartWithDocumentType(ADJOURNMENT_NOTICE);
 
         assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrPropertiesExcept("adjournmentInProgress");
         assertThat(sscsCaseData.getAdjournment().getAdjournmentInProgress()).isEqualTo(NO);
@@ -120,39 +111,32 @@ class AdjournCaseAboutToStartHandlerTest {
     @Test
     void givenCaseHasAdjournedFieldsPopulatedAndNoDraftAdjournedDocs_thenClearTransientFields() { // TODO SSCS-10951
         ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", false);
-        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        List<SscsDocument> documentList = new ArrayList<>();
-
-        SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(ADJOURNMENT_NOTICE.getValue()).build();
-        documentList.add(new SscsDocument(details));
-
-        sscsCaseData.setSscsDocument(documentList);
-
-        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        handleAboutToStartWithDocumentType(ADJOURNMENT_NOTICE);
 
         assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrProperties();
     }
 
     @Test
     void givenCaseHasAdjournedFieldsPopulatedAndDraftAdjournedDocs_thenDoNotClearTransientFields() {
+        handleAboutToStartWithDocumentType(DRAFT_ADJOURNMENT_NOTICE);
+
+        assertThat(sscsCaseData.getAdjournment()).hasNoNullFieldsOrProperties();
+    }
+
+    private void handleAboutToStartWithDocumentType(DocumentType documentType) {
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         List<SscsDocument> documentList = new ArrayList<>();
 
-        SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(DRAFT_ADJOURNMENT_NOTICE.getValue()).build();
+        SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(documentType.getValue()).build();
         documentList.add(new SscsDocument(details));
 
         sscsCaseData.setSscsDocument(documentList);
 
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        Adjournment adjournment = sscsCaseData.getAdjournment();
-        assertThat(adjournment).hasNoNullFieldsOrProperties();
     }
 
     @Test
