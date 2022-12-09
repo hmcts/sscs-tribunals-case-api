@@ -17,9 +17,16 @@
   </suppress>
   <suppress until = "2023-01-01">
     <notes><![CDATA[
-   file name: jackson-databind-2.13.4.jar
+     these common libraries are being mistaken as Apache Commons Net
    ]]></notes>
-    <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
-    <cve>CVE-2022-42003</cve>
+    <packageUrl regex="true">^pkg:maven\/commons\-(?!net)\w+\/commons\-(?!net)\w+@.*$</packageUrl>
+    <cve>CVE-2021-37533</cve>
+  </suppress>
+  <suppress until = "2023-01-01">
+    <notes><![CDATA[
+     these common libraries are being mistaken as Apache Commons Net
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/org\.apache\.commons/commons\-(?!net)\w+@.*$</packageUrl>
+    <cve>CVE-2021-37533</cve>
   </suppress>
 </suppressions>
