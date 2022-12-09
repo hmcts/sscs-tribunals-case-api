@@ -19,6 +19,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
@@ -97,7 +98,8 @@ class AdjournCaseAboutToStartHandlerTest {
     }
 
     @Test
-    void givenCaseHasAdjournedFieldsPopulatedAndNoDraftAdjournedDocs_thenClearTransientFields() {
+    void givenCaseHasAdjournedFieldsPopulatedAndNoDraftAdjournedDocs_thenClearTransientFields_andSetAdjournmentInProgressToNoIfFeatureFlagEnabled() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true); // TODO SSCS-10951
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -113,6 +115,25 @@ class AdjournCaseAboutToStartHandlerTest {
 
         assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrPropertiesExcept("adjournmentInProgress");
         assertThat(sscsCaseData.getAdjournment().getAdjournmentInProgress()).isEqualTo(NO);
+    }
+
+    @Test
+    void givenCaseHasAdjournedFieldsPopulatedAndNoDraftAdjournedDocs_thenClearTransientFields() { // TODO SSCS-10951
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", false);
+        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        List<SscsDocument> documentList = new ArrayList<>();
+
+        SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(ADJOURNMENT_NOTICE.getValue()).build();
+        documentList.add(new SscsDocument(details));
+
+        sscsCaseData.setSscsDocument(documentList);
+
+        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrProperties();
     }
 
     @Test
