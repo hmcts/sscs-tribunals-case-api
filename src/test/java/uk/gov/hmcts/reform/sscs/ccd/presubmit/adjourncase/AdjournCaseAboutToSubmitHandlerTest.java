@@ -167,8 +167,12 @@ class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandle
         DynamicListItem venue = new DynamicListItem(venueId, null);
         DynamicList adjournedNextVenue = new DynamicList(venue, null);
 
+        String originalRegion = "SUTTON";
+        String originalProcessingVenue = "Staines";
+
         sscsCaseData.getAdjournment().setNextHearingVenueSelected(adjournedNextVenue);
-        sscsCaseData.setRegion("SUTTON");
+        sscsCaseData.setRegion(originalRegion);
+        sscsCaseData.setProcessingVenue(originalProcessingVenue);
         sscsCaseData.setAppeal(Appeal.builder()
             .appellant(Appellant.builder()
                 .address(Address.builder().postcode(postcode).build()).isAppointee(YES.getValue())
@@ -182,6 +186,36 @@ class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandle
         assertThat(response.getErrors()).isEmpty();
 
         assertThat(sscsCaseData.getRegion()).isEqualTo(rpc.getName());
+        assertThat(sscsCaseData.getRegion()).isNotEqualTo(originalRegion);
+
         assertThat(sscsCaseData.getProcessingVenue()).isEqualTo(processingVenue);
+        assertThat(sscsCaseData.getProcessingVenue()).isNotEqualTo(originalProcessingVenue);
+    }
+
+    @DisplayName("When we have changed the next hearing venue through an adjournment, but the region is null,"
+        + " keep the original region and processing venue")
+    @Test
+    void givenRpcIsNull_thenDontSetRegion() {
+        String venueId = "01010101010101";
+
+        when(regionalProcessingCenterService.getByVenueId(venueId)).thenReturn(null);
+
+        DynamicListItem venue = new DynamicListItem(venueId, null);
+        DynamicList adjournedNextVenue = new DynamicList(venue, null);
+
+        String originalRegion = "SUTTON";
+        String originalProcessingVenue = "Staines";
+
+        sscsCaseData.getAdjournment().setNextHearingVenueSelected(adjournedNextVenue);
+        sscsCaseData.setRegion(originalRegion);
+        sscsCaseData.setProcessingVenue(originalProcessingVenue);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+
+        assertThat(sscsCaseData.getRegion()).isEqualTo(originalRegion);
+        assertThat(sscsCaseData.getProcessingVenue()).isEqualTo(originalProcessingVenue);
     }
 }
