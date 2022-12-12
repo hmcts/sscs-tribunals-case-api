@@ -100,7 +100,7 @@ class AdjournCasePreviewServiceTest {
     private ArgumentCaptor<GenerateFileParams> capture;
 
     private SscsCaseData sscsCaseData;
-    
+
     private Adjournment adjournment;
 
     @Mock
@@ -150,7 +150,7 @@ class AdjournCasePreviewServiceTest {
                     .venueId("someVenueId").build())
                 .build()))
             .build();
-        
+
         adjournment = sscsCaseData.getAdjournment();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -1487,7 +1487,7 @@ class AdjournCasePreviewServiceTest {
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
-        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname", nextHearingTypeText);
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "APPOINTEE SurNamE, appointee for APPELLANT LastNamE", nextHearingTypeText);
     }
 
     @ParameterizedTest

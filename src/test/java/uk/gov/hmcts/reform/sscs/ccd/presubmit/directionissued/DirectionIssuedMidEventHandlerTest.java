@@ -167,7 +167,7 @@ public class DirectionIssuedMidEventHandlerTest {
 
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname",
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "APPOINTEE SurNamE, appointee for APPELLANT LastNamE",
                 documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED),
                 sscsCaseData.isLanguagePreferenceWelsh());
     }
@@ -185,7 +185,7 @@ public class DirectionIssuedMidEventHandlerTest {
 
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname",
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "APPOINTEE SurNamE, appointee for APPELLANT LastNamE",
                 documentConfiguration.getDocuments().get(LanguagePreference.WELSH).get(EventType.DIRECTION_ISSUED),
                 sscsCaseData.isLanguagePreferenceWelsh());
     }

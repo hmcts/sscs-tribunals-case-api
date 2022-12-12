@@ -822,7 +822,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname", "Appointee Surname", "2018-10-10", true,
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "APPOINTEE SurNamE, appointee for APPELLANT LastNamE", "Appointee Surname", "2018-10-10", true,
             true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
     }
 
