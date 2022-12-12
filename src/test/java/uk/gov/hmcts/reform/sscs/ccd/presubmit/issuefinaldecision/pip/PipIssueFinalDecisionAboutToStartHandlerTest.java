@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.sscs.service.*;
 public class PipIssueFinalDecisionAboutToStartHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
+    public static final String APPELLANT_LAST_NAME = "APPELLANT LastNamE";
     private IssueFinalDecisionAboutToStartHandler handler;
     private static final String URL = "http://dm-store/documents/123";
     private static final String TEMPLATE_ID = "nuts.docx";
@@ -188,7 +189,7 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
             .documentUrl(URL)
             .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, false,
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, false,
             true, true);
 
         // Check that the generated date has not been updated
@@ -225,7 +226,7 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
             .documentUrl(URL)
             .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, false,
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, false,
             false, true);
 
         // Check that the generated date has not been updated

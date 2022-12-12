@@ -334,7 +334,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
         assertEquals(NoticeIssuedTemplateBody.ENGLISH_IMAGE, payload.getImage());
         assertEquals("DIRECTIONS NOTICE", payload.getNoticeType());
-        assertEquals("Appellant Lastname", payload.getAppellantFullName());
+        assertEquals("APPELLANT LastNamE", payload.getAppellantFullName());
         assertEquals(sscsCaseData.getDocumentGeneration().getDirectionNoticeContent(), payload.getNoticeBody());
         assertEquals(templateId, value.getTemplateId());
     }

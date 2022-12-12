@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 public abstract class AbstractEventIt {
 
     protected static final String JURISDICTION = "Benefit";
+    protected static final String AN_Test = "AN Test";
 
     @Rule
     public final SpringMethodRule springMethodRule = new SpringMethodRule();

@@ -73,7 +73,7 @@ import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 class AdjournCasePreviewServiceTest {
 
     private static final String ADDITIONAL_DIRECTIONS = "Something else.";
-    private static final String APPELLANT_FULL_NAME = "Appellant Lastname";
+    private static final String APPELLANT_FULL_NAME = "APPELLANT LastNamE";
     private static final String GAP_VENUE_NAME = "Gap venue name";
     private static final String HEARING_DATE = "2019-01-01";
     private static final String JUDGE_FULL_NAME = "Judge Full Name";
@@ -100,7 +100,7 @@ class AdjournCasePreviewServiceTest {
     private ArgumentCaptor<GenerateFileParams> capture;
 
     private SscsCaseData sscsCaseData;
-    
+
     private Adjournment adjournment;
 
     @Mock
@@ -150,7 +150,7 @@ class AdjournCasePreviewServiceTest {
                     .venueId("someVenueId").build())
                 .build()))
             .build();
-        
+
         adjournment = sscsCaseData.getAdjournment();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -1487,7 +1487,7 @@ class AdjournCasePreviewServiceTest {
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
-        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname", nextHearingTypeText);
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "APPOINTEE SurNamE, appointee for APPELLANT LastNamE", nextHearingTypeText);
     }
 
     @ParameterizedTest

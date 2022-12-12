@@ -136,7 +136,7 @@ public class ActionPostponementRequestMidEventHandlerTest {
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
         assertEquals(NoticeIssuedTemplateBody.ENGLISH_IMAGE, payload.getImage());
         assertEquals("DIRECTIONS NOTICE", payload.getNoticeType());
-        assertEquals("Appellant Lastname", payload.getAppellantFullName());
+        assertEquals("APPELLANT LastNamE", payload.getAppellantFullName());
         assertEquals(templateId, value.getTemplateId());
     }
 
