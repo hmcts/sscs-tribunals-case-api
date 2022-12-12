@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.WordUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -55,11 +54,9 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
     protected String buildName(SscsCaseData caseData, boolean displayAppointeeName) {
         if (displayAppointeeName && "yes".equalsIgnoreCase(caseData.getAppeal().getAppellant().getIsAppointee())
             && null != caseData.getAppeal().getAppellant().getAppointee()) {
-            return WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getAppointee().getName()
-                    .getFullNameNoTitle(), ' ', '.');
+            return caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle();
         }
-        return WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getName()
-                .getFullNameNoTitle(), ' ', '.');
+        return caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
     }
 
     protected HearingDetails getLastValidHearing(SscsCaseData caseData) {
