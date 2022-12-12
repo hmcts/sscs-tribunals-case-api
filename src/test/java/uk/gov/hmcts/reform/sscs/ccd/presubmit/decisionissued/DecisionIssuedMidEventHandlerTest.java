@@ -150,7 +150,7 @@ public class DecisionIssuedMidEventHandlerTest {
                 .documentUrl(URL)
                 .build(), response.getData().getDocumentStaging().getPreviewDocument());
 
-        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname",
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "APPELLANT LastNamE",
                 documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED));
     }
 

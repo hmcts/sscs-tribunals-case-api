@@ -188,7 +188,7 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
             .documentUrl(URL)
             .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, false,
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "APPELLANT LastNamE", null, "2018-10-10", true, true, false,
             true, true);
 
         // Check that the generated date has not been updated
@@ -225,7 +225,7 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
             .documentUrl(URL)
             .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, false,
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "APPELLANT LastNamE", null, "2018-10-10", true, true, false,
             false, true);
 
         // Check that the generated date has not been updated
