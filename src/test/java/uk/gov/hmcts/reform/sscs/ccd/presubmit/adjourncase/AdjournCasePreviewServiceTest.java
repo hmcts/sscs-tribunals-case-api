@@ -73,7 +73,7 @@ import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 class AdjournCasePreviewServiceTest {
 
     private static final String ADDITIONAL_DIRECTIONS = "Something else.";
-    private static final String APPELLANT_FULL_NAME = "Appellant Lastname";
+    private static final String APPELLANT_FULL_NAME = "APPELLANT LastNamE";
     private static final String GAP_VENUE_NAME = "Gap venue name";
     private static final String HEARING_DATE = "2019-01-01";
     private static final String JUDGE_FULL_NAME = "Judge Full Name";
