@@ -61,20 +61,20 @@ public abstract class IssueNoticeHandlerTestBase {
     @Test
     public void givenBuildNameWhenDisplayAppointeeNameIsFalse() {
         String actual = service.buildName(sscsCaseData, false);
-        assertEquals("Appellant Lastname", actual);
+        assertEquals("APPELLANT LastNamE", actual);
     }
 
     @Test
     public void givenBuildNameWhenDisplayAppointeeNameIsTrue() {
         String actual = service.buildName(sscsCaseData, true);
-        assertEquals("Appointee Test", actual);
+        assertEquals("APPOINTEE Test", actual);
     }
 
     @Test
     public void givenBuildNameWhenDisplayAppointeeNameIsTrueAndHasAppointeeIsNo() {
         sscsCaseData.getAppeal().getAppellant().setIsAppointee("No");
         String actual = service.buildName(sscsCaseData, true);
-        assertEquals("Appellant Lastname", actual);
+        assertEquals("APPELLANT LastNamE", actual);
     }
 
     @Test
@@ -82,6 +82,6 @@ public abstract class IssueNoticeHandlerTestBase {
         sscsCaseData.getAppeal().getAppellant().setAppointee(null);
 
         String actual = service.buildName(sscsCaseData, true);
-        assertEquals("Appellant Lastname", actual);
+        assertEquals("APPELLANT LastNamE", actual);
     }
 }
