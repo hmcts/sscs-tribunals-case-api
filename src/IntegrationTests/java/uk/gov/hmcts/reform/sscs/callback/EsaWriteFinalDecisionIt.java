@@ -103,20 +103,20 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
             + "\n"
             + "The decision made by the Secretary of State on 01/09/2018 is set aside.\n"
             + "\n"
-            + "An Test has limited capability for work.\n"
+            + "AN Test has limited capability for work.\n"
             + "\n"
             + "In applying the Work Capability Assessment 15 points were scored from the activities and descriptors in Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008 made up as follows:\n"
             + "\n"
             + "1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.\ta.Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.\t15\n"
             + "\n"
             + "\n"
-            + "An Test does not have limited capability for work-related activity because no descriptor from Schedule 3 of the ESA Regulations applied. Regulation 35 did not apply.\n"
+            + "AN Test does not have limited capability for work-related activity because no descriptor from Schedule 3 of the ESA Regulations applied. Regulation 35 did not apply.\n"
             + "\n"
             + "My reasons for decision\n"
             + "\n"
             + "Something else.\n"
             + "\n"
-            + "This has been an oral (face to face) hearing. An Test attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
+            + "This has been an oral (face to face) hearing. AN Test attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
     }
 
@@ -1399,7 +1399,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
             + "\n"
             + "Something else.\n"
             + "\n"
-            + "This has been an oral (face to face) hearing. An Test attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
+            + "This has been an oral (face to face) hearing. AN Test attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
         EsaTemplateContent esaTemplateContent = (EsaTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(EsaScenario.SCENARIO_10, esaTemplateContent.getScenario());
@@ -1465,7 +1465,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
             + "\n"
             + "Something else.\n"
             + "\n"
-            + "This has been an oral (face to face) hearing. An Test attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
+            + "This has been an oral (face to face) hearing. AN Test attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
         EsaTemplateContent esaTemplateContent = (EsaTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(EsaScenario.SCENARIO_10, esaTemplateContent.getScenario());
@@ -1532,7 +1532,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
             + "\n"
             + "Something else.\n"
             + "\n"
-            + "This has been an oral (face to face) hearing. An Test attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
+            + "This has been an oral (face to face) hearing. AN Test attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
     }
 
