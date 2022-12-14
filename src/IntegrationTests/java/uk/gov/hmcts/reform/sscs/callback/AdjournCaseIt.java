@@ -61,7 +61,7 @@ public class AdjournCaseIt extends AbstractEventIt {
     public static final String CCD_MID_EVENT_PREVIEW_ADJOURN_CASE = "/ccdMidEventPreviewAdjournCase";
     public static final String CCD_MID_EVENT_ADJOURN_CASE_POPULATE_VENUE_DROPDOWN = "/ccdMidEventAdjournCasePopulateVenueDropdown";
     public static final String CCD_MID_EVENT = "/ccdMidEvent";
-    public static final String TEST_NAME = "An Test";
+    public static final String TEST_NAME = "AN Test";
     public static final String CHESTER_MAGISTRATE_S_COURT = "Chester Magistrate's Court";
     public static final String FIRST_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED =
         "It will be first in the morning session on a date to be fixed";
@@ -134,7 +134,7 @@ public class AdjournCaseIt extends AbstractEventIt {
     //FIXME: Might need to improve the data for this test once manual route has been fully implemented
     public void givenCallToAboutToSubmitHandlerThenWritesManuallyUploadedAdjournNoticeToCase() throws Exception {
         setup(MANUALLY_GENERATED_JSON);
-        
+
         noticeGeneratedWithExpectedDetails();
     }
 
