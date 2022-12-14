@@ -67,7 +67,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals("AN Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -78,7 +78,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals("AN Test",payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -151,7 +151,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals("AN Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -162,7 +162,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isAllowed());
         assertEquals(false, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals("AN Test",payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -205,7 +205,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals("AN Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -216,7 +216,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isAllowed());
         assertEquals(false, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals("AN Test",payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -404,7 +404,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals("AN Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -415,7 +415,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isAllowed());
         assertEquals(false, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals("AN Test",payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -527,7 +527,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals("AN Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -538,7 +538,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals("AN Test",payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -649,7 +649,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals("AN Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -660,7 +660,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals("AN Test",payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -749,7 +749,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals("AN Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -760,7 +760,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals("AN Test",payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -880,7 +880,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals("AN Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -891,7 +891,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals("AN Test",payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -1038,7 +1038,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals("AN Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -1049,7 +1049,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals("AN Test",payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -1198,7 +1198,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals("AN Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -1209,7 +1209,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals("AN Test",payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -1281,7 +1281,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals("AN Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -1292,7 +1292,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals("AN Test",payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -1364,7 +1364,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals("AN Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -1375,7 +1375,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isAllowed());
         assertEquals(false, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals("AN Test",payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -1430,7 +1430,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals("AN Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -1441,7 +1441,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals("AN Test",payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -1497,7 +1497,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals("AN Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -1508,7 +1508,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals("AN Test",payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -1561,7 +1561,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals("AN Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -1572,7 +1572,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals("AN Test",payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
