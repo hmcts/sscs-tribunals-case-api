@@ -83,5 +83,4 @@ public class SscsUtil {
     public static boolean isValidCaseState(State state, List<State> allowedStates) {
         return allowedStates.contains(state);
     }
-
 }
