@@ -16,8 +16,10 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -38,8 +40,26 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
     }
 
     @Test
-    void givenAnIssueAdjournmentEvent_thenCreateAdjournmentWithFooterAndSetStatesAndClearDraftDoc() {
+    void givenAnIssueAdjournmentEvent_thenCreateAdjournmentWithFooterAndSetStatesAndClearDraftDoc_andSetAdjournmentInProgressToNoIfFeatureFlagEnabled() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true); // TODO SSCS-10951
 
+        final SscsCaseData newSscsCaseData = confirmAdjournment();
+
+        assertThat(newSscsCaseData.getAdjournment()).hasAllNullFieldsOrPropertiesExcept("adjournmentInProgress");
+        assertThat(newSscsCaseData.getAdjournment().getAdjournmentInProgress()).isEqualTo(NO);
+    }
+
+    @Test
+    void givenAnIssueAdjournmentEvent_thenCreateAdjournmentWithFooterAndSetStatesAndClearDraftDoc() { // TODO SSCS-10951
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", false);
+
+        final SscsCaseData newSscsCaseData = confirmAdjournment();
+
+        assertThat(newSscsCaseData.getAdjournment()).hasAllNullFieldsOrProperties();
+    }
+
+    @NotNull
+    private SscsCaseData confirmAdjournment() {
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         final SscsCaseData newSscsCaseData = callback.getCaseDetails().getCaseData();
         newSscsCaseData.getAdjournment().setPreviewDocument(docLink);
@@ -59,8 +79,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
 
         assertThat(sscsCaseData.getSscsDocument().stream()
             .filter(f -> f.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()))).isEmpty();
-        assertThat(newSscsCaseData.getAdjournment()).hasAllNullFieldsOrPropertiesExcept("adjournmentInProgress");
-        assertThat(newSscsCaseData.getAdjournment().getAdjournmentInProgress()).isEqualTo(NO);
+        return newSscsCaseData;
     }
 
     @Test
