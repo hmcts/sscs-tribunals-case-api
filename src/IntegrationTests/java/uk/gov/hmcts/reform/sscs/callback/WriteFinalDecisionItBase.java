@@ -89,7 +89,7 @@ public abstract class WriteFinalDecisionItBase extends AbstractEventIt {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals("AN Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -100,7 +100,7 @@ public abstract class WriteFinalDecisionItBase extends AbstractEventIt {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals("AN Test",payload.getAppellantName());
         assertNull(payload.getStartDate());
         assertNull(payload.getEndDate());
         assertEquals(true, payload.isIndefinite());
