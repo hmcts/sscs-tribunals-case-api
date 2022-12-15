@@ -390,7 +390,7 @@ logstash:
 sscs-evidence-share:
   enabled: false
   java:
-    image: hmctspublic.azurecr.io/sscs/evidence-share:latest
+    image: hmctspublic.azurecr.io/sscs/evidence-share:767ca47
     releaseNameOverride: ${SERVICE_NAME}-sscs-evidence-share
     environment:
       SEND_LETTER_SERVICE_ENABLED: "true"
