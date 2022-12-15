@@ -5,8 +5,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNME
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.FACE_TO_FACE;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,16 +19,17 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
-
 
 @Component
 @Slf4j
@@ -108,6 +112,32 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             adjournment.setGeneratedDate(LocalDate.now());
         }
 
+        updateHearingChannel(sscsCaseData);
+
         return new PreSubmitCallbackResponse<>(sscsCaseData);
+    }
+
+    public static void updateHearingChannel(SscsCaseData sscsCaseData) {
+
+        if (sscsCaseData.getAdjournment().getTypeOfNextHearing() != null) {
+            log.info(String.format("Update the hearing channel %s", sscsCaseData.getAdjournment().getTypeOfNextHearing()));
+            final Hearing latestHearing = sscsCaseData.getLatestHearing();
+            if (latestHearing != null && latestHearing.getValue() != null) {
+                final HearingChannel hearingChannel = getNextHearingChannel(sscsCaseData);
+                latestHearing.getValue().setHearingChannel(hearingChannel);
+                if (hearingChannel.getValueTribunals().equalsIgnoreCase(FACE_TO_FACE.getValueTribunals())) {
+                    sscsCaseData.getAppeal().setHearingType("oral");
+                } else {
+                    sscsCaseData.getAppeal().setHearingType(PAPER.getValueTribunals());
+                }
+            }
+        }
+    }
+
+    private static HearingChannel getNextHearingChannel(SscsCaseData caseData) {
+        return Arrays.stream(HearingChannel.values())
+                .filter(hearingChannel -> caseData.getAdjournment().getTypeOfNextHearing().getHearingChannel().getValueTribunals().equalsIgnoreCase(
+                        hearingChannel.getValueTribunals()))
+                .findFirst().orElse(HearingChannel.PAPER);
     }
 }
