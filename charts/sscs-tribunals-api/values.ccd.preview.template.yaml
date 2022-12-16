@@ -388,7 +388,7 @@ logstash:
     initialDelaySeconds: 90
 
 sscs-evidence-share:
-  enabled: false
+  enabled: true
   java:
     image: hmctspublic.azurecr.io/sscs/evidence-share:767ca47
     releaseNameOverride: ${SERVICE_NAME}-sscs-evidence-share
