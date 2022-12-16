@@ -5,6 +5,7 @@ import static java.util.Collections.singletonList;
 import static org.junit.Assert.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
@@ -13,10 +14,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Respondent;
 
 @RunWith(JUnitParamsRunner.class)
 public class IssueDocumentHandlerTest {
+
+    private static final String USER_AUTHORISATION = "Bearer token";
 
     private IssueDocumentHandler handler;
 
@@ -97,4 +101,50 @@ public class IssueDocumentHandlerTest {
         assertEquals("Respondent: Mr Hugo Lloris", respondents.get(11).getName());
     }
 
+    @Test
+    public void testDocumentPayloadValues() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+                .documentGeneration(DocumentGeneration.builder()
+                        .bodyContent("Hello World")
+                        .signedBy("Barry Allen")
+                        .signedRole("Judge")
+                        .build())
+                .ccdCaseId("1")
+                .appeal(Appeal.builder()
+                        .appellant(Appellant.builder()
+                                .name(Name.builder()
+                                        .title("Mr")
+                                        .firstName("User")
+                                        .lastName("Lloris")
+                                        .build())
+                                .identity(Identity.builder()
+                                        .nino("BB 22 55 66 B")
+                                        .build())
+                                .build())
+                        .benefitType(BenefitType.builder()
+                                .code("PIP")
+                                .build())
+                        .signer("Signer")
+                        .hearingType("oral")
+                        .receivedVia("Online")
+                        .build())
+                .build();
+
+        String documentTypeLabel = "directions notice";
+        LocalDate localDate = LocalDate.now();
+        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, documentTypeLabel, localDate, localDate, false, USER_AUTHORISATION);
+        assertEquals("User Lloris", payload.getAppellantFullName());
+        assertNull(payload.getAppointeeFullName());
+        assertEquals("1", payload.getCaseId());
+        assertEquals("BB 22 55 66 B", payload.getNino());
+        assertFalse(payload.isShouldHideNino());
+        assertEquals(1, payload.getRespondents().size());
+        assertEquals("Hello World", payload.getNoticeBody());
+        assertEquals("Barry Allen", payload.getUserName());
+        assertEquals("DIRECTIONS NOTICE", payload.getNoticeType());
+        assertEquals("Judge", payload.getUserRole());
+        assertEquals(localDate, payload.getDateAdded());
+        assertEquals(localDate, payload.getGeneratedDate());
+        assertEquals("Barry Allen", payload.getIdamSurname());
+    }
 }
