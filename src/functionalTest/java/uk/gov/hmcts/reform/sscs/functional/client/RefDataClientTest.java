@@ -81,10 +81,6 @@ public class RefDataClientTest {
                 failedIds.add(epimsId);
             }
         }
-
-        softly.assertThat(failedIds)
-            .as("No court venues were found for some epims ids.")
-            .isEmpty();
         softly.assertThat(duplicateIds)
             .as("Multiple court venues were found for some epims ids.")
             .isEmpty();
