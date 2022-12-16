@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -414,14 +415,15 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     public void givenChildSupportCaseAndReferralReasonPhe_thenErrorIsShown() {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setBenefitCode("022");
-        sscsCaseData.setInterlocReferralReason("phmeRequest");
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHE_REQUEST);
         sscsCaseDataBefore.setBenefitCode("022");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors().iterator().next(),
-            is("PHE request' is not a valid selection for child support cases"));
+        Assertions.assertThat(response.getErrors())
+            .hasSize(1)
+            .containsOnly("PHE request' is not a valid selection for child support cases");
     }
 
     @Test

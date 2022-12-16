@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DecisionType.STRIKE_OUT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.STRUCK_OUT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.WELSH_TRANSLATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -38,9 +39,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -169,14 +172,14 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"strikeOut, struckOut, null", "null, struckOut, interlocutoryReviewState", ",struckOut, interlocutoryReviewState"})
+    @Parameters({"strikeOut, STRUCK_OUT, null", "null, STRUCK_OUT, REVIEW_BY_TCW", ",STRUCK_OUT, REVIEW_BY_TCW"})
     public void givenDecisionTypeIsStrikeOut_shouldSetDwpStateValueAndInterlocReviewState(@Nullable String decisionType,
-                                                                                          @Nullable String expectedDwpState,
-                                                                                          @Nullable String expectedInterlocReviewState) {
+                                                                                          @Nullable DwpState expectedDwpState,
+                                                                                          @Nullable InterlocReviewState expectedInterlocReviewState) {
         sscsCaseData.setDecisionType(decisionType);
-        sscsCaseData.setInterlocReviewState(State.INTERLOCUTORY_REVIEW_STATE.getId());
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        String currentDwpState = response.getData().getDwpState();
+        DwpState currentDwpState = response.getData().getDwpState();
         String assertionMsg = "dwpState value (%s) is not as expected (%s)";
         assertEquals(String.format(assertionMsg, currentDwpState, expectedDwpState), expectedDwpState, currentDwpState);
         assertEquals(expectedInterlocReviewState, response.getData().getInterlocReviewState());
@@ -230,9 +233,9 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void givenDecisionIssuedAndCaseIsPreValidInterloc_setDwpStateToStruckOutAndOutcomeToNonCompliantAppealStruckout() {
-        sscsCaseData.setInterlocReviewState(State.INTERLOCUTORY_REVIEW_STATE.getId());
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(STRUCK_OUT.getId(), response.getData().getDwpState());
+        assertEquals(STRUCK_OUT, response.getData().getDwpState());
         assertEquals("nonCompliantAppealStruckout", response.getData().getOutcome());
         assertNull(response.getData().getInterlocReviewState());
         assertEquals(response.getData().getState(), (State.DORMANT_APPEAL_STATE));
@@ -244,7 +247,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(STRUCK_OUT.getId(), response.getData().getDwpState());
+        assertEquals(STRUCK_OUT, response.getData().getDwpState());
         assertEquals("struckOut", response.getData().getOutcome());
         assertEquals(response.getData().getState(), (State.DORMANT_APPEAL_STATE));
     }
@@ -256,7 +259,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("welshTranslation", response.getData().getInterlocReviewState());
+        assertEquals(WELSH_TRANSLATION, response.getData().getInterlocReviewState());
         assertEquals("Yes", response.getData().getTranslationWorkOutstanding());
         assertNull(response.getData().getDwpState());
         assertNull(response.getData().getOutcome());
@@ -288,7 +291,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getInterlocReviewState());
-        assertEquals(STRUCK_OUT.getId(), response.getData().getDwpState());
+        assertEquals(STRUCK_OUT, response.getData().getDwpState());
         assertEquals("struckOut", response.getData().getOutcome());
         assertEquals(response.getData().getState(), (State.DORMANT_APPEAL_STATE));
 

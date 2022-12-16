@@ -6,7 +6,9 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.JUnitSoftAssertions;
-import org.junit.*;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,6 +49,8 @@ public class RefDataClientTest {
     @Autowired
     private VenueDataLoader venueDataLoader;
 
+    // TODO: SSCS-11275 - re-enable when ref data is fixed
+    @Ignore
     @Test
     public void testVenueRefDataForVenueName() {
         List<String> failedIds = new ArrayList<>();

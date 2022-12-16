@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CANCEL_TRANSLATIONS;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -111,7 +112,7 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
         assertNull(response.getData().getSscsDocument().get(6).getValue().getDocumentTranslationStatus());
         assertEquals("No", response.getData().getTranslationWorkOutstanding());
 
-        assertEquals("reviewByTcw", response.getData().getInterlocReviewState());
+        assertEquals(REVIEW_BY_TCW, response.getData().getInterlocReviewState());
     }
 
     private Callback<SscsCaseData> buildCallback(EventType eventType, State state) {

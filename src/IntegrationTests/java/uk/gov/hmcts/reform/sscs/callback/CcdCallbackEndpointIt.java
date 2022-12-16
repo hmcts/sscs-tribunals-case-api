@@ -50,6 +50,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
@@ -204,7 +205,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
         assertHttpStatus(response, HttpStatus.OK);
 
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-        assertEquals("interlocutoryReview", result.getData().getInterlocReviewState());
+        assertEquals(InterlocReviewState.WELSH_TRANSLATION, result.getData().getInterlocReviewState());
         assertNull(result.getData().getDwpFurtherEvidenceStates());
     }
 
@@ -215,7 +216,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
             .willReturn(StartEventResponse.builder().build());
 
         Map<String, Object> data = new HashMap<>();
-        data.put("interlocReviewState", "interlocutoryReview");
+        data.put("interlocReviewState", InterlocReviewState.WELSH_TRANSLATION);
         given(coreCaseDataApi.submitEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
             eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
             eq(true), any(CaseDataContent.class)))

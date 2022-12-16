@@ -36,7 +36,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Postponement;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -79,7 +78,7 @@ public class PostponeHearingHandlerTest {
 
         caseData = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
-            .dwpState(State.VALID_APPEAL.getId())
+            .dwpState(DwpState.FE_ACTIONED_NR)
             .appeal(Appeal.builder().build())
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
                 .hearingRoute(HearingRoute.LIST_ASSIST).build())
@@ -138,7 +137,7 @@ public class PostponeHearingHandlerTest {
         assertThat(result.getPostponement()).isNotNull();
         assertThat(result.getPostponement().getPostponementEvent()).isNull();
         assertThat(result.getPostponement().getUnprocessedPostponement()).isEqualTo(NO);
-        assertThat(result.getDwpState()).isEqualTo(DwpState.HEARING_POSTPONED.getId());
+        assertThat(result.getDwpState()).isEqualTo(DwpState.HEARING_POSTPONED);
 
         verify(ccdService,times(1))
             .updateCase(any(SscsCaseData.class),
@@ -165,7 +164,7 @@ public class PostponeHearingHandlerTest {
         assertThat(result.getPostponement()).isNotNull();
         assertThat(result.getPostponement().getPostponementEvent()).isNull();
         assertThat(result.getPostponement().getUnprocessedPostponement()).isEqualTo(NO);
-        assertThat(result.getDwpState()).isEqualTo(DwpState.HEARING_POSTPONED.getId());
+        assertThat(result.getDwpState()).isEqualTo(DwpState.HEARING_POSTPONED);
 
         verify(ccdService,times(1))
             .updateCase(any(SscsCaseData.class),
@@ -194,7 +193,7 @@ public class PostponeHearingHandlerTest {
         SscsCaseData result = response.getData();
 
         assertThat(result.getPostponement().getUnprocessedPostponement()).isEqualTo(YES);
-        assertThat(result.getDwpState()).isEqualTo(State.VALID_APPEAL.getId());
+        assertThat(result.getDwpState()).isEqualTo(DwpState.FE_ACTIONED_NR);
     }
 
     @DisplayName("When case hearing postponed has been already handled the method handled does not update any fields "
@@ -216,7 +215,7 @@ public class PostponeHearingHandlerTest {
         SscsCaseData result = response.getData();
 
         assertThat(result.getPostponement().getUnprocessedPostponement()).isEqualTo(NO);
-        assertThat(result.getDwpState()).isEqualTo(State.VALID_APPEAL.getId());
+        assertThat(result.getDwpState()).isEqualTo(DwpState.FE_ACTIONED_NR);
     }
 
 
@@ -239,6 +238,6 @@ public class PostponeHearingHandlerTest {
         SscsCaseData result = response.getData();
 
         assertThat(result.getPostponement().getUnprocessedPostponement()).isEqualTo(YES);
-        assertThat(result.getDwpState()).isEqualTo(State.VALID_APPEAL.getId());
+        assertThat(result.getDwpState()).isEqualTo(DwpState.FE_ACTIONED_NR);
     }
 }

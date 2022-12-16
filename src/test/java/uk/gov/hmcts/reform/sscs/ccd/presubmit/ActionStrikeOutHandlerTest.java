@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
@@ -68,12 +69,12 @@ public class ActionStrikeOutHandlerTest {
 
     @Test
     @Parameters({
-        "ACTION_STRIKE_OUT, strikeOut, strikeOutActioned",
+        "ACTION_STRIKE_OUT, strikeOut, STRIKE_OUT_ACTIONED",
         "ACTION_STRIKE_OUT, ,null",
         "ACTION_STRIKE_OUT, null,null",
     })
     public void givenEvent_thenSetDwpStateToExpected(EventType eventType, @Nullable String decisionType,
-                                                     @Nullable String expectedDwpState) {
+                                                     @Nullable DwpState expectedDwpState) {
         when(callback.getEvent()).thenReturn(eventType);
         sscsCaseData.setDecisionType(decisionType);
 
@@ -93,7 +94,7 @@ public class ActionStrikeOutHandlerTest {
     public void throwExceptionIfCannotHandleEventType() {
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
 
-        sscsCaseData = SscsCaseData.builder().dwpState("someValue").build();
+        sscsCaseData = SscsCaseData.builder().dwpState(DwpState.IN_PROGRESS).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         actionStrikeOutHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

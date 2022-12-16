@@ -8,7 +8,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_FURTHER_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,7 +22,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -38,7 +38,7 @@ public class UploadFurtherEvidenceIt extends AbstractEventIt {
         sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("1")
                 .state(State.READY_TO_LIST)
-                .interlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId())
+                .interlocReviewState(InterlocReviewState.REVIEW_BY_TCW)
                 .appeal(Appeal.builder().build()).build();
         setJson(sscsCaseData, UPLOAD_FURTHER_EVIDENCE);
     }
@@ -63,7 +63,7 @@ public class UploadFurtherEvidenceIt extends AbstractEventIt {
             assertThat(result.getData().getSscsDocument(), is(nullValue()));
             assertThat(result.getData().getAudioVideoEvidence().size(), is(1));
             assertThat(result.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded(), is(UploadParty.CTSC));
-            assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), result.getData().getInterlocReferralReason());
+            assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE, result.getData().getInterlocReferralReason());
             assertEquals(YesNo.YES, result.getData().getHasUnprocessedAudioVideoEvidence());
         }
     }
