@@ -328,7 +328,6 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         }
         names.add(signedInJudgeName);
 
-
         List<DynamicList> panelMembers = caseData.getAdjournment().getPanelMembers();
 
         names.addAll(panelMembers.stream()
