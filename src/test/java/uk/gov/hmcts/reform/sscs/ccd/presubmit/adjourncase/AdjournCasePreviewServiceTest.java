@@ -140,6 +140,9 @@ class AdjournCasePreviewServiceTest {
                 .generateNotice(YES)
                 .typeOfNextHearing(FACE_TO_FACE)
                 .nextHearingDateType(FIRST_AVAILABLE_DATE)
+                .disabilityQualifiedPanelMemberName(new DynamicList(""))
+                .medicallyQualifiedPanelMemberName(new DynamicList(""))
+                .otherPanelMemberName(new DynamicList(""))
                 .build())
             .hearings(List.of(Hearing.builder()
                 .value(HearingDetails.builder()
@@ -774,9 +777,9 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setDisabilityQualifiedPanelMemberName("Mr Panel Member 1");
-        adjournment.setMedicallyQualifiedPanelMemberName("Ms Panel Member 2");
-        adjournment.setOtherPanelMemberName("Other Panel Member");
+        adjournment.setDisabilityQualifiedPanelMemberName(new DynamicList("Mr Panel Member 1"));
+        adjournment.setMedicallyQualifiedPanelMemberName(new DynamicList("Ms Panel Member 2"));
+        adjournment.setOtherPanelMemberName(new DynamicList("Other Panel Member"));
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
@@ -792,8 +795,8 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setDisabilityQualifiedPanelMemberName("Mr Panel Member 1");
-        adjournment.setMedicallyQualifiedPanelMemberName("Ms Panel Member 2");
+        adjournment.setDisabilityQualifiedPanelMemberName(new DynamicList("Mr Panel Member 1"));
+        adjournment.setMedicallyQualifiedPanelMemberName(new DynamicList("Ms Panel Member 2"));
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
@@ -809,7 +812,7 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setDisabilityQualifiedPanelMemberName("Mr Panel Member 1");
+        adjournment.setDisabilityQualifiedPanelMemberName(new DynamicList("Mr Panel Member 1"));
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
@@ -840,8 +843,9 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setMedicallyQualifiedPanelMemberName("");
-        adjournment.setDisabilityQualifiedPanelMemberName("");
+        adjournment.setMedicallyQualifiedPanelMemberName(new DynamicList(""));
+        adjournment.setDisabilityQualifiedPanelMemberName(new DynamicList(""));
+        adjournment.setOtherPanelMemberName(new DynamicList(""));
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);

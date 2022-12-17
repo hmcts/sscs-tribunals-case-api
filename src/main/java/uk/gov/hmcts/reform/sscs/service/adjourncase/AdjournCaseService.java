@@ -15,10 +15,12 @@ public class AdjournCaseService {
     public static void clearTransientFields(SscsCaseData sscsCaseData, boolean isAdjournmentEnabled) {
         log.info("Clearing transient adjournment case fields for caseId {}", sscsCaseData.getCcdCaseId());
 
-        sscsCaseData.setAdjournment(Adjournment.builder().build());
+        Adjournment adjournment = Adjournment.builder().build();
+
+        sscsCaseData.setAdjournment(adjournment);
 
         if (isAdjournmentEnabled) {
-            sscsCaseData.getAdjournment().setAdjournmentInProgress(YesNo.NO);
+            adjournment.setAdjournmentInProgress(YesNo.NO);
         }
     }
 }

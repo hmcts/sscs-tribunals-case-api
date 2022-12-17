@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTime;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -326,15 +327,14 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             throw new IllegalStateException("Unable to obtain signed in user name");
         }
         names.add(signedInJudgeName);
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getAdjournment().getDisabilityQualifiedPanelMemberName())) {
-            names.add(caseData.getAdjournment().getDisabilityQualifiedPanelMemberName());
-        }
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getAdjournment().getMedicallyQualifiedPanelMemberName())) {
-            names.add(caseData.getAdjournment().getMedicallyQualifiedPanelMemberName());
-        }
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getAdjournment().getOtherPanelMemberName())) {
-            names.add(caseData.getAdjournment().getOtherPanelMemberName());
-        }
+
+
+        List<DynamicList> panelMembers = caseData.getAdjournment().getPanelMembers();
+
+        names.addAll(panelMembers.stream()
+            .map(panelMember -> panelMember.getValue().getLabel())
+            .collect(Collectors.toList()));
+
         return StringUtils.getGramaticallyJoinedStrings(names);
     }
 

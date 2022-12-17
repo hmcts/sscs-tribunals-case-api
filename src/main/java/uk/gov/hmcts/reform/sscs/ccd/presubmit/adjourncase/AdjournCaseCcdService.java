@@ -33,7 +33,6 @@ public class AdjournCaseCcdService {
     }
 
     public DynamicList getVenueDynamicListForRpcName(String rpcName) {
-
         List<DynamicListItem> fullVenueList = new ArrayList<>();
 
         // Add the sorted venues for this RPC, without prefixing with RPC name
@@ -43,5 +42,13 @@ public class AdjournCaseCcdService {
         fullVenueList.addAll(getSortedVenueItems(v -> !v.getRpcInCaseDataFormat().equalsIgnoreCase(rpcName), true));
 
         return new DynamicList(new DynamicListItem("", ""), fullVenueList);
+    }
+
+    public DynamicList getPanelMembers() {
+        List<DynamicListItem> panelMembers = new ArrayList<>();
+
+        panelMembers.add(new DynamicListItem("aaaa", "aaaa"));
+
+        return new DynamicList(new DynamicListItem("aaaa", "aaaa"), panelMembers);
     }
 }

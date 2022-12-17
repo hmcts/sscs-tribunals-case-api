@@ -41,10 +41,12 @@ public class CcdMideventCallbackController {
     private final RestoreCasesService2 restoreCasesService2;
 
     @Autowired
-    public CcdMideventCallbackController(AuthorisationService authorisationService, SscsCaseCallbackDeserializer deserializer,
+    public CcdMideventCallbackController(AuthorisationService authorisationService,
+                                         SscsCaseCallbackDeserializer deserializer,
                                          DecisionNoticeService decisionNoticeService,
-                                            AdjournCasePreviewService adjournCasePreviewService, AdjournCaseCcdService adjournCaseCcdService,
-                                            RestoreCasesService2 restoreCasesService2) {
+                                         AdjournCasePreviewService adjournCasePreviewService,
+                                         AdjournCaseCcdService adjournCaseCcdService,
+                                         RestoreCasesService2 restoreCasesService2) {
         this.authorisationService = authorisationService;
         this.deserializer = deserializer;
         this.decisionNoticeService = decisionNoticeService;
@@ -70,6 +72,29 @@ public class CcdMideventCallbackController {
 
         sscsCaseData.getAdjournment().setNextHearingVenueSelected(adjournCaseCcdService.getVenueDynamicListForRpcName(
             sscsCaseData.getRegionalProcessingCenter().getName()));
+
+        return ok(preSubmitCallbackResponse);
+    }
+
+    @PostMapping(path = "/ccdMidEventAdjournCasePopulatePanelMemberDropdown", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdMidEventAdjournCasePopulatePanelMemberDropdown(
+        @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
+        @RequestHeader(AUTHORIZATION) String userAuthorisation,
+        @RequestBody String message) {
+        Callback<SscsCaseData> callback = deserializer.deserialize(message);
+        log.info("About to start ccdMidEventAdjournCasePopulatePanelMemberDropdown callback `{}`"
+                + "received for Case ID `{}`", callback.getEvent(),
+            callback.getCaseDetails().getId());
+
+        authorisationService.authorise(serviceAuthHeader);
+
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+
+        sscsCaseData.getAdjournment().setDisabilityQualifiedPanelMemberName(adjournCaseCcdService.getPanelMembers());
+        sscsCaseData.getAdjournment().setMedicallyQualifiedPanelMemberName(adjournCaseCcdService.getPanelMembers());
+        sscsCaseData.getAdjournment().setOtherPanelMemberName(adjournCaseCcdService.getPanelMembers());
+
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         return ok(preSubmitCallbackResponse);
     }
