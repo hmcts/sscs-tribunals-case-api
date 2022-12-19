@@ -11,9 +11,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 
@@ -52,9 +52,9 @@ public class AdminSendToWithDwpAboutToSubmitHandler implements PreSubmitCallback
         caseData.setDateSentToDwp(LocalDate.now().toString());
         caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate(getResponseDueDays(caseData)));
 
-        if (InterlocReferralReason.PHE_REQUEST.getId().equals(caseData.getInterlocReferralReason())) {
-            caseData.setInterlocReviewState(InterlocReviewState.NONE.getId());
-            caseData.setInterlocReferralReason(InterlocReferralReason.NONE.getId());
+        if (InterlocReferralReason.PHE_REQUEST.equals(caseData.getInterlocReferralReason())) {
+            caseData.setInterlocReviewState(InterlocReviewState.NONE);
+            caseData.setInterlocReferralReason(InterlocReferralReason.NONE);
         }
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);

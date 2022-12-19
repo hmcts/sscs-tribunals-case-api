@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.functional.handlers.actionposteponementrequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -49,8 +49,8 @@ public class ActionPostponementRequestTest extends BaseHandler {
         JsonNode root = mapper.readTree(response);
         SscsCaseData result = mapper.readValue(root.path("data").toPrettyString(), new TypeReference<SscsCaseData>(){});
 
-        assertThat(result.getInterlocReviewState()).isEqualTo(REVIEW_BY_JUDGE.getId());
-        assertThat(result.getInterlocReferralReason()).isEqualTo(REVIEW_POSTPONEMENT_REQUEST.getId());
+        assertThat(result.getInterlocReviewState()).isEqualTo(REVIEW_BY_JUDGE);
+        assertThat(result.getInterlocReferralReason()).isEqualTo(REVIEW_POSTPONEMENT_REQUEST);
         assertThat(result.getAppealNotePad().getNotesCollection())
             .hasSize(1)
             .extracting(Note::getValue)

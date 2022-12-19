@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -178,7 +178,7 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
 
         assertNull(caseData.getSscsWelshPreviewNextEvent());
         assertEquals(RequestOutcome.IN_PROGRESS, caseData.getReinstatementOutcome());
-        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), caseData.getInterlocReviewState());
+        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, caseData.getInterlocReviewState());
         assertEquals(State.APPEAL_CREATED, caseData.getPreviousState());
     }
 
@@ -208,7 +208,7 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         assertNull(caseData.getSscsWelshPreviewNextEvent());
         assertEquals(RequestOutcome.IN_PROGRESS, caseData.getReinstatementOutcome());
         assertEquals(State.INTERLOCUTORY_REVIEW_STATE, caseData.getPreviousState());
-        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), caseData.getInterlocReviewState());
+        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, caseData.getInterlocReviewState());
     }
 
     @Test
@@ -233,7 +233,7 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
 
         assertNull(caseData.getSscsWelshPreviewNextEvent());
         assertEquals(RequestOutcome.IN_PROGRESS, caseData.getReinstatementOutcome());
-        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), caseData.getInterlocReviewState());
+        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, caseData.getInterlocReviewState());
         assertEquals(State.APPEAL_CREATED, caseData.getPreviousState());
     }
 
@@ -259,7 +259,7 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
 
         assertNull(caseData.getSscsWelshPreviewNextEvent());
         assertEquals(RequestOutcome.IN_PROGRESS, caseData.getReinstatementOutcome());
-        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), caseData.getInterlocReviewState());
+        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, caseData.getInterlocReviewState());
         assertEquals(State.APPEAL_CREATED, caseData.getPreviousState());
     }
 

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionposthearingapplication;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
 import static java.util.Objects.requireNonNull;
 
@@ -9,10 +9,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ActionPostHearingTypes;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
@@ -20,7 +18,7 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ActionPostHearingApplicationAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
@@ -30,7 +28,7 @@ public class ActionPostHearingApplicationAboutToSubmitHandler implements PreSubm
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() == EventType.ACTION_POST_HEARING_APPLICATION
+            && callback.getEvent() == EventType.POST_HEARING_REVIEW
             && isPostHearingsEnabled;
     }
 
@@ -42,23 +40,12 @@ public class ActionPostHearingApplicationAboutToSubmitHandler implements PreSubm
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
         String caseId = caseData.getCcdCaseId();
-        if (!SscsUtil.isSAndLCase(caseData)) {
-            log.info("Action Post Hearing Application: Cannot process non Scheduling & Listing Case for Case ID {}",
-                caseId);
-            response.addError("Cannot process Action Post Hearing Application on non Scheduling & Listing Case");
-            return response;
-        }
 
-        ActionPostHearingTypes typeSelected = caseData.getActionPostHearingApplication().getTypeSelected();
-        log.info("Action Post Hearing Application: handing action {} for case {}", typeSelected,  caseId);
+        PostHearingReviewType typeSelected = caseData.getPostHearing().getReviewType();
+        log.info("Review Post Hearing App: handling action {} for case {}", typeSelected,  caseId);
 
-        clearTransientFields(caseData);
+        SscsUtil.clearDocumentTransientFields(caseData);
 
         return response;
-    }
-
-    private void clearTransientFields(SscsCaseData caseData) {
-        caseData.setDocumentGeneration(DocumentGeneration.builder().build());
-        caseData.setDocumentStaging(DocumentStaging.builder().build());
     }
 }

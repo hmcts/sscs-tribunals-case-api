@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.canceltranslations;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -51,7 +53,11 @@ public class CancelTranslationsAboutToSubmitHandler implements PreSubmitCallback
             setWelshNextEvent(caseData);
             log.info("Set Welsh next event to : {} for case id: {}", caseData.getSscsWelshPreviewNextEvent(), caseData.getCcdCaseId());
         } else {
-            caseData.setInterlocReviewState(caseData.getWelshInterlocNextReviewState());
+            InterlocReviewState interlocState = Arrays.stream(InterlocReviewState.values())
+                .filter(x -> x.getCcdDefinition().equals(caseData.getWelshInterlocNextReviewState()))
+                .findFirst()
+                .orElse(null);
+            caseData.setInterlocReviewState(interlocState);
             caseData.setWelshInterlocNextReviewState(null);
             log.info("Set InterlocReviewState : {} for case id: {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
         }

@@ -4,12 +4,12 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REJECT_HEARING_RECORDING_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_INFORMATION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.NONE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REJECT_HEARING_RECORDING_REQUEST;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.NONE;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
@@ -26,8 +26,20 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ExtensionNextEvent;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
@@ -128,7 +140,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         return Optional.empty();
     }
 
-    private SscsCaseData updateCaseAfterExtensionRefused(SscsCaseData caseData, String interlocReviewState, State state) {
+    private SscsCaseData updateCaseAfterExtensionRefused(SscsCaseData caseData, InterlocReviewState interlocReviewState, State state) {
         caseData.setHmctsDwpState("sentToDwp");
         caseData.setDateSentToDwp(LocalDate.now().toString());
         caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate(getResponseDueDays(caseData)));
@@ -143,13 +155,13 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         if (DirectionType.PROVIDE_INFORMATION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
 
-            caseData.setInterlocReviewState(AWAITING_INFORMATION.getId());
+            caseData.setInterlocReviewState(AWAITING_INFORMATION);
 
         } else if (getPreValidStates().contains(caseDetails.getState())
                 && DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setDateSentToDwp(LocalDate.now().toString());
             caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate(getResponseDueDays(caseData)));
-            caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
+            caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
             updateDwpRegionalCentre(caseData);
 
             //Set digital flag on legacy cases
@@ -158,7 +170,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             }
         } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
                 && ExtensionNextEvent.SEND_TO_LISTING.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
-            caseData = updateCaseAfterExtensionRefused(caseData, AWAITING_ADMIN_ACTION.getId(), State.RESPONSE_RECEIVED);
+            caseData = updateCaseAfterExtensionRefused(caseData, AWAITING_ADMIN_ACTION, State.RESPONSE_RECEIVED);
 
         } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
                 && ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
@@ -179,8 +191,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             caseData = updateCaseAfterUrgentHearingRefused(caseData);
 
         } else if (DirectionType.REFUSE_HEARING_RECORDING_REQUEST.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
-            caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
-            caseData.setInterlocReferralReason(REJECT_HEARING_RECORDING_REQUEST.getId());
+            caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
+            caseData.setInterlocReferralReason(REJECT_HEARING_RECORDING_REQUEST);
 
         } else {
             caseData.setInterlocReviewState(null);
@@ -198,7 +210,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
             caseData.setReinstatementOutcome(RequestOutcome.GRANTED);
-            caseData.setDwpState(DwpState.REINSTATEMENT_GRANTED.getId());
+            caseData.setDwpState(DwpState.REINSTATEMENT_GRANTED);
 
             updateStateIfInterLockReviewState(caseData);
 
@@ -216,7 +228,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
             caseData.setReinstatementOutcome(RequestOutcome.REFUSED);
-            caseData.setDwpState(DwpState.REINSTATEMENT_REFUSED.getId());
+            caseData.setDwpState(DwpState.REINSTATEMENT_REFUSED);
             log.info("Case ID {} reinstatement refused on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
         } else {
             log.info("Case ID {} reinstatement refused held pending Direction Translation {}", caseData.getCcdCaseId(), LocalDate.now().toString());
@@ -227,7 +239,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private SscsCaseData updateCaseAfterUrgentHearingGranted(SscsCaseData caseData) {
 
         caseData.setUrgentHearingOutcome(RequestOutcome.GRANTED.getValue());
-        caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
+        caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
         log.info("Case ID {} urgent hearing granted on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
         return caseData;
     }
@@ -236,7 +248,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         caseData.setUrgentHearingOutcome(RequestOutcome.REFUSED.getValue());
         caseData.setUrgentCase("No");
-        caseData.setInterlocReviewState(NONE.getId());
+        caseData.setInterlocReviewState(NONE);
         log.info("Case ID {} urgent hearing refused on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
         return caseData;
     }
@@ -248,7 +260,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             caseData.setState(previousState);
         } else {
             caseData.setState(State.INTERLOCUTORY_REVIEW_STATE);
-            caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
+            caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
         }
     }
 
@@ -305,7 +317,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             clearTransientFields(caseData, beforeState);
 
             if (shouldSetDwpState(caseData)) {
-                caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
+                caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED);
             }
 
             caseData.setTimeExtensionRequested("No");
@@ -315,7 +327,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 sscsCaseDataPreSubmitCallbackResponse.addErrors(response.getErrors());
             }
         } else {
-            caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
+            caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
             caseData.setTranslationWorkOutstanding("Yes");
             clearBasicTransientFields(caseData);
             log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());

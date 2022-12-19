@@ -10,7 +10,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.DocumentType.*;
 
 import java.io.IOException;
@@ -27,7 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
@@ -76,7 +76,7 @@ public class UploadDocumentFurtherEvidenceIt extends AbstractEventIt {
         sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("1")
                 .state(State.WITH_DWP)
-                .interlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId())
+                .interlocReviewState(InterlocReviewState.REVIEW_BY_TCW)
                 .hearings(Arrays.asList(hearing1, hearing2, hearing3, hearing4, hearing5))
                 .sscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder().sscsHearingRecordings(Arrays.asList(recording1, recording2, recording3, recording4, recording5)).build())
                 .appeal(Appeal.builder()
@@ -229,8 +229,8 @@ public class UploadDocumentFurtherEvidenceIt extends AbstractEventIt {
         assertEquals(1, response.getData().getAudioVideoEvidence().size());
         assertEquals(fileName, response.getData().getAudioVideoEvidence().get(0).getValue().getFileName());
         assertEquals(UploadParty.CTSC, response.getData().getAudioVideoEvidence().get(0).getValue().getPartyUploaded());
-        assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), response.getData().getInterlocReviewState());
-        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), response.getData().getInterlocReferralReason());
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW, response.getData().getInterlocReviewState());
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE, response.getData().getInterlocReferralReason());
         assertNull(response.getData().getDwpState());
         assertNull(response.getData().getDraftSscsFurtherEvidenceDocument());
         assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());

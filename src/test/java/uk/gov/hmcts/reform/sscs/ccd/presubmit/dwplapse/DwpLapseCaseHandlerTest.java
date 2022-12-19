@@ -9,6 +9,8 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.LAPSED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -105,8 +107,8 @@ public class DwpLapseCaseHandlerTest {
                 ))
         ));
 
-        assertEquals("awaitingAdminAction", response.getData().getInterlocReviewState());
-        assertEquals("lapsed", response.getData().getDwpState());
+        assertEquals(AWAITING_ADMIN_ACTION, response.getData().getInterlocReviewState());
+        assertEquals(LAPSED, response.getData().getDwpState());
     }
 
     @Test
@@ -153,7 +155,7 @@ public class DwpLapseCaseHandlerTest {
                 ))
         ));
 
-        assertEquals("awaitingAdminAction", response.getData().getInterlocReviewState());
-        assertEquals("lapsed", response.getData().getDwpState());
+        assertEquals(AWAITING_ADMIN_ACTION, response.getData().getInterlocReviewState());
+        assertEquals(LAPSED, response.getData().getDwpState());
     }
 }

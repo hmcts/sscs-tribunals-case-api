@@ -50,8 +50,8 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Evidence;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.EvidenceDescription;
@@ -316,7 +316,7 @@ public class EvidenceUploadServiceTest {
         sscsCaseDetails.getData().setAppeal(Appeal.builder().hearingType("sya").build());
 
         if (initialInterlocReviewState != null) {
-            sscsCaseDetails.getData().setInterlocReviewState(initialInterlocReviewState.getId());
+            sscsCaseDetails.getData().setInterlocReviewState(initialInterlocReviewState);
         }
 
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
@@ -355,8 +355,8 @@ public class EvidenceUploadServiceTest {
         verify(ccdService).updateCase(
                 and(and(and(and(hasAudioVideoDocumentAndSscsDocuments(avFileName, "http://dm-store/112"),
                         doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo()),
-                        argThat(argument -> argument.getInterlocReviewState().equals(expectedInterlocReviewState.getId()))),
-                        argThat(argument ->  argument.getInterlocReferralReason().equals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE.getId()))),
+                        argThat(argument -> argument.getInterlocReviewState().equals(expectedInterlocReviewState))),
+                        argThat(argument ->  argument.getInterlocReferralReason().equals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE))),
                         argThat(argument ->  argument.getHasUnprocessedAudioVideoEvidence().equals(YesNo.YES))),
                 eq(someCcdCaseId),
                 eq(UPLOAD_DOCUMENT.getCcdType()),
@@ -1022,7 +1022,7 @@ public class EvidenceUploadServiceTest {
     }
 
     private SscsCaseData interlocReviewStateSetToReviewByTcw() {
-        return argThat(argument -> argument.getInterlocReviewState().equals(InterlocReviewState.REVIEW_BY_TCW.getId()));
+        return argThat(argument -> argument.getInterlocReviewState().equals(InterlocReviewState.REVIEW_BY_TCW));
 
     }
 

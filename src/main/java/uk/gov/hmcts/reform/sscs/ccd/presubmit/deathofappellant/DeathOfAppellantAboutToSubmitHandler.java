@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.deathofappellant;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.APPOINTEE_DETAILS_NEEDED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome.GRANTED;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +17,12 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
@@ -91,12 +96,12 @@ public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHa
         Appointee appointeeAfter = caseDataAfter.getCaseData().getAppeal().getAppellant().getAppointee();
 
         if (shouldSetInterlocReviewState(appointeeBefore, appointeeAfter)) {
-            preSubmitCallbackResponse.getData().setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
+            preSubmitCallbackResponse.getData().setInterlocReviewState(AWAITING_ADMIN_ACTION);
         }
 
         if ((appointeeBefore == null || "no".equalsIgnoreCase(caseDataBefore.getCaseData().getAppeal().getAppellant().getIsAppointee()) || null == caseDataBefore.getCaseData().getAppeal().getAppellant().getIsAppointee())
                 && appointeeAfter == null || "no".equalsIgnoreCase(caseDataAfter.getCaseData().getAppeal().getAppellant().getIsAppointee()) || null == caseDataAfter.getCaseData().getAppeal().getAppellant().getIsAppointee()) {
-            preSubmitCallbackResponse.getData().setDwpState(APPOINTEE_DETAILS_NEEDED.getId());
+            preSubmitCallbackResponse.getData().setDwpState(APPOINTEE_DETAILS_NEEDED);
         }
 
         preSubmitCallbackResponse.getData().setConfidentialityRequestOutcomeAppellant(null);

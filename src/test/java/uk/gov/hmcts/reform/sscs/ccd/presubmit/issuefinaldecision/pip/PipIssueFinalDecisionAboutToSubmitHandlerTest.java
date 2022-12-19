@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -54,7 +55,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsPipCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.IssueFinalDecisionAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
@@ -310,7 +310,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
 
         verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(FINAL_DECISION_NOTICE), any(), eq(null), eq(null), eq(null));
         verifyNoInteractions(hearingMessageHelper);
-        assertEquals(FINAL_DECISION_ISSUED.getId(), response.getData().getDwpState());
+        assertEquals(FINAL_DECISION_ISSUED, response.getData().getDwpState());
 
         assertEquals("decisionInFavourOfAppellant", response.getData().getOutcome());
 
@@ -367,7 +367,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
 
         verifyNoInteractions(footerService);
-        assertNull(FINAL_DECISION_ISSUED.getId(), response.getData().getDwpState());
+        assertNull(FINAL_DECISION_ISSUED.getCcdDefinition(), response.getData().getDwpState());
         assertEquals(1, (int) response.getData().getSscsDocument().stream().filter(f -> f.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue())).count());
 
         assertNotNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionTypeOfHearing());
@@ -424,7 +424,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(FINAL_DECISION_NOTICE), any(), eq(null), eq(null), eq(null));
         verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
         verifyNoMoreInteractions(hearingMessageHelper);
-        assertEquals(FINAL_DECISION_ISSUED.getId(), response.getData().getDwpState());
+        assertEquals(FINAL_DECISION_ISSUED, response.getData().getDwpState());
 
         assertEquals("decisionInFavourOfAppellant", response.getData().getOutcome());
 
@@ -488,7 +488,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         assertEquals(0, response.getErrors().size());
 
         verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(FINAL_DECISION_NOTICE), any(), eq(null), eq(null), eq(null));
-        assertEquals(FINAL_DECISION_ISSUED.getId(), response.getData().getDwpState());
+        assertEquals(FINAL_DECISION_ISSUED, response.getData().getDwpState());
 
         assertEquals(expectedOutcome, response.getData().getOutcome());
 
@@ -548,7 +548,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         assertThat(response.getWarnings().size(), is(0));
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getData().getTranslationWorkOutstanding(), is(YesNo.YES.getValue()));
-        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.WELSH_TRANSLATION.getId()));
+        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.WELSH_TRANSLATION));
     }
 
     @Test

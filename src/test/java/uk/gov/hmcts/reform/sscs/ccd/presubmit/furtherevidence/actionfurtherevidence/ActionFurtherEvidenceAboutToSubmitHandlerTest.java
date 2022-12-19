@@ -52,7 +52,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.ScannedDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -553,7 +553,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(FURTHER_EVIDENCE_RECEIVED, updated.getData().getDwpFurtherEvidenceStates());
-        assertEquals(DwpState.FE_RECEIVED.getId(), updated.getData().getDwpState());
+        assertEquals(DwpState.FE_RECEIVED, updated.getData().getDwpState());
     }
 
     @Test
@@ -717,7 +717,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals(State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData.getPreviousState());
         assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getReinstatementOutcome());
         assertEquals(LocalDate.now(), sscsCaseData.getReinstatementRegistered());
-        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
+        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, sscsCaseData.getInterlocReviewState());
     }
 
     @Test
@@ -741,7 +741,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals(previousState, sscsCaseData.getPreviousState());
         assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getReinstatementOutcome());
         assertEquals(LocalDate.now(), sscsCaseData.getReinstatementRegistered());
-        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
+        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, sscsCaseData.getInterlocReviewState());
     }
 
     @Test
