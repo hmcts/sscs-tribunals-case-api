@@ -5,6 +5,7 @@ tags:
 java:
   image: ${IMAGE_NAME}
   readinessDelay: 45
+  restartPolicy: Never
   environment:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
     CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
@@ -33,6 +34,7 @@ java:
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
   enabled: true
+  restartPolicy: Never
   redirect_uris:
     XUI:
       - https://xui-${SERVICE_FQDN}/oauth2/callback
@@ -48,6 +50,7 @@ em-ccdorc:
   java:
     image: hmctspublic.azurecr.io/em/ccdorc:latest
     releaseNameOverride: ${SERVICE_NAME}-em-ccdorc
+    restartPolicy: Never
     environment:
       IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
       OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
@@ -62,6 +65,7 @@ ccd-case-document-am-api:
   java:
     image: hmctspublic.azurecr.io/ccd/case-document-am-api:latest
     releaseNameOverride: ${SERVICE_NAME}-ccd-case-document-am-api
+    restartPolicy: Never
     environment:
       CCD_DATA_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-data-store-api
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
@@ -79,6 +83,7 @@ xui-webapp:
     ingressHost: xui-${SERVICE_FQDN}
     memoryLimits: 1836Mi
     cpuLimits: 1900m
+    restartPolicy: Never
     environment:
       HEALTH_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw/health
       HEALTH_CCD_DATA_API: http://${SERVICE_NAME}-ccd-data-store-api/health
@@ -173,6 +178,7 @@ ccd:
       releaseNameOverride: ${SERVICE_NAME}-am-role-assignment-service
       readinessDelay: 240
       livenessDelay: 240
+      restartPolicy: Never
       environment:
         ROLE_ASSIGNMENT_DB_HOST: ${SERVICE_NAME}-postgresql
         ROLE_ASSIGNMENT_DB_NAME: "role_assignment"
@@ -213,6 +219,7 @@ ccd:
       image: hmctspublic.azurecr.io/ccd/admin-web:latest
       ingressHost: ${SERVICE_NAME}-ccd-admin-web
       keyVaults: []
+      restartPolicy: Never
       environment:
         IDAM_OAUTH2_AW_CLIENT_SECRET: ${ADMIN_WEB_IDAM_SECRET}
         IDAM_BASE_URL: https://idam-api.aat.platform.hmcts.net
@@ -226,6 +233,7 @@ ccd:
     java:
       image: hmctspublic.azurecr.io/ccd/user-profile-api:latest
       imagePullPolicy: Always
+      restartPolicy: Never
       enviroment:
         USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
         USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
@@ -236,6 +244,7 @@ ccd:
     java:
       image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
       imagePullPolicy: Always
+      restartPolicy: Never
       environment:
         DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
@@ -254,6 +263,7 @@ ccd:
       imagePullPolicy: Always
       memoryRequests: '1524Mi'
       cpuRequests: '900m'
+      restartPolicy: Never
       environment:
         DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
         DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
@@ -285,6 +295,7 @@ ccd:
   ccd-api-gateway-web:
     nodejs:
       imagePullPolicy: Always
+      restartPolicy: Never
       environment:
         ADDRESS_LOOKUP_TOKEN: ${ADDRESS_LOOKUP_TOKEN}
         IDAM_SERVICE_KEY: ${CCD_API_GATEWAY_S2S_SECRET}
@@ -295,6 +306,7 @@ ccd:
 
   ccd-user-profile-importer:
     image: hmctspublic.azurecr.io/ccd/user-profile-importer:db2r9a
+    restartPolicy: Never
     environment:
       AUTH_PROVIDER_BASE_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       CCD_USER_PROFILE_URL: http://${SERVICE_NAME}-ccd-user-profile-api
@@ -308,6 +320,7 @@ ccd:
     image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.17.8-9939nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
+    restartPolicy: Never
     environment:
       CCD_ENVIRONMENT: 'PROD'
       CCD_DEF_EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-em-ccd-orchestrator
@@ -393,6 +406,7 @@ sscs-evidence-share:
   java:
     image: hmctspublic.azurecr.io/sscs/evidence-share:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-evidence-share
+    restartPolicy: Never
     environment:
       SEND_LETTER_SERVICE_ENABLED: "true"
       SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
@@ -415,6 +429,7 @@ sscs-ccd-callback-orchestrator:
     image: hmctspublic.azurecr.io/sscs/ccd-callback-orchestrator:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     readinessDelay: 90
+    restartPolicy: Never
     environment:
       SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
       TOPIC_NAME: "sscs-evidenceshare-topic-aat"
@@ -426,6 +441,7 @@ sscs-tribunals-frontend:
   nodejs:
     image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
+    restartPolicy: Never
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master
       APPINSIGHTS_ROLE_NAME: ${SERVICE_NAME}
@@ -468,6 +484,7 @@ sscs-hearings-api:
   java:
     image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
+    restartPolicy: Never
     environment:
       ROOT_LOGGING_LEVEL: INFO
       SSCS_LOG_LEVEL: INFO #Switch to debug to see requests being sent.
@@ -509,6 +526,7 @@ hmc-cft-hearing-service:
   java:
     releaseNameOverride: ${SERVICE_NAME}-hmc-cft-hearing-service
     image: "hmctspublic.azurecr.io/hmc/cft-hearing-service:latest"
+    restartPolicy: Never
     environment:
       HMC_SERVICE_BUS_TOPIC: "hmc-to-cft"
       HMC_SERVICE_BUS_SUBSCRIPTION: "hmc-to-sscs-subscription"
