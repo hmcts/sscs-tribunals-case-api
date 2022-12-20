@@ -59,7 +59,10 @@ public class AdjournCaseIt extends AbstractEventIt {
         "callback/adjournCaseGeneratedVideoWhenCaseNotListedStraightAwayWithoutDirectionsMade.json";
     public static final String CCD_ABOUT_TO_SUBMIT = "/ccdAboutToSubmit";
     public static final String CCD_MID_EVENT_PREVIEW_ADJOURN_CASE = "/ccdMidEventPreviewAdjournCase";
-    public static final String CCD_MID_EVENT_ADJOURN_CASE_POPULATE_VENUE_DROPDOWN = "/ccdMidEventAdjournCasePopulateVenueDropdown";
+    public static final String CCD_MID_EVENT_ADJOURN_CASE_POPULATE_PANEL_MEMBER_DROPDOWN =
+        "/ccdMidEventAdjournCasePopulatePanelMemberDropdown";
+    public static final String CCD_MID_EVENT_ADJOURN_CASE_POPULATE_VENUE_DROPDOWN =
+        "/ccdMidEventAdjournCasePopulateVenueDropdown";
     public static final String CCD_MID_EVENT = "/ccdMidEvent";
     public static final String TEST_NAME = "An Test";
     public static final String CHESTER_MAGISTRATE_S_COURT = "Chester Magistrate's Court";
@@ -265,6 +268,39 @@ public class AdjournCaseIt extends AbstractEventIt {
             null,
             "paper"
         );
+    }
+
+    @DisplayName("Call to populate panel members dropdowns will populate the excluded panel members lists")
+    @Test
+    public void givenCallToPopulatePanelMemberDropdownThenPopulateAdjournedPanelMemberLists() throws Exception {
+        setup();
+
+        // TODO: see if i can delete this bit
+        String nextHearingDateSpecificDate = "2020-07-01";
+        setJsonAndReplace(GENERATED_FACE_TO_FACE_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITHOUT_DIRECTIONS_MADE_JSON,
+            "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER",
+            nextHearingDateSpecificDate);
+
+        //TODO: set the hearings to these lists so there are panel members in the HMC status DONT SET OTHER PANEL MEMBERS
+        // List<DynamicListItem> disabilityQualifiedPanelMembers = new ArrayList<>();
+        // List<DynamicListItem> medicallyQualifiedPanelMembers = new ArrayList<>();
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json,
+            CCD_MID_EVENT_ADJOURN_CASE_POPULATE_PANEL_MEMBER_DROPDOWN));
+        assertHttpStatus(response, HttpStatus.OK);
+
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+        assertThat(result.getErrors()).isEmpty();
+
+        /* Adjournment adjournment = result.getData().getAdjournment();
+
+        List<DynamicListItem> panelMemberDropdown = adjournment.getDisabilityQualifiedPanelMemberName().getListItems();
+        assertThat(panelMemberDropdown).isEqualTo(disabilityQualifiedPanelMembers);
+
+        panelMemberDropdown = adjournment.getMedicallyQualifiedPanelMemberName().getListItems();
+        assertThat(panelMemberDropdown).isEqualTo(medicallyQualifiedPanelMembers);
+
+        assertThatThrownBy(adjournment::getOtherPanelMemberName).isInstanceOf(NullPointerException.class); */
     }
 
     @DisplayName("Call to populate venue dropdown will populate next hearing venue selected list")

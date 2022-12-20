@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.service.venue.VenueRpcDetails;
@@ -44,11 +45,17 @@ public class AdjournCaseCcdService {
         return new DynamicList(new DynamicListItem("", ""), fullVenueList);
     }
 
+    public void setPanelMembers(Adjournment adjournment) {
+        adjournment.setDisabilityQualifiedPanelMemberName(getPanelMembers());
+        adjournment.setMedicallyQualifiedPanelMemberName(getPanelMembers());
+        adjournment.setOtherPanelMemberName(getPanelMembers());
+    }
+
     public DynamicList getPanelMembers() {
         List<DynamicListItem> panelMembers = new ArrayList<>();
 
         panelMembers.add(new DynamicListItem("aaaa", "aaaa"));
 
-        return new DynamicList(new DynamicListItem("aaaa", "aaaa"), panelMembers);
+        return new DynamicList(new DynamicListItem("", ""), panelMembers);
     }
 }

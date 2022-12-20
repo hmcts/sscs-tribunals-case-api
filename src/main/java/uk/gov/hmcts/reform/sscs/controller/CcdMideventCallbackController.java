@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
@@ -90,9 +91,9 @@ public class CcdMideventCallbackController {
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        sscsCaseData.getAdjournment().setDisabilityQualifiedPanelMemberName(adjournCaseCcdService.getPanelMembers());
-        sscsCaseData.getAdjournment().setMedicallyQualifiedPanelMemberName(adjournCaseCcdService.getPanelMembers());
-        sscsCaseData.getAdjournment().setOtherPanelMemberName(adjournCaseCcdService.getPanelMembers());
+        Adjournment adjournment = sscsCaseData.getAdjournment();
+
+        adjournCaseCcdService.setPanelMembers(adjournment);
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
