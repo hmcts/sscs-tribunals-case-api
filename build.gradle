@@ -5,7 +5,7 @@ plugins {
     id 'jacoco'
     id 'org.springframework.boot' version '2.7.6'
     id 'uk.gov.hmcts.java' version '0.12.33'
-    id 'com.gorylenko.gradle-git-properties' version '2.3.1'
+    id 'com.gorylenko.gradle-git-properties' version '2.4.1'
     id 'com.github.ben-manes.versions' version '0.39.0'
     id "info.solidsoft.pitest" version '1.9.0'
     id 'org.owasp.dependencycheck' version '7.3.2'
@@ -305,7 +305,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '4.24.0'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'DEV-SNAPSHOT'//4.24.0'
     implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.6.0'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.33.0'
@@ -510,7 +510,7 @@ bootWithCCD {
 
     //---Extra ccd loging----
     //Uncomment for ccd callback logging
-    //environment 'LOG_CALLBACK_DETAILS', '*'
+    environment 'LOG_CALLBACK_DETAILS', '*'
 
     //---Additional compose services---
     //Place any extra compose files you'd like to be started automatically here. These should be
@@ -529,7 +529,7 @@ bootWithCCD {
     environment 'DM_STORE_BASE_URL', 'http://localhost:5005'
     environment 'S2S_URL', 'http://localhost:4502'
     environment 'DOC_ASSEMBLY_URL', 'http://localhost:4631'
-    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'evidence'
+    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'sscsjobscheduler,evidence'
     environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
     environment 'CASE_DOCUMENT_S2S_AUTHORISED_SERVICES', 'ccd_case_document_am_api,ccd_gw,xui_webapp,ccd_data,bulk_scan_processor,sscs'
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,payment-api,xui_webapp,sscs,ccd_case_document_am_api,am_role_assignment_service'
