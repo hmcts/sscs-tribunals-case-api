@@ -109,7 +109,6 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             : null;
 
         adjournCaseBuilder.hearingType(hearingType);
-
         HearingType nextHearingType = HearingType.getByKey(String.valueOf(adjournment.getTypeOfNextHearing()));
 
         if (HearingType.FACE_TO_FACE.equals(nextHearingType)) {
