@@ -10,10 +10,10 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.WELSH_TRANSLATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.WELSH_TRANSLATION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest.ActionPostponementRequestAboutToSubmitHandler.POSTPONEMENT_DETAILS_SENT_TO_JUDGE_PREFIX;
 
 import java.time.LocalDate;
@@ -38,6 +38,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Note;
 import uk.gov.hmcts.reform.sscs.ccd.domain.NoteDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Postponement;
@@ -48,8 +50,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecordingCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -118,7 +118,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
                     .documentFilename("directionIssued.pdf")
                     .build())
                 .build())
-            .interlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId())
+            .interlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST)
             .postponementRequest(PostponementRequest.builder()
                 .actionPostponementRequestSelected("grant")
                 .build())
@@ -156,9 +156,9 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getInterlocReviewState())
-            .isEqualTo(InterlocReviewState.REVIEW_BY_JUDGE.getId());
+            .isEqualTo(InterlocReviewState.REVIEW_BY_JUDGE);
         assertThat(response.getData().getInterlocReferralReason())
-            .isEqualTo(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId());
+            .isEqualTo(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST);
         assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest()).isEqualTo(YES);
         assertThat(response.getData().getAppealNotePad().getNotesCollection())
             .isNotEmpty()
@@ -183,7 +183,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getInterlocReviewState()).isNull();
         assertThat(response.getData().getInterlocReferralReason()).isNull();
         assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest()).isEqualTo(NO);
-        assertThat(response.getData().getDwpState()).isEqualTo(DwpState.DIRECTION_ACTION_REQUIRED.getId());
+        assertThat(response.getData().getDwpState()).isEqualTo(DwpState.DIRECTION_ACTION_REQUIRED);
     }
 
     @Test
@@ -194,7 +194,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getInterlocReviewState()).isNull();
         assertThat(response.getData().getInterlocReferralReason()).isNull();
         assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest()).isEqualTo(NO);
-        assertThat(response.getData().getDwpState()).isEqualTo(DwpState.HEARING_POSTPONED.getId());
+        assertThat(response.getData().getDwpState()).isEqualTo(DwpState.HEARING_POSTPONED);
         assertThat(response.getData().getDocumentGeneration().getDirectionNoticeContent()).isNull();
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
                 eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
@@ -264,7 +264,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
                 eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(TRANSLATION_REQUIRED));
 
-        assertThat(response.getData().getInterlocReviewState()).isEqualTo(WELSH_TRANSLATION.getId());
+        assertThat(response.getData().getInterlocReviewState()).isEqualTo(WELSH_TRANSLATION);
         assertThat(response.getData().getTranslationWorkOutstanding()).isEqualTo(YES.getValue());
         System.out.println(response.getData().getSscsDocument());
         assertThat(response.getData().getDocumentGeneration().getDirectionNoticeContent()).isNull();

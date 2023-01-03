@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
@@ -62,10 +63,18 @@ public class AdjournCaseServiceTest {
             .build())
         .build();
 
+    @DisplayName("When adjournment feature flag is enabled, all fields are cleared except adjournmentInProgress which is NO")
     @Test
-    public void willRemoveTransientAdjournCaseData() {
-        AdjournCaseService.clearTransientFields(sscsCaseData);
+    public void willRemoveTransientAdjournCaseData_andSetAdjournmentInProgressToNoWhenFeatureFlagIsEnabled() {
+        AdjournCaseService.clearTransientFields(sscsCaseData, true);
         assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrPropertiesExcept("adjournmentInProgress");
         assertThat(sscsCaseData.getAdjournment().getAdjournmentInProgress()).isEqualTo(NO);
+    }
+
+    @DisplayName("When adjournment feature flag is disabled, all fields are cleared")
+    @Test
+    public void willRemoveTransientAdjournCaseData() {
+        AdjournCaseService.clearTransientFields(sscsCaseData, false);
+        assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrProperties();
     }
 }

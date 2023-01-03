@@ -17,7 +17,7 @@ public class DwpActionWithdrawalHandler implements PreSubmitCallbackHandler<Sscs
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType != null && callback != null && callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
             && callback.getEvent().equals(EventType.DWP_ACTION_WITHDRAWAL)
-            && WITHDRAWAL_RECEIVED.getId().equals(callback.getCaseDetails().getCaseData().getDwpState());
+            && WITHDRAWAL_RECEIVED == callback.getCaseDetails().getCaseData().getDwpState();
     }
 
     @Override
@@ -26,7 +26,7 @@ public class DwpActionWithdrawalHandler implements PreSubmitCallbackHandler<Sscs
             throw new IllegalStateException("Cannot handle callback");
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        caseData.setDwpState(WITHDRAWN.getId());
+        caseData.setDwpState(WITHDRAWN);
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }

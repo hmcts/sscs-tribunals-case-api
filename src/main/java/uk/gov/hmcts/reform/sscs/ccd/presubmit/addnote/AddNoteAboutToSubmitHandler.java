@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.addnote;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.findLabelById;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -12,7 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 
@@ -55,10 +54,10 @@ public class AddNoteAboutToSubmitHandler  implements PreSubmitCallbackHandler<Ss
         String note = sscsCaseData.getTempNoteDetail();
 
         if (callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED && nonNull(sscsCaseData.getInterlocReferralReason())
-                && StringUtils.isNoneBlank(sscsCaseData.getInterlocReferralReason()) && !sscsCaseData.getInterlocReferralReason().equals(InterlocReferralReason.NONE.getId())
+                && sscsCaseData.getInterlocReferralReason() != InterlocReferralReason.NONE
                 && nonNull(sscsCaseData.getSelectWhoReviewsCase())) {
 
-            String reasonLabel = findLabelById(sscsCaseData.getInterlocReferralReason());
+            String reasonLabel = sscsCaseData.getInterlocReferralReason().getDescription();
 
             log.info("Add note details for case id {} - select who reviews case: {}, interloc referral reason: {}",
                     sscsCaseData.getCcdCaseId(), sscsCaseData.getSelectWhoReviewsCase(), sscsCaseData.getInterlocReferralReason());

@@ -129,7 +129,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
                         .setDateApproved(LocalDate.now().toString()));
                 if (partyItemList.equals(PartyItemList.DWP)) {
                     dwpReleasedHearings.addAll(partyHearingRecordingsRequests);
-                    sscsCaseData.setDwpState(DwpState.HEARING_RECORDING_PROCESSED.getId());
+                    sscsCaseData.setDwpState(DwpState.HEARING_RECORDING_PROCESSED);
                 } else {
                     citizenReleasedHearings.addAll(partyHearingRecordingsRequests);
                 }
@@ -137,7 +137,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
                 requestedHearings.removeAll(partyHearingRecordingsRequests);
                 if (partyItemList.equals(PartyItemList.DWP)) {
                     dwpReleasedHearings.removeAll(partyHearingRecordingsRequests);
-                    sscsCaseData.setDwpState(DwpState.HEARING_RECORDING_PROCESSED.getId());
+                    sscsCaseData.setDwpState(DwpState.HEARING_RECORDING_PROCESSED);
                 } else {
                     citizenReleasedHearings.removeAll(partyHearingRecordingsRequests);
                 }

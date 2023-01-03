@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwprequesttimeextension;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.EXTENSION_REQUESTED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.TIME_EXTENSION;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -105,8 +107,8 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
 
         assertNull(actualCallback.getData().getTl1Form());
 
-        assertEquals("extensionRequested", actualCallback.getData().getDwpState());
-        assertEquals("timeExtension", actualCallback.getData().getInterlocReferralReason());
+        assertEquals(EXTENSION_REQUESTED, actualCallback.getData().getDwpState());
+        assertEquals(TIME_EXTENSION, actualCallback.getData().getInterlocReferralReason());
     }
 
     private void createTestData(List<SscsDocument> sscsDocuments, EventType eventType, boolean tl1Form) {

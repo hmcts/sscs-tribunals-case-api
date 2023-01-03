@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwplapse;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +41,10 @@ public class DwpLapseCaseHandler implements PreSubmitCallbackHandler<SscsCaseDat
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        log.info("Setting interloc review field to " + AWAITING_ADMIN_ACTION.getId() + " for case id " + caseData.getCcdCaseId());
+        log.info("Setting interloc review field to " + AWAITING_ADMIN_ACTION + " for case id " + caseData.getCcdCaseId());
 
-        caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
-        caseData.setDwpState(DwpState.LAPSED.getId());
+        caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
+        caseData.setDwpState(DwpState.LAPSED);
 
         if (caseData.getDwpLapseLetter() != null) {
             dwpDocumentService.addToDwpDocuments(caseData, caseData.getDwpLapseLetter(), DwpDocumentType.DWP_LAPSE_LETTER);

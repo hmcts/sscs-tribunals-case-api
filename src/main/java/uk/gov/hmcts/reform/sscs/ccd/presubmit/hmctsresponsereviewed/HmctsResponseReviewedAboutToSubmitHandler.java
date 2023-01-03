@@ -4,6 +4,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQUEST;
 
 import java.time.format.DateTimeFormatter;
 import lombok.extern.slf4j.Slf4j;
@@ -67,8 +68,8 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
 
     private void validateInterlocReferralReason(SscsCaseData sscsCaseData,
                                                 PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (sscsCaseData.isBenefitType(CHILD_SUPPORT) && nonNull(sscsCaseData.getInterlocReferralReason())
-                && sscsCaseData.getInterlocReferralReason().equals("phmeRequest")) {
+        if (sscsCaseData.isBenefitType(CHILD_SUPPORT)
+            && sscsCaseData.getInterlocReferralReason() == PHE_REQUEST) {
             preSubmitCallbackResponse.addError("PHE request' is not a valid selection for child support cases");
         }
     }

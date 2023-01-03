@@ -3,9 +3,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.supplementaryresponse;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.collections4.ListUtils.union;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
 import java.time.LocalDate;
@@ -74,10 +74,10 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
         if (sscsCaseData.getDwpOtherDoc() != null && sscsCaseData.getDwpOtherDoc().getDocumentLink() != null) {
             if (DocumentUtil.isFileAMedia(sscsCaseData.getDwpOtherDoc().getDocumentLink())) {
                 addAudioVideoEvidence(sscsCaseData);
-                if (!REVIEW_BY_JUDGE.getId().equals(sscsCaseData.getInterlocReviewState())) {
-                    sscsCaseData.setInterlocReviewState(REVIEW_BY_TCW.getId());
+                if (REVIEW_BY_JUDGE != sscsCaseData.getInterlocReviewState()) {
+                    sscsCaseData.setInterlocReviewState(REVIEW_BY_TCW);
                 }
-                sscsCaseData.setInterlocReferralReason(REVIEW_AUDIO_VIDEO_EVIDENCE.getId());
+                sscsCaseData.setInterlocReferralReason(REVIEW_AUDIO_VIDEO_EVIDENCE);
             } else {
                 responseDocuments.add(sscsCaseData.getDwpOtherDoc());
             }
@@ -90,7 +90,7 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
         if (responseDocuments.size() > 0) {
             sscsCaseData.setScannedDocuments(buildScannedDocsList(sscsCaseData, responseDocuments));
             sscsCaseData.setEvidenceHandled(YesNo.NO.getValue());
-            sscsCaseData.setDwpState(DwpState.SUPPLEMENTARY_RESPONSE.getId());
+            sscsCaseData.setDwpState(DwpState.SUPPLEMENTARY_RESPONSE);
         }
 
         setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);

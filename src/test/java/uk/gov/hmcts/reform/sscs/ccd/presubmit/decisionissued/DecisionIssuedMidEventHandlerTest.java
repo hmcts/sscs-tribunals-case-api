@@ -74,7 +74,7 @@ public class DecisionIssuedMidEventHandlerTest {
     public void setUp() {
         openMocks(this);
         Map<EventType, String> englishEventTypeDocs = new HashMap<>();
-        englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-draft-decision-notice.docx");
+        englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-directions-notice.docx");
         englishEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-ENG-draft-decision-notice.docx");
         englishEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00453.docx");
 
@@ -151,7 +151,7 @@ public class DecisionIssuedMidEventHandlerTest {
                 .build(), response.getData().getDocumentStaging().getPreviewDocument());
 
         verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname",
-                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DECISION_ISSUED));
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED));
     }
 
     @Test
@@ -161,7 +161,7 @@ public class DecisionIssuedMidEventHandlerTest {
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         verifyTemplateBody(NoticeIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname",
-                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DECISION_ISSUED));
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED));
     }
 
     @Test
@@ -176,8 +176,9 @@ public class DecisionIssuedMidEventHandlerTest {
 
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname",
-                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DECISION_ISSUED));
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE,
+                "Appointee Surname, appointee for Appellant Lastname",
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED));
     }
 
     @Test

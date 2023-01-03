@@ -253,7 +253,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(FINAL_DECISION_NOTICE), any(), eq(null), eq(null), eq(null));
         verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
         verifyNoMoreInteractions(hearingMessageHelper);
-        assertEquals(FINAL_DECISION_ISSUED.getId(), response.getData().getDwpState());
+        assertEquals(FINAL_DECISION_ISSUED, response.getData().getDwpState());
 
         assertEquals("decisionInFavourOfAppellant", response.getData().getOutcome());
 
@@ -321,7 +321,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         assertEquals(0, response.getErrors().size());
 
         verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(FINAL_DECISION_NOTICE), any(), eq(null), eq(null), eq(null));
-        assertEquals(FINAL_DECISION_ISSUED.getId(), response.getData().getDwpState());
+        assertEquals(FINAL_DECISION_ISSUED, response.getData().getDwpState());
 
         assertEquals(expectedOutcome, response.getData().getOutcome());
 
@@ -421,7 +421,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getState(), is(State.DORMANT_APPEAL_STATE));
-        assertThat(response.getData().getDwpState(), is(FINAL_DECISION_ISSUED.getId()));
+        assertThat(response.getData().getDwpState(), is(FINAL_DECISION_ISSUED));
     }
 
     @Test
@@ -429,11 +429,11 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         commonSetUp();
 
         callback.getCaseDetails().getCaseData().setState(State.READY_TO_LIST);
-        callback.getCaseDetails().getCaseData().setDwpState(DwpState.DIRECTION_RESPONDED.getId());
+        callback.getCaseDetails().getCaseData().setDwpState(DwpState.DIRECTION_RESPONDED);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getState(), is(State.READY_TO_LIST));
-        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_RESPONDED.getId()));
+        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_RESPONDED));
     }
 
     @Test
@@ -441,10 +441,10 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         commonSetUp();
 
         callback.getCaseDetails().getCaseData().setState(State.WITH_DWP);
-        callback.getCaseDetails().getCaseData().setDwpState(DwpState.DIRECTION_RESPONDED.getId());
+        callback.getCaseDetails().getCaseData().setDwpState(DwpState.DIRECTION_RESPONDED);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getState(), is(State.WITH_DWP));
-        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_RESPONDED.getId()));
+        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_RESPONDED));
     }
 }

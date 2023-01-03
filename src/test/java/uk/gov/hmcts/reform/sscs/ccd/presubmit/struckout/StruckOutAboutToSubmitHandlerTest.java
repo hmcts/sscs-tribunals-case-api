@@ -11,9 +11,9 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_INFORMATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -60,9 +60,9 @@ public class StruckOutAboutToSubmitHandlerTest {
 
         sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("1234")
-                .interlocReviewState(AWAITING_INFORMATION.getId())
+                .interlocReviewState(AWAITING_INFORMATION)
                 .directionDueDate(LocalDate.now().toString())
-                .dwpState(DwpState.IN_PROGRESS.getId())
+                .dwpState(DwpState.IN_PROGRESS)
                 .state(INTERLOCUTORY_REVIEW_STATE)
                 .appeal(Appeal.builder().build())
                 .schedulingAndListingFields(SchedulingAndListingFields.builder()
@@ -104,7 +104,7 @@ public class StruckOutAboutToSubmitHandlerTest {
         assertThat(response.getData().getInterlocReviewState(), is(nullValue()));
         assertThat(response.getData().getDirectionDueDate(), is(nullValue()));
         assertThat(response.getData().getPreviousState(), is(HEARING));
-        assertThat(response.getData().getDwpState(), is(DwpState.STRIKE_OUT_ACTIONED.getId()));
+        assertThat(response.getData().getDwpState(), is(DwpState.STRIKE_OUT_ACTIONED));
         verify(listAssistHearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()),
                 eq(CancellationReason.STRUCK_OUT));
         verifyNoMoreInteractions(listAssistHearingMessageHelper);
