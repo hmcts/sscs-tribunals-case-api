@@ -8,21 +8,21 @@
     <cve>CVE-2016-4432</cve>
     <cve>CVE-2016-3094</cve>
   </suppress>
-  <suppress until = "2023-02-01">
+  <suppress until = "2023-01-15">
     <notes><![CDATA[
      these common libraries are being mistaken as Apache Commons Net
    ]]></notes>
     <packageUrl regex="true">^pkg:maven\/commons\-(?!net)\w+\/commons\-(?!net)\w+@.*$</packageUrl>
     <cve>CVE-2021-37533</cve>
   </suppress>
-  <suppress until = "2023-02-01">
+  <suppress until = "2023-01-15">
     <notes><![CDATA[
      these common libraries are being mistaken as Apache Commons Net
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/org\.apache\.commons/commons\-(?!net)\w+@.*$</packageUrl>
     <cve>CVE-2021-37533</cve>
   </suppress>
-  <suppress until = "2023-02-01">
+  <suppress until = "2023-01-15">
     <notes><![CDATA[
    netty 4.1.85
    ]]></notes>
