@@ -24,6 +24,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Note;
 import uk.gov.hmcts.reform.sscs.ccd.domain.NoteDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.NotePad;
@@ -32,8 +34,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
@@ -84,7 +84,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         }
 
         String actionRequested = sscsCaseData.getPostponementRequest().getActionPostponementRequestSelected();
-        log.info("Action postponement request: handing action {} for case {}", actionRequested, caseId);
+        log.info("Action postponement request: handling action {} for case {}", actionRequested, caseId);
         if (SEND_TO_JUDGE.getValue().equals(actionRequested)) {
             sendToJudge(userAuthorisation, sscsCaseData);
         } else if (REFUSE.getValue().equals(actionRequested)) {
@@ -105,7 +105,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     private void refusePostponement(SscsCaseData sscsCaseData) {
         sscsCaseData.setInterlocReferralReason(null);
         sscsCaseData.setInterlocReviewState(null);
-        sscsCaseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
+        sscsCaseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED);
         addDirectionNotice(sscsCaseData);
         sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(NO);
     }
@@ -115,7 +115,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         postponementRequestService.addCurrentHearingToExcludeDates(response);
         sscsCaseData.setInterlocReferralReason(null);
         sscsCaseData.setInterlocReviewState(null);
-        sscsCaseData.setDwpState(DwpState.HEARING_POSTPONED.getId());
+        sscsCaseData.setDwpState(DwpState.HEARING_POSTPONED);
         addDirectionNotice(sscsCaseData);
 
         String listingOption = sscsCaseData.getPostponementRequest().getListingOption();
@@ -145,8 +145,8 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         sscsCaseData.getAppealNotePad().getNotesCollection()
                 .add(createPostponementRequestNote(userAuthorisation,
                         sscsCaseData.getPostponementRequest().getPostponementRequestDetails()));
-        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
-        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId());
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST);
         sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(YES);
     }
 
@@ -160,7 +160,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         footerService.createFooterAndAddDocToCase(url, caseData, POSTPONEMENT_REQUEST_DIRECTION_NOTICE, now,
                 null, null, documentTranslationStatus);
         if (documentTranslationStatus != null) {
-            caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
+            caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
             log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
             caseData.setTranslationWorkOutstanding(YES.getValue());
         }

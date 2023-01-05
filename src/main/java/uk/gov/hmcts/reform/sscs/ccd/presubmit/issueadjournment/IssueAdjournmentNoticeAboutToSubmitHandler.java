@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.ADJOURNMENT_NOTICE_ISSUED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -11,13 +12,14 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -29,6 +31,9 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
     private final FooterService footerService;
     private final Validator validator;
+
+    @Value("${feature.snl.adjournment.enabled}")
+    private boolean isAdjournmentEnabled; // TODO SSCS-10951
 
     @Autowired
     public IssueAdjournmentNoticeAboutToSubmitHandler(FooterService footerService, Validator validator) {
@@ -64,28 +69,8 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
             calculateDueDate(sscsCaseData);
 
-            if (sscsCaseData.getAdjournCasePreviewDocument() != null) {
-                createAdjournmentNoticeFromPreviewDraft(preSubmitCallbackResponse, documentTranslationStatus);
-
-                if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
-                    sscsCaseData.setDwpState(ADJOURNMENT_NOTICE_ISSUED.getId());
-                    if ("yes".equalsIgnoreCase(sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties())) {
-                        sscsCaseData.setState(State.NOT_LISTABLE);
-                    } else {
-                        sscsCaseData.setState(State.READY_TO_LIST);
-                    }
-                } else {
-                    log.info("Case is a Welsh case so Adjournment Notice requires translation for case id : {}", sscsCaseData.getCcdCaseId());
-                    clearBasicTransientFields(sscsCaseData);
-                    sscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
-                    log.info("Set the InterlocReviewState to {},  for case id : {}", sscsCaseData.getInterlocReviewState(), sscsCaseData.getCcdCaseId());
-                    sscsCaseData.setTranslationWorkOutstanding("Yes");
-                }
-
-                AdjournCaseService.clearTransientFields(sscsCaseData);
-
-                preSubmitCallbackResponse.getData().getSscsDocument()
-                        .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
+            if (sscsCaseData.getAdjournment().getPreviewDocument() != null) {
+                processResponse(sscsCaseData, preSubmitCallbackResponse, documentTranslationStatus);
             } else {
                 preSubmitCallbackResponse.addError("There is no Draft Adjournment Notice on the case so adjournment cannot be issued");
             }
@@ -94,19 +79,48 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         return preSubmitCallbackResponse;
     }
 
+    private void processResponse(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
+        SscsDocumentTranslationStatus documentTranslationStatus) {
+        createAdjournmentNoticeFromPreviewDraft(preSubmitCallbackResponse, documentTranslationStatus);
+
+        if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
+            sscsCaseData.setDwpState(ADJOURNMENT_NOTICE_ISSUED);
+            if (isYes(sscsCaseData.getAdjournment().getAreDirectionsBeingMadeToParties())) {
+                sscsCaseData.setState(State.NOT_LISTABLE);
+            } else {
+                sscsCaseData.setState(State.READY_TO_LIST);
+            }
+        } else {
+            log.info("Case is a Welsh case so Adjournment Notice requires translation for case id : {}", sscsCaseData.getCcdCaseId());
+            clearBasicTransientFields(sscsCaseData);
+            sscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
+            log.info("Set the InterlocReviewState to {},  for case id : {}", sscsCaseData.getInterlocReviewState(), sscsCaseData.getCcdCaseId());
+            sscsCaseData.setTranslationWorkOutstanding("Yes");
+        }
+
+        AdjournCaseService.clearTransientFields(sscsCaseData, isAdjournmentEnabled);
+
+        preSubmitCallbackResponse.getData().getSscsDocument()
+                .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
+    }
+
     private void calculateDueDate(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getAdjournCaseDirectionsDueDate() != null && !"".equalsIgnoreCase(sscsCaseData.getAdjournCaseDirectionsDueDate())) {
-            sscsCaseData.setDirectionDueDate(sscsCaseData.getAdjournCaseDirectionsDueDate());
-        } else if (sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset() != null && !"".equalsIgnoreCase(sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset())) {
-            sscsCaseData.setDirectionDueDate(LocalDate.now().plusDays(Integer.parseInt(sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset())).toString());
+        if (sscsCaseData.getAdjournment().getDirectionsDueDate() != null) {
+            sscsCaseData.setDirectionDueDate(sscsCaseData.getAdjournment().getDirectionsDueDate().toString());
+        } else if (sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset() != null) {
+            sscsCaseData.setDirectionDueDate(LocalDate.now()
+                .plusDays(sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset().getCcdDefinition())
+                .toString());
         }
     }
 
-    private void createAdjournmentNoticeFromPreviewDraft(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, SscsDocumentTranslationStatus documentTranslationStatus) {
+    private void createAdjournmentNoticeFromPreviewDraft(
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
+        SscsDocumentTranslationStatus documentTranslationStatus) {
 
         SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
 
-        DocumentLink docLink = sscsCaseData.getAdjournCasePreviewDocument();
+        DocumentLink docLink = sscsCaseData.getAdjournment().getPreviewDocument();
 
         DocumentLink documentLink = DocumentLink.builder()
             .documentUrl(docLink.getDocumentUrl())

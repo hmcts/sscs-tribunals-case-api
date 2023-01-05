@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty.REP;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.REPRESENTATIVE;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -69,12 +70,15 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
             UploadParty uploadParty = getUploadParty(sscsCaseData.getOriginalSender());
             postponementRequestService.processPostponementRequest(sscsCaseData, uploadParty);
         } else {
-            final String code = sscsCaseData.getSelectWhoReviewsCase().getValue().getCode();
-            sscsCaseData.setInterlocReviewState(code);
+            InterlocReviewState interlocState = Arrays.stream(InterlocReviewState.values())
+                .filter(x -> x.getCcdDefinition().equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode()))
+                .findFirst()
+                .orElse(null);
+            sscsCaseData.setInterlocReviewState(interlocState);
         }
         sscsCaseData.setSelectWhoReviewsCase(null);
         log.info("Setting interloc referral date to {}  for caseId {}", LocalDate.now(), sscsCaseData.getCcdCaseId());
-        sscsCaseData.setInterlocReferralDate(LocalDate.now().toString());
+        sscsCaseData.setInterlocReferralDate(LocalDate.now());
         sscsCaseData.setDirectionDueDate(null);
         return preSubmitCallbackResponse;
     }

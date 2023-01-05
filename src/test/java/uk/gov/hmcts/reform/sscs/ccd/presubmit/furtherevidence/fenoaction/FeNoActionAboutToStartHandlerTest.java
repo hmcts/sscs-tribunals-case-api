@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.fenoaction;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.junit.Assert.assertEquals;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FE_RECEIVED;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,11 +57,11 @@ public class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
                 "data.appeal.rep.id")
             .when(Option.TREATING_NULL_AS_ABSENT)
             .isEqualTo(expectedCaseData);
-        assertEquals("feReceived", actualCaseData.getData().getDwpState());
+        assertEquals(FE_RECEIVED, actualCaseData.getData().getDwpState());
 
         List<DynamicListItem> listOptions = new ArrayList<>();
-        listOptions.add(new DynamicListItem(DwpState.FE_ACTIONED_NR.getId(), DwpState.FE_ACTIONED_NR.getLabel()));
-        listOptions.add(new DynamicListItem(DwpState.FE_ACTIONED_NA.getId(), DwpState.FE_ACTIONED_NA.getLabel()));
+        listOptions.add(new DynamicListItem(DwpState.FE_ACTIONED_NR.getCcdDefinition(), DwpState.FE_ACTIONED_NR.getDescription()));
+        listOptions.add(new DynamicListItem(DwpState.FE_ACTIONED_NA.getCcdDefinition(), DwpState.FE_ACTIONED_NA.getDescription()));
         assertEquals(listOptions, actualCaseData.getData().getDwpStateFeNoAction().getListItems());
     }
 

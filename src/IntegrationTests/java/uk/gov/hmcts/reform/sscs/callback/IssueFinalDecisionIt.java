@@ -63,7 +63,7 @@ public class IssueFinalDecisionIt extends AbstractEventIt {
         assertEquals(DECISION_IN_FAVOUR_OF_APPELLANT.getId(), result.getData().getOutcome());
 
         assertEquals(FINAL_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        assertEquals(FINAL_DECISION_ISSUED.getId(), result.getData().getDwpState());
+        assertEquals(FINAL_DECISION_ISSUED, result.getData().getDwpState());
         assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
         assertEquals("Addition B - Final Decision Notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("B", result.getData().getSscsDocument().get(0).getValue().getBundleAddition());
@@ -87,7 +87,7 @@ public class IssueFinalDecisionIt extends AbstractEventIt {
         assertEquals(DECISION_IN_FAVOUR_OF_APPELLANT.getId(), result.getData().getOutcome());
 
         assertEquals(FINAL_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        assertEquals(FINAL_DECISION_ISSUED.getId(), result.getData().getDwpState());
+        assertEquals(FINAL_DECISION_ISSUED, result.getData().getDwpState());
         assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
         assertEquals("Addition B - Final Decision Notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("B", result.getData().getSscsDocument().get(0).getValue().getBundleAddition());
@@ -111,7 +111,7 @@ public class IssueFinalDecisionIt extends AbstractEventIt {
         assertEquals(DECISION_IN_FAVOUR_OF_APPELLANT.getId(), result.getData().getOutcome());
 
         assertEquals(FINAL_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        assertEquals(FINAL_DECISION_ISSUED.getId(), result.getData().getDwpState());
+        assertEquals(FINAL_DECISION_ISSUED, result.getData().getDwpState());
         assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
         assertEquals("Addition B - Final Decision Notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("B", result.getData().getSscsDocument().get(0).getValue().getBundleAddition());
@@ -135,7 +135,7 @@ public class IssueFinalDecisionIt extends AbstractEventIt {
         assertEquals(DECISION_IN_FAVOUR_OF_APPELLANT.getId(), result.getData().getOutcome());
 
         assertEquals(FINAL_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        assertEquals(FINAL_DECISION_ISSUED.getId(), result.getData().getDwpState());
+        assertEquals(FINAL_DECISION_ISSUED, result.getData().getDwpState());
         assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
         assertEquals("Addition B - Final Decision Notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("B", result.getData().getSscsDocument().get(0).getValue().getBundleAddition());

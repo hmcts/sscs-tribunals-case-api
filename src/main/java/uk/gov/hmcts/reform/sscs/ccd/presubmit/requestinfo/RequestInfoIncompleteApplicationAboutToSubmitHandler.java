@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.requestinfo;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_INFORMATION;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,7 @@ public class RequestInfoIncompleteApplicationAboutToSubmitHandler implements Pre
         log.info(String.format("Handling request info incomplete application event for caseId %s", sscsCaseData.getCcdCaseId()));
 
         if ("yes".equalsIgnoreCase(sscsCaseData.getResponseRequired())) {
-            sscsCaseData.setInterlocReviewState(AWAITING_INFORMATION.getId());
+            sscsCaseData.setInterlocReviewState(AWAITING_INFORMATION);
         }
 
         if (State.INCOMPLETE_APPLICATION_INFORMATION_REQUESTED.equals(caseDetails.getState())

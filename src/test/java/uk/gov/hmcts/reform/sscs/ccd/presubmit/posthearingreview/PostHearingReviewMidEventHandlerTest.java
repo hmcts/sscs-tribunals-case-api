@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionposthearingapplication;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -7,16 +7,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ACTION_POST_HEARING_APPLICATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DECISION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REVIEW;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionposthearingapplication.ActionPostHearingApplicationMidEventHandler.PAGE_ID_GENERATE_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview.PostHearingReviewMidEventHandler.PAGE_ID_GENERATE_NOTICE;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -50,7 +48,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 
 @ExtendWith(MockitoExtension.class)
-class ActionPostHearingApplicationMidEventHandlerTest {
+class PostHearingReviewMidEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private static final String URL = "http://dm-store/documents/123";
@@ -72,12 +70,12 @@ class ActionPostHearingApplicationMidEventHandlerTest {
     @Mock
     private DocumentConfiguration documentConfiguration;
 
-    private ActionPostHearingApplicationMidEventHandler handler;
+    private PostHearingReviewMidEventHandler handler;
 
 
     @BeforeEach
     void setUp() {
-        handler = new ActionPostHearingApplicationMidEventHandler(documentConfiguration, generateFile, true);
+        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, true);
 
         caseData = SscsCaseData.builder()
             .documentGeneration(DocumentGeneration.builder()
@@ -97,7 +95,7 @@ class ActionPostHearingApplicationMidEventHandlerTest {
 
     @Test
     void givenAValidMidEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(ACTION_POST_HEARING_APPLICATION);
+        when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(MID_EVENT, callback)).isTrue();
     }
 
@@ -114,8 +112,8 @@ class ActionPostHearingApplicationMidEventHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new ActionPostHearingApplicationMidEventHandler(documentConfiguration, generateFile, false);
-        when(callback.getEvent()).thenReturn(ACTION_POST_HEARING_APPLICATION);
+        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, false);
+        when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
 
@@ -190,23 +188,6 @@ class ActionPostHearingApplicationMidEventHandlerTest {
         assertThat(response.getErrors()).isEmpty();
 
         verifyNoInteractions(generateFile);
-    }
-
-    @Test
-    void givenNonLaCase_shouldReturnErrorWithCorrectMessage() {
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-
-        caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
-            .hearingRoute(GAPS)
-            .build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response =
-            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors())
-            .hasSize(1)
-            .containsOnly("Cannot process Action Post Hearing Application on non Scheduling & Listing Case");
     }
 
 }

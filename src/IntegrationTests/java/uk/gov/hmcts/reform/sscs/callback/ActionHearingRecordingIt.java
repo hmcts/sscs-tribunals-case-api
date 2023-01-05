@@ -33,7 +33,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -64,7 +64,7 @@ public class ActionHearingRecordingIt extends AbstractEventIt {
         sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("1")
                 .state(State.WITH_DWP)
-                .interlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId())
+                .interlocReviewState(InterlocReviewState.REVIEW_BY_TCW)
                 .hearings(List.of(hearing1))
                 .sscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder()
                         .selectHearingDetails(new DynamicList(selectedHearing, List.of(selectedHearing)))
@@ -263,7 +263,7 @@ public class ActionHearingRecordingIt extends AbstractEventIt {
                 sscsHearingRecordingCaseDataResponse.getDwpReleasedHearings().get(0).getValue()
                         .getDateApproved(), is(LocalDate.now().toString()));
         assertThat("Check DwpState is PROCESSED", response.getData().getDwpState(),
-                is(DwpState.HEARING_RECORDING_PROCESSED.getId()));
+                is(DwpState.HEARING_RECORDING_PROCESSED));
     }
 
 }

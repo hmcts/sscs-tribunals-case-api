@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.checkConfidentiality;
@@ -311,20 +312,15 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private String resolvePostCode(SscsCaseData sscsCaseData) {
-        String postCode;
-
-        if ("yes".equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())) {
-            postCode = Optional.ofNullable(sscsCaseData.getAppeal().getAppellant().getAppointee())
+    private static String resolvePostCode(SscsCaseData sscsCaseData) {
+        if (YES.getValue().equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())) {
+            return Optional.ofNullable(sscsCaseData.getAppeal().getAppellant().getAppointee())
                 .map(Appointee::getAddress)
                 .map(Address::getPostcode)
-                .filter(appointeePostCode -> !"".equals(appointeePostCode))
+                .filter(StringUtils::isNotEmpty)
                 .orElse(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
-        } else {
-            postCode = sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
         }
 
-        return postCode;
+        return sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
     }
-
 }
