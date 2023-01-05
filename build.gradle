@@ -259,6 +259,28 @@ dependencyManagement {
             entry 'snakeyaml'
         }
 
+        dependencySet(group: 'io.netty', version: '4.1.86.Final') {
+            entry 'netty-handler-proxy'
+            entry 'netty-handler'
+            entry 'netty-transport-native-unix-common'
+            entry 'netty-transport-native-epoll'
+            entry 'netty-transport-native-kqueue'
+            entry 'netty-codec-http2'
+            entry 'netty-codec-http'
+            entry 'netty-codec-dns'
+            entry 'netty-codec-socks'
+            entry 'netty-codec'
+            entry 'netty-transport'
+            entry 'netty-transport-classes-epoll'
+            entry 'netty-transport-classes-kqueue'
+            entry 'netty-buffer'
+            entry 'netty-resolver-dns-native-macos'
+            entry 'netty-resolver-dns-classes-macos'
+            entry 'netty-resolver-dns'
+            entry 'netty-resolver'
+            entry 'netty-common'
+        }
+
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:2021.0.5"
         }
