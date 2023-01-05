@@ -22,11 +22,11 @@
     <packageUrl regex="true">^pkg:maven/org\.apache\.commons/commons\-(?!net)\w+@.*$</packageUrl>
     <cve>CVE-2021-37533</cve>
   </suppress>
-  <suppress until = "2023-02-01">
+  <suppress>
     <notes><![CDATA[
-     Suppressed because dependent libraries haven't released new versions
+     LatencyUtils is being mistaken as utils_project:utils
    ]]></notes>
-    <cve>CVE-2022-41881</cve>
-    <cve>CVE-2022-41915</cve>
+    <packageUrl regex="true">^pkg:maven/org\.latencyutils/LatencyUtils@.*$</packageUrl>
+    <cve>CVE-2021-4277</cve>
   </suppress>
 </suppressions>
