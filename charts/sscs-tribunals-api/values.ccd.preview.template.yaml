@@ -309,7 +309,7 @@ ccd:
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
-      CCD_ENVIRONMENT: 'AAT'
+      CCD_ENVIRONMENT: 'PROD'
       CCD_DEF_EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-em-ccd-orchestrator
       CCD_DEF_SSCS_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-sscs-ccd-orchestrator
       CCD_DEF_TRIBUNALS_API_URL: http://${SERVICE_NAME}-java
@@ -323,7 +323,7 @@ ccd:
       CCD_DEF_MYA_LINK: http://${SERVICE_NAME}/sign-in?tya=
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
-      CCD_DEF_ENV: 'AAT'
+      CCD_DEF_ENV: 'PROD'
       CCD_DEF_VERSION: S10538-22nonProd
     secrets: []
     userRoles:
