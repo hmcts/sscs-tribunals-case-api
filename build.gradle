@@ -10,7 +10,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.9.0'
     id 'org.owasp.dependencycheck' version '7.3.2'
     id 'au.com.dius.pact' version '4.3.15'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.464'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.514'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -161,7 +161,7 @@ dependencyCheck {
     // Specifies if the build should be failed if a CVSS score above a specified level is identified.
     // range of 7-10 fails the build, anything lower and it doesn't fail the build
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild', 'true') == 'true' ? 7.0 : 11
-    suppressionFile = 'dependency-check-suppressions.xml'
+    suppressionFile = 'config/owasp/suppressions.xml'
 
     cveValidForHours = 24
 
@@ -259,6 +259,29 @@ dependencyManagement {
             entry 'snakeyaml'
         }
 
+        // CVE-2022-41881, CVE-2022-41915
+        dependencySet(group: 'io.netty', version: '4.1.86.Final') {
+            entry 'netty-buffer'
+            entry 'netty-common'
+            entry 'netty-codec'
+            entry 'netty-codec-dns'
+            entry 'netty-codec-http'
+            entry 'netty-codec-http2'
+            entry 'netty-codec-socks'
+            entry 'netty-handler'
+            entry 'netty-handler-proxy'
+            entry 'netty-resolver'
+            entry 'netty-resolver-dns'
+            entry 'netty-resolver-dns-classes-macos'
+            entry 'netty-resolver-dns-native-macos'
+            entry 'netty-transport'
+            entry 'netty-transport-classes-epoll'
+            entry 'netty-transport-classes-kqueue'
+            entry 'netty-transport-native-epoll'
+            entry 'netty-transport-native-kqueue'
+            entry 'netty-transport-native-unix-common'
+        }
+
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:2021.0.5"
         }
@@ -291,7 +314,7 @@ dependencies {
 
     implementation group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.8'
 
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.13'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.14'
 
     implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.10'
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.10.0'
@@ -306,13 +329,12 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5ae17b7'
-
     implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.6.0'
 
-    implementation group: 'com.azure', name: 'azure-core', version: '1.33.0'
-    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.12.0'
+    implementation group: 'com.azure', name: 'azure-core', version: '1.34.0'
+    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.13.0'
 
-    implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.4.15'
+    implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.5.1'
 
     implementation group:'org.overviewproject', name: 'mime-types', version: '1.0.2'
 
@@ -322,15 +344,15 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.1'
 
     implementation group:'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-    implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.6.0'
+    implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.7.0'
 
     implementation group: 'org.pitest', name: 'pitest', version:  '1.9.11'
     implementation group:'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.9.0'
     implementation group:'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: '0.5'
 
-    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.2.0'
-    testImplementation group: 'io.rest-assured', name: 'xml-path', version: '5.2.0'
-    testImplementation group: 'io.rest-assured', name: 'json-path', version: '5.2.0'
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.3.0'
+    testImplementation group: 'io.rest-assured', name: 'xml-path', version: '5.3.0'
+    testImplementation group: 'io.rest-assured', name: 'json-path', version: '5.3.0'
     testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.3.0', classifier: 'all', {
         exclude group: 'commons-io', module: 'commons-io'
     }
@@ -363,8 +385,8 @@ dependencies {
 
     testImplementation group: 'org.apache.httpcomponents', name: 'fluent-hc', version:  '4.5.13'
 
-    testImplementation group: 'com.azure', name: 'azure-core', version: '1.33.0'
-    testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.12.0'
+    testImplementation group: 'com.azure', name: 'azure-core', version: '1.34.0'
+    testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.13.0'
 
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.8.1'
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.36.0'
