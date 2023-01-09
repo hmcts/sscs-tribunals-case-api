@@ -29,7 +29,6 @@
     <packageUrl regex="true">^pkg:maven/org\.latencyutils/LatencyUtils@.*$</packageUrl>
     <cve>CVE-2021-4277</cve>
   </suppress>
-  <suppress>
   <suppress until = "2023-02-01">
     <notes><![CDATA[
    file name: snakeyaml-1.33.jar
