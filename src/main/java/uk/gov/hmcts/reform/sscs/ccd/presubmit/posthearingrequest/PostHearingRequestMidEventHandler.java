@@ -67,8 +67,21 @@ public class PostHearingRequestMidEventHandler implements PreSubmitCallbackHandl
         switch (typeSelected) {
             case SET_ASIDE:
                 return postHearing.getSetAside().getRequestFormat();
+            case CORRECTION:
+                //return postHearing.getCorrection().getRequestFormat();
+                break;
+            case STATEMENT_OF_REASONS:
+                //return postHearing.getStatementOfReasons().getRequestFormat();
+                break;
+            case PERMISSION_TO_APPEAL:
+                //return postHearing.getPermissionToAppeal().getRequestFormat();
+                break;
+            case LIBERTY_TO_APPLY:
+                //return postHearing.getLibertyToApply().getRequestFormat();
+                break;
             default:
                 return null;
         }
+        return null;
     }
 }
