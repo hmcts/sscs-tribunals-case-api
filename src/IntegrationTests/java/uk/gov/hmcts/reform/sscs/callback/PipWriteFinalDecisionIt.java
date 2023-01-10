@@ -540,7 +540,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
                     "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
             } else if (appellantAttended && !presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent.");
+                    "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend.");
             } else if (!appellantAttended && presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
                     "This has been a remote hearing in the form of a video hearing. Joe Bloggs did not attend the hearing today. A Presenting Officer attended on behalf of the Respondent.");
@@ -549,7 +549,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
                 additionalParagraph = true;
             } else if (!appellantAttended && !presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a video hearing. Joe Bloggs did not attend the hearing today. No Presenting Officer attended on behalf of the Respondent.");
+                    "This has been a remote hearing in the form of a video hearing. Joe Bloggs did not attend the hearing today. First Tier Agency representative did not attend.");
                 assertIsParagraphWithText(components, 9, (
                     "Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today. "));
                 additionalParagraph = true;
@@ -560,7 +560,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
                     "This has been a remote hearing in the form of a telephone hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
             } else if (appellantAttended && !presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a telephone hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent.");
+                    "This has been a remote hearing in the form of a telephone hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend.");
             } else if (!appellantAttended && presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
                     "This has been a remote hearing in the form of a telephone hearing. Joe Bloggs did not attend the hearing today. A Presenting Officer attended on behalf of the Respondent.");
@@ -569,7 +569,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
                 additionalParagraph = true;
             } else if (!appellantAttended && !presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a telephone hearing. Joe Bloggs did not attend the hearing today. No Presenting Officer attended on behalf of the Respondent.");
+                    "This has been a remote hearing in the form of a telephone hearing. Joe Bloggs did not attend the hearing today. First Tier Agency representative did not attend.");
                 assertIsParagraphWithText(components, 9,
                     "Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today. ");
                 additionalParagraph = true;
@@ -585,7 +585,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
                     "This has been an oral (face to face) hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
             } else if (appellantAttended && !presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been an oral (face to face) hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent.");
+                    "This has been an oral (face to face) hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend.");
             } else if (!appellantAttended && presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
                     "Joe Bloggs requested an oral hearing but did not attend today. A Presenting Officer attended on behalf of the Respondent.");
@@ -594,7 +594,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
                 additionalParagraph = true;
             } else if (!appellantAttended && !presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "Joe Bloggs requested an oral hearing but did not attend today. No Presenting Officer attended on behalf of the Respondent.");
+                    "Joe Bloggs requested an oral hearing but did not attend today. First Tier Agency representative did not attend.");
                 assertIsParagraphWithText(components, 9,
                     "Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today. ");
                 additionalParagraph = true;
