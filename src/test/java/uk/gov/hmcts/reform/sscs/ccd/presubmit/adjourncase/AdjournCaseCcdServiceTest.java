@@ -17,6 +17,7 @@ import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
+import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 import uk.gov.hmcts.reform.sscs.service.venue.VenueRpcDetailsService;
 
@@ -28,10 +29,13 @@ public class AdjournCaseCcdServiceTest {
     @Mock
     private VenueDataLoader venueDataLoader;
 
+    @Mock
+    private RefDataService refDataService;
+
     @Before
     public void setUp() throws IOException {
         openMocks(this);
-        service = new AdjournCaseCcdService(new VenueRpcDetailsService(venueDataLoader));
+        service = new AdjournCaseCcdService(new VenueRpcDetailsService(venueDataLoader), refDataService);
         Map<String, VenueDetails> venueDetailsMap = new HashMap<>();
         venueDetailsMap.put("venue1Rpc1", VenueDetails.builder().venueId("venue1Rpc1").active("Yes").venName("Zebedee Venue 1")
                 .regionalProcessingCentre("SSCS Rpc 1").build());

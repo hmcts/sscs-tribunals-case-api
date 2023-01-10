@@ -1,29 +1,32 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNALS_MEMBER_DISABILITY;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNALS_MEMBER_MEDICAL;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType;
+import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.venue.VenueRpcDetails;
 import uk.gov.hmcts.reform.sscs.service.venue.VenueRpcDetailsService;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class AdjournCaseCcdService {
 
     private final VenueRpcDetailsService venueRpcDetailsService;
 
-    @Autowired
-    public AdjournCaseCcdService(VenueRpcDetailsService venueRpcDetailsService) {
-        this.venueRpcDetailsService = venueRpcDetailsService;
-    }
+    private final RefDataService refDataService;
 
     private List<DynamicListItem> getSortedVenueItems(Predicate<VenueRpcDetails> predicate, boolean prefixWithRpc) {
         List<DynamicListItem> venueItems = venueRpcDetailsService.getVenues(predicate).stream().map(v ->
@@ -46,13 +49,16 @@ public class AdjournCaseCcdService {
     }
 
     public void setPanelMembers(Adjournment adjournment) {
-        adjournment.setDisabilityQualifiedPanelMemberName(getPanelMembers());
-        adjournment.setMedicallyQualifiedPanelMemberName(getPanelMembers());
-        adjournment.setOtherPanelMemberName(getPanelMembers());
+        adjournment.setDisabilityQualifiedPanelMemberName(getPanelMembers(TRIBUNALS_MEMBER_DISABILITY));
+        adjournment.setMedicallyQualifiedPanelMemberName(getPanelMembers(TRIBUNALS_MEMBER_MEDICAL));
+        adjournment.setOtherPanelMemberName(getPanelMembers(null));
     }
 
-    public DynamicList getPanelMembers() {
-        List<DynamicListItem> panelMembers = new ArrayList<>();
+    public DynamicList getPanelMembers(PanelMemberType panelMemberType) {
+
+        List<String> names = refDataService.getPanelMembers(panelMemberType);
+
+        List<DynamicListItem> panelMembers = names.stream().map(panelMember -> new DynamicListItem(panelMember, panelMember)).collect(Collectors.toList());
 
         panelMembers.add(new DynamicListItem("aaaa", "aaaa"));
 
