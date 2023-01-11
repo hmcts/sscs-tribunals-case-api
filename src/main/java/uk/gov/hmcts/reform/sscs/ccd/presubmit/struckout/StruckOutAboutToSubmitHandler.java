@@ -47,7 +47,7 @@ public class StruckOutAboutToSubmitHandler extends DormantEventsAboutToSubmitHan
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         log.info(String.format("Handling struckOut event for caseId %s", sscsCaseData.getCcdCaseId()));
 
-        sscsCaseData.setDwpState(DwpState.STRIKE_OUT_ACTIONED.getId());
+        sscsCaseData.setDwpState(DwpState.STRIKE_OUT_ACTIONED);
         cancelHearing(callback);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);

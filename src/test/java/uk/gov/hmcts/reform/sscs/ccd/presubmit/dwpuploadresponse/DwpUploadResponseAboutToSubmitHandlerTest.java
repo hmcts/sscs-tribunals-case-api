@@ -14,10 +14,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse.DwpUploadResponseAboutToSubmitHandler.NEW_OTHER_PARTY_RESPONSE_DUE_DAYS;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_1;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_2;
@@ -63,13 +64,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.WorkAllocationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
@@ -343,7 +344,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                 ))
         ));
 
-        assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
+        assertEquals(REVIEW_BY_JUDGE, response.getData().getInterlocReviewState());
     }
 
     @Test
@@ -358,7 +359,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("US", response.getData().getIssueCode());
         assertEquals("001", response.getData().getBenefitCode());
         assertEquals("001US", response.getData().getCaseCode());
-        assertEquals(DwpState.RESPONSE_SUBMITTED_DWP.getId(), response.getData().getDwpState());
+        assertEquals(DwpState.RESPONSE_SUBMITTED_DWP, response.getData().getDwpState());
         assertNull(response.getData().getInterlocReviewState());
     }
 
@@ -375,7 +376,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("UM", response.getData().getIssueCode());
         assertEquals("001", response.getData().getBenefitCode());
         assertEquals("001UM", response.getData().getCaseCode());
-        assertEquals(DwpState.RESPONSE_SUBMITTED_DWP.getId(), response.getData().getDwpState());
+        assertEquals(DwpState.RESPONSE_SUBMITTED_DWP, response.getData().getDwpState());
         assertNull(response.getData().getInterlocReviewState());
     }
 
@@ -403,11 +404,11 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("reviewByJudge", response.getData().getSelectWhoReviewsCase().getValue().getCode());
-        assertEquals("phmeRequest", response.getData().getInterlocReferralReason());
-        assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
+        assertEquals(PHE_REQUEST, response.getData().getInterlocReferralReason());
+        assertEquals(REVIEW_BY_JUDGE, response.getData().getInterlocReviewState());
         assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
         assertEquals("Referred to interloc for review by judge - PHE request", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
-        assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
+        assertEquals(LocalDate.now(), response.getData().getInterlocReferralDate());
 
         dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
@@ -439,11 +440,11 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("reviewByJudge", response.getData().getSelectWhoReviewsCase().getValue().getCode());
-        assertEquals("phmeRequest", response.getData().getInterlocReferralReason());
-        assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
+        assertEquals(PHE_REQUEST, response.getData().getInterlocReferralReason());
+        assertEquals(REVIEW_BY_JUDGE, response.getData().getInterlocReviewState());
         assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
         assertEquals("Referred to interloc for review by judge - PHE request", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
-        assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
+        assertEquals(LocalDate.now(), response.getData().getInterlocReferralDate());
     }
 
     @Test
@@ -472,11 +473,11 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getSelectWhoReviewsCase());
-        assertEquals("phmeRequest", response.getData().getInterlocReferralReason());
-        assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
+        assertEquals(PHE_REQUEST, response.getData().getInterlocReferralReason());
+        assertEquals(REVIEW_BY_JUDGE, response.getData().getInterlocReviewState());
         assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
         assertEquals("Referred to interloc for review by judge - PHE request", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
-        assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
+        assertEquals(LocalDate.now(), response.getData().getInterlocReferralDate());
     }
 
     @Test
@@ -625,8 +626,8 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("filename.mp4", audioVideoEvidence.getValue().getFileName());
         assertEquals(UploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
         assertNotNull(audioVideoEvidence.getValue().getDateAdded());
-        assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
-        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), callback.getCaseDetails().getCaseData().getInterlocReferralReason());
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW, callback.getCaseDetails().getCaseData().getInterlocReviewState());
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE, callback.getCaseDetails().getCaseData().getInterlocReferralReason());
     }
 
     @Test
@@ -647,8 +648,8 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("filename.mp4", audioVideoEvidence.getValue().getFileName());
         assertEquals(UploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
         assertNotNull(audioVideoEvidence.getValue().getDateAdded());
-        assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
-        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), callback.getCaseDetails().getCaseData().getInterlocReferralReason());
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW, callback.getCaseDetails().getCaseData().getInterlocReviewState());
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE, callback.getCaseDetails().getCaseData().getInterlocReferralReason());
     }
 
     @Test
@@ -684,8 +685,8 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         assertNull(callback.getCaseDetails().getCaseData().getDwpUploadAudioVideoEvidence());
         assertEquals(2, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
-        assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
-        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), callback.getCaseDetails().getCaseData().getInterlocReferralReason());
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW, callback.getCaseDetails().getCaseData().getInterlocReviewState());
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE, callback.getCaseDetails().getCaseData().getInterlocReferralReason());
     }
 
     @Test
@@ -710,7 +711,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("filename.mp4", audioVideoEvidence.getValue().getFileName());
         assertEquals(UploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
         assertNotNull(audioVideoEvidence.getValue().getDateAdded());
-        assertEquals(REVIEW_BY_JUDGE.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
+        assertEquals(REVIEW_BY_JUDGE, callback.getCaseDetails().getCaseData().getInterlocReviewState());
         assertNull(callback.getCaseDetails().getCaseData().getInterlocReferralReason());
     }
 
@@ -730,14 +731,14 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.setDwpUploadAudioVideoEvidence(new ArrayList<>(
                 Arrays.asList(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build())));
 
-        sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
+        sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
 
         dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
 
         assertNull(callback.getCaseDetails().getCaseData().getDwpUploadAudioVideoEvidence());
         assertEquals(2, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
-        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
-        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), callback.getCaseDetails().getCaseData().getInterlocReferralReason());
+        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, callback.getCaseDetails().getCaseData().getInterlocReviewState());
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE, callback.getCaseDetails().getCaseData().getInterlocReferralReason());
     }
 
     @Test
@@ -1196,7 +1197,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             .extracting(CcdValue::getValue)
             .anySatisfy((OtherParty otherParty) -> {
                 Assertions.assertThat(otherParty.getId()).isEqualTo(ID_1);
-                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);;
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
             })
             .anySatisfy((OtherParty otherParty) -> {
                 Assertions.assertThat(otherParty.getId()).isEqualTo(ID_2);
@@ -1231,7 +1232,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             .extracting(CcdValue::getValue)
             .anySatisfy((OtherParty otherParty) -> {
                 Assertions.assertThat(otherParty.getId()).isEqualTo(ID_1);
-                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);;
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
                 Assertions.assertThat(otherParty.getAppointee().getId()).isEqualTo(ID_3);
                 Assertions.assertThat(otherParty.getRep().getId()).isEqualTo(ID_4);
             })
@@ -1265,7 +1266,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             .extracting(CcdValue::getValue)
             .anySatisfy((OtherParty otherParty) -> {
                 Assertions.assertThat(otherParty.getId()).isEqualTo(ID_1);
-                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);;
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
                 Assertions.assertThat(otherParty.getAppointee().getId()).isEqualTo(ID_3);
                 Assertions.assertThat(otherParty.getRep().getId()).isEqualTo(ID_4);
             })

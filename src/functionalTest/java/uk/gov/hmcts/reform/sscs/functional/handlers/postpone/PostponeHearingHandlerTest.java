@@ -47,7 +47,7 @@ public class PostponeHearingHandlerTest extends BaseHandler {
         caseDetails.getData().getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
         caseDetails.getData().getPostponement().setUnprocessedPostponement(YES);
         caseDetails.getData().getPostponement().setPostponementEvent(READY_TO_LIST);
-        caseDetails.getData().setDwpState(DwpState.IN_PROGRESS.getId());
+        caseDetails.getData().setDwpState(DwpState.IN_PROGRESS);
 
         SscsCaseDetails updatedCaseDetails = runEvent(caseDetails.getData(), EventType.UPDATE_CASE_ONLY);
 
@@ -84,6 +84,6 @@ public class PostponeHearingHandlerTest extends BaseHandler {
 
         assertThat(result.getPostponement().getUnprocessedPostponement()).isEqualTo(NO);
         assertThat(result.getPostponement().getPostponementEvent()).isNull();
-        assertThat(result.getDwpState()).isEqualTo(DwpState.HEARING_POSTPONED.getId());
+        assertThat(result.getDwpState()).isEqualTo(DwpState.HEARING_POSTPONED);
     }
 }

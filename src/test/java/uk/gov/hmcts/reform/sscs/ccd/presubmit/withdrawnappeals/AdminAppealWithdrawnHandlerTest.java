@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.WITHDRAWAL_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.WITHDRAWAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADMIN_APPEAL_WITHDRAWN;
 
 import java.io.IOException;
@@ -79,7 +80,7 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
                 ADMIN_APPEAL_WITHDRAWN_CALLBACK_JSON), USER_AUTHORISATION);
 
         String expectedCaseData = fetchData("callback/withdrawnappeals/adminAppealWithdrawnExpectedCaseData.json");
-        assertEquals("withdrawalReceived", actualResult.getData().getDwpState());
+        assertEquals(WITHDRAWAL_RECEIVED, actualResult.getData().getDwpState());
         assertEquals(1, actualResult.getData().getSscsDocument().size());
         assertThatJson(actualResult.getData())
             .whenIgnoringPaths(
@@ -130,7 +131,7 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
                 CallbackType.ABOUT_TO_SUBMIT, buildTestCallbackGivenEvent(ADMIN_APPEAL_WITHDRAWN,
                         "adminAppealWithdrawnCallbackWithdrawalDocument.json"), USER_AUTHORISATION);
 
-        assertEquals("withdrawalReceived", actualResult.getData().getDwpState());
+        assertEquals(WITHDRAWAL_RECEIVED, actualResult.getData().getDwpState());
         assertThatJson(actualResult.getData().getSscsDocument().size()).isEqualTo(1);
         assertEquals(LocalDate.now().toString(), actualResult.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
         assertEquals(WITHDRAWAL_REQUEST.getValue(), actualResult.getData().getSscsDocument().get(0).getValue().getDocumentType());

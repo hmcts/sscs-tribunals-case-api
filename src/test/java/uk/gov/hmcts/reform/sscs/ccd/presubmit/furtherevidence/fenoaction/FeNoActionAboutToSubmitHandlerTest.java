@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.fenoaction;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.junit.Assert.assertEquals;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FE_ACTIONED_NR;
 
 import java.io.IOException;
 import junitparams.JUnitParamsRunner;
@@ -57,7 +58,7 @@ public class FeNoActionAboutToSubmitHandlerTest extends BaseHandlerTest {
                 "data.appeal.rep.id")
             .when(Option.TREATING_NULL_AS_ABSENT)
             .isEqualTo(expectedCaseData);
-        assertEquals("feActionedNR", actualCaseData.getData().getDwpState());
+        assertEquals(FE_ACTIONED_NR, actualCaseData.getData().getDwpState());
     }
 
     @Test(expected = IllegalStateException.class)

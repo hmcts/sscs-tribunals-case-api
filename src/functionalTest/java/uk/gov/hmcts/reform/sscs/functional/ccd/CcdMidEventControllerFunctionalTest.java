@@ -71,7 +71,7 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
             getJsonCallbackForTest(WRITE_FINAL_DECISION_CALLBACK_JSON)), "AdjournCasePopulateVenueDropdown");
         CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
         assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
-        DynamicList adjournCaseNextHearingVenueSelected = ccdEventResponse.getData().getAdjournCaseNextHearingVenueSelected();
+        DynamicList adjournCaseNextHearingVenueSelected = ccdEventResponse.getData().getAdjournment().getNextHearingVenueSelected();
         assertThat(adjournCaseNextHearingVenueSelected.getValue().getCode()).isEqualTo("");
         assertThat(adjournCaseNextHearingVenueSelected.getValue().getLabel()).isEqualTo("");
         assertThat(adjournCaseNextHearingVenueSelected.getListItems()).hasSizeGreaterThan(2);
@@ -94,7 +94,7 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
             ADJOURN_CASE_GAPS_CALLBACK_JSON)), "PreviewAdjournCase");
         CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
         assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
-        assertThat(ccdEventResponse.getData().getAdjournCasePreviewDocument()).isNotNull();
+        assertThat(ccdEventResponse.getData().getAdjournment().getPreviewDocument()).isNotNull();
     }
 
     @DisplayName("Admin restore cases should return an error for data without restore cases date")

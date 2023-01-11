@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
@@ -85,7 +84,7 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
             State beforeState = callback.getCaseDetailsBefore().map(CaseDetails::getState).orElse(null);
             clearTransientFields(caseData,beforeState);
-            caseData.setDwpState(DwpState.STRUCK_OUT.getId());
+            caseData.setDwpState(DwpState.STRUCK_OUT);
             caseData.setDirectionDueDate(null);
 
             if (STRIKE_OUT.getValue().equals(caseData.getDecisionType())) {
@@ -100,7 +99,7 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
         } else {
             log.info("Case is a Welsh case so Decsion Notice requires translation for case id : {}", caseData.getCcdCaseId());
             clearBasicTransientFields(caseData);
-            caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
+            caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
             log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
             caseData.setTranslationWorkOutstanding("Yes");
 

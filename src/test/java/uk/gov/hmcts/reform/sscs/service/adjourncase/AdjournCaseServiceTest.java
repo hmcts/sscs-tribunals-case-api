@@ -1,83 +1,80 @@
 package uk.gov.hmcts.reform.sscs.service.adjourncase;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.nullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
-import java.util.Arrays;
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.Test;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-
+import org.junit.jupiter.api.DisplayName;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingPeriod;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 public class AdjournCaseServiceTest {
 
     SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
             .appeal(Appeal.builder().build())
             .state(HEARING)
-            .adjournCaseGenerateNotice("")
-            .adjournCaseTypeOfHearing("")
-            .adjournCaseCanCaseBeListedRightAway("")
-            .adjournCaseAreDirectionsBeingMadeToParties("")
-            .adjournCaseDirectionsDueDateDaysOffset("")
-            .adjournCaseDirectionsDueDate("")
-            .adjournCaseTypeOfNextHearing("")
-            .adjournCaseNextHearingVenue("")
-            .adjournCaseNextHearingVenueSelected(new DynamicList(new DynamicListItem("",""), Arrays.asList(new DynamicListItem("", ""))))
-            .adjournCasePanelMembersExcluded("")
-            .adjournCaseDisabilityQualifiedPanelMemberName("")
-            .adjournCaseMedicallyQualifiedPanelMemberName("")
-            .adjournCaseOtherPanelMemberName("")
-            .adjournCaseNextHearingListingDurationType("")
-            .adjournCaseNextHearingListingDuration("")
-            .adjournCaseNextHearingListingDurationUnits("")
-            .adjournCaseInterpreterRequired("")
-            .adjournCaseInterpreterLanguage("")
-            .adjournCaseNextHearingDateType("")
-            .adjournCaseNextHearingDateOrPeriod("")
-            .adjournCaseNextHearingDateOrTime("")
-            .adjournCaseNextHearingFirstAvailableDateAfterDate("")
-            .adjournCaseNextHearingFirstAvailableDateAfterPeriod("")
-            .adjournCaseReasons(List.of(new CollectionItem<>(null, "")))
-            .adjournCaseAdditionalDirections(List.of(new CollectionItem<>(null, "")))
-            .build();
+        .adjournment(Adjournment.builder()
+            .generateNotice(YES)
+            .typeOfHearing(AdjournCaseTypeOfHearing.VIDEO)
+            .canCaseBeListedRightAway(YES)
+            .areDirectionsBeingMadeToParties(NO)
+            .directionsDueDateDaysOffset(AdjournCaseDaysOffset.FOURTEEN_DAYS)
+            .directionsDueDate(LocalDate.now().plusMonths(1))
+            .typeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE)
+            .nextHearingVenue(AdjournCaseNextHearingVenue.SOMEWHERE_ELSE)
+            .nextHearingVenueSelected(new DynamicList(new DynamicListItem("",""), List.of(new DynamicListItem("", ""))))
+            .panelMembersExcluded(AdjournCasePanelMembersExcluded.NO)
+            .disabilityQualifiedPanelMemberName("")
+            .medicallyQualifiedPanelMemberName("")
+            .otherPanelMemberName("")
+            .nextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD)
+            .nextHearingListingDuration(1)
+            .nextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS)
+            .interpreterRequired(NO)
+            .interpreterLanguage("spanish")
+            .nextHearingDateType(AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER)
+            .nextHearingDateOrPeriod(AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD)
+            .nextHearingFirstAvailableDateAfterDate(null)
+            .nextHearingFirstAvailableDateAfterPeriod(AdjournCaseNextHearingPeriod.NINETY_DAYS)
+            .nextHearingDateOrTime("")
+            .reasons(List.of(new CollectionItem<>(null, "")))
+            .additionalDirections(List.of(new CollectionItem<>(null, "")))
+            .previewDocument(DocumentLink.builder().build())
+            .generatedDate(LocalDate.now())
+            .adjournmentInProgress(YES)
+            .build())
+        .build();
 
+    @DisplayName("When adjournment feature flag is enabled, all fields are cleared except adjournmentInProgress which is NO")
     @Test
-    public void willRemoveTransientAdjournCaseData() {
-
-        AdjournCaseService.clearTransientFields(sscsCaseData);
-
-        verifyTemporaryAdjournCaseFieldsAreCleared(sscsCaseData);
+    public void willRemoveTransientAdjournCaseData_andSetAdjournmentInProgressToNoWhenFeatureFlagIsEnabled() {
+        AdjournCaseService.clearTransientFields(sscsCaseData, true);
+        assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrPropertiesExcept("adjournmentInProgress");
+        assertThat(sscsCaseData.getAdjournment().getAdjournmentInProgress()).isEqualTo(NO);
     }
 
-    private void verifyTemporaryAdjournCaseFieldsAreCleared(SscsCaseData sscsCaseData) {
-        assertThat(sscsCaseData.getAdjournCaseDirectionsDueDate(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseGenerateNotice(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseTypeOfHearing(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseCanCaseBeListedRightAway(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseDirectionsDueDate(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseTypeOfNextHearing(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseNextHearingVenue(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseNextHearingVenueSelected(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCasePanelMembersExcluded(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseDisabilityQualifiedPanelMemberName(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseMedicallyQualifiedPanelMemberName(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseOtherPanelMemberName(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseNextHearingListingDurationType(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseNextHearingListingDuration(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseNextHearingListingDurationUnits(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseInterpreterRequired(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseInterpreterLanguage(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseNextHearingDateType(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseNextHearingDateOrPeriod(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseNextHearingDateOrTime(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseNextHearingFirstAvailableDateAfterDate(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseNextHearingFirstAvailableDateAfterPeriod(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseTime(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseReasons(), is(nullValue()));
-        assertThat(sscsCaseData.getAdjournCaseAdditionalDirections(), is(nullValue()));
+    @DisplayName("When adjournment feature flag is disabled, all fields are cleared")
+    @Test
+    public void willRemoveTransientAdjournCaseData() {
+        AdjournCaseService.clearTransientFields(sscsCaseData, false);
+        assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrProperties();
     }
 }

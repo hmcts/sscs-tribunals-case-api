@@ -23,10 +23,11 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 
 @RunWith(JUnitParamsRunner.class)
 public class ReviewConfidentialityRequestAboutToStartHandlerTest {
@@ -52,8 +53,8 @@ public class ReviewConfidentialityRequestAboutToStartHandlerTest {
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
             .appeal(Appeal.builder().build())
-            .dwpState("previousDwpState")
-            .interlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId())
+            .dwpState(DwpState.FE_ACTIONED_NR)
+            .interlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE)
             .build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);

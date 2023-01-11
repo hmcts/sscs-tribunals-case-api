@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.DocumentType.REQUEST_FOR_HEARING_RECORDING;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.getOriginalSender;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.isValidAudioVideoDocumentType;
@@ -24,7 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 import uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil;
@@ -155,10 +155,10 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
                 sscsCaseData.setAudioVideoEvidence(new ArrayList<>());
             }
             sscsCaseData.getAudioVideoEvidence().addAll(newAudioVideoEvidence);
-            if (!REVIEW_BY_JUDGE.getId().equals(sscsCaseData.getInterlocReviewState())) {
-                sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId());
+            if (!REVIEW_BY_JUDGE.equals(sscsCaseData.getInterlocReviewState())) {
+                sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
             }
-            sscsCaseData.setInterlocReferralReason(REVIEW_AUDIO_VIDEO_EVIDENCE.getId());
+            sscsCaseData.setInterlocReferralReason(REVIEW_AUDIO_VIDEO_EVIDENCE);
         }
     }
 

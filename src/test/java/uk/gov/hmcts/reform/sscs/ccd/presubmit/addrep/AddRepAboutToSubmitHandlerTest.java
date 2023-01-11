@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.REP_ADDED;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -66,6 +67,6 @@ public class AddRepAboutToSubmitHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("repAdded", response.getData().getDwpState());
+        assertEquals(REP_ADDED, response.getData().getDwpState());
     }
 }

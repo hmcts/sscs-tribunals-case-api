@@ -95,7 +95,11 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
                 log.info("Setting next event to {}", nextEvent);
                 caseData.setSscsWelshPreviewNextEvent(nextEvent);
             } else if (!caseData.isTranslationWorkOutstanding()) {
-                caseData.setInterlocReviewState(caseData.getWelshInterlocNextReviewState());
+                InterlocReviewState interlocState = Arrays.stream(InterlocReviewState.values())
+                    .filter(x -> x.getCcdDefinition().equals(caseData.getWelshInterlocNextReviewState()))
+                    .findFirst()
+                    .orElse(null);
+                caseData.setInterlocReviewState(interlocState);
                 caseData.setWelshInterlocNextReviewState(null);
             }
         }

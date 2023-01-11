@@ -24,11 +24,11 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionBenefitTypeHelper;
@@ -94,7 +94,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         if (!(State.READY_TO_LIST.equals(sscsCaseData.getState())
             || State.WITH_DWP.equals(sscsCaseData.getState()))) {
-            sscsCaseData.setDwpState(FINAL_DECISION_ISSUED.getId());
+            sscsCaseData.setDwpState(FINAL_DECISION_ISSUED);
             sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
         }
         if (eligibleForHearingsCancel.test(callback)) {
@@ -160,7 +160,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, DocumentType.FINAL_DECISION_NOTICE, now,
                 null, null, documentTranslationStatus);
         if (documentTranslationStatus != null) {
-            sscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
+            sscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
             log.info("Set the InterlocReviewState to {},  for case id : {}", sscsCaseData.getInterlocReviewState(), sscsCaseData.getCcdCaseId());
             sscsCaseData.setTranslationWorkOutstanding(YES.getValue());
         }
