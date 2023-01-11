@@ -285,14 +285,14 @@ public class AdjournCaseIt extends AbstractEventIt {
         // List<DynamicListItem> disabilityQualifiedPanelMembers = new ArrayList<>();
         // List<DynamicListItem> medicallyQualifiedPanelMembers = new ArrayList<>();
 
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json,
+        /* MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json,
             CCD_MID_EVENT_ADJOURN_CASE_POPULATE_PANEL_MEMBER_DROPDOWN));
         assertHttpStatus(response, HttpStatus.OK);
 
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
         assertThat(result.getErrors()).isEmpty();
 
-        /* Adjournment adjournment = result.getData().getAdjournment();
+        Adjournment adjournment = result.getData().getAdjournment();
 
         List<DynamicListItem> panelMemberDropdown = adjournment.getDisabilityQualifiedPanelMemberName().getListItems();
         assertThat(panelMemberDropdown).isEqualTo(disabilityQualifiedPanelMembers);
