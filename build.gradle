@@ -129,7 +129,7 @@ task fortifyScan(type: JavaExec)  {
 }
 
 jacoco {
-    toolVersion = "0.8.2"
+    toolVersion = "0.8.8"
 }
 
 jacocoTestReport {
@@ -328,7 +328,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '4.25.2'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'ba89f85'
     implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.6.0'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.34.0'

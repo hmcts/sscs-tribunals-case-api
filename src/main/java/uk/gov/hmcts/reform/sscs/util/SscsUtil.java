@@ -9,16 +9,20 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
+import uk.gov.hmcts.reform.sscs.model.docassembly.PostHearingRequestTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.PostponeRequestTemplateBody;
 
 @Slf4j
@@ -75,6 +79,54 @@ public class SscsUtil {
         return response;
     }
 
+    public static PreSubmitCallbackResponse<SscsCaseData> processPostHearingRequestPdfAndSetPreviewDocument(String userAuthorisation,
+                                                                                                            SscsCaseData sscsCaseData,
+                                                                                                            PreSubmitCallbackResponse<SscsCaseData> response,
+                                                                                                            GenerateFile generateFile,
+                                                                                                            String templateId) {
+
+        log.debug("Executing processPostHearingRequestPdfAndSetPreviewDocument for caseId: {}", sscsCaseData.getCcdCaseId());
+        final String requestDetails = sscsCaseData.getPostHearing().getRequestReason();
+        if (isBlank(requestDetails)) {
+            response.addError("Please enter request details to generate a post hearing request document");
+            return response;
+        }
+
+        Event latestIssueFinalDecision = getLatestIssueFinalDecision(sscsCaseData);
+        if (latestIssueFinalDecision == null) {
+            log.error("latestIssueFinalDecision unexpectedly null for caseId: {}", sscsCaseData.getCcdCaseId());
+            throw new IllegalArgumentException("latestIssueFinalDecision unexpectedly null for caseId: " + sscsCaseData.getCcdCaseId());
+        }
+
+        final LocalDate dateOfFinalDecision = latestIssueFinalDecision.getValue().getDateTime().toLocalDate();
+
+        final String postHearingRequestType = "Set Aside"; // TODO should be calculated for each PostHearingRequestType using descriptionEn
+
+        StringBuilder additionalRequestDetails = new StringBuilder();
+        additionalRequestDetails.append("Date request received: ").append(LocalDate.now().format(DATE_TIME_FORMATTER)).append("\n");
+        additionalRequestDetails.append("Date of decision: ").append(dateOfFinalDecision.format(DATE_TIME_FORMATTER)).append("\n");
+        additionalRequestDetails.append("Reason for ").append(postHearingRequestType).append(" Request: ").append(requestDetails).append("\n");
+
+        GenerateFileParams params = GenerateFileParams.builder()
+                .renditionOutputLocation(null)
+                .templateId(templateId)
+                .formPayload(
+                    PostHearingRequestTemplateBody.builder()
+                        .title(String.format("%s Application from FTA", postHearingRequestType))
+                        .text(additionalRequestDetails.toString())
+                        .build())
+                .userAuthentication(userAuthorisation)
+                .build();
+        final String generatedFileUrl = generateFile.assemble(params);
+        sscsCaseData.getPostHearing().setPreviewDocument(DocumentLink.builder()
+                .documentFilename("Post Hearing Request.pdf")
+                .documentBinaryUrl(generatedFileUrl + "/binary")
+                .documentUrl(generatedFileUrl)
+                .build());
+
+        return response;
+    }
+
     public static boolean isSAndLCase(SscsCaseData sscsCaseData) {
         return LIST_ASSIST == Optional.of(sscsCaseData)
             .map(SscsCaseData::getSchedulingAndListingFields)
@@ -89,5 +141,26 @@ public class SscsUtil {
     public static void clearDocumentTransientFields(SscsCaseData caseData) {
         caseData.setDocumentGeneration(DocumentGeneration.builder().build());
         caseData.setDocumentStaging(DocumentStaging.builder().build());
+    }
+
+    public static Event getLatestEventOfSpecifiedType(SscsCaseData caseData, EventType specifiedType) {
+        return caseData.getEvents().stream()
+            .filter(event -> specifiedType.equals(event.getValue().getEventType()))
+            .max(Event::compareTo)
+            .orElse(null);
+    }
+
+    public static Event getLatestIssueFinalDecision(SscsCaseData sscsCaseData) {
+        Event english = getLatestEventOfSpecifiedType(sscsCaseData, EventType.ISSUE_FINAL_DECISION);
+        Event welsh = getLatestEventOfSpecifiedType(sscsCaseData, EventType.ISSUE_FINAL_DECISION_WELSH);
+        if (english == null && welsh == null) {
+            return null;
+        } else if (english == null) {
+            return welsh;
+        } else if (welsh == null) {
+            return english;
+        } else {
+            return Stream.of(english, welsh).max(Event::compareTo).orElse(null);
+        }
     }
 }
