@@ -7,11 +7,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -69,5 +72,26 @@ public class SscsUtil {
         DocumentType documentType = DocumentType.fromValue(sscsDocument.getValue().getDocumentType());
         String dateIssued = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         footerService.createFooterAndAddDocToCase(url, sscsCaseData, documentType, dateIssued, null, null, null);
+    }
+
+    public static Event getLatestEventOfSpecifiedType(SscsCaseData caseData, EventType specifiedType) {
+        return caseData.getEvents().stream()
+            .filter(event -> specifiedType.equals(event.getValue().getEventType()))
+            .max(Event::compareTo)
+            .orElse(null);
+    }
+
+    public static Event getLatestIssueFinalDecision(SscsCaseData sscsCaseData) {
+        Event english = getLatestEventOfSpecifiedType(sscsCaseData, EventType.ISSUE_FINAL_DECISION);
+        Event welsh = getLatestEventOfSpecifiedType(sscsCaseData, EventType.ISSUE_FINAL_DECISION_WELSH);
+        if (english == null && welsh == null) {
+            return null;
+        } else if (english == null) {
+            return welsh;
+        } else if (welsh == null) {
+            return english;
+        } else {
+            return Stream.of(english, welsh).max(Event::compareTo).orElse(null);
+        }
     }
 }
