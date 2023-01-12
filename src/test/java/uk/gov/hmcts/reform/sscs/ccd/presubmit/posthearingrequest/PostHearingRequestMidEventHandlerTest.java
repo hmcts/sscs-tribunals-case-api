@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +28,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
@@ -105,6 +108,31 @@ class PostHearingRequestMidEventHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void givenGenerateNoticeYes_generateNotice() {
+        String dmUrl = "http://dm-store/documents/123";
+        when(generateFile.assemble(any())).thenReturn(dmUrl);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(callback.getPageId()).thenReturn("generateDocument");
+        caseData.getDocumentGeneration().setGenerateNotice(YES);
+        caseData.getPostHearing().setRequestType(PostHearingRequestType.SET_ASIDE);
+        caseData.getPostHearing().getSetAside().setRequestFormat(RequestFormat.GENERATE);
+        caseData.getPostHearing().setRequestReason("This is the reason for the set aside request");
+        caseData.setEvents(List.of(new Event(new EventDetails("2017-06-20T12:00:00", "issueFinalDecision", "issued"))));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getPostHearing().getPreviewDocument()).isNotNull();
+        DocumentLink documentLink = DocumentLink.builder()
+            .documentBinaryUrl(dmUrl + "/binary")
+            .documentUrl(dmUrl)
+            .documentFilename("Post Hearing Request.pdf")
+            .build();
+        assertThat(response.getData().getPostHearing().getPreviewDocument()).isEqualTo(documentLink);
     }
 
     @ParameterizedTest

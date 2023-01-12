@@ -38,6 +38,9 @@ public class PostHearingRequestMidEventHandler implements PreSubmitCallbackHandl
         this.templateId = templateId;
     }
 
+    private final GenerateFile generateFile;
+    private final String templateId;
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType.equals(CallbackType.MID_EVENT)
