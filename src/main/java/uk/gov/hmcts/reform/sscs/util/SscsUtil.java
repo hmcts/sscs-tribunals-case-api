@@ -74,24 +74,20 @@ public class SscsUtil {
         footerService.createFooterAndAddDocToCase(url, sscsCaseData, documentType, dateIssued, null, null, null);
     }
 
-    public static Event getLatestEventOfSpecifiedType(SscsCaseData caseData, EventType specifiedType) {
+    public static Optional<Event> getLatestEventOfSpecifiedType(SscsCaseData caseData, EventType specifiedType) {
         return caseData.getEvents().stream()
             .filter(event -> specifiedType.equals(event.getValue().getEventType()))
-            .max(Event::compareTo)
-            .orElse(null);
+            .max(Event::compareTo);
     }
 
     public static Event getLatestIssueFinalDecision(SscsCaseData sscsCaseData) {
-        Event english = getLatestEventOfSpecifiedType(sscsCaseData, EventType.ISSUE_FINAL_DECISION);
-        Event welsh = getLatestEventOfSpecifiedType(sscsCaseData, EventType.ISSUE_FINAL_DECISION_WELSH);
-        if (english == null && welsh == null) {
-            return null;
-        } else if (english == null) {
-            return welsh;
-        } else if (welsh == null) {
-            return english;
+        Optional<Event> english = getLatestEventOfSpecifiedType(sscsCaseData, EventType.ISSUE_FINAL_DECISION);
+        Optional<Event> welsh = getLatestEventOfSpecifiedType(sscsCaseData, EventType.ISSUE_FINAL_DECISION_WELSH);
+
+        if (english.isPresent() && welsh.isPresent()) {
+            return Stream.of(english.get(), welsh.get()).max(Event::compareTo).orElse(null);
         } else {
-            return Stream.of(english, welsh).max(Event::compareTo).orElse(null);
+            return english.orElseGet(() -> welsh.orElse(null));
         }
     }
 }
