@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
@@ -25,6 +27,9 @@ public class PostHearingRequestMidEventHandler implements PreSubmitCallbackHandl
     public static final String PAGE_ID_GENERATE_DOCUMENT = "generateDocument";
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
+
+    private final GenerateFile generateFile;
+    private final String templateId;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -51,7 +56,7 @@ public class PostHearingRequestMidEventHandler implements PreSubmitCallbackHandl
 
         if (PAGE_ID_GENERATE_DOCUMENT.equals(pageId) && GENERATE.equals(requestFormat)) {
             log.info("Post Hearing Request: Generating notice for caseId {}", caseId);
-            // TODO SSCS-10983 put doc generation here
+            SscsUtil.processPostHearingRequestPdfAndSetPreviewDocument(userAuthorisation, caseData, response, generateFile, templateId);
         }
 
         return response;
