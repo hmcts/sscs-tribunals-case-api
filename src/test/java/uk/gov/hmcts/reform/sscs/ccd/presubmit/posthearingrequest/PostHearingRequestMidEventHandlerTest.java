@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -37,6 +38,7 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 class PostHearingRequestMidEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     public static final String CASE_ID = "123123";
+    public static final String GENERATE_DOCUMENT = "generateDocument";
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -60,15 +62,14 @@ class PostHearingRequestMidEventHandlerTest {
 
         caseData = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
-            .documentGeneration(DocumentGeneration.builder().generateNotice(YES).build())
+            .documentGeneration(DocumentGeneration.builder()
+                .generateNotice(YES)
+                .build())
             .postHearing(PostHearing.builder()
                 .requestReason("Reason")
                 .build())
             .events(List.of(new Event(new EventDetails("2017-06-20T12:00:00", "issueFinalDecision", "issued"))))
             .build();
-
-        caseData.getPostHearing().setRequestType(PostHearingRequestType.SET_ASIDE);
-        caseData.getPostHearing().getSetAside().setRequestFormat(RequestFormat.GENERATE);
     }
 
     @Test
@@ -105,31 +106,28 @@ class PostHearingRequestMidEventHandlerTest {
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
-
-        when(callback.getPageId()).thenReturn("generateNotice");
+        when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
     }
 
-    @Test
-    void givenGenerateNoticeYes_generateNotice() {
+    @ParameterizedTest
+    @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE"}) // TODO add all other types as their feature code is implemented
+    void givenGenerateNoticeYes_generateNotice(PostHearingRequestType postHearingRequestType) {
         String dmUrl = "http://dm-store/documents/123";
         when(generateFile.assemble(any())).thenReturn(dmUrl);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
-        when(callback.getPageId()).thenReturn("generateDocument");
-        caseData.getDocumentGeneration().setGenerateNotice(YES);
-        caseData.getPostHearing().setRequestType(PostHearingRequestType.SET_ASIDE);
+        when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
+
+        caseData.getPostHearing().setRequestType(postHearingRequestType);
         caseData.getPostHearing().getSetAside().setRequestFormat(RequestFormat.GENERATE);
-        caseData.getPostHearing().setRequestReason("This is the reason for the set aside request");
-        caseData.setEvents(List.of(new Event(new EventDetails("2017-06-20T12:00:00", "issueFinalDecision", "issued"))));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-        assertThat(response.getData().getPostHearing().getPreviewDocument()).isNotNull();
         DocumentLink documentLink = DocumentLink.builder()
             .documentBinaryUrl(dmUrl + "/binary")
             .documentUrl(dmUrl)
@@ -138,16 +136,18 @@ class PostHearingRequestMidEventHandlerTest {
         assertThat(response.getData().getPostHearing().getPreviewDocument()).isEqualTo(documentLink);
     }
 
-    @Test
-    void givenRequestDetailsIsBlank_returnResponseWithError() {
+    @ParameterizedTest
+    @ValueSource(strings = {""})
+    @NullSource
+    void givenRequestDetailsIsBlank_returnResponseWithError(String emptyValue) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
-        when(callback.getPageId()).thenReturn("generateDocument");
-        caseData.getDocumentGeneration().setGenerateNotice(YES);
+        when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
+
         caseData.getPostHearing().setRequestType(PostHearingRequestType.SET_ASIDE);
         caseData.getPostHearing().getSetAside().setRequestFormat(RequestFormat.GENERATE);
-        caseData.getPostHearing().setRequestReason("");
-        caseData.setEvents(List.of(new Event(new EventDetails("2017-06-20T12:00:00", "issueFinalDecision", "issued"))));
+
+        caseData.getPostHearing().setRequestReason(emptyValue);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -160,24 +160,23 @@ class PostHearingRequestMidEventHandlerTest {
     void givenCaseEventsContainsNoIssueFinalDecision_throwsException() {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
-        when(callback.getPageId()).thenReturn("generateDocument");
-        caseData.getDocumentGeneration().setGenerateNotice(YES);
+        when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
+
         caseData.getPostHearing().setRequestType(PostHearingRequestType.SET_ASIDE);
         caseData.getPostHearing().getSetAside().setRequestFormat(RequestFormat.GENERATE);
-        caseData.getPostHearing().setRequestReason("Something");
+
         caseData.setEvents(List.of());
 
         assertThatThrownBy(() -> handler.handle(MID_EVENT, callback, USER_AUTHORISATION))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("latestIssueFinalDecision unexpectedly null for caseId: " + CASE_ID);
+            .hasMessage("latestIssueFinalDecision unexpectedly null for caseId: " + CASE_ID);
     }
 
     @Test
     void givenOtherPageId_doNothing() {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
-
-        when(callback.getPageId()).thenReturn("test page id");
+        when(callback.getPageId()).thenReturn("something else");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
