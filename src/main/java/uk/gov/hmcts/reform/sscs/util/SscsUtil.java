@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -29,8 +30,6 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.PostponeRequestTemplateBody;
 @Slf4j
 public class SscsUtil {
 
-    private static final String TITLE = "Postponement Request from FTA";
-    public static final String FILENAME = "Postponement Request.pdf";
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private SscsUtil() {
@@ -48,15 +47,16 @@ public class SscsUtil {
                                                                                                              String templateId) {
 
         log.debug("Executing processPostponementRequestPdfAndSetPreviewDocument for caseId: {}", sscsCaseData.getCcdCaseId());
-        final String requestDetails = sscsCaseData.getPostponementRequest().getPostponementRequestDetails();
+        PostponementRequest postponementRequest = sscsCaseData.getPostponementRequest();
+        final String requestDetails = postponementRequest.getPostponementRequestDetails();
 
         if (isBlank(requestDetails)) {
             response.addError("Please enter request details to generate a postponement request document");
             return response;
         }
 
-        String hearingVenue = sscsCaseData.getPostponementRequest().getPostponementRequestHearingVenue();
-        LocalDate hearingDate = LocalDateTime.parse(sscsCaseData.getPostponementRequest().getPostponementRequestHearingDateAndTime()).toLocalDate();
+        String hearingVenue = postponementRequest.getPostponementRequestHearingVenue();
+        LocalDate hearingDate = LocalDateTime.parse(postponementRequest.getPostponementRequestHearingDateAndTime()).toLocalDate();
 
         StringBuilder additionalRequestDetails = new StringBuilder();
         additionalRequestDetails.append("Date request received: ").append(LocalDate.now().format(DATE_TIME_FORMATTER)).append("\n");
@@ -67,12 +67,15 @@ public class SscsUtil {
         GenerateFileParams params = GenerateFileParams.builder()
                 .renditionOutputLocation(null)
                 .templateId(templateId)
-                .formPayload(PostponeRequestTemplateBody.builder().title(TITLE).text(additionalRequestDetails.toString()).build())
+                .formPayload(PostponeRequestTemplateBody.builder()
+                    .title("Postponement Request from FTA")
+                    .text(additionalRequestDetails.toString())
+                    .build())
                 .userAuthentication(userAuthorisation)
                 .build();
         final String generatedFileUrl = generateFile.assemble(params);
-        sscsCaseData.getPostponementRequest().setPostponementPreviewDocument(DocumentLink.builder()
-                .documentFilename(FILENAME)
+        postponementRequest.setPostponementPreviewDocument(DocumentLink.builder()
+                .documentFilename("Postponement Request.pdf")
                 .documentBinaryUrl(generatedFileUrl + "/binary")
                 .documentUrl(generatedFileUrl)
                 .build());
@@ -105,7 +108,7 @@ public class SscsUtil {
         final StringBuilder additionalRequestDetails = new StringBuilder();
         additionalRequestDetails.append("Date request received: ").append(LocalDate.now().format(DATE_TIME_FORMATTER)).append("\n");
         additionalRequestDetails.append("Date of decision: ").append(dateOfFinalDecision.format(DATE_TIME_FORMATTER)).append("\n");
-        additionalRequestDetails.append("Reason for ").append(postHearingRequestType).append(" Request: ").append(requestDetails).append("\n");
+        additionalRequestDetails.append("Reason for ").append(postHearingRequestType).append(" request: ").append(requestDetails).append("\n");
 
         GenerateFileParams params = GenerateFileParams.builder()
                 .renditionOutputLocation(null)
