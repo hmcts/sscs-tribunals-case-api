@@ -26,6 +26,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
@@ -65,8 +68,15 @@ class PostHearingRequestMidEventHandlerTest {
             .documentGeneration(DocumentGeneration.builder()
                 .generateNotice(YES)
                 .build())
+            .postHearing(PostHearing.builder()
+                .requestReason("Reason")
+                .build())
             .issueFinalDecisionDate(LocalDate.now())
+            .events(List.of(new Event(new EventDetails("2017-06-20T12:00:00", "issueFinalDecision", "issued"))))
             .build();
+
+        caseData.getPostHearing().setRequestType(PostHearingRequestType.SET_ASIDE);
+        caseData.getPostHearing().getSetAside().setRequestFormat(RequestFormat.GENERATE);
     }
 
     @Test
