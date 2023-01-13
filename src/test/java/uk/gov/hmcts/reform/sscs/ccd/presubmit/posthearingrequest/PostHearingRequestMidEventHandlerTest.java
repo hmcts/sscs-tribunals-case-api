@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingrequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
@@ -21,9 +22,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -33,6 +36,7 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 @ExtendWith(MockitoExtension.class)
 class PostHearingRequestMidEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
+    public static final String CASE_ID = "123123";
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -54,7 +58,17 @@ class PostHearingRequestMidEventHandlerTest {
     void setUp() {
         handler = new PostHearingRequestMidEventHandler(true, generateFile, templateId);
 
-        caseData = SscsCaseData.builder().build();
+        caseData = SscsCaseData.builder()
+            .ccdCaseId(CASE_ID)
+            .documentGeneration(DocumentGeneration.builder().generateNotice(YES).build())
+            .postHearing(PostHearing.builder()
+                .requestReason("Reason")
+                .build())
+            .events(List.of(new Event(new EventDetails("2017-06-20T12:00:00", "issueFinalDecision", "issued"))))
+            .build();
+
+        caseData.getPostHearing().setRequestType(PostHearingRequestType.SET_ASIDE);
+        caseData.getPostHearing().getSetAside().setRequestFormat(RequestFormat.GENERATE);
     }
 
     @Test
@@ -122,6 +136,40 @@ class PostHearingRequestMidEventHandlerTest {
             .documentFilename("Post Hearing Request.pdf")
             .build();
         assertThat(response.getData().getPostHearing().getPreviewDocument()).isEqualTo(documentLink);
+    }
+
+    @Test
+    void givenRequestDetailsIsBlank_returnResponseWithError() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(callback.getPageId()).thenReturn("generateDocument");
+        caseData.getDocumentGeneration().setGenerateNotice(YES);
+        caseData.getPostHearing().setRequestType(PostHearingRequestType.SET_ASIDE);
+        caseData.getPostHearing().getSetAside().setRequestFormat(RequestFormat.GENERATE);
+        caseData.getPostHearing().setRequestReason("");
+        caseData.setEvents(List.of(new Event(new EventDetails("2017-06-20T12:00:00", "issueFinalDecision", "issued"))));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors())
+            .hasSize(1)
+            .containsOnly("Please enter request details to generate a post hearing request document");
+    }
+
+    @Test
+    void givenCaseEventsContainsNoIssueFinalDecision_throwsException() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(callback.getPageId()).thenReturn("generateDocument");
+        caseData.getDocumentGeneration().setGenerateNotice(YES);
+        caseData.getPostHearing().setRequestType(PostHearingRequestType.SET_ASIDE);
+        caseData.getPostHearing().getSetAside().setRequestFormat(RequestFormat.GENERATE);
+        caseData.getPostHearing().setRequestReason("Something");
+        caseData.setEvents(List.of());
+
+        assertThatThrownBy(() -> handler.handle(MID_EVENT, callback, USER_AUTHORISATION))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("latestIssueFinalDecision unexpectedly null for caseId: " + CASE_ID);
     }
 
     @Test
