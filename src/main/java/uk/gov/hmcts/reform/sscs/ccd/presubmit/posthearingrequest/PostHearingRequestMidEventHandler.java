@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingrequest;
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat.GENERATE;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,14 +21,22 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
-@RequiredArgsConstructor
 public class PostHearingRequestMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     public static final String PAGE_ID_GENERATE_DOCUMENT = "generateDocument";
-    @Value("${feature.postHearings.enabled}")
-    private final boolean isPostHearingsEnabled;
 
+    private final boolean isPostHearingsEnabled;
     private final GenerateFile generateFile;
     private final String templateId;
+
+    PostHearingRequestMidEventHandler(
+        @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled,
+        GenerateFile generateFile,
+        @Value("${doc_assembly.posthearingrequest}") String templateId
+    ) {
+        this.isPostHearingsEnabled = isPostHearingsEnabled;
+        this.generateFile = generateFile;
+        this.templateId = templateId;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
