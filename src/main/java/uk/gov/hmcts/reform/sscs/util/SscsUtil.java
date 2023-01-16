@@ -1,14 +1,18 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FINAL_DECISION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FINAL_DECISION_WELSH;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -97,11 +101,11 @@ public class SscsUtil {
             return response;
         }
 
-        Event latestIssueFinalDecision = getLatestIssueFinalDecision(sscsCaseData);
-        if (latestIssueFinalDecision == null) {
-            log.error("latestIssueFinalDecision unexpectedly null for caseId: {}", caseId);
-            throw new IllegalArgumentException("latestIssueFinalDecision unexpectedly null for caseId: " + caseId);
-        }
+        Event latestIssueFinalDecision = getLatestEventOfSpecifiedTypes(sscsCaseData, ISSUE_FINAL_DECISION, ISSUE_FINAL_DECISION_WELSH)
+            .orElseThrow(() -> {
+                log.error("latestIssueFinalDecision unexpectedly null for caseId: {}", caseId);
+                throw new IllegalArgumentException("latestIssueFinalDecision unexpectedly null for caseId: " + caseId);
+            });
 
         final LocalDate dateOfFinalDecision = latestIssueFinalDecision.getValue().getDateTime().toLocalDate();
         final String postHearingRequestType = postHearing.getRequestType().getDescriptionEn();
@@ -146,20 +150,11 @@ public class SscsUtil {
         caseData.setDocumentStaging(DocumentStaging.builder().build());
     }
 
-    public static Optional<Event> getLatestEventOfSpecifiedType(SscsCaseData caseData, EventType specifiedType) {
+    public static Optional<Event> getLatestEventOfSpecifiedTypes(SscsCaseData caseData, EventType specifiedType, EventType... specifiedTypes) {
+        List<EventType> targets = Stream.concat(Stream.of(specifiedType), Arrays.stream(specifiedTypes)).collect(Collectors.toList());
+
         return caseData.getEvents().stream()
-            .filter(event -> specifiedType.equals(event.getValue().getEventType()))
+            .filter(event -> targets.contains(event.getValue().getEventType()))
             .max(Event::compareTo);
-    }
-
-    public static Event getLatestIssueFinalDecision(SscsCaseData sscsCaseData) {
-        Optional<Event> english = getLatestEventOfSpecifiedType(sscsCaseData, EventType.ISSUE_FINAL_DECISION);
-        Optional<Event> welsh = getLatestEventOfSpecifiedType(sscsCaseData, EventType.ISSUE_FINAL_DECISION_WELSH);
-
-        if (english.isPresent() && welsh.isPresent()) {
-            return Stream.of(english.get(), welsh.get()).max(Event::compareTo).orElse(null);
-        } else {
-            return english.orElseGet(() -> welsh.orElse(null));
-        }
     }
 }
