@@ -44,13 +44,23 @@ public class IssueGenericLetterAboutToStartHandler implements PreSubmitCallbackH
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        sscsCaseData.setGenericLetterText("");
+        clearFields(sscsCaseData);
+
         setPartiesToSendLetter(sscsCaseData);
         setDocuments(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         return callbackResponse;
+    }
+
+    private static void clearFields(SscsCaseData sscsCaseData) {
+        sscsCaseData.setGenericLetterText("");
+        sscsCaseData.setSendToAllParties(null);
+        sscsCaseData.setSendToApellant(null);
+        sscsCaseData.setSendToJointParty(null);
+        sscsCaseData.setSendToOtherParties(null);
+        sscsCaseData.setSendToRepresentative(null);
     }
 
     private void setDocuments(SscsCaseData sscsCaseData) {
