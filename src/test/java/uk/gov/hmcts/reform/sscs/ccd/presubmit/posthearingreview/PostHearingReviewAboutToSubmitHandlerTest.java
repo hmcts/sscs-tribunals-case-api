@@ -1,13 +1,18 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.SET_ASIDE_APPLICATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REVIEW;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.SET_ASIDE;
 
+import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,12 +20,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingReviewAboutToSubmitHandlerTest {
@@ -37,11 +38,15 @@ class PostHearingReviewAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private FooterService footerService;
     private SscsCaseData caseData;
+
+    private SscsDocument expectedDocument;
 
     @BeforeEach
     void setUp() {
-        handler = new PostHearingReviewAboutToSubmitHandler(true);
+        handler = new PostHearingReviewAboutToSubmitHandler(true, footerService);
 
         caseData = SscsCaseData.builder()
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
@@ -54,10 +59,18 @@ class PostHearingReviewAboutToSubmitHandlerTest {
                 .previewDocument(DocumentLink.builder()
                     .documentUrl(DOCUMENT_URL)
                     .documentBinaryUrl(DOCUMENT_URL + "/binary")
-                    .documentFilename("decisionIssued.pdf")
+                    .documentFilename("setAside.pdf")
                     .build())
                 .build())
             .build();
+
+        expectedDocument = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentFileName(caseData.getDocumentStaging().getPreviewDocument().getDocumentFilename())
+                .documentLink(caseData.getDocumentStaging().getPreviewDocument())
+                .documentDateAdded(LocalDate.now().minusDays(1).toString())
+                .documentType(SET_ASIDE_APPLICATION.getValue())
+                .build()).build();
     }
 
     @Test
@@ -79,7 +92,7 @@ class PostHearingReviewAboutToSubmitHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new PostHearingReviewAboutToSubmitHandler(false);
+        handler = new PostHearingReviewAboutToSubmitHandler(false, footerService);
         when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
@@ -94,5 +107,23 @@ class PostHearingReviewAboutToSubmitHandlerTest {
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    public void givenARefusedPostponementAndApplicationTypeSetAside_thenAddSetAsideDoc() {
+        caseData.setPostponementRequest(PostponementRequest.builder()
+            .actionPostponementRequestSelected("refuse")
+            .build());
+        caseData.getPostHearing().setReviewType(SET_ASIDE);
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
+            eq(SET_ASIDE_APPLICATION), any(),  eq(null), eq(null), eq(null));
+
     }
 }
