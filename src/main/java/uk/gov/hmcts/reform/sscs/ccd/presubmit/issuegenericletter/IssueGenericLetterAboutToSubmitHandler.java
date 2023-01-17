@@ -1,14 +1,19 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuegenericletter;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
+import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentSelectionDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartySelectionDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
@@ -35,10 +40,50 @@ public class IssueGenericLetterAboutToSubmitHandler implements PreSubmitCallback
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        log.info("case {}, letter text {}", sscsCaseData.getCcdCaseId(), sscsCaseData.getGenericLetterText());
+        if (!isEmpty(sscsCaseData.getDocumentSelection())) {
+            removeDocumentsDuplicates(sscsCaseData);
+        }
 
-        PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+        if (!isEmpty(sscsCaseData.getOtherPartySelection())) {
+            removeOtherPartyDuplicates(sscsCaseData);
+        }
 
-        return callbackResponse;
+        return new PreSubmitCallbackResponse<>(sscsCaseData);
+    }
+
+    private void removeOtherPartyDuplicates(SscsCaseData sscsCaseData) {
+        var list = new ArrayList<CcdValue<OtherPartySelectionDetails>>();
+
+        var duplicates = new ArrayList<>();
+
+        for (CcdValue<OtherPartySelectionDetails> otherParty : sscsCaseData.getOtherPartySelection()) {
+            var otherPartySelection = otherParty.getValue().getOtherPartiesList();
+            var test = otherPartySelection.getValue();
+
+            if (!duplicates.contains(test)) {
+                list.add(otherParty);
+                duplicates.add(test);
+            }
+        }
+
+        sscsCaseData.setOtherPartySelection(list);
+    }
+
+    private void removeDocumentsDuplicates(SscsCaseData sscsCaseData) {
+        var list = new ArrayList<CcdValue<DocumentSelectionDetails>>();
+
+        var duplicates = new ArrayList<>();
+
+        for (CcdValue<DocumentSelectionDetails> document : sscsCaseData.getDocumentSelection()) {
+            var documentSelection = document.getValue().getDocumentsList();
+            var test = documentSelection.getValue();
+
+            if (!duplicates.contains(test)) {
+                list.add(document);
+                duplicates.add(test);
+            }
+        }
+
+        sscsCaseData.setDocumentSelection(list);
     }
 }

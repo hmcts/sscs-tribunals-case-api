@@ -13,12 +13,11 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentSelectionDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentSelectionList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartySelection;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartySelectionDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -45,17 +44,9 @@ public class IssueGenericLetterAboutToStartHandler implements PreSubmitCallbackH
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        log.info("blabla");
-        log.info("IssueGenericLetterAboutToStartHandler::{} dwpDocuments {} sscsDocument {}",
-                caseDetails.getId(), sscsCaseData.getDwpDocuments(), sscsCaseData.getSscsDocument().get(0).getValue().getDocumentFileName());
-
+        sscsCaseData.setGenericLetterText("");
         setPartiesToSendLetter(sscsCaseData);
         setDocuments(sscsCaseData);
-
-
-        log.info("IssueGenericLetterAboutToStartHandler:: hasJointParty {} hasRepresentative: {} hasOtherParties: {}",
-                sscsCaseData.getHasJointParty().getValue(), sscsCaseData.getHasRepresentative().getValue(),
-                sscsCaseData.getHasOtherParties().getValue());
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
@@ -67,20 +58,20 @@ public class IssueGenericLetterAboutToStartHandler implements PreSubmitCallbackH
 
         if (isNotEmpty(sscsCaseData.getDwpDocuments())) {
             for (var dwpDocument : sscsCaseData.getDwpDocuments()) {
-                listOptions.add(new DynamicListItem(dwpDocument.getValue().getDocumentLink().getDocumentFilename(),
-                                                    dwpDocument.getValue().getDocumentLink().getDocumentFilename()));
+                listOptions.add(new DynamicListItem(dwpDocument.getValue().getDocumentFileName(),
+                                                    dwpDocument.getValue().getDocumentFileName()));
             }
         }
 
         if (isNotEmpty(sscsCaseData.getSscsDocument())) {
             for (var sscsDocument : sscsCaseData.getSscsDocument()) {
-                listOptions.add(new DynamicListItem(sscsDocument.getValue().getDocumentLink().getDocumentFilename(),
-                        sscsDocument.getValue().getDocumentLink().getDocumentFilename()));
+                listOptions.add(new DynamicListItem(sscsDocument.getValue().getDocumentFileName(),
+                        sscsDocument.getValue().getDocumentFileName()));
             }
         }
 
-        var documentSelections = new ArrayList<DocumentSelectionList>();
-        documentSelections.add(new DocumentSelectionList(new DocumentSelectionDetails(null, new DynamicList(null, listOptions))));
+        var documentSelections = new ArrayList<CcdValue<DocumentSelectionDetails>>();
+        documentSelections.add(new CcdValue<>(new DocumentSelectionDetails(new DynamicList(null, listOptions))));
 
         sscsCaseData.setDocumentSelection(documentSelections);
     }
@@ -104,8 +95,9 @@ public class IssueGenericLetterAboutToStartHandler implements PreSubmitCallbackH
 
             List<DynamicListItem> listOptions = new ArrayList<>();
             addOtherPartiesToListOptions(sscsCaseData, listOptions);
-            var list = new ArrayList<OtherPartySelection>();
-            list.add(new OtherPartySelection(new OtherPartySelectionDetails(new DynamicList(null, listOptions))));
+
+            var list = new ArrayList<CcdValue<OtherPartySelectionDetails>>();
+            list.add(new CcdValue<>(new OtherPartySelectionDetails(new DynamicList(null, listOptions))));
 
             sscsCaseData.setOtherPartySelection(list);
         } else {
