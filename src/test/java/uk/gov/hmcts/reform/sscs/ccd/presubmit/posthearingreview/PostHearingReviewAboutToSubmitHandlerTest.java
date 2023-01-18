@@ -137,7 +137,7 @@ class PostHearingReviewAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenARefusedPostponementAndApplicationTypeSetAsideWithWelsh_thenAddSetAsideDoc() {
+    public void givenARefusedPostponementAndApplicationTypeSetAsideWithWelsh_thenAddSetAsideDocWithTranslation() {
         caseData.setLanguagePreferenceWelsh("YES");
         caseData.setPostponementRequest(PostponementRequest.builder()
             .actionPostponementRequestSelected("refuse")
