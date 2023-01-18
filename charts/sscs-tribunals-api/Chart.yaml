@@ -14,7 +14,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: idam-pr.enabled
   - name: xui-webapp
-    version: 1.0.1
+    version: 1.0.4
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: xui-webapp.enabled
   - name: elasticsearch
@@ -26,11 +26,11 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: elastic.enabled
   - name: sscs-evidence-share
-    version: 0.0.45
+    version: 0.0.46
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-evidence-share.enabled
   - name: sscs-ccd-callback-orchestrator
-    version: 0.0.27
+    version: 0.0.28
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-ccd-callback-orchestrator.enabled
   - name: ccd
@@ -44,7 +44,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-tribunals-frontend.enabled
   - name: redis
-    version: 17.0.11
+    version: 17.4.3
     repository: "https://charts.bitnami.com/bitnami"
     condition: redis.enabled
   - name: em-ccdorc
