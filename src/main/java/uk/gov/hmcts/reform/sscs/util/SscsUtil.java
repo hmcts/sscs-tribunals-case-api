@@ -14,19 +14,25 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.PdfRequestTemplateBody;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @Slf4j
 public class SscsUtil {
@@ -59,13 +65,10 @@ public class SscsUtil {
         return processRequestPdfAndSetPreviewDocument(RequestPdfType.POST_HEARING, userAuthorisation, sscsCaseData, response, generateFile, templateId);
     }
 
+    @AllArgsConstructor
     private enum RequestPdfType {
         POSTPONEMENT("Postponement"),
         POST_HEARING("Post Hearing");
-
-        RequestPdfType(String name) {
-            this.name = name;
-        }
 
         final String name;
 
@@ -187,5 +190,21 @@ public class SscsUtil {
         return caseData.getEvents().stream()
             .filter(event -> targets.contains(event.getValue().getEventType()))
             .max(Event::compareTo);
+    }
+
+    public static void addDocument(SscsCaseData caseData, DocumentType documentType, FooterService footerService) {
+        DocumentLink url = caseData.getDocumentStaging().getPreviewDocument();
+        String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        SscsDocumentTranslationStatus documentTranslationStatus = null;
+        if (caseData.isLanguagePreferenceWelsh()) {
+            documentTranslationStatus = SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
+        }
+        footerService.createFooterAndAddDocToCase(url, caseData, documentType, now,
+            null, null, documentTranslationStatus);
+        if (documentTranslationStatus != null) {
+            caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
+            log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
+            caseData.setTranslationWorkOutstanding(YesNo.YES.getValue());
+        }
     }
 }

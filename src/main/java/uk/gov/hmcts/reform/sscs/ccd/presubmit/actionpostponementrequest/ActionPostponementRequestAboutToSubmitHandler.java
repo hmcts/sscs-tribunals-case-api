@@ -9,7 +9,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +19,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -32,7 +30,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.NotePad;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Postponement;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
@@ -151,19 +148,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     }
 
     private void addDirectionNotice(SscsCaseData caseData) {
-        DocumentLink url = caseData.getDocumentStaging().getPreviewDocument();
-        String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        SscsDocumentTranslationStatus documentTranslationStatus = null;
-        if (caseData.isLanguagePreferenceWelsh()) {
-            documentTranslationStatus = SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
-        }
-        footerService.createFooterAndAddDocToCase(url, caseData, POSTPONEMENT_REQUEST_DIRECTION_NOTICE, now,
-                null, null, documentTranslationStatus);
-        if (documentTranslationStatus != null) {
-            caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
-            log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
-            caseData.setTranslationWorkOutstanding(YES.getValue());
-        }
+        SscsUtil.addDocument(caseData, POSTPONEMENT_REQUEST_DIRECTION_NOTICE, footerService);
     }
 
     private Note createPostponementRequestNote(String userAuthorisation, String details) {
