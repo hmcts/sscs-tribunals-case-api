@@ -10,7 +10,7 @@ dependencies:
     version: 4.0.4
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
   - name: idam-pr
-    version: 2.2.6
+    version: 2.3.6
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: idam-pr.enabled
   - name: xui-webapp
