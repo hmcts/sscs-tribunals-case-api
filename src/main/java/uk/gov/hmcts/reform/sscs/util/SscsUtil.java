@@ -21,15 +21,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
-import uk.gov.hmcts.reform.sscs.model.docassembly.PostHearingRequestTemplateBody;
-import uk.gov.hmcts.reform.sscs.model.docassembly.PostponeRequestTemplateBody;
+import uk.gov.hmcts.reform.sscs.model.docassembly.PdfRequestTemplateBody;
 
 @Slf4j
 public class SscsUtil {
@@ -45,93 +42,127 @@ public class SscsUtil {
     }
 
     public static PreSubmitCallbackResponse<SscsCaseData> processPostponementRequestPdfAndSetPreviewDocument(String userAuthorisation,
-                                                                                                             SscsCaseData sscsCaseData,
-                                                                                                             PreSubmitCallbackResponse<SscsCaseData> response,
-                                                                                                             GenerateFile generateFile,
-                                                                                                             String templateId) {
+        SscsCaseData sscsCaseData,
+        PreSubmitCallbackResponse<SscsCaseData> response,
+        GenerateFile generateFile,
+        String templateId) {
 
-        log.debug("Executing processPostponementRequestPdfAndSetPreviewDocument for caseId: {}", sscsCaseData.getCcdCaseId());
-        PostponementRequest postponementRequest = sscsCaseData.getPostponementRequest();
-        final String requestDetails = postponementRequest.getPostponementRequestDetails();
+        return processRequestPdfAndSetPreviewDocument(RequestPdfType.POSTPONEMENT, userAuthorisation, sscsCaseData, response, generateFile, templateId);
+    }
+
+    public static PreSubmitCallbackResponse<SscsCaseData> processPostHearingRequestPdfAndSetPreviewDocument(String userAuthorisation,
+        SscsCaseData sscsCaseData,
+        PreSubmitCallbackResponse<SscsCaseData> response,
+        GenerateFile generateFile,
+        String templateId) {
+
+        return processRequestPdfAndSetPreviewDocument(RequestPdfType.POST_HEARING, userAuthorisation, sscsCaseData, response, generateFile, templateId);
+    }
+
+    private enum RequestPdfType {
+        POSTPONEMENT("Postponement"),
+        POST_HEARING("Post Hearing");
+
+        RequestPdfType(String name) {
+            this.name = name;
+        }
+
+        final String name;
+
+        @Override
+        public String toString() {
+            return this.name;
+        }
+    }
+
+    public static PreSubmitCallbackResponse<SscsCaseData> processRequestPdfAndSetPreviewDocument(
+        RequestPdfType requestPdfType,
+        String userAuthorisation,
+        SscsCaseData sscsCaseData,
+        PreSubmitCallbackResponse<SscsCaseData> response,
+        GenerateFile generateFile,
+        String templateId
+    ) {
+        final String caseId = sscsCaseData.getCcdCaseId();
+        log.debug("Executing processRequestPdfAndSetPreviewDocument for caseId: {}", caseId);
+
+        String requestDetails;
+        String title;
+        final StringBuilder additionalRequestDetails = new StringBuilder();
+        additionalRequestDetails.append("Date request received: ").append(LocalDate.now().format(DATE_TIME_FORMATTER)).append("\n");
+
+        switch (requestPdfType) {
+            case POST_HEARING:
+                requestDetails = sscsCaseData.getPostHearing().getRequestReason();
+                Event latestIssueFinalDecision = getLatestEventOfSpecifiedTypes(sscsCaseData, ISSUE_FINAL_DECISION, ISSUE_FINAL_DECISION_WELSH)
+                    .orElseThrow(() -> {
+                        log.error("latestIssueFinalDecision unexpectedly null for caseId: {}", caseId);
+                        throw new IllegalArgumentException("latestIssueFinalDecision unexpectedly null for caseId: " + caseId);
+                    });
+                final LocalDate dateOfFinalDecision = latestIssueFinalDecision.getValue().getDateTime().toLocalDate();
+                final String postHearingRequestType = sscsCaseData.getPostHearing().getRequestType().getDescriptionEn();
+                additionalRequestDetails.append("Date of decision: ").append(dateOfFinalDecision.format(DATE_TIME_FORMATTER)).append("\n");
+                additionalRequestDetails.append("Reason for ").append(postHearingRequestType).append(" request: ").append(requestDetails).append("\n");
+                title = String.format("%s Application from FTA", postHearingRequestType);
+                break;
+            case POSTPONEMENT:
+                requestDetails = sscsCaseData.getPostponementRequest().getPostponementRequestDetails();
+                String hearingVenue = sscsCaseData.getPostponementRequest().getPostponementRequestHearingVenue();
+                LocalDate hearingDate = LocalDateTime.parse(sscsCaseData.getPostponementRequest().getPostponementRequestHearingDateAndTime()).toLocalDate();
+                additionalRequestDetails.append("Date of Hearing: ").append(hearingDate.format(DATE_TIME_FORMATTER)).append("\n");
+                additionalRequestDetails.append("Hearing Venue: ").append(hearingVenue).append("\n");
+                additionalRequestDetails.append("Reason for Postponement Request: ").append(requestDetails).append("\n");
+                title = "Postponement Request from FTA";
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported event type for processRequestPdfAndSetPreviewDocument: " + requestPdfType);
+        }
 
         if (isBlank(requestDetails)) {
-            response.addError("Please enter request details to generate a postponement request document");
+            response.addError(String.format("Please enter request details to generate a %s request document", requestPdfType.toString().toLowerCase()));
             return response;
         }
 
-        String hearingVenue = postponementRequest.getPostponementRequestHearingVenue();
-        LocalDate hearingDate = LocalDateTime.parse(postponementRequest.getPostponementRequestHearingDateAndTime()).toLocalDate();
+        DocumentLink previewDocument = getPreviewDocument(requestPdfType, userAuthorisation, generateFile, templateId, title, additionalRequestDetails);
 
-        StringBuilder additionalRequestDetails = new StringBuilder();
-        additionalRequestDetails.append("Date request received: ").append(LocalDate.now().format(DATE_TIME_FORMATTER)).append("\n");
-        additionalRequestDetails.append("Date of Hearing: ").append(hearingDate.format(DATE_TIME_FORMATTER)).append("\n");
-        additionalRequestDetails.append("Hearing Venue: ").append(hearingVenue).append("\n");
-        additionalRequestDetails.append("Reason for Postponement Request: ").append(requestDetails).append("\n");
-
-        GenerateFileParams params = GenerateFileParams.builder()
-                .renditionOutputLocation(null)
-                .templateId(templateId)
-                .formPayload(PostponeRequestTemplateBody.builder()
-                    .title("Postponement Request from FTA")
-                    .text(additionalRequestDetails.toString())
-                    .build())
-                .userAuthentication(userAuthorisation)
-                .build();
-        final String generatedFileUrl = generateFile.assemble(params);
-        postponementRequest.setPostponementPreviewDocument(DocumentLink.builder()
-                .documentFilename("Postponement Request.pdf")
-                .documentBinaryUrl(generatedFileUrl + "/binary")
-                .documentUrl(generatedFileUrl)
-                .build());
+        switch (requestPdfType) {
+            case POST_HEARING:
+                sscsCaseData.getPostHearing().setPreviewDocument(previewDocument);
+                break;
+            case POSTPONEMENT:
+                sscsCaseData.getPostponementRequest().setPostponementPreviewDocument(previewDocument);
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported event type for processRequestPdfAndSetPreviewDocument: " + requestPdfType);
+        }
 
         return response;
     }
 
-    public static PreSubmitCallbackResponse<SscsCaseData> processPostHearingRequestPdfAndSetPreviewDocument(String userAuthorisation,
-                                                                                                            SscsCaseData sscsCaseData,
-                                                                                                            PreSubmitCallbackResponse<SscsCaseData> response,
-                                                                                                            GenerateFile generateFile,
-                                                                                                            String templateId) {
-        final String caseId = sscsCaseData.getCcdCaseId();
-        log.debug("Executing processPostHearingRequestPdfAndSetPreviewDocument for caseId: {}", caseId);
-        final PostHearing postHearing = sscsCaseData.getPostHearing();
-        final String requestDetails = postHearing.getRequestReason();
-        if (isBlank(requestDetails)) {
-            response.addError("Please enter request details to generate a post hearing request document");
-            return response;
-        }
-
-        Event latestIssueFinalDecision = getLatestEventOfSpecifiedTypes(sscsCaseData, ISSUE_FINAL_DECISION, ISSUE_FINAL_DECISION_WELSH)
-            .orElseThrow(() -> {
-                log.error("latestIssueFinalDecision unexpectedly null for caseId: {}", caseId);
-                throw new IllegalArgumentException("latestIssueFinalDecision unexpectedly null for caseId: " + caseId);
-            });
-
-        final LocalDate dateOfFinalDecision = latestIssueFinalDecision.getValue().getDateTime().toLocalDate();
-        final String postHearingRequestType = postHearing.getRequestType().getDescriptionEn();
-        final StringBuilder additionalRequestDetails = new StringBuilder();
-        additionalRequestDetails.append("Date request received: ").append(LocalDate.now().format(DATE_TIME_FORMATTER)).append("\n");
-        additionalRequestDetails.append("Date of decision: ").append(dateOfFinalDecision.format(DATE_TIME_FORMATTER)).append("\n");
-        additionalRequestDetails.append("Reason for ").append(postHearingRequestType).append(" request: ").append(requestDetails).append("\n");
-
+    private static DocumentLink getPreviewDocument(
+        RequestPdfType requestPdfType,
+        String userAuthorisation,
+        GenerateFile generateFile,
+        String templateId,
+        String title,
+        StringBuilder additionalRequestDetails
+    ) {
         GenerateFileParams params = GenerateFileParams.builder()
-                .renditionOutputLocation(null)
-                .templateId(templateId)
-                .formPayload(
-                    PostHearingRequestTemplateBody.builder()
-                        .title(String.format("%s Application from FTA", postHearingRequestType))
-                        .text(additionalRequestDetails.toString())
-                        .build())
-                .userAuthentication(userAuthorisation)
-                .build();
+            .renditionOutputLocation(null)
+            .templateId(templateId)
+            .formPayload(PdfRequestTemplateBody.builder()
+                .title(title)
+                .text(additionalRequestDetails.toString())
+                .build())
+            .userAuthentication(userAuthorisation)
+            .build();
         final String generatedFileUrl = generateFile.assemble(params);
-        postHearing.setPreviewDocument(DocumentLink.builder()
-                .documentFilename("Post Hearing Request.pdf")
-                .documentBinaryUrl(generatedFileUrl + "/binary")
-                .documentUrl(generatedFileUrl)
-                .build());
 
-        return response;
+        return DocumentLink.builder()
+            .documentFilename(requestPdfType + " Request.pdf")
+            .documentBinaryUrl(generatedFileUrl + "/binary")
+            .documentUrl(generatedFileUrl)
+            .build();
     }
 
     public static boolean isSAndLCase(SscsCaseData sscsCaseData) {
