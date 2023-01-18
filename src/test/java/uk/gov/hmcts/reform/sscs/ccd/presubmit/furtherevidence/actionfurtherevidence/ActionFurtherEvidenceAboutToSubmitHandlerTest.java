@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.*;
@@ -19,6 +21,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurth
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.APPELLANT;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.DWP;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.JOINT_PARTY;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.REPRESENTATIVE;
@@ -193,6 +196,54 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertThat(sscsCaseData.getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.YES));
         assertThat(sscsCaseData.getAppealNotePad().getNotesCollection().stream()
                 .anyMatch(note -> note.getValue().getNoteDetail().equals("Request Detail Test")), is(true));
+    }
+
+    private void setUpCaseDataForSetAside() {
+        sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
+        sscsCaseData.getFurtherEvidenceAction().setValue(
+                new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
+                        FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel())
+        );
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+                .value(ScannedDocumentDetails.builder().type(SET_ASIDE_APPLICATION.getValue())
+                        .fileName("Test.pdf").url(DocumentLink.builder()
+                                .documentUrl("test.com").build()).build()).build();
+
+        sscsCaseData.setScannedDocuments(Arrays.asList(scannedDocument));
+    }
+
+    @Test
+    public void givenAValidSetAsideApplicationRequest_thenInterlocReviewStateAndCaseStateUpdated() {
+        setUpCaseDataForSetAside();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getState(), is(State.POST_HEARING));
+        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_JUDGE));
+    }
+
+    @Test
+    public void giveAValidSetAsideApplicationRequestFromAnFtaUser_thenDwpStateIsUpdatedToSetAsideRequested() {
+        setUpCaseDataForSetAside();
+        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(DWP.getCode(), DWP.getLabel()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getDwpState(), is(DwpState.SET_ASIDE_REQUESTED));
+    }
+
+    @Test
+    public void givenAValidSetAsideApplicationRequestWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError() {
+        setUpCaseDataForSetAside();
+
+        sscsCaseData.getFurtherEvidenceAction().setValue(
+                new DynamicListItem(FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode(),
+                        FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getLabel())
+        );
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        response.getErrors().forEach(error ->
+                assertThat(response.getErrors(), hasItem(
+                        containsString(String.format("Further evidence action must be set to '%s'",
+                                SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel())))));
     }
 
     @Test
