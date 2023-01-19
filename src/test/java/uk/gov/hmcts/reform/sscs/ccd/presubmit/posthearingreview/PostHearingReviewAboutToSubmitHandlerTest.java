@@ -21,6 +21,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
+import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingReviewAboutToSubmitHandlerTest {
@@ -37,11 +39,17 @@ class PostHearingReviewAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private GenerateFile generateFile;
+
+    @Mock
+    private DocumentConfiguration documentConfiguration;
+
     private SscsCaseData caseData;
 
     @BeforeEach
     void setUp() {
-        handler = new PostHearingReviewAboutToSubmitHandler(true);
+        handler = new PostHearingReviewAboutToSubmitHandler(true, generateFile, documentConfiguration);
 
         caseData = SscsCaseData.builder()
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
@@ -79,7 +87,9 @@ class PostHearingReviewAboutToSubmitHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new PostHearingReviewAboutToSubmitHandler(false);
+        handler = new PostHearingReviewAboutToSubmitHandler(false,
+            generateFile,
+            documentConfiguration);
         when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }

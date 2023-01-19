@@ -35,9 +35,11 @@ public class DocumentConfigurationTest {
                 {LanguagePreference.ENGLISH, EventType.DECISION_ISSUED, Optional.empty(), "TB-SCS-GNO-ENG-draft-decision-notice.docx"},
                 {LanguagePreference.ENGLISH, EventType.DIRECTION_ISSUED, Optional.empty(), "TB-SCS-GNO-ENG-directions-notice.docx"},
                 {LanguagePreference.ENGLISH, EventType.ISSUE_FINAL_DECISION, Optional.empty(), "TB-SCS-GNO-ENG-final-decision-notice.docx"},
+                {LanguagePreference.ENGLISH, EventType.SET_ASIDE_REFUSED, Optional.empty(), "TB-SCS-GNO-ENG-grant-refuse-set-aside.docx"},
                 {LanguagePreference.WELSH, EventType.DECISION_ISSUED, Optional.empty(), "TB-SCS-GNO-WEL-00473.docx"},
                 {LanguagePreference.WELSH, EventType.DIRECTION_ISSUED, Optional.empty(), "TB-SCS-GNO-WEL-00473.docx"},
-                {LanguagePreference.WELSH, EventType.ISSUE_FINAL_DECISION, Optional.empty(), "TB-SCS-GNO-ENG-final-decision-notice.docx"}
+                {LanguagePreference.WELSH, EventType.ISSUE_FINAL_DECISION, Optional.empty(), "TB-SCS-GNO-ENG-final-decision-notice.docx"},
+                {LanguagePreference.WELSH, EventType.SET_ASIDE_REFUSED, Optional.empty(), "TB-SCS-GNO-WEL-grant-refuse-set-aside.docx"}
         };
     }
 

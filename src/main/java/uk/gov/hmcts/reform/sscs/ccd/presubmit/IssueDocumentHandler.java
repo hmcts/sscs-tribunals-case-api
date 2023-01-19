@@ -14,7 +14,6 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.WordUtils;
 import uk.gov.hmcts.reform.docassembly.domain.FormPayload;
-import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -107,10 +106,11 @@ public class IssueDocumentHandler {
                 || SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
     }
 
-    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation) {
-
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-
+    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(SscsCaseData caseData,
+                                                                    DocumentType documentType,
+                                                                    String templateId,
+                                                                    GenerateFile generateFile,
+                                                                    String userAuthorisation) {
         if ((ADJOURNMENT_NOTICE.equals(documentType) || DRAFT_ADJOURNMENT_NOTICE.equals(documentType))
             && caseData.getAdjournment().getGenerateNotice() == null) {
             throw new IllegalStateException("Generate notice has not been set");

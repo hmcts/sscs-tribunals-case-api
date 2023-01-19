@@ -37,7 +37,8 @@ public class PostHearingReviewMidEventHandler extends IssueDocumentHandler imple
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType,
+                                                          Callback<SscsCaseData> callback,
                                                           String userAuthorisation) {
         final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
@@ -52,9 +53,10 @@ public class PostHearingReviewMidEventHandler extends IssueDocumentHandler imple
 
         if (PAGE_ID_GENERATE_NOTICE.equals(pageId) && isYes(caseData.getDocumentGeneration().getGenerateNotice())) {
             log.info("Review Post Hearing App: Generating notice for caseId {}", caseId);
+
             String templateId = documentConfiguration.getDocuments()
                 .get(caseData.getLanguagePreference()).get(DECISION_ISSUED);
-            response = issueDocument(callback, DECISION_NOTICE, templateId, generateFile, userAuthorisation);
+            response = issueDocument(caseData, DECISION_NOTICE, templateId, generateFile, userAuthorisation);
         }
 
         return response;
