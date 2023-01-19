@@ -29,9 +29,9 @@ public class PdfRequestUtils {
     }
 
     @AllArgsConstructor
-    private enum RequestPdfType {
-        POSTPONEMENT("Postponement"),
-        POST_HEARING("Post Hearing");
+    private enum PdfType {
+        POSTPONEMENT("Postponement Request"),
+        POST_HEARING("Post hearing application");
 
         final String name;
 
@@ -48,7 +48,7 @@ public class PdfRequestUtils {
         GenerateFile generateFile,
         String templateId
     ) {
-        return processRequestPdfAndSetPreviewDocument(RequestPdfType.POSTPONEMENT, userAuthorisation, sscsCaseData, response, generateFile, templateId);
+        return processRequestPdfAndSetPreviewDocument(PdfType.POSTPONEMENT, userAuthorisation, sscsCaseData, response, generateFile, templateId);
     }
 
     public static PreSubmitCallbackResponse<SscsCaseData> processPostHearingRequestPdfAndSetPreviewDocument(
@@ -58,11 +58,11 @@ public class PdfRequestUtils {
         GenerateFile generateFile,
         String templateId
     ) {
-        return processRequestPdfAndSetPreviewDocument(RequestPdfType.POST_HEARING, userAuthorisation, sscsCaseData, response, generateFile, templateId);
+        return processRequestPdfAndSetPreviewDocument(PdfType.POST_HEARING, userAuthorisation, sscsCaseData, response, generateFile, templateId);
     }
 
     public static PreSubmitCallbackResponse<SscsCaseData> processRequestPdfAndSetPreviewDocument(
-        RequestPdfType requestPdfType,
+        PdfType pdfType,
         String userAuthorisation,
         SscsCaseData sscsCaseData,
         PreSubmitCallbackResponse<SscsCaseData> response,
@@ -73,7 +73,7 @@ public class PdfRequestUtils {
 
         additionalRequestDetails.append("Date request received: ").append(LocalDate.now().format(DATE_TIME_FORMATTER)).append("\n");
 
-        switch (requestPdfType) {
+        switch (pdfType) {
             case POST_HEARING:
                 handlePostHearing(sscsCaseData);
                 break;
@@ -81,17 +81,17 @@ public class PdfRequestUtils {
                 handlePostponement(sscsCaseData);
                 break;
             default:
-                throw new IllegalArgumentException("Unsupported event type for processRequestPdfAndSetPreviewDocument: " + requestPdfType);
+                throw new IllegalArgumentException("Unsupported event type for processRequestPdfAndSetPreviewDocument: " + pdfType);
         }
 
         if (isBlank(requestDetails)) {
-            response.addError(String.format("Please enter request details to generate a %s request document", requestPdfType.toString().toLowerCase()));
+            response.addError(String.format("Please enter request details to generate a %s document", pdfType.toString().toLowerCase()));
             return response;
         }
 
-        DocumentLink previewDocument = getPreviewDocument(requestPdfType, userAuthorisation, generateFile, templateId, title);
+        DocumentLink previewDocument = getPreviewDocument(pdfType, userAuthorisation, generateFile, templateId, title);
 
-        switch (requestPdfType) {
+        switch (pdfType) {
             case POST_HEARING:
                 sscsCaseData.getPostHearing().setPreviewDocument(previewDocument);
                 break;
@@ -99,7 +99,7 @@ public class PdfRequestUtils {
                 sscsCaseData.getPostponementRequest().setPostponementPreviewDocument(previewDocument);
                 break;
             default:
-                throw new IllegalArgumentException("Unsupported event type for processRequestPdfAndSetPreviewDocument: " + requestPdfType);
+                throw new IllegalArgumentException("Unsupported event type for processRequestPdfAndSetPreviewDocument: " + pdfType);
         }
 
         return response;
@@ -130,7 +130,7 @@ public class PdfRequestUtils {
     }
 
     private static DocumentLink getPreviewDocument(
-        RequestPdfType requestPdfType,
+        PdfType pdfType,
         String userAuthorisation,
         GenerateFile generateFile,
         String templateId,
@@ -148,7 +148,7 @@ public class PdfRequestUtils {
         final String generatedFileUrl = generateFile.assemble(params);
 
         return DocumentLink.builder()
-            .documentFilename(requestPdfType + " Request.pdf")
+            .documentFilename(pdfType + ".pdf")
             .documentBinaryUrl(generatedFileUrl + "/binary")
             .documentUrl(generatedFileUrl)
             .build();

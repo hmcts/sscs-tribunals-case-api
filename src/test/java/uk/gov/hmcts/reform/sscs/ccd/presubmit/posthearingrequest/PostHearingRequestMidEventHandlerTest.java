@@ -131,7 +131,7 @@ class PostHearingRequestMidEventHandlerTest {
         DocumentLink documentLink = DocumentLink.builder()
             .documentBinaryUrl(dmUrl + "/binary")
             .documentUrl(dmUrl)
-            .documentFilename("Post Hearing Request.pdf")
+            .documentFilename("Post hearing application.pdf")
             .build();
         assertThat(response.getData().getPostHearing().getPreviewDocument()).isEqualTo(documentLink);
     }
@@ -153,7 +153,7 @@ class PostHearingRequestMidEventHandlerTest {
 
         assertThat(response.getErrors())
             .hasSize(1)
-            .containsOnly("Please enter request details to generate a post hearing request document");
+            .containsOnly("Please enter request details to generate a post hearing application document");
     }
 
     @Test
