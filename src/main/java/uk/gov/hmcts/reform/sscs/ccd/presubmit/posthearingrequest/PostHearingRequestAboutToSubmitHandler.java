@@ -53,7 +53,7 @@ public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallback
             default:
                 throw new IllegalArgumentException("Unexpected request type: " + requestType);
         }
-        SscsUtil.addDocument(caseData, documentType, footerService);
+        SscsUtil.addDocumentToDocumentTab(footerService, caseData, documentType);
         SscsUtil.clearDocumentTransientFields(caseData);
 
         return new PreSubmitCallbackResponse<>(caseData);
