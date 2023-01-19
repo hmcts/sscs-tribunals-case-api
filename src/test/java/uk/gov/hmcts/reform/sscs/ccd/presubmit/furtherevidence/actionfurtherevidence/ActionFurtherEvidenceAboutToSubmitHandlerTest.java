@@ -214,7 +214,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     public void givenAValidSetAsideApplicationRequest_thenInterlocReviewStateAndCaseStateUpdated() {
+        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
         setUpCaseDataForSetAside();
+
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getData().getState(), is(State.POST_HEARING));
@@ -223,6 +225,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     public void giveAValidSetAsideApplicationRequestFromAnFtaUser_thenDwpStateIsUpdatedToSetAsideRequested() {
+        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
         setUpCaseDataForSetAside();
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(DWP.getCode(), DWP.getLabel()));
 
@@ -232,6 +235,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     public void givenAValidSetAsideApplicationRequestWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError() {
+        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
         setUpCaseDataForSetAside();
 
         sscsCaseData.getFurtherEvidenceAction().setValue(
