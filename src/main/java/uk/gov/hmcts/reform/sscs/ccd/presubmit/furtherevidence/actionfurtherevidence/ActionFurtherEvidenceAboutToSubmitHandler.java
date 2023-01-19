@@ -228,7 +228,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             }
         }
 
-        if (isSetAsideApplicationRequest(sscsCaseData)) {
+        if (isSetAsideApplicationRequest(sscsCaseData)
+                && caseDetails.getState().equals(State.DORMANT_APPEAL_STATE)) {
             sscsCaseData.setState(State.POST_HEARING);
             sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
             if (sscsCaseData.getOriginalSender().getValue().getCode().equals(PartyItemList.DWP.getCode())) {
