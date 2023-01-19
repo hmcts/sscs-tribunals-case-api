@@ -586,6 +586,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         if (ScannedDocumentType.POSTPONEMENT_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
             return POSTPONEMENT_REQUEST;
         }
+        if (ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocument.getValue().getType())) {
+            return SET_ASIDE_APPLICATION;
+        }
 
         String originalSenderStripped  = originalSenderCode.replaceAll("\\d","");
 
