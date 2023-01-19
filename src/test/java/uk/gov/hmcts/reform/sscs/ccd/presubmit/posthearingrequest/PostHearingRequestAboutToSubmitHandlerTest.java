@@ -15,7 +15,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,14 +25,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.service.PostHearingRequestService;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingRequestAboutToSubmitHandlerTest {
@@ -56,13 +59,15 @@ class PostHearingRequestAboutToSubmitHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new PostHearingRequestAboutToSubmitHandler(true, footerService);
+        handler = new PostHearingRequestAboutToSubmitHandler(true, footerService, new PostHearingRequestService());
 
         caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build())
+            .state(State.DORMANT_APPEAL_STATE)
             .ccdCaseId("1234")
             .postHearing(PostHearing.builder()
                 .previewDocument(DocumentLink.builder()
-                    .documentFilename("filename")
+                    .documentFilename("Post Hearing Request.pdf")
                     .build())
                 .build())
             .build();
@@ -93,7 +98,7 @@ class PostHearingRequestAboutToSubmitHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new PostHearingRequestAboutToSubmitHandler(false, footerService);
+        handler = new PostHearingRequestAboutToSubmitHandler(false, footerService, new PostHearingRequestService());
         when(callback.getEvent()).thenReturn(POST_HEARING_REQUEST);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
@@ -112,11 +117,9 @@ class PostHearingRequestAboutToSubmitHandlerTest {
         assertThat(response.getErrors()).isEmpty();
     }
 
-    @Disabled("Until adding doc to bundle is properly implemented") // TODO fix
     @ParameterizedTest
     @CsvSource({"SET_ASIDE,SET_ASIDE_APPLICATION"})
     void givenAPostHearingRequest_AddGeneratedDocumentToBundle(PostHearingRequestType requestType, DocumentType documentType) {
-        when(callback.getEvent()).thenReturn(POST_HEARING_REQUEST);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         caseData.getPostHearing().setRequestType(requestType);
