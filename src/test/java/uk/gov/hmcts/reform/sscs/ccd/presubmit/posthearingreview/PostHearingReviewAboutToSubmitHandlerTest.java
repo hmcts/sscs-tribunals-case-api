@@ -10,18 +10,28 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.SET_ASIDE_APPLI
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REVIEW;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.SET_ASIDE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
 
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,6 +55,8 @@ class PostHearingReviewAboutToSubmitHandlerTest {
 
     private SscsDocument expectedDocument;
 
+    private DocumentType documentType;
+
     @BeforeEach
     void setUp() {
         handler = new PostHearingReviewAboutToSubmitHandler(true, footerService);
@@ -60,18 +72,9 @@ class PostHearingReviewAboutToSubmitHandlerTest {
                 .previewDocument(DocumentLink.builder()
                     .documentUrl(DOCUMENT_URL)
                     .documentBinaryUrl(DOCUMENT_URL + "/binary")
-                    .documentFilename("setAside.pdf")
                     .build())
                 .build())
             .build();
-
-        expectedDocument = SscsDocument.builder()
-            .value(SscsDocumentDetails.builder()
-                .documentFileName(caseData.getDocumentStaging().getPreviewDocument().getDocumentFilename())
-                .documentLink(caseData.getDocumentStaging().getPreviewDocument())
-                .documentDateAdded(LocalDate.now().minusDays(1).toString())
-                .documentType(SET_ASIDE_APPLICATION.getValue())
-                .build()).build();
     }
 
     @Test
@@ -110,9 +113,25 @@ class PostHearingReviewAboutToSubmitHandlerTest {
         assertThat(response.getErrors()).isEmpty();
     }
 
-    @Test
-    public void givenPostHearingAndApplicationTypeSetAside_thenAddSetAsideDoc() {
-        caseData.getPostHearing().setReviewType(SET_ASIDE);
+    @ParameterizedTest
+    @EnumSource(value = PostHearingReviewType.class, names = {"SET_ASIDE"})
+    public void givenPostHearingWithGivenReviewType_thenRespectiveDocTypeShouldBeAdded(PostHearingReviewType reviewType) {
+        switch (reviewType) {
+            case SET_ASIDE:
+                documentType = SET_ASIDE_APPLICATION;
+                break;
+            default:
+                documentType = null;
+        }
+        expectedDocument = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentFileName(caseData.getDocumentStaging().getPreviewDocument().getDocumentFilename())
+                .documentLink(caseData.getDocumentStaging().getPreviewDocument())
+                .documentDateAdded(LocalDate.now().minusDays(1).toString())
+                .documentType(documentType.getValue())
+                .build()).build();
+
+        caseData.getPostHearing().setReviewType(reviewType);
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
@@ -121,14 +140,30 @@ class PostHearingReviewAboutToSubmitHandlerTest {
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
-            eq(SET_ASIDE_APPLICATION), any(),  eq(null), eq(null), eq(null));
+            eq(documentType), any(),  eq(null), eq(null), eq(null));
 
     }
 
-    @Test
-    public void givenPostHearingAndApplicationTypeSetAsideWithWelsh_thenAddSetAsideDocWithTranslation() {
+    @ParameterizedTest
+    @EnumSource(value = PostHearingReviewType.class, names = {"SET_ASIDE"})
+    public void givenPostHearingWithGivenReviewTypeAndWithWelshPreference_thenRespectiveDocTypeShouldBeAddedWithTranslation(PostHearingReviewType reviewType) {
+        switch (reviewType) {
+            case SET_ASIDE:
+                documentType = SET_ASIDE_APPLICATION;
+                break;
+            default:
+                documentType = null;
+        }
+        expectedDocument = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentFileName(caseData.getDocumentStaging().getPreviewDocument().getDocumentFilename())
+                .documentLink(caseData.getDocumentStaging().getPreviewDocument())
+                .documentDateAdded(LocalDate.now().minusDays(1).toString())
+                .documentType(documentType.getValue())
+                .build()).build();
+
         caseData.setLanguagePreferenceWelsh("YES");
-        caseData.getPostHearing().setReviewType(SET_ASIDE);
+        caseData.getPostHearing().setReviewType(reviewType);
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
@@ -137,7 +172,7 @@ class PostHearingReviewAboutToSubmitHandlerTest {
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
-            eq(SET_ASIDE_APPLICATION), any(),  eq(null), eq(null), eq(TRANSLATION_REQUIRED));
+            eq(documentType), any(),  eq(null), eq(null), eq(TRANSLATION_REQUIRED));
 
     }
 }
