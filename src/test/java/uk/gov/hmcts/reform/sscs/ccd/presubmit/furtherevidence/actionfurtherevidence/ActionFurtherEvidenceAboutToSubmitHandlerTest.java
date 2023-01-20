@@ -270,8 +270,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({
-            "VALID_APPEAL,setAsideApplication",
-            "READY_TO_LIST,setAsideApplication"
+        "VALID_APPEAL,setAsideApplication",
+        "READY_TO_LIST,setAsideApplication"
     })
     public void givenAPostHearingApplicationRequestNotInDormantAppealState_thenExpectedFieldsNotUpdated(State state, String documentType) {
         when(caseDetails.getState()).thenReturn(state);
