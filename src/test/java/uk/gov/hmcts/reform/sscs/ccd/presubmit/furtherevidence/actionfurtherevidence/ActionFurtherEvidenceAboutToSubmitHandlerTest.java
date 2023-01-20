@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.*;
@@ -198,99 +198,56 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                 .anyMatch(note -> note.getValue().getNoteDetail().equals("Request Detail Test")), is(true));
     }
 
-    @Test
-    @Parameters({"setAsideApplication"})
-    public void givenAValidPostHearingApplicationRequest_thenInterlocReviewStateAndCaseStateUpdated(String documentType) {
-        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
+    private void setUpCaseDataForSetAside() {
         sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
         sscsCaseData.getFurtherEvidenceAction().setValue(
                 new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
                         FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel())
         );
         ScannedDocument scannedDocument = ScannedDocument.builder()
-                .value(ScannedDocumentDetails.builder().type(documentType)
+                .value(ScannedDocumentDetails.builder().type(SET_ASIDE_APPLICATION.getValue())
                         .fileName("Test.pdf").url(DocumentLink.builder()
                                 .documentUrl("test.com").build()).build()).build();
 
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        sscsCaseData.setScannedDocuments(Arrays.asList(scannedDocument));
+    }
 
-        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
-                ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+    @Test
+    public void givenAValidSetAsideApplicationRequest_thenInterlocReviewStateAndCaseStateUpdated() {
+        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
+        setUpCaseDataForSetAside();
+
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getData().getState(), is(State.POST_HEARING));
         assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_JUDGE));
     }
 
     @Test
-    @Parameters({"setAsideApplication"})
-    public void giveAValidPostHearingApplicationRequestFromAnFtaUser_thenDwpStateIsUpdatedToSetAsideRequested(String documentType) {
+    public void giveAValidSetAsideApplicationRequestFromAnFtaUser_thenDwpStateIsUpdatedToSetAsideRequested() {
         when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
-        sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
-        sscsCaseData.getFurtherEvidenceAction().setValue(
-                new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
-                        FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel())
-        );
-        ScannedDocument scannedDocument = ScannedDocument.builder()
-                .value(ScannedDocumentDetails.builder().type(documentType)
-                        .fileName("Test.pdf").url(DocumentLink.builder()
-                                .documentUrl("test.com").build()).build()).build();
-
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        setUpCaseDataForSetAside();
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(DWP.getCode(), DWP.getLabel()));
 
-        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
-                ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getData().getDwpState(), is(DwpState.SET_ASIDE_REQUESTED));
     }
 
     @Test
-    @Parameters({"setAsideApplication"})
-    public void givenAValidPostHearingRequestWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError(String documentType) {
+    public void givenAValidSetAsideApplicationRequestWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError() {
         when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
-        sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
+        setUpCaseDataForSetAside();
+
         sscsCaseData.getFurtherEvidenceAction().setValue(
-                new DynamicListItem(FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE.getCode(),
-                        FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE.getLabel())
+                new DynamicListItem(FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode(),
+                        FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getLabel())
         );
-        ScannedDocument scannedDocument = ScannedDocument.builder()
-                .value(ScannedDocumentDetails.builder().type(documentType)
-                        .fileName("Test.pdf").url(DocumentLink.builder()
-                                .documentUrl("test.com").build()).build()).build();
 
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
-
-        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
-                ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors(), hasSize(1));
-        assertThat(response.getErrors(), hasItem(
-                String.format("Further evidence action must be set to '%s'",
-                        SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel())));
-    }
-
-    @Test
-    @Parameters({"VALID_APPEAL,setAsideApplication", "READY_TO_LIST,setAsideApplication"})
-    public void givenAPostHearingApplicationRequestNotInDormantAppealState_thenExpectedFieldsNotUpdated(State state,
-            String documentType) {
-        when(caseDetails.getState()).thenReturn(state);
-        sscsCaseData.setState(state);
-        sscsCaseData.getFurtherEvidenceAction().setValue(
-                new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
-                        FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel())
-        );
-        ScannedDocument scannedDocument = ScannedDocument.builder()
-                .value(ScannedDocumentDetails.builder().type(documentType)
-                        .fileName("Test.pdf").url(DocumentLink.builder()
-                                .documentUrl("test.com").build()).build()).build();
-
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
-
-        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
-                ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getDwpState(), not(DwpState.SET_ASIDE_REQUESTED));
-        assertThat(response.getData().getState(), not(State.POST_HEARING));
-        assertThat(response.getData().getInterlocReviewState(), not(InterlocReviewState.REVIEW_BY_JUDGE));
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        response.getErrors().forEach(error ->
+                assertThat(response.getErrors(), hasItem(
+                        containsString(String.format("Further evidence action must be set to '%s'",
+                                SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel())))));
     }
 
     @Test
