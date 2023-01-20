@@ -229,10 +229,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
 
         if (isSetAsideApplicationRequest(sscsCaseData)
-                && caseDetails.getState().equals(State.DORMANT_APPEAL_STATE)) {
+                && State.DORMANT_APPEAL_STATE.equals(caseDetails.getState())) {
             sscsCaseData.setState(State.POST_HEARING);
             sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
-            if (sscsCaseData.getOriginalSender().getValue().getCode().equals(PartyItemList.DWP.getCode())) {
+            if (PartyItemList.DWP.getCode().equals(sscsCaseData.getOriginalSender().getValue().getCode())) {
                 sscsCaseData.setDwpState(DwpState.SET_ASIDE_REQUESTED);
             }
         }
@@ -252,7 +252,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private boolean isSetAsideApplicationRequest(SscsCaseData sscsCaseData) {
         return emptyIfNull(sscsCaseData.getScannedDocuments()).stream()
                 .anyMatch(doc -> doc.getValue() != null && StringUtils.isNotBlank(doc.getValue().getType())
-                        && doc.getValue().getType().equals(DocumentType.SET_ASIDE_APPLICATION.getValue()));
+                        && DocumentType.SET_ASIDE_APPLICATION.getValue().equals(doc.getValue().getType()));
     }
 
     private Note createPostponementRequestNote(String userAuthorisation, String details) {
