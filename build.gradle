@@ -383,7 +383,7 @@ dependencies {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
 
-    testImplementation group: 'org.apache.httpcomponents', name: 'fluent-hc', version:  '4.5.13'
+    testImplementation group: 'org.apache.httpcomponents', name: 'fluent-hc', version:  '4.5.14'
 
     testImplementation group: 'com.azure', name: 'azure-core', version: '1.34.0'
     testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.13.0'
