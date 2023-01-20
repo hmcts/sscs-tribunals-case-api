@@ -44,7 +44,7 @@ tasks.withType(Copy).all { duplicatesStrategy 'warn' }
 mainClassName = 'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication'
 
 pmd {
-    toolVersion = "6.5.0"
+    toolVersion = "6.53.0"
     ignoreFailures = true
     sourceSets = [sourceSets.main, sourceSets.test]
     reportsDir = file("$project.buildDir/reports/pmd")
