@@ -5,7 +5,7 @@ plugins {
     id 'jacoco'
     id 'org.springframework.boot' version '2.7.6'
     id 'uk.gov.hmcts.java' version '0.12.33'
-    id 'com.gorylenko.gradle-git-properties' version '2.3.1'
+    id 'com.gorylenko.gradle-git-properties' version '2.4.1'
     id 'com.github.ben-manes.versions' version '0.39.0'
     id "info.solidsoft.pitest" version '1.9.0'
     id 'org.owasp.dependencycheck' version '7.4.4'
@@ -44,7 +44,7 @@ tasks.withType(Copy).all { duplicatesStrategy 'warn' }
 mainClassName = 'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication'
 
 pmd {
-    toolVersion = "6.5.0"
+    toolVersion = "6.53.0"
     ignoreFailures = true
     sourceSets = [sourceSets.main, sourceSets.test]
     reportsDir = file("$project.buildDir/reports/pmd")
@@ -260,7 +260,7 @@ dependencyManagement {
         }
 
         // CVE-2022-41881, CVE-2022-41915
-        dependencySet(group: 'io.netty', version: '4.1.86.Final') {
+        dependencySet(group: 'io.netty', version: '4.1.87.Final') {
             entry 'netty-buffer'
             entry 'netty-common'
             entry 'netty-codec'
