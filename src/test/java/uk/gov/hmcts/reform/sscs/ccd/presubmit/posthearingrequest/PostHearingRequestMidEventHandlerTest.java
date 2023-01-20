@@ -10,7 +10,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REQUEST
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
-import java.util.List;
+import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,8 +25,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat;
@@ -68,7 +66,7 @@ class PostHearingRequestMidEventHandlerTest {
             .postHearing(PostHearing.builder()
                 .requestReason("Reason")
                 .build())
-            .events(List.of(new Event(new EventDetails("2017-06-20T12:00:00", "issueFinalDecision", "issued"))))
+            .issueFinalDecisionDate(LocalDate.now())
             .build();
     }
 
@@ -157,19 +155,18 @@ class PostHearingRequestMidEventHandlerTest {
     }
 
     @Test
-    void givenCaseEventsContainsNoIssueFinalDecision_throwsException() {
+    void givenIssueFinalDecisionDateIsNull_throwsException() {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
 
         caseData.getPostHearing().setRequestType(PostHearingRequestType.SET_ASIDE);
         caseData.getPostHearing().getSetAside().setRequestFormat(RequestFormat.GENERATE);
-
-        caseData.setEvents(List.of());
+        caseData.setIssueFinalDecisionDate(null);
 
         assertThatThrownBy(() -> handler.handle(MID_EVENT, callback, USER_AUTHORISATION))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("latestIssueFinalDecision unexpectedly null for caseId: " + CASE_ID);
+            .hasMessage("issueFinalDecisionDate unexpectedly null for caseId: " + CASE_ID);
     }
 
     @Test

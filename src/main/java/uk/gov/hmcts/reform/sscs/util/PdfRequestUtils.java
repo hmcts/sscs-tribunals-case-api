@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FINAL_DECISION;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FINAL_DECISION_WELSH;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
@@ -22,7 +19,7 @@ public class PdfRequestUtils {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static String requestDetails;
     private static String title;
-    private static final StringBuilder additionalRequestDetails = new StringBuilder();
+    private static final StringBuilder ADDITIONAL_REQUEST_DETAILS = new StringBuilder();
 
     private PdfRequestUtils() {
         //
@@ -71,7 +68,7 @@ public class PdfRequestUtils {
     ) {
         log.debug("Executing processRequestPdfAndSetPreviewDocument for caseId: {}", sscsCaseData.getCcdCaseId());
 
-        additionalRequestDetails.append("Date request received: ").append(LocalDate.now().format(DATE_TIME_FORMATTER)).append("\n");
+        ADDITIONAL_REQUEST_DETAILS.append("Date request received: ").append(LocalDate.now().format(DATE_TIME_FORMATTER)).append("\n");
 
         switch (pdfType) {
             case POST_HEARING:
@@ -109,23 +106,21 @@ public class PdfRequestUtils {
         requestDetails = sscsCaseData.getPostponementRequest().getPostponementRequestDetails();
         String hearingVenue = sscsCaseData.getPostponementRequest().getPostponementRequestHearingVenue();
         LocalDate hearingDate = LocalDateTime.parse(sscsCaseData.getPostponementRequest().getPostponementRequestHearingDateAndTime()).toLocalDate();
-        additionalRequestDetails.append("Date of Hearing: ").append(hearingDate.format(DATE_TIME_FORMATTER)).append("\n");
-        additionalRequestDetails.append("Hearing Venue: ").append(hearingVenue).append("\n");
-        additionalRequestDetails.append("Reason for Postponement Request: ").append(requestDetails).append("\n");
+        ADDITIONAL_REQUEST_DETAILS.append("Date of Hearing: ").append(hearingDate.format(DATE_TIME_FORMATTER)).append("\n");
+        ADDITIONAL_REQUEST_DETAILS.append("Hearing Venue: ").append(hearingVenue).append("\n");
+        ADDITIONAL_REQUEST_DETAILS.append("Reason for Postponement Request: ").append(requestDetails).append("\n");
         title = "Postponement Request from FTA";
     }
 
     private static void handlePostHearing(SscsCaseData sscsCaseData) {
         requestDetails = sscsCaseData.getPostHearing().getRequestReason();
-        Event latestIssueFinalDecision = SscsUtil.getLatestEventOfSpecifiedTypes(sscsCaseData, ISSUE_FINAL_DECISION, ISSUE_FINAL_DECISION_WELSH)
-            .orElseThrow(() -> {
-                log.error("latestIssueFinalDecision unexpectedly null for caseId: {}", sscsCaseData.getCcdCaseId());
-                throw new IllegalArgumentException("latestIssueFinalDecision unexpectedly null for caseId: " + sscsCaseData.getCcdCaseId());
-            });
-        final LocalDate dateOfFinalDecision = latestIssueFinalDecision.getValue().getDateTime().toLocalDate();
-        final String postHearingRequestType = sscsCaseData.getPostHearing().getRequestType().getDescriptionEn();
-        additionalRequestDetails.append("Date of decision: ").append(dateOfFinalDecision.format(DATE_TIME_FORMATTER)).append("\n");
-        additionalRequestDetails.append("Reason for ").append(postHearingRequestType).append(" request: ").append(requestDetails).append("\n");
+        LocalDate issueFinalDecisionDate = sscsCaseData.getIssueFinalDecisionDate();
+        if (issueFinalDecisionDate == null) {
+            throw new IllegalArgumentException("issueFinalDecisionDate unexpectedly null for caseId: " + sscsCaseData.getCcdCaseId());
+        }
+        ADDITIONAL_REQUEST_DETAILS.append("Date of decision: ").append(issueFinalDecisionDate.format(DATE_TIME_FORMATTER)).append("\n");
+        String postHearingRequestType = sscsCaseData.getPostHearing().getRequestType().getDescriptionEn();
+        ADDITIONAL_REQUEST_DETAILS.append("Reason for ").append(postHearingRequestType).append(" request: ").append(requestDetails).append("\n");
         title = String.format("%s Application from FTA", postHearingRequestType);
     }
 
@@ -141,7 +136,7 @@ public class PdfRequestUtils {
             .templateId(templateId)
             .formPayload(PdfRequestTemplateBody.builder()
                 .title(title)
-                .text(additionalRequestDetails.toString())
+                .text(ADDITIONAL_REQUEST_DETAILS.toString())
                 .build())
             .userAuthentication(userAuthorisation)
             .build();
