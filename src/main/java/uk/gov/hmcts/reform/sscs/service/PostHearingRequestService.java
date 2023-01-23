@@ -18,7 +18,7 @@ public class PostHearingRequestService {
 
     public void processPostHearingRequest(SscsCaseData sscsCaseData, UploadParty uploadParty) {
         ensureSscsDocumentsIsNotNull(sscsCaseData);
-        final SscsDocument sscsDocument = buildNewSscsDocumentFromPostponementRequest(sscsCaseData, uploadParty);
+        final SscsDocument sscsDocument = buildNewSscsDocumentFromPostHearingRequest(sscsCaseData, uploadParty);
         addToSscsDocuments(sscsCaseData, sscsDocument);
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
         clearTransientFields(sscsCaseData);
@@ -29,7 +29,7 @@ public class PostHearingRequestService {
         sscsCaseData.setSscsDocument(sscsDocuments);
     }
 
-    private SscsDocument buildNewSscsDocumentFromPostponementRequest(SscsCaseData sscsCaseData, UploadParty uploadParty) {
+    private SscsDocument buildNewSscsDocumentFromPostHearingRequest(SscsCaseData sscsCaseData, UploadParty uploadParty) {
         PostHearing postHearing = sscsCaseData.getPostHearing();
         DocumentType documentType;
 
