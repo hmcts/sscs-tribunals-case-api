@@ -99,10 +99,7 @@ public class SscsUtil {
     public static void addDocumentToDocumentTab(FooterService footerService, SscsCaseData caseData, DocumentType documentType) {
         DocumentLink url = caseData.getDocumentStaging().getPreviewDocument();
         String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        SscsDocumentTranslationStatus documentTranslationStatus = null;
-        if (caseData.isLanguagePreferenceWelsh()) {
-            documentTranslationStatus = SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
-        }
+        SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
         footerService.createFooterAndAddDocToCase(url, caseData, documentType, now,
             null, null, documentTranslationStatus);
         if (documentTranslationStatus != null) {

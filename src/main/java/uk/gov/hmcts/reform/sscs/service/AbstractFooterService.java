@@ -39,18 +39,16 @@ public abstract class AbstractFooterService<D extends AbstractDocument> {
 
             String bundleAddition = getNextBundleAddition(documents);
 
-            String issuedOrReceivedText = " issued on ";
-            if (documentType.equals(DocumentType.SET_ASIDE_APPLICATION)) {
-                issuedOrReceivedText = " received on ";
-            }
-            String bundleFileName = overrideFileName != null ? overrideFileName : buildBundleAdditionFileName(bundleAddition, label + issuedOrReceivedText + dateIssued);
+            String issuedOrReceivedText = documentType.equals(DocumentType.SET_ASIDE_APPLICATION) ? " received on " : " issued on ";
+            String fileName = label + issuedOrReceivedText + dateIssued;
+            String bundleFileName = overrideFileName != null ? overrideFileName : buildBundleAdditionFileName(bundleAddition, fileName);
 
             url = addFooter(url, label, bundleAddition);
 
             footerDetails = new FooterDetails(url, bundleAddition, bundleFileName);
 
         } else {
-            log.info("Could not find {} documentso skipping generating footer", label);
+            log.info("Could not find {} document so skipping generating footer", label);
         }
         return footerDetails;
     }

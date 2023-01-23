@@ -123,11 +123,15 @@ class PostHearingReviewAboutToSubmitHandlerTest {
             default:
                 documentType = null;
         }
+
+        DocumentLink previewDoc =  caseData.getDocumentStaging().getPreviewDocument();
+        String docFileName = previewDoc.getDocumentFilename();
+        String dateAddedStr = LocalDate.now().minusDays(1).toString();
         expectedDocument = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
-                .documentFileName(caseData.getDocumentStaging().getPreviewDocument().getDocumentFilename())
-                .documentLink(caseData.getDocumentStaging().getPreviewDocument())
-                .documentDateAdded(LocalDate.now().minusDays(1).toString())
+                .documentFileName(docFileName)
+                .documentLink(previewDoc)
+                .documentDateAdded(dateAddedStr)
                 .documentType(documentType.getValue())
                 .build()).build();
 
@@ -154,11 +158,15 @@ class PostHearingReviewAboutToSubmitHandlerTest {
             default:
                 documentType = null;
         }
+
+        DocumentLink previewDoc =  caseData.getDocumentStaging().getPreviewDocument();
+        String docFileName = previewDoc.getDocumentFilename();
+        String dateAddedStr = LocalDate.now().minusDays(1).toString();
         expectedDocument = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
-                .documentFileName(caseData.getDocumentStaging().getPreviewDocument().getDocumentFilename())
-                .documentLink(caseData.getDocumentStaging().getPreviewDocument())
-                .documentDateAdded(LocalDate.now().minusDays(1).toString())
+                .documentFileName(docFileName)
+                .documentLink(previewDoc)
+                .documentDateAdded(dateAddedStr)
                 .documentType(documentType.getValue())
                 .build()).build();
 
