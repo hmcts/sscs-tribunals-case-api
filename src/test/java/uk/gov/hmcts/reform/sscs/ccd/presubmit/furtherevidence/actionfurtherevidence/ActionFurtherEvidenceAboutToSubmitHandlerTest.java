@@ -201,16 +201,23 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Test
     @Parameters({"setAsideApplication"})
     public void givenAValidPostHearingApplicationRequest_thenInterlocReviewStateAndCaseStateUpdated(String documentType) {
+        DynamicListItem sendToInterlocListItem = new DynamicListItem(
+                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
+                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel());
+
         when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
         sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
-        sscsCaseData.getFurtherEvidenceAction().setValue(
-                new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
-                        FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel())
-        );
+        sscsCaseData.getFurtherEvidenceAction().setValue(sendToInterlocListItem);
+
+        DocumentLink docLink = DocumentLink.builder().documentUrl("test.com").build();
+        ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
+                .type(documentType)
+                .fileName("Test.pdg")
+                .url(docLink)
+                .build();
         ScannedDocument scannedDocument = ScannedDocument.builder()
-                .value(ScannedDocumentDetails.builder().type(documentType)
-                        .fileName("Test.pdf").url(DocumentLink.builder()
-                                .documentUrl("test.com").build()).build()).build();
+                .value(scannedDocDetails)
+                .build();
 
         sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
 
@@ -223,16 +230,23 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Test
     @Parameters({"setAsideApplication"})
     public void giveAValidPostHearingApplicationRequestFromAnFtaUser_thenDwpStateIsUpdatedToSetAsideRequested(String documentType) {
+        DynamicListItem sendToInterlocListItem = new DynamicListItem(
+                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
+                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel());
+
         when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
         sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
-        sscsCaseData.getFurtherEvidenceAction().setValue(
-                new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
-                        FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel())
-        );
+        sscsCaseData.getFurtherEvidenceAction().setValue(sendToInterlocListItem);
+
+        DocumentLink docLink = DocumentLink.builder().documentUrl("test.com").build();
+        ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
+                .type(documentType)
+                .fileName("Test.pdg")
+                .url(docLink)
+                .build();
         ScannedDocument scannedDocument = ScannedDocument.builder()
-                .value(ScannedDocumentDetails.builder().type(documentType)
-                        .fileName("Test.pdf").url(DocumentLink.builder()
-                                .documentUrl("test.com").build()).build()).build();
+                .value(scannedDocDetails)
+                .build();
 
         sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(DWP.getCode(), DWP.getLabel()));
@@ -246,16 +260,23 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Test
     @Parameters({"setAsideApplication"})
     public void givenAValidPostHearingRequestWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError(String documentType) {
+        DynamicListItem issueEvidenceAction = new DynamicListItem(
+                FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE.getCode(),
+                FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE.getLabel());
+
         when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
         sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
-        sscsCaseData.getFurtherEvidenceAction().setValue(
-                new DynamicListItem(FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE.getCode(),
-                        FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE.getLabel())
-        );
+        sscsCaseData.getFurtherEvidenceAction().setValue(issueEvidenceAction);
+
+        DocumentLink docLink = DocumentLink.builder().documentUrl("test.com").build();
+        ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
+                .type(documentType)
+                .fileName("Test.pdg")
+                .url(docLink)
+                .build();
         ScannedDocument scannedDocument = ScannedDocument.builder()
-                .value(ScannedDocumentDetails.builder().type(documentType)
-                        .fileName("Test.pdf").url(DocumentLink.builder()
-                                .documentUrl("test.com").build()).build()).build();
+                .value(scannedDocDetails)
+                .build();
 
         sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
 
@@ -274,16 +295,23 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         "READY_TO_LIST,setAsideApplication"
     })
     public void givenAPostHearingApplicationRequestNotInDormantAppealState_thenExpectedFieldsNotUpdated(State state, String documentType) {
+        DynamicListItem sendToInterlocListItem = new DynamicListItem(
+                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
+                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel());
+
         when(caseDetails.getState()).thenReturn(state);
         sscsCaseData.setState(state);
-        sscsCaseData.getFurtherEvidenceAction().setValue(
-                new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
-                        FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel())
-        );
+        sscsCaseData.getFurtherEvidenceAction().setValue(sendToInterlocListItem);
+
+        DocumentLink docLink = DocumentLink.builder().documentUrl("test.com").build();
+        ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
+                .type(documentType)
+                .fileName("Test.pdg")
+                .url(docLink)
+                .build();
         ScannedDocument scannedDocument = ScannedDocument.builder()
-                .value(ScannedDocumentDetails.builder().type(documentType)
-                        .fileName("Test.pdf").url(DocumentLink.builder()
-                                .documentUrl("test.com").build()).build()).build();
+                .value(scannedDocDetails)
+                .build();
 
         sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
 

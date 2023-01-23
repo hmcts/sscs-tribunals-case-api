@@ -140,15 +140,17 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             }
         }
 
-        if (ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals((scannedDocument.getValue().getType()))
-                && !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode()
-                .equals(sscsCaseData.getFurtherEvidenceAction().getValue().getCode())) {
+        String scannedDocumentType = scannedDocument.getValue().getType();
+        String actionCode = sscsCaseData.getFurtherEvidenceAction().getValue().getCode();
+
+        if (ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocumentType)
+                && !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode)) {
             preSubmitCallbackResponse.addError(String
                     .format("Further evidence action must be set to '%s'",
                             SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel()));
         }
 
-        if (ScannedDocumentType.URGENT_HEARING_REQUEST.getValue().equals((scannedDocument.getValue().getType()))
+        if (ScannedDocumentType.URGENT_HEARING_REQUEST.getValue().equals(scannedDocumentType)
                 && !OTHER_DOCUMENT_MANUAL.getCode().equals(sscsCaseData.getFurtherEvidenceAction().getValue().getCode())) {
             preSubmitCallbackResponse.addError(String
                     .format("Further evidence action must be '%s' for a %s", OTHER_DOCUMENT_MANUAL.getLabel(),
