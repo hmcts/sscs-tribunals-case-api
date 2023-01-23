@@ -52,7 +52,7 @@ public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallback
 
         if (response.getErrors().isEmpty()) {
             postHearingRequestService.processPostHearingRequest(caseData, UploadParty.DWP);
-            List<SscsDocument> documents = caseData.getSscsDocument(); // null
+            List<SscsDocument> documents = caseData.getSscsDocument();
             SscsUtil.addDocumentToBundle(footerService, caseData, documents.get(documents.size() - 1));
         }
 
