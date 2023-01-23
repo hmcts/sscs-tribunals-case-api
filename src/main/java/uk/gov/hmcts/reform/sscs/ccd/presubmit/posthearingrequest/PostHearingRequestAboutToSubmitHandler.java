@@ -62,7 +62,7 @@ public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallback
     @NotNull
     private PreSubmitCallbackResponse<SscsCaseData> validatePostHearingRequest(SscsCaseData sscsCaseData) {
         final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
-        if (sscsCaseData.getPostHearing().getPreviewDocument() == null) {
+        if (sscsCaseData.getDocumentStaging().getPreviewDocument() == null) {
             response.addError("There is no post hearing request document");
         }
         return response;

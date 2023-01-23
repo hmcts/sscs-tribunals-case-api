@@ -42,8 +42,8 @@ public class PostHearingRequestService {
         }
 
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
-            .documentLink(postHearing.getPreviewDocument())
-            .documentFileName(postHearing.getPreviewDocument().getDocumentFilename())
+            .documentLink(sscsCaseData.getDocumentStaging().getPreviewDocument())
+            .documentFileName(sscsCaseData.getDocumentStaging().getPreviewDocument().getDocumentFilename())
             .documentType(documentType.getValue())
             .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
             .originalPartySender(uploadParty.getValue())
@@ -55,7 +55,7 @@ public class PostHearingRequestService {
     }
 
     private void clearTransientFields(SscsCaseData sscsCaseData) {
-        sscsCaseData.getPostHearing().setRequestReason(null);
-        sscsCaseData.getPostHearing().setPreviewDocument(null);
+        sscsCaseData.getDocumentGeneration().setBodyContent(null);
+        sscsCaseData.getDocumentStaging().setPreviewDocument(null);
     }
 }

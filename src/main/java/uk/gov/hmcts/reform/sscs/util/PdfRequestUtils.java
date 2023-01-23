@@ -90,7 +90,7 @@ public class PdfRequestUtils {
 
         switch (pdfType) {
             case POST_HEARING:
-                sscsCaseData.getPostHearing().setPreviewDocument(previewDocument);
+                sscsCaseData.getDocumentStaging().setPreviewDocument(previewDocument);
                 break;
             case POSTPONEMENT:
                 sscsCaseData.getPostponementRequest().setPostponementPreviewDocument(previewDocument);
@@ -113,7 +113,7 @@ public class PdfRequestUtils {
     }
 
     private static void handlePostHearing(SscsCaseData sscsCaseData) {
-        requestDetails = sscsCaseData.getPostHearing().getRequestReason();
+        requestDetails = sscsCaseData.getDocumentGeneration().getBodyContent();
         LocalDate issueFinalDecisionDate = sscsCaseData.getIssueFinalDecisionDate();
         if (issueFinalDecisionDate == null) {
             throw new IllegalArgumentException("issueFinalDecisionDate unexpectedly null for caseId: " + sscsCaseData.getCcdCaseId());

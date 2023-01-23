@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -62,9 +61,6 @@ class PostHearingRequestMidEventHandlerTest {
             .ccdCaseId(CASE_ID)
             .documentGeneration(DocumentGeneration.builder()
                 .generateNotice(YES)
-                .build())
-            .postHearing(PostHearing.builder()
-                .requestReason("Reason")
                 .build())
             .issueFinalDecisionDate(LocalDate.now())
             .build();
@@ -122,6 +118,7 @@ class PostHearingRequestMidEventHandlerTest {
 
         caseData.getPostHearing().setRequestType(postHearingRequestType);
         caseData.getPostHearing().getSetAside().setRequestFormat(RequestFormat.GENERATE);
+        caseData.getDocumentGeneration().setBodyContent("Something");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -131,7 +128,7 @@ class PostHearingRequestMidEventHandlerTest {
             .documentUrl(dmUrl)
             .documentFilename("Post hearing application.pdf")
             .build();
-        assertThat(response.getData().getPostHearing().getPreviewDocument()).isEqualTo(documentLink);
+        assertThat(response.getData().getDocumentStaging().getPreviewDocument()).isEqualTo(documentLink);
     }
 
     @ParameterizedTest
@@ -144,8 +141,7 @@ class PostHearingRequestMidEventHandlerTest {
 
         caseData.getPostHearing().setRequestType(PostHearingRequestType.SET_ASIDE);
         caseData.getPostHearing().getSetAside().setRequestFormat(RequestFormat.GENERATE);
-
-        caseData.getPostHearing().setRequestReason(emptyValue);
+        caseData.getDocumentGeneration().setBodyContent(emptyValue);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 

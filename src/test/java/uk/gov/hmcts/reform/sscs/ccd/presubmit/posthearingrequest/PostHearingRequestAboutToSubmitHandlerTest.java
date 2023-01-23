@@ -12,7 +12,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +27,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
@@ -65,7 +65,8 @@ class PostHearingRequestAboutToSubmitHandlerTest {
             .appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build())
             .state(State.DORMANT_APPEAL_STATE)
             .ccdCaseId("1234")
-            .postHearing(PostHearing.builder()
+            .postHearing(PostHearing.builder().build())
+            .documentStaging(DocumentStaging.builder()
                 .previewDocument(DocumentLink.builder()
                     .documentFilename("Post Hearing Request.pdf")
                     .build())
@@ -73,8 +74,8 @@ class PostHearingRequestAboutToSubmitHandlerTest {
             .build();
 
         expectedDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
-            .documentLink(caseData.getPostHearing().getPreviewDocument())
-            .documentFileName(caseData.getPostHearing().getPreviewDocument().getDocumentFilename())
+            .documentLink(caseData.getDocumentStaging().getPreviewDocument())
+            .documentFileName(caseData.getDocumentStaging().getPreviewDocument().getDocumentFilename())
             .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
             .build()).build();
     }
@@ -119,7 +120,7 @@ class PostHearingRequestAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"SET_ASIDE,SET_ASIDE_APPLICATION"})
-    void givenAPostHearingRequest_AddGeneratedDocumentToBundle(PostHearingRequestType requestType, DocumentType documentType) {
+    void givenAPostHearingRequest_addGeneratedDocumentToBundle(PostHearingRequestType requestType, DocumentType documentType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         caseData.getPostHearing().setRequestType(requestType);
@@ -127,7 +128,7 @@ class PostHearingRequestAboutToSubmitHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         List<SscsDocument> sscsDocuments = response.getData().getSscsDocument();
-        assertThat(sscsDocuments).isEqualTo(Collections.singletonList(expectedDocument));
+        assertThat(sscsDocuments).isEqualTo(List.of(expectedDocument));
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
             eq(documentType), any(), any(), eq(null), eq(null));
     }
