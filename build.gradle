@@ -260,7 +260,7 @@ dependencyManagement {
         }
 
         // CVE-2022-41881, CVE-2022-41915
-        dependencySet(group: 'io.netty', version: '4.1.86.Final') {
+        dependencySet(group: 'io.netty', version: '4.1.87.Final') {
             entry 'netty-buffer'
             entry 'netty-common'
             entry 'netty-codec'
@@ -383,7 +383,7 @@ dependencies {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
 
-    testImplementation group: 'org.apache.httpcomponents', name: 'fluent-hc', version:  '4.5.13'
+    testImplementation group: 'org.apache.httpcomponents', name: 'fluent-hc', version:  '4.5.14'
 
     testImplementation group: 'com.azure', name: 'azure-core', version: '1.34.0'
     testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.13.0'
