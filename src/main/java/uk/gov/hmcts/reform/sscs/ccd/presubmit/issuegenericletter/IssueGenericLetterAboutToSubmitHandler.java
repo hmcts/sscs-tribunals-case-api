@@ -37,8 +37,8 @@ public class IssueGenericLetterAboutToSubmitHandler implements PreSubmitCallback
             throw new IllegalStateException("Cannot handle callback.");
         }
 
-        final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        final SscsCaseData sscsCaseData = caseDetails.getCaseData();
+        CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
+        SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         if (!isEmpty(sscsCaseData.getDocumentSelection())) {
             removeDocumentsDuplicates(sscsCaseData);

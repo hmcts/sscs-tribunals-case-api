@@ -21,10 +21,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentSelectionDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartySelectionDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
@@ -44,14 +47,13 @@ public class IssueGenericLetterAboutToStartHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private static final String APPOINTEE_FIRST_NAME = "Appointee";
-    private static final String APPOINTEE_LAST_NAME = "Appointiev";
+    private static final String APPOINTEE_FIRST_NAME = "AppointeeFirstName";
+    private static final String APPOINTEE_LAST_NAME = "AppointeeLastName";
 
     private static final String OTHER_PARTY_FIRST_NAME = "Ivan";
     private static final String OTHER_PARTY_LAST_NAME = "Ivanov";
-    private static final String OTHER_PARTY_ID = "other_party_1";
-
     private static final String APPOINTEE_ID = "appointee_id";
+    private static final String CASE_ID = "1111111111111111";
 
 
     @BeforeEach
@@ -59,18 +61,19 @@ public class IssueGenericLetterAboutToStartHandlerTest {
         openMocks(this);
         handler = new IssueGenericLetterAboutToStartHandler();
 
-        var appointee = Appointee.builder().name(getName("Mr", APPOINTEE_FIRST_NAME, APPOINTEE_LAST_NAME)).id(APPOINTEE_ID).build();
+        DwpDocument dwpDocument = DwpDocument.builder().value(DwpDocumentDetails.builder().documentFileName("DwpDocument").build()).build();
+        SscsDocument sscsDocument = new SscsDocument(SscsDocumentDetails.builder().documentFileName("SscsDocument").build());
 
-        var dwpDocument = DwpDocument.builder().value(DwpDocumentDetails.builder().documentFileName("DwpDocument").build()).build();
-        var sscsDocument = new SscsDocument(SscsDocumentDetails.builder().documentFileName("SscsDocument").build());
+        Appointee appointee = Appointee.builder().name(getName("Mr", APPOINTEE_FIRST_NAME, APPOINTEE_LAST_NAME)).id(APPOINTEE_ID).build();
+        Name name = getName("Mr", OTHER_PARTY_FIRST_NAME, OTHER_PARTY_LAST_NAME);
+        OtherParty otherParty = OtherParty.builder().isAppointee(YesNo.YES.getValue()).appointee(appointee).name(name).id(APPOINTEE_ID).build();
+        List<CcdValue<OtherParty>> otherParties = List.of(new CcdValue<>(otherParty));
 
         caseData = SscsCaseData.builder()
-                .ccdCaseId("1234")
+                .ccdCaseId(CASE_ID)
                 .appeal(Appeal.builder().build())
                 .sscsDocument(List.of())
-                .otherParties(List.of(
-                        new CcdValue<>(OtherParty.builder().isAppointee(YesNo.YES.getValue()).appointee(appointee).name(getName("Mr", OTHER_PARTY_FIRST_NAME, OTHER_PARTY_LAST_NAME)).id(APPOINTEE_ID).build())
-                ))
+                .otherParties(otherParties)
                 .dwpDocuments(List.of(dwpDocument))
                 .sscsDocument(List.of(sscsDocument))
                 .genericLetterText("testtest")
@@ -118,14 +121,14 @@ public class IssueGenericLetterAboutToStartHandlerTest {
 
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        Assertions.assertEquals(1, result.getData().getOtherPartySelection().size());
-        Assertions.assertEquals(1, result.getData().getOtherPartySelection().get(0).getValue().getOtherPartiesList().getListItems().size());
-        assertThat(result.getData().getOtherPartySelection().get(0).getValue().getOtherPartiesList().getListItems().get(0).getCode()).contains(APPOINTEE_ID);
-        assertThat(result.getData().getOtherPartySelection().get(0).getValue().getOtherPartiesList().getListItems().get(0).getLabel())
-                .contains(APPOINTEE_LAST_NAME)
-                .contains(APPOINTEE_FIRST_NAME)
-                .contains(OTHER_PARTY_FIRST_NAME)
-                .contains(OTHER_PARTY_LAST_NAME);
+        List<CcdValue<OtherPartySelectionDetails>> otherPartySelection = result.getData().getOtherPartySelection();
+        Assertions.assertEquals(1, otherPartySelection.size());
+
+        List<DynamicListItem> listItems = otherPartySelection.get(0).getValue().getOtherPartiesList().getListItems();
+        Assertions.assertEquals(1, listItems.size());
+        assertThat(listItems.get(0).getCode()).contains(APPOINTEE_ID);
+        assertThat(listItems.get(0).getLabel())
+                .contains(APPOINTEE_LAST_NAME, APPOINTEE_FIRST_NAME, OTHER_PARTY_FIRST_NAME, OTHER_PARTY_LAST_NAME);
     }
 
     @Test
@@ -136,7 +139,8 @@ public class IssueGenericLetterAboutToStartHandlerTest {
 
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        Assertions.assertEquals(1,  result.getData().getDocumentSelection().size());
-        Assertions.assertEquals(2, result.getData().getDocumentSelection().get(0).getValue().getDocumentsList().getListItems().size());
+        List<CcdValue<DocumentSelectionDetails>> documentSelection = result.getData().getDocumentSelection();
+        Assertions.assertEquals(1, documentSelection.size());
+        Assertions.assertEquals(2, documentSelection.get(0).getValue().getDocumentsList().getListItems().size());
     }
 }
