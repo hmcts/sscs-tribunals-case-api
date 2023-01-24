@@ -91,7 +91,7 @@ public class IssueGenericLetterAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenANonCreateBundleEvent_thenReturnFalse() {
+    void givenANonCreateBundleEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
         Assertions.assertFalse(handler.canHandle(ABOUT_TO_START, callback));
     }
