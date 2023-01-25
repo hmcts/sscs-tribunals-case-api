@@ -75,24 +75,28 @@ public class PdfRequestUtils {
         log.debug("Executing processRequestPdfAndSetPreviewDocument for caseId: {}", sscsCaseData.getCcdCaseId());
 
         ADDITIONAL_REQUEST_DETAILS.append("Date request received: ").append(LocalDate.now().format(DATE_TIME_FORMATTER)).append("\n");
-
+        StringBuilder pdfUrlBuilder = new StringBuilder();
         switch (pdfType) {
             case POST_HEARING:
+                pdfUrlBuilder.append(getPostHearingDocumentType(sscsCaseData).getLabel());
+                pdfUrlBuilder.append(" from FTA"); // TODO SSCS-10759 make dynamic for the uploading party
                 handlePostHearing(sscsCaseData);
                 break;
             case POSTPONEMENT:
+                pdfUrlBuilder.append("Postponement Request");
                 handlePostponement(sscsCaseData);
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported event type for processRequestPdfAndSetPreviewDocument: " + pdfType);
         }
+        pdfUrlBuilder.append(".pdf");
 
         if (isBlank(requestDetails)) {
             response.addError(String.format("Please enter request details to generate a %s document", pdfType.toString().toLowerCase()));
             return response;
         }
 
-        DocumentLink previewDocument = getPreviewDocument(pdfType, userAuthorisation, generateFile, templateId, title);
+        DocumentLink previewDocument = getPreviewDocument(pdfUrlBuilder.toString(), userAuthorisation, generateFile, templateId, title);
 
         switch (pdfType) {
             case POST_HEARING:
@@ -127,11 +131,11 @@ public class PdfRequestUtils {
         ADDITIONAL_REQUEST_DETAILS.append("Date of decision issued: ").append(issueFinalDecisionDate.format(DATE_TIME_FORMATTER)).append("\n");
         String postHearingRequestType = sscsCaseData.getPostHearing().getRequestType().getDescriptionEn();
         ADDITIONAL_REQUEST_DETAILS.append("Reason for ").append(postHearingRequestType).append(" request: ").append(requestDetails).append("\n");
-        title = String.format("%s Application from FTA", postHearingRequestType);
+        title = String.format("%s Application from %s", postHearingRequestType, "FTA"); // TODO SSCS-10759 make dynamic for the uploading party
     }
 
     private static DocumentLink getPreviewDocument(
-        PdfType pdfType,
+        String pdfUrl,
         String userAuthorisation,
         GenerateFile generateFile,
         String templateId,
@@ -149,7 +153,7 @@ public class PdfRequestUtils {
         final String generatedFileUrl = generateFile.assemble(params);
 
         return DocumentLink.builder()
-            .documentFilename(pdfType.getFileName())
+            .documentFilename(pdfUrl)
             .documentBinaryUrl(generatedFileUrl + "/binary")
             .documentUrl(generatedFileUrl)
             .build();
