@@ -123,10 +123,11 @@ class PostHearingRequestMidEventHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
+        String expectedFileName = String.format("%s Application from FTA.pdf", postHearingRequestType.getDescriptionEn()); // TODO SSCS-10759
         DocumentLink documentLink = DocumentLink.builder()
             .documentBinaryUrl(dmUrl + "/binary")
             .documentUrl(dmUrl)
-            .documentFilename("Post Hearing Application.pdf")
+            .documentFilename(expectedFileName)
             .build();
         assertThat(response.getData().getDocumentStaging().getPreviewDocument()).isEqualTo(documentLink);
     }
