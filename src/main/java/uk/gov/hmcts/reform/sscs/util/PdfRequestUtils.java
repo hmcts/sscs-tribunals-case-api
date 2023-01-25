@@ -7,8 +7,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
@@ -26,15 +28,19 @@ public class PdfRequestUtils {
     }
 
     @AllArgsConstructor
-    private enum PdfType {
+    public enum PdfType {
         POSTPONEMENT("Postponement Request"),
-        POST_HEARING("Post hearing application");
+        POST_HEARING("Post Hearing Application");
 
         final String name;
 
         @Override
         public String toString() {
             return this.name;
+        }
+
+        public String getFileName() {
+            return this.name + ".pdf"; // TODO change to PostHearingRequestType eg "Set Aside Application from FTA.pdf"
         }
     }
 
@@ -118,7 +124,7 @@ public class PdfRequestUtils {
         if (issueFinalDecisionDate == null) {
             throw new IllegalArgumentException("issueFinalDecisionDate unexpectedly null for caseId: " + sscsCaseData.getCcdCaseId());
         }
-        ADDITIONAL_REQUEST_DETAILS.append("Date of decision: ").append(issueFinalDecisionDate.format(DATE_TIME_FORMATTER)).append("\n");
+        ADDITIONAL_REQUEST_DETAILS.append("Date of decision issued: ").append(issueFinalDecisionDate.format(DATE_TIME_FORMATTER)).append("\n");
         String postHearingRequestType = sscsCaseData.getPostHearing().getRequestType().getDescriptionEn();
         ADDITIONAL_REQUEST_DETAILS.append("Reason for ").append(postHearingRequestType).append(" request: ").append(requestDetails).append("\n");
         title = String.format("%s Application from FTA", postHearingRequestType);
@@ -143,10 +149,24 @@ public class PdfRequestUtils {
         final String generatedFileUrl = generateFile.assemble(params);
 
         return DocumentLink.builder()
-            .documentFilename(pdfType + ".pdf")
+            .documentFilename(pdfType.getFileName())
             .documentBinaryUrl(generatedFileUrl + "/binary")
             .documentUrl(generatedFileUrl)
             .build();
+    }
+
+    public static DocumentType getPostHearingDocumentType(SscsCaseData sscsCaseData) {
+        PostHearing postHearing = sscsCaseData.getPostHearing();
+        DocumentType documentType;
+
+        switch (postHearing.getRequestType()) {
+            case SET_ASIDE:
+                documentType = DocumentType.SET_ASIDE_APPLICATION;
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected request type: " + postHearing.getRequestType());
+        }
+        return documentType;
     }
 
 }
