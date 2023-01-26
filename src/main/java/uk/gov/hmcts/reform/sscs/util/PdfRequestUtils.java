@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
@@ -21,7 +22,7 @@ public class PdfRequestUtils {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static String requestDetails;
     private static String title;
-    private static final StringBuilder ADDITIONAL_REQUEST_DETAILS = new StringBuilder();
+    private static StringBuilder additionalRequestDetails = new StringBuilder();
 
     private PdfRequestUtils() {
         //
@@ -74,12 +75,13 @@ public class PdfRequestUtils {
     ) {
         log.debug("Executing processRequestPdfAndSetPreviewDocument for caseId: {}", sscsCaseData.getCcdCaseId());
 
-        ADDITIONAL_REQUEST_DETAILS.append("Date request received: ").append(LocalDate.now().format(DATE_TIME_FORMATTER)).append("\n");
+        additionalRequestDetails.append("Date request received: ").append(LocalDate.now().format(DATE_TIME_FORMATTER)).append("\n");
         StringBuilder pdfUrlBuilder = new StringBuilder();
         switch (pdfType) {
             case POST_HEARING:
-                pdfUrlBuilder.append(getPostHearingDocumentType(sscsCaseData).getLabel());
-                pdfUrlBuilder.append(" from FTA"); // TODO SSCS-10759 make dynamic for the uploading party
+                String postHearingDocumentTypeLabel = getPostHearingDocumentType(sscsCaseData).getLabel();
+                pdfUrlBuilder.append(postHearingDocumentTypeLabel)
+                    .append(" from FTA"); // TODO SSCS-10759 make dynamic for the uploading party
                 handlePostHearing(sscsCaseData);
                 break;
             case POSTPONEMENT:
@@ -92,7 +94,8 @@ public class PdfRequestUtils {
         pdfUrlBuilder.append(".pdf");
 
         if (isBlank(requestDetails)) {
-            response.addError(String.format("Please enter request details to generate a %s document", pdfType.toString().toLowerCase()));
+            String responseErrorMsg = String.format("Please enter request details to generate a %s document", pdfType.toString().toLowerCase());
+            response.addError(responseErrorMsg);
             return response;
         }
 
@@ -113,12 +116,19 @@ public class PdfRequestUtils {
     }
 
     private static void handlePostponement(SscsCaseData sscsCaseData) {
-        requestDetails = sscsCaseData.getPostponementRequest().getPostponementRequestDetails();
-        String hearingVenue = sscsCaseData.getPostponementRequest().getPostponementRequestHearingVenue();
-        LocalDate hearingDate = LocalDateTime.parse(sscsCaseData.getPostponementRequest().getPostponementRequestHearingDateAndTime()).toLocalDate();
-        ADDITIONAL_REQUEST_DETAILS.append("Date of Hearing: ").append(hearingDate.format(DATE_TIME_FORMATTER)).append("\n");
-        ADDITIONAL_REQUEST_DETAILS.append("Hearing Venue: ").append(hearingVenue).append("\n");
-        ADDITIONAL_REQUEST_DETAILS.append("Reason for Postponement Request: ").append(requestDetails).append("\n");
+        PostponementRequest postponementRequest = sscsCaseData.getPostponementRequest();
+        requestDetails = postponementRequest.getPostponementRequestDetails();
+        String hearingVenue = postponementRequest.getPostponementRequestHearingVenue();
+        LocalDate hearingDate = LocalDateTime.parse(postponementRequest.getPostponementRequestHearingDateAndTime()).toLocalDate();
+        additionalRequestDetails.append("Date of Hearing: ")
+            .append(hearingDate.format(DATE_TIME_FORMATTER))
+            .append("\n")
+            .append("Hearing Venue: ")
+            .append(hearingVenue)
+            .append("\n")
+            .append("Reason for Postponement Request: ")
+            .append(requestDetails)
+            .append("\n");
         title = "Postponement Request from FTA";
     }
 
@@ -128,9 +138,15 @@ public class PdfRequestUtils {
         if (issueFinalDecisionDate == null) {
             throw new IllegalArgumentException("issueFinalDecisionDate unexpectedly null for caseId: " + sscsCaseData.getCcdCaseId());
         }
-        ADDITIONAL_REQUEST_DETAILS.append("Date of decision issued: ").append(issueFinalDecisionDate.format(DATE_TIME_FORMATTER)).append("\n");
         String postHearingRequestType = sscsCaseData.getPostHearing().getRequestType().getDescriptionEn();
-        ADDITIONAL_REQUEST_DETAILS.append("Reason for ").append(postHearingRequestType).append(" request: ").append(requestDetails).append("\n");
+        additionalRequestDetails.append("Date of decision issued: ")
+            .append(issueFinalDecisionDate.format(DATE_TIME_FORMATTER))
+            .append("\n")
+            .append("Reason for ")
+            .append(postHearingRequestType)
+            .append(" request: ")
+            .append(requestDetails)
+            .append("\n");
         title = String.format("%s Application from %s", postHearingRequestType, "FTA"); // TODO SSCS-10759 make dynamic for the uploading party
     }
 
@@ -146,7 +162,7 @@ public class PdfRequestUtils {
             .templateId(templateId)
             .formPayload(PdfRequestTemplateBody.builder()
                 .title(title)
-                .text(ADDITIONAL_REQUEST_DETAILS.toString())
+                .text(additionalRequestDetails.toString())
                 .build())
             .userAuthentication(userAuthorisation)
             .build();
