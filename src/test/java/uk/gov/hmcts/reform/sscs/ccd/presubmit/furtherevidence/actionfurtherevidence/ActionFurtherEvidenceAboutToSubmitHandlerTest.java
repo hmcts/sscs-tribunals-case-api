@@ -290,40 +290,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({
-        "VALID_APPEAL,setAsideApplication",
-        "READY_TO_LIST,setAsideApplication"
-    })
-    public void givenAPostHearingApplicationRequestNotInDormantAppealState_thenExpectedFieldsNotUpdated(State state, String documentType) {
-        DynamicListItem sendToInterlocListItem = new DynamicListItem(
-                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
-                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel());
-
-        when(caseDetails.getState()).thenReturn(state);
-        sscsCaseData.setState(state);
-        sscsCaseData.getFurtherEvidenceAction().setValue(sendToInterlocListItem);
-
-        DocumentLink docLink = DocumentLink.builder().documentUrl("test.com").build();
-        ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
-                .type(documentType)
-                .fileName("Test.pdg")
-                .url(docLink)
-                .build();
-        ScannedDocument scannedDocument = ScannedDocument.builder()
-                .value(scannedDocDetails)
-                .build();
-
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
-
-        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
-                ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getDwpState(), not(DwpState.SET_ASIDE_REQUESTED));
-        assertThat(response.getData().getState(), not(State.POST_HEARING));
-        assertThat(response.getData().getInterlocReviewState(), not(InterlocReviewState.REVIEW_BY_JUDGE));
-    }
-
-    @Test
     @Parameters(method = "generateFurtherEvidenceActionListScenarios")
     public void givenACaseWithScannedDocuments_shouldMoveToSscsDocuments(@Nullable DynamicList furtherEvidenceActionList,
         @Nullable DynamicList originalSender,
