@@ -58,7 +58,9 @@ public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallback
     private PreSubmitCallbackResponse<SscsCaseData> validatePostHearingRequest(SscsCaseData sscsCaseData) {
         final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
         DocumentLink previewDocument = sscsCaseData.getDocumentStaging().getPreviewDocument();
-        if (previewDocument == null || !PdfRequestUtils.PdfType.POST_HEARING.getFileName().equals(previewDocument.getDocumentFilename())) {
+        if (previewDocument == null
+            || !previewDocument.getDocumentFilename().contains(sscsCaseData.getPostHearing().getRequestType().getDescriptionEn())
+        ) {
             response.addError("There is no post hearing request document");
         }
         return response;

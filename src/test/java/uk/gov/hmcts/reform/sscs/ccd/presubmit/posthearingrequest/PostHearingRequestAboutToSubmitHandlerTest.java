@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REQUEST;
@@ -37,7 +38,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
-import uk.gov.hmcts.reform.sscs.util.PdfRequestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingRequestAboutToSubmitHandlerTest {
@@ -60,23 +60,25 @@ class PostHearingRequestAboutToSubmitHandlerTest {
 
     @BeforeEach
     void setUp() {
+        openMocks(this);
         handler = new PostHearingRequestAboutToSubmitHandler(true, footerService);
 
+        DocumentLink previewDocument = DocumentLink.builder()
+            .documentFilename("Set Aside Application from FTA.pdf")
+            .build();
         caseData = SscsCaseData.builder()
             .appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build())
             .state(State.DORMANT_APPEAL_STATE)
             .ccdCaseId("1234")
             .postHearing(PostHearing.builder().build())
             .documentStaging(DocumentStaging.builder()
-                .previewDocument(DocumentLink.builder()
-                    .documentFilename(PdfRequestUtils.PdfType.POST_HEARING.getFileName())
-                    .build())
+                .previewDocument(previewDocument)
                 .build())
             .build();
 
         expectedDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
-            .documentLink(caseData.getDocumentStaging().getPreviewDocument())
-            .documentFileName(caseData.getDocumentStaging().getPreviewDocument().getDocumentFilename())
+            .documentLink(previewDocument)
+            .documentFileName(previewDocument.getDocumentFilename())
             .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
             .build()).build();
     }
