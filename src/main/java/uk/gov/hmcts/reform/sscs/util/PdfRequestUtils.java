@@ -39,10 +39,6 @@ public class PdfRequestUtils {
         public String toString() {
             return this.name;
         }
-
-        public String getFileName() {
-            return this.name + ".pdf"; // TODO change to PostHearingRequestType eg "Set Aside Application from FTA.pdf"
-        }
     }
 
     public static PreSubmitCallbackResponse<SscsCaseData> processPostponementRequestPdfAndSetPreviewDocument(
@@ -65,7 +61,7 @@ public class PdfRequestUtils {
         return processRequestPdfAndSetPreviewDocument(PdfType.POST_HEARING, userAuthorisation, sscsCaseData, response, generateFile, templateId);
     }
 
-    public static PreSubmitCallbackResponse<SscsCaseData> processRequestPdfAndSetPreviewDocument(
+    private static PreSubmitCallbackResponse<SscsCaseData> processRequestPdfAndSetPreviewDocument(
         PdfType pdfType,
         String userAuthorisation,
         SscsCaseData sscsCaseData,
