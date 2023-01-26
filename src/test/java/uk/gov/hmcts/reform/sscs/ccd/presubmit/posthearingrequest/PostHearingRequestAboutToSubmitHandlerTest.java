@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -135,5 +136,36 @@ class PostHearingRequestAboutToSubmitHandlerTest {
         assertThat(sscsDocuments).isEqualTo(List.of(expectedDocument)); // TODO this is returning null - figure out if required nonNull
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
             eq(documentType), any(), any(), eq(null), eq(null));
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = PostHearingRequestType.class,
+        names = {"SET_ASIDE"})
+    void givenPreviewDocumentIsNull_doesNotGenerateADocument(PostHearingRequestType requestType) {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        caseData.getPostHearing().setRequestType(requestType);
+        caseData.getDocumentStaging().setPreviewDocument(null);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors()).hasSize(1).containsOnly("There is no post hearing request document");
+        verifyNoInteractions(footerService);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = PostHearingRequestType.class,
+        names = {"SET_ASIDE"})
+    void givenPreviewDocumentIsNotAPostHearingDoc_doesNotGenerateADocument(PostHearingRequestType requestType) {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        caseData.getPostHearing().setRequestType(requestType);
+        DocumentLink notPostHearingDoc = DocumentLink.builder()
+            .documentFilename("Not a post hearing doc.xml")
+            .build();
+        caseData.getDocumentStaging().setPreviewDocument(notPostHearingDoc);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors()).hasSize(1).containsOnly("There is no post hearing request document");
+        verifyNoInteractions(footerService);
     }
 }
