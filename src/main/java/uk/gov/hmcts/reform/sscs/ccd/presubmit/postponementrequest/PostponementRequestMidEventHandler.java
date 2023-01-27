@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.util.PdfRequestUtils;
+import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 
 @Service
 public class PostponementRequestMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -39,7 +39,7 @@ public class PostponementRequestMidEventHandler implements PreSubmitCallbackHand
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        return PdfRequestUtils.processPostponementRequestPdfAndSetPreviewDocument(userAuthorisation, sscsCaseData, response,
+        return PdfRequestUtil.processPostponementRequestPdfAndSetPreviewDocument(userAuthorisation, sscsCaseData, response,
                 generateFile, templateId);
     }
 }

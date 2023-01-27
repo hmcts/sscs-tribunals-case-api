@@ -18,18 +18,18 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.PdfRequestTemplateBody;
 
 @Slf4j
-public class PdfRequestUtils {
+public class PdfRequestUtil {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static String requestDetails;
     private static String title;
     private static StringBuilder additionalRequestDetails;
 
-    private PdfRequestUtils() {
+    private PdfRequestUtil() {
         //
     }
 
     @AllArgsConstructor
-    public enum PdfType {
+    private enum PdfType {
         POSTPONEMENT("Postponement Request"),
         POST_HEARING("Post Hearing Application");
 
@@ -61,7 +61,7 @@ public class PdfRequestUtils {
         return processRequestPdfAndSetPreviewDocument(PdfType.POST_HEARING, userAuthorisation, sscsCaseData, response, generateFile, templateId);
     }
 
-    private static PreSubmitCallbackResponse<SscsCaseData> processRequestPdfAndSetPreviewDocument(
+    protected static PreSubmitCallbackResponse<SscsCaseData> processRequestPdfAndSetPreviewDocument(
         PdfType pdfType,
         String userAuthorisation,
         SscsCaseData sscsCaseData,
@@ -86,7 +86,7 @@ public class PdfRequestUtils {
                 handlePostponement(sscsCaseData);
                 break;
             default:
-                throw new IllegalArgumentException("Unsupported event type for processRequestPdfAndSetPreviewDocument: " + pdfType);
+                throw new IllegalArgumentException("Unsupported pdf type for processRequestPdfAndSetPreviewDocument: " + pdfType);
         }
         pdfUrlBuilder.append(".pdf");
 

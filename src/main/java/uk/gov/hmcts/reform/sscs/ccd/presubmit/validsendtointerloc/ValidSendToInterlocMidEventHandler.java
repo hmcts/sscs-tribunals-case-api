@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.util.PdfRequestUtils;
+import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 
 @Service
 public class ValidSendToInterlocMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -42,7 +42,7 @@ public class ValidSendToInterlocMidEventHandler implements PreSubmitCallbackHand
         final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if (SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId().equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode())) {
-            PdfRequestUtils.processPostponementRequestPdfAndSetPreviewDocument(userAuthorisation, sscsCaseData, response,
+            PdfRequestUtil.processPostponementRequestPdfAndSetPreviewDocument(userAuthorisation, sscsCaseData, response,
                     generateFile, templateId);
         }
 

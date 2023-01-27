@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.util.PdfRequestUtils;
+import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 
 @Component
 @Slf4j
@@ -63,7 +63,7 @@ public class PostHearingRequestMidEventHandler implements PreSubmitCallbackHandl
 
         if (PAGE_ID_GENERATE_DOCUMENT.equals(pageId) && GENERATE.equals(requestFormat)) {
             log.info("Post Hearing Request: Generating notice for caseId {}", caseId);
-            PdfRequestUtils.processPostHearingRequestPdfAndSetPreviewDocument(userAuthorisation, caseData, response, generateFile, templateId);
+            PdfRequestUtil.processPostHearingRequestPdfAndSetPreviewDocument(userAuthorisation, caseData, response, generateFile, templateId);
         }
 
         return response;

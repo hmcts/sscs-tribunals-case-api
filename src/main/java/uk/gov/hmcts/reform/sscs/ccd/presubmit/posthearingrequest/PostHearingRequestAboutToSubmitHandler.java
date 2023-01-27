@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
-import uk.gov.hmcts.reform.sscs.util.PdfRequestUtils;
+import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
@@ -48,7 +48,7 @@ public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallback
         final PreSubmitCallbackResponse<SscsCaseData> response = validatePostHearingRequest(caseData);
 
         if (response.getErrors().isEmpty()) {
-            SscsUtil.addDocumentToDocumentTab(footerService, caseData, PdfRequestUtils.getPostHearingDocumentType(caseData));
+            SscsUtil.addDocumentToDocumentTab(footerService, caseData, PdfRequestUtil.getPostHearingDocumentType(caseData));
         }
 
         return response;
