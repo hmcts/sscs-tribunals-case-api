@@ -22,7 +22,7 @@ public class PdfRequestUtils {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static String requestDetails;
     private static String title;
-    private static StringBuilder additionalRequestDetails = new StringBuilder();
+    private static StringBuilder additionalRequestDetails;
 
     private PdfRequestUtils() {
         //
@@ -71,6 +71,7 @@ public class PdfRequestUtils {
     ) {
         log.debug("Executing processRequestPdfAndSetPreviewDocument for caseId: {}", sscsCaseData.getCcdCaseId());
 
+        additionalRequestDetails = new StringBuilder();
         additionalRequestDetails.append("Date request received: ").append(LocalDate.now().format(DATE_TIME_FORMATTER)).append("\n");
         StringBuilder pdfUrlBuilder = new StringBuilder();
         switch (pdfType) {
