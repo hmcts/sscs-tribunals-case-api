@@ -62,6 +62,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUser;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
@@ -774,9 +775,9 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setDisabilityQualifiedPanelMemberName("Mr Panel Member 1");
-        adjournment.setMedicallyQualifiedPanelMemberName("Ms Panel Member 2");
-        adjournment.setOtherPanelMemberName("Other Panel Member");
+        adjournment.setDisabilityQualifiedPanelMemberName(JudicialUser.builder().fullName("Mr Panel Member 1").build());
+        adjournment.setMedicallyQualifiedPanelMemberName(JudicialUser.builder().fullName("Ms Panel Member 2").build());
+        adjournment.setOtherPanelMemberName(JudicialUser.builder().fullName("Other Panel Member").build());
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
@@ -792,8 +793,8 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setDisabilityQualifiedPanelMemberName("Mr Panel Member 1");
-        adjournment.setMedicallyQualifiedPanelMemberName("Ms Panel Member 2");
+        adjournment.setDisabilityQualifiedPanelMemberName(JudicialUser.builder().fullName("Mr Panel Member 1").build());
+        adjournment.setMedicallyQualifiedPanelMemberName(JudicialUser.builder().fullName("Ms Panel Member 2").build());
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
@@ -809,7 +810,7 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setDisabilityQualifiedPanelMemberName("Mr Panel Member 1");
+        adjournment.setDisabilityQualifiedPanelMemberName(JudicialUser.builder().fullName("Mr Panel Member 1").build());
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
@@ -840,8 +841,8 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setMedicallyQualifiedPanelMemberName("");
-        adjournment.setDisabilityQualifiedPanelMemberName("");
+        adjournment.setMedicallyQualifiedPanelMemberName(null);
+        adjournment.setDisabilityQualifiedPanelMemberName(null);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);

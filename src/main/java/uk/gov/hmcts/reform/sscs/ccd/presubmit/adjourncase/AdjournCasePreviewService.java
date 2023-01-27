@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
+
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -28,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUser;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody.AdjournCaseTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
@@ -326,15 +330,18 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             throw new IllegalStateException("Unable to obtain signed in user name");
         }
         names.add(signedInJudgeName);
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getAdjournment().getDisabilityQualifiedPanelMemberName())) {
-            names.add(caseData.getAdjournment().getDisabilityQualifiedPanelMemberName());
-        }
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getAdjournment().getMedicallyQualifiedPanelMemberName())) {
-            names.add(caseData.getAdjournment().getMedicallyQualifiedPanelMemberName());
-        }
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getAdjournment().getOtherPanelMemberName())) {
-            names.add(caseData.getAdjournment().getOtherPanelMemberName());
-        }
+
+        Adjournment adjournment = caseData.getAdjournment();
+
+        List<JudicialUser> panelMembers = Arrays.asList(adjournment.getDisabilityQualifiedPanelMemberName(),
+            adjournment.getMedicallyQualifiedPanelMemberName(),
+            adjournment.getOtherPanelMemberName());
+
+        names.addAll(panelMembers.stream()
+            .filter(Objects::nonNull)
+            .map(JudicialUser::getFullName)
+            .collect(Collectors.toList()));
+
         return StringUtils.getGramaticallyJoinedStrings(names);
     }
 
