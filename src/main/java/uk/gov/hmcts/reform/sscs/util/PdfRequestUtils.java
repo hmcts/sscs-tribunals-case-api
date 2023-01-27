@@ -141,7 +141,7 @@ public class PdfRequestUtils {
             .append("\n")
             .append("Reason for ")
             .append(postHearingRequestType)
-            .append(" request: ")
+            .append(" application: ")
             .append(requestDetails)
             .append("\n");
         title = String.format("%s Application from %s", postHearingRequestType, "FTA"); // TODO SSCS-10759 make dynamic for the uploading party
