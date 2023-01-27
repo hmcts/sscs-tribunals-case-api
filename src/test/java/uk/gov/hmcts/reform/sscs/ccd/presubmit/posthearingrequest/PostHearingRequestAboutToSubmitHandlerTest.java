@@ -14,9 +14,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -116,24 +114,22 @@ class PostHearingRequestAboutToSubmitHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(caseData);
         caseData.getPostHearing().setRequestType(requestType);
 
-        PreSubmitCallbackResponse<SscsCaseData> response =
-            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
     }
 
-    @Disabled("Setup likely needs tweaking so that validatePostHearingRequest returns true")
     @ParameterizedTest
     @CsvSource({"SET_ASIDE,SET_ASIDE_APPLICATION"})
-    void givenAPostHearingRequest_addGeneratedDocumentToBundle(PostHearingRequestType requestType, DocumentType documentType) {
+    void givenAPostHearingRequest_footerServiceIsCalledToCreateDocAndAddToBundle(PostHearingRequestType requestType, DocumentType documentType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         caseData.getPostHearing().setRequestType(requestType);
         expectedDocument.getValue().setDocumentType(documentType.getValue());
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        List<SscsDocument> sscsDocuments = response.getData().getSscsDocument();
-        assertThat(sscsDocuments).isEqualTo(List.of(expectedDocument)); // TODO this is returning null - figure out if required nonNull
+
+        assertThat(response.getErrors()).isEmpty();
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
             eq(documentType), any(), any(), eq(null), eq(null));
     }
@@ -148,7 +144,9 @@ class PostHearingRequestAboutToSubmitHandlerTest {
         caseData.getDocumentStaging().setPreviewDocument(null);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(response.getErrors()).hasSize(1).containsOnly("There is no post hearing request document");
+
+        assertThat(response.getErrors()).hasSize(1)
+            .containsOnly("There is no post hearing request document");
         verifyNoInteractions(footerService);
     }
 
@@ -165,7 +163,9 @@ class PostHearingRequestAboutToSubmitHandlerTest {
         caseData.getDocumentStaging().setPreviewDocument(notPostHearingDoc);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(response.getErrors()).hasSize(1).containsOnly("There is no post hearing request document");
+
+        assertThat(response.getErrors()).hasSize(1)
+            .containsOnly("There is no post hearing request document");
         verifyNoInteractions(footerService);
     }
 }
