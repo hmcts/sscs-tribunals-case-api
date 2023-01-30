@@ -561,7 +561,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private Boolean isOriginalSenderValidForBundleAddition(DocumentType documentType) {
-        return documentType != null && SENDER_VALID_STATES.contains(documentType);
+        return SENDER_VALID_STATES.contains(documentType);
     }
 
     private DocumentType getScannedDocumenttype(String originalSenderCode, ScannedDocument scannedDocument) {
