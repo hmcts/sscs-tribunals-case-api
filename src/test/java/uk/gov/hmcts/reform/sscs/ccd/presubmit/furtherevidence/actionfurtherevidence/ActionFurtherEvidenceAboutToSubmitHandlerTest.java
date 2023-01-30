@@ -196,6 +196,117 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    @Parameters({
+        "setAsideApplication,APPELLANT",
+        "setAsideApplication,REPRESENTATIVE",
+        "setAsideApplication,DWP",
+        "setAsideApplication,HMCTS"
+    })
+    public void givenAValidPostHearingRequestFromParty_thenOriginalSenderSetOnSscsDocument(String documentType, PartyItemList sender) {
+        DynamicListItem sendToInterlocListItem = new DynamicListItem(
+                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
+                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel());
+
+        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
+        sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
+        sscsCaseData.getFurtherEvidenceAction().setValue(sendToInterlocListItem);
+        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(sender.getCode(), sender.getLabel()));
+
+        DocumentLink docLink = DocumentLink.builder().documentUrl("test.com").build();
+        ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
+                .type(documentType)
+                .fileName("Test.pdf")
+                .url(docLink)
+                .build();
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+                .value(scannedDocDetails)
+                .build();
+
+        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
+                ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getOriginalSender().getValue().getCode(), is(sender.getCode()));
+        assertThat(response.getData().getOriginalSender().getValue().getLabel(), is(sender.getLabel()));
+    }
+
+    @Test
+    @Parameters({
+        "setAsideApplication,APPELLANT",
+        "setAsideApplication,REPRESENTATIVE",
+        "setAsideApplication,DWP",
+        "setAsideApplication,HMCTS"
+    })
+    public void givenValidAPostHearingRequestFromParty_thenAddFooterTextToDocument(String documentType, PartyItemList sender) {
+        DynamicListItem sendToInterlocListItem = new DynamicListItem(
+                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
+                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel());
+
+        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
+        sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
+        sscsCaseData.getFurtherEvidenceAction().setValue(sendToInterlocListItem);
+        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(sender.getCode(), sender.getLabel()));
+
+        DocumentLink docLink = DocumentLink.builder().documentUrl("test.com").build();
+        ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
+                .type(documentType)
+                .fileName("Test.pdf")
+                .url(docLink)
+                .includeInBundle(YES)
+                .build();
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+                .value(scannedDocDetails)
+                .build();
+
+        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
+                ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(footerService).addFooter(eq(scannedDocument.getValue().getUrl()), eq(sender.getDocumentFooter()), eq(null));
+        assertEquals(0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(SET_ASIDE_APPLICATION.getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
+    }
+
+    @Test
+    @Parameters({
+        "setAsideApplication,APPELLANT,1",
+        "setAsideApplication,REPRESENTATIVE,1"
+    })
+    public void givenValidAPostHearingRequestFromPartyWhenIncludeInBundle_thenAddDocumentToBundle(String documentType, PartyItemList sender, int occurs) {
+        when(footerService.getNextBundleAddition(any())).thenReturn("A");
+        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
+
+        DynamicListItem sendToInterlocListItem = new DynamicListItem(
+                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
+                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel());
+
+        sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
+        sscsCaseData.getFurtherEvidenceAction().setValue(sendToInterlocListItem);
+        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(sender.getCode(), sender.getLabel()));
+
+        DocumentLink docLink = DocumentLink.builder().documentUrl("test.com").build();
+        ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
+                .type(documentType)
+                .fileName("Test.pdf")
+                .url(docLink)
+                .includeInBundle(YES)
+                .build();
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+                .value(scannedDocDetails)
+                .build();
+
+        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
+                ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(occurs, response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count());
+    }
+
+    @Test
     @Parameters(method = "generateFurtherEvidenceActionListScenarios")
     public void givenACaseWithScannedDocuments_shouldMoveToSscsDocuments(@Nullable DynamicList furtherEvidenceActionList,
         @Nullable DynamicList originalSender,

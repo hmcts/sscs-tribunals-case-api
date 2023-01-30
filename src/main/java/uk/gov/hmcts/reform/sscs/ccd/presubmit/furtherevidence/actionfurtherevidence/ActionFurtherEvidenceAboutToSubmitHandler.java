@@ -61,7 +61,16 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     SEND_TO_INTERLOC_REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_TCW).stream()
             .map(FurtherEvidenceActionDynamicListItems::getCode)
             .collect(Collectors.toUnmodifiableList());
-    private static final Set<State> ADDITION_VALID_STATES = Set.of(State.DORMANT_APPEAL_STATE, State.RESPONSE_RECEIVED, State.READY_TO_LIST, State.HEARING, State.NOT_LISTABLE, State.WITH_DWP);
+    private static final Set<State> ADDITION_VALID_STATES = Set.of(State.DORMANT_APPEAL_STATE,
+            State.RESPONSE_RECEIVED,
+            State.READY_TO_LIST,
+            State.HEARING,
+            State.NOT_LISTABLE,
+            State.WITH_DWP,
+            State.POST_HEARING);
+
+    private static final Set<DocumentType> SENDER_VALID_STATES = Set.of(POSTPONEMENT_REQUEST,
+            SET_ASIDE_APPLICATION);
 
     private final FooterService footerService;
     private final BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder;
@@ -445,7 +454,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         DocumentLink url = scannedDocument.getValue().getUrl();
 
-        DocumentType documentType = getSubtype(sscsCaseData.getOriginalSender().getValue().getCode(), scannedDocument);
+        DocumentType documentType = getScannedDocumenttype(sscsCaseData.getOriginalSender().getValue().getCode(), scannedDocument);
 
         String bundleAddition = null;
         String originalSenderCode = sscsCaseData.getOriginalSender().getValue().getCode();
@@ -466,7 +475,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
 
         String requestingParty = null;
-        if (documentType.equals(POSTPONEMENT_REQUEST)) {
+
+        if (isOriginalSenderValidForBundleAddition(documentType)) {
             requestingParty = originalSenderCode;
         }
 
@@ -550,7 +560,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         return ADDITION_VALID_STATES.contains(caseState);
     }
 
-    private DocumentType getSubtype(String originalSenderCode, ScannedDocument scannedDocument) {
+    private Boolean isOriginalSenderValidForBundleAddition(DocumentType documentType) {
+        return documentType != null && SENDER_VALID_STATES.contains(documentType);
+    }
+
+    private DocumentType getScannedDocumenttype(String originalSenderCode, ScannedDocument scannedDocument) {
         if (ScannedDocumentType.REINSTATEMENT_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
             return REINSTATEMENT_REQUEST;
         }
@@ -562,6 +576,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
         if (ScannedDocumentType.POSTPONEMENT_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
             return POSTPONEMENT_REQUEST;
+        }
+        if (ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocument.getValue().getType())) {
+            return SET_ASIDE_APPLICATION;
         }
 
         String originalSenderStripped  = originalSenderCode.replaceAll("\\d","");
