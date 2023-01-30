@@ -53,27 +53,6 @@ public class CcdMideventCallbackController {
         this.restoreCasesService2 = restoreCasesService2;
     }
 
-    @PostMapping(path = "/ccdMidEventAdjournCasePopulateVenueDropdown", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdMidEventAdjournCasePopulateVenueDropdown(
-        @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
-        @RequestHeader(AUTHORIZATION) String userAuthorisation,
-        @RequestBody String message) {
-        Callback<SscsCaseData> callback = deserializer.deserialize(message);
-        log.info("About to start ccdMidEventAdjournCasePopulateVenueDropdown callback `{}` received for Case ID `{}`", callback.getEvent(),
-            callback.getCaseDetails().getId());
-
-        authorisationService.authorise(serviceAuthHeader);
-
-        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-
-        sscsCaseData.getAdjournment().setNextHearingVenueSelected(adjournCaseCcdService.getVenueDynamicListForRpcName(
-            sscsCaseData.getRegionalProcessingCenter().getName()));
-
-        return ok(preSubmitCallbackResponse);
-    }
-
     @PostMapping(path = "/ccdMidEventPreviewFinalDecision", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdMidEventPreviewFinalDecision(
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
