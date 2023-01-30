@@ -11,7 +11,18 @@
         }
       ],
       "adjournCaseCanCaseBeListedRightAway": "Yes",
-      "adjournCaseDisabilityQualifiedPanelMemberName": "Bob Smith",
+      "adjournCaseDisabilityQualifiedPanelMemberName": {
+        "appointments": null,
+        "authorisations": null,
+        "email_id": null,
+        "full_name": "Bob Smith",
+        "known_as": null,
+        "post_nominals": null,
+        "object_id": null,
+        "sidam_id": null,
+        "surname": "Smith",
+        "personal_code": null
+      },
       "adjournCaseGenerateNotice": "Yes",
       "adjournCaseInterpreterLanguageList": "spanish",
       "adjournCaseInterpreterRequired": "Yes",
