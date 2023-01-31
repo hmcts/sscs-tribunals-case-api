@@ -29,7 +29,7 @@ public class PdfRequestUtil {
     }
 
     @AllArgsConstructor
-    private enum PdfType {
+    public enum PdfType {
         POSTPONEMENT("Postponement Request"),
         POST_HEARING("Post Hearing Application");
 
@@ -41,27 +41,7 @@ public class PdfRequestUtil {
         }
     }
 
-    public static PreSubmitCallbackResponse<SscsCaseData> processPostponementRequestPdfAndSetPreviewDocument(
-        String userAuthorisation,
-        SscsCaseData sscsCaseData,
-        PreSubmitCallbackResponse<SscsCaseData> response,
-        GenerateFile generateFile,
-        String templateId
-    ) {
-        return processRequestPdfAndSetPreviewDocument(PdfType.POSTPONEMENT, userAuthorisation, sscsCaseData, response, generateFile, templateId);
-    }
-
-    public static PreSubmitCallbackResponse<SscsCaseData> processPostHearingRequestPdfAndSetPreviewDocument(
-        String userAuthorisation,
-        SscsCaseData sscsCaseData,
-        PreSubmitCallbackResponse<SscsCaseData> response,
-        GenerateFile generateFile,
-        String templateId
-    ) {
-        return processRequestPdfAndSetPreviewDocument(PdfType.POST_HEARING, userAuthorisation, sscsCaseData, response, generateFile, templateId);
-    }
-
-    protected static PreSubmitCallbackResponse<SscsCaseData> processRequestPdfAndSetPreviewDocument(
+    public static PreSubmitCallbackResponse<SscsCaseData> processRequestPdfAndSetPreviewDocument(
         PdfType pdfType,
         String userAuthorisation,
         SscsCaseData sscsCaseData,
@@ -78,7 +58,7 @@ public class PdfRequestUtil {
             case POST_HEARING:
                 String postHearingDocumentTypeLabel = getPostHearingDocumentType(sscsCaseData).getLabel();
                 pdfUrlBuilder.append(postHearingDocumentTypeLabel)
-                    .append(" from FTA"); // TODO SSCS-10759 make dynamic for the uploading party
+                    .append(" from FTA");
                 handlePostHearing(sscsCaseData);
                 break;
             case POSTPONEMENT:
@@ -144,7 +124,7 @@ public class PdfRequestUtil {
             .append(" application: ")
             .append(requestDetails)
             .append("\n");
-        title = String.format("%s Application from %s", postHearingRequestType, "FTA"); // TODO SSCS-10759 make dynamic for the uploading party
+        title = String.format("%s Application from %s", postHearingRequestType, "FTA");
     }
 
     private static DocumentLink getPreviewDocument(

@@ -65,14 +65,21 @@ class PostHearingRequestAboutToSubmitHandlerTest {
         DocumentLink previewDocument = DocumentLink.builder()
             .documentFilename("Set Aside Application from FTA.pdf")
             .build();
+        DocumentStaging documentStaging = DocumentStaging.builder()
+            .previewDocument(previewDocument)
+            .build();
+        MrnDetails mrnDetails = MrnDetails.builder()
+            .dwpIssuingOffice("3")
+            .build();
+        Appeal appeal = Appeal.builder()
+            .mrnDetails(mrnDetails)
+            .build();
         caseData = SscsCaseData.builder()
-            .appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build())
+            .appeal(appeal)
             .state(State.DORMANT_APPEAL_STATE)
             .ccdCaseId("1234")
             .postHearing(PostHearing.builder().build())
-            .documentStaging(DocumentStaging.builder()
-                .previewDocument(previewDocument)
-                .build())
+            .documentStaging(documentStaging)
             .build();
 
         expectedDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
