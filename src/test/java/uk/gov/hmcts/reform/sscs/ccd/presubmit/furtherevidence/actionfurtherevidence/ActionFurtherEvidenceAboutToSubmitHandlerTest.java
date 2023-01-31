@@ -267,15 +267,15 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         verify(footerService).addFooter(eq(scannedDocument.getValue().getUrl()), eq(sender.getDocumentFooter()), eq(null));
         assertEquals(0, response.getErrors().size());
         assertEquals(0, response.getWarnings().size());
-        assertEquals(SET_ASIDE_APPLICATION.getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals(documentType, response.getData().getSscsDocument().get(0).getValue().getDocumentType());
     }
 
     @Test
     @Parameters({
-        "setAsideApplication,APPELLANT,1",
-        "setAsideApplication,REPRESENTATIVE,1"
+        "setAsideApplication,APPELLANT",
+        "setAsideApplication,REPRESENTATIVE"
     })
-    public void givenValidAPostHearingRequestFromPartyWhenIncludeInBundle_thenAddDocumentToBundle(String documentType, PartyItemList sender, int occurs) {
+    public void givenValidAPostHearingRequestFromPartyWhenIncludeInBundle_thenAddDocumentToBundle(String documentType, PartyItemList sender) {
         when(footerService.getNextBundleAddition(any())).thenReturn("A");
         when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
 
@@ -303,7 +303,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
                 ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(occurs, response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count());
+        assertEquals(1, response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count());
     }
 
     @Test
