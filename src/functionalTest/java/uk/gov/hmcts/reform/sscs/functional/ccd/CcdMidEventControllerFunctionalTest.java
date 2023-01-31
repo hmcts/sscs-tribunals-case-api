@@ -18,7 +18,6 @@ import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.functional.mya.BaseFunctionTest;
 
 @Slf4j
