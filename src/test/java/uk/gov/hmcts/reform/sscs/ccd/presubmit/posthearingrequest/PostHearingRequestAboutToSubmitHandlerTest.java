@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 @ExtendWith(MockitoExtension.class)
 class PostHearingRequestAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
+    public static final String SET_ASIDE_APPLICATION_FROM_FTA_PDF = "Set Aside Application from FTA.pdf";
 
     private PostHearingRequestAboutToSubmitHandler handler;
 
@@ -62,17 +63,16 @@ class PostHearingRequestAboutToSubmitHandlerTest {
         openMocks(this);
         handler = new PostHearingRequestAboutToSubmitHandler(true, footerService);
 
-        DocumentLink previewDocument = DocumentLink.builder()
-            .documentFilename("Set Aside Application from FTA.pdf")
+        DocumentLink documentLink = DocumentLink.builder()
+            .documentFilename(SET_ASIDE_APPLICATION_FROM_FTA_PDF)
             .build();
         DocumentStaging documentStaging = DocumentStaging.builder()
-            .previewDocument(previewDocument)
-            .build();
-        MrnDetails mrnDetails = MrnDetails.builder()
-            .dwpIssuingOffice("3")
+            .previewDocument(documentLink)
             .build();
         Appeal appeal = Appeal.builder()
-            .mrnDetails(mrnDetails)
+            .mrnDetails(MrnDetails.builder()
+                .dwpIssuingOffice("3")
+                .build())
             .build();
         caseData = SscsCaseData.builder()
             .appeal(appeal)
@@ -82,11 +82,13 @@ class PostHearingRequestAboutToSubmitHandlerTest {
             .documentStaging(documentStaging)
             .build();
 
-        expectedDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
-            .documentLink(previewDocument)
-            .documentFileName(previewDocument.getDocumentFilename())
-            .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
-            .build()).build();
+        expectedDocument = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentLink(documentLink)
+                .documentFileName(documentLink.getDocumentFilename())
+                .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
+                .build())
+            .build();
     }
 
     @Test
@@ -127,12 +129,20 @@ class PostHearingRequestAboutToSubmitHandlerTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"SET_ASIDE,SET_ASIDE_APPLICATION"})
-    void givenAPostHearingRequest_footerServiceIsCalledToCreateDocAndAddToBundle(PostHearingRequestType requestType, DocumentType documentType) {
+    @CsvSource({"SET_ASIDE,Set Aside Application from FTA.pdf,SET_ASIDE_APPLICATION"})
+    void givenAPostHearingRequest_footerServiceIsCalledToCreateDocAndAddToBundle(
+        PostHearingRequestType requestType,
+        String filename,
+        DocumentType documentType
+    ) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         caseData.getPostHearing().setRequestType(requestType);
         expectedDocument.getValue().setDocumentType(documentType.getValue());
+        DocumentLink postHearingDoc = DocumentLink.builder()
+            .documentFilename(filename)
+            .build();
+        caseData.getDocumentStaging().setPreviewDocument(postHearingDoc);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

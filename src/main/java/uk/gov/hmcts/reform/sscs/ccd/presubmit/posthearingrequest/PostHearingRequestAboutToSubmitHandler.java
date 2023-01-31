@@ -38,8 +38,10 @@ public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallback
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
-        String userAuthorisation) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType,
+        Callback<SscsCaseData> callback,
+        String userAuthorisation
+    ) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         String caseId = caseData.getCcdCaseId();
         PostHearingRequestType requestType = caseData.getPostHearing().getRequestType();
