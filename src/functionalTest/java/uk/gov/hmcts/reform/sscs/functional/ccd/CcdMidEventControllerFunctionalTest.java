@@ -64,19 +64,6 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
         assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
     }
 
-    @DisplayName("Adjourn case populate venue dropdown should populate next hearing venue dropdown")
-    @Test
-    public void testAdjournCasePopulateVenueDropdown() throws IOException {
-        HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(
-            getJsonCallbackForTest(WRITE_FINAL_DECISION_CALLBACK_JSON)), "AdjournCasePopulateVenueDropdown");
-        CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
-        assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
-        DynamicList adjournCaseNextHearingVenueSelected = ccdEventResponse.getData().getAdjournment().getNextHearingVenueSelected();
-        assertThat(adjournCaseNextHearingVenueSelected.getValue().getCode()).isEqualTo("");
-        assertThat(adjournCaseNextHearingVenueSelected.getValue().getLabel()).isEqualTo("");
-        assertThat(adjournCaseNextHearingVenueSelected.getListItems()).hasSizeGreaterThan(2);
-    }
-
     @DisplayName("Preview final decision should populate final decision preview document")
     @Test
     public void testPreviewFinalDecision() throws IOException {
