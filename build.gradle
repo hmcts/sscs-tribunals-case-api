@@ -8,7 +8,7 @@ plugins {
     id 'com.gorylenko.gradle-git-properties' version '2.4.1'
     id 'com.github.ben-manes.versions' version '0.39.0'
     id "info.solidsoft.pitest" version '1.9.0'
-    id 'org.owasp.dependencycheck' version '7.4.4'
+    id 'org.owasp.dependencycheck' version '8.0.2'
     id 'au.com.dius.pact' version '4.3.15'
     id 'com.github.hmcts.rse-cft-lib' version '0.19.514'
 }
