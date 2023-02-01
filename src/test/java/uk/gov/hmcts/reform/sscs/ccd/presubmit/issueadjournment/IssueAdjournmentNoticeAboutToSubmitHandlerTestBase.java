@@ -34,7 +34,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.model.client.JudicialUser;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @ExtendWith(MockitoExtension.class)
@@ -85,9 +85,9 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
                 .nextHearingVenueSelected(new DynamicList(
                     new DynamicListItem("",""), List.of(new DynamicListItem("", ""))))
                 .panelMembersExcluded(AdjournCasePanelMembersExcluded.YES)
-                .disabilityQualifiedPanelMemberName(JudicialUser.builder().fullName("a").build())
-                .medicallyQualifiedPanelMemberName(JudicialUser.builder().fullName("b").build())
-                .otherPanelMemberName(JudicialUser.builder().fullName("c").build())
+                .disabilityQualifiedPanelMemberName(JudicialUserBase.builder().idamId("12").personalCode("21").build())
+                .medicallyQualifiedPanelMemberName(JudicialUserBase.builder().idamId("123").personalCode("321").build())
+                .otherPanelMemberName(JudicialUserBase.builder().idamId("1234").personalCode("4321").build())
                 .nextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD)
                 .nextHearingListingDuration(2)
                 .nextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS)

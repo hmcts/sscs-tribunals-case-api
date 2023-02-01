@@ -12,31 +12,15 @@
       ],
       "adjournCaseCanCaseBeListedRightAway": "Yes",
       "adjournCaseDisabilityQualifiedPanelMemberName": {
-        "appointments": null,
-        "authorisations": null,
-        "email_id": null,
-        "full_name": "Bob Smith",
-        "known_as": null,
-        "post_nominals": null,
-        "object_id": null,
-        "sidam_id": null,
-        "surname": "Smith",
-        "personal_code": null
+        "idamId": "123",
+        "personalCode": "456"
       },
       "adjournCaseGenerateNotice": "Yes",
       "adjournCaseInterpreterLanguage": "spanish",
       "adjournCaseInterpreterRequired": "Yes",
       "adjournCaseMedicallyQualifiedPanelMemberName": {
-        "appointments": null,
-        "authorisations": null,
-        "email_id": null,
-        "full_name": "Wendy Rowe",
-        "known_as": null,
-        "post_nominals": null,
-        "object_id": null,
-        "sidam_id": null,
-        "surname": "Rowe",
-        "personal_code": null
+        "idamId": "1234",
+        "personalCode": "4567"
       },
       "adjournCaseNextHearingDateType": "dateToBeFixed",
       "adjournCaseNextHearingListingDuration": 720,
@@ -63,16 +47,8 @@
         ]
       },
       "adjournCaseOtherPanelMemberName": {
-        "appointments": null,
-        "authorisations": null,
-        "email_id": null,
-        "full_name": "The Doctor",
-        "known_as": null,
-        "post_nominals": null,
-        "object_id": null,
-        "sidam_id": null,
-        "surname": null,
-        "personal_code": null
+        "idamId": "12345",
+        "personalCode": "45678"
       },
       "adjournCasePanelMembersExcluded": "Yes",
       "adjournCasePreviewDocument": {

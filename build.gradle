@@ -328,7 +328,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '11d2854'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'd270a9c'
     implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.6.0'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.34.0'
@@ -529,7 +529,7 @@ bootWithCCD {
 
     //---Debug-----
     //Uncomment to launch with debug
-    // jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
+    jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
 
     //---Extra ccd loging----
     //Uncomment for ccd callback logging
