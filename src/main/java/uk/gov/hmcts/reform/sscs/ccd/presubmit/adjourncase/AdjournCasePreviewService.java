@@ -31,7 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
-import uk.gov.hmcts.reform.sscs.model.client.JudicialUser;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody.AdjournCaseTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
@@ -343,13 +343,13 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
         Adjournment adjournment = caseData.getAdjournment();
 
-        List<JudicialUser> panelMembers = Arrays.asList(adjournment.getDisabilityQualifiedPanelMemberName(),
+        List<JudicialUserBase> panelMembers = Arrays.asList(adjournment.getDisabilityQualifiedPanelMemberName(),
             adjournment.getMedicallyQualifiedPanelMemberName(),
             adjournment.getOtherPanelMemberName());
 
         names.addAll(panelMembers.stream()
             .filter(Objects::nonNull)
-            .map(JudicialUser::getFullName)
+            .map(panelMember -> userDetailsService.getUserFullNameByUserId(userAuthorisation, panelMember.getIdamId()))
             .collect(Collectors.toList()));
 
         return StringUtils.getGramaticallyJoinedStrings(names);

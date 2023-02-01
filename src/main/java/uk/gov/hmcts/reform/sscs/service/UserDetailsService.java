@@ -25,12 +25,16 @@ public class UserDetailsService {
         return userDetails.getSurname().orElse("");
     }
 
-    private UserDetails getUserDetails(String userAuthorisation) throws IllegalStateException {
+    public String getUserFullNameByUserId(String userAuthorisation, String idamId) {
+        UserDetails userDetails = idamClient.getUserByUserId(userAuthorisation, idamId);
+        return userDetails.getFullName();
+    }
+
+    protected UserDetails getUserDetails(String userAuthorisation) throws IllegalStateException {
         UserDetails userDetails = idamClient.getUserDetails(userAuthorisation);
         if (userDetails == null) {
             throw new IllegalStateException("Unable to obtain signed in user details");
         }
         return userDetails;
     }
-
 }

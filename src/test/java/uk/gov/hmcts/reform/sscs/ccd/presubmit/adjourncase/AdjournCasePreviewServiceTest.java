@@ -62,7 +62,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
-import uk.gov.hmcts.reform.sscs.model.client.JudicialUser;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
@@ -78,12 +78,18 @@ class AdjournCasePreviewServiceTest {
     private static final String APPELLANT_FULL_NAME = "Appellant Lastname";
     private static final String GAP_VENUE_NAME = "Gap venue name";
     private static final String HEARING_DATE = "2019-01-01";
-    private static final String JUDGE_FULL_NAME = "Judge Full Name";
     private static final String REASONS = "My reasons for decision";
     private static final String TEMPLATE_ID = "nuts.docx";
     private static final String URL = "http://dm-store/documents/123";
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final LocalDate LOCAL_DATE = LocalDate.parse("2018-10-10");
+    private static final String JUDGE_FULL_NAME = "Judge Full Name";
+    private static final String PANEL_MEMBER_1_IDAM = "12";
+    private static final String PANEL_MEMBER_1_NAME = "Mr Panel Member 1";
+    private static final String PANEL_MEMBER_2_IDAM = "123";
+    private static final String PANEL_MEMBER_2_NAME = "Ms Panel Member 2";
+    private static final String OTHER_PANEL_MEMBER_IDAM = "1234";
+    private static final String OTHER_PANEL_MEMBER_NAME = "Other Panel Member";
 
     private AdjournCasePreviewService service;
 
@@ -779,14 +785,24 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setDisabilityQualifiedPanelMemberName(JudicialUser.builder().fullName("Mr Panel Member 1").build());
-        adjournment.setMedicallyQualifiedPanelMemberName(JudicialUser.builder().fullName("Ms Panel Member 2").build());
-        adjournment.setOtherPanelMemberName(JudicialUser.builder().fullName("Other Panel Member").build());
+        adjournment.setDisabilityQualifiedPanelMemberName(JudicialUserBase.builder().idamId(PANEL_MEMBER_1_IDAM).build());
+        adjournment.setMedicallyQualifiedPanelMemberName(JudicialUserBase.builder().idamId(PANEL_MEMBER_2_IDAM).build());
+        adjournment.setOtherPanelMemberName(JudicialUserBase.builder().idamId(OTHER_PANEL_MEMBER_IDAM).build());
+
+        when(userDetailsService.getUserFullNameByUserId(USER_AUTHORISATION, PANEL_MEMBER_1_IDAM))
+            .thenReturn(PANEL_MEMBER_1_NAME);
+        when(userDetailsService.getUserFullNameByUserId(USER_AUTHORISATION, PANEL_MEMBER_2_IDAM))
+            .thenReturn(PANEL_MEMBER_2_NAME);
+        when(userDetailsService.getUserFullNameByUserId(USER_AUTHORISATION, OTHER_PANEL_MEMBER_IDAM))
+            .thenReturn(OTHER_PANEL_MEMBER_NAME);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
-        assertThat(body.getHeldBefore()).isEqualTo("Judge Full Name, Mr Panel Member 1, Ms Panel Member 2 and Other Panel Member");
+        assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME + ", "
+            + PANEL_MEMBER_1_NAME + ", "
+            + PANEL_MEMBER_2_NAME + " and "
+            + OTHER_PANEL_MEMBER_NAME);
     }
 
     @ParameterizedTest
@@ -797,11 +813,20 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setDisabilityQualifiedPanelMemberName(JudicialUser.builder().fullName("Mr Panel Member 1").build());
-        adjournment.setMedicallyQualifiedPanelMemberName(JudicialUser.builder().fullName("Ms Panel Member 2").build());
+        adjournment.setDisabilityQualifiedPanelMemberName(JudicialUserBase.builder().idamId(PANEL_MEMBER_1_IDAM).build());
+        adjournment.setMedicallyQualifiedPanelMemberName(JudicialUserBase.builder().idamId(PANEL_MEMBER_2_IDAM).build());
+
+        when(userDetailsService.getUserFullNameByUserId(USER_AUTHORISATION, PANEL_MEMBER_1_IDAM))
+            .thenReturn(PANEL_MEMBER_1_NAME);
+        when(userDetailsService.getUserFullNameByUserId(USER_AUTHORISATION, PANEL_MEMBER_2_IDAM))
+            .thenReturn(PANEL_MEMBER_2_NAME);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
+
+        assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME + ", "
+            + PANEL_MEMBER_1_NAME + " and "
+            + PANEL_MEMBER_2_NAME);
 
         assertThat(body.getHeldBefore()).isEqualTo("Judge Full Name, Mr Panel Member 1 and Ms Panel Member 2");
     }
@@ -814,12 +839,15 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setDisabilityQualifiedPanelMemberName(JudicialUser.builder().fullName("Mr Panel Member 1").build());
+        adjournment.setDisabilityQualifiedPanelMemberName(JudicialUserBase.builder().idamId(PANEL_MEMBER_1_IDAM).build());
+
+        when(userDetailsService.getUserFullNameByUserId(USER_AUTHORISATION, PANEL_MEMBER_1_IDAM))
+            .thenReturn(PANEL_MEMBER_1_NAME);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
-        assertThat(body.getHeldBefore()).isEqualTo("Judge Full Name and Mr Panel Member 1");
+        assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME + " and " + PANEL_MEMBER_1_NAME);
     }
 
     @ParameterizedTest
