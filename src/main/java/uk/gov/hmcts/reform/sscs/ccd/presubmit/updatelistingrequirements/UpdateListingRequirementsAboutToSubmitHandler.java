@@ -49,8 +49,6 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        log.info("reserved to judge: {}", sscsCaseData.getReservedJudge());
-
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         State state = callback.getCaseDetails().getState();
