@@ -5,7 +5,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNME
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.FACE_TO_FACE;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
 
 import java.time.LocalDate;
@@ -125,10 +124,10 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             if (latestHearing != null && latestHearing.getValue() != null) {
                 final HearingChannel hearingChannel = getNextHearingChannel(sscsCaseData);
                 latestHearing.getValue().setHearingChannel(hearingChannel);
-                if (hearingChannel.getValueTribunals().equalsIgnoreCase(FACE_TO_FACE.getValueTribunals())) {
-                    sscsCaseData.getAppeal().setHearingType("oral");
-                } else {
+                if (hearingChannel.getValueTribunals().equalsIgnoreCase(PAPER.getValueTribunals())) {
                     sscsCaseData.getAppeal().setHearingType(PAPER.getValueTribunals());
+                } else {
+                    sscsCaseData.getAppeal().setHearingType("oral");
                 }
             }
         }

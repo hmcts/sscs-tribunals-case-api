@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,17 +22,21 @@ import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
@@ -218,4 +223,45 @@ class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandle
         assertThat(sscsCaseData.getRegion()).isEqualTo(originalRegion);
         assertThat(sscsCaseData.getProcessingVenue()).isEqualTo(originalProcessingVenue);
     }
+
+    @DisplayName("When adjournment is enabled and case hearing type is Paper and Adjournment next hearing type is not provided "
+            + ", then case hearing type should not be updated.")
+    @Test
+    void givenAdjournmentNextHearingNotProvided_thenNoChangeInHearingChannel() {
+        HearingDetails hearingDetails = new HearingDetails();
+        hearingDetails.setHearingChannel(HearingChannel.PAPER);
+        callback.getCaseDetails().getCaseData().setHearings(Arrays.asList(new Hearing(hearingDetails)));
+        callback.getCaseDetails().getCaseData().getAdjournment().setTypeOfNextHearing(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(callback.getCaseDetails().getCaseData().getLatestHearing().getValue().getHearingChannel()).isEqualTo(HearingChannel.PAPER);
+
+    }
+
+    @DisplayName("When adjournment is enabled and case hearing type is Paper and Adjournment next hearing type is Face To Face "
+            + ", then case hearing type should updated from paper to face to face.")
+    @Test
+    void givenAdjournmentNextHearingIsFaceToFace_thenUpdateHearingChannel() {
+        HearingDetails hearingDetails = new HearingDetails();
+        hearingDetails.setHearingChannel(HearingChannel.PAPER);
+        callback.getCaseDetails().getCaseData().setHearings(Arrays.asList(new Hearing(hearingDetails)));
+        callback.getCaseDetails().getCaseData().getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(callback.getCaseDetails().getCaseData().getLatestHearing().getValue().getHearingChannel()).isEqualTo(HearingChannel.FACE_TO_FACE);
+    }
+
+    @DisplayName("When adjournment is enabled and case hearing type is face_to_face and Adjournment next hearing type is Paper "
+            + ", then case hearing type should updated from face_to_face to Paper.")
+    @Test
+    void givenAdjournmentNextHearingIsPaper_thenUpdateHearingChannel() {
+        HearingDetails hearingDetails = new HearingDetails();
+        hearingDetails.setHearingChannel(HearingChannel.FACE_TO_FACE);
+        callback.getCaseDetails().getCaseData().setHearings(Arrays.asList(new Hearing(hearingDetails)));
+        callback.getCaseDetails().getCaseData().getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.PAPER);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(callback.getCaseDetails().getCaseData().getLatestHearing().getValue().getHearingChannel()).isEqualTo(HearingChannel.PAPER);
+    }
+
 }
