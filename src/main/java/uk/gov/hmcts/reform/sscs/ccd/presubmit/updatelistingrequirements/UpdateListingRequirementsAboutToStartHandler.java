@@ -46,6 +46,8 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
+        log.info("reserved to judge: {}", sscsCaseData.getReservedJudge());
+
         if (isScheduleListingEnabled) {
             log.info("Handling override fields update listing requirements event for caseId {}",
                 sscsCaseData.getCcdCaseId());
