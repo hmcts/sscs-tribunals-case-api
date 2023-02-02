@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody.AdjournCaseTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
+import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.LanguageService;
@@ -46,9 +47,9 @@ import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 @Component
 @Slf4j
 public class AdjournCasePreviewService extends IssueNoticeHandler {
-
     private final VenueDataLoader venueDataLoader;
     private final LanguageService languageService;
+    private final JudicialRefDataService judicialRefDataService;
     private static final String DOCUMENT_DATE_PATTERN = "dd/MM/yyyy";
     public static final String IN_CHAMBERS = "In chambers";
 
@@ -56,12 +57,13 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
     @Autowired
     public AdjournCasePreviewService(GenerateFile generateFile, UserDetailsService userDetailsService, VenueDataLoader venueDataLoader,
-                                     LanguageService languageService, @Value("${doc_assembly.adjourn_case}") String templateId,
-                                     SignLanguagesService signLanguagesService) {
+                                     LanguageService languageService, JudicialRefDataService judicialRefDataService,
+                                     @Value("${doc_assembly.adjourn_case}") String templateId, SignLanguagesService signLanguagesService) {
         super(generateFile, userDetailsService, languagePreference -> templateId);
         this.venueDataLoader = venueDataLoader;
         this.languageService = languageService;
         this.signLanguagesService = signLanguagesService;
+        this.judicialRefDataService = judicialRefDataService;
     }
 
     @Override
@@ -349,7 +351,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
         names.addAll(panelMembers.stream()
             .filter(Objects::nonNull)
-            .map(panelMember -> userDetailsService.getUserFullNameByUserId(userAuthorisation, panelMember.getIdamId()))
+            .map(panelMember -> judicialRefDataService.getJudicialUserFullName(panelMember.getPersonalCode()))
             .collect(Collectors.toList()));
 
         return StringUtils.getGramaticallyJoinedStrings(names);

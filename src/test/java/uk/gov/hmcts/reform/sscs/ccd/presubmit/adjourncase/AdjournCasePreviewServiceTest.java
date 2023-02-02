@@ -66,6 +66,7 @@ import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
+import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.LanguageService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
@@ -84,11 +85,11 @@ class AdjournCasePreviewServiceTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final LocalDate LOCAL_DATE = LocalDate.parse("2018-10-10");
     private static final String JUDGE_FULL_NAME = "Judge Full Name";
-    private static final String PANEL_MEMBER_1_IDAM = "12";
+    private static final String PANEL_MEMBER_1_PERSONAL_CODE = "12";
     private static final String PANEL_MEMBER_1_NAME = "Mr Panel Member 1";
-    private static final String PANEL_MEMBER_2_IDAM = "123";
+    private static final String PANEL_MEMBER_2_PERSONAL_CODE = "123";
     private static final String PANEL_MEMBER_2_NAME = "Ms Panel Member 2";
-    private static final String OTHER_PANEL_MEMBER_IDAM = "1234";
+    private static final String OTHER_PANEL_MEMBER_PERSONAL_CODE = "1234";
     private static final String OTHER_PANEL_MEMBER_NAME = "Other Panel Member";
 
     private AdjournCasePreviewService service;
@@ -114,6 +115,9 @@ class AdjournCasePreviewServiceTest {
     @Mock
     private VenueDataLoader venueDataLoader;
 
+    @Mock
+    private JudicialRefDataService judicialRefDataService;
+
     Map<String, VenueDetails> venueDetailsMap;
 
     @Mock
@@ -122,7 +126,7 @@ class AdjournCasePreviewServiceTest {
     @BeforeEach
     void setUp() throws IOException {
         service = new AdjournCasePreviewService(generateFile, userDetailsService,
-            venueDataLoader, new LanguageService(), TEMPLATE_ID, signLanguagesService);
+            venueDataLoader, new LanguageService(), judicialRefDataService, TEMPLATE_ID, signLanguagesService);
 
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -785,15 +789,15 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setDisabilityQualifiedPanelMemberName(JudicialUserBase.builder().idamId(PANEL_MEMBER_1_IDAM).build());
-        adjournment.setMedicallyQualifiedPanelMemberName(JudicialUserBase.builder().idamId(PANEL_MEMBER_2_IDAM).build());
-        adjournment.setOtherPanelMemberName(JudicialUserBase.builder().idamId(OTHER_PANEL_MEMBER_IDAM).build());
+        adjournment.setDisabilityQualifiedPanelMemberName(JudicialUserBase.builder().personalCode(PANEL_MEMBER_1_PERSONAL_CODE).build());
+        adjournment.setMedicallyQualifiedPanelMemberName(JudicialUserBase.builder().personalCode(PANEL_MEMBER_2_PERSONAL_CODE).build());
+        adjournment.setOtherPanelMemberName(JudicialUserBase.builder().personalCode(OTHER_PANEL_MEMBER_PERSONAL_CODE).build());
 
-        when(userDetailsService.getUserFullNameByUserId(USER_AUTHORISATION, PANEL_MEMBER_1_IDAM))
+        when(judicialRefDataService.getJudicialUserFullName(PANEL_MEMBER_1_PERSONAL_CODE))
             .thenReturn(PANEL_MEMBER_1_NAME);
-        when(userDetailsService.getUserFullNameByUserId(USER_AUTHORISATION, PANEL_MEMBER_2_IDAM))
+        when(judicialRefDataService.getJudicialUserFullName(PANEL_MEMBER_2_PERSONAL_CODE))
             .thenReturn(PANEL_MEMBER_2_NAME);
-        when(userDetailsService.getUserFullNameByUserId(USER_AUTHORISATION, OTHER_PANEL_MEMBER_IDAM))
+        when(judicialRefDataService.getJudicialUserFullName(OTHER_PANEL_MEMBER_PERSONAL_CODE))
             .thenReturn(OTHER_PANEL_MEMBER_NAME);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
@@ -813,12 +817,12 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setDisabilityQualifiedPanelMemberName(JudicialUserBase.builder().idamId(PANEL_MEMBER_1_IDAM).build());
-        adjournment.setMedicallyQualifiedPanelMemberName(JudicialUserBase.builder().idamId(PANEL_MEMBER_2_IDAM).build());
+        adjournment.setDisabilityQualifiedPanelMemberName(JudicialUserBase.builder().personalCode(PANEL_MEMBER_1_PERSONAL_CODE).build());
+        adjournment.setMedicallyQualifiedPanelMemberName(JudicialUserBase.builder().personalCode(PANEL_MEMBER_2_PERSONAL_CODE).build());
 
-        when(userDetailsService.getUserFullNameByUserId(USER_AUTHORISATION, PANEL_MEMBER_1_IDAM))
+        when(judicialRefDataService.getJudicialUserFullName(PANEL_MEMBER_1_PERSONAL_CODE))
             .thenReturn(PANEL_MEMBER_1_NAME);
-        when(userDetailsService.getUserFullNameByUserId(USER_AUTHORISATION, PANEL_MEMBER_2_IDAM))
+        when(judicialRefDataService.getJudicialUserFullName(PANEL_MEMBER_2_PERSONAL_CODE))
             .thenReturn(PANEL_MEMBER_2_NAME);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
@@ -839,9 +843,9 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setDisabilityQualifiedPanelMemberName(JudicialUserBase.builder().idamId(PANEL_MEMBER_1_IDAM).build());
+        adjournment.setDisabilityQualifiedPanelMemberName(JudicialUserBase.builder().personalCode(PANEL_MEMBER_1_PERSONAL_CODE).build());
 
-        when(userDetailsService.getUserFullNameByUserId(USER_AUTHORISATION, PANEL_MEMBER_1_IDAM))
+        when(judicialRefDataService.getJudicialUserFullName(PANEL_MEMBER_1_PERSONAL_CODE))
             .thenReturn(PANEL_MEMBER_1_NAME);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
