@@ -93,6 +93,11 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
         HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(getJsonCallbackForTest(
             ADJOURN_CASE_GAPS_CALLBACK_JSON)), "PreviewAdjournCase");
         CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
+
+        log.info("#12 errors: {}", ccdEventResponse.getErrors().toString());
+        log.info("#13 warnings: {}", ccdEventResponse.getWarnings().toString());
+        log.info("#14 data: {}", ccdEventResponse.getData().toString());
+
         assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         assertThat(ccdEventResponse.getData().getAdjournment().getPreviewDocument()).isNotNull();
     }
