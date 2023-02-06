@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevid
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.*;
@@ -19,6 +21,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurth
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.APPELLANT;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.DWP;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.JOINT_PARTY;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.REPRESENTATIVE;
@@ -193,6 +196,97 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertThat(sscsCaseData.getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.YES));
         assertThat(sscsCaseData.getAppealNotePad().getNotesCollection().stream()
             .anyMatch(note -> note.getValue().getNoteDetail().equals("Request Detail Test")), is(true));
+    }
+
+    @Test
+    @Parameters({"setAsideApplication"})
+    public void givenAValidPostHearingApplicationRequest_thenInterlocReviewStateAndCaseStateUpdated(String documentType) {
+        DynamicListItem sendToInterlocListItem = new DynamicListItem(
+                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
+                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel());
+
+        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
+        sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
+        sscsCaseData.getFurtherEvidenceAction().setValue(sendToInterlocListItem);
+
+        DocumentLink docLink = DocumentLink.builder().documentUrl("test.com").build();
+        ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
+                .type(documentType)
+                .fileName("Test.pdg")
+                .url(docLink)
+                .build();
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+                .value(scannedDocDetails)
+                .build();
+
+        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
+                ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getState(), is(State.POST_HEARING));
+        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_JUDGE));
+    }
+
+    @Test
+    @Parameters({"setAsideApplication"})
+    public void giveAValidPostHearingApplicationRequestFromAnFtaUser_thenDwpStateIsUpdatedToSetAsideRequested(String documentType) {
+        DynamicListItem sendToInterlocListItem = new DynamicListItem(
+                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
+                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel());
+
+        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
+        sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
+        sscsCaseData.getFurtherEvidenceAction().setValue(sendToInterlocListItem);
+
+        DocumentLink docLink = DocumentLink.builder().documentUrl("test.com").build();
+        ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
+                .type(documentType)
+                .fileName("Test.pdg")
+                .url(docLink)
+                .build();
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+                .value(scannedDocDetails)
+                .build();
+
+        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(DWP.getCode(), DWP.getLabel()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
+                ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getDwpState(), is(DwpState.SET_ASIDE_REQUESTED));
+    }
+
+    @Test
+    @Parameters({"setAsideApplication"})
+    public void givenAValidPostHearingRequestWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError(String documentType) {
+        DynamicListItem issueEvidenceAction = new DynamicListItem(
+                FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE.getCode(),
+                FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE.getLabel());
+
+        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
+        sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
+        sscsCaseData.getFurtherEvidenceAction().setValue(issueEvidenceAction);
+
+        DocumentLink docLink = DocumentLink.builder().documentUrl("test.com").build();
+        ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
+                .type(documentType)
+                .fileName("Test.pdg")
+                .url(docLink)
+                .build();
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+                .value(scannedDocDetails)
+                .build();
+
+        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
+                ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors(), hasSize(1));
+        assertThat(response.getErrors(), hasItem(
+                String.format("Further evidence action must be set to '%s'",
+                        SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel())));
     }
 
     @Test
