@@ -9,6 +9,7 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome.GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE;
@@ -139,8 +140,18 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             }
         }
 
-        if (ScannedDocumentType.URGENT_HEARING_REQUEST.getValue().equals((scannedDocument.getValue().getType()))
-            && !OTHER_DOCUMENT_MANUAL.getCode().equals(sscsCaseData.getFurtherEvidenceAction().getValue().getCode())) {
+        String scannedDocumentType = scannedDocument.getValue().getType();
+        String actionCode = sscsCaseData.getFurtherEvidenceAction().getValue().getCode();
+
+        if (ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocumentType)
+                && !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode)) {
+            preSubmitCallbackResponse.addError(String
+                    .format("Further evidence action must be set to '%s'",
+                            SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel()));
+        }
+
+        if (ScannedDocumentType.URGENT_HEARING_REQUEST.getValue().equals(scannedDocumentType)
+                && !OTHER_DOCUMENT_MANUAL.getCode().equals(sscsCaseData.getFurtherEvidenceAction().getValue().getCode())) {
             preSubmitCallbackResponse.addError(String
                 .format("Further evidence action must be '%s' for a %s", OTHER_DOCUMENT_MANUAL.getLabel(),
                     URGENT_HEARING_REQUEST.getLabel()));
@@ -219,6 +230,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             }
         }
 
+        if (isSetAsideApplicationRequest(sscsCaseData)) {
+            sscsCaseData.setState(State.POST_HEARING);
+            sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
+            if (PartyItemList.DWP.getCode().equals(sscsCaseData.getOriginalSender().getValue().getCode())) {
+                sscsCaseData.setDwpState(DwpState.SET_ASIDE_REQUESTED);
+            }
+        }
+
         buildSscsDocumentFromScan(sscsCaseData, caseDetails.getState(), callback.isIgnoreWarnings(),
             preSubmitCallbackResponse);
 
@@ -229,6 +248,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         return emptyIfNull(sscsCaseData.getScannedDocuments()).stream()
             .anyMatch(doc -> doc.getValue() != null && StringUtils.isNotBlank(doc.getValue().getType())
                 && doc.getValue().getType().equals(DocumentType.POSTPONEMENT_REQUEST.getValue()));
+    }
+
+    private boolean isSetAsideApplicationRequest(SscsCaseData sscsCaseData) {
+        return emptyIfNull(sscsCaseData.getScannedDocuments()).stream()
+                .anyMatch(doc -> doc.getValue() != null && StringUtils.isNotBlank(doc.getValue().getType())
+                        && DocumentType.SET_ASIDE_APPLICATION.getValue().equals(doc.getValue().getType()));
     }
 
     private Note createPostponementRequestNote(String userAuthorisation, String details) {
@@ -562,6 +587,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
         if (ScannedDocumentType.POSTPONEMENT_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
             return POSTPONEMENT_REQUEST;
+        }
+        if (ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocument.getValue().getType())) {
+            return SET_ASIDE_APPLICATION;
         }
 
         String originalSenderStripped  = originalSenderCode.replaceAll("\\d","");
