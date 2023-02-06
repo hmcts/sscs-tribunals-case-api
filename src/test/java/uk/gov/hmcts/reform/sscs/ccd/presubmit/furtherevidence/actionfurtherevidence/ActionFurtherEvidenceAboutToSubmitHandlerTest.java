@@ -94,7 +94,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService,
-                bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
+            bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_FURTHER_EVIDENCE);
         when(callback.isIgnoreWarnings()).thenReturn(true);
@@ -121,7 +121,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         scannedDocumentList.add(scannedDocument);
         scannedDocumentList.add(scannedDocument2);
         DynamicList furtherEvidenceActionList = buildFurtherEvidenceActionItemListForGivenOption(ISSUE_FURTHER_EVIDENCE.getCode(),
-                ISSUE_FURTHER_EVIDENCE.getLabel());
+            ISSUE_FURTHER_EVIDENCE.getLabel());
 
         DynamicListItem value = new DynamicListItem("appellant", "Appellant (or Appointee)");
         DynamicList originalSender = new DynamicList(value, Collections.singletonList(value));
@@ -154,13 +154,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     public void givenAPostponementRequestWithoutDetails_thenAddAnError() {
         when(caseDetails.getState()).thenReturn(State.HEARING);
         sscsCaseData.getFurtherEvidenceAction().setValue(
-                new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
-                        FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getLabel()));
+            new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
+                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getLabel()));
 
         ScannedDocument scannedDocument = ScannedDocument.builder()
-                .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
-                        .fileName("Testing.jpg").url(DocumentLink.builder()
-                                .documentUrl("test1.com").build()).build()).build();
+            .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
+                .fileName("Testing.jpg").url(DocumentLink.builder()
+                    .documentUrl("test1.com").build()).build()).build();
 
 
         sscsCaseData.setScannedDocuments(Arrays.asList(scannedDocument));
@@ -169,20 +169,20 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors(), is(not(empty())));
         assertThat(response.getErrors().iterator().next(),
-                is(ActionFurtherEvidenceAboutToSubmitHandler.POSTPONEMENT_DETAILS_IS_MANDATORY));
+            is(ActionFurtherEvidenceAboutToSubmitHandler.POSTPONEMENT_DETAILS_IS_MANDATORY));
     }
 
     @Test
     public void givenAValidPostponementRequest_thenSscsDocumentTypeIsPostponementRequestAndOriginalSenderIsSetAndNoteIsCreatedAndFlagUnprocessedIsYes() {
         when(caseDetails.getState()).thenReturn(State.HEARING);
         sscsCaseData.getFurtherEvidenceAction().setValue(
-                new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
-                        FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getLabel()));
+            new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
+                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getLabel()));
 
         ScannedDocument scannedDocument = ScannedDocument.builder()
-                .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
-                        .fileName("Testing.jpg").url(DocumentLink.builder()
-                                .documentUrl("test.com").build()).build()).build();
+            .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
+                .fileName("Testing.jpg").url(DocumentLink.builder()
+                    .documentUrl("test.com").build()).build()).build();
 
 
         sscsCaseData.setScannedDocuments(Arrays.asList(scannedDocument));
@@ -195,7 +195,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertThat(sscsDocumentDetail.getOriginalPartySender(), is(sscsCaseData.getOriginalSender().getValue().getCode()));
         assertThat(sscsCaseData.getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.YES));
         assertThat(sscsCaseData.getAppealNotePad().getNotesCollection().stream()
-                .anyMatch(note -> note.getValue().getNoteDetail().equals("Request Detail Test")), is(true));
+            .anyMatch(note -> note.getValue().getNoteDetail().equals("Request Detail Test")), is(true));
     }
 
     @Test
@@ -292,9 +292,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Test
     @Parameters(method = "generateFurtherEvidenceActionListScenarios")
     public void givenACaseWithScannedDocuments_shouldMoveToSscsDocuments(@Nullable DynamicList furtherEvidenceActionList,
-        @Nullable DynamicList originalSender,
-        @Nullable String evidenceHandle,
-        DocumentType expectedDocumentType) {
+                                                                         @Nullable DynamicList originalSender,
+                                                                         @Nullable String evidenceHandle,
+                                                                         DocumentType expectedDocumentType) {
         sscsCaseData.setFurtherEvidenceAction(furtherEvidenceActionList);
         sscsCaseData.setOriginalSender(originalSender);
         sscsCaseData.setEvidenceHandled(evidenceHandle);
@@ -315,14 +315,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setIsConfidentialCase(YesNo.YES);
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder()
-                        .fileName("bla3.pdf")
-                        .subtype("sscs1")
-                        .url(DocumentLink.builder().documentUrl("www.test.com").build())
-                        .editedUrl(DocumentLink.builder().documentUrl("www.edited.com").build())
-                        .scannedDate("2020-06-13T00:00:00.000")
-                        .controlNumber("123")
-                        .build()).build();
+            ScannedDocumentDetails.builder()
+                .fileName("bla3.pdf")
+                .subtype("sscs1")
+                .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                .editedUrl(DocumentLink.builder().documentUrl("www.edited.com").build())
+                .scannedDate("2020-06-13T00:00:00.000")
+                .controlNumber("123")
+                .build()).build();
 
         scannedDocumentList.add(scannedDocument);
 
@@ -418,28 +418,28 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Test
     public void edgeCaseWhereEvidenceIsSentToBulkPrintSinceNoFurtherActionIsSelected() {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder()
-                        .type(ScannedDocumentType.REINSTATEMENT_REQUEST.getValue())
-                        .fileName("bla.pdf")
-                        .subtype("sscs1")
-                        .url(DocumentLink.builder().documentUrl("www.test.com").build())
-                        .scannedDate("2019-06-12T00:00:00.000")
-                        .controlNumber("123")
-                        .includeInBundle(NO)
-                        .build()).build();
+            ScannedDocumentDetails.builder()
+                .type(ScannedDocumentType.REINSTATEMENT_REQUEST.getValue())
+                .fileName("bla.pdf")
+                .subtype("sscs1")
+                .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                .scannedDate("2019-06-12T00:00:00.000")
+                .controlNumber("123")
+                .includeInBundle(NO)
+                .build()).build();
         scannedDocumentList = new ArrayList<>();
         scannedDocumentList.add(scannedDocument);
         sscsCaseData.setScannedDocuments(scannedDocumentList);
         sscsCaseData.setFurtherEvidenceAction(
-                buildFurtherEvidenceActionItemListForGivenOption(ISSUE_FURTHER_EVIDENCE.code, ISSUE_FURTHER_EVIDENCE.label));
+            buildFurtherEvidenceActionItemListForGivenOption(ISSUE_FURTHER_EVIDENCE.code, ISSUE_FURTHER_EVIDENCE.label));
         sscsCaseData.setOriginalSender(buildOriginalSenderItemListForGivenOption("appellant",
-                "Appellant (or Appointee)"));
+            "Appellant (or Appointee)"));
         sscsCaseData.setEvidenceHandled(NO);
 
         when(callback.isIgnoreWarnings()).thenReturn(false);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
-                actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(response.getData().getSscsDocument().size(), 1);
         assertEquals(response.getData().getSscsDocument().get(0).getValue().getEvidenceIssued(), NO);
@@ -448,7 +448,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     private void assertHappyPaths(DocumentType expectedDocumentType,
-        PreSubmitCallbackResponse<SscsCaseData> response) {
+                                  PreSubmitCallbackResponse<SscsCaseData> response) {
 
         SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(1).getValue();
         assertEquals((expectedDocumentType.getLabel() != null ? expectedDocumentType.getLabel() : expectedDocumentType.getValue()) + " received on 13-06-2019", sscsDocumentDetail.getDocumentFileName());
@@ -636,7 +636,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             .appeal(Appeal.builder().appellant(Appellant.builder().address(Address.builder().line1("My Road").postcode("TS1 2BA").build()).build()).build())
             .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-                state, sscsCaseData, LocalDateTime.now(), "Benefit");
+            state, sscsCaseData, LocalDateTime.now(), "Benefit");
         return new Callback<>(caseDetails, Optional.empty(), EventType.ACTION_FURTHER_EVIDENCE, false);
     }
 
@@ -734,8 +734,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("Testing.jpg").url(DocumentLink.builder().documentUrl("test.com").build())
-                        .editedUrl(DocumentLink.builder().documentUrl("test").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName("Testing.jpg").url(DocumentLink.builder().documentUrl("test.com").build())
+                .editedUrl(DocumentLink.builder().documentUrl("test").build()).build()).build();
 
         docs.add(scannedDocument);
 
@@ -756,8 +756,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("Testing.jpg").url(DocumentLink.builder().documentUrl("test.com").build())
-                        .editedUrl(DocumentLink.builder().documentUrl("test").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName("Testing.jpg").url(DocumentLink.builder().documentUrl("test.com").build())
+                .editedUrl(DocumentLink.builder().documentUrl("test").build()).build()).build();
 
         docs.add(scannedDocument);
 
@@ -850,8 +850,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setLanguagePreferenceWelsh("yes");
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.REINSTATEMENT_REQUEST.getValue())
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.REINSTATEMENT_REQUEST.getValue())
+                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -875,8 +875,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setPreviousState(previousState);
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.URGENT_HEARING_REQUEST.getValue())
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).includeInBundle(NO).build()).build();
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.URGENT_HEARING_REQUEST.getValue())
+                .url(DocumentLink.builder().documentUrl("test.com").build()).includeInBundle(NO).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -897,8 +897,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         when(footerService.getNextBundleAddition(any())).thenReturn("A");
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.URGENT_HEARING_REQUEST.getValue())
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.URGENT_HEARING_REQUEST.getValue())
+                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
 
         docs.add(scannedDocument);
@@ -925,10 +925,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         when(footerService.getNextBundleAddition(any())).thenReturn("A");
 
         ScannedDocument scannedDocument = ScannedDocument
-                .builder()
-                .value(
+            .builder()
+            .value(
                 ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.URGENT_HEARING_REQUEST.getValue())
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).includeInBundle(includeInBundle).build()).build();
+                    .url(DocumentLink.builder().documentUrl("test.com").build()).includeInBundle(includeInBundle).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
 
         docs.add(scannedDocument);
@@ -1013,8 +1013,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, null"
     })
     public void givenConfidentialRequestWhenJointPartyExistsAndAlreadyHasConfidentialityFromOriginalSenderAppellant_thenUpdateCaseWithConfidentialFieldsAndDisplayWarning(
-            FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem,
-            @Nullable String isProgressingViaGaps
+        FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem,
+        @Nullable String isProgressingViaGaps
     ) {
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(furtherEvidenceActionDynamicListItem.code, furtherEvidenceActionDynamicListItem.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
@@ -1045,8 +1045,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).includeInBundle(NO).build()).build();
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                .url(DocumentLink.builder().documentUrl("test.com").build()).includeInBundle(NO).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1065,8 +1065,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).includeInBundle(NO).build()).build();
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                .url(DocumentLink.builder().documentUrl("test.com").build()).includeInBundle(NO).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1086,8 +1086,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setIsConfidentialCase(YesNo.YES);
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1105,8 +1105,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1122,8 +1122,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1140,11 +1140,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setIsConfidentialCase(YesNo.NO);
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
-                        .url(DocumentLink.builder().documentUrl("test.com").build())
-                        .originalSenderOtherPartyId("1")
-                        .originalSenderOtherPartyName("Other Party")
-                        .build()).build();
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                .url(DocumentLink.builder().documentUrl("test.com").build())
+                .originalSenderOtherPartyId("1")
+                .originalSenderOtherPartyName("Other Party")
+                .build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1249,10 +1249,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(OTHER_PARTY.getCode() + otherParty.getId(), OTHER_PARTY.getLabel() + " - " + otherParty.getName()));
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
-                        .originalSenderOtherPartyId("otherPartyUnknown")
-                        .originalSenderOtherPartyName("unknown name")
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
+                .originalSenderOtherPartyId("otherPartyUnknown")
+                .originalSenderOtherPartyName("unknown name")
+                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1275,10 +1275,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(OTHER_PARTY.getCode() + otherParty.getId(), OTHER_PARTY.getLabel() + " - " + otherParty.getName()));
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
-                        .originalSenderOtherPartyId(null)
-                        .originalSenderOtherPartyName(null)
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                .originalSenderOtherPartyId(null)
+                .originalSenderOtherPartyName(null)
+                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1300,10 +1300,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(OTHER_PARTY.getCode() + otherParty.getId(), OTHER_PARTY.getLabel() + " - " + otherParty.getName()));
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
-                        .originalSenderOtherPartyId("10")
-                        .originalSenderOtherPartyName("John Smith")
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                .originalSenderOtherPartyId("10")
+                .originalSenderOtherPartyName("John Smith")
+                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1321,10 +1321,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
-                        .originalSenderOtherPartyId("10")
-                        .originalSenderOtherPartyName("John Smith")
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                .originalSenderOtherPartyId("10")
+                .originalSenderOtherPartyName("John Smith")
+                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1358,9 +1358,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(ISSUE_FURTHER_EVIDENCE.code, ISSUE_FURTHER_EVIDENCE.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(sender.getCode(), sender.getLabel()));
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CHERISHED.getValue())
-                        .includeInBundle(YES)
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CHERISHED.getValue())
+                .includeInBundle(YES)
+                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1413,23 +1413,23 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     })
     public void findOriginalSenderOtherPartyId(String otherPartyCode, String otherPartyId, String expectedName) {
         ScannedDocument scannedDocument = ScannedDocument
-                .builder()
-                .value(
-                        ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
-                                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+            .builder()
+            .value(
+                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                    .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         sscsCaseData.setOtherParties(List.of(new CcdValue<>(
-                OtherParty.builder()
-                        .id("1")
-                        .name(Name.builder().firstName("Other").lastName("Party").build())
-                        .rep(Representative.builder()
-                                .id("2")
-                                .name(Name.builder().firstName("Rep").lastName("Party").build())
-                                .hasRepresentative(YES)
-                                .build())
-                        .build())));
+            OtherParty.builder()
+                .id("1")
+                .name(Name.builder().firstName("Other").lastName("Party").build())
+                .rep(Representative.builder()
+                    .id("2")
+                    .name(Name.builder().firstName("Rep").lastName("Party").build())
+                    .hasRepresentative(YES)
+                    .build())
+                .build())));
 
         DynamicList originalSender = buildOriginalSenderItemListForGivenOption(otherPartyCode + otherPartyId, "Other party " + expectedName);
         sscsCaseData.setOriginalSender(originalSender);
@@ -1482,11 +1482,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     public void isThreadSafe() throws Exception {
 
         DynamicList furtherEvidenceActionList =
-                buildFurtherEvidenceActionItemListForGivenOption(OTHER_DOCUMENT_MANUAL.getCode(),
-                        OTHER_DOCUMENT_MANUAL.getLabel());
+            buildFurtherEvidenceActionItemListForGivenOption(OTHER_DOCUMENT_MANUAL.getCode(),
+                OTHER_DOCUMENT_MANUAL.getLabel());
 
         DynamicList originalSender = buildOriginalSenderItemListForGivenOption("appellant",
-                "Appellant (or Appointee)");
+            "Appellant (or Appointee)");
 
         String evidenceHandle = null;
 
@@ -1501,12 +1501,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                 String expectedId1 = String.valueOf(i);
 
                 SscsCaseData thisCaseData = SscsCaseData.builder()
-                        .ccdCaseId(expectedId1)
-                        .scannedDocuments(scannedDocumentList)
-                        .furtherEvidenceAction(furtherEvidenceActionList)
-                        .originalSender(originalSender)
-                        .appeal(Appeal.builder().appellant(Appellant.builder().address(Address.builder().line1("My Road").postcode("TS1 2BA").build()).build()).build())
-                        .build();
+                    .ccdCaseId(expectedId1)
+                    .scannedDocuments(scannedDocumentList)
+                    .furtherEvidenceAction(furtherEvidenceActionList)
+                    .originalSender(originalSender)
+                    .appeal(Appeal.builder().appellant(Appellant.builder().address(Address.builder().line1("My Road").postcode("TS1 2BA").build()).build()).build())
+                    .build();
 
                 thisCaseData.setFurtherEvidenceAction(furtherEvidenceActionList);
                 thisCaseData.setOriginalSender(originalSender);
