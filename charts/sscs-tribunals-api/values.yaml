@@ -81,7 +81,7 @@ elastic:
 sscs-evidence-share:
   enabled: false
 sscs-tya-notif:
-  enabled: false
+  enabled: true
 sscs-ccd-callback-orchestrator:
   enabled: false
 sscs-tribunals-frontend:
