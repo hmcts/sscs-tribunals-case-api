@@ -80,6 +80,8 @@ elastic:
   enabled: false
 sscs-evidence-share:
   enabled: false
+sscs-tya-notif:
+  enabled: false
 sscs-ccd-callback-orchestrator:
   enabled: false
 sscs-tribunals-frontend:

@@ -305,7 +305,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S10538-22nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-11381-1nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -418,6 +418,47 @@ sscs-ccd-callback-orchestrator:
       SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
       TOPIC_NAME: "sscs-evidenceshare-topic-aat"
       AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
+
+sscs-tya-notif:
+  enabled: true
+  java:
+    image: hmctspublic.azurecr.io/sscs/tya-notif:latest
+    ingressHost: ${SERVICE_FQDN}
+    readinessDelay: 45
+    keyVaults:
+      sscs:
+        secrets:
+          - idam-api
+          - idam-oauth-user
+          - idam-redirect
+          - idam-sscs-systemupdate-user
+          - idam-sscs-systemupdate-password
+          - sscs-email-mac-secret-text
+          - idam-sscs-oauth2-client-secret
+          - sscs-s2s-secret
+          - s2s-micro
+          - evidence-share-topic-shared-access-key
+          - docmosis-api-key
+          - notification-key
+          - notification-test-key
+    environment:
+      COH_URL: "http://coh-cor-aat.service.core-compute-aat.internal"
+      ONLINE_HEARING_LINK: "https://sscs-cor-frontend-aat.service.core-compute-aat.internal"
+      SUBSCRIPTION_NAME: "sscs-notifications-subscription-aat"
+      TOPIC_NAME: "sscs-evidenceshare-topic-aat"
+      AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
+      AMQP_USERNAME: "SendAndListenSharedAccessKey"
+      JOB_SCHEDULER_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
+      JOB_SCHEDULER_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
+      JOB_SCHEDULER_DB_NAME: "{{ .Values.postgresql.auth.database}}"
+      JOB_SCHEDULER_DB_HOST: "{{ .Release.Name }}-postgresql"
+      JOB_SCHEDULER_DB_CONNECTION_OPTIONS: ""
+      HOURS_START_TIME: 0
+      HOURS_END_TIME: 23
+      RUN_DB_MIGRATION_ON_STARTUP: true
+      TEST_RECIPIENTS_POSTCODE: "*"
+    postgresql:
+      enabled: true
 
 #Enable for SYA
 sscs-tribunals-frontend:

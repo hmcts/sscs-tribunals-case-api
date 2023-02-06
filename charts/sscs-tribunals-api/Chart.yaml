@@ -29,6 +29,10 @@ dependencies:
     version: 0.0.46
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-evidence-share.enabled
+  - name: sscs-tya-notif
+    version: 0.0.41
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: sscs-tya-notif.enabled
   - name: sscs-ccd-callback-orchestrator
     version: 0.0.27
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
