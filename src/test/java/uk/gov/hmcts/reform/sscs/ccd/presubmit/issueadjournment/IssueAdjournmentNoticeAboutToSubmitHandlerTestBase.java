@@ -85,9 +85,9 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
                 .nextHearingVenueSelected(new DynamicList(
                     new DynamicListItem("",""), List.of(new DynamicListItem("", ""))))
                 .panelMembersExcluded(AdjournCasePanelMembersExcluded.YES)
-                .disabilityQualifiedPanelMemberName(JudicialUserBase.builder().idamId("12").personalCode("21").build())
-                .medicallyQualifiedPanelMemberName(JudicialUserBase.builder().idamId("123").personalCode("321").build())
-                .otherPanelMemberName(JudicialUserBase.builder().idamId("1234").personalCode("4321").build())
+                .panelMember1(JudicialUserBase.builder().idamId("12").personalCode("21").build())
+                .panelMember2(JudicialUserBase.builder().idamId("123").personalCode("321").build())
+                .panelMember3(JudicialUserBase.builder().idamId("1234").personalCode("4321").build())
                 .nextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD)
                 .nextHearingListingDuration(2)
                 .nextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS)

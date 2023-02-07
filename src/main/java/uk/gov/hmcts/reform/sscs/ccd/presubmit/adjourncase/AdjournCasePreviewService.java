@@ -36,6 +36,8 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody.AdjournCaseTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
+import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
@@ -345,9 +347,9 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
         Adjournment adjournment = caseData.getAdjournment();
 
-        List<JudicialUserBase> panelMembers = Arrays.asList(adjournment.getDisabilityQualifiedPanelMemberName(),
-            adjournment.getMedicallyQualifiedPanelMemberName(),
-            adjournment.getOtherPanelMemberName());
+        List<JudicialUserBase> panelMembers = Arrays.asList(adjournment.getPanelMember1(),
+            adjournment.getPanelMember2(),
+            adjournment.getPanelMember3());
 
         names.addAll(panelMembers.stream()
             .filter(Objects::nonNull)

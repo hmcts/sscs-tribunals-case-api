@@ -66,6 +66,7 @@ import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.LanguageService;
@@ -552,9 +553,7 @@ class AdjournCasePreviewServiceTest {
 
         Hearing hearing1 = createHearingWithDateAndVenueName(null, "venue 1 name");
 
-        Hearing hearing2 = null;
-
-        sscsCaseData.setHearings(Arrays.asList(hearing2, hearing1));
+        sscsCaseData.setHearings(Arrays.asList(null, hearing1));
 
         checkDocumentIsNotCreatedAndReturnsError("Unable to determine hearing date or venue");
     }
@@ -670,9 +669,7 @@ class AdjournCasePreviewServiceTest {
 
         Hearing hearing1 = createHearingWithDateAndVenueName(HEARING_DATE, "Venue Name");
 
-        Hearing hearing2 = null;
-
-        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
+        List<Hearing> hearings = Arrays.asList(null, hearing1);
         sscsCaseData.setHearings(hearings);
 
         checkDocumentIsNotCreatedAndReturnsError("Unable to determine hearing date or venue");
@@ -789,9 +786,9 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setDisabilityQualifiedPanelMemberName(JudicialUserBase.builder().personalCode(PANEL_MEMBER_1_PERSONAL_CODE).build());
-        adjournment.setMedicallyQualifiedPanelMemberName(JudicialUserBase.builder().personalCode(PANEL_MEMBER_2_PERSONAL_CODE).build());
-        adjournment.setOtherPanelMemberName(JudicialUserBase.builder().personalCode(OTHER_PANEL_MEMBER_PERSONAL_CODE).build());
+        adjournment.setPanelMember1(JudicialUserBase.builder().personalCode(PANEL_MEMBER_1_PERSONAL_CODE).build());
+        adjournment.setPanelMember2(JudicialUserBase.builder().personalCode(PANEL_MEMBER_2_PERSONAL_CODE).build());
+        adjournment.setPanelMember3(JudicialUserBase.builder().personalCode(OTHER_PANEL_MEMBER_PERSONAL_CODE).build());
 
         when(judicialRefDataService.getJudicialUserFullName(PANEL_MEMBER_1_PERSONAL_CODE))
             .thenReturn(PANEL_MEMBER_1_NAME);
@@ -817,8 +814,8 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setDisabilityQualifiedPanelMemberName(JudicialUserBase.builder().personalCode(PANEL_MEMBER_1_PERSONAL_CODE).build());
-        adjournment.setMedicallyQualifiedPanelMemberName(JudicialUserBase.builder().personalCode(PANEL_MEMBER_2_PERSONAL_CODE).build());
+        adjournment.setPanelMember1(JudicialUserBase.builder().personalCode(PANEL_MEMBER_1_PERSONAL_CODE).build());
+        adjournment.setPanelMember2(JudicialUserBase.builder().personalCode(PANEL_MEMBER_2_PERSONAL_CODE).build());
 
         when(judicialRefDataService.getJudicialUserFullName(PANEL_MEMBER_1_PERSONAL_CODE))
             .thenReturn(PANEL_MEMBER_1_NAME);
@@ -843,7 +840,7 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setDisabilityQualifiedPanelMemberName(JudicialUserBase.builder().personalCode(PANEL_MEMBER_1_PERSONAL_CODE).build());
+        adjournment.setPanelMember1(JudicialUserBase.builder().personalCode(PANEL_MEMBER_1_PERSONAL_CODE).build());
 
         when(judicialRefDataService.getJudicialUserFullName(PANEL_MEMBER_1_PERSONAL_CODE))
             .thenReturn(PANEL_MEMBER_1_NAME);
@@ -877,8 +874,8 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setMedicallyQualifiedPanelMemberName(null);
-        adjournment.setDisabilityQualifiedPanelMemberName(null);
+        adjournment.setPanelMember1(null);
+        adjournment.setPanelMember2(null);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
