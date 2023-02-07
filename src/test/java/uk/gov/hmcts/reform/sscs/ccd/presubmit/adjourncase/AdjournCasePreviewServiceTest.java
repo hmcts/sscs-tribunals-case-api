@@ -68,7 +68,6 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
-import uk.gov.hmcts.reform.sscs.service.LanguageService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 
@@ -125,8 +124,8 @@ class AdjournCasePreviewServiceTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        service = new AdjournCasePreviewService(generateFile, userDetailsService,
-            venueDataLoader, new LanguageService(), TEMPLATE_ID, signLanguagesService, judicialRefDataService);
+        service = new AdjournCasePreviewService(generateFile, userDetailsService, venueDataLoader, TEMPLATE_ID,
+            signLanguagesService, judicialRefDataService);
 
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);

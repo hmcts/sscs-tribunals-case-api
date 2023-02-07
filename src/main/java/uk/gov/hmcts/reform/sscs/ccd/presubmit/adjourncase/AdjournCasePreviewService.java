@@ -39,7 +39,6 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.Notic
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
-import uk.gov.hmcts.reform.sscs.service.LanguageService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
@@ -48,7 +47,6 @@ import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 @Slf4j
 public class AdjournCasePreviewService extends IssueNoticeHandler {
     private final VenueDataLoader venueDataLoader;
-    private final LanguageService languageService;
     private final JudicialRefDataService judicialRefDataService;
     private static final String DOCUMENT_DATE_PATTERN = "dd/MM/yyyy";
     public static final String IN_CHAMBERS = "In chambers";
@@ -59,13 +57,11 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     public AdjournCasePreviewService(GenerateFile generateFile,
                                      UserDetailsService userDetailsService,
                                      VenueDataLoader venueDataLoader,
-                                     LanguageService languageService,
                                      @Value("${doc_assembly.adjourn_case}") String templateId,
                                      SignLanguagesService signLanguagesService,
                                      JudicialRefDataService judicialRefDataService) {
         super(generateFile, userDetailsService, languagePreference -> templateId);
         this.venueDataLoader = venueDataLoader;
-        this.languageService = languageService;
         this.signLanguagesService = signLanguagesService;
         this.judicialRefDataService = judicialRefDataService;
     }
