@@ -349,6 +349,8 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             adjournment.getPanelMember2(),
             adjournment.getPanelMember3());
 
+        log.info("#13 Panel members: {}", panelMembers);
+
         names.addAll(panelMembers.stream()
             .filter(Objects::nonNull)
             .map(panelMember -> judicialRefDataService.getJudicialUserFullName(panelMember.getPersonalCode()))
