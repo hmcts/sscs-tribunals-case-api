@@ -50,7 +50,6 @@ import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 @Slf4j
 public class AdjournCasePreviewService extends IssueNoticeHandler {
     private final VenueDataLoader venueDataLoader;
-    private final LanguageService languageService;
     private final JudicialRefDataService judicialRefDataService;
     private static final String DOCUMENT_DATE_PATTERN = "dd/MM/yyyy";
     public static final String IN_CHAMBERS = "In chambers";
@@ -63,7 +62,6 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                                      @Value("${doc_assembly.adjourn_case}") String templateId, SignLanguagesService signLanguagesService) {
         super(generateFile, userDetailsService, languagePreference -> templateId);
         this.venueDataLoader = venueDataLoader;
-        this.languageService = languageService;
         this.signLanguagesService = signLanguagesService;
         this.judicialRefDataService = judicialRefDataService;
     }
