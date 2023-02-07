@@ -11,14 +11,14 @@
         }
       ],
       "adjournCaseCanCaseBeListedRightAway": "Yes",
-      "adjournCaseDisabilityQualifiedPanelMemberName": {
+      "adjournCasePanelMember1": {
         "idamId": "123",
         "personalCode": "456"
       },
       "adjournCaseGenerateNotice": "Yes",
-      "adjournCaseInterpreterLanguage": "spanish",
+      "adjournCaseInterpreterLanguageList": "spanish",
       "adjournCaseInterpreterRequired": "Yes",
-      "adjournCaseMedicallyQualifiedPanelMemberName": {
+      "adjournCasePanelMember2": {
         "idamId": "1234",
         "personalCode": "4567"
       },
@@ -46,7 +46,7 @@
           }
         ]
       },
-      "adjournCaseOtherPanelMemberName": {
+      "adjournCasePanelMember3": {
         "idamId": "12345",
         "personalCode": "45678"
       },
@@ -393,11 +393,11 @@
         ]
       },
       "adjournCaseCanCaseBeListedRightAway": "PUBLIC",
-      "adjournCaseDisabilityQualifiedPanelMemberName": "PUBLIC",
+      "adjournCasePanelMember1": "PUBLIC",
       "adjournCaseGenerateNotice": "PUBLIC",
       "adjournCaseInterpreterLanguage": "PUBLIC",
       "adjournCaseInterpreterRequired": "PUBLIC",
-      "adjournCaseMedicallyQualifiedPanelMemberName": "PUBLIC",
+      "adjournCasePanelMember2": "PUBLIC",
       "adjournCaseNextHearingDateType": "PUBLIC",
       "adjournCaseNextHearingListingDuration": "PUBLIC",
       "adjournCaseNextHearingListingDurationType": "PUBLIC",
@@ -405,7 +405,7 @@
       "adjournCaseNextHearingSpecificTime": "PUBLIC",
       "adjournCaseNextHearingVenue": "PUBLIC",
       "adjournCaseNextHearingVenueSelected": "PUBLIC",
-      "adjournCaseOtherPanelMemberName": "PUBLIC",
+      "adjournCasePanelMember3": "PUBLIC",
       "adjournCasePanelMembersExcluded": "PUBLIC",
       "adjournCasePreviewDocument": "PUBLIC",
       "adjournCaseReasons": {
@@ -818,11 +818,11 @@
     "security_classifications": {
       "adjournCaseAdditionalDirections": "PUBLIC",
       "adjournCaseCanCaseBeListedRightAway": "PUBLIC",
-      "adjournCaseDisabilityQualifiedPanelMemberName": "PUBLIC",
+      "adjournCasePanelMember1": "PUBLIC",
       "adjournCaseGenerateNotice": "PUBLIC",
       "adjournCaseInterpreterLanguage": "PUBLIC",
       "adjournCaseInterpreterRequired": "PUBLIC",
-      "adjournCaseMedicallyQualifiedPanelMemberName": "PUBLIC",
+      "adjournCasePanelMember2": "PUBLIC",
       "adjournCaseNextHearingDateType": "PUBLIC",
       "adjournCaseNextHearingListingDuration": "PUBLIC",
       "adjournCaseNextHearingListingDurationType": "PUBLIC",
@@ -830,7 +830,7 @@
       "adjournCaseNextHearingSpecificTime": "PUBLIC",
       "adjournCaseNextHearingVenue": "PUBLIC",
       "adjournCaseNextHearingVenueSelected": "PUBLIC",
-      "adjournCaseOtherPanelMemberName": "PUBLIC",
+      "adjournCasePanelMember3": "PUBLIC",
       "adjournCasePanelMembersExcluded": "PUBLIC",
       "adjournCasePreviewDocument": "PUBLIC",
       "adjournCaseReasons": {

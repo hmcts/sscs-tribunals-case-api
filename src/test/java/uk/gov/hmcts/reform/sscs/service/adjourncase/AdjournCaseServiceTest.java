@@ -46,7 +46,7 @@ public class AdjournCaseServiceTest {
             .nextHearingListingDuration(1)
             .nextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS)
             .interpreterRequired(NO)
-            .interpreterLanguage("spanish")
+            .interpreterLanguage(new DynamicList("Spanish"))
             .nextHearingDateType(AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER)
             .nextHearingDateOrPeriod(AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD)
             .nextHearingFirstAvailableDateAfterDate(null)

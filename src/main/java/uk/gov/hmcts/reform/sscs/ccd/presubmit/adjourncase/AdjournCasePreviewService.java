@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
-
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
@@ -36,6 +36,8 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody.AdjournCaseTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
+import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
 import uk.gov.hmcts.reform.sscs.service.LanguageService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
@@ -51,13 +53,20 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     private static final String DOCUMENT_DATE_PATTERN = "dd/MM/yyyy";
     public static final String IN_CHAMBERS = "In chambers";
 
+    private final SignLanguagesService signLanguagesService;
+
     @Autowired
-    public AdjournCasePreviewService(GenerateFile generateFile, UserDetailsService userDetailsService, VenueDataLoader venueDataLoader,
-                                     LanguageService languageService, JudicialRefDataService judicialRefDataService,
-                                     @Value("${doc_assembly.adjourn_case}") String templateId) {
+    public AdjournCasePreviewService(GenerateFile generateFile,
+                                     UserDetailsService userDetailsService,
+                                     VenueDataLoader venueDataLoader,
+                                     LanguageService languageService,
+                                     @Value("${doc_assembly.adjourn_case}") String templateId,
+                                     SignLanguagesService signLanguagesService,
+                                     JudicialRefDataService judicialRefDataService) {
         super(generateFile, userDetailsService, languagePreference -> templateId);
         this.venueDataLoader = venueDataLoader;
         this.languageService = languageService;
+        this.signLanguagesService = signLanguagesService;
         this.judicialRefDataService = judicialRefDataService;
     }
 
@@ -109,7 +118,6 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             : null;
 
         adjournCaseBuilder.hearingType(hearingType);
-
         HearingType nextHearingType = HearingType.getByKey(String.valueOf(adjournment.getTypeOfNextHearing()));
 
         if (HearingType.FACE_TO_FACE.equals(nextHearingType)) {
@@ -186,9 +194,14 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     private void setIntepreterDescriptionIfRequired(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData) {
         if (isYes(caseData.getAdjournment().getInterpreterRequired())) {
             if (caseData.getAdjournment().getInterpreterLanguage() != null) {
-                adjournCaseBuilder.interpreterDescription(
-                    languageService.getInterpreterDescriptionForLanguageKey(
-                        caseData.getAdjournment().getInterpreterLanguage()));
+                String languageLabel = caseData.getAdjournment().getInterpreterLanguage().getValue().getLabel();
+                String languageKey = caseData.getAdjournment().getInterpreterLanguage().getValue().getCode();
+                Language hmrcRefLanguage = signLanguagesService.getLanguageByHmcReference(languageKey);
+                String interpreterDescription = String.format("an interpreter in %s", languageLabel);
+                if (nonNull(hmrcRefLanguage)) {
+                    interpreterDescription = String.format("a sign language interpreter (%s)", languageLabel);
+                }
+                adjournCaseBuilder.interpreterDescription(interpreterDescription);
             } else {
                 throw new IllegalStateException("An interpreter is required but no language is set");
             }
@@ -336,9 +349,9 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
         Adjournment adjournment = caseData.getAdjournment();
 
-        List<JudicialUserBase> panelMembers = Arrays.asList(adjournment.getDisabilityQualifiedPanelMemberName(),
-            adjournment.getMedicallyQualifiedPanelMemberName(),
-            adjournment.getOtherPanelMemberName());
+        List<JudicialUserBase> panelMembers = Arrays.asList(adjournment.getPanelMember1(),
+            adjournment.getPanelMember2(),
+            adjournment.getPanelMember3());
 
         names.addAll(panelMembers.stream()
             .filter(Objects::nonNull)

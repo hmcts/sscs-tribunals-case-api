@@ -19,10 +19,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
@@ -44,9 +42,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
+import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 
 @ExtendWith(MockitoExtension.class)
 class AdjournCaseAboutToStartHandlerTest {
+
+    @Mock
+    private DynamicListLanguageUtil dynamicListLanguageUtil;
 
     private static final String USER_AUTHORISATION = "Bearer token";
     private AdjournCaseAboutToStartHandler handler;
@@ -61,7 +63,7 @@ class AdjournCaseAboutToStartHandlerTest {
 
     @BeforeEach
     public void setUp() {
-        handler = new AdjournCaseAboutToStartHandler();
+        handler = new AdjournCaseAboutToStartHandler(dynamicListLanguageUtil);
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
                 .appeal(Appeal.builder().build())
@@ -76,14 +78,14 @@ class AdjournCaseAboutToStartHandlerTest {
                 .nextHearingVenue(AdjournCaseNextHearingVenue.SOMEWHERE_ELSE)
                 .nextHearingVenueSelected(new DynamicList("testListItem"))
                 .panelMembersExcluded(AdjournCasePanelMembersExcluded.NO)
-                .disabilityQualifiedPanelMemberName(JudicialUserBase.builder().build())
-                .medicallyQualifiedPanelMemberName(JudicialUserBase.builder().build())
-                .otherPanelMemberName(JudicialUserBase.builder().build())
+                .panelMember1(JudicialUserBase.builder().build())
+                .panelMember2(JudicialUserBase.builder().build())
+                .panelMember3(JudicialUserBase.builder().build())
                 .nextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD)
                 .nextHearingListingDuration(1)
                 .nextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS)
                 .interpreterRequired(NO)
-                .interpreterLanguage("spanish")
+                .interpreterLanguage(new DynamicList("Spanish"))
                 .nextHearingDateType(AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER)
                 .nextHearingDateOrPeriod(AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD)
                 .nextHearingDateOrTime("")
@@ -100,44 +102,40 @@ class AdjournCaseAboutToStartHandlerTest {
     }
 
     @Test
-    void givenCaseHasAdjournedFieldsPopulatedAndNoDraftAdjournedDocs_thenClearTransientFields_andSetAdjournmentInProgressToNoIfFeatureFlagEnabled() {
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true); // TODO SSCS-10951
-
-        handleAboutToStartWithDocumentType(ADJOURNMENT_NOTICE);
-
-        assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrPropertiesExcept("adjournmentInProgress");
-        assertThat(sscsCaseData.getAdjournment().getAdjournmentInProgress()).isEqualTo(NO);
-    }
-
-    @Test
-    void givenCaseHasAdjournedFieldsPopulatedAndNoDraftAdjournedDocs_thenClearTransientFields() { // TODO SSCS-10951
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", false);
-
-        handleAboutToStartWithDocumentType(ADJOURNMENT_NOTICE);
-
-        assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrProperties();
-    }
-
-    @Test
-    void givenCaseHasAdjournedFieldsPopulatedAndDraftAdjournedDocs_thenDoNotClearTransientFields() {
-        handleAboutToStartWithDocumentType(DRAFT_ADJOURNMENT_NOTICE);
-
-        assertThat(sscsCaseData.getAdjournment()).hasNoNullFieldsOrProperties();
-    }
-
-    private void handleAboutToStartWithDocumentType(DocumentType documentType) {
+    void givenCaseHasAdjournedFieldsPopulatedAndNoDraftAdjournedDocs_thenClearTransientFields() {
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         List<SscsDocument> documentList = new ArrayList<>();
 
-        SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(documentType.getValue()).build();
+        SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(ADJOURNMENT_NOTICE.getValue()).build();
         documentList.add(new SscsDocument(details));
 
         sscsCaseData.setSscsDocument(documentList);
 
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrPropertiesExcept("adjournmentInProgress");
+    }
+
+    @Test
+    void givenCaseHasAdjournedFieldsPopulatedAndDraftAdjournedDocs_thenDoNotClearTransientFields() {
+        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        List<SscsDocument> documentList = new ArrayList<>();
+
+        SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(DRAFT_ADJOURNMENT_NOTICE.getValue()).build();
+        documentList.add(new SscsDocument(details));
+
+        sscsCaseData.setSscsDocument(documentList);
+
+        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        Adjournment adjournment = sscsCaseData.getAdjournment();
+        assertThat(adjournment).hasNoNullFieldsOrPropertiesExcept("interpreterLanguage");
     }
 
     @Test

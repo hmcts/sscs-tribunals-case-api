@@ -60,11 +60,11 @@ public class AdjournCaseAboutToSubmitHandlerTest extends BaseHandler {
             .extracting(CollectionItem::getValue)
             .containsOnly("Nothing else");
         assertThat(adjournment.getCanCaseBeListedRightAway()).isEqualTo(YES);
-        assertThat(adjournment.getDisabilityQualifiedPanelMemberName().getIdamId()).isEqualTo("123");
+        assertThat(adjournment.getPanelMember1().getIdamId()).isEqualTo("123");
         assertThat(adjournment.getGenerateNotice()).isEqualTo(YES);
-        assertThat(adjournment.getInterpreterLanguage()).isEqualTo("spanish");
+        assertThat(adjournment.getInterpreterLanguage().getValue().getCode()).isEqualTo("spanish");
         assertThat(adjournment.getInterpreterRequired()).isEqualTo(YES);
-        assertThat(adjournment.getMedicallyQualifiedPanelMemberName().getIdamId()).isEqualTo("1234");
+        assertThat(adjournment.getPanelMember2().getIdamId()).isEqualTo("1234");
         assertThat(adjournment.getNextHearingDateType()).isEqualTo(AdjournCaseNextHearingDateType.DATE_TO_BE_FIXED);
         assertThat(adjournment.getNextHearingListingDuration()).isEqualTo(720);
         assertThat(adjournment.getNextHearingListingDurationType()).isEqualTo(AdjournCaseNextHearingDurationType.STANDARD);
@@ -72,7 +72,7 @@ public class AdjournCaseAboutToSubmitHandlerTest extends BaseHandler {
         assertThat(adjournment.getTime().getAdjournCaseNextHearingSpecificTime()).isEqualTo("am");
         assertThat(adjournment.getNextHearingVenue()).isEqualTo(AdjournCaseNextHearingVenue.SOMEWHERE_ELSE);
         assertThat(adjournment.getNextHearingVenueSelected().getValue().getCode()).isEqualTo("1256");
-        assertThat(adjournment.getOtherPanelMemberName().getIdamId()).isEqualTo("12345");
+        assertThat(adjournment.getPanelMember3().getIdamId()).isEqualTo("12345");
         assertThat(adjournment.getPanelMembersExcluded()).isEqualTo(AdjournCasePanelMembersExcluded.YES);
         assertThat(adjournment.getTypeOfHearing()).isEqualTo(AdjournCaseTypeOfHearing.FACE_TO_FACE);
         assertThat(adjournment.getTypeOfNextHearing()).isEqualTo(AdjournCaseTypeOfHearing.FACE_TO_FACE);

@@ -84,7 +84,7 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             if (sscsCaseData.getAppeal().getHearingOptions() != null) {
                 hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
             }
-            hearingOptions.setLanguages(adjournment.getInterpreterLanguage());
+            hearingOptions.setLanguages(adjournment.getInterpreterLanguage().getValue().getLabel());
             hearingOptions.setLanguageInterpreter(adjournment.getInterpreterRequired().getValue());
 
             sscsCaseData.getAppeal().setHearingOptions(hearingOptions);
@@ -124,7 +124,6 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             if (latestHearing != null && latestHearing.getValue() != null) {
                 final HearingChannel hearingChannel = getNextHearingChannel(sscsCaseData);
                 latestHearing.getValue().setHearingChannel(hearingChannel);
-
                 if (hearingChannel.getValueTribunals().equalsIgnoreCase(PAPER.getValueTribunals())) {
                     sscsCaseData.getAppeal().setHearingType(PAPER.getValueTribunals());
                 } else {
