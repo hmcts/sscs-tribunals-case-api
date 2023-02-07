@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.functional.ccd;
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler.getJsonCallbackForTest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,9 +18,11 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.functional.mya.BaseFunctionTest;
+import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
 
 @Slf4j
 public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
@@ -28,6 +31,9 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
     public static final String WRITE_FINAL_DECISION_CALLBACK_JSON = "handlers/writefinaldecision/writeFinalDecisionCallback.json";
     @Autowired
     protected ObjectMapper objectMapper;
+
+    @Mock
+    JudicialRefDataService judicialRefDataService;
 
     public CcdMidEventControllerFunctionalTest() {
         baseURI = baseUrl;
@@ -90,6 +96,9 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
     @DisplayName("Preview adjourn case should populate adjourn case preview document")
     @Test
     public void testPreviewAdjournCaseGaps() throws IOException {
+        when(judicialRefDataService.getJudicialUserFullName("456"))
+            .thenReturn("Mr Panel Member 1");
+
         HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(getJsonCallbackForTest(
             ADJOURN_CASE_GAPS_CALLBACK_JSON)), "PreviewAdjournCase");
         CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
