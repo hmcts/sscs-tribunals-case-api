@@ -2,8 +2,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +17,11 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 
@@ -51,17 +56,31 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        State state = callback.getCaseDetails().getState();
-        HearingRoute hearingRoute = sscsCaseData.getSchedulingAndListingFields().getHearingRoute();
+        SchedulingAndListingFields callbackSNLFields = callbackResponse.getData().getSchedulingAndListingFields();
+        ReserveTo callbackReserveTo = callbackSNLFields.getReserveTo();
+        boolean emptyReservedJudge = isEmpty(callbackReserveTo.getReservedJudge().getIdamId())
+            && isEmpty(callbackReserveTo.getReservedJudge().getPersonalCode());
 
+        YesNo callbackReservedDTJ = callbackReserveTo.getReservedDistrictTribunalJudge();
+        if (isYes(callbackReservedDTJ) && !emptyReservedJudge) {
+            callbackResponse.addError(
+                "Reserved Judge field is not applicable as case is reserved to a District Tribunal Judge");
+        }
+
+        SchedulingAndListingFields caseDataSNLFields = sscsCaseData.getSchedulingAndListingFields();
+        caseDataSNLFields.getReserveTo().setReservedDistrictTribunalJudge(callbackReservedDTJ);
+
+        State state = callback.getCaseDetails().getState();
+        HearingRoute hearingRoute = caseDataSNLFields.getHearingRoute();
         if (gapsSwitchOverFeature
             && state == State.READY_TO_LIST
             && hearingRoute == LIST_ASSIST
-            && nonNull(sscsCaseData.getSchedulingAndListingFields().getOverrideFields())) {
+            && nonNull(caseDataSNLFields.getOverrideFields())
+        ) {
             String caseId = sscsCaseData.getCcdCaseId();
             log.info("UpdateListingRequirements List Assist request, Update Hearing,"
                     + "amend reasons: {}, for case ID: {}",
-                sscsCaseData.getSchedulingAndListingFields().getAmendReasons(), caseId);
+                caseDataSNLFields.getAmendReasons(), caseId);
 
             HearingState hearingState = UPDATE_HEARING;
 
@@ -72,7 +91,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 null);
 
             if (messageSuccess) {
-                sscsCaseData.getSchedulingAndListingFields().setHearingState(hearingState);
+                caseDataSNLFields.setHearingState(hearingState);
             } else {
                 callbackResponse.addError("An error occurred during message publish. Please try again.");
             }
