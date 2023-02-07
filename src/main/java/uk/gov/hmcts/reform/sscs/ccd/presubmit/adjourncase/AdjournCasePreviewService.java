@@ -351,7 +351,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
         names.addAll(panelMembers.stream()
             .filter(Objects::nonNull)
-            .map(JudicialUserBase::getPersonalCode)
+            .map(panelMember -> judicialRefDataService.getJudicialUserFullName(panelMember.getPersonalCode()))
             .collect(Collectors.toList()));
 
         return StringUtils.getGramaticallyJoinedStrings(names);
