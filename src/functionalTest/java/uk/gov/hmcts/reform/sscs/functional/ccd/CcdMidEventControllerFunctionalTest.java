@@ -96,7 +96,7 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
     @DisplayName("Preview adjourn case should populate adjourn case preview document")
     @Test
     public void testPreviewAdjournCaseGaps() throws IOException {
-        when(judicialRefDataService.getJudicialUserFullName("456"))
+        when(judicialRefDataService.getJudicialUserFullName("49933315"))
             .thenReturn("Mr Panel Member 1");
 
         HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(getJsonCallbackForTest(
