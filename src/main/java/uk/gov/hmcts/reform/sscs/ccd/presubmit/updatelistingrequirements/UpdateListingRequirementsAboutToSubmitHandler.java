@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -46,8 +47,9 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType,
-                                                          Callback<SscsCaseData> callback,
-                                                          String userAuthorisation) {
+        Callback<SscsCaseData> callback,
+        String userAuthorisation
+    ) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -56,31 +58,32 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        SchedulingAndListingFields callbackSNLFields = callbackResponse.getData().getSchedulingAndListingFields();
-        ReserveTo callbackReserveTo = callbackSNLFields.getReserveTo();
-        boolean emptyReservedJudge = isEmpty(callbackReserveTo.getReservedJudge().getIdamId())
-            && isEmpty(callbackReserveTo.getReservedJudge().getPersonalCode());
+        ReserveTo callbackReserveTo = callbackResponse.getData().getSchedulingAndListingFields().getReserveTo();
+        SchedulingAndListingFields caseDataSnlFields = sscsCaseData.getSchedulingAndListingFields();
 
-        YesNo callbackReservedDTJ = callbackReserveTo.getReservedDistrictTribunalJudge();
-        if (isYes(callbackReservedDTJ) && !emptyReservedJudge) {
-            callbackResponse.addError(
-                "Reserved Judge field is not applicable as case is reserved to a District Tribunal Judge");
+        if (nonNull(callbackReserveTo)) {
+            boolean emptyReservedJudge = isNull(callbackReserveTo.getReservedJudge())
+                || (isEmpty(callbackReserveTo.getReservedJudge().getIdamId()) && isEmpty(callbackReserveTo.getReservedJudge().getPersonalCode()));
+
+            YesNo callbackReservedDtj = callbackReserveTo.getReservedDistrictTribunalJudge();
+            if (isYes(callbackReservedDtj) && !emptyReservedJudge) {
+                callbackResponse.addError(
+                    "Reserved Judge field is not applicable as case is reserved to a District Tribunal Judge");
+            }
+            caseDataSnlFields.getReserveTo().setReservedDistrictTribunalJudge(callbackReservedDtj);
         }
 
-        SchedulingAndListingFields caseDataSNLFields = sscsCaseData.getSchedulingAndListingFields();
-        caseDataSNLFields.getReserveTo().setReservedDistrictTribunalJudge(callbackReservedDTJ);
-
         State state = callback.getCaseDetails().getState();
-        HearingRoute hearingRoute = caseDataSNLFields.getHearingRoute();
+        HearingRoute hearingRoute = caseDataSnlFields.getHearingRoute();
         if (gapsSwitchOverFeature
             && state == State.READY_TO_LIST
             && hearingRoute == LIST_ASSIST
-            && nonNull(caseDataSNLFields.getOverrideFields())
+            && nonNull(caseDataSnlFields.getOverrideFields())
         ) {
             String caseId = sscsCaseData.getCcdCaseId();
             log.info("UpdateListingRequirements List Assist request, Update Hearing,"
                     + "amend reasons: {}, for case ID: {}",
-                caseDataSNLFields.getAmendReasons(), caseId);
+                caseDataSnlFields.getAmendReasons(), caseId);
 
             HearingState hearingState = UPDATE_HEARING;
 
@@ -91,7 +94,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 null);
 
             if (messageSuccess) {
-                caseDataSNLFields.setHearingState(hearingState);
+                caseDataSnlFields.setHearingState(hearingState);
             } else {
                 callbackResponse.addError("An error occurred during message publish. Please try again.");
             }

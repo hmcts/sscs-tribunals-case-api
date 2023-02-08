@@ -11,6 +11,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,10 +29,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UpdateListingRequirementsAboutToSubmitHandlerTest {
@@ -161,5 +165,67 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
             USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void reservedDistrictTribunalJudge_Yes() {
+        ReserveTo reserveTo = new ReserveTo();
+        reserveTo.setReservedDistrictTribunalJudge(YES);
+        reserveTo.setReservedJudge(new JudicialUserBase("", ""));
+        sscsCaseData.getSchedulingAndListingFields().setReserveTo(reserveTo);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getData().getSchedulingAndListingFields().getReserveTo().getReservedDistrictTribunalJudge()).isEqualTo(YES);
+    }
+
+    @Test
+    public void reservedDistrictTribunalJudge_No() {
+        ReserveTo reserveTo = new ReserveTo();
+        reserveTo.setReservedDistrictTribunalJudge(NO);
+        reserveTo.setReservedJudge(new JudicialUserBase("", ""));
+        sscsCaseData.getSchedulingAndListingFields().setReserveTo(reserveTo);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getData().getSchedulingAndListingFields().getReserveTo().getReservedDistrictTribunalJudge()).isEqualTo(NO);
+    }
+
+    @Test
+    public void reservedDistrictTribunalJudge_null() {
+        ReserveTo reserveTo = new ReserveTo();
+        reserveTo.setReservedDistrictTribunalJudge(null);
+        reserveTo.setReservedJudge(new JudicialUserBase("", ""));
+        sscsCaseData.getSchedulingAndListingFields().setReserveTo(reserveTo);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getData().getSchedulingAndListingFields().getReserveTo().getReservedDistrictTribunalJudge()).isNull();
+    }
+
+    @Test
+    public void reservedDistrictTribunalJudge_throwsException() {
+        ReserveTo reserveTo = new ReserveTo();
+        reserveTo.setReservedDistrictTribunalJudge(YES);
+        reserveTo.setReservedJudge(new JudicialUserBase("123", "456"));
+        sscsCaseData.getSchedulingAndListingFields().setReserveTo(reserveTo);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors())
+            .hasSize(1)
+            .containsOnly("Reserved Judge field is not applicable as case is reserved to a District Tribunal Judge");
     }
 }
