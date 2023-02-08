@@ -12,30 +12,25 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 
 @Component
 @RequiredArgsConstructor
-public class UpdateListingRequirementsUtil {
+public class DynamicListLanguageUtil {
     private final SignLanguagesService signLanguagesService;
     private final VerbalLanguagesService verbalLanguagesService;
 
-    public void generateInterpreterLanguageFields(OverrideFields overrideFields) {
-        if (isNull(overrideFields.getAppellantInterpreter())
-            || isNull(overrideFields.getAppellantInterpreter().getInterpreterLanguage())) {
-            overrideFields.setAppellantInterpreter(HearingInterpreter.builder()
-                .interpreterLanguage(new DynamicList(null, null))
-                .build());
+    public DynamicList generateInterpreterLanguageFields(DynamicList list) {
+        if (isNull(list)) {
+            list = new DynamicList(null, null);
         }
 
         List<DynamicListItem> interpreterLanguage = generateInterpreterLanguage();
 
-        overrideFields.getAppellantInterpreter().getInterpreterLanguage()
-            .setListItems(interpreterLanguage);
+        list.setListItems(interpreterLanguage);
+        return list;
     }
 
     @NotNull
