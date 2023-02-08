@@ -25,7 +25,7 @@ public class UserDetailsService {
         return userDetails.getSurname().orElse("");
     }
 
-    protected UserDetails getUserDetails(String userAuthorisation) throws IllegalStateException {
+    private UserDetails getUserDetails(String userAuthorisation) throws IllegalStateException {
         UserDetails userDetails = idamClient.getUserDetails(userAuthorisation);
         if (userDetails == null) {
             throw new IllegalStateException("Unable to obtain signed in user details");
