@@ -60,6 +60,7 @@ public class IssueDocumentHandler {
                 .userRole(caseData.getDocumentGeneration().getSignedRole())
                 .dateAdded(dateAdded)
                 .generatedDate(generatedDate)
+                .idamSurname(caseData.getDocumentGeneration().getSignedBy())
                 .build();
 
         if (isScottish) {
