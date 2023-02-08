@@ -1,12 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,14 +59,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
         SchedulingAndListingFields caseDataSnlFields = sscsCaseData.getSchedulingAndListingFields();
 
         if (nonNull(callbackReserveTo)) {
-            boolean emptyReservedJudge = isNull(callbackReserveTo.getReservedJudge())
-                || (isEmpty(callbackReserveTo.getReservedJudge().getIdamId()) && isEmpty(callbackReserveTo.getReservedJudge().getPersonalCode()));
-
             YesNo callbackReservedDtj = callbackReserveTo.getReservedDistrictTribunalJudge();
-            if (isYes(callbackReservedDtj) && !emptyReservedJudge) {
-                callbackResponse.addError(
-                    "Reserved Judge field is not applicable as case is reserved to a District Tribunal Judge");
-            }
             caseDataSnlFields.getReserveTo().setReservedDistrictTribunalJudge(callbackReservedDtj);
         }
 

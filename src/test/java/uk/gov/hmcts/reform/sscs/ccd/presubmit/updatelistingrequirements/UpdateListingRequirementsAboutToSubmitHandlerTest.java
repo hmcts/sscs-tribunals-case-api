@@ -9,16 +9,12 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -214,33 +210,4 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             .isEqualTo(reservedDtj);
     }
 
-    @ParameterizedTest
-    @MethodSource("reservedJudgeProvider")
-    void givenReservedDistrictTribunalJudgeIsYes_andReservedJudgeIsNotEmpty_throwsException(JudicialUserBase reservedJudge) {
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-        ReserveTo reserveTo = new ReserveTo();
-        reserveTo.setReservedDistrictTribunalJudge(YES);
-        reserveTo.setReservedJudge(reservedJudge);
-        sscsCaseData.getSchedulingAndListingFields().setReserveTo(reserveTo);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-            ABOUT_TO_SUBMIT,
-            callback,
-            USER_AUTHORISATION);
-
-        assertThat(response.getErrors())
-            .hasSize(1)
-            .containsOnly("Reserved Judge field is not applicable as case is reserved to a District Tribunal Judge");
-    }
-
-    static Stream<Arguments> reservedJudgeProvider() {
-        return Stream.of(
-            Arguments.of(new JudicialUserBase("123", "")),
-            Arguments.of(new JudicialUserBase("", "abc")),
-            Arguments.of(new JudicialUserBase("123", "abc"))
-        );
-    }
 }
