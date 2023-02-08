@@ -3,10 +3,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.SET_ASIDE_APPLICATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REVIEW;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
@@ -17,7 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -51,11 +51,8 @@ class PostHearingReviewAboutToSubmitHandlerTest {
 
     @Mock
     private FooterService footerService;
+
     private SscsCaseData caseData;
-
-    private SscsDocument expectedDocument;
-
-    private DocumentType documentType;
 
     @BeforeEach
     void setUp() {
@@ -103,7 +100,6 @@ class PostHearingReviewAboutToSubmitHandlerTest {
 
     @Test
     void shouldReturnWithoutError() {
-
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
@@ -114,73 +110,66 @@ class PostHearingReviewAboutToSubmitHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = PostHearingReviewType.class, names = {"SET_ASIDE"})
-    public void givenPostHearingWithGivenReviewType_thenRespectiveDocTypeShouldBeAdded(PostHearingReviewType reviewType) {
-        switch (reviewType) {
-            case SET_ASIDE:
-                documentType = SET_ASIDE_APPLICATION;
-                break;
-            default:
-                documentType = null;
-        }
-
-        DocumentLink previewDoc =  caseData.getDocumentStaging().getPreviewDocument();
-        String docFileName = previewDoc.getDocumentFilename();
-        String dateAddedStr = LocalDate.now().minusDays(1).toString();
-        expectedDocument = SscsDocument.builder()
-            .value(SscsDocumentDetails.builder()
-                .documentFileName(docFileName)
-                .documentLink(previewDoc)
-                .documentDateAdded(dateAddedStr)
-                .documentType(documentType.getValue())
-                .build()).build();
-
+    @CsvSource(value = {
+        "SET_ASIDE,SET_ASIDE_APPLICATION"
+    })
+    void givenPostHearingWithGivenReviewType_thenRespectiveDocTypeShouldBeAdded(
+        PostHearingReviewType reviewType,
+        DocumentType documentType
+    ) {
         caseData.getPostHearing().setReviewType(reviewType);
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response =
-            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
-            eq(documentType), any(),  eq(null), eq(null), eq(null));
-
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = PostHearingReviewType.class, names = {"SET_ASIDE"})
-    public void givenPostHearingWithGivenReviewTypeAndWithWelshPreference_thenRespectiveDocTypeShouldBeAddedWithTranslation(PostHearingReviewType reviewType) {
-        switch (reviewType) {
-            case SET_ASIDE:
-                documentType = SET_ASIDE_APPLICATION;
-                break;
-            default:
-                documentType = null;
-        }
-
         DocumentLink previewDoc =  caseData.getDocumentStaging().getPreviewDocument();
         String docFileName = previewDoc.getDocumentFilename();
         String dateAddedStr = LocalDate.now().minusDays(1).toString();
-        expectedDocument = SscsDocument.builder()
+        SscsDocument expectedDocument = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentFileName(docFileName)
                 .documentLink(previewDoc)
                 .documentDateAdded(dateAddedStr)
                 .documentType(documentType.getValue())
-                .build()).build();
+                .build())
+            .build();
 
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
+            eq(documentType), any(),  eq(null), eq(null), eq(null));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+        "SET_ASIDE,SET_ASIDE_APPLICATION"
+    })
+    void givenPostHearingWithGivenReviewTypeAndWithWelshPreference_thenRespectiveDocTypeShouldBeAddedWithTranslation(
+        PostHearingReviewType reviewType,
+        DocumentType documentType
+    ) {
         caseData.setLanguagePreferenceWelsh("YES");
         caseData.getPostHearing().setReviewType(reviewType);
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response =
-            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        DocumentLink previewDoc =  caseData.getDocumentStaging().getPreviewDocument();
+        String docFileName = previewDoc.getDocumentFilename();
+        String dateAddedStr = LocalDate.now().minusDays(1).toString();
+        SscsDocument expectedDocument = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentFileName(docFileName)
+                .documentLink(previewDoc)
+                .documentDateAdded(dateAddedStr)
+                .documentType(documentType.getValue())
+                .build())
+            .build();
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
             eq(documentType), any(),  eq(null), eq(null), eq(TRANSLATION_REQUIRED));
-
     }
+
 }
