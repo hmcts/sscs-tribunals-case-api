@@ -20,7 +20,7 @@
       "adjournCaseInterpreterRequired": "Yes",
       "adjournCasePanelMember2": {
         "idamId": "1234",
-        "personalCode": "4567"
+        "personalCode": "49933315"
       },
       "adjournCaseNextHearingDateType": "dateToBeFixed",
       "adjournCaseNextHearingListingDuration": 720,
@@ -48,7 +48,7 @@
       },
       "adjournCasePanelMember3": {
         "idamId": "12345",
-        "personalCode": "45678"
+        "personalCode": "49933315"
       },
       "adjournCasePanelMembersExcluded": "Yes",
       "adjournCasePreviewDocument": {
