@@ -4,6 +4,7 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +61,13 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
         if (nonNull(callbackReserveTo)) {
             YesNo callbackReservedDtj = callbackReserveTo.getReservedDistrictTribunalJudge();
-            caseDataSnlFields.getReserveTo().setReservedDistrictTribunalJudge(callbackReservedDtj);
+            ReserveTo caseDataReserveTo = caseDataSnlFields.getReserveTo();
+            caseDataReserveTo.setReservedDistrictTribunalJudge(callbackReservedDtj);
+            if (isNoOrNull(callbackReservedDtj)) {
+                // TODO save callbackReserveTo.getReservedJudge() to caseDataReserveTo SSCS-11395
+            } else {
+                caseDataReserveTo.setReservedJudge(null);
+            }
         }
 
         State state = callback.getCaseDetails().getState();

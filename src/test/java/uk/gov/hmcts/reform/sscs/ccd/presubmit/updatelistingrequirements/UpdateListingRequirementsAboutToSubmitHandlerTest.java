@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -190,14 +191,13 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     @ParameterizedTest
     @EnumSource(value = YesNo.class)
     @NullSource
-    void reservedDistrictTribunalJudge(YesNo reservedDtj) {
+    void reservedDistrictTribunalJudge_savesSelectionToCaseData(YesNo reservedDtj) {
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
         given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
         ReserveTo reserveTo = new ReserveTo();
         reserveTo.setReservedDistrictTribunalJudge(reservedDtj);
-        reserveTo.setReservedJudge(new JudicialUserBase("", ""));
         sscsCaseData.getSchedulingAndListingFields().setReserveTo(reserveTo);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
@@ -206,8 +206,29 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-        assertThat(response.getData().getSchedulingAndListingFields().getReserveTo().getReservedDistrictTribunalJudge())
-            .isEqualTo(reservedDtj);
+        YesNo result = response.getData().getSchedulingAndListingFields().getReserveTo().getReservedDistrictTribunalJudge();
+        assertThat(result).isEqualTo(reservedDtj);
+    }
+
+    @Test
+    void givenReservedDistrictTribunalJudgeIsYesAndReservedJudgeIsNotNull_responseReservedJudgeIsNull() {
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
+        ReserveTo reserveTo = new ReserveTo();
+        reserveTo.setReservedDistrictTribunalJudge(YES);
+        reserveTo.setReservedJudge(new JudicialUserBase("1", "2"));
+        sscsCaseData.getSchedulingAndListingFields().setReserveTo(reserveTo);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        JudicialUserBase result = response.getData().getSchedulingAndListingFields().getReserveTo().getReservedJudge();
+        assertThat(result).isNull();
     }
 
 }
