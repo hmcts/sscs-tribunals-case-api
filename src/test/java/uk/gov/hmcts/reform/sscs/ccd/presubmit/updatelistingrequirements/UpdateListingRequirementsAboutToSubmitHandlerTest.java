@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
-import java.util.stream.Stream;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -13,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
