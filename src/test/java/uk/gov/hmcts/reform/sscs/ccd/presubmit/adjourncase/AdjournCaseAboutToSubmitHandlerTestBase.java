@@ -5,6 +5,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,9 +20,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 
 @ExtendWith(MockitoExtension.class)
@@ -82,6 +86,18 @@ abstract class AdjournCaseAboutToSubmitHandlerTestBase {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
         sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
         sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(YES);
+
+        return handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+    }
+
+    protected PreSubmitCallbackResponse<SscsCaseData> panelMembersGetExcluded() {
+        sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
+            .excludedPanelMembers(new ArrayList<>(Arrays.asList(JudicialUserBase.builder().idamId("1").build(), JudicialUserBase.builder().idamId("2").build()))).build());
+        sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.YES);
+        sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().idamId("1").build());
+        sscsCaseData.getAdjournment().setPanelMember3(JudicialUserBase.builder().idamId("3").build());
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
+        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
 
         return handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
