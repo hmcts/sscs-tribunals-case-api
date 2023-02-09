@@ -13,6 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
@@ -51,6 +53,8 @@ abstract class AdjournCaseAboutToSubmitHandlerTestBase {
         ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
+            .adjournment(Adjournment.builder()
+                .panelMembersExcluded(AdjournCasePanelMembersExcluded.NO).build())
             .appeal(Appeal.builder().build())
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
                 .hearingRoute(HearingRoute.GAPS)
