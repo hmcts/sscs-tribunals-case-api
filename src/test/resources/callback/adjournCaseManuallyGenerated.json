@@ -738,6 +738,7 @@
     "security_classification": "PUBLIC",
     "case_data": {
       "adjournCaseGenerateNotice" : "Yes",
+      "adjournCasePanelMembersExcluded" : "No",
       "adjournCaseTypeOfHearing" : "video",
       "adjournCaseCanCaseBeListedRightAway" : "No",
       "adjournCaseAreDirectionsBeingMadeToParties" : "Yes",
