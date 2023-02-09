@@ -162,7 +162,7 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
                 PanelMemberExclusions exclusions = caseData.getSchedulingAndListingFields().getPanelMemberExclusions();
                 List<JudicialUserBase> panelMemberExclusions = exclusions.getExcludedPanelMembers();
 
-                if (isEmpty(panelMemberExclusions.isEmpty())) {
+                if (isEmpty(panelMemberExclusions)) {
                     exclusions.setExcludedPanelMembers(panelMembers);
                 } else {
                     panelMemberExclusions.addAll(panelMembers.stream()
