@@ -26,7 +26,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: elastic.enabled
   - name: sscs-evidence-share
-    version: 0.0.45
+    version: 0.0.46
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-evidence-share.enabled
   - name: sscs-ccd-callback-orchestrator
