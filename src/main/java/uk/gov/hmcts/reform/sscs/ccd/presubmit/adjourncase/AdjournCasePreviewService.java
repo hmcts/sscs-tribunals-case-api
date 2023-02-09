@@ -7,9 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -343,14 +341,9 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         }
         names.add(signedInJudgeName);
 
-        Adjournment adjournment = caseData.getAdjournment();
-
-        List<JudicialUserBase> panelMembers = Arrays.asList(adjournment.getPanelMember1(),
-            adjournment.getPanelMember2(),
-            adjournment.getPanelMember3());
+        List<JudicialUserBase> panelMembers = caseData.getAdjournment().getPanelMembers();
 
         names.addAll(panelMembers.stream()
-            .filter(Objects::nonNull)
             .map(panelMember -> judicialRefDataService.getJudicialUserFullName(panelMember.getPersonalCode()))
             .collect(Collectors.toList()));
 
