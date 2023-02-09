@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static java.util.Objects.nonNull;
 import static java.util.function.Predicate.not;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
@@ -161,9 +162,13 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
                 PanelMemberExclusions exclusions = caseData.getSchedulingAndListingFields().getPanelMemberExclusions();
                 List<JudicialUserBase> panelMemberExclusions = exclusions.getExcludedPanelMembers();
 
-                panelMemberExclusions.addAll(panelMembers.stream()
-                    .filter(not(panelMemberExclusions::contains))
-                    .collect(Collectors.toList()));
+                if (isEmpty(panelMemberExclusions.isEmpty())) {
+                    exclusions.setExcludedPanelMembers(panelMembers);
+                } else {
+                    panelMemberExclusions.addAll(panelMembers.stream()
+                        .filter(not(panelMemberExclusions::contains))
+                        .collect(Collectors.toList()));
+                }
 
                 exclusions.setArePanelMembersExcluded(YES);
             }
