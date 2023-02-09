@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static java.util.Objects.nonNull;
+import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
@@ -24,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -156,11 +158,14 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             List<JudicialUserBase> panelMembers = adjournment.getPanelMembers();
 
             if (nonNull(panelMembers)) {
-                List<JudicialUserBase> panelMemberExclusions = caseData.getSchedulingAndListingFields()
-                    .getPanelMemberExclusions().getExcludedPanelMembers();
+                PanelMemberExclusions exclusions = caseData.getSchedulingAndListingFields().getPanelMemberExclusions();
+                List<JudicialUserBase> panelMemberExclusions = exclusions.getExcludedPanelMembers();
 
                 panelMemberExclusions.addAll(panelMembers.stream()
-                    .filter(panelMemberExclusions::contains).collect(Collectors.toList()));
+                    .filter(not(panelMemberExclusions::contains))
+                    .collect(Collectors.toList()));
+
+                exclusions.setArePanelMembersExcluded(YES);
             }
         }
     }

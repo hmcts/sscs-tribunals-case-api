@@ -134,4 +134,13 @@ class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHa
         assertThat(response.getErrors()).isEmpty();
     }
 
+    @DisplayName("When we have written an adjournment notice and excluded some panel members, add them "
+        + "to the excluded panel members list")
+    @Test
+    void givenPanelMembersExcluded_thenAddPanelMembersToExclusionList() {
+        panelMembersGetExcluded();
+
+        assertThat(sscsCaseData.getSchedulingAndListingFields().getPanelMemberExclusions().getExcludedPanelMembers()).hasSize(3);
+    }
+
 }
