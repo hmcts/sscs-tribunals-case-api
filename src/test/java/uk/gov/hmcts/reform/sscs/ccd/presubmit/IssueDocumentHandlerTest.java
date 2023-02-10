@@ -169,6 +169,22 @@ public class IssueDocumentHandlerTest {
     }
 
     @Test
+    public void givenSetAsideStateRefused_thenReturnSetAsideDecisionNotice() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .ccdCaseId("1")
+            .postHearing(PostHearing.builder()
+                .setAside(SetAside.builder()
+                    .action(SetAsideActions.REFUSE)
+                    .build())
+                .build())
+            .build();
+
+        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, "adfdsf2");
+
+        assertEquals("Set Aside Decision Notice", documentTypeLabel);
+    }
+
+    @Test
     public void givenSetAsideStateIsNull_thenReturnDraftDecisionNotice() {
         String expectedDefaultDocumentLabel = "Draft Decision Notice";
         SscsCaseData sscsCaseData = SscsCaseData.builder()
