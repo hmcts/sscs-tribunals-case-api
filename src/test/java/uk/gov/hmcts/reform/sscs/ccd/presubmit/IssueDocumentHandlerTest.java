@@ -150,7 +150,7 @@ public class IssueDocumentHandlerTest {
     }
 
     @Test
-    public void givenSetAsideState_thenReturnSetAsideDicisionNotice() {
+    public void givenSetAsideState_thenReturnSetAsideDecisionNotice() {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("1")
             .postHearing(PostHearing.builder()
@@ -166,14 +166,44 @@ public class IssueDocumentHandlerTest {
     }
 
     @Test
+    public void givenSetAsideStateRefused_thenReturnSetAsideDecisionNotice() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .ccdCaseId("1")
+            .postHearing(PostHearing.builder()
+                .setAside(SetAside.builder()
+                    .action(SetAsideActions.REFUSE)
+                    .build())
+                .build())
+            .build();
+
+        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, "adfdsf2");
+
+        assertEquals("Set Aside Decision Notice", documentTypeLabel);
+    }
+
+    @Test
     public void givenSetAsideStateIsNull_thenReturnDraftDecisionNotice() {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
-                .ccdCaseId("1")
-                .postHearing(PostHearing.builder()
-                   .build())
-                .build();
+            .ccdCaseId("1")
+            .postHearing(PostHearing.builder()
+                .setAside(SetAside.builder()
+                    .action(null)
+                    .build())
+               .build())
+            .build();
 
         String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, "Draft Decision Notice");
         assertEquals("Draft Decision Notice", documentTypeLabel);
     }
+
+    @Test
+    public void givenHearingIsNull_thenReturnDraftDecisionNotice() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .ccdCaseId("1")
+            .build();
+
+        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, "Draft Decision Notice");
+        assertEquals("Draft Decision Notice", documentTypeLabel);
+    }
+
 }
