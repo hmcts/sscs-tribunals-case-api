@@ -13,6 +13,7 @@ import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Respondent;
@@ -146,5 +147,33 @@ public class IssueDocumentHandlerTest {
         assertEquals(localDate, payload.getDateAdded());
         assertEquals(localDate, payload.getGeneratedDate());
         assertEquals("Barry Allen", payload.getIdamSurname());
+    }
+
+    @Test
+    public void givenSetAsideState_thenReturnSetAsideDicisionNotice() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .ccdCaseId("1")
+            .postHearing(PostHearing.builder()
+                .setAside(SetAside.builder()
+                    .action(SetAsideActions.GRANT)
+                    .build())
+                .build())
+            .build();
+
+        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, "adfdsf2");
+
+        assertEquals("Set Aside Decision Notice", documentTypeLabel);
+    }
+
+    @Test
+    public void givenSetAsideStateIsNull_thenReturnDraftDecisionNotice() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+                .ccdCaseId("1")
+                .postHearing(PostHearing.builder()
+                   .build())
+                .build();
+
+        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, "Draft Decision Notice");
+        assertEquals("Draft Decision Notice", documentTypeLabel);
     }
 }
