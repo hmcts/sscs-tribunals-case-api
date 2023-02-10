@@ -2,7 +2,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
 
 import java.time.LocalDate;
@@ -87,13 +90,11 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             DynamicList interpreterLanguage = adjournment.getInterpreterLanguage();
             hearingOptions.setLanguages(nonNull(interpreterLanguage.getValue()) ? interpreterLanguage.getValue().getLabel() : NO.getValue());
             hearingOptions.setLanguageInterpreter(adjournment.getInterpreterRequired().getValue());
-
-            sscsCaseData.getAppeal().setHearingOptions(hearingOptions);
         } else {
             hearingOptions.setLanguages(null);
             hearingOptions.setLanguageInterpreter(NO.getValue());
-            sscsCaseData.getAppeal().setHearingOptions(hearingOptions);
         }
+        sscsCaseData.getAppeal().setHearingOptions(hearingOptions);
 
         if (nonNull(adjournment.getNextHearingVenueSelected())) {
             String venueId = adjournment.getNextHearingVenueSelected().getValue().getCode();
