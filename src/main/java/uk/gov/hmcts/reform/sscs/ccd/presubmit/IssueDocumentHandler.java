@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Respondent;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
+
 
 @Slf4j
 public class IssueDocumentHandler {
@@ -122,8 +124,7 @@ public class IssueDocumentHandler {
 
         String documentTypeLabel = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
 
-        String embeddedDocumentTypeLabel = (FINAL_DECISION_NOTICE.equals(documentType) ? "Decision Notice" : documentTypeLabel);
-
+        String embeddedDocumentTypeLabel = getDocumentTypeLabel(caseData, documentType, documentTypeLabel);
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
@@ -158,6 +159,21 @@ public class IssueDocumentHandler {
         setDocumentOnCaseData(caseData, previewFile);
 
         return response;
+    }
+
+    protected String getDocumentTypeLabel(SscsCaseData caseData, DocumentType documentType, String documentTypeLabel) {
+
+        String embeddedDocumentTypeLabel = (FINAL_DECISION_NOTICE.equals(documentType) ? "Decision Notice" : documentTypeLabel);
+
+        PostHearing postHearing = caseData.getPostHearing();
+        if (nonNull(postHearing) && nonNull(postHearing.getSetAside().getAction())) {
+            CcdCallbackMap action = postHearing.getSetAside().getAction();
+            if (action.toString().equals(SetAsideActions.GRANT.getCcdDefinition())
+                || action.toString().equals(SetAsideActions.REFUSE.getCcdDefinition())) {
+                embeddedDocumentTypeLabel = "Set Aside Decision Notice";
+            }
+        }
+        return embeddedDocumentTypeLabel;
     }
 
     /**
