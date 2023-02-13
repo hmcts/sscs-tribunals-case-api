@@ -154,8 +154,8 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
 
     private void updateExcludedPanelMembers(SscsCaseData caseData) {
         Adjournment adjournment = caseData.getAdjournment();
-
-        if (adjournment.getPanelMembersExcluded().equals(AdjournCasePanelMembersExcluded.YES)) {
+        if (nonNull(adjournment.getPanelMembersExcluded())
+            && adjournment.getPanelMembersExcluded().equals(AdjournCasePanelMembersExcluded.YES)) {
             List<JudicialUserBase> panelMembers = adjournment.getPanelMembers();
 
             if (nonNull(panelMembers)) {
@@ -170,7 +170,7 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
                         .collect(Collectors.toList()));
                 }
 
-                exclusions.setArePanelMembersExcluded(YES);
+                exclusions.setArePanelMembersExclusions(YES);
             }
         }
     }
