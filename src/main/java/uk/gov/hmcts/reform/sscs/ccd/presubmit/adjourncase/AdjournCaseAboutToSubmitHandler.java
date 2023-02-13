@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static java.util.Objects.nonNull;
-import static java.util.function.Predicate.not;
-import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
@@ -12,8 +10,6 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.excludePanelMembers;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,12 +23,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
-import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
