@@ -90,15 +90,18 @@ abstract class AdjournCaseAboutToSubmitHandlerTestBase {
         return handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 
-    protected PreSubmitCallbackResponse<SscsCaseData> panelMembersGetExcluded() {
-        sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
-            .excludedPanelMembers(new ArrayList<>(Arrays.asList(JudicialUserBase.builder().idamId("1").build(), JudicialUserBase.builder().idamId("2").build()))).build());
+    protected void panelMembersGetExcluded(boolean areExistingExclusions) {
+        if (areExistingExclusions) {
+            sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
+                .excludedPanelMembers(new ArrayList<>(Arrays.asList(JudicialUserBase.builder().idamId("1").build(), JudicialUserBase.builder().idamId("2").build()))).build());
+        }
+
         sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.YES);
         sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().idamId("1").build());
         sscsCaseData.getAdjournment().setPanelMember3(JudicialUserBase.builder().idamId("3").build());
         sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
         sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
 
-        return handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 }
