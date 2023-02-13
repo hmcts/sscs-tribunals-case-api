@@ -111,7 +111,7 @@ public class SscsUtil {
                     .collect(Collectors.toList()));
             }
 
-            exclusions.setArePanelMembersExclusions(YES);
+            exclusions.setArePanelMembersExcluded(YES);
         }
     }
 }
