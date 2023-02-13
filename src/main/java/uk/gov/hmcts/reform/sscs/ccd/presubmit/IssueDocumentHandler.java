@@ -168,10 +168,9 @@ public class IssueDocumentHandler {
         PostHearing postHearing = caseData.getPostHearing();
         if (nonNull(postHearing) && nonNull(postHearing.getSetAside().getAction())) {
             CcdCallbackMap action = postHearing.getSetAside().getAction();
-            if (action.toString().equals(SetAsideActions.GRANT.getCcdDefinition())
-                || action.toString().equals(SetAsideActions.REFUSE.getCcdDefinition())) {
-                embeddedDocumentTypeLabel = "Set Aside Decision Notice";
-            }
+            boolean isGrantOrRefuseSetAsideAction = action.toString().equals(SetAsideActions.GRANT.getCcdDefinition())
+                || action.toString().equals(SetAsideActions.REFUSE.getCcdDefinition());
+            embeddedDocumentTypeLabel =  isGrantOrRefuseSetAsideAction ? "Set Aside Decision Notice" : embeddedDocumentTypeLabel;
         }
         return embeddedDocumentTypeLabel;
     }
