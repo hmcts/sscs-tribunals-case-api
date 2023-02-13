@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.excludePanelMembers;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -152,26 +153,11 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
                 .findFirst().orElse(HearingChannel.PAPER);
     }
 
-    private void updateExcludedPanelMembers(SscsCaseData caseData) {
+    private static void updateExcludedPanelMembers(SscsCaseData caseData) {
         Adjournment adjournment = caseData.getAdjournment();
         if (nonNull(adjournment.getPanelMembersExcluded())
             && adjournment.getPanelMembersExcluded().equals(AdjournCasePanelMembersExcluded.YES)) {
-            List<JudicialUserBase> panelMembers = adjournment.getPanelMembers();
-
-            if (nonNull(panelMembers)) {
-                PanelMemberExclusions exclusions = caseData.getSchedulingAndListingFields().getPanelMemberExclusions();
-                List<JudicialUserBase> panelMemberExclusions = exclusions.getExcludedPanelMembers();
-
-                if (isEmpty(panelMemberExclusions)) {
-                    exclusions.setExcludedPanelMembers(panelMembers);
-                } else {
-                    panelMemberExclusions.addAll(panelMembers.stream()
-                        .filter(not(panelMemberExclusions::contains))
-                        .collect(Collectors.toList()));
-                }
-
-                exclusions.setArePanelMembersExclusions(YES);
-            }
+            excludePanelMembers(caseData, adjournment.getPanelMembers());
         }
     }
 }
