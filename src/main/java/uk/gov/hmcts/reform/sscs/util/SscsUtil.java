@@ -1,7 +1,11 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static java.util.Objects.nonNull;
+import static java.util.function.Predicate.not;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -9,15 +13,19 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.PostponeRequestTemplateBody;
 
@@ -89,5 +97,22 @@ public class SscsUtil {
     public static void clearDocumentTransientFields(SscsCaseData caseData) {
         caseData.setDocumentGeneration(DocumentGeneration.builder().build());
         caseData.setDocumentStaging(DocumentStaging.builder().build());
+    }
+
+    public static void excludePanelMembers(SscsCaseData caseData, List<JudicialUserBase> panelMembers) {
+        if (nonNull(panelMembers)) {
+            PanelMemberExclusions exclusions = caseData.getSchedulingAndListingFields().getPanelMemberExclusions();
+            List<JudicialUserBase> panelMemberExclusions = exclusions.getExcludedPanelMembers();
+
+            if (isEmpty(panelMemberExclusions)) {
+                exclusions.setExcludedPanelMembers(panelMembers);
+            } else {
+                panelMemberExclusions.addAll(panelMembers.stream()
+                    .filter(not(panelMemberExclusions::contains))
+                    .collect(Collectors.toList()));
+            }
+
+            exclusions.setArePanelMembersExclusions(YES);
+        }
     }
 }
