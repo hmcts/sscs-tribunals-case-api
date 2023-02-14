@@ -62,8 +62,8 @@ public class EditBundleAboutToSubmitHandlerTest {
         when(serviceRequestExecutor.post(any(), any())).thenReturn(new PreSubmitCallbackResponse<>(sscsCaseData));
 
         coverPage = new HashMap<>();
-        coverPage.put(LanguagePreference.ENGLISH,"SSCS-cover-page.docx");
-        coverPage.put(LanguagePreference.WELSH,"TB-SCS-LET-WEL-00486.docx");
+        coverPage.put(LanguagePreference.ENGLISH,"TB-SCS-LET-ENG-Cover-Letter.docx");
+        coverPage.put(LanguagePreference.WELSH,"TB-SCS-LET-WEL-Cover-Letter.docx");
         documentConfiguration.setCover(coverPage);
     }
 
@@ -89,7 +89,7 @@ public class EditBundleAboutToSubmitHandlerTest {
         BundleDetails bundleResult = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION).getData().getCaseBundles().get(0).getValue();
 
         assertEquals("9876-myBundle.pdf", bundleResult.getFileName());
-        assertEquals("SSCS-cover-page.docx", bundleResult.getCoverpageTemplate());
+        assertEquals("TB-SCS-LET-ENG-Cover-Letter.docx", bundleResult.getCoverpageTemplate());
         assertEquals("Yes", bundleResult.getHasTableOfContents());
         assertEquals("Yes", bundleResult.getHasCoversheets());
         assertEquals(null, bundleResult.getPaginationStyle());
@@ -130,7 +130,7 @@ public class EditBundleAboutToSubmitHandlerTest {
         BundleDetails bundleResult1 = result.getData().getCaseBundles().get(0).getValue();
 
         assertEquals("54321-SscsBundle", bundleResult1.getFileName());
-        assertEquals("SSCS-cover-page.docx", bundleResult1.getCoverpageTemplate());
+        assertEquals("TB-SCS-LET-ENG-Cover-Letter.docx", bundleResult1.getCoverpageTemplate());
         assertEquals("Yes", bundleResult1.getHasTableOfContents());
         assertEquals("Yes", bundleResult1.getHasCoversheets());
         assertEquals(null, bundleResult1.getPaginationStyle());
