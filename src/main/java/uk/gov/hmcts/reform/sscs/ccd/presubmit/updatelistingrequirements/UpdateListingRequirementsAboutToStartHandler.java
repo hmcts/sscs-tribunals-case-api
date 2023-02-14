@@ -5,7 +5,6 @@ import static java.util.Objects.requireNonNull;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -58,7 +57,7 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
             OverrideFields overrideFields = schedulingAndListingFields.getOverrideFields();
 
             if (isNull(overrideFields)) {
-                overrideFields = initialiseOverrideFields(schedulingAndListingFields);
+                overrideFields = initialiseOverrideFields();
                 schedulingAndListingFields.setOverrideFields(overrideFields);
             }
 
@@ -72,8 +71,7 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    @NotNull
-    private OverrideFields initialiseOverrideFields(SchedulingAndListingFields schedulingAndListingFields) {
+    private OverrideFields initialiseOverrideFields() {
         HearingInterpreter appellantInterpreter = HearingInterpreter.builder().build();
 
         OverrideFields overrideFields = new OverrideFields();
