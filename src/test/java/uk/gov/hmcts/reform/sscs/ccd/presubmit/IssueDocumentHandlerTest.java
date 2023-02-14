@@ -180,7 +180,7 @@ public class IssueDocumentHandlerTest {
                .build())
             .build();
 
-        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, "Draft Decision Notice");
+        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, expectedDefaultDocumentLabel);
         assertEquals(expectedDefaultDocumentLabel, documentTypeLabel);
     }
 
@@ -191,7 +191,7 @@ public class IssueDocumentHandlerTest {
             .ccdCaseId("1")
             .build();
 
-        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, "Draft Decision Notice");
+        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, expectedDefaultDocumentLabel);
         assertEquals(expectedDefaultDocumentLabel, documentTypeLabel);
     }
 
