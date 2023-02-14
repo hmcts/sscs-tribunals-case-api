@@ -98,9 +98,7 @@ public class SscsUtil {
         caseData.setDocumentStaging(DocumentStaging.builder().build());
     }
 
-    public static void excludePanelMembers(SscsCaseData caseData, List<JudicialUserBase> panelMembers) {
-        PanelMemberExclusions exclusions = caseData.getSchedulingAndListingFields().getPanelMemberExclusions();
-
+    public static void excludePanelMembers(PanelMemberExclusions exclusions, List<JudicialUserBase> panelMembers) {
         if (nonNull(panelMembers)) {
             List<JudicialUserBase> panelMemberExclusions = exclusions.getExcludedPanelMembers();
 

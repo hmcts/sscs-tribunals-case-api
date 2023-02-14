@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -151,10 +152,13 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
         Adjournment adjournment = caseData.getAdjournment();
         AdjournCasePanelMembersExcluded panelMemberExcluded = adjournment.getPanelMembersExcluded();
         if (nonNull(panelMemberExcluded)) {
+            PanelMemberExclusions panelMemberExclusions = caseData.getSchedulingAndListingFields()
+                .getPanelMemberExclusions();
+
             if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.YES)) {
-                excludePanelMembers(caseData, adjournment.getPanelMembers());
+                excludePanelMembers(panelMemberExclusions, adjournment.getPanelMembers());
             } else if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.RESERVED)) {
-                caseData.getSchedulingAndListingFields().getPanelMemberExclusions().setArePanelMembersReserved(YES);
+                panelMemberExclusions.setArePanelMembersReserved(YES);
             }
         }
     }
