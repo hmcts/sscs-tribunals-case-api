@@ -5,12 +5,15 @@ import static java.util.Objects.requireNonNull;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -47,23 +50,35 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         if (isScheduleListingEnabled) {
-            log.info("Handling override fields update listing requirements event for caseId {}",
-                sscsCaseData.getCcdCaseId());
+            String caseId = sscsCaseData.getCcdCaseId();
+
+            log.info("Handling override fields update listing requirements event for caseId {}", caseId);
 
             SchedulingAndListingFields schedulingAndListingFields = sscsCaseData.getSchedulingAndListingFields();
-
             OverrideFields overrideFields = schedulingAndListingFields.getOverrideFields();
 
             if (isNull(overrideFields)) {
-                overrideFields = new OverrideFields();
+                overrideFields = initialiseOverrideFields(schedulingAndListingFields);
                 schedulingAndListingFields.setOverrideFields(overrideFields);
             }
 
-            log.info("{} Languages in DynamicList for caseId {}",
-                overrideFields.getAppellantInterpreter().getInterpreterLanguage().getListItems().size(),
-                sscsCaseData.getCcdCaseId());
+            HearingInterpreter appellantInterpreter = overrideFields.getAppellantInterpreter();
+            DynamicList interpreterLanguages = utils.generateInterpreterLanguageFields(appellantInterpreter.getInterpreterLanguage());
+            appellantInterpreter.setInterpreterLanguage(interpreterLanguages);
+
+            log.info("{} Languages in DynamicList for caseId {}", interpreterLanguages.getListItems().size(), caseId);
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
+    }
+
+    @NotNull
+    private OverrideFields initialiseOverrideFields(SchedulingAndListingFields schedulingAndListingFields) {
+        HearingInterpreter appellantInterpreter = HearingInterpreter.builder().build();
+
+        OverrideFields overrideFields = new OverrideFields();
+        overrideFields.setAppellantInterpreter(appellantInterpreter);
+
+        return overrideFields;
     }
 }
