@@ -99,8 +99,9 @@ public class SscsUtil {
     }
 
     public static void excludePanelMembers(SscsCaseData caseData, List<JudicialUserBase> panelMembers) {
+        PanelMemberExclusions exclusions = caseData.getSchedulingAndListingFields().getPanelMemberExclusions();
+
         if (nonNull(panelMembers)) {
-            PanelMemberExclusions exclusions = caseData.getSchedulingAndListingFields().getPanelMemberExclusions();
             List<JudicialUserBase> panelMemberExclusions = exclusions.getExcludedPanelMembers();
 
             if (isEmpty(panelMemberExclusions)) {
@@ -111,7 +112,8 @@ public class SscsUtil {
                     .collect(Collectors.toList()));
             }
 
-            exclusions.setArePanelMembersExcluded(YES);
         }
+
+        exclusions.setArePanelMembersExcluded(YES);
     }
 }
