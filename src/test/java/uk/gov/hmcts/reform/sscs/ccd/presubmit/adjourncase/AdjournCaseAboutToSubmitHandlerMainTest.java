@@ -16,8 +16,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
@@ -138,13 +136,22 @@ class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHa
 
     @DisplayName("When we have written an adjournment notice and excluded some panel members, add them "
         + "to the excluded panel members list")
-    @ParameterizedTest
-    @ValueSource(booleans =  {true, false})
-    void givenPanelMembersExcluded_thenAddPanelMembersToExclusionList(boolean areExistingExclusions) {
-        panelMembersGetExcluded(areExistingExclusions);
+    @Test
+    void givenPanelMembersExcluded_thenAddPanelMembersToExclusionList() {
+        panelMembersExcludedWithExistingExclusions();
 
         assertThat(sscsCaseData.getSchedulingAndListingFields()
-            .getPanelMemberExclusions().getExcludedPanelMembers()).hasSize(areExistingExclusions ? 3 : 2);
+            .getPanelMemberExclusions().getExcludedPanelMembers()).hasSize(3);
+    }
+
+    @DisplayName("When we have written an adjournment notice and excluded some panel members, and there are no current "
+        + "exclusions,  add them to the excluded panel members list")
+    @Test
+    void givenNoExistingPanelMembersExcluded_thenAddPanelMembersToExclusionList() {
+        panelMembersExcluded();
+
+        assertThat(sscsCaseData.getSchedulingAndListingFields()
+            .getPanelMemberExclusions().getExcludedPanelMembers()).hasSize(2);
     }
 
 }
