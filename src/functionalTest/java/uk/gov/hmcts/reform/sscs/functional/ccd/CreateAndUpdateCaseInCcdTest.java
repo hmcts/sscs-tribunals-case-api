@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
@@ -88,14 +89,14 @@ public class CreateAndUpdateCaseInCcdTest {
         caseData.setUrgentCase("Yes");
         caseData.setDocumentSentToDwp("Yes");
         caseData.setDirectionDueDate("2019-10-10");
-        caseData.setReservedToJudge("Judge Rinder");
+        caseData.getSchedulingAndListingFields().setReservedJudge(JudicialUserBase.builder().idamId("12345").build());
 
         caseData.setIsWaiverNeeded("Yes");
-        caseData.setWaiverDeclaration(Arrays.asList(new String[]{"waiverDeclarationText"}));
-        caseData.setWaiverReason(Arrays.asList(new String[]{"nonCompliantOther", "nonCompliantNoMRN"}));
+        caseData.setWaiverDeclaration(List.of("waiverDeclarationText"));
+        caseData.setWaiverReason(Arrays.asList("nonCompliantOther", "nonCompliantNoMRN"));
         caseData.setWaiverReasonOther("Not sure");
-        caseData.setClerkDelegatedAuthority(Arrays.asList(new String[]{"delegatedAuthorityText"}));
-        caseData.setClerkAppealSatisfactionText(Arrays.asList(new String[]{"appealSatisfactionText"}));
+        caseData.setClerkDelegatedAuthority(List.of("delegatedAuthorityText"));
+        caseData.setClerkAppealSatisfactionText(List.of("appealSatisfactionText"));
         caseData.setClerkConfirmationOfMrn("No");
         caseData.setClerkOtherReason("No");
         caseData.setClerkConfirmationOther("No idea");
@@ -111,7 +112,7 @@ public class CreateAndUpdateCaseInCcdTest {
         assertEquals("Yes", updatedCaseData.getUrgentCase());
         assertEquals("Yes", updatedCaseData.getDocumentSentToDwp());
         assertEquals("2019-10-10", updatedCaseData.getDirectionDueDate());
-        assertEquals("Judge Rinder", updatedCaseData.getReservedToJudge());
+        assertEquals("12345", updatedCaseData.getSchedulingAndListingFields().getReservedJudge().getIdamId());
         assertEquals("Yes", updatedCaseData.getIsWaiverNeeded());
         assertEquals("waiverDeclarationText", updatedCaseData.getWaiverDeclaration().get(0));
         assertEquals("nonCompliantOther", updatedCaseData.getWaiverReason().get(0));
