@@ -7,6 +7,6 @@
 ## Returns a valid IDAM user id for the given token.
 
 USER_TOKEN=${1}
-IDAM_URL="http://localhost:5000"
+IDAM_URL="http://rse-idam-simulator:5000"
 
 curl --silent --show-error -X GET "${IDAM_URL}/details" -H "accept: application/json" -H "authorization: Bearer ${USER_TOKEN}" | jq -r .id

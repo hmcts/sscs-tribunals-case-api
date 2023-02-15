@@ -23,7 +23,7 @@ fi
 
 if [[ -z "${SSCS_DMNS_PATH}" ]]; then
   echo ""
-  echo "Environment variable SSCS_TASK_DMNS_BPMNS_PATH was not set skipping deployment."
+  echo "Environment variable SSCS_DMNS_PATH was not set skipping deployment."
 else
   echo "Deploying SSCS Task Configuration BPMN and DMNs..."
   echo "SERVICE_TOKEN=${SERVICE_TOKEN}"

@@ -21,7 +21,7 @@ services:
     ports:
       - 4631:8079
     extra_hosts:
-      - "docmosis.aat.platform.hmcts.net:10.10.161.121"
+      - "docmosis.aat.platform.hmcts.net:10.10.161.100"
       - "host.docker.internal:host-gateway"
     networks:
       - cftlib_default

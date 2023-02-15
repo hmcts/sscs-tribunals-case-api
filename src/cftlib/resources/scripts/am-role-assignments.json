@@ -1,0 +1,21 @@
+[
+  {
+    "email": "local.test@example.com",
+    "roleAssignments": [
+      {
+        "roleType": "ORGANISATION",
+        "roleName": "tribunal-caseworker",
+        "grantType": "STANDARD",
+        "roleCategory": "LEGAL_OPERATIONS",
+        "classification": "PUBLIC",
+        "readOnly": false,
+        "attributes": {
+          "caseType": "Benefit",
+          "jurisdiction": "SSCS"
+        },
+        "authorisations": []
+      }
+    ],
+    "overrideAll": true
+  }
+]

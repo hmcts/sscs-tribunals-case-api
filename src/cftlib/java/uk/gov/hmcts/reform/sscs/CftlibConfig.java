@@ -19,25 +19,16 @@ public class CftlibConfig implements CFTLibConfigurer {
             "caseworker-sscs-systemupdate",
             "caseworker-sscs-judge",
             "caseworker-sscs-dwpresponsewriter",
-            "caseworker-sscs-registrar",
-            "caseworker-wa",
-            "caseworker-wa-task-configuration",
-            "caseworker-ia-caseofficer"
+            "caseworker-sscs-registrar"
         );
         lib.createIdamUser("local.test@example.com",
             "caseworker",
-            "caseworker-sscs",
-            "caseworker-wa",
-            "caseworker-wa-configuration",
-            "caseworker-ia-caseofficer"
+            "caseworker-sscs"
         );
         lib.createIdamUser("super-user@example.com",
             "caseworker",
             "caseworker-sscs",
-            "caseworker-sscs-superuser",
-            "caseworker-wa",
-            "caseworker-wa-configuration",
-            "caseworker-ia-caseofficer"
+            "caseworker-sscs-superuser"
         );
         lib.createIdamUser("sscs-citizen@hmcts.net",
             "citizen"
@@ -67,7 +58,12 @@ public class CftlibConfig implements CFTLibConfigurer {
             "caseworker-sscs",
             "caseworker-sscs-hmrcresponsewriter"
         );
+        lib.createIdamUser("wa-system-user@fake.hmcts.net",
+             "caseworker-wa",
+             "caseworker-wa-configuration"
+        );
         lib.createRoles(
+            "caseworker-sscs",
             "caseworker-sscs-superuser",
             "caseworker-sscs-clerk",
             "caseworker-sscs-systemupdate",
@@ -81,11 +77,7 @@ public class CftlibConfig implements CFTLibConfigurer {
             "caseworker-sscs-bulkscan",
             "caseworker-sscs-anonymouscitizen",
             "caseworker-sscs-pcqextractor",
-            "citizen",
-            "caseworker-sscs",
-            "caseworker-wa",
-            "caseworker-wa-configuration",
-            "caseworker-ia-caseofficer"
+            "citizen"
         );
         var def = Files.readAllBytes(Path.of("../sscs-ccd-definitions/releases/CCD_SSCSDefinition_vdev_LOCAL.xlsx"));
         lib.importDefinition(def);
