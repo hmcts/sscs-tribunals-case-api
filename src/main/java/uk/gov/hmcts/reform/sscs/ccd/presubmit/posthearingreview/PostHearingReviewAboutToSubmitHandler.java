@@ -1,11 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,15 +35,15 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
-                                                          String userAuthorisation) {
+        String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         updateCaseStatus(caseData);
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
         excludePanelMembers(caseData, response);
-        String caseId = caseData.getCcdCaseId();
 
+        String caseId = caseData.getCcdCaseId();
         PostHearingReviewType typeSelected = caseData.getPostHearing().getReviewType();
         log.info("Review Post Hearing App: handling action {} for case {}", typeSelected,  caseId);
 
@@ -75,7 +74,7 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
             List<String> panelMembers = List.of(panel.getAssignedTo(), panel.getMedicalMember(), panel.getDisabilityQualifiedMember());
             // map them to JudicialUserBase
             List<JudicialUserBase> panelMembersMapped = panelMembers.stream()
-                .map(fullName -> new JudicialUserBase()) // TODO
+                .map(fullName -> JudicialUserBase.builder().idamId(fullName).build()) // TODO
                 .collect(Collectors.toList());
             // exclude panel members
             SscsUtil.excludePanelMembers(exclusions, panelMembersMapped);
