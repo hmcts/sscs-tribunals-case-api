@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
@@ -12,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
@@ -38,6 +42,7 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
         updateCaseStatus(caseData);
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
+        excludePanelMembers(caseData, response);
         String caseId = caseData.getCcdCaseId();
 
         PostHearingReviewType typeSelected = caseData.getPostHearing().getReviewType();
@@ -53,6 +58,31 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
         if (nonNull(postHearing) && nonNull(postHearing.getSetAside().getAction())) {
             caseData.setState(State.NOT_LISTABLE);
             caseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION);
+        }
+    }
+
+    protected void excludePanelMembers(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        PostHearing postHearing = response.getData().getPostHearing();
+        if (PostHearingReviewType.SET_ASIDE.equals(postHearing.getReviewType())
+            && SetAsideActions.GRANT.equals(postHearing.getSetAside().getAction())
+        ) {
+            PanelMemberExclusions exclusions = caseData.getSchedulingAndListingFields().getPanelMemberExclusions();
+            String caseId = caseData.getCcdCaseId();
+            Panel panel = caseData.getPanel();
+            log.info("Set Aside is granted. Excluding panel members for case {}", caseId);
+
+            // identify panel members using JudicialRefDataService TODO
+            List<String> panelMembers = List.of(panel.getAssignedTo(), panel.getMedicalMember(), panel.getDisabilityQualifiedMember());
+            // map them to JudicialUserBase
+            List<JudicialUserBase> panelMembersMapped = panelMembers.stream()
+                .map(fullName -> new JudicialUserBase()) // TODO
+                .collect(Collectors.toList());
+            // exclude panel members
+            SscsUtil.excludePanelMembers(exclusions, panelMembersMapped);
+            // reset case data Panel and arePanelMembersReserved
+            caseData.setPanel(null);
+            caseData.getSchedulingAndListingFields().getPanelMemberExclusions().setArePanelMembersReserved(YesNo.NO);
+            caseData.getSchedulingAndListingFields().getPanelMemberExclusions().setArePanelMembersExcluded(YesNo.YES);
         }
     }
 }

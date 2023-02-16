@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -15,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingReviewAboutToSubmitHandlerTest {
@@ -125,5 +128,37 @@ class PostHearingReviewAboutToSubmitHandlerTest {
 
         handler.updateCaseStatus(caseData);
         assertThat(caseData.getState()).isEqualTo(State.NOT_LISTABLE);
+    }
+
+    @Test
+    void givenSetAsideGranted_shouldExcludePanelMembers() {
+        caseData.getPostHearing().setReviewType(PostHearingReviewType.SET_ASIDE);
+        caseData.getPostHearing().getSetAside().setAction(SetAsideActions.GRANT);
+        JudicialUserBase judge = JudicialUserBase.builder().personalCode("j1").build();
+        JudicialUserBase medicalMember = JudicialUserBase.builder().personalCode("m1").build();
+        JudicialUserBase disabilityQualifiedMember = JudicialUserBase.builder().personalCode("d1").build();
+        Panel panel = Panel.builder()
+            .assignedTo(judge.getPersonalCode())
+            .medicalMember(medicalMember.getPersonalCode())
+            .disabilityQualifiedMember(disabilityQualifiedMember.getPersonalCode())
+            .build();
+        caseData.setPanel(panel);
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getPanel()).isNull();
+        PanelMemberExclusions panelMemberExclusions = response.getData().getSchedulingAndListingFields().getPanelMemberExclusions();
+        assertThat(panelMemberExclusions).isNotNull();
+        assertThat(panelMemberExclusions.getArePanelMembersExcluded()).isEqualTo(YesNo.YES);
+        assertThat(panelMemberExclusions.getArePanelMembersReserved()).isEqualTo(YesNo.NO);
+        List<JudicialUserBase> excludedPanelMembers = panelMemberExclusions.getExcludedPanelMembers();
+        assertThat(excludedPanelMembers)
+            .hasSize(3)
+            .contains(judge, medicalMember, disabilityQualifiedMember);
     }
 }
