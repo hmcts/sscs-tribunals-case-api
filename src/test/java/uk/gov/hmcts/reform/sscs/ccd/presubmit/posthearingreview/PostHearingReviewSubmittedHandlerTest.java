@@ -38,6 +38,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingReviewSubmittedHandlerTest {
@@ -51,6 +53,12 @@ class PostHearingReviewSubmittedHandlerTest {
 
     @Mock
     private CcdCallbackMapService ccdCallbackMapService;
+    @Mock
+    private CcdService ccdService;
+
+    @Mock
+    private IdamService idamService;
+
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -62,7 +70,7 @@ class PostHearingReviewSubmittedHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new PostHearingReviewSubmittedHandler(ccdCallbackMapService, true);
+        handler = new PostHearingReviewSubmittedHandler(ccdCallbackMapService, ccdService, idamService, true);
 
         caseData = SscsCaseData.builder()
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
@@ -103,7 +111,7 @@ class PostHearingReviewSubmittedHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new PostHearingReviewSubmittedHandler(ccdCallbackMapService, false);
+        handler = new PostHearingReviewSubmittedHandler(ccdCallbackMapService, ccdService, idamService, false);
         when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
     }

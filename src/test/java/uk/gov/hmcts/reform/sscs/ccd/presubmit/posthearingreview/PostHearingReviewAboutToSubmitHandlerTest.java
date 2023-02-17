@@ -19,12 +19,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingReviewAboutToSubmitHandlerTest {
@@ -41,17 +37,11 @@ class PostHearingReviewAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
-    @Mock
-    private CcdService ccdService;
-
-    @Mock
-    private IdamService idamService;
-
     private SscsCaseData caseData;
 
     @BeforeEach
     void setUp() {
-        handler = new PostHearingReviewAboutToSubmitHandler(true, ccdService, idamService);
+        handler = new PostHearingReviewAboutToSubmitHandler(true);
 
         caseData = SscsCaseData.builder()
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
@@ -89,7 +79,7 @@ class PostHearingReviewAboutToSubmitHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new PostHearingReviewAboutToSubmitHandler(false, ccdService, idamService);
+        handler = new PostHearingReviewAboutToSubmitHandler(false);
         when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
@@ -103,18 +93,5 @@ class PostHearingReviewAboutToSubmitHandlerTest {
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-    }
-
-    @Test
-    void sendSorToJudgeWhenUserHasRequested() {
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-
-        caseData.getPostHearing().getSetAside().setRequestStatementOfReasons(YesNo.YES);
-
-        PreSubmitCallbackResponse<SscsCaseData> response =
-            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(response.getErrors()).isEmpty();
-        assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_JUDGE);
     }
 }
