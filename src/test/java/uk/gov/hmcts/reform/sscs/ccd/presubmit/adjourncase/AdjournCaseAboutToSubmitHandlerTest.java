@@ -104,6 +104,33 @@ class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandle
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo(SPANISH);
     }
 
+    @DisplayName("When interpreter required is not null and interpreter language is not selected "
+        + ", then interpreter language set to NO")
+    @Test
+    void givenInterpreterRequiredIsNotNullButNoLanguageSelected_thenUpdateWithNoInterpreterLanguageAndRequiredFlagToYes() {
+        DynamicList languagesList = new DynamicList(null);
+        callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterRequired(NO);
+        callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterLanguage(languagesList);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo(NO.getValue());
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo(NO.getValue());
+    }
+
+    @DisplayName("When interpreter required is null, then interpreter language set to null and requirement is NO")
+    @Test
+    void givenInterpreterRequiredIsNull_thenUpdateWithNullInterpreterLanguageAndRequiredFlagToYes() {
+        DynamicList languagesList = new DynamicList(null);
+        callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterRequired(null);
+        callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterLanguage(languagesList);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo(NO.getValue());
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo(null);
+    }
+
     @DisplayName("When adjournment is disabled and case is LA, then should not send any messages")
     @Test
     void givenFeatureFlagDisabled_thenNoMessageIsSent() {
