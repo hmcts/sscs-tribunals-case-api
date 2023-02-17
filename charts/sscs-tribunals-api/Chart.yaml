@@ -7,10 +7,10 @@ maintainers:
   - name: HMCTS SSCS Team
 dependencies:
   - name: java
-    version: 4.0.12
+    version: 4.0.13
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
   - name: idam-pr
-    version: 2.2.6
+    version: 2.3.0
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: idam-pr.enabled
   - name: xui-webapp
@@ -18,7 +18,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: xui-webapp.enabled
   - name: elasticsearch
-    version: 7.8.2
+    version: 7.17.3
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: elastic.enabled
   - name: logstash
@@ -30,11 +30,11 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-evidence-share.enabled
   - name: sscs-ccd-callback-orchestrator
-    version: 0.0.27
+    version: 0.0.28
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-ccd-callback-orchestrator.enabled
   - name: ccd
-    version: 8.0.19
+    version: 8.0.24
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd.enabled
     tags:
@@ -44,15 +44,15 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-tribunals-frontend.enabled
   - name: redis
-    version: 17.0.11
+    version: 17.7.4
     repository: "https://charts.bitnami.com/bitnami"
     condition: redis.enabled
   - name: em-ccdorc
-    version: 1.0.15
+    version: 1.0.16
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: em-ccdorc.enabled
   - name: ccd-case-document-am-api
-    version: 1.7.6
+    version: 1.7.8
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd-case-document-am-api.enabled
   - name: sscs-hearings-api
