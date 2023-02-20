@@ -13,6 +13,8 @@ import uk.gov.hmcts.contino.GradleBuilder
 def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
+def dmnBranch = "master"
+def waStandaloneBranch = "master"
 
 def gradleBuilder = new GradleBuilder(this, product)
 
@@ -105,6 +107,11 @@ withPipeline(type, product, component) {
             for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd") ) {
                 env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
                 println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}""".stripIndent()
+                sh """
+                ./bin/pull-camunda-dmn-files.sh ${dmnBranch}
+                ./bin/pull-camunda-bpmn-files.sh ${waStandaloneBranch}
+                ./bin/import-camunda-files.sh
+                """
             }
         }
         println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}. - The branch name is ${env.BRANCH_NAME}""".stripIndent()
