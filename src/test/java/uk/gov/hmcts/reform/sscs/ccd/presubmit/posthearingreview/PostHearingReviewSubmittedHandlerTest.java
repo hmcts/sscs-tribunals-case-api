@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -121,6 +122,10 @@ class PostHearingReviewSubmittedHandlerTest {
     void givenActionTypeSetAsideSelected_shouldReturnCallCorrectCallback(SetAsideActions value) {
         caseData.getPostHearing().setReviewType(SET_ASIDE);
         caseData.getPostHearing().getSetAside().setAction(value);
+
+        if (SetAsideActions.REFUSE_SOR.equals(value)) {
+            caseData.getPostHearing().getSetAside().setRequestStatementOfReasons(YesNo.YES);
+        }
 
         verifyCcdCallbackCalledCorrectly(value);
     }
