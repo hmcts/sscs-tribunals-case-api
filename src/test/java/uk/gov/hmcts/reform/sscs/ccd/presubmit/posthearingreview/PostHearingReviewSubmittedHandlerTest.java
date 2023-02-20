@@ -123,10 +123,6 @@ class PostHearingReviewSubmittedHandlerTest {
         caseData.getPostHearing().setReviewType(SET_ASIDE);
         caseData.getPostHearing().getSetAside().setAction(value);
 
-        if (SetAsideActions.REFUSE_SOR.equals(value)) {
-            caseData.getPostHearing().getSetAside().setRequestStatementOfReasons(YesNo.YES);
-        }
-
         verifyCcdCallbackCalledCorrectly(value);
     }
 
