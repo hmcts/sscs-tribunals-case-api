@@ -92,11 +92,11 @@ public class CreateAndUpdateCaseInCcdTest {
         caseData.getSchedulingAndListingFields().setReservedJudge(JudicialUserBase.builder().idamId("736238ce-5565-49b2-8d35-48d96ab438bf").build());
 
         caseData.setIsWaiverNeeded("Yes");
-        caseData.setWaiverDeclaration(List.of("waiverDeclarationText"));
+        caseData.setWaiverDeclaration(Arrays.asList(new String[]{"waiverDeclarationText"}));
         caseData.setWaiverReason(Arrays.asList("nonCompliantOther", "nonCompliantNoMRN"));
         caseData.setWaiverReasonOther("Not sure");
-        caseData.setClerkDelegatedAuthority(List.of("delegatedAuthorityText"));
-        caseData.setClerkAppealSatisfactionText(List.of("appealSatisfactionText"));
+        caseData.setClerkDelegatedAuthority(Arrays.asList(new String[]{"delegatedAuthorityText"}));
+        caseData.setClerkAppealSatisfactionText(Arrays.asList(new String[]{"appealSatisfactionText"}));
         caseData.setClerkConfirmationOfMrn("No");
         caseData.setClerkOtherReason("No");
         caseData.setClerkConfirmationOther("No idea");
