@@ -123,11 +123,17 @@ class PostHearingReviewSubmittedHandlerTest {
         caseData.getPostHearing().setReviewType(SET_ASIDE);
         caseData.getPostHearing().getSetAside().setAction(value);
 
-        if (SetAsideActions.REFUSE_SOR.equals(value)) {
-            caseData.getPostHearing().getSetAside().setRequestStatementOfReasons(YesNo.YES);
-        }
-
         verifyCcdCallbackCalledCorrectly(value);
+    }
+
+    @Test
+    void givenRefusedSetAsideSelected_shouldReturnCallCorrectCallback() {
+        caseData.getPostHearing().setReviewType(SET_ASIDE);
+        caseData.getPostHearing().getSetAside().setAction(SetAsideActions.REFUSE);
+
+        caseData.getPostHearing().getSetAside().setRequestStatementOfReasons(YesNo.YES);
+
+        verifyCcdCallbackCalledCorrectly(SetAsideActions.REFUSE_SOR);
     }
 
     @ParameterizedTest
