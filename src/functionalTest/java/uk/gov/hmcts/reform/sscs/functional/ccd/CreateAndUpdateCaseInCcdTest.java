@@ -93,7 +93,7 @@ public class CreateAndUpdateCaseInCcdTest {
 
         caseData.setIsWaiverNeeded("Yes");
         caseData.setWaiverDeclaration(Arrays.asList(new String[]{"waiverDeclarationText"}));
-        caseData.setWaiverReason(Arrays.asList("nonCompliantOther", "nonCompliantNoMRN"));
+        caseData.setWaiverReason(Arrays.asList(new String[]{"nonCompliantOther", "nonCompliantNoMRN"}));
         caseData.setWaiverReasonOther("Not sure");
         caseData.setClerkDelegatedAuthority(Arrays.asList(new String[]{"delegatedAuthorityText"}));
         caseData.setClerkAppealSatisfactionText(Arrays.asList(new String[]{"appealSatisfactionText"}));
