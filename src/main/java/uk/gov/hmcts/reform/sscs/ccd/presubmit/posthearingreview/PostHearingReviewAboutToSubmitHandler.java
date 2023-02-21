@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -65,23 +66,23 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
         if (PostHearingReviewType.SET_ASIDE.equals(postHearing.getReviewType())
             && SetAsideActions.GRANT.equals(postHearing.getSetAside().getAction())
         ) {
-            PanelMemberExclusions exclusions = caseData.getSchedulingAndListingFields().getPanelMemberExclusions();
-            String caseId = caseData.getCcdCaseId();
-            Panel panel = caseData.getPanel();
-            log.info("Set Aside is granted. Excluding panel members for case {}", caseId);
-
-            // identify panel members using JudicialRefDataService TODO
-            List<String> panelMembers = List.of(panel.getAssignedTo(), panel.getMedicalMember(), panel.getDisabilityQualifiedMember());
-            // map them to JudicialUserBase
-            List<JudicialUserBase> panelMembersMapped = panelMembers.stream()
-                .map(fullName -> JudicialUserBase.builder().idamId(fullName).build()) // TODO
-                .collect(Collectors.toList());
+            log.info("Set Aside is granted. Excluding panel members for case {}", caseData.getCcdCaseId());
+            // identify panel members from HearingDetails
+            HearingDetails latestHearing = caseData.getLatestHearing().getValue();
+            List<String> panelMemberIds = latestHearing.getPanelMemberIds(); // TODO test this list to confirm working as expected
+            String judgeId = latestHearing.getJudgeId();
+            ArrayList<JudicialUserBase> panelMembersToExclude = panelMemberIds.stream()
+                .map(id -> JudicialUserBase.builder().personalCode(id).build())
+                .collect(Collectors.toCollection(ArrayList::new));
+            JudicialUserBase judgeToExclude = JudicialUserBase.builder().personalCode(judgeId).build();
+            panelMembersToExclude.add(judgeToExclude);
             // exclude panel members
-            SscsUtil.excludePanelMembers(exclusions, panelMembersMapped);
-            // reset case data Panel and arePanelMembersReserved
+            PanelMemberExclusions exclusions = caseData.getSchedulingAndListingFields().getPanelMemberExclusions();
+            SscsUtil.excludePanelMembers(exclusions, panelMembersToExclude);
+            // reset case data Panel and set arePanelMembersReserved/Excluded
             caseData.setPanel(null);
-            caseData.getSchedulingAndListingFields().getPanelMemberExclusions().setArePanelMembersReserved(YesNo.NO);
-            caseData.getSchedulingAndListingFields().getPanelMemberExclusions().setArePanelMembersExcluded(YesNo.YES);
+            exclusions.setArePanelMembersReserved(YesNo.NO);
+            exclusions.setArePanelMembersExcluded(YesNo.YES);
         }
     }
 }
