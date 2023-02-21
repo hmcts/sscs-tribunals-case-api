@@ -67,7 +67,7 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
             && SetAsideActions.GRANT.equals(postHearing.getSetAside().getAction())
         ) {
             log.info("Set Aside is granted. Excluding panel members for case {}", caseData.getCcdCaseId());
-            // identify panel members from HearingDetails
+
             HearingDetails latestHearing = caseData.getLatestHearing().getValue();
             List<String> panelMemberIds = latestHearing.getPanelMemberIds(); // TODO test this list to confirm working as expected
             String judgeId = latestHearing.getJudgeId();
@@ -76,10 +76,10 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
                 .collect(Collectors.toCollection(ArrayList::new));
             JudicialUserBase judgeToExclude = JudicialUserBase.builder().personalCode(judgeId).build();
             panelMembersToExclude.add(judgeToExclude);
-            // exclude panel members
+
             PanelMemberExclusions exclusions = caseData.getSchedulingAndListingFields().getPanelMemberExclusions();
             SscsUtil.excludePanelMembers(exclusions, panelMembersToExclude);
-            // reset case data Panel and set arePanelMembersReserved/Excluded
+
             caseData.setPanel(null);
             exclusions.setArePanelMembersReserved(YesNo.NO);
             exclusions.setArePanelMembersExcluded(YesNo.YES);

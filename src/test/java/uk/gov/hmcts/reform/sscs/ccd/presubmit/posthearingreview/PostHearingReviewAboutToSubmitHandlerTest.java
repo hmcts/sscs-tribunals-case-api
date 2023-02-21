@@ -47,19 +47,14 @@ class PostHearingReviewAboutToSubmitHandlerTest {
     void setUp() {
         handler = new PostHearingReviewAboutToSubmitHandler(true);
 
-        judge = JudicialUserBase.builder().idamId("j1").build();
-        medicalMember = JudicialUserBase.builder().idamId("m1").build();
-        disabilityQualifiedMember = JudicialUserBase.builder().idamId("d1").build();
-        Panel panel = Panel.builder() // TODO set this up properly
-            .assignedTo(judge.getIdamId())
-            .medicalMember(medicalMember.getIdamId())
-            .disabilityQualifiedMember(disabilityQualifiedMember.getIdamId())
-            .build();
+        judge = JudicialUserBase.builder().personalCode("j1").build();
+        medicalMember = JudicialUserBase.builder().personalCode("m1").build();
+        disabilityQualifiedMember = JudicialUserBase.builder().personalCode("d1").build();
 
         caseData = SscsCaseData.builder()
-            .panel(panel)
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
                 .hearingRoute(LIST_ASSIST).build())
+            .panel(Panel.builder().build())
             .ccdCaseId("1234")
             .documentGeneration(DocumentGeneration.builder()
                 .directionNoticeContent("Body Content")
@@ -154,6 +149,13 @@ class PostHearingReviewAboutToSubmitHandlerTest {
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
+        List<Hearing> hearings = List.of(Hearing.builder()
+            .value(HearingDetails.builder()
+                .judgeId(judge.getPersonalCode())
+                .panelMemberIds(List.of(disabilityQualifiedMember.getPersonalCode(), medicalMember.getPersonalCode()))
+                .build())
+            .build());
+        caseData.setHearings(hearings);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -166,7 +168,8 @@ class PostHearingReviewAboutToSubmitHandlerTest {
         List<JudicialUserBase> excludedPanelMembers = panelMemberExclusions.getExcludedPanelMembers();
         assertThat(excludedPanelMembers)
             .hasSize(3)
-            .contains(judge, medicalMember, disabilityQualifiedMember);
+            .extracting(JudicialUserBase::getPersonalCode)
+            .contains(judge.getPersonalCode(), medicalMember.getPersonalCode(), disabilityQualifiedMember.getPersonalCode());
     }
 
     @ParameterizedTest
