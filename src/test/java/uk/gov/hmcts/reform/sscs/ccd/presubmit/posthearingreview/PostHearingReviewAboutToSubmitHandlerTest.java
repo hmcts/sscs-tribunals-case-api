@@ -1,11 +1,16 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.SET_ASIDE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions.GRANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +50,7 @@ class PostHearingReviewAboutToSubmitHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new PostHearingReviewAboutToSubmitHandler(true);
+        handler = new PostHearingReviewAboutToSubmitHandler(true, true);
 
         judge = JudicialUserBase.builder().personalCode("j1").build();
         medicalMember = JudicialUserBase.builder().personalCode("m1").build();
@@ -88,7 +93,7 @@ class PostHearingReviewAboutToSubmitHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new PostHearingReviewAboutToSubmitHandler(false);
+        handler = new PostHearingReviewAboutToSubmitHandler(false, false);
         when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
@@ -133,7 +138,7 @@ class PostHearingReviewAboutToSubmitHandlerTest {
             .state(State.DORMANT_APPEAL_STATE)
             .postHearing(PostHearing.builder()
                 .setAside(SetAside.builder()
-                    .action(SetAsideActions.GRANT)
+                    .action(GRANT)
                     .build())
                 .build())
             .build();
@@ -144,8 +149,8 @@ class PostHearingReviewAboutToSubmitHandlerTest {
 
     @Test
     void givenSetAsideGranted_shouldExcludePanelMembers() {
-        caseData.getPostHearing().setReviewType(PostHearingReviewType.SET_ASIDE);
-        caseData.getPostHearing().getSetAside().setAction(SetAsideActions.GRANT);
+        caseData.getPostHearing().setReviewType(SET_ASIDE);
+        caseData.getPostHearing().getSetAside().setAction(GRANT);
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
@@ -163,8 +168,8 @@ class PostHearingReviewAboutToSubmitHandlerTest {
         assertThat(response.getErrors()).isEmpty();
         assertThat(response.getData().getPanel()).isNull();
         PanelMemberExclusions panelMemberExclusions = response.getData().getSchedulingAndListingFields().getPanelMemberExclusions();
-        assertThat(panelMemberExclusions.getArePanelMembersExcluded()).isEqualTo(YesNo.YES);
-        assertThat(panelMemberExclusions.getArePanelMembersReserved()).isEqualTo(YesNo.NO);
+        assertThat(panelMemberExclusions.getArePanelMembersExcluded()).isEqualTo(YES);
+        assertThat(panelMemberExclusions.getArePanelMembersReserved()).isEqualTo(NO);
         List<JudicialUserBase> excludedPanelMembers = panelMemberExclusions.getExcludedPanelMembers();
         assertThat(excludedPanelMembers)
             .hasSize(3)
@@ -173,9 +178,9 @@ class PostHearingReviewAboutToSubmitHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = SetAsideActions.class, names = "GRANT", mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(value = SetAsideActions.class, names = "GRANT", mode = EXCLUDE)
     void givenSetAsideActionIsNotGrant_shouldNotAutoExcludePanelMembers(SetAsideActions action) {
-        caseData.getPostHearing().setReviewType(PostHearingReviewType.SET_ASIDE);
+        caseData.getPostHearing().setReviewType(SET_ASIDE);
         caseData.getPostHearing().getSetAside().setAction(action);
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -187,12 +192,12 @@ class PostHearingReviewAboutToSubmitHandlerTest {
         assertThat(response.getErrors()).isEmpty();
         assertThat(response.getData().getPanel()).isNotNull();
         PanelMemberExclusions panelMemberExclusions = response.getData().getSchedulingAndListingFields().getPanelMemberExclusions();
-        assertThat(panelMemberExclusions.getArePanelMembersExcluded()).isNotEqualTo(YesNo.YES);
+        assertThat(panelMemberExclusions.getArePanelMembersExcluded()).isNotEqualTo(YES);
         assertThat(panelMemberExclusions.getExcludedPanelMembers()).isNull();
     }
 
     @ParameterizedTest
-    @EnumSource(value = PostHearingReviewType.class, names = "SET_ASIDE", mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(value = PostHearingReviewType.class, names = "SET_ASIDE", mode = EXCLUDE)
     void givenPostHearingReviewTypeIsNotSetAside_shouldNotAutoExcludePanelMembers(PostHearingReviewType reviewType) {
         caseData.getPostHearing().setReviewType(reviewType);
 
@@ -205,7 +210,24 @@ class PostHearingReviewAboutToSubmitHandlerTest {
         assertThat(response.getErrors()).isEmpty();
         assertThat(response.getData().getPanel()).isNotNull();
         PanelMemberExclusions panelMemberExclusions = response.getData().getSchedulingAndListingFields().getPanelMemberExclusions();
-        assertThat(panelMemberExclusions.getArePanelMembersExcluded()).isNotEqualTo(YesNo.YES);
+        assertThat(panelMemberExclusions.getArePanelMembersExcluded()).isNotEqualTo(YES);
+        assertThat(panelMemberExclusions.getExcludedPanelMembers()).isNull();
+    }
+
+    @Test
+    void givenPanelMembersFeatureIsNotEnabled_shouldNotExcludePanelMembers() {
+        handler = new PostHearingReviewAboutToSubmitHandler(true, false);
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getPanel()).isNotNull();
+        PanelMemberExclusions panelMemberExclusions = response.getData().getSchedulingAndListingFields().getPanelMemberExclusions();
+        assertThat(panelMemberExclusions.getArePanelMembersExcluded()).isNotEqualTo(YES);
         assertThat(panelMemberExclusions.getExcludedPanelMembers()).isNull();
     }
 }

@@ -25,6 +25,9 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
+    @Value("${feature.panelMembers.enabled}")
+    private final boolean isPanelMembersEnabled;
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -63,7 +66,8 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
 
     protected void excludePanelMembers(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         PostHearing postHearing = response.getData().getPostHearing();
-        if (PostHearingReviewType.SET_ASIDE.equals(postHearing.getReviewType())
+        if (isPanelMembersEnabled
+            && PostHearingReviewType.SET_ASIDE.equals(postHearing.getReviewType())
             && SetAsideActions.GRANT.equals(postHearing.getSetAside().getAction())
         ) {
             log.info("Set Aside is granted. Excluding panel members for case {}", caseData.getCcdCaseId());
