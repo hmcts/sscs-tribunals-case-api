@@ -6,9 +6,9 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQUEST;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.*;
@@ -107,7 +107,7 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
     private void updateDocument(DwpDocument dwpDocument,
                                 DwpResponseDocument dwpResponseDocument,
                                 String documentTypePrefix) {
-        String todayDate = java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         if (nonNull(dwpResponseDocument) && nonNull(dwpResponseDocument.getDocumentLink())) {
             String fileExtension = dwpResponseDocument.getDocumentLink().getDocumentFilename()
                     .substring(dwpResponseDocument.getDocumentLink().getDocumentFilename().lastIndexOf("."));
@@ -118,7 +118,7 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
                         .documentUrl(dwpResponseDocument.getDocumentLink().getDocumentUrl())
                         .documentFilename(documentTypePrefix + " on " + todayDate + fileExtension)
                         .build());
-                dwpDocument.getValue().setDocumentDateAdded(java.time.LocalDate.now().toString());
+                dwpDocument.getValue().setDocumentDateAdded(LocalDate.now().toString());
                 dwpDocument.getValue().setDocumentFileName(documentTypePrefix + " on " + todayDate);
             }
         }
