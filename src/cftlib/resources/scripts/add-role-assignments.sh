@@ -4,7 +4,7 @@ set -eu
 
 dir=$(dirname ${0})
 
-jq -c '(.[])' ${dir}/am-role-assignments.json | while read user; do
+jq -c '(.[])' ${dir}/../am-role-assignments.json | while read user; do
   email=$(jq -r '.email' <<< $user)
   token=$(${dir}/util/idam-user-token.sh $email)
   idamId=$(${dir}/util/idam-user-id.sh $token)

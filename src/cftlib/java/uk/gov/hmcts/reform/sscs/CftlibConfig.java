@@ -1,11 +1,18 @@
 package uk.gov.hmcts.reform.sscs;
 
+import static java.lang.Boolean.parseBoolean;
+
+import com.google.common.io.Resources;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.rse.ccd.lib.api.CFTLib;
 import uk.gov.hmcts.rse.ccd.lib.api.CFTLibConfigurer;
 
+@Slf4j
 @Component
 public class CftlibConfig implements CFTLibConfigurer {
 
@@ -81,5 +88,27 @@ public class CftlibConfig implements CFTLibConfigurer {
         );
         var def = Files.readAllBytes(Path.of("../sscs-ccd-definitions/releases/CCD_SSCSDefinition_vdev_LOCAL.xlsx"));
         lib.importDefinition(def);
+
+        var roleAssignments = Resources.toString(Resources.getResource("am-role-assignments.json"), StandardCharsets.UTF_8);
+        lib.configureRoleAssignments(roleAssignments);
+
+        if (parseBoolean(System.getenv("ENABLE_WORK_ALLOCATION"))) {
+            loadCamundaFiles();
+        }
+    }
+
+    @SneakyThrows
+    private void loadCamundaFiles() {
+        int code = new ProcessBuilder("./src/cftlib/resources/scripts/camunda-deployment.sh")
+                .inheritIO()
+                .start()
+                .waitFor();
+
+        if (code != 0) {
+            log.error("****** Camunda deployment failed ******");
+            log.info("Exit value: {}", code);
+        } else {
+            log.info("Camunda deployment successful");
+        }
     }
 }

@@ -1,6 +1,7 @@
 [
   {
     "email": "local.test@example.com",
+    "id": "d40536a4-a89f-3736-a6b1-675db3216a24",
     "roleAssignments": [
       {
         "roleType": "ORGANISATION",

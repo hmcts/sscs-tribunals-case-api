@@ -6,8 +6,8 @@
 ##
 ## deploys bpmn/dmn to camunda.
 
-WA_BPMNS_DMNS_PATH="/your/$USER/path/to/wa-standalone-task-bpmn"
-SSCS_DMNS_PATH="/your/$USER/path/to/sscs-task-configuration"
+WA_BPMNS_DMNS_PATH="../wa-standalone-task-bpmn"
+SSCS_DMNS_PATH="../sscs-task-configuration"
 SERVICE_TOKEN="$(sh ./idam-service-token.sh "wa_camunda_pipeline_upload")"
 
 echo "Uploading Camunda BPMs and DMNs..."

@@ -6,7 +6,7 @@ name: cft-lib-work-allocation
 services:
   camunda-local-bpm:
     image:  hmctsprivate.azurecr.io/camunda/bpm:latest
-    container_name: camunda-bpm
+    container_name: wa-camunda-bpm
     environment:
       CAMUNDA_DB_HOST: shared-database-pg12
       CAMUNDA_DB_PORT: 5432
@@ -26,6 +26,7 @@ services:
 
   ccd-message-publisher:
     image: hmctspublic.azurecr.io/ccd/message-publisher:latest
+    container_name: wa-message-publisher
     environment:
       DATA_STORE_DB_HOST: shared-database-pg12
       DATA_STORE_DB_URL: jdbc:postgresql://shared-database-pg12:5432/datastore
@@ -45,7 +46,7 @@ services:
     image: "hmctspublic.azurecr.io/wa/workflow-api:latest"
     container_name: wa-workflow-api
     environment:
-      CAMUNDA_URL: http://camunda-bpm:8999/engine-rest
+      CAMUNDA_URL: http://wa-camunda-bpm:8999/engine-rest
       S2S_URL: http://host.docker.internal:4502/
       S2S_SECRET_WORKFLOW_API: "AAAAAAAAAAAAAAAA"
       POSTGRES_HOST: shared-database-pg12
@@ -68,7 +69,7 @@ services:
       image: "hmctspublic.azurecr.io/wa/task-management-api:latest"
       container_name: wa-task-management-api
       environment:
-        CAMUNDA_URL: http://camunda-bpm:8999/engine-rest
+        CAMUNDA_URL: http://wa-camunda-bpm:8999/engine-rest
         S2S_URL: http://host.docker.internal:4502/
         IDAM_URL: http://rse-idam-simulator:5000
         CCD_URL: http://host.docker.internal:4452
@@ -94,7 +95,7 @@ services:
 
   case-event-handler:
       image: "hmctspublic.azurecr.io/wa/case-event-handler:latest"
-      container_name: case-event-handler
+      container_name: wa-case-event-handler
       environment:
         POSTGRES_HOST: shared-database-pg12
         POSTGRES_USERNAME: postgres
@@ -111,7 +112,7 @@ services:
         OPEN_ID_IDAM_URL: http://rse-idam-simulator:5000
         IDAM_URL: http://rse-idam-simulator:5000
         ROLE_ASSIGNMENT_URL: http://host.docker.internal:4096
-        CAMUNDA_URL: http://camunda-bpm:8999/engine-rest
+        CAMUNDA_URL: http://wa-camunda-bpm:8999/engine-rest
         CCD_URL: http://host.docker.internal:4452
         WA_TASK_MANAGEMENT_API_URL: http://wa-task-management-api:8087
         AZURE_SERVICE_BUS_MESSAGE_AUTHOR: "${AZURE_SERVICE_BUS_MESSAGE_AUTHOR}"
@@ -142,7 +143,7 @@ services:
       OPEN_ID_IDAM_URL: http://rse-idam-simulator:5000
       IDAM_URL: http://rse-idam-simulator:5000
       ROLE_ASSIGNMENT_URL: http://host.docker.internal:4096
-      CAMUNDA_URL: http://camunda-bpm:8999/engine-rest
+      CAMUNDA_URL: http://wa-camunda-bpm:8999/engine-rest
       CCD_URL: http://host.docker.internal:4452
       WA_TASK_MANAGEMENT_API_URL: http://wa-task-management-api:8087
       CASE_EVENT_HANDLER_SERVICE_URL: http://wa-case-event-handler:8088
