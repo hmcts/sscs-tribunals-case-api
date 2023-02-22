@@ -540,7 +540,7 @@ bootWithCCD {
     //in the folder /src/cftlib/resources/docker/ and comma delimited.
     environment 'ADDITIONAL_COMPOSE_FILES', 'cft-lib-activemq.yml,cft-lib-doc-stack.yml,cft-lib-doc-assembly.yml,cft-lib-ref-data-wiremock.yml'
     environment 'ADDITIONAL_COMPOSE_FILES_WA', 'cft-lib-work-allocation.yml'
-    environment 'ENABLE_WORK_ALLOCATION', 'true'
+    environment 'ENABLE_WORK_ALLOCATION', 'false'
 
     //Turn this on to automatically recreate containers above. Useful for debugging if you make changes.
     environment 'FORCE_RECREATE_ADDITIONAL_CONTAINERS', 'false'
