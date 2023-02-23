@@ -82,7 +82,6 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
 
             caseData.setPanel(null);
             exclusions.setArePanelMembersReserved(YesNo.NO);
-            exclusions.setArePanelMembersExcluded(YesNo.YES);
         }
     }
 }
