@@ -5,6 +5,7 @@ import static java.util.Collections.sort;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.CONFIRM_PANEL_COMPOSITION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
@@ -31,6 +32,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidenceDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpResponseDocument;
@@ -107,6 +109,8 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         checkSscs2AndSscs5Confidentiality(preSubmitCallbackResponse, sscsCaseData);
 
+        setSscs2InterlocProperties(sscsCaseData);
+
         if (isValidBenefitTypeForConfidentiality(sscsCaseData)
                 && sscsCaseData.getOtherParties() != null) {
             assignNewOtherPartyData(sscsCaseData.getOtherParties());
@@ -118,6 +122,12 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         }
 
         return preSubmitCallbackResponse;
+    }
+
+    private void setSscs2InterlocProperties(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) && YesNo.isNoOrNull(sscsCaseData.getDwpFurtherInfo())) {
+            sscsCaseData.setInterlocReferralReason(CONFIRM_PANEL_COMPOSITION);
+        }
     }
 
     private void checkSscs2AndSscs5Confidentiality(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, SscsCaseData sscsCaseData) {
