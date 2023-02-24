@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REQUEST;
@@ -32,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
@@ -60,7 +60,6 @@ class PostHearingRequestAboutToSubmitHandlerTest {
 
     @BeforeEach
     void setUp() {
-        openMocks(this);
         handler = new PostHearingRequestAboutToSubmitHandler(true, footerService);
 
         DocumentLink documentLink = DocumentLink.builder()
@@ -170,7 +169,7 @@ class PostHearingRequestAboutToSubmitHandlerTest {
     @ParameterizedTest
     @EnumSource(value = PostHearingRequestType.class,
         names = {"SET_ASIDE"})
-    void givenPreviewDocumentIsNotAPostHearingDoc_doesNotGenerateADocument(PostHearingRequestType requestType) {
+    void givenPreviewDocumentIsNotAPostHearingDoc_andRequestFormatIsNotUpload_doesNotGenerateADocument(PostHearingRequestType requestType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         caseData.getPostHearing().setRequestType(requestType);
@@ -184,5 +183,32 @@ class PostHearingRequestAboutToSubmitHandlerTest {
         assertThat(response.getErrors()).hasSize(1)
             .containsOnly("There is no post hearing request document");
         verifyNoInteractions(footerService);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = PostHearingRequestType.class,
+        names = {"SET_ASIDE"})
+    void givenUploadedDocument_previewDocumentIsRenamedToExpectedPostHearingFormat(PostHearingRequestType postHearingRequestType) {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        caseData.getPostHearing().setRequestType(postHearingRequestType);
+        caseData.getPostHearing().getSetAside().setRequestFormat(RequestFormat.UPLOAD);
+        String dmUrl = "http://dm-store/documents/123";
+        DocumentLink uploadedDocument = DocumentLink.builder()
+            .documentFilename("A random filename.pdf")
+            .documentUrl(dmUrl)
+            .documentBinaryUrl(dmUrl + "/binary")
+            .build();
+        caseData.getDocumentStaging().setPreviewDocument(uploadedDocument);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        String expectedFileName = String.format("%s Application from FTA.pdf", postHearingRequestType.getDescriptionEn());
+        DocumentLink expectedDocument = uploadedDocument.toBuilder()
+            .documentFilename(expectedFileName)
+            .build();
+        assertThat(response.getData().getDocumentStaging().getPreviewDocument()).isEqualTo(expectedDocument);
     }
 }

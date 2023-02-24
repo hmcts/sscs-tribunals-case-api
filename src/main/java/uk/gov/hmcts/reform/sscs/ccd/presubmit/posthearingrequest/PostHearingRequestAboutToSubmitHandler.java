@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingrequest;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat.UPLOAD;
 
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -72,7 +73,7 @@ public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallback
     }
 
     private void renameDocumentIfUpload(SscsCaseData caseData, String requestTypeDescription) {
-        if (UPLOAD.equals(caseData.getPostHearing().getRequestFormat())) {
+        if (Objects.equals(UPLOAD, caseData.getPostHearing().getRequestFormat())) {
             DocumentLink previewDocument = caseData.getDocumentStaging().getPreviewDocument();
             String filename = String.format("%s Application from FTA.pdf", requestTypeDescription);
 
