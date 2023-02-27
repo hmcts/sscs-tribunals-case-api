@@ -7,4 +7,8 @@
     <packageUrl regex="true">^pkg:maven/org\.apache\.qpid/qpid\-jms\-client@.*$</packageUrl>
     <cve>CVE-2016-3094</cve>
   </suppress>
+  <suppress>
+    <notes>Temporarily suppress json related vulnerability</notes>
+    <cve>CVE-2022-45688</cve>
+  </suppress>
 </suppressions>
