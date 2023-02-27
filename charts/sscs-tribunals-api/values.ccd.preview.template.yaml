@@ -223,7 +223,7 @@ ccd:
     nodejs:
       image: hmctspublic.azurecr.io/ccd/admin-web:latest
       ingressHost: ${SERVICE_NAME}-ccd-admin-web
-      keyVaults: []
+      disableKeyVaults: true
       environment:
         IDAM_OAUTH2_AW_CLIENT_SECRET: ${ADMIN_WEB_IDAM_SECRET}
         IDAM_BASE_URL: https://idam-api.aat.platform.hmcts.net
@@ -302,7 +302,7 @@ ccd:
         IDAM_OAUTH2_CLIENT_SECRET: ${CCD_API_GATEWAY_IDAM_CLIENT_SECRET}
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
       ingressIP: ${INGRESS_IP}
-      keyVaults: []
+      disableKeyVaults: true
 
   ccd-user-profile-importer:
     image: hmctspublic.azurecr.io/ccd/user-profile-importer:db2r9a
@@ -354,8 +354,13 @@ ccd:
       - caseworker-sscs-bulkscan
       - caseworker-sscs-pcqextractor
 
-elastic:
-  enabled: true
+  elasticsearch:
+    nameOverride: ${SERVICE_NAME}-es
+    clusterName: "es"
+    replicas: 1
+  logstash:
+    image:
+    tag: ccd-cmc-logstash-latest
 
 sscs-evidence-share:
   enabled: false
