@@ -11,9 +11,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.CONFIRM_PANEL_COMPOSITION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
@@ -72,6 +78,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.WorkAllocationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
@@ -100,6 +108,12 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Mock
     private UserDetailsService userDetailsService;
 
+    @Mock
+    private CcdService ccdService;
+
+    @Mock
+    private IdamService idamService;
+
     private DwpDocumentService dwpDocumentService;
 
     private AddedDocumentsUtil addedDocumentsUtil;
@@ -112,7 +126,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         dwpDocumentService = new DwpDocumentService();
         AddNoteService addNoteService = new AddNoteService(userDetailsService);
         dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-            addNoteService, addedDocumentsUtil);
+            addNoteService, addedDocumentsUtil, ccdService, idamService);
 
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
                 .forename("Chris").surname("Davis").build().getFullName());
@@ -745,7 +759,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenAudioVideoDocuments_shouldComputeCorrectAudioVideoTotals() throws JsonProcessingException {
         dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true));
+            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true), ccdService, idamService);
 
         List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>();
 
@@ -795,7 +809,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenPreExistingAudioVideoDocuments_shouldComputeCorrectAudioVideoTotalsForAvAddedThisEvent() throws JsonProcessingException {
         dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true));
+            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true), ccdService, idamService);
 
         List<AudioVideoEvidence> newAudioVideoEvidence = new ArrayList<>();
 
@@ -847,7 +861,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenNoNewAudioVideoDocuments_shouldStillClearAddedDocuments() {
         dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true));
+            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true), ccdService, idamService);
 
         sscsCaseData.setDwpUploadAudioVideoEvidence(new ArrayList<>());
         sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder()
@@ -1131,7 +1145,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenChildSupportCaseWithDwpFurtherInfoIsNo_thenSetInterlocReferralReasonToConfirmPanelComposition() {
+    public void givenChildSupportCaseWithDwpFurtherInfoIsNo_thenSetInterlocReferralReasonToConfirmPanelCompositionAndsetInterlocReferralDateAndSendToInterloc() {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         callback.getCaseDetails().getCaseData().setDwpFurtherInfo(NO.getValue());
 
@@ -1140,10 +1154,12 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getErrors().size(), is(0));
         assertNotNull(response.getData().getInterlocReferralReason());
         assertEquals(CONFIRM_PANEL_COMPOSITION, response.getData().getInterlocReferralReason());
+        assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now()));
+        verify(ccdService, times(1)).updateCase(any(SscsCaseData.class), eq(1234L), eq(VALID_SEND_TO_INTERLOC.getCcdType()), eq("Send to interloc"), eq("Send a case to a whoToReview for review"), any());
     }
 
     @Test
-    public void givenChildSupportCaseWithDwpFurtherInfoIsYes_thenLeaveInterlocReferralReasonAsNull() {
+    public void givenChildSupportCaseWithDwpFurtherInfoIsYes_thenLeaveInterlocPropertiesAsNull() {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         callback.getCaseDetails().getCaseData().setDwpFurtherInfo(YES.getValue());
 
@@ -1151,6 +1167,8 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors().size(), is(0));
         assertNull(response.getData().getInterlocReferralReason());
+        assertNull(response.getData().getInterlocReferralDate());
+        verify(ccdService, never()).updateCase(any(), any(), any(), any(), any(), any());
     }
 
     @Test

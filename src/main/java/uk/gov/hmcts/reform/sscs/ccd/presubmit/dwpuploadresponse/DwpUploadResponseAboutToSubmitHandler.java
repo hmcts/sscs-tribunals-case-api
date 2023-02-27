@@ -44,6 +44,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
@@ -60,15 +62,19 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     private final DwpDocumentService dwpDocumentService;
     private final AddNoteService addNoteService;
     private final AddedDocumentsUtil addedDocumentsUtil;
+    private final CcdService ccdService;
+    private final IdamService idamService;
     private static final Enum<EventType> EVENT_TYPE = EventType.DWP_UPLOAD_RESPONSE;
 
 
     @Autowired
     public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService, AddNoteService addNoteService,
-                                                 AddedDocumentsUtil addedDocumentsUtil) {
+                                                 AddedDocumentsUtil addedDocumentsUtil, CcdService ccdService, IdamService idamService) {
         this.dwpDocumentService = dwpDocumentService;
         this.addNoteService = addNoteService;
         this.addedDocumentsUtil = addedDocumentsUtil;
+        this.ccdService = ccdService;
+        this.idamService = idamService;
     }
 
     @Override
@@ -109,7 +115,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         checkSscs2AndSscs5Confidentiality(preSubmitCallbackResponse, sscsCaseData);
 
-        setSscs2InterlocProperties(sscsCaseData);
+        setSscs2InterlocProperties(caseDetails);
 
         if (isValidBenefitTypeForConfidentiality(sscsCaseData)
                 && sscsCaseData.getOtherParties() != null) {
@@ -124,9 +130,13 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         return preSubmitCallbackResponse;
     }
 
-    private void setSscs2InterlocProperties(SscsCaseData sscsCaseData) {
+    private void setSscs2InterlocProperties(CaseDetails<SscsCaseData> caseDetails) {
+        SscsCaseData sscsCaseData = caseDetails.getCaseData();
         if (sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) && YesNo.isNoOrNull(sscsCaseData.getDwpFurtherInfo())) {
             sscsCaseData.setInterlocReferralReason(CONFIRM_PANEL_COMPOSITION);
+            // todo: set the whoToReview
+            ccdService.updateCase(sscsCaseData, caseDetails.getId(), EventType.VALID_SEND_TO_INTERLOC.getCcdType(), "Send to interloc", "Send a case to a whoToReview for review", idamService.getIdamTokens());
+            sscsCaseData.setInterlocReferralDate(LocalDate.now());
         }
     }
 
