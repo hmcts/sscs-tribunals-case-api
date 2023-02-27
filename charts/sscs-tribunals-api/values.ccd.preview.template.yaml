@@ -70,6 +70,15 @@ ccd-case-document-am-api:
       S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       DM_STORE_BASE_URL: http://dm-store-aat.service.core-compute-aat.internal
 
+postgresql:
+  initdbScripts:
+    init.sql: |-
+      CREATE DATABASE "camunda" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "wa-task-management-api" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "wa-case-event-handler" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "wa_workflow_api" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "cft_task_db" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+
 xui-webapp:
   enabled: true
   nodejs:
