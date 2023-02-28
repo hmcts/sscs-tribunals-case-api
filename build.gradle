@@ -129,7 +129,7 @@ task fortifyScan(type: JavaExec)  {
 }
 
 jacoco {
-    toolVersion = "0.8.2"
+    toolVersion = "0.8.8"
 }
 
 jacocoTestReport {
