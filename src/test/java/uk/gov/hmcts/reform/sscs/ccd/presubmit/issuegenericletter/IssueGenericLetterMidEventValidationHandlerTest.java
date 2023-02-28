@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuegenericletter;
 
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,8 +26,13 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartySelectionDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
@@ -72,6 +78,7 @@ class IssueGenericLetterMidEventValidationHandlerTest {
         caseData.getJointParty().setAddress(caseData.getAppeal().getAppellant().getAddress());
         caseData.setSendToAllParties(YesNo.YES);
         caseData.setOtherParties(buildOtherParties());
+        caseData.setJointParty(buildJointParty(true));
 
         var result = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -79,35 +86,152 @@ class IssueGenericLetterMidEventValidationHandlerTest {
         assertTrue(isEmpty(result.getErrors()));
     }
 
+    @Test
+    void giveAddressIsEmptyForMultipleParties_returnErrors() {
+        caseData.getAppeal().getAppellant().setAppointee(null);
+        caseData.getAppeal().getAppellant().setAddress(null);
+        caseData.getAppeal().getRep().setAddress(null);
+        caseData.setOtherParties(List.of(buildOtherParty(false)));
+        caseData.setSendToAllParties(YesNo.YES);
+        caseData.setJointParty(buildJointParty(false));
+
+        var result = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(result);
+        assertFalse(isEmpty(result.getErrors()));
+        assertEquals(4, result.getErrors().size());
+    }
+
+    @Test
+    void giveAppellantAppointeeAddressIsEmpty_returnError() {
+        caseData.getAppeal().getAppellant().getAppointee().setAddress(null);
+        caseData.setSendToAllParties(YesNo.YES);
+
+        var result = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(result);
+        assertFalse(isEmpty(result.getErrors()));
+        assertEquals(1, result.getErrors().size());
+    }
+
+    @Test
+    void givenOtherPartyAppointeeHasEmptyAddress_returnError() {
+        var otherParty = buildOtherParty(false);
+        var appointee = caseData.getAppeal().getAppellant().getAppointee();
+        appointee.setAddress(null);
+        otherParty.getValue().setAppointee(appointee);
+        otherParty.getValue().setIsAppointee(YesNo.YES.getValue());
+
+        var item = new DynamicListItem(appointee.getId(), null);
+        var list = new ArrayList<DynamicListItem>();
+
+        List<CcdValue<OtherPartySelectionDetails>> otherPartySelection = List.of(
+                new CcdValue<>(new OtherPartySelectionDetails(new DynamicList(item, list)))
+        );
+
+        caseData.setSendToAllParties(YesNo.NO);
+        caseData.setSendToApellant(YesNo.NO);
+        caseData.setSendToOtherParties(YesNo.YES);
+        caseData.setOtherParties(List.of(otherParty));
+        caseData.setOtherPartySelection(otherPartySelection);
+
+        var result = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(result);
+        assertFalse(isEmpty(result.getErrors()));
+        assertEquals(1, result.getErrors().size());
+    }
+
+    @Test
+    void givenOtherPartyHasEmptyAddress_returnError() {
+        var otherParty = buildOtherParty(false);
+
+        var item = new DynamicListItem(otherParty.getValue().getId(), null);
+        var list = new ArrayList<DynamicListItem>();
+
+        List<CcdValue<OtherPartySelectionDetails>> otherPartySelection = List.of(
+                new CcdValue<>(new OtherPartySelectionDetails(new DynamicList(item, list)))
+        );
+        caseData.setOtherPartySelection(otherPartySelection);
+        caseData.setSendToOtherParties(YesNo.YES);
+        caseData.setOtherParties(List.of(otherParty));
+
+        var result = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(result);
+        assertFalse(isEmpty(result.getErrors()));
+        assertEquals(1, result.getErrors().size());
+    }
+
+    @Test
+    void givenNoReceiverSelected_returnError() {
+        caseData.setSendToAllParties(YesNo.NO);
+        caseData.setSendToApellant(YesNo.NO);
+        caseData.setSendToOtherParties(YesNo.NO);
+
+        var result = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(result);
+        assertFalse(isEmpty(result.getErrors()));
+        assertEquals(1, result.getErrors().size());
+    }
+
     private List<CcdValue<OtherParty>> buildOtherParties() {
         var list = new ArrayList<CcdValue<OtherParty>>();
 
-        list.add(buildOtherParty());
-        list.add(buildOtherParty());
+        list.add(buildOtherParty(true));
+        list.add(buildOtherParty(true));
 
         return list;
     }
 
-    private CcdValue<OtherParty> buildOtherParty() {
-        Address address = Address.builder()
-                .postcode("AP12 4PA")
-                .line1("42 Appointed Mews")
-                .line2("Apford")
-                .town("Apton")
-                .county("Appshire")
-                .build();
+    private CcdValue<OtherParty> buildOtherParty(boolean addAddress) {
+        Address address = addAddress ? buildAddress() : null;
 
         Name name = Name.builder()
                 .lastName("LastName")
                 .firstName("FirstName")
                 .build();
 
+        Representative rep = Representative.builder()
+                .name(name)
+                .address(address)
+                .hasRepresentative(YesNo.YES.getValue())
+                .build();
+
         OtherParty party =  OtherParty.builder()
                 .id(UUID.randomUUID().toString())
                 .address(address)
                 .name(name)
+                .rep(rep)
                 .build();
 
         return new CcdValue<>(party);
+    }
+
+    private JointParty buildJointParty(boolean addAddress) {
+        Address address = addAddress ? buildAddress() : null;
+
+        Name name = Name.builder()
+                .lastName("LastName")
+                .firstName("FirstName")
+                .build();
+
+        return JointParty.builder()
+                .hasJointParty(YesNo.YES)
+                .address(address)
+                .name(name)
+                .build();
+
+    }
+
+    private static Address buildAddress() {
+        return Address.builder()
+                .postcode("AP12 4PA")
+                .line1("42 Appointed Mews")
+                .line2("Apford")
+                .town("Apton")
+                .county("Appshire")
+                .build();
     }
 }

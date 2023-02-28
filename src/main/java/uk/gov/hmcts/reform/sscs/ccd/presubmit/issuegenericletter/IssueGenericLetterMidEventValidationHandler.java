@@ -60,11 +60,13 @@ public class IssueGenericLetterMidEventValidationHandler implements PreSubmitCal
         var appellantAppointee = appellant.getAppointee();
         
         var sendToAllParties = YesNo.isYes(caseData.getSendToAllParties());
-        
-        if (appellantAppointee != null && isAddressEmpty(appellantAppointee.getAddress())) {
-            errors.add("Address is empty for an appellant appointee");
-        } else if (isAddressEmpty(appellant.getAddress())) {
-            errors.add("Address is empty for an appellant");
+
+        if (sendToAllParties || YesNo.isYes(caseData.getSendToApellant())) {
+            if (appellantAppointee != null && isAddressEmpty(appellantAppointee.getAddress())) {
+                errors.add("Address is empty for an appellant appointee");
+            } else if (isAddressEmpty(appellant.getAddress())) {
+                errors.add("Address is empty for an appellant");
+            }
         }
         
         if ((sendToAllParties && caseData.isThereAJointParty()) || YesNo.isYes(caseData.getSendToJointParty())) {
@@ -75,7 +77,7 @@ public class IssueGenericLetterMidEventValidationHandler implements PreSubmitCal
             }
         }
         
-        if ((sendToAllParties && caseData.isThereAJointParty()) || YesNo.isYes(caseData.getSendToRepresentative())) {
+        if ((sendToAllParties && caseData.isThereARepresentative()) || YesNo.isYes(caseData.getSendToRepresentative())) {
             var representative = caseData.getAppeal().getRep();
             
             if (isAddressEmpty(representative.getAddress())) {
@@ -115,13 +117,13 @@ public class IssueGenericLetterMidEventValidationHandler implements PreSubmitCal
                 var party = otherParty.getValue();
 
                 if (party.hasAppointee() && isAddressEmpty(party.getAppointee().getAddress())) {
-                    errors.add(String.format(ADDRESS_IS_EMPTY, party.getAppointee().getName().getFullName()));
+                    errors.add(String.format(ADDRESS_IS_EMPTY, party.getAppointee().getName().getFullNameNoTitle()));
                 } else if (isAddressEmpty(party.getAddress())) {
-                    errors.add(String.format(ADDRESS_IS_EMPTY, party.getName().getFullName()));
+                    errors.add(String.format(ADDRESS_IS_EMPTY, party.getName().getFullNameNoTitle()));
                 }
 
                 if (party.hasRepresentative() && isAddressEmpty(party.getRep().getAddress())) {
-                    errors.add(String.format(ADDRESS_IS_EMPTY, party.getRep().getName().getFullName()));
+                    errors.add(String.format(ADDRESS_IS_EMPTY, party.getRep().getName().getFullNameNoTitle()));
                 }
             }
         }
@@ -137,7 +139,7 @@ public class IssueGenericLetterMidEventValidationHandler implements PreSubmitCal
             var party = getOtherPartyByEntityId(entityId, otherParties);
 
             if (party != null && isAddressEmpty(party.getAddress())) {
-                errors.add(String.format(ADDRESS_IS_EMPTY, party.getName().getFullName()));
+                errors.add(String.format(ADDRESS_IS_EMPTY, party.getName().getFullNameNoTitle()));
             }
         }
 
@@ -179,11 +181,8 @@ public class IssueGenericLetterMidEventValidationHandler implements PreSubmitCal
         if (YesNo.isYes(sscsCaseData.getSendToRepresentative())) {
             return false;
         }
-        if (YesNo.isYes(sscsCaseData.getSendToOtherParties()) && isEmpty(sscsCaseData.getOtherPartySelection())) {
-            return false;
-        }
 
-        return true;
+        return !YesNo.isYes(sscsCaseData.getSendToOtherParties()) || isEmpty(sscsCaseData.getOtherPartySelection());
     }
 
     private boolean isAddressEmpty(Address address) {
