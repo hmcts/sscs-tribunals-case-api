@@ -29,6 +29,10 @@ java:
     CASE_ACCESS_MANAGEMENT_FEATURE: true
     WORK_ALLOCATION_FEATURE: true
     SCHEDULE_LISTING_FEATURE: true
+    ENABLE_JMS: true
+    JMS_AMQP_CONNECTION_TEMPLATE: amqp://%1s?amqp.idleTimeout=%2d
+    JMS_HEARINGS_EVENT_QUEUE_NAME: tribunals-to-hearings-queue
+    JMS_NAMESPACE: ${SERVICE_NAME}
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
@@ -118,6 +122,22 @@ xui-webapp:
           - system-user-name
           - system-user-password
 
+postgresql:
+  enabled: true
+  initdbScripts:
+    init.sql: |-
+      CREATE DATABASE "data-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "draftstore" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "evidence" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "annotation" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "hmc-cft-hearing-service" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+  auth:
+    postgresUsername: hmcts
+    postgresPassword: hmcts
+
 ccd:
   enabled: true
   ccd:
@@ -129,24 +149,10 @@ ccd:
       enabled: true
     apiGatewayWeb:
       enabled: true
-    postgresql:
-      enabled: true
     s2s:
       enabled: false
     elastic:
       enabled: true
-
-  postgresql:
-    initdbScripts:
-      init.sql: |-
-        CREATE DATABASE "data-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-        CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-        CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-        CREATE DATABASE "draftstore" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-        CREATE DATABASE "evidence" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-        CREATE DATABASE "annotation" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-        CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-        CREATE DATABASE "hmc-cft-hearing-service" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
 
   global:
     ccdApiGatewayIngress: ${SERVICE_NAME}-ccd-api-gw
@@ -447,14 +453,14 @@ sscs-hearings-api:
       HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
       #Messaging
       AMQP_CONNECTION_STRING: "amqp://%1s?amqp:idleTimeout=%2d"
-      HMC_HEARINGS_TOPIC_CONNECTION_POSTFIX: ""
-      HMC_HEARING_LISTENING_ENABLED: true
+      HMC_HEARINGS_TOPIC_CONNECTION_POSTFIX: ".preview.platform.hmcts.net"
+      HMC_HEARINGS_LISTENING_ENABLED: true
       HMC_HEARINGS_TOPIC_NAMESPACE: ${SERVICE_NAME}
-      HEARINGS_TOPIC_NAME: "stub-hmc-to-cft"
-      HEARINGS_TOPIC_SUBSCRIPTION_NAME: "tribunals-to-hearing-api"
-      TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
+      HMC_HEARINGS_TOPIC_NAME: "stub-hmc-to-cft"
+      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "stub-to-sscs-subscription"
+      TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
       TRIBUNALS_EVENT_QUEUE_NAMESPACE: ${SERVICE_NAME}
-      TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-queue"
+      TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
 
 hmc-cft-hearing-service:
   enabled: false
@@ -504,9 +510,9 @@ servicebus:
   #Each topic/queue matches up to one used in the config above
   setup:
     topics:
-      - name: hmc-to-cft
+      - name: stub-hmc-to-cft
     subscriptions:
-      - name: hmc-to-sscs-subscription
+      - name: stub-to-sscs-subscription
     queues:
       - name: hmc-from-hmi
       - name: hmc-to-hmi

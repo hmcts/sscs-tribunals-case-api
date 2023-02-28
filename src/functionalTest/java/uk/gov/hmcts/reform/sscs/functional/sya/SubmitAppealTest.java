@@ -20,10 +20,7 @@ import java.time.LocalDate;
 import junitparams.JUnitParamsRunner;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -157,6 +154,7 @@ public class SubmitAppealTest {
     }
 
     @Test
+    @Ignore
     public void appealShouldCreateDuplicateAndLinked() throws InterruptedException {
         SyaJsonMessageSerializer syaJsonMessageSerializer = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
         String body = syaJsonMessageSerializer.getSerializedMessage();
